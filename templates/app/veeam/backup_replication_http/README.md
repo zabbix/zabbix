@@ -41,6 +41,7 @@ This template has been tested on:
 
 1. Create a user to monitor the service or use an existing read-only account.
 > See [Veeam Help Center](https://helpcenter.veeam.com/references/vbr/13/rest/1.3-rev1/tag/SectionOverview#section/Authorization-and-Security) for more details.
+***NOTE:*** License, Authorization Events, and Security Analyzer Data require the "Backup Administrator" role; without it, these items are not supported.
 2. Link the template to a host.
 3. Configure the following macros: `{$VEEAM.API.URL}`, `{$VEEAM.API.VERSION}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
 
@@ -100,12 +101,12 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get metrics|<p>The result of API requests is returned as JSON.</p>|Script|veeam.get.metrics|
-|Get Security Analyzer results|<p>Authenticates with the Veeam API and retrieves security analyzer best practices data.</p>|HTTP agent|veeam.security.analyzer.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get security analyzer results|<p>Authenticates with the Veeam API and retrieves security analyzer best practices data.</p>|HTTP agent|veeam.security.analyzer.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|License: Status|<p>The status of the license.</p>|Dependent item|veeam.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.expirationDate`</p></li><li><p>JavaScript: `return Math.floor(Date.parse(value) / 1000);`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|License: Licensed instances|<p>The number of licensed instances.</p>|Dependent item|veeam.license.licensed.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.licensedInstancesNumber`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|License: Used instances|<p>The number of used instances.</p>|Dependent item|veeam.license.used.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.usedInstancesNumber`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Status|<p>The status of the license.</p>|Dependent item|veeam.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.status`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.expirationDate`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `return Math.floor(Date.parse(value) / 1000);`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Licensed instances|<p>The number of licensed instances.</p>|Dependent item|veeam.license.licensed.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.licensedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Used instances|<p>The number of used instances.</p>|Dependent item|veeam.license.used.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.usedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
@@ -233,7 +234,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Authorization events discovery|<p>Discovery of authorization events.</p>|Dependent item|veeam.authorization.events.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.authorization_events.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Authorization events discovery|<p>Discovery of authorization events.</p>|Dependent item|veeam.authorization.events.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.authorization_events.data`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Authorization events discovery
 
