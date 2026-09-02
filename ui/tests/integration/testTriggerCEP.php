@@ -34,9 +34,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// runs quickly in CI, and small values are also handy while debugging to reach a failure fast; when
 	// running locally to actually stress CEP, raise them to the recommended values noted below (or higher).
 	// Increasing them makes the tests slower but far more thorough.
-	const LLD_DISCOVERY_COUNT = 2;	// discovered items/triggers per rule; use at least 4000 to stress CEP
-	const LOG_EVENT_COUNT = 2;		// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 2;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const LLD_DISCOVERY_COUNT = 10;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LOG_EVENT_COUNT = 100;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 100;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
 	// How many ids the close window scenarios drive (see runEventAssessmentTestCepWindowCloseWindow()). Every
@@ -111,7 +111,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_OPERATION_TAG_VALUE_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = false;
+	const SKIP_SERVICES_TESTS = null;
 
 	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
 	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
