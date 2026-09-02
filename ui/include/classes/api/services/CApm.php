@@ -219,25 +219,7 @@ class CApm extends CApiService {
 				return (string) $row['rowscount'];
 			}
 
-			$row_fixed = [];
-
-			foreach ($row as $field => $value) {
-				if (is_array(self::CLICKHOUSE_TRACES_FIELDS[$field])) {
-					if (!array_key_exists(self::CLICKHOUSE_TRACES_FIELDS[$field][0], $row_fixed)) {
-						$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field][0]] = [];
-					}
-
-					foreach ($value as $index => $sub_value) {
-						$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field][0]][$index]
-							[self::CLICKHOUSE_TRACES_FIELDS[$field][1]] = $sub_value;
-					}
-				}
-				else {
-					$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field]] = $value;
-				}
-			}
-
-			$db_traces[] = $row_fixed;
+			$db_traces[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_TRACES_FIELDS);
 		}
 
 		return $db_traces;
@@ -391,25 +373,7 @@ class CApm extends CApiService {
 				return (string) $row['rowscount'];
 			}
 
-			$row_fixed = [];
-
-			foreach ($row as $field => $value) {
-				if (is_array(self::CLICKHOUSE_SPANS_FIELDS[$field])) {
-					if (!array_key_exists(self::CLICKHOUSE_SPANS_FIELDS[$field][0], $row_fixed)) {
-						$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field][0]] = [];
-					}
-
-					foreach ($value as $index => $sub_value) {
-						$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field][0]][$index]
-							[self::CLICKHOUSE_SPANS_FIELDS[$field][1]] = $sub_value;
-					}
-				}
-				else {
-					$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field]] = $value;
-				}
-			}
-
-			$db_spans[] = $row_fixed;
+			$db_spans[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_SPANS_FIELDS);
 		}
 
 		return $db_spans;
@@ -565,25 +529,7 @@ class CApm extends CApiService {
 				return (string) $row['rowscount'];
 			}
 
-			$row_fixed = [];
-
-			foreach ($row as $field => $value) {
-				if (is_array(self::CLICKHOUSE_LOGS_FIELDS[$field])) {
-					if (!array_key_exists(self::CLICKHOUSE_LOGS_FIELDS[$field][0], $row_fixed)) {
-						$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field][0]] = [];
-					}
-
-					foreach ($value as $index => $sub_value) {
-						$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field][0]][$index]
-							[self::CLICKHOUSE_LOGS_FIELDS[$field][1]] = $sub_value;
-					}
-				}
-				else {
-					$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field]] = $value;
-				}
-			}
-
-			$db_logs[] = $row_fixed;
+			$db_logs[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_LOGS_FIELDS);
 		}
 
 		return $db_logs;
@@ -879,25 +825,7 @@ class CApm extends CApiService {
 				return (string) $row['rowscount'];
 			}
 
-			$row_fixed = [];
-
-			foreach ($row as $field => $value) {
-				if (is_array(self::CLICKHOUSE_METRICS_FIELDS[$field])) {
-					if (!array_key_exists(self::CLICKHOUSE_METRICS_FIELDS[$field][0], $row_fixed)) {
-						$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field][0]] = [];
-					}
-
-					foreach ($value as $index => $sub_value) {
-						$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field][0]][$index]
-							[self::CLICKHOUSE_METRICS_FIELDS[$field][1]] = $sub_value;
-					}
-				}
-				else {
-					$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field]] = $value;
-				}
-			}
-
-			$db_metrics[] = $row_fixed;
+			$db_metrics[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_METRICS_FIELDS);
 		}
 
 		return $db_metrics;
@@ -944,5 +872,26 @@ class CApm extends CApiService {
 		$options['sortfield'] = array_map(static fn (string $value) => $output_fields[$value], $options['sortfield']);
 
 		return $options;
+	}
+
+	private static function fixRowForClickHouse(array $db_row, array $fields_spec): array {
+		$row = [];
+
+		foreach ($db_row as $field => $value) {
+			if (is_array($fields_spec[$field])) {
+				if (!array_key_exists($fields_spec[$field][0], $row)) {
+					$row[$fields_spec[$field][0]] = [];
+				}
+
+				foreach ($value as $index => $sub_value) {
+					$row[$fields_spec[$field][0]][$index][$fields_spec[$field][1]] = $sub_value;
+				}
+			}
+			else {
+				$row[$fields_spec[$field]] = $value;
+			}
+		}
+
+		return $row;
 	}
 }
