@@ -765,7 +765,7 @@ class CCepRule extends CApiService {
 	private static function checkOperationOrder(array $cep_rule, string $cep_rule_path): void {
 		$order = array_flip(CCepRuleHelper::EXECUTE_WHEN_ORDER);
 
-		CArrayHelper::sort($cep_rule['operations'], ['field' => 'sortorder', 'order' => ZBX_SORT_UP]);
+		CArrayHelper::sort($cep_rule['operations'], [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
 		$prev_i = null;
 
 		foreach ($cep_rule['operations'] as $i => $operation) {
