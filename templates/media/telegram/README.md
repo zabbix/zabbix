@@ -23,6 +23,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Telegram"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Telegram", e.g. {$HTTP.TLS.VERIFY:"Telegram"}.|
 |api_parse_mode|\<PLACE PARSE MODE\>|Formatting mode applied for messages. Possible values: markdown, html, markdownv2.|
 |api_token|\<PLACE YOUR TOKEN\>|Bot token that is used to access the Telegram HTTP API.|
 
