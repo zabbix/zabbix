@@ -59,6 +59,7 @@ This template has been tested on:
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable storage volumes by name.</p>|`.*`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable storage volumes by name.</p>|`CHANGE_IF_NEEDED`|
 |{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v1", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.</p>|`full`|
 
 ### Items
 
@@ -394,6 +395,7 @@ This template has been tested on:
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable storage volumes by name.</p>|`.*`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable storage volumes by name.</p>|`CHANGE_IF_NEEDED`|
 |{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v2", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.</p>|`full`|
 
 ### Items
 

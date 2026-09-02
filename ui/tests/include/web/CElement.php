@@ -733,7 +733,7 @@ class CElement extends CBaseElement implements IWaitable {
 				return $this->asCheckboxList($options);
 			}
 
-			if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
+			if (in_array('range-control', $class) || in_array('date-selector', $class)) {
 				return $this->asCompositeInput($options);
 			}
 
