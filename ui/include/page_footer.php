@@ -56,17 +56,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		}
 	}
 
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		makePageFooter()->show();
-	}
-
 	insertPagePostJs(true);
 
 	if (CWebUser::isLoggedIn()) {
 		require_once 'include/views/js/common.init.js.php';
 	}
 
-	echo '</div></body></html>';
+	echo '</body></html>';
 }
 
 session_write_close();
