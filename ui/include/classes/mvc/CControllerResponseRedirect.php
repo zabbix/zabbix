@@ -39,6 +39,8 @@ class CControllerResponseRedirect extends CControllerResponse {
 	}
 
 	public function redirect(): void {
+		CMessageHelper::restoreScheduleMessages();
+
 		$form_data = $this->getFormData();
 		$messages = $this->getMessages();
 
@@ -47,8 +49,6 @@ class CControllerResponseRedirect extends CControllerResponse {
 		}
 
 		$data = ['form' => $form_data, 'messages' => $messages];
-
-		CMessageHelper::restoreScheduleMessages();
 
 		(new CHtmlPageHeader(_('Loading...'), CWebUser::getLang()))->show();
 
