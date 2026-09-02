@@ -324,4 +324,7 @@ int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_ty
 int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
 		int limit, int *count, char **error);
 void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
+
+int	zbx_eval_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
+
 #endif

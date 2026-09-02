@@ -66,9 +66,6 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values (except binary and JSON) */
-#define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
-
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -2242,7 +2239,7 @@ static void	dc_local_add_history_text_bin_json_helper(unsigned char value_type, 
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_TEXT:
-				maxlen = ZBX_HISTORY_VALUE_LEN;
+				maxlen = ZBX_HISTORY_VALUE_LEN_MAX;
 				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
@@ -2286,7 +2283,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 		item_value->logeventid = log->logeventid;
 		item_value->timestamp = log->timestamp;
 
-		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN) + 1;
+		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN_MAX) + 1;
 
 		if (NULL != log->source && '\0' != *log->source)
 			item_value->source.len = zbx_db_strlen_n(log->source, ZBX_HISTORY_LOG_SOURCE_LEN) + 1;
@@ -2507,20 +2504,27 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
 		zbx_uint64_t lastlogsize)
 {
-	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.str))
+	size_t	json_len = strlen(value->data.str);
+
+	if (ZBX_HISTORY_JSON_VALUE_LEN < json_len)
 	{
 		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
 		return;
 	}
 
-	char	*err = NULL;
-
-	if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+	/* Large JSON entries are validated now to avoid polluting history cache */
+	/* with large invalid JSON that will be discarded anyway.                */
+	if (ZBX_HISTORY_VALUE_LEN_MAX < json_len)
 	{
-		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
-		zbx_free(err);
+		char	*err = NULL;
 
-		return;
+		if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+		{
+			dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
+			zbx_free(err);
+
+			return;
+		}
 	}
 
 	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.str,
