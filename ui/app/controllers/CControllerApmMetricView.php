@@ -165,8 +165,8 @@ class CControllerApmMetricView extends CController {
 			return true;
 		}
 
-		return !array_diff($this->getInput('filter_types'), [APM_METRIC_TYPE_COUNTER, APM_METRIC_TYPE_GAUGE,
-			APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_SUMMARY]);
+		return !array_diff($this->getInput('filter_types'), [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
+			APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]);
 	}
 
 	/**

@@ -18,15 +18,17 @@ class CApmMetricHelper {
 
 	public static function getName(int $type): string {
 		return match ($type) {
-			APM_METRIC_TYPE_COUNTER => _('Counter'),
 			APM_METRIC_TYPE_GAUGE => _('Gauge'),
+			APM_METRIC_TYPE_SUM => _('Summary'),
 			APM_METRIC_TYPE_HISTOGRAM => _('Histogram'),
-			APM_METRIC_TYPE_SUMMARY => _('Summary'),
+			APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM => _('Exponential histogram'),
 			default => _('Unknown')
 		};
 	}
 
-	public static function getTypes(int $min = APM_METRIC_TYPE_COUNTER, int $max = APM_METRIC_TYPE_SUMMARY): array {
+	public static function getTypes(int $min = APM_METRIC_TYPE_GAUGE,
+			int $max = APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM): array {
+
 		$types = [];
 
 		foreach (range($min, $max) as $type) {
