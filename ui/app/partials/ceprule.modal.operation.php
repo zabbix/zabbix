@@ -159,7 +159,19 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 				)
 			)
 		)
-		->addItem(new CLabel(_('Operation'), 'ceprule-operation-type-label'))
+		->addItem(
+			(new CLabel(_('Operation'), 'ceprule-operation-type-label'))
+				->addItem(
+					makeHelpIcon([
+						_('Problem event generation mode impacts cloning:'),
+						(new CList([
+							_('Multiple: Clones any problem.'),
+							_('Single: Clones closed problems only.')
+						]))->addClass(ZBX_STYLE_LIST_DASHED)
+					])
+						->setId('ceprule-operation-type-hint')
+				)
+		)
 		->addItem(new CFormField([
 			new CHorList([
 				(new CListItem([

@@ -321,6 +321,7 @@ window.ceprule_operation_edit_popup = new class {
 		const row_rename = document.getElementById('ceprule-operation-tag-rename-argument');
 		const row_tag_pair = document.getElementById('ceprule-operation-tag-pair-argument');
 		const row_severity = document.getElementById('ceprule-operation-severity-argument');
+		const operation_hint = document.getElementById('ceprule-operation-type-hint');
 
 		Object.entries(fields).forEach(([field_name, field]) => {
 			field.disabled = true;
@@ -333,15 +334,19 @@ window.ceprule_operation_edit_popup = new class {
 		row_rename.style.display = 'none';
 		row_tag_pair.style.display = 'none';
 		row_severity.style.display = 'none';
+		operation_hint.style.display = 'none';
 
 		switch (value) {
-			case <?= CCepRuleHelper::OP_CLONE_FIRST ?>:
-			case <?= CCepRuleHelper::OP_CLONE_LAST ?>:
 			case <?= CCepRuleHelper::OP_UNSUPPRESS ?>:
 			case <?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>:
 			case <?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>:
 			case <?= CCepRuleHelper::OP_DISCARD ?>:
 			case <?= CCepRuleHelper::OP_CLOSE_EVENT ?>:
+				break;
+
+			case <?= CCepRuleHelper::OP_CLONE_FIRST ?>:
+			case <?= CCepRuleHelper::OP_CLONE_LAST ?>:
+				operation_hint.style.display = '';
 				break;
 
 			case <?= CCepRuleHelper::OP_SUPPRESS ?>:
