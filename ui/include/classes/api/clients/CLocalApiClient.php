@@ -272,7 +272,7 @@ class CLocalApiClient extends CApiClient {
 					break;
 
 				default:
-					if (strpos($db_rule['name'], 'api.method.') === 0 && $auth_type != CJsonRpc::AUTH_TYPE_DPOP) {
+					if (str_starts_with($db_rule['name'], 'api.method.')) {
 						$api_methods[] = $rule_value;
 					}
 					elseif ($exists_action_rule && $db_rule['name'] === $method_rules['action']) {
@@ -287,6 +287,10 @@ class CLocalApiClient extends CApiClient {
 			if (!$is_action_allowed) {
 				return false;
 			}
+		}
+
+		if ($auth_type == CJsonRpc::AUTH_TYPE_DPOP) {
+			return true;
 		}
 
 		$api_method_masks = [
