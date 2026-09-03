@@ -518,7 +518,7 @@ static int	eval_has_usermacro(const char *str, size_t len)
  *                                                                            *
  * Parameters: itemquery    - [IN]                                            *
  *             len          - [IN] item query length                          *
- *             out          - [OUT] item query with expanded macros           *
+ *             out          - [IN/OUT] item query with expanded macros        *
  *             error        - [OUT] Error message, optional. If specified,    *
  *                                  the function will return failure at the   *
  *                                  first failed macro expansion.             *
@@ -614,7 +614,7 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 	zbx_eval_compose_expression(&ctx, &filter);
 	zbx_eval_clear(&ctx);
 
-	*out = zbx_dsprintf(NULL, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
+	*out = zbx_dsprintf(*out, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
 	ret = SUCCEED;
 out:
 	va_end(args);

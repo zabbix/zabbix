@@ -20,7 +20,7 @@
 #include "zbxnum.h"
 #include "zbxvariant.h"
 
-#include "zbx_variant_common.h"
+#include "zbxmockvariant.h"
 
 static unsigned int	hex2num(char c)
 {

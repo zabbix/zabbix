@@ -21,6 +21,9 @@
 #include "zbxshmem.h"
 #include "zbxipcservice.h"
 
+/* the maximum number of characters for history cache values (except binary and JSON) */
+#define ZBX_HISTORY_VALUE_LEN_MAX	(64 * ZBX_KIBIBYTE)
+
 #define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
 #define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
 

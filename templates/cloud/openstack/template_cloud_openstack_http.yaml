@@ -131,7 +131,7 @@ zabbix_export:
         Access rights are set using policies. Each service has its own policy file, therefore **further steps for setting up policies, are mentioned in the template documentation of each supported service**, e.g., __OpenStack Nova by HTTP__.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -143,6 +143,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             const request_path = '/v3/auth/tokens';
             
@@ -176,7 +201,7 @@ zabbix_export:
             }
             
             function getHttpData(url, params, app_cred_id, app_cred_secret) {
-            	const request = new HttpRequest();
+            	const request = new HttpRequest(tls.options);
             
             	request.addHeader('Content-Type: application/json');
             
@@ -253,6 +278,9 @@ zabbix_export:
             	auth_cred_id = params.app_cred_id,
             	auth_cred_secret = params.app_cred_secret;
             
+            const tls = new CTlsConfig(params.tls_verify);
+            tls.checkURL(url);
+            
             const httpData = getHttpData(url + request_path, params, auth_cred_id, auth_cred_secret);
             return parseHttpData(httpData);
           description: 'Authorizes user on the OpenStack Identity service and gets the service catalog.'
@@ -266,6 +294,8 @@ zabbix_export:
               value: '{$OPENSTACK.APP.CRED.SECRET}'
             - name: http_proxy
               value: '{$OPENSTACK.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"OpenStack"}'
           tags:
             - tag: component
               value: raw
@@ -322,11 +352,27 @@ zabbix_export:
         - tag: target
           value: openstack
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "OpenStack Nova", e.g. {$HTTP.TLS.VERIFY:"OpenStack"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OPENSTACK.APP.CRED.ID}'
           description: 'Application credential ID for monitoring user access.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'App credential ID'
             description: 'Application credential ID for monitoring user access.'
             required: 'YES'
@@ -335,7 +381,7 @@ zabbix_export:
           description: 'Application credential password for monitoring user access.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'App credential password'
             description: 'Application credential password for monitoring user access.'
             required: 'YES'
@@ -422,7 +468,7 @@ zabbix_export:
         Note that a restart of OpenStack Nova services might be needed for these new changes to be applied.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -684,6 +730,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             const request_path = '/os-simple-tenant-usage';
             
@@ -742,7 +813,7 @@ zabbix_export:
             }
             
             function getHttpData(url, params, api_token) {
-            	const request = new HttpRequest();
+            	const request = new HttpRequest(tls.options);
             
             	request.addHeader('Content-Type: application/json');
             	request.addHeader('X-Auth-Token: ' + api_token);
@@ -770,6 +841,9 @@ zabbix_export:
             	token = params.api_token,
             	period = params.period;
             
+            const tls = new CTlsConfig(params.tls_verify);
+            tls.checkURL(url);
+            
             return getHttpData(buildUrl(url, period), params, token);
           description: 'Gets a list of tenants and its data.'
           preprocessing:
@@ -788,6 +862,8 @@ zabbix_export:
               value: '{$OPENSTACK.HTTP.PROXY}'
             - name: period
               value: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"OpenStack Nova"}'
           tags:
             - tag: component
               value: raw
@@ -1512,12 +1588,28 @@ zabbix_export:
         - tag: target
           value: openstack
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "OpenStack Nova", e.g. {$HTTP.TLS.VERIFY:"OpenStack Nova"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Sets the zone name regex filter to use in availability zone discovery for including.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Availability zone name filter (include)'
             description: 'Sets the zone name regex filter to use in availability zone discovery for including.'
@@ -1526,7 +1618,7 @@ zabbix_export:
           description: 'Sets the zone name regex filter to use in availability zone discovery for excluding.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Availability zone name filter (exclude)'
             description: 'Sets the zone name regex filter to use in availability zone discovery for excluding.'
@@ -1543,7 +1635,7 @@ zabbix_export:
           description: 'Sets the hostname regex filter to use in hypervisor discovery for including.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Hypervisor hostname filter (include)'
             description: 'Sets the hostname regex filter to use in hypervisor discovery for including.'
@@ -1552,7 +1644,7 @@ zabbix_export:
           description: 'Sets the hostname regex filter to use in hypervisor discovery for excluding.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Hypervisor hostname filter (exclude)'
             description: 'Sets the hostname regex filter to use in hypervisor discovery for excluding.'
@@ -1561,7 +1653,7 @@ zabbix_export:
           description: 'Sets the host IP address regex filter to use in hypervisor discovery for including.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Hypervisor host IP filter (include)'
             description: 'Sets the host IP address regex filter to use in hypervisor discovery for including.'
@@ -1570,7 +1662,7 @@ zabbix_export:
           description: 'Sets the host IP address regex filter to use in hypervisor discovery for excluding.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Hypervisor host IP filter (exclude)'
             description: 'Sets the host IP address regex filter to use in hypervisor discovery for excluding.'
@@ -1579,7 +1671,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in hypervisor discovery for including.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Hypervisor type filter (include)'
             description: 'Sets the type regex filter to use in hypervisor discovery for including.'
@@ -1588,7 +1680,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in hypervisor discovery for excluding.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Hypervisor type filter (exclude)'
             description: 'Sets the type regex filter to use in hypervisor discovery for excluding.'
@@ -1597,7 +1689,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a high severity event about vCPU resource usage.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'vCPU usage high threshold (%)'
             description: 'Sets the percentage threshold for creating a high severity event about vCPU resource usage. In the range from 0 to 100 inclusive.'
@@ -1607,7 +1699,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a warning severity event about vCPU resource usage.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'vCPU usage warning threshold (%)'
             description: 'Sets the percentage threshold for creating a warning severity event about vCPU resource usage. In the range from 0 to 100 inclusive.'
@@ -1617,7 +1709,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a high severity event about instances resource count.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Instances count high threshold (%)'
             description: 'Sets the percentage threshold for creating a high severity event about instances resource count. In the range from 0 to 100 inclusive.'
@@ -1627,7 +1719,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a warning severity event about instances resource count.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Instances count warning threshold (%)'
             description: 'Sets the percentage threshold for creating a warning severity event about instances resource count. In the range from 0 to 100 inclusive.'
@@ -1637,7 +1729,7 @@ zabbix_export:
           description: 'Interval for availability zone HTTP agent item query.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Availability zone query interval'
             description: 'Interval for availability zone HTTP agent item query.'
@@ -1646,7 +1738,7 @@ zabbix_export:
           description: 'Interval for hypervisor HTTP agent item query.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Other
             label: 'Hypervisor query interval'
             description: 'Interval for hypervisor HTTP agent item query.'
@@ -1655,7 +1747,7 @@ zabbix_export:
           description: 'Interval for absolute limit HTTP agent item query.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'Absolute limit query interval'
             description: 'Interval for absolute limit HTTP agent item query.'
@@ -1664,7 +1756,7 @@ zabbix_export:
           description: 'Interval for server HTTP agent item queries.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'Server query interval'
             description: 'Interval for server HTTP agent item queries.'
@@ -1673,7 +1765,7 @@ zabbix_export:
           description: 'Interval for service HTTP agent item query.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'Service query interval'
             description: 'Interval for service HTTP agent item query.'
@@ -1682,7 +1774,7 @@ zabbix_export:
           description: 'Interval for tenant HTTP agent item query.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Other
             label: 'Tenant query interval'
             description: 'Interval for tenant HTTP agent item query.'
@@ -1691,7 +1783,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a high severity event about RAM resource usage.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'RAM usage high threshold (%)'
             description: 'Sets the percentage threshold for creating a high severity event about RAM resource usage. In the range from 0 to 100 inclusive.'
@@ -1701,7 +1793,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a warning severity event about RAM resource usage.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'RAM usage warning threshold (%)'
             description: 'Sets the percentage threshold for creating a warning severity event about RAM resource usage. In the range from 0 to 100 inclusive.'
@@ -1724,7 +1816,7 @@ zabbix_export:
              'd' - current day until now.
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Tenant usage period'
             description: |
               Period for which tenant usage statistics will be queried. Possible values are:
@@ -1737,7 +1829,7 @@ zabbix_export:
           description: 'Sets the server name regex filter to use in server discovery for including.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Server name filter (include)'
             description: 'Sets the server name regex filter to use in server discovery for including.'
@@ -1746,7 +1838,7 @@ zabbix_export:
           description: 'Sets the server name regex filter to use in server discovery for excluding.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Server name filter (exclude)'
             description: 'Sets the server name regex filter to use in server discovery for excluding.'
@@ -1755,7 +1847,7 @@ zabbix_export:
           description: 'Sets the binary name regex filter to use in compute services discovery for including.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Compute binary name filter (include)'
             description: 'Sets the binary name regex filter to use in compute services discovery for including.'
@@ -1764,7 +1856,7 @@ zabbix_export:
           description: 'Sets the binary name regex filter to use in compute services discovery for excluding.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Compute binary name filter (exclude)'
             description: 'Sets the binary name regex filter to use in compute services discovery for excluding.'
@@ -1773,7 +1865,7 @@ zabbix_export:
           description: 'Sets the host name regex filter to use in compute services discovery for including.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Compute host name filter (include)'
             description: 'Sets the host name regex filter to use in compute services discovery for including.'
@@ -1782,7 +1874,7 @@ zabbix_export:
           description: 'Sets the host name regex filter to use in compute services discovery for excluding.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Compute host name filter (exclude)'
             description: 'Sets the host name regex filter to use in compute services discovery for excluding.'

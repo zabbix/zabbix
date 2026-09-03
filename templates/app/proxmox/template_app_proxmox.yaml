@@ -100,7 +100,7 @@ zabbix_export:
         3. Set the hostname or IP address of the Proxmox API VE host in the `Proxmox VE Host`. You can also change the API port in the `Proxmox VE Port` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -324,6 +324,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Proxmox = {
             	params: {},
             
@@ -380,6 +405,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		Proxmox.tls = new CTlsConfig(params.tls_verify);
             		Proxmox.params['proxy'] = params.proxy;
             
             		['url', 'token', 'token_id'].forEach(function (field) {
@@ -391,7 +417,7 @@ zabbix_export:
             	},
             
             	getData: function () {
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Proxmox.tls.options);
             
             		if (typeof Proxmox.params.proxy !== 'undefined' && Proxmox.params.proxy !== '') {
             			request.setProxy(Proxmox.params.proxy);
@@ -532,6 +558,8 @@ zabbix_export:
           parameters:
             - name: proxy
               value: '{$PVE.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Proxmox VE"}'
             - name: token
               value: '{$PVE.TOKEN.SECRET}'
             - name: token_id
@@ -4438,12 +4466,28 @@ zabbix_export:
         - tag: target
           value: proxmox
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Proxmox VE", e.g. {$HTTP.TLS.VERIFY:"Proxmox VE"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$PVE.FILTER.CERT.FILE.MATCH}'
           value: '.*'
           description: 'Filter for certificate file discovery by name.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Certificate file discovery filter'
             description: 'The filter for certificate file discovery by name.'
@@ -4453,7 +4497,7 @@ zabbix_export:
           description: 'Exclude filter for certificate file discovery by name.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Certificate file discovery exclude filter'
             description: 'The exclude filter for certificate file discovery by name.'
@@ -4463,7 +4507,7 @@ zabbix_export:
           description: 'Filter for disk discovery by name.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Disk discovery filter'
             description: 'The filter for disk discovery by name.'
@@ -4473,7 +4517,7 @@ zabbix_export:
           description: 'Exclude filter for disk discovery by name.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Disk discovery exclude filter'
             description: 'The exclude filter for disk discovery by name.'
@@ -4483,7 +4527,7 @@ zabbix_export:
           description: 'Filter for LXC discovery by name.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'LXC discovery filter'
             description: 'The filter for LXC discovery by name.'
@@ -4493,7 +4537,7 @@ zabbix_export:
           description: 'Exclude filter for LXC discovery by name.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'LXC discovery exclude filter'
             description: 'The exclude filter for LXC discovery by name.'
@@ -4503,7 +4547,7 @@ zabbix_export:
           description: 'Filter for node discovery by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Node discovery filter'
             description: 'The filter for node discovery by name.'
@@ -4513,7 +4557,7 @@ zabbix_export:
           description: 'Exclude filter for node discovery by name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Node discovery exclude filter'
             description: 'The exclude filter for node discovery by name.'
@@ -4523,7 +4567,7 @@ zabbix_export:
           description: 'Filter for node discovery by status.'
           config:
             type: CHECKBOX
-            priority: '13'
+            priority: '14'
             section_name: Other
             label: 'Discovery only online nodes'
             description: 'The filter for node discovery by status.'
@@ -4535,7 +4579,7 @@ zabbix_export:
           description: 'Filter for QEMU virtual machine filesystem discovery by mount point.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'QEMU virtual machine filesystem mount point discovery filter'
             description: 'The filter for QEMU virtual machine filesystem discovery by mount point.'
@@ -4545,7 +4589,7 @@ zabbix_export:
           description: 'Exclude filter for QEMU virtual machine filesystem discovery by mount point.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'QEMU virtual machine filesystem mount point discovery exclude filter'
             description: 'The exclude filter for QEMU virtual machine filesystem discovery by mount point.'
@@ -4555,7 +4599,7 @@ zabbix_export:
           description: 'Filter for QEMU virtual machine filesystem discovery by type.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'QEMU virtual machine filesystem type discovery filter'
             description: 'The filter for QEMU virtual machine filesystem discovery by type.'
@@ -4565,7 +4609,7 @@ zabbix_export:
           description: 'Exclude filter for QEMU virtual machine filesystem discovery by type.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'QEMU virtual machine filesystem type discovery exclude filter'
             description: 'The exclude filter for QEMU virtual machine filesystem discovery by type.'
@@ -4575,7 +4619,7 @@ zabbix_export:
           description: 'Filter for QEMU virtual machine discovery by name.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'QEMU virtual machine discovery filter'
             description: 'The filter for QEMU virtual machine discovery by name.'
@@ -4585,7 +4629,7 @@ zabbix_export:
           description: 'Filter for QEMU virtual machine network interface discovery by name.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'QEMU virtual machine network interface discovery filter'
             description: 'The filter for QEMU virtual machine network interface discovery by name.'
@@ -4595,7 +4639,7 @@ zabbix_export:
           description: 'Exclude filter for QEMU virtual machine network interface discovery by name.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'QEMU virtual machine network interface discovery exclude filter'
             description: 'The exclude filter for QEMU virtual machine network interface discovery by name.'
@@ -4605,7 +4649,7 @@ zabbix_export:
           description: 'Exclude filter for QEMU virtual machine discovery by name.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'QEMU virtual machine discovery exclude filter'
             description: 'The exclude filter for QEMU virtual machine discovery by name.'
@@ -4615,7 +4659,7 @@ zabbix_export:
           description: 'Filter for QEMU virtual machine OS metric discovery by name.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'QEMU virtual machine OS metric discovery filter'
             description: 'The filter for QEMU virtual machine OS metric discovery by name.'
@@ -4625,7 +4669,7 @@ zabbix_export:
           description: 'Exclude filter for QEMU virtual machine OS metric discovery by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'QEMU virtual machine OS metric discovery exclude filter'
             description: 'The exclude filter for QEMU virtual machine OS metric discovery by name.'
@@ -4635,7 +4679,7 @@ zabbix_export:
           description: 'Filter for QEMU and LXC discovery by status.'
           config:
             type: CHECKBOX
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Discovery only running QEMU virtual machines and LXC containers'
             description: |
@@ -4649,7 +4693,7 @@ zabbix_export:
           description: 'Filter for storage discovery by name.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Filters
             label: 'Storage discovery filter'
             description: 'The filter for storage discovery by name.'
@@ -4659,7 +4703,7 @@ zabbix_export:
           description: 'Exclude filter for storage discovery by name.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Filters
             label: 'Storage discovery exclude filter'
             description: 'The exclude filter for storage discovery by name.'
@@ -4669,7 +4713,7 @@ zabbix_export:
           description: 'Filter for user discovery by fullname.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'User discovery filter'
             description: 'The filter for user discovery by fullname.'
@@ -4679,7 +4723,7 @@ zabbix_export:
           description: 'Exclude filter for user discovery by fullname.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'User discovery exclude filter'
             description: 'The exclude filter for user discovery by fullname.'
@@ -4689,7 +4733,7 @@ zabbix_export:
           description: 'Enable discovery of node certificates.'
           config:
             type: CHECKBOX
-            priority: '19'
+            priority: '20'
             section_name: 'Low Level Discovery'
             label: 'Enable discovery of node certificates'
             description: 'If enabled, the template will discover node certificates.'
@@ -4701,7 +4745,7 @@ zabbix_export:
           description: 'Enable discovery of node disks.'
           config:
             type: CHECKBOX
-            priority: '20'
+            priority: '21'
             section_name: 'Low Level Discovery'
             label: 'Enable discovery of node disks'
             description: 'If enabled, the template will discover node disks.'
@@ -4713,7 +4757,7 @@ zabbix_export:
           description: 'Enable discovery of node storage.'
           config:
             type: CHECKBOX
-            priority: '21'
+            priority: '22'
             section_name: 'Low Level Discovery'
             label: 'Enable discovery of node storage'
             description: 'If enabled, the template will discover node storage.'
@@ -4725,7 +4769,7 @@ zabbix_export:
           description: 'Interval for certificate data retrieval.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Other
             label: 'Certificate data update interval'
             description: |
@@ -4737,7 +4781,7 @@ zabbix_export:
           description: 'Interval for cluster data retrieval.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'Cluster data update interval'
             description: 'The interval for retrieving cluster data from the Proxmox VE API.'
@@ -4747,7 +4791,7 @@ zabbix_export:
           description: 'Interval for disk discovery.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Other
             label: 'Disk discovery interval'
             description: 'The interval for discovering disk from the Proxmox VE API.'
@@ -4757,7 +4801,7 @@ zabbix_export:
           description: 'Interval for node data retrieval.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Other
             label: 'Node data update interval'
             description: |
@@ -4769,7 +4813,7 @@ zabbix_export:
           description: 'Interval for QEMU virtual machine filesystem discover.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Other
             label: 'QEMU virtual machine filesystem discovery interval'
             description: 'The interval for discovery QEMU virtual machine filesystem from the Proxmox VE API.'
@@ -4779,7 +4823,7 @@ zabbix_export:
           description: 'Interval for QEMU virtual machine network interface discovery.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '44'
             section_name: Other
             label: 'QEMU virtual machine network interface discovery interval'
             description: 'The interval for discovery QEMU virtual machine network interface from the Proxmox VE API.'
@@ -4789,7 +4833,7 @@ zabbix_export:
           description: 'Interval for QEMU virtual machine OS metric data retrieval.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Other
             label: 'QEMU virtual machine OS metric data update interval'
             description: |
@@ -4801,7 +4845,7 @@ zabbix_export:
           description: 'Interval for storage discovery.'
           config:
             type: TEXT
-            priority: '46'
+            priority: '47'
             section_name: Other
             label: 'Storage discovery interval'
             description: 'The interval for discovering storage from the Proxmox VE API.'
@@ -4811,7 +4855,7 @@ zabbix_export:
           description: 'Interval for user data retrieval.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'User data update interval'
             description: |
@@ -4822,7 +4866,7 @@ zabbix_export:
           description: 'Proxy settings for the Proxmox VE API.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'Proxmox VE API Proxy'
             description: |
@@ -4854,7 +4898,7 @@ zabbix_export:
           description: 'Threshold for CPU utilization warning triggers in percentage. This macro support context.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Other
             label: 'Threshold for CPU utilization (in %).'
             description: 'If the CPU utilization is greater than this value, a trigger will be activated. In the range from 1 to 100 inclusive.'
@@ -4864,7 +4908,7 @@ zabbix_export:
           description: 'Threshold for disk usage warning triggers in percentage. This macro support context.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Other
             label: 'Threshold for disk usage (in %).'
             description: 'If the disk usage is greater than this value, a trigger will be activated. In the range from 1 to 100 inclusive.'
@@ -4874,7 +4918,7 @@ zabbix_export:
           description: 'Threshold for memory usage warning triggers in percentage. This macro support context.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Other
             label: 'Threshold for memory usage (in %).'
             description: 'If the memory usage is greater than this value, a trigger will be activated. In the range from 1 to 100 inclusive.'
@@ -4884,7 +4928,7 @@ zabbix_export:
           description: 'Threshold for swap usage warning triggers in percentage. This macro support context.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Other
             label: 'Threshold for swap usage (in %).'
             description: 'If the swap usage is greater than this value, a trigger will be activated. In the range from 1 to 100 inclusive.'
@@ -4894,7 +4938,7 @@ zabbix_export:
           description: 'Threshold for uptime triggers. This macro support context.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Other
             label: 'Threshold for uptime triggers.'
             description: 'If the node uptime is less than this value, a trigger will be activated..'
