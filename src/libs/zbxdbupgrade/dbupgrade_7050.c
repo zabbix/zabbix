@@ -1267,7 +1267,6 @@ static int	DBpatch_7050092(void)
 
 	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
 	zbx_db_select_uint64("select rr.roleid from role_rule rr"
-			" inner join role r on r.roleid=rr.roleid"
 			" where rr.name='api.mode' and rr.value_int=1"
 				" and not exists ("
 					"select null"
