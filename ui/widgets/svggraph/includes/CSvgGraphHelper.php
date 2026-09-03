@@ -684,7 +684,7 @@ class CSvgGraphHelper {
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
 			if (!array_key_exists($key, $tr_groups)) {
 				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
-				$extend = min(SEC_PER_DAY, max(30 * SEC_PER_MIN, (int) ($period / 24)));
+				$extend = (int) ($period * sqrt(SEC_PER_HOUR / ($period + SEC_PER_HOUR)));
 
 				$tr_groups[$key] = [
 					'time' => [
