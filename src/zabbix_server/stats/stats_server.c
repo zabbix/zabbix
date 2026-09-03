@@ -139,11 +139,13 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 
 	if (0 != vps_stats.values_limit)
 	{
-		double pavailable;
+		double	pavailable;
 
 		if (0 != vps_stats.overcommit_limit)
+		{
 			pavailable = (double)(vps_stats.overcommit_limit - vps_stats.overcommit) * 100 /
 					vps_stats.overcommit_limit;
+		}
 		else
 			pavailable = 0;
 
