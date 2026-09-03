@@ -558,11 +558,11 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs)
  *                                                                            *
  ******************************************************************************/
 static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_addr_t *addr,
-		char **out, char **error)
+		unsigned char protocol, char **out, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "sending to [%s]:%d: %s", addr->ip, addr->port, data);
 
-	if (SUCCEED != zbx_tcp_send(sock, data))
+	if (SUCCEED != zbx_tcp_send_ext(sock, data, strlen(data), 0, protocol, 0))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to send to [%s]:%d: %s",
 					addr->ip, addr->port, zbx_socket_strerror());
@@ -618,7 +618,8 @@ static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_add
  ******************************************************************************/
 int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int loglevel, const zbx_config_tls_t *config_tls,
-		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error)
+		unsigned char protocol, const char *data, char *(*connect_callback)(void *), void *cb_data, char **out,
+		char **error)
 {
 	zbx_socket_t		sock;
 	int			conn_ret, ret = FAIL, retries = 0;
@@ -645,7 +646,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		if (NULL != connect_callback)
 			data = connect_callback(cb_data);
 
-		if (SUCCEED == (ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], out, error)))
+		if (SUCCEED == (ret = zbx_comms_exchange_data(&sock, data, addrs->values[0], protocol, out, error)))
 		{
 			if (ZBX_REDIRECT_FAIL != (conn_ret = comms_check_redirect(sock.buffer, addrs)))
 			{
@@ -744,4 +745,3 @@ char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
 
 	return NULL;
 }
-

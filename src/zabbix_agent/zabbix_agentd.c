@@ -45,6 +45,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 static int	zbx_config_listen_port = ZBX_DEFAULT_AGENT_PORT;
 static char	*zbx_config_listen_ip = NULL;
 static int	zbx_config_refresh_active_checks = 5;
+static int	zbx_config_enable_compression = 1;
 ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 static int	config_log_level = LOG_LEVEL_WARNING;
 static int	zbx_config_buffer_size = 100;
@@ -845,6 +846,7 @@ static int	add_serveractive_host_agent_cb(const zbx_vector_addr_ptr_t *addrs, zb
 				0 < hostnames->values_num ? hostnames->values[i] : "");
 		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
 		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
+		config_active_args[forks].config_enable_compression = zbx_config_enable_compression;
 		config_active_args[forks].config_heartbeat_frequency = zbx_config_heartbeat_frequency;
 		config_active_args[forks].config_host_interface = zbx_config_host_interface;
 		config_active_args[forks].config_host_interface_item = zbx_config_host_interface_item;
@@ -944,6 +946,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ServerActive",		&active_hosts,				ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"EnableCompression",		&zbx_config_enable_compression,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"Hostname",			&zbx_config_hostnames,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostnameItem",		&config_hostname_item,			ZBX_CFG_TYPE_STRING,
