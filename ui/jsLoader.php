@@ -93,9 +93,11 @@ $available_js = [
 	'component.z-bar-gauge.js' => '',
 	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
+	'component.z-navigation-tree.js' => '',
 	'component.z-sparkline.js' => '',
 	'component.z-split-view.js' => '',
 	'component.z-textarea-flexible.js' => '',
+	'component.z-timeline-range-slider.js' => '',
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
@@ -887,10 +889,12 @@ elseif ($_GET['files'] === 'components') {
 	$files = [
 		'component.z-bar-gauge.js',
 		'component.z-color-picker.js',
+		'component.z-navigation-tree.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
 		'component.z-split-view.js',
 		'component.z-textarea-flexible.js',
+		'component.z-timeline-range-slider.js',
 		'component.z-vertical.js'
 	];
 }

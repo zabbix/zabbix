@@ -89,12 +89,15 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/tag";
 @import "components/time-quick";
 @import "components/toc";
+@import "components/trace-view";
 @import "components/z-bar-gauge";
 @import "components/z-color-picker";
+@import "components/z-navigation-tree";
 @import "components/z-select";
 @import "components/z-sparkline";
 @import "components/z-split-view";
 @import "components/z-textarea-flexible";
+@import "components/z-timeline-range-slider";
 
 @import "components/dashboard/widget-field-sparkline";
 
