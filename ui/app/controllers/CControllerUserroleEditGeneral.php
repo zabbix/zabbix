@@ -53,8 +53,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 	private function getProfileSectionRules(): array {
 		return [
-			'profile.redirect.enforce' => $this->getInput('profile_redirect_enforce'),
-			'profile.redirect.url' => $this->getInput('profile_redirect_url')
+			'profile.redirect.enforce' => $this->getInput('profile_redirect_enforce', ZBX_ROLE_RULE_DISABLED),
+			'profile.redirect.url' => $this->getInput('profile_redirect_url', '')
 		];
 	}
 
