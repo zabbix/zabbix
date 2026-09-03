@@ -237,8 +237,7 @@ try {
 
 		CSessionHelper::set('saml_data', $saml_data);
 
-		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false
-				&& (new CFrontendActionValidator())->validate(getRequest('RelayState'))) {
+		if (hasRequest('RelayState') && (new CFrontendActionValidator())->validate(getRequest('RelayState'))) {
 			$relay_state = getRequest('RelayState');
 		}
 	}
