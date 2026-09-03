@@ -581,9 +581,11 @@ class CRoleHelper {
 			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
 		}
 
-		$labels += [
-			self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring and discovery')
-		];
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [
+				self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring and discovery')
+			];
+		}
 
 		return $labels;
 	}
