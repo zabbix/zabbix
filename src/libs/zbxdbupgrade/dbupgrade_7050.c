@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 /*
  * 8.0 development database patches
