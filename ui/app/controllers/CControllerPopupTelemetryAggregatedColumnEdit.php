@@ -131,7 +131,8 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 		);
 
 		if ($data['column'] !== '' && !array_key_exists($data['column'], $data['columns'])) {
-			$data['columns'][$data['column']] = $data['column'];
+			$data['columns'][$data['column']] = ['label' => $data['column'], 'disabled' => true];
+			ksort($data['columns']);
 		}
 
 		$data['functions'] = CTelemetryHelper::getFunctionLabels();

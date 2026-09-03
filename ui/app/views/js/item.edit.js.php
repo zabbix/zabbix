@@ -599,9 +599,11 @@ window.item_edit_form = new class {
 	#populateColumnSelect(select) {
 		const value = select.value;
 		const names = this.#getTelemetryColumns();
+		const is_unavailable = value !== null && value !== '' && !names.includes(value);
+		const options = is_unavailable ? [...names, value].sort() : names;
 
 		select.clearOptions();
-		select.addOptions(names.map((name) => ({value: name, label: name})));
+		select.addOptions(options.map((name) => ({value: name, label: name})));
 
 		if (value === null || value === '') {
 			select.preselectHightlighted();
@@ -609,11 +611,11 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		if (!names.includes(value)) {
-			select.addOption({value: value, label: value});
-		}
-
 		select.value = value;
+
+		if (is_unavailable) {
+			select.getOptionByValue(value).disabled = true;
+		}
 	}
 
 	#toggleAttributeKey(select) {
