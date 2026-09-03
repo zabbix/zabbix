@@ -35,7 +35,7 @@ zabbix_export:
         4. Change the `Scheme` and `Port` if needed.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -97,6 +97,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
             	fields = ['username', 'password', 'base_url'],
             	methods = [
@@ -130,7 +155,10 @@ zabbix_export:
             	params.base_url += '/';
             }
             
-            var response, request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            tls.checkURL(params.base_url);
+            
+            var response, request = new HttpRequest(tls.options);
             request.addHeader('datatype: xml');
             
             auth_string = md5(params.username + '_' + params.password);
@@ -227,6 +255,8 @@ zabbix_export:
               value: '{$HPE.MSA.API.SCHEME}://{$HPE.MSA.API.HOST}:{$HPE.MSA.API.PORT}/'
             - name: password
               value: '{$HPE.MSA.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"HPE MSA 2040 Storage"}'
             - name: username
               value: '{$HPE.MSA.API.USERNAME}'
           tags:
@@ -3631,7 +3661,7 @@ zabbix_export:
           description: 'The hostname or IP address of the API host.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: Address
             description: 'The hostname or IP address of the API host.'
             required: 'YES'
@@ -3640,7 +3670,7 @@ zabbix_export:
           description: 'Specify password for API.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: Password
             description: 'Specify password for API.'
             required: 'YES'
@@ -3649,7 +3679,7 @@ zabbix_export:
           description: 'Connection port for API.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: Port
             description: 'Connection port for API. In the range from 1 to 65535 inclusive.'
             required: 'YES'
@@ -3659,7 +3689,7 @@ zabbix_export:
           description: 'Connection scheme for API.'
           config:
             type: LIST
-            priority: '1'
+            priority: '2'
             label: Scheme
             description: 'Connection scheme for API.'
             required: 'YES'
@@ -3673,7 +3703,7 @@ zabbix_export:
           description: 'Specify user name for API.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: Username
             description: 'Specify user name for API.'
             required: 'YES'
@@ -3682,7 +3712,7 @@ zabbix_export:
           description: 'The critical threshold of the CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'CPU utilization critical threshold (%)'
             description: 'The critical threshold of the CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
@@ -3692,7 +3722,7 @@ zabbix_export:
           description: 'Response timeout for API.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Other
             label: 'API response timeout'
             description: 'Response timeout for API.'
@@ -3701,7 +3731,7 @@ zabbix_export:
           description: 'The critical threshold of the disk group space utilization in %.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Disk group space critical threshold (%)'
             description: 'The critical threshold of the disk group space utilization in %. In the range from 0 to 100 inclusive.'
@@ -3711,7 +3741,7 @@ zabbix_export:
           description: 'The warning threshold of the disk group space utilization in %.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Disk group space warning threshold (%)'
             description: 'The warning threshold of the disk group space utilization in %. In the range from 0 to 100 inclusive.'
@@ -3721,7 +3751,7 @@ zabbix_export:
           description: 'The critical threshold of the pool space utilization in %.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Pool space critical threshold (%)'
             description: 'The critical threshold of the pool space utilization in %. In the range from 0 to 100 inclusive.'
@@ -3731,11 +3761,27 @@ zabbix_export:
           description: 'The warning threshold of the pool space utilization in %.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Pool space warning threshold (%)'
             description: 'The warning threshold of the pool space utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE MSA 2040 Storage", e.g. {$HTTP.TLS.VERIFY:"HPE MSA 2040 Storage"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 32f1ffd5ec5144fc9073b547cc7cfb01
           name: 'Storage overview'

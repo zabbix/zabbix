@@ -53,6 +53,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  *       (GnuTLS counterpart of test 10; skipped when compiled with OpenSSL)
  * 19. libgnutls cipher mismatch: non-overlapping priority strings → handshake rejected (negative)
  *       (GnuTLS counterpart of test 12; skipped when compiled with OpenSSL)
+ * 20. Agent 2 validates the peer certificate on incoming connections even when
+ *       its outgoing connections are unencrypted
  *
  * @onAfter clearData
  */
@@ -1858,5 +1860,65 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		]);
 		$this->assertEmpty($data['result'],
 			'Data was collected despite non-overlapping GnuTLS priority strings on server and agent');
+	}
+
+	// =========================================================================
+	// Test 20 – Agent 2: incoming certificate validation is independent of
+	// TLSConnect
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderAgent2IncomingCertSubject(): array {
+		$c = self::generateCertificates();
+
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key']
+			],
+			self::COMPONENT_AGENT2 => [
+				'Hostname'             => 'enc_agent2',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'unencrypted',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent2_crt'],
+				'TLSKeyFile'           => $c['agent2_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=unexpected_server'
+			]
+		];
+	}
+
+	/**
+	 * Verify that TLSConnect=unencrypted does not disable certificate issuer and
+	 * subject validation when Agent 2 accepts an incoming certificate connection.
+	 *
+	 * @required-components server, agent2
+	 * @configurationDataProvider configProviderAgent2IncomingCertSubject
+	 * @hosts enc_agent2
+	 * @backup hosts
+	 */
+	public function testEncryption_agent2IncomingCertSubject(): void {
+		$start_time = time();
+		$this->updateHostCertTLS('enc_agent2', 'CN=ZabbixTestCA', 'CN=zabbix_agent2');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT2,
+			'invalid certificate subject CN=zabbix_server');
+
+		$data = $this->call('history.get', [
+			'itemids'   => self::$itemids['enc_agent2:agent.ping'],
+			'history'   => ITEM_VALUE_TYPE_UINT64,
+			'time_from' => $start_time
+		]);
+		$this->assertEmpty($data['result'],
+			'Data was collected despite the unexpected server certificate subject');
 	}
 }
