@@ -1695,8 +1695,20 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
 void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
 {
 	char	byte = 1;
+	ssize_t	n;
 
-	write(service->alert_pipe[1], &byte, 1);
+	while (1 != (n = write(service->alert_pipe[1], &byte, 1)))
+	{
+		if (EWOULDBLOCK == errno || EAGAIN == errno)
+			return;
+
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot alert IPC service \"%s\": %s", service->path,
+					zbx_strerror(errno));
+			return;
+		}
+	}
 }
 
 /******************************************************************************
