@@ -461,7 +461,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => [self::$trap2_itemid]
 		], 5, 2);
-		$this->assertEquals(1, count($response['result']));
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 	}
 
 	/**

@@ -73,8 +73,13 @@ $html_page
 				'config', 'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
 			])
 		))
-	)
-	->show();
+	);
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
+}
+
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
@@ -83,7 +88,6 @@ $html_page
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
 		'checkbox_object' => 'itemids',
-		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
 		'layout_mode' => $web_layout_mode
 	]).');
 '))

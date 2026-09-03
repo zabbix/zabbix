@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
+	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update" || {form} == "clone")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
 	'parent_discoveryid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null],
 	'host' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -61,7 +61,6 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,	IN('"name","status","discover"'),				null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -69,6 +68,10 @@ $fields = [
 check_fields($fields);
 
 $hostid = getRequest('hostid', 0);
+
+$backurl = (new CUrl('host_prototypes.php'))
+	->setArgument('context', getRequest('context'))
+	->setArgument('parent_discoveryid', getRequest('parent_discoveryid'));
 
 // permissions
 if (getRequest('parent_discoveryid')) {
@@ -98,16 +101,12 @@ if (getRequest('parent_discoveryid')) {
 		]);
 		$hostPrototype = reset($hostPrototype);
 		if (!$hostPrototype) {
+			zbx_add_post_js("history.replaceState({}, '');");
 			access_deny();
 		}
 	}
 }
 else {
-	access_deny();
-}
-
-// Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -135,15 +134,18 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	$result = DBend($result);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Host prototype deleted'));
+
 		uncheckTableRows($discoveryRule['itemid']);
 	}
-	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete host prototypes'));
+	}
 
-	unset($_REQUEST['hostid'], $_REQUEST['form']);
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
-	unset($_REQUEST['hostid']);
-
 	if (hasRequest('group_prototypes')) {
 		foreach ($_REQUEST['group_prototypes'] as &$group_prototype) {
 			unset($group_prototype['group_prototypeid']);
@@ -260,17 +262,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$result = false;
 	}
 
-	if (hasRequest('add')) {
-		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
-	}
-	else {
-		show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
+	if ($result) {
+		$message_success = hasRequest('add') ? _('Host prototype added') : _('Host prototype updated');
+		CMessageHelper::setSuccessTitle($message_success);
+
+		uncheckTableRows($discoveryRule['itemid']);
+
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
 	}
 
-	if ($result) {
-		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows($discoveryRule['itemid']);
-	}
+	$message_failed = hasRequest('add') ? _('Cannot add host prototype') : _('Cannot update host prototype');
+	show_error_message($message_failed);
 }
 elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscover') {
 	$result = API::HostPrototype()->update([
@@ -285,10 +288,8 @@ elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscov
 		CMessageHelper::setErrorTitle(_('Cannot update host prototype'));
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 // GO
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototype.massenable', 'hostprototype.massdisable']) && hasRequest('group_hostid')) {
@@ -315,10 +316,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 		CMessageHelper::setErrorTitle(_n('Cannot update host prototype', 'Cannot update host prototypes', $updated));
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelete' && getRequest('group_hostid')) {
 	DBstart();
@@ -353,11 +352,12 @@ if (hasRequest('form')) {
 	$hostid = getRequest('hostid', 0);
 
 	$data = [
+		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => [
 			'hostid' => $hostid,
-			'templateid' => ($hostid == 0) ? 0 : $hostPrototype['templateid'],
+			'templateid' => $hostid == 0 || getRequest('form') === 'clone' ? 0 : $hostPrototype['templateid'],
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),

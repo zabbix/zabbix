@@ -190,7 +190,7 @@ if (array_key_exists('problems', $data)) {
 			))
 				->addClass(ZBX_STYLE_NOWRAP),
 			$problem_update_link,
-			($data['show_tags'] != SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? (new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 		]));
 	}
 

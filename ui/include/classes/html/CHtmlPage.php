@@ -110,7 +110,7 @@ class CHtmlPage {
 					->addItem($this->kiosk_mode_controls)
 					->addItem(
 						get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-							->setAttribute('aria-label', _('Content controls'))
+							->setAttribute('aria-label', _('Exit full screen mode'))
 					)
 			);
 		}
@@ -136,11 +136,14 @@ class CHtmlPage {
 	private function createTopHeader(): CTag {
 		$divs = [
 			(new CTag('nav', true,
-				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))->setId('sidebar-button-toggle')
+				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))
+					->setId('sidebar-button-toggle')
+					->setAttribute('aria-label', _('Show sidebar'))
+					->setAttribute('aria-controls', 'sidebar')
 			))
 				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
-				->setAttribute('aria-label', _('Sidebar control'))
+				->setAttribute('aria-label', _('Show main menu'))
 		];
 
 		if ($this->title !== '') {
@@ -168,8 +171,8 @@ class CHtmlPage {
 				(new CLink(null, $this->doc_url))
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_HELP)
-					->setTitle(_('Help'))
 					->setTarget('_blank')
+					->setAttribute('aria-label', _('Open Zabbix documentation in a new tab'))
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 

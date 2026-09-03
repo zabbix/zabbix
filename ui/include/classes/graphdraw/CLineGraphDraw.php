@@ -2032,6 +2032,10 @@ class CLineGraphDraw extends CGraphDraw {
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
 		}
 
+		if ($this->with_bottom_padding) {
+			$y_offsets += static::DEFAULT_TOP_BOTTOM_PADDING / 2;
+		}
+
 		// Actual outer dimensions, regardless $this->outer setting.
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;

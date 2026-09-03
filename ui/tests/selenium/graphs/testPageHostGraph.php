@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup graphs
@@ -28,7 +29,8 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			'class' => CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -65,8 +67,10 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
@@ -113,8 +117,8 @@ class testPageHostGraph extends CLegacyWebTest {
 
 			// Check name value.
 			$this->assertEquals($graph['name'],
-					$element->query('xpath:./td/a[@href="graphs.php?form=update&graphid='.
-							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]')->one()->getText()
+					$element->query('xpath:./td/a[@href="graphs.php?form=update&context=host&graphid='.
+							$graph['graphid'].'&filter_hostids%5B0%5D='.$hostid.'"]')->one()->getText()
 			);
 
 			// Check width value.
@@ -613,10 +617,17 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_DeleteSelected($data) {
 		$this->selectGraph($data);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+		$selected_count = ($data['graph'] === 'all') ? $before_rows_count : count($data['graph']);
+		$this->assertSelectedCount($selected_count);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
+		$this->assertTableStats($before_rows_count - $selected_count);
+		$this->assertSelectedCount(0);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

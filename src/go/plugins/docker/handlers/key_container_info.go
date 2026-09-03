@@ -72,6 +72,8 @@ type containerState struct {
 //
 //nolint:tagliatelle // Docker API uses non-standard naming conventions
 type hostConfig struct {
+	resources
+
 	Binds           []string `json:"Binds"`
 	ContainerIDFile string   `json:"ContainerIDFile"`
 	NetworkMode     string   `json:"NetworkMode"`
@@ -92,8 +94,6 @@ type hostConfig struct {
 	ShmSize         int64             `json:"ShmSize"`
 	Sysctls         map[string]string `json:"Sysctls"`
 	Runtime         string            `json:"Runtime"`
-
-	resources
 }
 
 // resources contains container's resources.

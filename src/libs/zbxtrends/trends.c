@@ -506,6 +506,9 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
+	/* Unlike dc_trends_update_float() which has safeguards against float overflow, it is not needed here. */
+	/* That is because dc_trends_update_float() adds safety margin rounding to a float enough for this     */
+	/* function not to overflow, even if historic trends have DBL_MAX.                                     */
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		avg = atof(row[0]);
