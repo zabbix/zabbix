@@ -87,8 +87,18 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 					'tag_name' => ['db cep_condition.tag', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 					],
-					'tag_value' => ['db cep_condition.tag_value',
-						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+					'tag_value' => [
+						['db cep_condition.tag_value', 'required',
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+						],
+						['db cep_condition.tag_value', 'required', 'not_empty',
+							'when' => [
+								['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]],
+								['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
+									CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+								]]
+							]
+						]
 					],
 					'host' => ['db cep_condition.host', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]

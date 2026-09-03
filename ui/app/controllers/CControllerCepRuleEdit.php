@@ -300,8 +300,18 @@ class CControllerCepRuleEdit extends CController {
 			'tag_name' => ['db cep_condition.tag', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 			],
-			'tag_value' => ['db cep_condition.tag_value',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+			'tag_value' => [
+				['db cep_condition.tag_value', 'required',
+					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+				],
+				['db cep_condition.tag_value', 'required', 'not_empty',
+					'when' => [
+						['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]],
+						['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
+							CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+						]]
+					]
+				]
 			],
 			'host' => ['db cep_condition.host', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
@@ -372,8 +382,18 @@ class CControllerCepRuleEdit extends CController {
 			'tag_name' => ['db cep_operation_condition.tag', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
 			],
-			'tag_value' => ['db cep_operation_condition.tag_value', 'required',
-				'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+			'tag_value' => [
+				['db cep_operation_condition.tag_value', 'required',
+					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+				],
+				['db cep_operation_condition.tag_value', 'required', 'not_empty',
+					'when' => [
+						['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]],
+						['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
+							CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+						]]
+					]
+				]
 			]
 		]]))->getRules();
 	}
