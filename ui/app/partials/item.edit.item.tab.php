@@ -650,10 +650,11 @@ $formgrid
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
-		(new CLabel(_('Category'), 'signal_type'))->setId('js-item-signal-type-label'),
+		(new CLabel(_('Category'), 'label-signal-type'))->setId('js-item-signal-type-label'),
 		(new CFormField(
 			(new CSelect('signal_type'))
 				->setId('signal_type')
+				->setFocusableElementId('label-signal-type')
 				->setValue($item['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray([
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES => _('Traces'),
@@ -782,11 +783,12 @@ $formgrid
 		))->setId('js-item-aggregated-columns-field')
 	])
 	->addItem([
-		(new CLabel(_('Type of calculation'), 'evaltype'))->setId('js-item-evaltype-label'),
+		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('js-item-evaltype-label'),
 		(new CFormField([
 			(new CDiv(
 				(new CSelect('evaltype'))
 					->setId('evaltype')
+					->setFocusableElementId('label-evaltype')
 					->setValue((int) $item['evaltype'])
 					->addOptions(CSelect::createOptionsFromArray([
 						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
