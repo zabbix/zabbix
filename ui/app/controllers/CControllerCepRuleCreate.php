@@ -104,6 +104,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					],
 					'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
 						'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
+						'messages' => ['use' => _('Invalid period.')],
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
 					],
 					'formulaid' => ['string', 'required', 'not_empty',
