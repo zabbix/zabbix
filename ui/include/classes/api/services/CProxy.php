@@ -245,8 +245,6 @@ class CProxy extends CApiService {
 					unset($attribute['id']);
 				}
 				unset($attribute);
-
-				$apm['additional_resource_attributes'] = array_values($apm['additional_resource_attributes']);
 			}
 
 			$row['apm'] = array_intersect_key($apm, array_flip($options['selectApm']));
