@@ -3,22 +3,20 @@
 
 ## Overview
 
-This template is designed as a master template that discovers various Oracle Cloud Infrastructure (OCI) services
-and resources, such as:
+This template is designed to monitor Oracle Cloud by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of Compute instances, Autonomous Databases, Virtual Cloud Networks (VCNs), Block Volumes, Boot Volumes, and Object Storage resources.
 
-* OCI Compute;
+## Included Monitoring Templates
 
-* OCI Autonomous Database (serverless);
+- *Oracle Cloud Autonomous Database by HTTP*
+- *Oracle Cloud Block Volume by HTTP*
+- *Oracle Cloud Boot Volume by HTTP*
+- *Oracle Cloud Compute by HTTP*
+- *Oracle Cloud Networking by HTTP*
+- *Oracle Cloud Object Storage by HTTP*
 
-* OCI Object Storage;
-
-* OCI Virtual Cloud Networks (VCNs);
-
-* OCI Block Volumes;
-
-* OCI Boot Volumes.
-
-For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests. 
+For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
 `POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses an
 HTTP request body for queries.
 
@@ -217,6 +215,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of autonomous database names to allow in discovery.</p>|`.*`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of autonomous database names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 
 ### LLD rule Compute instances discovery
@@ -303,6 +302,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Compute", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 |{$OCI.COMPUTE.VNIC.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of VNIC states to allow in discovery.</p>|`.*`|
 |{$OCI.COMPUTE.VNIC.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of VNIC states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
@@ -428,6 +428,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Object Storage", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Object Storage"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 
 ### Items
@@ -500,6 +501,7 @@ The LLD filter values and trigger threshold values can be changed with the respe
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Autonomous Database", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 |{$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}|<p>Sets the percentage threshold for creating a "warning" severity event about CPU resource utilization.</p>|`75`|
 |{$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}|<p>Sets the percentage threshold for creating a "high" severity event about CPU resource utilization.</p>|`90`|
@@ -613,6 +615,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Block Volume", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Block Volume"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 
 ### Items
@@ -684,6 +687,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Boot Volume", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Boot Volume"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 
 ### Items
@@ -754,6 +758,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Networking", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Networking"}.</p>|`full`|
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 |{$OCI.VCN.SUBNET.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of VCN subnet states to allow in discovery.</p>|`.*`|
 |{$OCI.VCN.SUBNET.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of VCN subnet states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|

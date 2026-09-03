@@ -23,6 +23,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"OTRS CE"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "OTRS CE", e.g. {$HTTP.TLS.VERIFY:"OTRS CE"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 |otrs_closed_state_id|0|((OTRS)) CE state ID for closed tasks. Possible values: 0 - Disable tickets closing; >0 - State ID from the State Management page.|
 |otrs_auth_password|\<PUT YOUR USER PASSWORD\>|Agent password.|

@@ -46,6 +46,7 @@ This template has been tested on:
 |{$NCM.DEVICE.NAME.MATCHES}|<p>A regular expression to filter devices by name. Only devices with names matching this regex will be monitored.</p>|`.*`|
 |{$NCM.DEVICE.NAME.NOT_MATCHES}|<p>Regular expression to filter devices by name. Devices with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
 |{$NCM.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cradlepoint NCM v2", e.g. {$HTTP.TLS.VERIFY:"Cradlepoint NCM v2"}.</p>|`full`|
 
 ### Items
 
@@ -100,6 +101,7 @@ This template has been tested on:
 |{$NCM.NET.DEVICE.CONN.MATCHES}|<p>Regular expression to filter Network devices based on their connection types. Only devices with connection types matching this regex will be monitored.</p>|`.*`|
 |{$NCM.NET.DEVICE.CONN.NOT_MATCHES}|<p>Regular expression to filter Network devices based on their connection types. Devices with connection types matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
 |{$NCM.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cradlepoint NCM v2 device", e.g. {$HTTP.TLS.VERIFY:"Cradlepoint NCM v2 device"}.</p>|`full`|
 
 ### Items
 

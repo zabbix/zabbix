@@ -35,7 +35,7 @@ zabbix_export:
         If you need to monitor only one Enterprise, fill in this field (requires only READ EDGE privileges).
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 7.4-2
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -47,6 +47,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var VeloCloud = {
             	params: {},
             
@@ -69,6 +94,8 @@ zabbix_export:
             			VeloCloud.params.url += '/';
             		}
             
+            		VeloCloud.tls = new CTlsConfig(params.tls_verify);
+            		VeloCloud.tls.checkURL(VeloCloud.params.url);
             	},
             
             	getField: function (data, path, trace) {
@@ -87,7 +114,7 @@ zabbix_export:
             
             	request: function (url, body) {
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(VeloCloud.tls.options);
             
             		if (typeof VeloCloud.params.http_proxy !== 'undefined' && VeloCloud.params.http_proxy !== '') {
             			request.setProxy(VeloCloud.params.http_proxy);
@@ -177,6 +204,8 @@ zabbix_export:
               value: '{$VELOCLOUD.ENTERPRISE.ID}'
             - name: http_proxy
               value: '{$VELOCLOUD.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"VeloCloud SD-WAN"}'
             - name: token
               value: '{$VELOCLOUD.TOKEN}'
             - name: url
@@ -834,6 +863,22 @@ zabbix_export:
         - tag: target
           value: velocloud-sd-wan
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VeloCloud SD-WAN", e.g. {$HTTP.TLS.VERIFY:"VeloCloud SD-WAN"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VELOCLOUD.ENTERPRISE.ID}'
           description: 'VeloCloud SD-WAN Enterprise ID. Specify a single Enterprise ID (requires READ EDGE privileges). By default parameter is empty, data will be retrieved for all Enterprises (privileges required: READ ENTERPRISE and READ EDGE).'
           config:
@@ -857,7 +902,7 @@ zabbix_export:
           description: 'Filter for discoverable Edges by name.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: 'Discovery filters'
             label: 'Edges name matches'
             description: 'Regex to match Edges names.'
@@ -866,7 +911,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Edges by name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: 'Discovery filters'
             label: 'Edges name not matches'
             description: 'A regex to exclude certain Edges names from discovery.'
@@ -875,7 +920,7 @@ zabbix_export:
           description: 'Filter for discoverable Edges by state.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: 'Discovery filters'
             label: 'Edges state matches'
             description: 'Regex to match Edges state.'
@@ -884,7 +929,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Edges by state.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: 'Discovery filters'
             label: 'Edges state not matches'
             description: 'A regex to exclude Edges by state from discovery.'
@@ -893,7 +938,7 @@ zabbix_export:
           description: 'Filter for discoverable gateways.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: 'Discovery filters'
             label: 'Gateways name matches'
             description: 'Regex to match gateways name.'
@@ -902,7 +947,7 @@ zabbix_export:
           description: 'Filter to exclude discovered gateways.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: 'Discovery filters'
             label: 'Gateways name not matches'
             description: 'A regex to exclude certain gateways names from discovery.'
@@ -1110,7 +1155,7 @@ zabbix_export:
         3. Set the following fields: `API token`, `API URL`, `Enterprise ID`, `Edge ID`.
       vendor:
         name: Zabbix
-        version: 7.4-0
+        version: 7.4-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1296,6 +1341,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var VeloCloud = {
             	params: {},
             
@@ -1318,6 +1388,8 @@ zabbix_export:
             			VeloCloud.params.url += '/';
             		}
             
+            		VeloCloud.tls = new CTlsConfig(params.tls_verify);
+            		VeloCloud.tls.checkURL(VeloCloud.params.url);
             	},
             
             	getField: function (data, path, trace) {
@@ -1336,7 +1408,7 @@ zabbix_export:
             
             	request: function (url, body) {
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(VeloCloud.tls.options);
             
             		if (typeof VeloCloud.params.http_proxy !== 'undefined' && VeloCloud.params.http_proxy !== '') {
             			request.setProxy(VeloCloud.params.http_proxy);
@@ -1416,6 +1488,8 @@ zabbix_export:
               value: '{$VELOCLOUD.EDGE.NAME}'
             - name: enterprise_id
               value: '{$VELOCLOUD.ENTERPRISE.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"VeloCloud SD-WAN Edge"}'
             - name: token
               value: '{$VELOCLOUD.TOKEN}'
             - name: url
@@ -2695,12 +2769,28 @@ zabbix_export:
         - tag: target
           value: velocloud-sd-wan-edge
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VeloCloud SD-WAN Edge", e.g. {$HTTP.TLS.VERIFY:"VeloCloud SD-WAN Edge"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VELOCLOUD.EDGE.CPU.UTIL.WARN}'
           value: '80'
           description: 'Warning threshold of cluster service CPU utilization expressed in percent.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'CPU Utilization Warning Threshold'
             description: 'The maximum CPU utilization percentage before a warning is triggered.'
@@ -2710,7 +2800,7 @@ zabbix_export:
           description: 'Response timeout for API.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'API timeout'
             description: 'Response timeout for the API (e.g., 15s). In the range from 1 to 60 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -2719,14 +2809,14 @@ zabbix_export:
           description: 'Update interval for raw item collection.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'Update interval'
             description: 'Update interval for raw item (e.g., 1h).'
         - macro: '{$VELOCLOUD.EDGE.ID}'
           description: 'SD-WAN Edge ID.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Edge ID'
             description: 'VeloCloud SD-WAN Edge ID.'
             required: 'YES'
@@ -2736,7 +2826,7 @@ zabbix_export:
           description: 'Warning threshold of cluster memory utilization expressed in percent.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Memory Utilization Warning Threshold'
             description: 'The maximum memory utilization percentage before a warning is triggered.'
@@ -2745,7 +2835,7 @@ zabbix_export:
           description: 'VeloCloud SD-WAN Enterprise ID. Specify a single Enterprise ID (requires READ EDGE privileges). By default parameter is empty, data will be retrieved for all Enterprises (privileges required: READ ENTERPRISE and READ EDGE).'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'Enterprise ID'
             description: 'VeloCloud SD-WAN Enterprise ID.'
             required: 'YES'
@@ -2755,7 +2845,7 @@ zabbix_export:
           description: 'Filter for discoverable links.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: 'Discovery filters'
             label: 'links name matches'
             description: 'Regex to match links names.'
@@ -2764,7 +2854,7 @@ zabbix_export:
           description: 'Filter to exclude discovered links.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: 'Discovery filters'
             label: 'Links name not matches'
             description: 'A regex to exclude certain links names from discovery.'
@@ -2773,7 +2863,7 @@ zabbix_export:
           description: 'VeloCloud SD-WAN Orchestrator API token.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: 'API token'
             description: 'VeloCloud SD-WAN Orchestrator API token.'
             required: 'YES'
@@ -2781,7 +2871,7 @@ zabbix_export:
           description: 'VeloCloud SD-WAN Orchestrator URL, e.g., `vco.velocloud.net`.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: 'API URL'
             description: 'VeloCloud SD-WAN Orchestrator API URL. Format example: `vco.velocloud.net`'
             required: 'YES'
