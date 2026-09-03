@@ -86,7 +86,7 @@
 #	define ZBX_NORETURN
 #endif
 
-#if (defined(__GNUC__) && __GNUC__ >= 3) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
 #	define ZBX_ATTR_NOINLINE	__attribute__((__noinline__))
 #elif defined(_MSC_VER)
 #	define ZBX_ATTR_NOINLINE	__declspec(noinline)
