@@ -679,9 +679,10 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 	 * @dataProvider getTriggerCreateData
 	 */
 	public function testTemplateTriggerDependencies_LinkedTriggerPrototypeUpdate($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
-				self::$templateids['Template with everything'].'&context=template'
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.
+				self::$templateids['Template with everything']
 		)->waitUntilReady();
+
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'Template that linked to template: Drule for template')
 				->query('link:Trigger prototypes')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();

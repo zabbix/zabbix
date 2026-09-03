@@ -37,9 +37,14 @@
 				callback: ({data, event}) => {
 					uncheckTableRows('host_discovery_prototypes_' + this.checkbox_hash, [], false);
 
-					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
+					if (data.submit?.redirect_url) {
+						const url = new URL(data.submit.redirect_url, location.href);
+						event.setRedirectUrl(url.href);
+					}
+					else if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
 
+						url.searchParams.set('action', 'lldrule.list');
 						url.searchParams.set('context', this.context);
 
 						event.setRedirectUrl(url.href);

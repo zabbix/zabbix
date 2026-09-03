@@ -54,7 +54,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -95,9 +95,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Veeam = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             	token: '',
             
             	setParams: function (params) {
@@ -116,6 +141,10 @@ zabbix_export:
             		if (Veeam.params.created_after > 365 || Veeam.params.created_after < 1) {
             			throw 'Incorrect "created_after" parameter given: ' + Veeam.params.created_after + '\nMust be between 1 and 365 days.';
             		}
+            
+            		Veeam.tls = new CTlsConfig(params.tls_verify);
+            		Veeam.tls.checkURL(Veeam.params.api_endpoint);
+            		Veeam.request = new HttpRequest(Veeam.tls.options);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -250,6 +279,8 @@ zabbix_export:
               value: '{$VEEAM.HTTP.PROXY}'
             - name: password
               value: '{$VEEAM.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}'
             - name: user
               value: '{$VEEAM.USER}'
           tags:
@@ -382,10 +413,36 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   var auth_response,
                   	token,
-                  	request = new HttpRequest(),
-                  	url = '{$VEEAM.API.URL}' + '/api/v1/securityAnalyzer/bestPractices',
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
+                  	url = tls.checkURL('{$VEEAM.API.URL}' + '/api/v1/securityAnalyzer/bestPractices'),
                   	response;
                   
                   try {
@@ -1552,7 +1609,7 @@ zabbix_export:
           description: 'Filter of discoverable authorization events by name.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'Authorization event name filter (include)'
             description: 'A regex pattern to include authorization events by name.'
@@ -1561,7 +1618,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable authorization events by name.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'Authorization event name filter (exclude)'
             description: 'A regex pattern to exclude authorization events by name.'
@@ -1570,7 +1627,7 @@ zabbix_export:
           description: 'Filter of discoverable authorization events by state.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '44'
             section_name: Filters
             label: 'Authorization event state filter (include)'
             description: 'A regex pattern to include authorization events by state.'
@@ -1579,7 +1636,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable authorization events by state.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Filters
             label: 'Authorization event state filter (exclude)'
             description: 'A regex pattern to exclude authorization events by state.'
@@ -1588,17 +1645,33 @@ zabbix_export:
           description: 'Returns sessions that are created after chosen days.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Created after'
             description: 'Returns sessions that are created after chosen days.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$JOB.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable jobs by name.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Job name filter (include)'
             description: 'A regex pattern to include jobs by name.'
@@ -1607,7 +1680,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by name.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Job name filter (exclude)'
             description: 'A regex pattern to exclude jobs by name.'
@@ -1616,7 +1689,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by status.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Job status filter (include)'
             description: 'A regex pattern to include jobs by status.'
@@ -1625,7 +1698,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by status.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Job status filter (exclude)'
             description: 'A regex pattern to exclude jobs by status.'
@@ -1634,7 +1707,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by type.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Job type filter (include)'
             description: 'A regex pattern to include jobs by type.'
@@ -1643,7 +1716,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by type.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Job type filter (exclude)'
             description: 'A regex pattern to exclude jobs by type.'
@@ -1652,7 +1725,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by severity.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Malware event severity filter (include)'
             description: 'A regex pattern to include malware events by severity.'
@@ -1661,7 +1734,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by severity.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Malware event severity filter (exclude)'
             description: 'A regex pattern to exclude malware events by severity.'
@@ -1670,7 +1743,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by state.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Malware event state filter (include)'
             description: 'A regex pattern to include malware events by state.'
@@ -1679,7 +1752,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by state.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Malware event state filter (exclude)'
             description: 'A regex pattern to exclude malware events by state.'
@@ -1688,7 +1761,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by type.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Malware event type filter (include)'
             description: 'A regex pattern to include malware events by type.'
@@ -1697,7 +1770,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by type.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Malware event type filter (exclude)'
             description: 'A regex pattern to exclude malware events by type.'
@@ -1706,7 +1779,7 @@ zabbix_export:
           description: 'Filter of discoverable proxies by name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Proxies name filter (include)'
             description: 'A regex pattern to include proxies by name.'
@@ -1715,7 +1788,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable proxies by name.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Proxies name filter (exclude)'
             description: 'A regex pattern to exclude proxies by name.'
@@ -1724,7 +1797,7 @@ zabbix_export:
           description: 'Filter of discoverable proxies by type.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Proxies type filter (include)'
             description: 'A regex pattern to include proxies by type.'
@@ -1733,7 +1806,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable proxies by type.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Proxies type filter (exclude)'
             description: 'A regex pattern to exclude proxies by type.'
@@ -1742,7 +1815,7 @@ zabbix_export:
           description: 'Filter of discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Repositories name filter (include)'
             description: 'A regex pattern to include repositories by name.'
@@ -1751,7 +1824,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Repositories name filter (exclude)'
             description: 'A regex pattern to exclude repositories by name.'
@@ -1760,7 +1833,7 @@ zabbix_export:
           description: 'Filter of discoverable repositories by type.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Repositories type filter (include)'
             description: 'A regex pattern to include repositories by type.'
@@ -1769,7 +1842,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable repositories by type.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Repositories type filter (exclude)'
             description: 'A regex pattern to exclude repositories by type.'
@@ -1778,7 +1851,7 @@ zabbix_export:
           description: 'Filter of discoverable security best practices by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Security best practice name filter (include)'
             description: 'A regex pattern to include security best practices by name.'
@@ -1787,7 +1860,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable security best practices by name.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Security best practice name filter (exclude)'
             description: 'A regex pattern to exclude security best practices by name.'
@@ -1796,7 +1869,7 @@ zabbix_export:
           description: 'Filter of discoverable security best practices by status.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Security best practice status filter (include)'
             description: 'A regex pattern to include security best practices by status.'
@@ -1805,7 +1878,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable security best practices by status.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Security best practice status filter (exclude)'
             description: 'A regex pattern to exclude security best practices by status.'
@@ -1814,7 +1887,7 @@ zabbix_export:
           description: 'Filter of discoverable sessions by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Session name filter (include)'
             description: 'A regex pattern to include sessions by name.'
@@ -1823,7 +1896,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable sessions by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Session name filter (exclude)'
             description: 'A regex pattern to exclude sessions by name.'
@@ -1832,7 +1905,7 @@ zabbix_export:
           description: 'Filter of discoverable sessions by result.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Session result filter (include)'
             description: 'A regex pattern to include sessions by result.'
@@ -1841,7 +1914,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable sessions by result.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Session result filter (exclude)'
             description: 'A regex pattern to exclude sessions by result.'
@@ -1850,7 +1923,7 @@ zabbix_export:
           description: 'Filter of discoverable sessions by type.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Session type filter (include)'
             description: 'A regex pattern to include sessions by type.'
@@ -1859,7 +1932,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable sessions by type.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Session type filter (exclude)'
             description: 'A regex pattern to exclude sessions by type.'
@@ -1886,7 +1959,7 @@ zabbix_export:
           description: 'The update interval for the get metrics item.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'Update data interval'
             description: 'The update interval for the get metrics item.'
@@ -1895,7 +1968,7 @@ zabbix_export:
           description: 'A response timeout for the API.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Other
             label: 'API response timeout'
             description: 'A response timeout for the API in seconds.'
@@ -1913,7 +1986,7 @@ zabbix_export:
           description: 'Number of days until the license expires.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Other
             label: 'License expiry warning (days)'
             description: 'Number of days until the license expires.'
@@ -1923,7 +1996,7 @@ zabbix_export:
           description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: Password
             description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
             required: 'YES'
@@ -1932,7 +2005,7 @@ zabbix_export:
           description: 'Repository space warning threshold, expressed in %.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Thresholds
             label: 'Repository space warning threshold'
             description: 'Repository space warning threshold, expressed in %. In the range from 0 to 100 inclusive.'
@@ -1942,7 +2015,7 @@ zabbix_export:
           description: 'The update interval for the security analyzer best practices item.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'Update security data interval'
             description: 'The update interval for the security analyzer best practices get metrics item in hours.'
@@ -1951,7 +2024,7 @@ zabbix_export:
           description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: Username
             description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'
             required: 'YES'

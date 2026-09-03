@@ -39,7 +39,7 @@ zabbix_export:
         Install Zabbix agent on the AIX OS according to Zabbix documentation.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -420,6 +420,17 @@ zabbix_export:
           tags:
             - tag: component
               value: os
+        - uuid: 59c429d16bbf4783a16b79486901cefd
+          name: 'Block devices: Get data'
+          key: 'vfs.dev.get[disk_stats,.*]'
+          history: '0'
+          value_type: TEXT
+          description: 'Retrieves block device configuration and I/O statistics for discovery and dependent items.'
+          tags:
+            - tag: component
+              value: raw
+            - tag: component
+              value: storage
         - uuid: 4771d6d33c2247d6843198152a7065a8
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
@@ -549,6 +560,157 @@ zabbix_export:
                   item:
                     host: 'AIX by Zabbix agent'
                     key: 'net.if.out[{#IFNAME}]'
+        - uuid: c2e2463c567a448697932f45794812c7
+          name: 'Block devices discovery'
+          type: DEPENDENT
+          key: vfs.dev.dependent.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#DEVNAME}'
+                value: '{$AIX.VFS.DEV.NAME.MATCHES}'
+              - macro: '{#DEVNAME}'
+                value: '{$AIX.VFS.DEV.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Discovers AIX block devices from vfs.dev.get.'
+          item_prototypes:
+            - uuid: 8bd47fa6370147cc86c09812561c1090
+              name: 'Disk [{#DEVNAME}]: I/O time'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.io.time[{#DEVNAME}]'
+              value_type: FLOAT
+              units: s
+              description: 'Time spent doing I/O.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name == ''{#DEVNAME}'')].stats.io_time_ms.first()'
+                - type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+              trigger_prototypes:
+                - uuid: c36a5d2cd0f64efcac7e0abd7b37fdc7
+                  expression: 'min(/AIX by Zabbix agent/vfs.dev.disk.io.time[{#DEVNAME}],5m)>{$AIX.VFS.DEV.IO.WARN}'
+                  name: 'AIX: Disk [{#DEVNAME}]: High I/O time'
+                  event_name: 'AIX: Disk [{#DEVNAME}]: High I/O time (over {$AIX.VFS.DEV.IO.WARN} for 5m)'
+                  priority: WARNING
+                  description: 'Disk I/O time has been above {$AIX.VFS.DEV.IO.WARN} for 5 minutes.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: 237b06f0303541808e92bac0d8674f9a
+              name: 'Disk [{#DEVNAME}]: Read bytes rate'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.read.rate[{#DEVNAME}]'
+              value_type: FLOAT
+              units: Bps
+              description: 'Number of bytes read per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name == ''{#DEVNAME}'')].stats.bytes_read.first()'
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: 7d8b9261d4a64f7aa3e2183f6e5b90c4
+              name: 'Disk [{#DEVNAME}]: Read rate'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.read[{#DEVNAME}]'
+              value_type: FLOAT
+              units: '!r/s'
+              description: 'Read operations completed per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name == ''{#DEVNAME}'')].stats.reads_completed.first()'
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: c962e1dc9998451b95c54694000dae43
+              name: 'Disk [{#DEVNAME}]: Block device size'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.size[{#DEVNAME}]'
+              units: B
+              description: 'Total size of the block device.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.config[?(@.name == ''{#DEVNAME}'')].size_bytes.first()'
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: 0c9a8e1e4ea34c049c26d70640fd96e4
+              name: 'Disk [{#DEVNAME}]: Write bytes rate'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.write.rate[{#DEVNAME}]'
+              value_type: FLOAT
+              units: Bps
+              description: 'Number of bytes written per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name == ''{#DEVNAME}'')].stats.bytes_written.first()'
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: 844e54adbf7e4b61ba0e5fe9420fc92a
+              name: 'Disk [{#DEVNAME}]: Write rate'
+              type: DEPENDENT
+              key: 'vfs.dev.disk.write[{#DEVNAME}]'
+              value_type: FLOAT
+              units: '!w/s'
+              description: 'Write operations completed per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name == ''{#DEVNAME}'')].stats.writes_completed.first()'
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+          master_item:
+            key: 'vfs.dev.get[disk_stats,.*]'
+          lld_macro_paths:
+            - lld_macro: '{#DEVNAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.config
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 4a0b17decdf1449d9463cf00720a843d
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
@@ -902,6 +1064,15 @@ zabbix_export:
             section_name: Other
             label: 'Seconds since the last Zabbix agent seen'
             description: 'Timeout after which the agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (in passive mode).'
+        - macro: '{$AIX.VFS.DEV.IO.WARN}'
+          value: '0.9'
+          description: 'Warning threshold for disk I/O time in seconds.'
+        - macro: '{$AIX.VFS.DEV.NAME.MATCHES}'
+          value: '^hdisk[0-9]+$'
+          description: 'Block devices to include in discovery.'
+        - macro: '{$AIX.VFS.DEV.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Block devices to exclude from discovery.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
           description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'

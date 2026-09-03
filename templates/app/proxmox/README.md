@@ -66,6 +66,7 @@ Please provide the necessary access levels for both the User and the Token:
 |{$PVE.URL.PORT}|<p>The port number of the Proxmox VE API host.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Proxmox VE", e.g. {$HTTP.TLS.VERIFY:"Proxmox VE"}.</p>|`full`|
 |{$PVE.PROXY}|<p>Proxy settings for the Proxmox VE API.</p>||
 |{$PVE.PARAMS.INTERVAL.CLUSTER}|<p>Interval for cluster data retrieval.</p>|`1m`|
 |{$PVE.PARAMS.INTERVAL.USER}|<p>Interval for user data retrieval.</p>|`1h`|

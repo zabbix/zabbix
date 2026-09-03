@@ -48,7 +48,8 @@ class TabIndicators {
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const GRAPH = document.querySelector('form.dashboard-widget-svggraph');
 		const HOST = document.querySelector('#host-form');
-		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
+		const HOST_DISCOVERY = document.querySelector('#lldrule-form');
+		const HOST_DISCOVERY_PROTOTYPE = document.querySelector('#lldrule-prototype-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
@@ -80,6 +81,8 @@ class TabIndicators {
 				return HOST;
 			case !!HOST_DISCOVERY:
 				return HOST_DISCOVERY;
+			case !!HOST_DISCOVERY_PROTOTYPE:
+				return HOST_DISCOVERY_PROTOTYPE;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
 			case !!PROXY:
@@ -901,10 +904,9 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const form_rows = [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.macro')]
-			.filter(el => el.value !== '');
-
-		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
+		return [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
+			.filter(el => el.value !== '')
+			.length;
 	}
 
 	initObserver() {

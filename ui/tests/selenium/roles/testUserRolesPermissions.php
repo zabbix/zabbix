@@ -373,6 +373,7 @@ class testUserRolesPermissions extends CWebTest {
 			if (in_array('Cancel', $data['form_button'])) {
 				$this->query('button:Cancel')->one()->click();
 				COverlayDialogElement::ensureNotPresent();
+				$this->page->waitUntilReady();
 			}
 
 			if ($action_status) {
