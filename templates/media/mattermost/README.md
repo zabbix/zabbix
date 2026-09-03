@@ -1,10 +1,63 @@
-
+![](images/logo.png?raw=true)
 # Mattermost webhook
-![](images/logoHorizontal.png?raw=true)
+
+## Overview
 
 This guide describes how to integrate your Zabbix 8.0 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
-## Setting up a Mattermost bot
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Parameters
+
+After importing the webhook, you can configure it using webhook parameters.
+
+### Configurable parameters
+
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|bot_token|\<YOUR BOT TOKEN\>|Mattermost bot token.|
+|mattermost_url|\<YOUR MATTERMOST URL\>|Mattermost URL.|
+|send_mode|alarm|Mattermost notification mode.|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Mattermost"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Mattermost", e.g. {$HTTP.TLS.VERIFY:"Mattermost"}.|
+|zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
+
+### Internal parameters
+
+Internal parameters are reserved for predefined macros that are not meant to be changed.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+|alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
+|discovery_host_dns|\{DISCOVERY\.DEVICE\.DNS\}|DNS name of the discovered device.|
+|discovery_host_ip|\{DISCOVERY\.DEVICE\.IPADDRESS\}|IP address of the discovered device.|
+|event_date|\{EVENT\.DATE\}|Date of the event that triggered an action.|
+|event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
+|event_nseverity|\{EVENT\.NSEVERITY\}|Numeric value of the event severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_opdata|\{EVENT\.OPDATA\}|Operational data of the underlying trigger of a problem.|
+|event_recovery_date|\{EVENT\.RECOVERY\.DATE\}|Date of the recovery event.|
+|event_recovery_time|\{EVENT\.RECOVERY\.TIME\}|Time of the recovery event.|
+|event_severity|\{EVENT\.SEVERITY\}|Name of the event severity.|
+|event_source|\{EVENT\.SOURCE\}|Numeric value of the event source. Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal, 4 - Service.|
+|event_tags|\{EVENT\.TAGS\}|A comma-separated list of event tags. Expanded to an empty string if no tags exist.|
+|event_time|\{EVENT\.TIME\}|Time of the event that triggered an action.|
+|event_update_date|\{EVENT\.UPDATE\.DATE\}|Date of event [update]('https://www.zabbix.com/documentation/current/manual/config/notifications/action/update_operations') (acknowledgment, etc).|
+|event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
+|event_update_time|\{EVENT\.UPDATE\.TIME\}|Time of event [update]('https://www.zabbix.com/documentation/current/manual/config/notifications/action/update_operations') (acknowledgment, etc).|
+|event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
+|host_ip|\{HOST\.IP\}|Host IP address|
+|host_name|\{HOST\.HOST\}|Host name.|
+|send_to|\{ALERT\.SENDTO\}|'Send to' value from user media configuration.|
+|trigger_description|\{TRIGGER\.DESCRIPTION\}|Trigger description.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
+
+## Service setup
 
 1\. From the **Main menu** of your Mattermost installation, select **Integrations** and click on the **Bot accounts** block. 
 
@@ -37,10 +90,7 @@ This guide describes how to integrate your Zabbix 8.0 installation with Mattermo
 [![](images/thumb.14.png?raw=true)](images/14.png)
 [![](images/thumb.13.png?raw=true)](images/13.png)
 
-
-## Zabbix Webhook configuration
-
-### Create a global macro
+## Zabbix configuration
 
 1\. Before setting up the **Webhook**, you need to setup the global macro **{$ZABBIX.URL}**, which must contain the **URL** to the **Zabbix frontend**.
 
@@ -58,7 +108,6 @@ This guide describes how to integrate your Zabbix 8.0 installation with Mattermo
 		- Recovery message from Zabbix will update initial message
 	- **event**
 		- Recovery and update messages from Zabbix will be posted as new messages
-
 
 4\. Click the **Update** button to save the **Webhook** settings.
 
@@ -83,6 +132,8 @@ You can view the channel identifier in the channel properties.
 
 For more information, use the [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
 
-## Supported Versions
+## Feedback
 
-Zabbix 8.0
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
