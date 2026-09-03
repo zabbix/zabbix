@@ -10,7 +10,9 @@ SERVER_tests = \
 	dc_function_calculate_nextcheck \
 	um_cache_sync \
 	um_cache_resolve \
-	um_cache_resolve_cont
+	um_cache_resolve_cont \
+	dc_sync_settings
+endif
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -150,6 +152,22 @@ um_cache_resolve_cont_SOURCES = \
 um_cache_resolve_cont_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
+
+dc_sync_settings_CFLAGS = -I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
+dc_sync_settings_SOURCES = \
+	dc_sync_settings.c \
+	um_cache_mock.c \
+	um_cache_mock.h
+dc_sync_settings_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+dc_sync_settings_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=__zbx_shmem_malloc \
 	-Wl,--wrap=__zbx_shmem_realloc \
 	-Wl,--wrap=__zbx_shmem_free
