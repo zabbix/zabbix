@@ -28,6 +28,7 @@ declare -A BASELINE_TIMES=(
   [testProxyConfSync]=70
   [testComplexServiceStatus]=66
   [testItemRate]=66
+  [testHousekeepingConfSync]=60
   [testTelnetChecks]=54
   [testUserParametersReload]=47
   [testEventsCauseAndSymptoms]=44
