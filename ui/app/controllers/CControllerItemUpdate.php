@@ -269,29 +269,39 @@ class CControllerItemUpdate extends CControllerItem {
 			'units' => ['db items.units',
 				'when' => ['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
 			],
-			'delay_flex' => ['objects', 'fields' => [
-				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
-				'schedule' => ['string', 'required', 'not_empty',
-					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Invalid interval.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
+			'delay_flex' => ['objects',
+				'fields' => [
+					'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
+					'schedule' => ['string', 'required',
+						'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
+						'messages' => ['use' => _('Invalid interval.')],
+						'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
+					],
+					'delay' => ['string', 'required',
+						'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
+						'messages' => ['use' => _('Invalid interval.')],
+						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+					],
+					'period' => [
+						[
+							'string', 'required',
+							'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+							'messages' => ['use' => _('Invalid period.')],
+							'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+						],
+						['string', 'required', 'not_empty', 'when' => ['delay', 'not_empty']]
+					]
 				],
-				'delay' => ['string', 'required', 'not_empty',
-					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Invalid interval.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-				],
-				'period' => ['string', 'required', 'not_empty',
-					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Invalid period.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-				]
-			]],
+				'when' => ['type', 'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT]]
+			],
 			'delay' => [
 				['string',
 					'not_in' => ['0', ...array_map(fn (string $suffix) => "0$suffix", str_split(ZBX_TIME_SUFFIXES))],
 					'messages' => ['not_in' => _('This field cannot be set to "0" without defining custom intervals.')],
-					'when' => ['delay_flex', 'empty']
+					'when' => [
+						['delay_flex', 'empty'],
+						['type', 'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT]]
+					]
 				],
 				['db items.delay', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class,

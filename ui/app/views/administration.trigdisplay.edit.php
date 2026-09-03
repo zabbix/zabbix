@@ -29,7 +29,6 @@ $form_list = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
 		->setUncheckedValue(EVENT_CUSTOM_COLOR_DISABLED)
 		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-		->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColorPicker('problem_unack_color'))
@@ -152,17 +151,21 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigdisplay')))->removeId())
 	->setId('trigdisplay-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'trigdisplay.update')
-		->getUrl()
-	)
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $form_list)
 			->setFooter(makeFormFooter(
-				new CSubmit('update', _('Update')),
-				[new CButton('resetDefaults', _('Reset defaults'))]
+				(new CSubmit('', _('Update')))->addClass('js-submit'),
+				[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 			))
 	);
 
 $html_page->addItem($form)->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+	]).')'))
+	->setOnDocumentReady()
+	->show();

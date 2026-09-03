@@ -16,11 +16,11 @@
 
 class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'recipientid' =>			'id',
 			'old_recipientid' =>		'id',
@@ -30,14 +30,13 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			'creatorid' =>				'id',
 			'creator_type' =>			'in '.ZBX_REPORT_CREATOR_TYPE_USER.','.ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
 			'creator_name' =>			'string',
-			'exclude' =>				'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
 			'userids' =>				'array',
 			'usrgrpids' =>				'array',
-			'edit' =>					'in 1',
-			'update' =>					'in 1'
+			'exclude' =>				'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
+			'edit' =>					'in 1'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateSubscription();
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -52,86 +51,12 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 		return $ret;
 	}
 
-	/**
-	 * Validate subscription to add or update.
-	 *
-	 * @return bool
-	 */
-	protected function validateSubscription(): bool {
-		if (!$this->hasInput('update')) {
-			return true;
-		}
-
-		$recipientid = $this->getInput('recipientid', 0);
-
-		if (!$recipientid) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Recipient'), _('cannot be empty')));
-
-			return false;
-		}
-
-		$recipient_type = $this->getInput('recipient_type', ZBX_REPORT_RECIPIENT_TYPE_USER);
-
-		if (($recipient_type == ZBX_REPORT_RECIPIENT_TYPE_USER
-					&& in_array($recipientid, $this->getInput('userids', [])))
-				|| ($recipient_type == ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP
-					&& in_array($recipientid, $this->getInput('usrgrpids', [])))) {
-			if ($this->getInput('edit', 0) == 1 && $recipientid == $this->getInput('old_recipientid', 0)) {
-				return true;
-			}
-
-			error(_('Recipient already exists.'));
-
-			return false;
-		}
-
-		return true;
-	}
-
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
 			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 	}
 
-	protected function doAction() {
-		$this->setResponse($this->hasInput('update') ? $this->prepareJsonResponse() : $this->prepareViewResponse());
-	}
-
-	/**
-	 * Prepare response data for the report editing form in JSON format.
-	 *
-	 * @return CControllerResponse
-	 */
-	protected function prepareJsonResponse(): CControllerResponse {
-		$data = [];
-		$this->getInputs($data, ['recipientid', 'old_recipientid', 'recipient_type', 'recipient_name',
-			'recipient_inaccessible', 'creator_type', 'edit'
-		]);
-
-		if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
-			$data['exclude'] = $this->getInput('exclude');
-		}
-
-		if ($data['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER) {
-			$data['creatorid'] = CWebUser::$data['userid'];
-			$data['creator_name'] = getUserFullname(CWebUser::$data);
-			$data['creator_inaccessible'] = 0;
-		}
-		else {
-			$data['creatorid'] = 0;
-			$data['creator_name'] = _('Recipient');
-			$data['creator_inaccessible'] = $data['recipient_inaccessible'];
-		}
-
-		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
-	}
-
-	/**
-	 * Prepare response data to render the subscription editing form.
-	 *
-	 * @return CControllerResponse
-	 */
-	protected function prepareViewResponse(): CControllerResponse {
+	protected function doAction(): void {
 		$data = [
 			'action' => $this->getAction(),
 			'edit' => 0,
@@ -148,10 +73,14 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 
 		if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
 			$data['exclude'] = $this->getInput('exclude', ZBX_REPORT_EXCLUDE_USER_FALSE);
-			$data['userids'] = $this->getInput('userids', []);
+			$data['userids'] = array_values(array_diff($this->getInput('userids', []), [$data['old_recipientid']]));
+			$data['usrgrpids'] = [];
 		}
 		else {
-			$data['usrgrpids'] = $this->getInput('usrgrpids', []);
+			$data['userids'] = [];
+			$data['usrgrpids'] = array_values(
+				array_diff($this->getInput('usrgrpids', []), [$data['old_recipientid']])
+			);
 		}
 
 		$data['recipient_ms'] = ($data['recipientid'] != 0)
@@ -162,9 +91,14 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			'title' => _('Subscription'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerPopupScheduledReportSubscriptionCheck::getValidationRules($data['userids'],
+					$data['usrgrpids']
+				)
+			))->getRules()
 		];
 
-		return new CControllerResponseData($data);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

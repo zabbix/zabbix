@@ -47,10 +47,6 @@ foreach ($data['macros'] as $i => $macro) {
 		->setErrorContainer('macro_'.$i.'_error_container')
 		->setErrorLabel(_('Macro'));
 
-	if ($i == 0) {
-		$macro_input->setAttribute('autofocus', 'autofocus');
-	}
-
 	$value = array_key_exists('value', $macro) ? $macro['value'] : null;
 	$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value))
 		->setErrorContainer('macro_'.$i.'_error_container')

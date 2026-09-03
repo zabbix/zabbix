@@ -28,6 +28,9 @@ class CTimeUnitValidatorTest extends TestCase {
 			['{$MACRO}',	['usermacros' => true, 'max' => ZBX_MAX_DATE],					null],
 			['{#MACRO}',	['lldmacros' => true, 'max' => ZBX_MAX_DATE],					null],
 			['5y',			['with_year' => true, 'max' => ZBX_MAX_DATE],					null],
+			['0',			['accept_zero' => true, 'min' => 10, 'max' => 50],				null],
+			['0s',			['accept_zero' => true, 'min' => 10, 'max' => 50],				null],
+			['0h',			['accept_zero' => true, 'min' => 10, 'max' => 50],				null],
 
 			// Invalid time: format.
 			['-2s',			[],																'a time unit is expected'],

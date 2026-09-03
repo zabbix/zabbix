@@ -99,11 +99,11 @@
 			curl.setArgument('action', 'iconmap.list');
 			this.#list_action = curl.getUrl();
 
-			const clone_btn = document.getElementById('clone');
-			clone_btn && clone_btn.addEventListener('click', () => this.#clone());
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-clone')
+				?.addEventListener('click', () => this.#clone());
 
-			const delete_btn = document.getElementById('delete');
-			delete_btn && delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
+				?.addEventListener('click', () => this.#delete());
 
 			document.querySelectorAll('z-select').forEach(zselect => {
 				zselect.setAttribute('width', zselect._listWidth());
@@ -111,7 +111,7 @@
 		}
 
 		#clone() {
-			this.#setLoadingStatus(['clone']);
+			this.#setLoadingStatus('js-clone');
 
 			const curl = new Curl(this.form_element.getAttribute('action')),
 				{name, mappings, default_iconid} = this.form.getAllValues();
@@ -149,7 +149,7 @@
 		}
 
 		submit() {
-			this.#setLoadingStatus(['add', 'update']);
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 			const fields = this.form.getAllValues();
 
@@ -183,7 +183,8 @@
 								location.href = this.#list_action;
 							}
 						})
-						.catch((exception) => this.#ajaxExceptionHandler(exception));
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus())
 			});
 		}
 
@@ -191,14 +192,21 @@
 			const src = 'imgstore.php?&width=<?= ZBX_ICON_PREVIEW_WIDTH ?>&height='
 					+ '<?= ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + iconid;
 
-			img.setAttribute('src', src);
-			img.setAttribute('data-image-full', 'imgstore.php?iconid=' + iconid);
+			img.src = src;
+			img.dataset.imageFull = 'imgstore.php?iconid=' + iconid;
 		}
 
-		#delete(url) {
+		#delete() {
 			if (window.confirm('<?= _('Delete icon map?') ?>')) {
-				this.#setLoadingStatus(['delete']);
-				redirect(url, 'post', 'action', undefined, true);
+				this.#setLoadingStatus('js-delete');
+
+				const params = {
+					action: 'iconmap.delete',
+					iconmapid: this.form.findFieldByName('iconmapid').getValue()
+				};
+				params[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('iconmap')) ?>;
+
+				redirect(zabbixUrl(params), 'post', 'action', undefined, true);
 			}
 		}
 
@@ -221,35 +229,27 @@
 			this.#unsetLoadingStatus();
 		}
 
-		#setLoadingStatus(loading_ids) {
-			[
-				document.getElementById('add'),
-				document.getElementById('clone'),
-				document.getElementById('delete'),
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
-					button.setAttribute('disabled', true);
+		#setLoadingStatus(loading_btn_class) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-					if (loading_ids.includes(button.id)) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
+
+					if (button.classList.contains(loading_btn_class)) {
 						button.classList.add('is-loading');
 					}
-				}
-			});
+				});
 		}
 
 		#unsetLoadingStatus() {
-			[
-				document.getElementById('add'),
-				document.getElementById('clone'),
-				document.getElementById('delete'),
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
 					button.classList.remove('is-loading');
-					button.removeAttribute('disabled');
-				}
-			});
+					button.disabled = false;
+				});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 
 	}

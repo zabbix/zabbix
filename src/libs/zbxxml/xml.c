@@ -39,59 +39,6 @@ struct _zbx_xml_node_t
 
 ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *)
 
-static char	data_static[ZBX_MAX_B64_LEN];
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get DATA from <tag>DATA</tag>                                     *
- *                                                                            *
- * !!! Attention: static !!! Not thread-safe                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
-{
-	size_t		len, sz;
-	const char	*start, *end;
-
-	sz = sizeof(data_static);
-
-	len = zbx_snprintf(data_static, sz, "<%s>", tag);
-	if (NULL == (start = strstr(xml, data_static)))
-		return FAIL;
-
-	zbx_snprintf(data_static, sz, "</%s>", tag);
-	if (NULL == (end = strstr(xml, data_static)))
-		return FAIL;
-
-	if (end < start)
-		return FAIL;
-
-	start += len;
-	len = end - start;
-
-	if (len > sz - 1)
-		*data = (char *)zbx_malloc(*data, len + 1);
-	else
-		*data = data_static;
-
-	zbx_strlcpy(*data, start, len + 1);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * !!! Attention: static !!! Not thread-safe                                  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_xml_free_data_dyn(char **data)
-{
-	if (*data == data_static)
-		*data = NULL;
-	else
-		zbx_free(*data);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: replace <> symbols in string with &lt;&gt; so the resulting       *
@@ -1562,5 +1509,25 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: logs outer XML string of specified node                           *
+ *                                                                            *
+ * Parameters: node      - [IN] XML node                                      *
+ *             log_level - [IN] debug, warning, etc                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_xml_node_dump(xmlNode *node, int log_level)
+{
+	xmlBufferPtr	buffer;
+
+	if (NULL == node || NULL == (buffer = xmlBufferCreate()))
+		return;
+
+	xmlNodeDump(buffer, node->doc, node, 0, 1);
+	zabbix_log(log_level, "outer XML:%s", (const char *)xmlBufferContent(buffer));
+	xmlBufferFree(buffer);
 }
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL

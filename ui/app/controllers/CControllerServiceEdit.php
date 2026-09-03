@@ -29,10 +29,12 @@ class CControllerServiceEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'serviceid' => ['db services.serviceid'],
 			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']]
-		]]);
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -211,6 +213,8 @@ class CControllerServiceEdit extends CController {
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$data['js_validation_rules'] = (new CFormValidator($js_validation_rules))->getRules();
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerServiceCreate::getValidationRules()))
+			->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

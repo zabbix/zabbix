@@ -1062,6 +1062,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / (double)total * 100));
 		}
+		else if (0 == strcmp(tmp, "paccessed"))
+		{
+			SET_DBL_RESULT(result, (0 == stats.slots_num ? 0 :
+					(double)stats.recent_entry_num / stats.slots_num * 100));
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -1107,7 +1112,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		zbx_vps_monitor_stats_t	stats;
 		zbx_vps_monitor_get_stats(&stats);
 
-		if (2 > nparams || 3 < nparams)
+		if (2 > nparams || nparams > 3)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;

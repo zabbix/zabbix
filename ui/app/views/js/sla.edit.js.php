@@ -33,6 +33,8 @@ window.sla_edit_popup = new class {
 			document.getElementById('excluded-downtime-tmpl').innerHTML
 		);
 
+		this.dialogue.classList.add('modal-popup-sla-edit');
+
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'sla.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);

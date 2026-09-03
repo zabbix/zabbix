@@ -84,7 +84,7 @@ static void	load_um_cache(zbx_um_mock_cache_t *mock_cache, zbx_mock_handle_t hco
 	zbx_um_mock_cache_t	mock_cache0;
 	zbx_dc_config_t		*config;
 	zbx_dbsync_t		gmacros, hmacros, htmpls;
-	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 	const char		*config_source_ip = "";
 	char			*config_ssl_ca_location = NULL, *config_ssl_cert_location = NULL,
@@ -119,7 +119,7 @@ static void	load_um_cache(zbx_um_mock_cache_t *mock_cache, zbx_mock_handle_t hco
 		fail_msg("invalid vault json");
 
 	zbx_dc_sync_kvs_paths(&jp, &config_vault, config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location);
+			config_ssl_cert_location, config_ssl_key_location, NULL);
 	config->um_cache->refcount++;
 
 	zbx_free(vault);

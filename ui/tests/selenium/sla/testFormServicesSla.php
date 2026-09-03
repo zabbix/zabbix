@@ -219,6 +219,8 @@ class testFormServicesSla extends CWebTest {
 		$this->checkTableElements($downtimes_table_elements, $downtimes_table);
 
 		$downtimes_table->query('button:Add')->one()->click();
+		$downtime_start = date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00';
+
 		$downtimes_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$this->assertEquals('New excluded downtime', $downtimes_dialog->getTitle());
 
@@ -229,7 +231,7 @@ class testFormServicesSla extends CWebTest {
 
 		$downtime_default_values = [
 			'Name' => '',
-			'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+			'Start time' => $downtime_start,
 			'id:duration_days' => '0',
 			'name:duration_hours' => '1',
 			'name:duration_minutes' => '0'
@@ -262,7 +264,7 @@ class testFormServicesSla extends CWebTest {
 				'field' => 'id:start_time',
 				'maxlength' => 16,
 				'placeholder' => 'YYYY-MM-DD hh:mm',
-				'value' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00'
+				'value' => $downtime_start
 			],
 			[
 				'field' => 'id:duration_days',
@@ -287,7 +289,7 @@ class testFormServicesSla extends CWebTest {
 
 		$table_data = [
 			[
-				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+				'Start time' => $downtime_start,
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
 				'Actions' => 'EditRemove'
@@ -301,6 +303,7 @@ class testFormServicesSla extends CWebTest {
 
 	public function getSlaData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -314,6 +317,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -327,7 +331,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// Duplicate SLA name
+			// #2 Duplicate SLA name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -341,6 +345,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -354,6 +359,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -367,6 +373,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -376,10 +383,11 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
-						'SLO' => 'This value must be no less than "0".'
+						'SLO' => 'Value must be greater than or equal to 0.'
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -389,11 +397,11 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
-						'SLO' => 'This value must be no greater than "100".'
+						'SLO' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
-			// TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -413,7 +421,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #8 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -430,7 +438,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #9 TODO: remove the "'Monday' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -447,7 +455,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #10 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,7 +472,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #11 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -481,6 +489,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -495,6 +504,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -509,6 +519,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -523,6 +534,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -537,7 +549,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: change the error message when ZBX-21085 will be fixed.
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -552,6 +564,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -566,6 +579,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -580,6 +594,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -598,6 +613,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -616,6 +632,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -635,6 +652,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -654,6 +672,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -672,6 +691,7 @@ class testFormServicesSla extends CWebTest {
 					'downtime_error' => 'Excluded downtime must not extend beyond 2038-01-19 05:14:07.'
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -691,6 +711,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -710,6 +731,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -729,6 +751,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'fields' => [
@@ -738,6 +761,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -767,6 +791,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #29.
 			[
 				[
 					'fields' => [
@@ -808,6 +833,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #30.
 			[
 				[
 					'fields' => [
@@ -1104,8 +1130,16 @@ class testFormServicesSla extends CWebTest {
 		}
 
 		if (array_key_exists('inline_errors', $data)) {
+			// An additional submit is required for #7 case. This validation is triggered only on form submission.
+			if (in_array('At least one entry should be selected.', $data['inline_errors'])) {
+				$form->submit();
+			}
 			$this->page->removeFocus();
-			$form->getField(array_keys($data['inline_errors'])[0])->waitUntilClassesPresent('has-error');
+			$selector = (array_keys($data['inline_errors'])[0]);
+			$field = (strpos($selector, ':') === false) ? $form->getField($selector) : $form->query($selector)->one();
+
+			// An additional wait is required for the Custom Schedule block, as the error message may appear with a delay.
+			$field->waitUntilClassesPresent('has-error');
 			$this->assertInlineError($form, $data['inline_errors']);
 		}
 

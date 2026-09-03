@@ -38,7 +38,7 @@ zabbix_export:
         Device: ZYXEL MES-3528
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -48,10 +48,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: network
@@ -586,8 +582,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{ $IFCONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. The trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1076,7 +1072,7 @@ zabbix_export:
           value: '90'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
             description: 'In the range from 0 to 100 inclusive.'
@@ -1090,6 +1086,15 @@ zabbix_export:
             section_name: Thresholds
             label: 'Time interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '3'
+            section_name: Thresholds
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
@@ -1108,7 +1113,7 @@ zabbix_export:
             2 - Fiber link
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Filter for interface link-up type (include)'
             description: |
@@ -1121,7 +1126,7 @@ zabbix_export:
           description: 'Filter to exclude discovered by link types.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for interface link-up type (exclude)'
             description: 'Filter to exclude discovered by link types.'
@@ -1130,7 +1135,7 @@ zabbix_export:
           description: 'Filter by discoverable interface names.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Filters
             label: 'Filter for interface name (include)'
             description: 'Filter by discoverable interface names.'
@@ -1139,7 +1144,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by name.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Filter for interface name (exclude)'
             description: 'Filter to exclude discovered interfaces by name.'
@@ -1152,7 +1157,7 @@ zabbix_export:
             2 - nonoperational
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for SFP status (include)'
             description: |
@@ -1165,7 +1170,7 @@ zabbix_export:
           description: 'Filter to exclude discovered by status.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Filter for SFP status (exclude)'
             description: 'Filter to exclude discovered by status.'
@@ -1174,7 +1179,7 @@ zabbix_export:
           description: 'Filter by discoverable SFP modules name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Filter for SFP DDM description (include)'
             description: 'Filter by discoverable SFP modules name.'
@@ -1183,7 +1188,7 @@ zabbix_export:
           description: 'Filter to exclude discovered SFP modules by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Filter for SFP DDM description (exclude)'
             description: 'Filter to exclude discovered SFP modules by name.'
@@ -1192,7 +1197,7 @@ zabbix_export:
           description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Other
             label: 'Update inteval'
             description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
@@ -1290,11 +1295,20 @@ zabbix_export:
               newvalue: nonoperational
   triggers:
     - uuid: d138c874f4de4f3a97a0c615d589826a
-      expression: '(last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)>0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)<10m) or (last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)=0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime)<10m)'
+      expression: |
+        (last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)>0 and change(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)<0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime,#2)<42949672.96-(lastclock(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)-lastclock(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime,#2)))
+        or (last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)=0 and change(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime)<0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime,#2)<42949672.96-(lastclock(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime)-lastclock(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime,#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)>{$SNMP.UPTIME.WARN}
+        or last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime)>{$SNMP.UPTIME.WARN}
       name: 'ZYXEL: Host has been restarted'
-      event_name: 'ZYXEL: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'ZYXEL: {HOST.NAME} has been restarted'
       priority: INFO
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       tags:
         - tag: scope

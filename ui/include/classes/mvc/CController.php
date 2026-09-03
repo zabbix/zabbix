@@ -285,10 +285,11 @@ abstract class CController {
 	 * Validate input parameters.
 	 *
 	 * @param array $validation_rules
+	 * @param bool  $global_errors     Add validation errors to global errors for INPUT_VALIDATION_FORM.
 	 *
 	 * @return bool
 	 */
-	protected function validateInput(array $validation_rules): bool {
+	protected function validateInput(array $validation_rules, bool $global_errors = false): bool {
 		if ($this->raw_input === null && $this->raw_files === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
@@ -296,18 +297,19 @@ abstract class CController {
 		}
 
 		return $this->input_validation_method == self::INPUT_VALIDATION_FORM
-			? $this->validateWithFormValidator($validation_rules)
+			? $this->validateWithFormValidator($validation_rules, $global_errors)
 			: $this->validateWithNewValidator($validation_rules);
 	}
 
 	/**
 	 * Validate input using CFormValidator.
 	 *
-	 * @param array    $validation_rules  Validation rules.
+	 * @param array $validation_rules  Validation rules.
+	 * @param bool  $global_errors     Add validation errors as global errors.
 	 *
 	 * @return bool
 	 */
-	protected function validateWithFormValidator(array $validation_rules): bool {
+	protected function validateWithFormValidator(array $validation_rules, bool $global_errors = false): bool {
 		$validator = new CFormValidator($validation_rules);
 		$data = $this->raw_input;
 		$files = $this->raw_files;
@@ -329,6 +331,10 @@ abstract class CController {
 				$this->validation_errors = $validator->getErrors();
 				$this->validation_result = self::VALIDATION_FATAL_ERROR;
 				break;
+		}
+
+		if ($global_errors) {
+			$validator->addErrorsToGlobal();
 		}
 
 		return $this->validation_result == self::VALIDATION_OK;

@@ -344,6 +344,14 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_HTTPAGENT && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON) {
+				if ($db_item !== null && $db_item['type'] != ITEM_TYPE_TRAPPER && ($db_item['type'] != ITEM_TYPE_HTTPAGENT || $db_item['allow_traps'] != HTTPCHECK_ALLOW_TRAPS_ON)) {
+					$item['trapper_hosts'] = !array_key_exists('trapper_hosts', $item)
+						? ZBX_DEFAULT_TRAPPER_HOSTS
+						: $item['trapper_hosts'];
+				}
+			}
+
 			if (array_key_exists('query_fields', $item)) {
 				if (strlen(self::prepareQueryFieldsForDb($item['query_fields']))
 						> DB::getFieldLength('items', 'query_fields')) {

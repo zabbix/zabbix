@@ -191,6 +191,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProviderTLS() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+		}
+
 		self::$certBaseDirAgent = self::generateCertificates();
 		$baseDir = self::$certBaseDirAgent;
 		return [
@@ -233,8 +237,11 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED ' .
@@ -430,6 +437,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
+	if ($this->detectTLSLibrary() === 'none') {
+		$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+	}
+
 	self::$certBaseDirProxy = self::generateCertificates();
 	$baseDir = self::$certBaseDirProxy;
 
@@ -492,20 +503,29 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+		$openssl = ('gnutls' !== $this->detectTLSLibrary());
+
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_accept():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 
@@ -561,6 +581,7 @@ class testDataCollection extends CIntegrationTest {
 			'key_' => 'trap',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'preprocessing' => [[
 				'params' => '100',
 				'type' => 1,
@@ -573,7 +594,7 @@ class testDataCollection extends CIntegrationTest {
 		$itemid = $response['result']['itemids'][0];
 		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue('trapper_host', 'trap', 1, self::COMPONENT_SERVER);
 
@@ -600,21 +621,23 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
+		$t = time();
+		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, 0, $t);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'DESC',
 			'limit' => 1,
-			'itemids' => [$itemid]
+			'itemids' => [$itemid],
+			'time_from' => $t
 		], 60, 1);
 		$this->assertArrayHasKey('result', $response);
-		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
-		$this->assertEquals(400, $response['result'][0]['value']);
+
+		$this->assertEquals(400, $response['result'][0]['value'], json_encode($response) . " result:" .
+			json_encode($result)." time:".date("U", $t));
 	}
 
 	/**
@@ -643,8 +666,7 @@ class testDataCollection extends CIntegrationTest {
 		$hostid = $response['result']['hostids'][0];
 		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$response = $this->call('host.get', [
 			'output' => ['host'],
@@ -692,8 +714,7 @@ class testDataCollection extends CIntegrationTest {
 		$itemid = $response['result']['itemids'][0];
 		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',

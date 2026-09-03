@@ -623,7 +623,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 			if ($data['default'] === DRULE_STATUS_DISABLED && array_key_exists('hintbox', $data)) {
 				$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
-						->query('button')->one()->getAttribute('data-hintbox-contents')
+						->query('button')->one()->getAttribute('data-hintbox-html')
 				);
 			}
 			else {
@@ -663,7 +663,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 				if (array_key_exists('hintbox', $data)) {
 					$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
-							->query('button')->one()->getAttribute('data-hintbox-contents')
+							->query('button')->one()->getAttribute('data-hintbox-html')
 					);
 				}
 

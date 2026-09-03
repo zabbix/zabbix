@@ -42,7 +42,7 @@ zabbix_export:
         3. If you use an atypical location of ES API, don't forget to change the host wizard configuration fields `Elasticsearch scheme`,`Elasticsearch port`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -71,7 +71,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns the health status of a cluster.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s&filter_path=status,number_of_nodes,number_of_data_nodes,active_shards_percent_as_number,unassigned_shards,initializing_shards,relocating_shards,delayed_unassigned_shards,number_of_pending_tasks,task_max_waiting_in_queue_millis'
           tags:
             - tag: component
               value: raw
@@ -86,7 +86,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster statistics.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/stats?filter_path=indices.count,indices.docs.count,nodes.count.*,nodes.fs.*,nodes.jvm.max_uptime_in_millis'
           tags:
             - tag: component
               value: raw
@@ -460,7 +460,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster nodes statistics.'
           timeout: 30s
-          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/stats?filter_path=nodes.*.name,nodes.*.fs.total.*,nodes.*.jvm.uptime_in_millis,nodes.*.jvm.mem.heap*,nodes.*.indices.*,nodes.*.thread_pool.*,nodes.*.http.current_open,nodes.*.http.total_opened'
           tags:
             - tag: component
               value: raw
@@ -640,7 +640,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.http.opened.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of HTTP connections opened for the node per second.'
               preprocessing:
                 - type: JSONPATH
@@ -659,9 +659,19 @@ zabbix_export:
               type: CALCULATED
               key: 'es.node.indices.flush.latency[{#ES.NODE}]'
               value_type: FLOAT
-              units: ms
-              params: 'change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
-              description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
+              units: '!ms'
+              params: 'change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / (change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
+              description: |
+                The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.
+                If the calculated value cannot be evaluated due to missing historical data, the item returns '-1', indicating that there is not enough data to calculate the metric yet.
+              valuemap:
+                name: 'Missing data condition'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               tags:
                 - tag: component
                   value: operations
@@ -702,7 +712,7 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent on flushing indices to disk'
               type: DEPENDENT
               key: 'es.node.indices.flush.total_time_in_millis[{#ES.NODE}]'
-              units: ms
+              units: '!ms'
               description: 'Total time in milliseconds spent performing flush operations.'
               preprocessing:
                 - type: JSONPATH
@@ -742,9 +752,19 @@ zabbix_export:
               type: CALCULATED
               key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
               value_type: FLOAT
-              units: ms
-              params: 'change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
-              description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
+              units: '!ms'
+              params: 'change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
+              description: |
+                The average indexing latency calculated from the available index_total and index_time_in_millis metrics.
+                If the calculated value cannot be evaluated due to missing historical data, the item returns '-1', indicating that there is not enough data to calculate the metric yet.
+              valuemap:
+                name: 'Missing data condition'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               tags:
                 - tag: component
                   value: operations
@@ -766,7 +786,7 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing indexing'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]'
-              units: ms
+              units: '!ms'
               description: 'Total time in milliseconds spent performing indexing operations.'
               preprocessing:
                 - type: JSONPATH
@@ -872,7 +892,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.indices.refresh.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of refresh operations per second.'
               preprocessing:
                 - type: JSONPATH
@@ -913,7 +933,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.indices.search.fetch.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of fetch operations per second.'
               preprocessing:
                 - type: JSONPATH
@@ -948,9 +968,19 @@ zabbix_export:
               type: CALCULATED
               key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
               value_type: FLOAT
-              units: ms
-              params: 'change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
-              description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
+              units: '!ms'
+              params: 'change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
+              description: |
+                The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.
+                If the calculated value cannot be evaluated due to missing historical data, the item returns '-1', indicating that there is not enough data to calculate the metric yet.
+              valuemap:
+                name: 'Missing data condition'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               tags:
                 - tag: component
                   value: fetches
@@ -995,7 +1025,7 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]'
-              units: ms
+              units: '!ms'
               description: 'Time in milliseconds spent performing fetch operations.'
               preprocessing:
                 - type: JSONPATH
@@ -1035,7 +1065,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.indices.search.query.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of query operations per second.'
               preprocessing:
                 - type: JSONPATH
@@ -1070,11 +1100,19 @@ zabbix_export:
               type: CALCULATED
               key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
               value_type: FLOAT
-              units: ms
-              params: |
-                change(//es.node.indices.search.query_time_in_millis[{#ES.NODE}]) /
-                ( change(//es.node.indices.search.query_total[{#ES.NODE}]) + (change(//es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
-              description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
+              units: '!ms'
+              params: 'change(//es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / (change(//es.node.indices.search.query_total[{#ES.NODE}]) + (change(//es.node.indices.search.query_total[{#ES.NODE}]) = 0) )'
+              description: |
+                The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.
+                If the calculated value cannot be evaluated due to missing historical data, the item returns '-1', indicating that there is not enough data to calculate the metric yet.
+              valuemap:
+                name: 'Missing data condition'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               tags:
                 - tag: component
                   value: queries
@@ -1116,7 +1154,7 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_time_in_millis[{#ES.NODE}]'
-              units: ms
+              units: '!ms'
               description: 'Time in milliseconds spent performing query operations.'
               preprocessing:
                 - type: JSONPATH
@@ -1313,7 +1351,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks completed by the refresh thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1348,7 +1386,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks rejected by the refresh thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1393,7 +1431,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks completed by the search thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1428,7 +1466,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks rejected by the search thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1473,7 +1511,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks completed by the write thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1508,7 +1546,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
               value_type: FLOAT
-              units: rps
+              units: '!rps'
               description: 'The number of tasks rejected by the write thread pool executor.'
               preprocessing:
                 - type: JSONPATH
@@ -1634,7 +1672,7 @@ zabbix_export:
                     host: 'Elasticsearch Cluster by HTTP'
                     key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes?filter_path=nodes.*.name'
           lld_macro_paths:
             - lld_macro: '{#ES.NODE}'
               path: $..name.first()
@@ -1696,12 +1734,12 @@ zabbix_export:
             description: 'The maximum percent in the use of JVM heap for warning trigger expression. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.HOST}'
-          description: 'The hostname or IP address of the Elasticsearch host.'
+          description: 'Elasticsearch host.'
           config:
             type: TEXT
             priority: '3'
             label: 'Elasticsearch host'
-            description: 'The hostname or IP address of the Elasticsearch host.'
+            description: 'Elasticsearch host.'
             required: 'YES'
         - macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
           value: '100'
@@ -1714,21 +1752,22 @@ zabbix_export:
             description: 'Maximum of indexing latency in milliseconds for trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.PASSWORD}'
-          description: 'The password of the Elasticsearch.'
+          type: SECRET_TEXT
+          description: 'Elasticsearch password.'
           config:
             type: TEXT
             priority: '2'
             label: 'Elasticsearch password'
-            description: 'The password of the Elasticsearch.'
+            description: 'Elasticsearch password.'
             required: 'YES'
         - macro: '{$ELASTICSEARCH.PORT}'
           value: '9200'
-          description: 'The port of the Elasticsearch host.'
+          description: 'Elasticsearch port.'
           config:
             type: TEXT
             priority: '4'
             label: 'Elasticsearch port'
-            description: 'The port of the Elasticsearch host. In the range from 1 to 65535 inclusive.'
+            description: 'Elasticsearch port. In the range from 1 to 65535 inclusive.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
@@ -1752,12 +1791,12 @@ zabbix_export:
             description: 'The ES cluster maximum response time in seconds for trigger expression.'
         - macro: '{$ELASTICSEARCH.SCHEME}'
           value: http
-          description: 'The scheme of the Elasticsearch (http/https).'
+          description: 'Elasticsearch HTTP scheme.'
           config:
             type: LIST
             priority: '5'
             label: 'Elasticsearch scheme'
-            description: 'The scheme of the Elasticsearch (http/https).'
+            description: 'Elasticsearch HTTP scheme.'
             required: 'YES'
             options:
               - value: http
@@ -1774,12 +1813,12 @@ zabbix_export:
             label: 'Single node JVM minimum space (bytes)'
             description: 'Minimum free space available to JVM in single node instance in bytes for trigger expression.'
         - macro: '{$ELASTICSEARCH.USERNAME}'
-          description: 'The username of the Elasticsearch.'
+          description: 'Elasticsearch username.'
           config:
             type: TEXT
             priority: '1'
             label: 'Elasticsearch username'
-            description: 'The username of the Elasticsearch.'
+            description: 'Elasticsearch username.'
             required: 'YES'
       valuemaps:
         - uuid: d651bdf75d0849d5ab2b0802fab76e22
@@ -1793,6 +1832,11 @@ zabbix_export:
               newvalue: red
             - value: '255'
               newvalue: unknown
+        - uuid: c701ccabe9e54923ac107771eac7299c
+          name: 'Missing data condition'
+          mappings:
+            - value: '-1'
+              newvalue: 'Not enough data'
         - uuid: 15d416d869894fdb959ca2cda2c5e37c
           name: 'Service state'
           mappings:

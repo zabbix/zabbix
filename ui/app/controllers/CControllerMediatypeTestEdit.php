@@ -82,7 +82,10 @@ class CControllerMediatypeTestEdit extends CController {
 			'parameters' => $mediatype[0]['parameters'],
 			'type' => $mediatype[0]['type'],
 			'enabled' => ($mediatype[0]['status'] == MEDIA_STATUS_ACTIVE),
-			'user' => ['debug_mode' => $this->getDebugMode()]
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerMediatypeTestSend::getValidationRules()
+			))->getRules()
 		]));
 	}
 }

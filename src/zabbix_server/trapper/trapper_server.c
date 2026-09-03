@@ -13,6 +13,7 @@
 **/
 
 #include "trapper_history_push.h"
+#include "trapper_push_test.h"
 #include "trapper_server.h"
 
 #include "proxydata.h"
@@ -29,6 +30,7 @@
 #include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
+#include "zbx_rtc_constants.h"
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
@@ -67,7 +69,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	zbx_report_test(&jp_data, user.userid, &j);
 	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, config_timeout);
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 out:
 	zbx_user_free(&user);
 }
@@ -183,6 +185,15 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
+	if (MEDIA_TYPE_PUSH == type)
+	{
+		ret = trapper_process_push_test(sendto, subject, message, mediatypeid, type, row, smtp_port,
+				smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format,
+				&error, &debug);
+		zbx_db_free_result(result);
+		goto fail;
+	}
+
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[19], row[1], row[2], row[3], row[4],
 			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], message_format, row[17], row[18],
@@ -246,7 +257,6 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(get_program_type_cb);
-	ZBX_UNUSED(rtc);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
@@ -264,13 +274,22 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
+		int	vault_ret = SUCCEED;
+
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
 #endif
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-				config_comms->config_ssl_key_location);
+				config_comms->config_ssl_key_location, &vault_ret);
+
+		if (SUCCEED != vault_ret && NULL != config_vault->token)
+		{
+			zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char *)config_vault->token,
+					(zbx_uint32_t)strlen(config_vault->token) + 1);
+		}
 
 		return SUCCEED;
 	}
@@ -279,7 +298,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
 #endif
-		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
+		recv_proxy_data(rtc, sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 
 		return SUCCEED;
 	}

@@ -666,14 +666,11 @@ window.trigger_edit_popup = new class {
 	}
 
 	#toggleInheritedTags() {
-		const form_refresh = document.createElement('input');
+		const parameters = this.form.getAllValues();
 
-		form_refresh.setAttribute('type', 'hidden');
-		form_refresh.setAttribute('name', 'form_refresh');
-		form_refresh.setAttribute('value', 1);
-		this.form_element.append(form_refresh);
+		parameters.form_refresh = 1;
 
-		reloadPopup(this.form_element, this.action);
+		reloadPopup(this.form_element, this.action, parameters);
 	}
 
 	#getFormFields() {

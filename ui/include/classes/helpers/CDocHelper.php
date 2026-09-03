@@ -28,7 +28,7 @@ class CDocHelper {
 	const ADMINISTRATION_IMAGE_EDIT =							'web_interface/frontend_sections/administration/general#images';
 	const ADMINISTRATION_IMAGE_LIST =							'web_interface/frontend_sections/administration/general#images';
 	const ADMINISTRATION_MACROS_EDIT =							'web_interface/frontend_sections/administration/macros';
-	const ADMINISTRATION_MISCCONFIG_EDIT =						'web_interface/frontend_sections/administration/general#other-parameters';
+	const ADMINISTRATION_MISCCONFIG_EDIT =						'web_interface/frontend_sections/administration/general#other';
 	const ADMINISTRATION_MODULE_EDIT =							'extensions/frontendmodules#manifest-preparation';
 	const ADMINISTRATION_MODULE_LIST =							'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =							'distributed_monitoring/proxies#configuration';
@@ -122,6 +122,7 @@ class CDocHelper {
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
 	const POPUP_CONNECTOR_EDIT =								'config/export/streaming#configuration';
 	const POPUP_DASHBOARD_IMPORT =								'xml_export_import/dashboards#importing';
+	const POPUP_REGEXP_IMPORT =									'xml_export_import/global_regexes#importing';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';
@@ -161,11 +162,13 @@ class CDocHelper {
 	const USERS_AUTHENTICATION_EDIT =							'web_interface/frontend_sections/users/authentication';
 	const USERS_TOKEN_LIST =									'web_interface/frontend_sections/users/api_tokens';
 	const USERS_USER_EDIT =										'config/users_and_usergroups/user';
+	const USERS_DEVICE =										'web_interface/frontend_sections/users/devices';
 	const USERS_USER_LIST =										'web_interface/frontend_sections/users/user_list';
 	const USERS_USER_TOKEN_LIST =								'web_interface/user_profile#api-tokens';
 	const USERS_USERGROUP_EDIT =								'config/users_and_usergroups/usergroup#configuration';
 	const USERS_USERGROUP_LIST =								'web_interface/frontend_sections/users/user_groups';
 	const USERS_USERPROFILE_EDIT =								'web_interface/user_profile#user-profile';
+	const USERS_USERPROFILE_DEVICE =							'web_interface/user_profile#devices';
 	const USERS_USERPROFILE_NOTIFICATION_EDIT =					'web_interface/user_profile#notifications';
 	const USERS_USERROLE_EDIT =									'web_interface/frontend_sections/users/user_roles#default-user-roles';
 	const USERS_USERROLE_LIST =									'web_interface/frontend_sections/users/user_roles';

@@ -143,7 +143,7 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 	if ($value !== '') {
 		$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
-			? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
+			? (new CTrim($value, ZBX_HINTBOX_HTML_LIMIT)) : (new CDiv($value));
 
 		$value_cell->setHint(
 			$hintbox_value
@@ -154,6 +154,16 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 	switch ($column['display']) {
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as $threshold) {
+					if ($value < $threshold['threshold']) {
+						break;
+					}
+
+					$color = $threshold['color'];
+				}
+			}
+
 			$style = $color !== '' ? 'background-color: #'.$color : null;
 			$value_cell->addStyle($style);
 
@@ -270,7 +280,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 		->addClass(ZBX_STYLE_NOWRAP);
 
 	$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
-		? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
+		? (new CTrim($value, ZBX_HINTBOX_HTML_LIMIT)) : (new CDiv($value));
 
 	if ($value !== '') {
 		$value_cell->setHint(

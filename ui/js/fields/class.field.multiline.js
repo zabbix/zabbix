@@ -18,6 +18,24 @@ class CFieldMultiline extends CField {
 	init() {
 		super.init();
 		jQuery(this._field).on('change', () => this.fieldChanged());
+
+		const edit_button = this._field.querySelector('button.zi-pencil');
+
+		edit_button.addEventListener('focusout', () => {
+			setTimeout(() => {
+				if (!this._field.isConnected || $(this._field).data('multilineInput').options.disabled
+						|| $(this._field).data('multilineInput').options.readonly) {
+					return;
+				}
+
+				let element = overlays_stack.end()?.element;
+				element = element instanceof jQuery ? element[0] : element;
+
+				if (!edit_button.contains(document.activeElement) && !edit_button.contains(element)) {
+					this.onBlur();
+				}
+			});
+		});
 	}
 
 	getValueTrimmed() {
@@ -44,5 +62,27 @@ class CFieldMultiline extends CField {
 
 	isDisabled() {
 		return this._field.disabled;
+	}
+
+	lock() {
+		if ($(this._field).data().multilineInput.options.disabled) {
+			return false;
+		}
+
+		this._field.dataset.formDisabled = '';
+		$(this._field).prop('disabled', true);
+
+		return true;
+	}
+
+	unlock() {
+		if ('formDisabled' in this._field.dataset) {
+			$(this._field).prop('disabled', false);
+			delete this._field.dataset.formDisabled;
+
+			return true;
+		}
+
+		return false;
 	}
 }

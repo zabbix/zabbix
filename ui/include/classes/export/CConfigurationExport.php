@@ -64,7 +64,8 @@ class CConfigurationExport {
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => [],
-			'dashboards' => []
+			'dashboards' => [],
+			'global_regexes' => []
 		], $options);
 
 		$this->unlink_templates_data = $unlink_templates_data;
@@ -132,7 +133,8 @@ class CConfigurationExport {
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => [],
-			'dashboards' => []
+			'dashboards' => [],
+			'global_regexes' => []
 		];
 
 		$this->dataFields = [
@@ -204,7 +206,6 @@ class CConfigurationExport {
 	public function export() {
 		try {
 			$this->gatherData();
-
 			// Parameter in CImportValidatorFactory is irrelevant here, since export does not validate data.
 			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
@@ -267,6 +268,10 @@ class CConfigurationExport {
 				$this->builder->buildDashboards($schema['rules']['dashboards'], $this->data['dashboards']);
 			}
 
+			if ($this->data['global_regexes']) {
+				$this->builder->buildGlobalRegexes($schema['rules']['global_regexes'], $this->data['global_regexes']);
+			}
+
 			return $this->writer->write($this->builder->getExport());
 		}
 		catch (CConfigurationExportException $e) {
@@ -316,6 +321,10 @@ class CConfigurationExport {
 
 		if ($options['dashboards']) {
 			$this->gatherDashboards($options['dashboards']);
+		}
+
+		if ($options['global_regexes']) {
+			$this->gatherGlobalRegexes($options['global_regexes']);
 		}
 	}
 
@@ -1620,6 +1629,21 @@ class CConfigurationExport {
 			],
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
+			'preservekeys' => true
+		]);
+	}
+
+	/**
+	 * Get global regexes for export builder from database.
+	 *
+	 * @param array $regexids
+	 */
+	protected function gatherGlobalRegexes(array $regexids): void {
+		$this->data['global_regexes'] = API::Regexp()->get([
+			'output' => ['regexpid', 'name', 'description'],
+			'selectExpressions' => ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive'],
+			'regexpids' => $regexids,
 			'preservekeys' => true
 		]);
 	}

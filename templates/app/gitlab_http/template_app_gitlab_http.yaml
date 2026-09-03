@@ -41,7 +41,7 @@ zabbix_export:
         *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab's documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1104,6 +1104,7 @@ zabbix_export:
           value: gitlab
       macros:
         - macro: '{$GITLAB.HEALTH.TOKEN}'
+          type: SECRET_TEXT
           description: 'The token path for Gitlab health check. Example `?token=your_token`'
           config:
             type: TEXT

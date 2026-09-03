@@ -16,7 +16,6 @@
 const EXPANDABLE_SUBFILTER_EVENT_EXPAND = 'expand';
 
 const ZBX_STYLE_EXPANDED = 'expanded';
-const ZBX_STYLE_HIDDEN = 'hidden';
 
 // Empty space in pixels reserved for expand button.
 const ZBX_EXPAND_BUTTON_SIZE = 40;

@@ -45,7 +45,7 @@ function getLocales(): array {
 		'it_IT' => ['name' => _('Italian (it_IT)'),	'display' => true],
 		'ko_KR' => ['name' => _('Korean (ko_KR)'),	'display' => true],
 		'ja_JP' => ['name' => _('Japanese (ja_JP)'),	'display' => true],
-		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => false],
+		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => true],
 		'lt_LT' => ['name' => _('Lithuanian (lt_LT)'),	'display' => false],
 		'nb_NO' => ['name' => _('Norwegian (nb_NO)'),	'display' => true],
 		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],
@@ -65,23 +65,23 @@ function getLocales(): array {
 }
 
 /**
- * Get support URL for specified language.
+ * Get subscriptions URL for specified language.
  *
  * @param string $language  ISO639-1 code.
  *
- * @return string  Fallback to English support URL.
+ * @return string  Fallback to English subscriptions URL.
  */
-function getSupportUrl(string $language): string {
+function getSubscriptionsUrl(string $language): string {
 	$urls = [
-		'cs' => 'https://www.zabbix.com/cz/support',
-		'fr' => 'https://www.zabbix.com/fr/support',
-		'ja' => 'https://www.zabbix.com/jp/support',
-		'pt' => 'https://www.zabbix.com/br/support',
-		'ru' => 'https://www.zabbix.com/ru/support',
-		'zh' => 'https://www.zabbix.com/cn/support'
+		'cs' => 'https://www.zabbix.com/cz/subscriptions',
+		'fr' => 'https://www.zabbix.com/fr/subscriptions',
+		'ja' => 'https://www.zabbix.com/jp/subscriptions',
+		'pt' => 'https://www.zabbix.com/br/subscriptions',
+		'ru' => 'https://www.zabbix.com/ru/subscriptions',
+		'zh' => 'https://www.zabbix.com/cn/subscriptions'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/subscriptions';
 }
 
 /**

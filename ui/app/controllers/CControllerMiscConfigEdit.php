@@ -21,79 +21,52 @@ class CControllerMiscConfigEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'url' =>							'setting url',
-			'discovery_groupid' =>				'setting discovery_groupid',
-			'default_inventory_mode' =>			'setting default_inventory_mode',
-			'alert_usrgrpid' =>					'setting alert_usrgrpid',
-			'snmptrap_logging' =>				'setting snmptrap_logging',
-			'login_attempts' =>					'setting login_attempts',
-			'login_block' =>					'setting login_block',
-			'validate_uri_schemes' =>			'setting validate_uri_schemes',
-			'uri_valid_schemes' =>				'setting uri_valid_schemes',
-			'x_frame_header_enabled' =>			'in 0,1',
-			'x_frame_options' =>				'setting x_frame_options',
-			'iframe_sandboxing_enabled' =>		'setting iframe_sandboxing_enabled',
-			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
-			'vault_provider' =>					'setting vault_provider',
-			'proxy_secrets_provider' =>			'setting proxy_secrets_provider'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction(): void {
-		$data = [
-			'url' => $this->getInput('url', CSettingsHelper::get(CSettingsHelper::URL)),
-			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
-				CSettingsHelper::DISCOVERY_GROUPID
-			)),
-			'default_inventory_mode' => $this->getInput('default_inventory_mode', CSettingsHelper::get(
-				CSettingsHelper::DEFAULT_INVENTORY_MODE
-			)),
-			'alert_usrgrpid' => $this->getInput('alert_usrgrpid', CSettingsHelper::get(
-				CSettingsHelper::ALERT_USRGRPID
-			)),
-			'snmptrap_logging' => $this->getInput('snmptrap_logging', CSettingsHelper::get(
-				CSettingsHelper::SNMPTRAP_LOGGING
-			)),
-			'login_attempts' => $this->getInput('login_attempts', CSettingsHelper::get(
-				CSettingsHelper::LOGIN_ATTEMPTS
-			)),
-			'login_block' => $this->getInput('login_block', CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)),
-			'validate_uri_schemes' => $this->getInput('validate_uri_schemes', CSettingsHelper::get(
-				CSettingsHelper::VALIDATE_URI_SCHEMES
-			)),
-			'uri_valid_schemes' => $this->getInput('uri_valid_schemes', CSettingsHelper::get(
-				CSettingsHelper::URI_VALID_SCHEMES
-			)),
-			'iframe_sandboxing_enabled' => $this->getInput('iframe_sandboxing_enabled', CSettingsHelper::get(
-				CSettingsHelper::IFRAME_SANDBOXING_ENABLED
-			)),
-			'iframe_sandboxing_exceptions' => $this->getInput('iframe_sandboxing_exceptions', CSettingsHelper::get(
-				CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS
-			)),
-			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(
-				CSettingsHelper::VAULT_PROVIDER
-			)),
-			'proxy_secrets_provider' => $this->getInput('proxy_secrets_provider', CSettingsHelper::get(
-				CSettingsHelper::PROXY_SECRETS_PROVIDER
-			))
+	private function getDefaultValues(): array {
+		return [
+			'url' => CSettingsSchema::getDefault('url'),
+			'discovery_groupid' => null,
+			'default_inventory_mode' => CSettingsSchema::getDefault('default_inventory_mode'),
+			'alert_usrgrpid' => null,
+			'snmptrap_logging' => CSettingsSchema::getDefault('snmptrap_logging'),
+			'login_attempts' => CSettingsSchema::getDefault('login_attempts'),
+			'login_block' => CSettingsSchema::getDefault('login_block'),
+			'vault_provider' => CSettingsSchema::getDefault('vault_provider'),
+			'proxy_secrets_provider' => CSettingsSchema::getDefault('proxy_secrets_provider'),
+			'validate_uri_schemes' => CSettingsSchema::getDefault('validate_uri_schemes'),
+			'uri_valid_schemes' => CSettingsSchema::getDefault('uri_valid_schemes'),
+			'x_frame_options' => CSettingsSchema::getDefault('x_frame_options'),
+			'iframe_sandboxing_enabled' => CSettingsSchema::getDefault('iframe_sandboxing_enabled'),
+			'iframe_sandboxing_exceptions' => CSettingsSchema::getDefault('iframe_sandboxing_exceptions')
 		];
+	}
 
-		$x_frame_options = $this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
-		$data['x_frame_header_enabled'] = strcasecmp('null', $x_frame_options) == 0 ? 0 : 1;
-		$data['x_frame_options'] = $data['x_frame_header_enabled'] == 1	? $x_frame_options : '';
+	private function processXframeOptionConfig(array &$config): void {
+		if (strcasecmp('null', $config['x_frame_options']) == 0) {
+			$config['x_frame_header_enabled'] = 0;
+			$config['x_frame_options'] = '';
+		}
+		else {
+			$config['x_frame_header_enabled'] = 1;
+		}
+	}
+
+	protected function doAction(): void {
+		$default_values = $this->getDefaultValues();
+		$data = [];
+
+		foreach ($default_values as $key => $default_value) {
+			$data[$key] = CSettingsHelper::get($key);
+		}
+
+		$this->processXframeOptionConfig($default_values);
+		$this->processXframeOptionConfig($data);
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
@@ -110,6 +83,10 @@ class CControllerMiscConfigEdit extends CController {
 			'usrgrpids' => $data['alert_usrgrpid']
 		]);
 		$data['alert_usrgrp_data'] = CArrayHelper::renameObjectsKeys($data['alert_usrgrp_data'], ['usrgrpid' => 'id']);
+
+		$data['js_validation_rules'] = (new CFormValidator(CControllerMiscConfigUpdate::getValidationRules()))
+			->getRules();
+		$data['default_values'] = $default_values;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Other configuration parameters'));

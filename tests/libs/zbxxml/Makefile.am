@@ -4,16 +4,14 @@ if SERVER
 SERVER_tests = \
 	zbx_json_to_xml \
 	zbx_xml_to_json
-endif
 
 noinst_PROGRAMS = $(SERVER_tests)
 
-if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 XML_LIBS = \
-	$(XML_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

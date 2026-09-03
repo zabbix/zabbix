@@ -26,6 +26,7 @@ class CFormField extends CTag {
 	public const ZBX_STYLE_FORM_FIELD_OFFSET_3 = 'offset-3';
 
 	public const ZBX_STYLE_FORM_FIELD_FLUID    = 'field-fluid';
+	public const ZBX_STYLE_FORM_FIELD_INLINE   = 'field-inline';
 
 	/**
 	 * @param CTag|CTag[]|CPartial|null $items

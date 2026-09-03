@@ -1429,7 +1429,7 @@ static int	send_data(zbx_thread_sendval_args *sendval_args, int ret, struct zbx_
 	sendval_args->json = NULL;
 
 	*buffer_count = 0;
-	zbx_json_clean(*json);
+	zbx_json_free(*json);
 	zbx_free(*json);
 
 	return ret;

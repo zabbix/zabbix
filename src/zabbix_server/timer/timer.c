@@ -14,6 +14,7 @@
 
 #include "timer.h"
 
+#include "zbxevent.h"
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -179,13 +180,17 @@ static void     service_send_suppression_data(const zbx_vector_uint64_pair_t *ev
 static void	db_remove_expired_event_suppress_data(time_t now)
 {
 	zbx_vector_uint64_pair_t	event_maintenance;
-	zbx_db_row_t		row;
-	zbx_db_result_t		result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zbx_vector_uint64_pair_create(&event_maintenance);
 
-	result = zbx_db_select("select eventid,maintenanceid from event_suppress where suppress_until<" ZBX_FS_TIME_T
-			" and suppress_until<>0", (zbx_fs_time_t)now);
+	result = zbx_db_select(
+			"select eventid,maintenanceid"
+			" from event_suppress"
+			" where suppress_until<" ZBX_FS_TIME_T
+				" and suppress_until<>0",
+			(zbx_fs_time_t)now);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -198,13 +203,41 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_begin();
-	zbx_db_execute("delete from event_suppress where suppress_until<" ZBX_FS_TIME_T " and suppress_until<>0",
-			(zbx_fs_time_t)now);
-	zbx_db_commit();
+	if (0 != event_maintenance.values_num)
+	{
+		zbx_db_insert_t	db_insert;
 
-	if (0 != event_maintenance.values_num && 0 != zbx_dc_get_itservices_num())
-		service_send_suppression_data(&event_maintenance, 0);
+		zbx_db_begin();
+
+		zbx_db_execute(
+				"delete from event_suppress"
+				" where suppress_until<" ZBX_FS_TIME_T
+					" and suppress_until<>0",
+				(zbx_fs_time_t)now);
+
+		zbx_db_insert_prepare(&db_insert, "acknowledges", "acknowledgeid",
+				"eventid", "clock", "action", "maintenanceid", (char *)NULL);
+
+		for (int i = 0; i < event_maintenance.values_num; i++)
+		{
+			if (0 != event_maintenance.values[i].second)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event_maintenance.values[i].first,
+						(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
+						event_maintenance.values[i].second);
+			}
+		}
+
+		zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		if (ZBX_DB_OK == zbx_db_commit())
+		{
+			if (0 != zbx_dc_get_itservices_num())
+				service_send_suppression_data(&event_maintenance, 0);
+		}
+	}
 
 	zbx_vector_uint64_pair_destroy(&event_maintenance);
 }
@@ -417,9 +450,11 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
  * Parameters: suppressed_num - [OUT]                                         *
  *             process_num    - [IN]                                          *
  *             get_forks_cb   - [IN]                                          *
+ *             now            - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-static int	db_update_event_suppress_data(int *suppressed_num, int process_num, zbx_get_config_forks_f get_forks_cb)
+static int	db_update_event_suppress_data(int *suppressed_num, int process_num, zbx_get_config_forks_f get_forks_cb,
+		time_t now)
 {
 	zbx_vector_event_suppress_query_ptr_t	event_queries;
 	zbx_vector_event_suppress_data_ptr_t	event_data;
@@ -434,7 +469,8 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 	if (0 != event_queries.values_num)
 	{
-		zbx_db_insert_t			db_insert;
+		zbx_db_insert_t			db_insert_es;
+		zbx_db_insert_t			db_insert_ack;
 		char				*sql = NULL;
 		size_t				sql_alloc = 0, sql_offset = 0;
 		int				j, k;
@@ -455,8 +491,11 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 		if (0 != maintenanceids.values_num && SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
 			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
-		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
-				"suppress_until", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_es, "event_suppress", "event_suppressid",
+				"eventid", "maintenanceid", "suppress_until", (char *)NULL);
+
+		zbx_db_insert_prepare(&db_insert_ack, "acknowledges", "acknowledgeid",
+				"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
 
 		for (int i = 0; i < event_queries.values_num; i++)
 		{
@@ -477,6 +516,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 				while (j < data->maintenances.values_num && k < query->maintenances.values_num)
 				{
+					/* delete suppressions that don't have any active maintenance periods */
 					if (data->maintenances.values[j].first < query->maintenances.values[k].first)
 					{
 						pair.first = query->eventid;
@@ -491,10 +531,17 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 					{
 						if (0 == query->r_eventid)
 						{
-							zbx_db_insert_add_values(&db_insert, __UINT64_C(0),
+							zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0),
 									query->eventid,
 									query->maintenances.values[k].first,
 									(int)query->maintenances.values[k].second);
+
+							zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0),
+									query->eventid,
+									(int)now,
+									ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS,
+									(int)query->maintenances.values[k].second,
+									query->maintenances.values[k].first);
 
 							(*suppressed_num)++;
 
@@ -518,6 +565,11 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 									query->eventid,
 									query->maintenances.values[k].first);
 
+						zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), query->eventid,
+								(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS,
+								(int)query->maintenances.values[k].second,
+								query->maintenances.values[k].first);
+
 						if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc,
 								&sql_offset))
 						{
@@ -528,6 +580,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 					k++;
 				}
 
+				/* delete suppressions that don't have any active maintenance periods */
 				for (;j < data->maintenances.values_num; j++)
 				{
 					pair.first = query->eventid;
@@ -540,9 +593,14 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 			{
 				for (;k < query->maintenances.values_num; k++)
 				{
-					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+					zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), query->eventid,
 							query->maintenances.values[k].first,
 							(int)query->maintenances.values[k].second);
+
+					zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), query->eventid,
+							(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS,
+							(int)query->maintenances.values[k].second,
+							query->maintenances.values[k].first);
 
 					(*suppressed_num)++;
 
@@ -562,6 +620,10 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 						del_event_maintenances.values[i].first,
 						del_event_maintenances.values[i].second);
 
+			zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), del_event_maintenances.values[i].first,
+					(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
+					0, del_event_maintenances.values[i].second);
+
 			if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto cleanup;
 		}
@@ -569,8 +631,11 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			goto cleanup;
 
-		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
-		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_autoincrement(&db_insert_es, "event_suppressid");
+		zbx_db_insert_execute(&db_insert_es);
+
+		zbx_db_insert_autoincrement(&db_insert_ack, "acknowledgeid");
+		zbx_db_insert_execute(&db_insert_ack);
 cleanup:
 		if (ZBX_DB_OK == (txn_rc = zbx_db_commit()))
 		{
@@ -587,12 +652,12 @@ cleanup:
 			}
 		}
 
-		zbx_db_insert_clean(&db_insert);
+		zbx_db_insert_clean(&db_insert_es);
+		zbx_db_insert_clean(&db_insert_ack);
 		zbx_free(sql);
 
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 		zbx_vector_uint64_destroy(&maintenanceids);
-
 		zbx_vector_uint64_pair_destroy(&suppressed);
 	}
 
@@ -719,7 +784,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				{
 					zbx_dc_maintenance_set_update_flags();
 					while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
-							args_in->get_process_forks_cb_arg))
+							args_in->get_process_forks_cb_arg, (time_t)sec))
 						;
 
 					zbx_dc_maintenance_reset_update_flag(process_num);
@@ -742,7 +807,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 					process_num, info);
 
 			while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
-					args_in->get_process_forks_cb_arg))
+					args_in->get_process_forks_cb_arg, (time_t)sec))
 				;
 
 			info_offset = 0;

@@ -561,9 +561,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
 					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 		}
 
@@ -611,8 +611,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'discovery rule',
-					'url' => 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D=',
-					'form' => 'id:host-discovery-form',
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids%5B0%5D=',
+					'overlay_form' => true,
+					'form' => 'id:lldrule-form',
 					'fields' => [
 						'Type' => 'Dependent item'
 					]
@@ -692,8 +693,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'discovery rule',
-					'url' => 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D=',
-					'form' => 'id:host-discovery-form',
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids%5B0%5D=',
+					'overlay_form' => true,
+					'form' => 'id:lldrule-form',
 					'fields' => [
 						'Type' => 'Dependent item'
 					]

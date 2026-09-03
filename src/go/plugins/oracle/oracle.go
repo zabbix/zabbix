@@ -17,6 +17,7 @@ package oracle
 import (
 	"context"
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,7 +47,7 @@ type Plugin struct {
 // Export implements the Exporter interface.
 //
 //nolint:gocyclo,cyclop // Complex code that currently has no unit tests and hence is not safe for refactoring.
-func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.ContextProvider) (any, error) {
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (any, error) {
 	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
 		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
 	}
@@ -75,7 +76,14 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
-	conn, err := p.connMgr.GetConnection(*connDetails)
+	connectionTimeout, err := p.getConnectionTimeout(params)
+	if err != nil {
+		return nil, err
+	}
+
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
+	conn, err := p.connMgr.GetConnection(*connDetails, connectionTimeout)
 	if err != nil {
 		p.Errf("%s failed: %v\n", key, err.Error())
 
@@ -88,25 +96,22 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	timeout := conn.GetCallTimeout()
-	if timeout < time.Second*time.Duration(pluginCtx.Timeout()) {
-		timeout = time.Second * time.Duration(pluginCtx.Timeout())
+	if ctx.LegacyTimeout() {
+		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyItemTimeout)
 	}
 
-	ctx, cancel := conn.GetContextWithTimeout(timeout)
-	defer cancel()
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
 
 	result, err := handleMetric(ctx, conn, params, extraParams...)
-
 	if err != nil {
 		p.Errf("%s failed: %v\n", key, err.Error())
 
 		ctxErr := ctx.Err()
 		if ctxErr != nil && errors.Is(ctxErr, context.DeadlineExceeded) {
 			p.Errf(
-				"failed to handle metric %q: query execution timeout %s exceeded: %s",
+				"failed to handle metric %q: query execution timeout %d exceeded: %s",
 				key,
-				timeout.String(),
+				ctx.Timeout(),
 				err.Error(),
 			)
 
@@ -131,8 +136,6 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 func (p *Plugin) Start() {
 	opt := &dbconn.Options{
 		KeepAlive:            time.Duration(p.options.KeepAlive) * time.Second,
-		ConnectTimeout:       time.Duration(p.options.ConnectTimeout) * time.Second,
-		CallTimeout:          time.Duration(p.options.CallTimeout) * time.Second,
 		CustomQueriesEnabled: p.options.CustomQueriesEnabled,
 		CustomQueriesPath:    p.options.CustomQueriesPath,
 		ResolveTNS:           p.options.ResolveTNS,
@@ -147,4 +150,20 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+
+		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+		if err != nil {
+			p.Tracef("failed to convert default connection timeout %s", err.Error())
+
+			return 0, errs.New("failed to get connection timeout")
+		}
+	}
+
+	return connectionTimeout, nil
 }

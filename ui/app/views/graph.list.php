@@ -80,7 +80,7 @@ $html_page->addItem(
 								'parameters' => [
 										'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 										'srcfld1' => 'groupid',
-										'dstfrm' => 'zbx_filter',
+										'dstfrm' => CFilter::FORM_NAME,
 										'dstfld1' => 'filter_groupids_',
 										'editable' => true,
 										'enrich_parent_groups' => true
@@ -104,7 +104,7 @@ $html_page->addItem(
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_hostids_',
 									'editable' => 1
 								]
@@ -176,10 +176,12 @@ foreach ($data['graphs'] as $graph) {
 
 	if ($graph['discoveryRule']) {
 		$name[] = (new CLink($graph['discoveryRule']['name'],
-			(new CUrl('host_discovery.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'graph.prototype.edit')
 				->setArgument('context', $data['context'])
+				->setArgument('parent_discoveryid', $graph['discoveryRule']['itemid'])
+				->setArgument('graphid', $graph['discoveryData']['parent_graphid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
