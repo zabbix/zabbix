@@ -112,7 +112,7 @@
 				user_configs}) {
 
 			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'apm.trace.view.data');
+			data_provider_url.searchParams.set('action', 'apm.trace.list.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
@@ -333,7 +333,7 @@
 
 		#openSideDrawer(container, traceid) {
 			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'apm.trace.side.view');
+			url.searchParams.set('action', 'apm.trace.list.split.view');
 
 			this.#side_drawer = new CSideDrawer(container, {
 				split_view_class: 'trace-split-view',

@@ -22,7 +22,7 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJsFile('apm.log.view.js.php');
+$this->includeJsFile('apm.metric.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -35,7 +35,7 @@ if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attrib
 }
 
 $filter = (new CFilter())
-	->setId('apm_log_filter')
+	->setId('apm_metric_filter')
 	->setResetUrl($reset_url)
 	->setProfile($data['filter_options']['idx'])
 	->setActiveTab($data['active_tab'])
@@ -49,24 +49,22 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				(new CLabel(_('Body'), 'filter_body')),
+				(new CLabel(_('Metric name'), 'filter_metric_name')),
 				new CFormField(
-					(new CTextBox('filter_body', $data['filter']['body']))
+					(new CTextBox('filter_metric_name', $data['filter']['metric_name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
 			->addItem([
-				(new CLabel(_('Trace ID'), 'filter_traceid')),
+				(new CLabel(_('Type'), 'filter_types')),
 				new CFormField(
-					(new CTextBox('filter_traceid', $data['filter']['traceid']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-			])
-			->addItem([
-				(new CLabel(_('Span ID'), 'filter_spanid')),
-				new CFormField(
-					(new CTextBox('filter_spanid', $data['filter']['spanid']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					(new CCheckBoxList('filter_types'))
+						->setUniqid('#{uniqid}')
+						->setOptions(CApmMetricHelper::getTypes())
+						->setChecked($data['filter']['types'])
+						->setColumns(2)
+						->setVertical()
+						->showTitles()
 				)
 			])
 			->addItem([
@@ -86,18 +84,6 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				(new CLabel(_('Severity'), 'filter_severities')),
-				new CFormField(
-					(new CCheckBoxList('filter_severities'))
-						->setUniqid('#{uniqid}')
-						->setOptions(CApmLogHelper::getSeverities())
-						->setChecked($data['filter']['severities'])
-						->setColumns(3)
-						->setVertical()
-						->showTitles()
-				)
-			])
-			->addItem([
 				(new CLabel(_('Attributes'), 'filter_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
@@ -109,15 +95,15 @@ $filter = (new CFilter())
 	]);
 
 $form = (new CForm())
-	->setName('logs')
+	->setName('metrics')
 	->addItem(
-		(new CDataTable())->setId('datatable-logs')
+		(new CDataTable())->setId('datatable-metrics')
 	);
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Logs'))
+	->setTitle(_('Metrics'))
 	->setWebLayoutMode($web_layout_mode)
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_LOG_VIEW))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_METRIC_VIEW))
 	->setControls(
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))

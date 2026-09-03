@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerApmTraceView extends CController {
+class CControllerApmTraceList extends CController {
 
 	protected function init(): void {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
@@ -68,16 +68,16 @@ class CControllerApmTraceView extends CController {
 			$this->deleteProfiles();
 		}
 
-		$sort_field = $this->getInput('sort', CProfile::get('web.apm.trace.sort', 'timestamp'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.apm.trace.sortorder', ZBX_SORT_DOWN));
+		$sort_field = $this->getInput('sort', CProfile::get('web.apm.trace.list.sort', 'timestamp'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.apm.trace.list.sortorder', ZBX_SORT_DOWN));
 
-		CProfile::update('web.apm.trace.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$storage_idx = 'web.apm.traces.datatable';
+		$storage_idx = 'web.apm.trace.list.datatable';
 
 		$timeselector_options = [
-			'profileIdx' => 'web.apm.trace.filter',
+			'profileIdx' => 'web.apm.trace.list.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -86,24 +86,24 @@ class CControllerApmTraceView extends CController {
 
 		$filter_attributes = [];
 
-		foreach (CProfile::getArray('web.apm.trace.filter_attributes.key', []) as $i => $attribute) {
+		foreach (CProfile::getArray('web.apm.trace.list.filter_attributes.key', []) as $i => $attribute) {
 			$filter_attributes[] = [
 				'key' => $attribute,
-				'value' => CProfile::get('web.apm.trace.filter_attributes.value', null, $i),
-				'operator' => CProfile::get('web.apm.trace.filter_attributes.operator', null, $i)
+				'value' => CProfile::get('web.apm.trace.list.filter_attributes.value', null, $i),
+				'operator' => CProfile::get('web.apm.trace.list.filter_attributes.operator', null, $i)
 			];
 		}
 
 		$filter = [
-			'traceid' => CProfile::get('web.apm.trace.filter_traceid', ''),
-			'spanid' => CProfile::get('web.apm.trace.filter_spanid', ''),
-			'service_name' => CProfile::get('web.apm.trace.filter_service_name', ''),
-			'operation_name' => CProfile::get('web.apm.trace.filter_operation_name', ''),
-			'scope_name' => CProfile::get('web.apm.trace.filter_scope_name', ''),
-			'min_duration' => CProfile::get('web.apm.trace.filter_min_duration', ''),
-			'max_duration' => CProfile::get('web.apm.trace.filter_max_duration', ''),
-			'statuses' => CProfile::getArray('web.apm.trace.filter_statuses', []),
-			'evaltype' => CProfile::get('web.apm.trace.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+			'traceid' => CProfile::get('web.apm.trace.list.filter_traceid', ''),
+			'spanid' => CProfile::get('web.apm.trace.list.filter_spanid', ''),
+			'service_name' => CProfile::get('web.apm.trace.list.filter_service_name', ''),
+			'operation_name' => CProfile::get('web.apm.trace.list.filter_operation_name', ''),
+			'scope_name' => CProfile::get('web.apm.trace.list.filter_scope_name', ''),
+			'min_duration' => CProfile::get('web.apm.trace.list.filter_min_duration', ''),
+			'max_duration' => CProfile::get('web.apm.trace.list.filter_max_duration', ''),
+			'statuses' => CProfile::getArray('web.apm.trace.list.filter_statuses', []),
+			'evaltype' => CProfile::get('web.apm.trace.list.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
 			'attributes' => $filter_attributes
 		];
 
@@ -113,11 +113,11 @@ class CControllerApmTraceView extends CController {
 			'default_sort_order' => ZBX_SORT_DOWN,
 			'filter' => $filter,
 			'filter_options' => [
-				'idx' => 'web.apm.trace.filter',
+				'idx' => 'web.apm.trace.list.filter',
 				'timeselector' => getTimeSelectorPeriod($timeselector_options)
 			],
 			'filter_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
-			'active_tab' => CProfile::get('web.apm.trace.filter.active', 2),
+			'active_tab' => CProfile::get('web.apm.trace.list.filter.active', 2),
 			'page' => $this->getInput('page', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'sort_field' => $sort_field,
@@ -142,42 +142,42 @@ class CControllerApmTraceView extends CController {
 			}
 		}
 
-		CProfile::update('web.apm.trace.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_service_name', $this->getInput('filter_service_name', ''),
+		CProfile::update('web.apm.trace.list.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.filter_service_name', $this->getInput('filter_service_name', ''),
 			PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_operation_name', $this->getInput('filter_operation_name', ''),
+		CProfile::update('web.apm.trace.list.filter_operation_name', $this->getInput('filter_operation_name', ''),
 			PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_min_duration', $this->getInput('filter_min_duration', ''),
+		CProfile::update('web.apm.trace.list.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.filter_min_duration', $this->getInput('filter_min_duration', ''),
 			PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_max_duration', $this->getInput('filter_max_duration', ''),
+		CProfile::update('web.apm.trace.list.filter_max_duration', $this->getInput('filter_max_duration', ''),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.trace.filter_statuses', $this->getInput('filter_statuses', []),
+		CProfile::updateArray('web.apm.trace.list.filter_statuses', $this->getInput('filter_statuses', []),
 			PROFILE_TYPE_INT);
-		CProfile::update('web.apm.trace.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+		CProfile::update('web.apm.trace.list.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT);
-		CProfile::updateArray('web.apm.trace.filter_attributes.key', array_column($filter_attributes, 'key'),
+		CProfile::updateArray('web.apm.trace.list.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.trace.filter_attributes.value', array_column($filter_attributes, 'value'),
+		CProfile::updateArray('web.apm.trace.list.filter_attributes.value', array_column($filter_attributes, 'value'),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.trace.filter_attributes.operator', array_column($filter_attributes, 'operator'),
+		CProfile::updateArray('web.apm.trace.list.filter_attributes.operator', array_column($filter_attributes, 'operator'),
 			PROFILE_TYPE_INT);
 	}
 
 	private function deleteProfiles(): void {
-		CProfile::delete('web.apm.trace.filter_traceid');
-		CProfile::delete('web.apm.trace.filter_spanid');
-		CProfile::delete('web.apm.trace.filter_service_name');
-		CProfile::delete('web.apm.trace.filter_operation_name');
-		CProfile::delete('web.apm.trace.filter_scope_name');
-		CProfile::delete('web.apm.trace.filter_min_duration');
-		CProfile::delete('web.apm.trace.filter_max_duration');
-		CProfile::deleteIdx('web.apm.trace.filter_statuses');
-		CProfile::delete('web.apm.trace.filter_evaltype');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.key');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.value');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.operator');
+		CProfile::delete('web.apm.trace.list.filter_traceid');
+		CProfile::delete('web.apm.trace.list.filter_spanid');
+		CProfile::delete('web.apm.trace.list.filter_service_name');
+		CProfile::delete('web.apm.trace.list.filter_operation_name');
+		CProfile::delete('web.apm.trace.list.filter_scope_name');
+		CProfile::delete('web.apm.trace.list.filter_min_duration');
+		CProfile::delete('web.apm.trace.list.filter_max_duration');
+		CProfile::deleteIdx('web.apm.trace.list.filter_statuses');
+		CProfile::delete('web.apm.trace.list.filter_evaltype');
+		CProfile::deleteIdx('web.apm.trace.list.filter_attributes.key');
+		CProfile::deleteIdx('web.apm.trace.list.filter_attributes.value');
+		CProfile::deleteIdx('web.apm.trace.list.filter_attributes.operator');
 	}
 
 	/**

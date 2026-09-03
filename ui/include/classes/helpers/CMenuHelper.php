@@ -79,15 +79,15 @@ class CMenuHelper {
 		$submenu_apm = array_filter([
 			CWebUser::checkAccess(CRoleHelper::UI_APM_TRACES)
 				? (new CMenuItem(_('Traces')))
-					->setAction('apm.trace.view')
+					->setAction('apm.trace.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_APM_METRICS)
 				? (new CMenuItem(_('Metrics')))
-					->setAction('apm.metric.view')
+					->setAction('apm.metric.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_APM_LOGS)
 				? (new CMenuItem(_('Logs')))
-					->setAction('apm.log.view')
+					->setAction('apm.log.list')
 				: null
 		]);
 

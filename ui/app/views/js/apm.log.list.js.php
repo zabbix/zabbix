@@ -54,8 +54,6 @@
 		}
 
 		#initEvents(filter_options) {
-			$.subscribe('event.rank_change', () => this.#refresh());
-
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				if (data.idx === filter_options.idx) {
 					this.#global_timerange.from = data.from;
@@ -67,6 +65,11 @@
 		}
 
 		#initFilter(filter_options) {
+			this.#global_timerange = {
+				from: filter_options.timeselector.from,
+				to: filter_options.timeselector.to
+			};
+
 			$('#filter-attributes')
 				.dynamicRows({template: '#filter-attributes-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
@@ -77,20 +80,13 @@
 			document.querySelectorAll(`#filter-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
 				new CApmAttrFilterItem(row);
 			});
-
-			this.#global_timerange = {
-				from: filter_options.timeselector.from,
-				to: filter_options.timeselector.to
-			};
-
-			$.publish('timeselector.rangechange', this.#global_timerange);
 		}
 
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
 				user_configs}) {
 
 			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'apm.log.view.data');
+			data_provider_url.searchParams.set('action', 'apm.log.list.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());

@@ -22,7 +22,7 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJsFile('apm.metric.view.js.php');
+$this->includeJsFile('apm.trace.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -35,7 +35,7 @@ if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attrib
 }
 
 $filter = (new CFilter())
-	->setId('apm_metric_filter')
+	->setId('apm_trace_filter')
 	->setResetUrl($reset_url)
 	->setProfile($data['filter_options']['idx'])
 	->setActiveTab($data['active_tab'])
@@ -49,28 +49,30 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				(new CLabel(_('Metric name'), 'filter_metric_name')),
+				(new CLabel(_('Trace ID'), 'filter_traceid')),
 				new CFormField(
-					(new CTextBox('filter_metric_name', $data['filter']['metric_name']))
+					(new CTextBox('filter_traceid', $data['filter']['traceid']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
 			->addItem([
-				(new CLabel(_('Type'), 'filter_types')),
+				(new CLabel(_('Span ID'), 'filter_spanid')),
 				new CFormField(
-					(new CCheckBoxList('filter_types'))
-						->setUniqid('#{uniqid}')
-						->setOptions(CApmMetricHelper::getTypes())
-						->setChecked($data['filter']['types'])
-						->setColumns(2)
-						->setVertical()
-						->showTitles()
+					(new CTextBox('filter_spanid', $data['filter']['spanid']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
 			->addItem([
 				(new CLabel(_('Service name'), 'filter_service_name')),
 				new CFormField(
 					(new CTextBox('filter_service_name', $data['filter']['service_name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				(new CLabel(_('Operation name'), 'filter_operation_name')),
+				new CFormField(
+					(new CTextBox('filter_operation_name', $data['filter']['operation_name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
@@ -84,6 +86,31 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
+				(new CLabel(_('Min. duration'), 'filter_min_duration')),
+				new CFormField(
+					(new CTextBox('filter_min_duration', $data['filter']['min_duration']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				(new CLabel(_('Max. duration'), 'filter_max_duration')),
+				new CFormField(
+					(new CTextBox('filter_max_duration', $data['filter']['max_duration']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				(new CLabel(_('Status'), 'filter_statuses')),
+				new CFormField(
+					(new CCheckBoxList('filter_statuses'))
+						->setUniqid('#{uniqid}')
+						->setOptions(CApmTraceHelper::getStatuses())
+						->setChecked($data['filter']['statuses'])
+						->setColumns(3)
+						->showTitles()
+				)
+			])
+			->addItem([
 				(new CLabel(_('Attributes'), 'filter_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
@@ -95,15 +122,15 @@ $filter = (new CFilter())
 	]);
 
 $form = (new CForm())
-	->setName('metrics')
+	->setName('traces')
 	->addItem(
-		(new CDataTable())->setId('datatable-metrics')
+		(new CDataTable())->setId('datatable-traces')
 	);
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Metrics'))
+	->setTitle(_('Traces'))
 	->setWebLayoutMode($web_layout_mode)
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_METRIC_VIEW))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_TRACE_VIEW))
 	->setControls(
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
@@ -133,6 +160,7 @@ $html_page->show();
 		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
+		'filter_validation_rules' => $data['filter_validation_rules'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],

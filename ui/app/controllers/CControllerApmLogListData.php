@@ -14,13 +14,12 @@
 **/
 
 
-class CControllerApmMetricViewData extends CControllerDataTable {
+class CControllerApmLogListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['metric_name', 'type', 'unit', 'service_name', 'start_time', 'sum_value',
-		'count'];
+	protected array $allowed_data_fields = ['timestamp', 'body', 'severity_text', 'severity_number'];
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_APM_METRICS);
+		return $this->checkAccess(CRoleHelper::UI_APM_LOGS);
 	}
 
 	protected function getData(): array

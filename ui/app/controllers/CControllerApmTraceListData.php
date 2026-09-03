@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerApmTraceViewData extends CControllerDataTable {
+class CControllerApmTraceListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['traceid', 'service_name', 'span_count', 'error_count', 'span_name',
 		'timestamp', 'span_attributes', 'duration_time_units', 'duration_percentage'];
@@ -30,18 +30,18 @@ class CControllerApmTraceViewData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', 'timestamp');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 
-		CProfile::update('web.apm.trace.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.trace.filter',
+			'profileIdx' => 'web.apm.trace.list.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		]);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$traces = API::Apm()->getTraces([
+		$traces = API::ApmTrace()->get([
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
 			'sortfield' => $sort_field,

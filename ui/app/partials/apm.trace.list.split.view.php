@@ -34,13 +34,13 @@ $trace_header_links = (new CDiv([
 	(new CLink(
 		_('Logs'),
 		(new CUrl('zabbix.php'))
-			->setArgument('action', 'apm.log.view')
+			->setArgument('action', 'apm.log.list')
 			->setArgument('filter_traceid', $data['trace']['traceid'])
 			->setArgument('filter_set', '1')
 	)),
 	(new CLink(
 		_('Metrics'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'apm.metric.view')
+		(new CUrl('zabbix.php'))->setArgument('action', 'apm.metric.list')
 	))
 ]))->addClass('trace-header-links');
 
@@ -55,9 +55,11 @@ $trace_timescale_header = (new CDiv())->addClass('trace-timescale-header');
 
 $trace_timescale_timeline = (new CDiv())->addClass('trace-timescale-timeline');
 
+$trace_span_tree_content = (new CDiv())->addClass('trace-span-tree-content');
+
 $trace_span_tree = (new CDiv([
 	(new CDiv(_('Span tree')))->addClass('trace-span-tree-header'),
-	(new CDiv())->addClass('trace-span-tree-content')
+	$trace_span_tree_content
 ]))->addClass('trace-span-tree');
 
 $trace_span_timeline = (new CDiv([

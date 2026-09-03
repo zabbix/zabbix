@@ -22,7 +22,7 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('layout.mode.js');
 
-$this->includeJsFile('apm.trace.view.js.php');
+$this->includeJsFile('apm.log.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -35,7 +35,7 @@ if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attrib
 }
 
 $filter = (new CFilter())
-	->setId('apm_trace_filter')
+	->setId('apm_log_filter')
 	->setResetUrl($reset_url)
 	->setProfile($data['filter_options']['idx'])
 	->setActiveTab($data['active_tab'])
@@ -48,6 +48,13 @@ $filter = (new CFilter())
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				(new CLabel(_('Body'), 'filter_body')),
+				new CFormField(
+					(new CTextBox('filter_body', $data['filter']['body']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
 			->addItem([
 				(new CLabel(_('Trace ID'), 'filter_traceid')),
 				new CFormField(
@@ -70,13 +77,6 @@ $filter = (new CFilter())
 				)
 			])
 			->addItem([
-				(new CLabel(_('Operation name'), 'filter_operation_name')),
-				new CFormField(
-					(new CTextBox('filter_operation_name', $data['filter']['operation_name']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-			])
-			->addItem([
 				(new CLabel(_('Scope name'), 'filter_scope_name')),
 				new CFormField(
 					(new CTextBox('filter_scope_name', $data['filter']['scope_name']))
@@ -86,27 +86,14 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				(new CLabel(_('Min. duration'), 'filter_min_duration')),
+				(new CLabel(_('Severity'), 'filter_severities')),
 				new CFormField(
-					(new CTextBox('filter_min_duration', $data['filter']['min_duration']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-			])
-			->addItem([
-				(new CLabel(_('Max. duration'), 'filter_max_duration')),
-				new CFormField(
-					(new CTextBox('filter_max_duration', $data['filter']['max_duration']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-			])
-			->addItem([
-				(new CLabel(_('Status'), 'filter_statuses')),
-				new CFormField(
-					(new CCheckBoxList('filter_statuses'))
+					(new CCheckBoxList('filter_severities'))
 						->setUniqid('#{uniqid}')
-						->setOptions(CApmTraceHelper::getStatuses())
-						->setChecked($data['filter']['statuses'])
+						->setOptions(CApmLogHelper::getSeverities())
+						->setChecked($data['filter']['severities'])
 						->setColumns(3)
+						->setVertical()
 						->showTitles()
 				)
 			])
@@ -122,15 +109,15 @@ $filter = (new CFilter())
 	]);
 
 $form = (new CForm())
-	->setName('traces')
+	->setName('logs')
 	->addItem(
-		(new CDataTable())->setId('datatable-traces')
+		(new CDataTable())->setId('datatable-logs')
 	);
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Traces'))
+	->setTitle(_('Logs'))
 	->setWebLayoutMode($web_layout_mode)
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_TRACE_VIEW))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::APM_LOG_VIEW))
 	->setControls(
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
@@ -160,7 +147,6 @@ $html_page->show();
 		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
-		'filter_validation_rules' => $data['filter_validation_rules'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],
