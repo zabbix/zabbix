@@ -88,6 +88,8 @@
 
 #if (defined(__GNUC__) && __GNUC__ >= 3) || defined(__clang__)
 #	define ZBX_ATTR_NOINLINE	__attribute__((__noinline__))
+#elif defined(_MSC_VER)
+#	define ZBX_ATTR_NOINLINE	__declspec(noinline)
 #else
 #	define ZBX_ATTR_NOINLINE
 #endif
