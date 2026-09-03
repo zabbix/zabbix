@@ -1535,4 +1535,9 @@ int	zbx_macro_event_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
 		char *error, size_t maxerrlen);
 
+int	zbx_macro_event_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 #endif
