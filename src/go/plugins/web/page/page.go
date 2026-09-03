@@ -109,7 +109,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 6)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid seventh parameter: %s", err)
+			return nil, fmt.Errorf("Invalid seventh parameter: %s.", err)
 		}
 
 		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
@@ -135,7 +135,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 3)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid fourth parameter: %s", err)
+			return nil, fmt.Errorf("Invalid fourth parameter: %s.", err)
 		}
 
 		start := time.Now()
@@ -153,7 +153,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 3)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid fourth parameter: %s", err)
+			return nil, fmt.Errorf("Invalid fourth parameter: %s.", err)
 		}
 
 		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
@@ -168,7 +168,7 @@ func parseRedirectLimit(params []string, index int) (int, error) {
 
 	limit, err := strconv.Atoi(params[index])
 	if err != nil || limit < 0 || limit > maxRedirectLimit {
-		return 0, fmt.Errorf("value must be between 0 and %d.", maxRedirectLimit)
+		return 0, fmt.Errorf("value must be between 0 and %d", maxRedirectLimit)
 	}
 
 	return limit, nil
