@@ -193,7 +193,7 @@ void	zbx_vps_monitor_stats_ext_get_data(struct zbx_json *json, const void *arg)
 
 	if (0 != stats.values_limit)
 	{
-		double pavailable;
+		double	pavailable;
 
 		if (0 != stats.overcommit_limit)
 			pavailable = (double)(stats.overcommit_limit - stats.overcommit) * 100 / stats.overcommit_limit;
