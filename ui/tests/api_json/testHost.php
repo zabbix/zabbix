@@ -1293,7 +1293,7 @@ class testHost extends CAPITest {
 					// Write-only properties.
 					'tls_psk_identity' => null,
 					'tls_psk' => null,
-					'name_upper' => null,
+					'name_upper' => null
 				]
 			],
 			'Check direct request of inventory_mode and other properties' => [
