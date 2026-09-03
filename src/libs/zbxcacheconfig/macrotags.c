@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxexpr.h"
 #include "zbxcacheconfig.h"
 #include "zbx_expression_constants.h"
 
