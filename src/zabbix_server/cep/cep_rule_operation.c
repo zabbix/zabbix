@@ -917,7 +917,7 @@ static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event
 	zbx_timespec(&ts);
 
 	if (NULL == (db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
-			event->value, &event->tags)))
+			TRIGGER_VALUE_PROBLEM, &event->tags)))
 	{
 		goto out;
 	}
