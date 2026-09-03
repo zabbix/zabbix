@@ -38,7 +38,7 @@
 #include "zbxtypes.h"
 #include "zbxvariant.h"
 #include "zbxipcservice.h"
-#include "zbxexpr.h"
+#include "zbxcacheconfig.h"
 #include "zbx_expression_constants.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
