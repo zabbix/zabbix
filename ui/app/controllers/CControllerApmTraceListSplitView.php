@@ -47,7 +47,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function doAction(): void {
 		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.trace.list.filter',
+			'profileIdx' => 'web.apm.trace.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null

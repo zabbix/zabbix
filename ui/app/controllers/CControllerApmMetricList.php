@@ -64,10 +64,10 @@ class CControllerApmMetricList extends CController {
 		$sort_field = $this->getInput('sort', 'metric_name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
 
-		$storage_idx = 'web.apm.trace.list.datatable';
+		$storage_idx = 'web.apm.trace.datatable';
 
 		$timeselector_options = [
-			'profileIdx' => 'web.apm.metric.list.filter',
+			'profileIdx' => 'web.apm.metric.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -76,20 +76,20 @@ class CControllerApmMetricList extends CController {
 
 		$filter_attributes = [];
 
-		foreach (CProfile::getArray('web.apm.metric.list.filter_attributes.key', []) as $i => $attribute) {
+		foreach (CProfile::getArray('web.apm.metric.filter_attributes.key', []) as $i => $attribute) {
 			$filter_attributes[] = [
 				'key' => $attribute,
-				'value' => CProfile::get('web.apm.metric.list.filter_attributes.value', null, $i),
-				'operator' => CProfile::get('web.apm.metric.list.filter_attributes.operator', null, $i)
+				'value' => CProfile::get('web.apm.metric.filter_attributes.value', null, $i),
+				'operator' => CProfile::get('web.apm.metric.filter_attributes.operator', null, $i)
 			];
 		}
 
 		$filter = [
-			'metric_name' => CProfile::get('web.apm.metric.list.filter_metric_name', ''),
-			'types' => CProfile::getArray('web.apm.metric.list.filter_types', []),
-			'service_name' => CProfile::get('web.apm.metric.list.filter_service_name', ''),
-			'scope_name' => CProfile::get('web.apm.metric.list.filter_scope_name', ''),
-			'evaltype' => CProfile::get('web.apm.metric.list.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+			'metric_name' => CProfile::get('web.apm.metric.filter_metric_name', ''),
+			'types' => CProfile::getArray('web.apm.metric.filter_types', []),
+			'service_name' => CProfile::get('web.apm.metric.filter_service_name', ''),
+			'scope_name' => CProfile::get('web.apm.metric.filter_scope_name', ''),
+			'evaltype' => CProfile::get('web.apm.metric.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
 			'attributes' => $filter_attributes
 		];
 
@@ -99,10 +99,10 @@ class CControllerApmMetricList extends CController {
 			'default_sort_order' => ZBX_SORT_UP,
 			'filter' => $filter,
 			'filter_options' => [
-				'idx' => 'web.apm.metric.list.filter',
+				'idx' => 'web.apm.metric.filter',
 				'timeselector' => getTimeSelectorPeriod($timeselector_options)
 			],
-			'active_tab' => CProfile::get('web.apm.metric.list.filter.active', 2),
+			'active_tab' => CProfile::get('web.apm.metric.filter.active', 2),
 			'page' => $this->getInput('page', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'sort_field' => $sort_field,
@@ -127,32 +127,32 @@ class CControllerApmMetricList extends CController {
 			}
 		}
 
-		CProfile::update('web.apm.metric.list.filter_metric_name', $this->getInput('filter_metric_name', ''),
+		CProfile::update('web.apm.metric.filter_metric_name', $this->getInput('filter_metric_name', ''),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.metric.list.filter_types', $this->getInput('filter_types', []),
+		CProfile::updateArray('web.apm.metric.filter_types', $this->getInput('filter_types', []),
 			PROFILE_TYPE_INT);
-		CProfile::update('web.apm.metric.list.filter_service_name', $this->getInput('filter_service_name', ''),
+		CProfile::update('web.apm.metric.filter_service_name', $this->getInput('filter_service_name', ''),
 			PROFILE_TYPE_STR);
-		CProfile::update('web.apm.metric.list.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.metric.list.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+		CProfile::update('web.apm.metric.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.metric.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT);
-		CProfile::updateArray('web.apm.metric.list.filter_attributes.key', array_column($filter_attributes, 'key'),
+		CProfile::updateArray('web.apm.metric.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.metric.list.filter_attributes.value', array_column($filter_attributes, 'value'),
+		CProfile::updateArray('web.apm.metric.filter_attributes.value', array_column($filter_attributes, 'value'),
 			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.metric.list.filter_attributes.operator', array_column($filter_attributes, 'operator'),
+		CProfile::updateArray('web.apm.metric.filter_attributes.operator', array_column($filter_attributes, 'operator'),
 			PROFILE_TYPE_INT);
 	}
 
 	private function deleteProfiles(): void {
-		CProfile::delete('web.apm.metric.list.filter_metric_name');
-		CProfile::deleteIdx('web.apm.metric.list.filter_types');
-		CProfile::delete('web.apm.metric.list.filter_service_name');
-		CProfile::delete('web.apm.metric.list.filter_scope_name');
-		CProfile::delete('web.apm.metric.list.filter_evaltype');
-		CProfile::deleteIdx('web.apm.metric.list.filter_attributes.key');
-		CProfile::deleteIdx('web.apm.metric.list.filter_attributes.value');
-		CProfile::deleteIdx('web.apm.metric.list.filter_attributes.operator');
+		CProfile::delete('web.apm.metric.filter_metric_name');
+		CProfile::deleteIdx('web.apm.metric.filter_types');
+		CProfile::delete('web.apm.metric.filter_service_name');
+		CProfile::delete('web.apm.metric.filter_scope_name');
+		CProfile::delete('web.apm.metric.filter_evaltype');
+		CProfile::deleteIdx('web.apm.metric.filter_attributes.key');
+		CProfile::deleteIdx('web.apm.metric.filter_attributes.value');
+		CProfile::deleteIdx('web.apm.metric.filter_attributes.operator');
 	}
 
 	/**

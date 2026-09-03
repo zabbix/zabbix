@@ -30,11 +30,11 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', 'timestamp');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 
-		CProfile::update('web.apm.trace.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.trace.list.filter',
+			'profileIdx' => 'web.apm.trace.filter',
 			'profileIdx2' => 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null

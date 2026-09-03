@@ -22,7 +22,7 @@ class CControllerTimeSelectorUpdate extends CController {
 	public static array $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
 		'web.problem.filter', 'web.auditlog.filter', 'web.actionlog.filter', 'web.item.graph.filter',
 		'web.toptriggers.filter', 'web.availabilityreport.filter', 'web.monitoring.hosts',
-		'web.monitoring.problem', 'web.apm.trace.list.filter', 'web.apm.metric.list.filter', 'web.apm.log.list.filter'
+		'web.monitoring.problem', 'web.apm.trace.list.filter', 'web.apm.metric.list.filter', 'web.apm.log.filter'
 	];
 
 	public function init(): void {

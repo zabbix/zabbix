@@ -88,9 +88,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.device.list.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
-				case 'web.apm.trace.list.datatable':
-				case 'web.apm.metric.list.datatable':
-				case 'web.apm.log.list.datatable':
+				case 'web.apm.trace.datatable':
+				case 'web.apm.metric.datatable':
+				case 'web.apm.log.datatable':
 				case 'web.monitoring.hosts.datatable':
 				case 'web.monitoring.latest.datatable':
 				case 'web.monitoring.problem.datatable':
@@ -117,9 +117,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case 'web.apm.log.list.datatable':
-				case 'web.apm.metric.list.datatable':
-				case 'web.apm.trace.list.datatable':
+				case 'web.apm.log.datatable':
+				case 'web.apm.metric.datatable':
+				case 'web.apm.trace.datatable':
 				case 'web.monitoring.hosts.datatable':
 				case 'web.monitoring.latest.datatable':
 				case 'web.monitoring.problem.datatable':
@@ -164,9 +164,9 @@ class CControllerProfileUpdate extends CController {
 				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
-			case 'web.apm.log.list.datatable':
-			case 'web.apm.metric.list.datatable':
-			case 'web.apm.trace.list.datatable':
+			case 'web.apm.log.datatable':
+			case 'web.apm.metric.datatable':
+			case 'web.apm.trace.datatable':
 			case 'web.monitoring.hosts.datatable':
 			case 'web.monitoring.latest.datatable':
 			case 'web.monitoring.problem.datatable':
