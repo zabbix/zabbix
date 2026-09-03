@@ -66,7 +66,6 @@ class CSettings extends CApiService {
 			'fields' => [
 				'status' => [
 					'type' => API_INT32,
-					'length' => 1,
 					'default' => APM_GLOBAL_DB_STATUS_NOT_CONFIGURED
 				],
 				'url' => [
@@ -76,7 +75,6 @@ class CSettings extends CApiService {
 				],
 				'authentication_type' => [
 					'type' => API_INT32,
-					'length' => 1,
 					'default' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 				],
 				'username' => [
@@ -96,12 +94,10 @@ class CSettings extends CApiService {
 				],
 				'ssl_verify_peer' => [
 					'type' => API_INT32,
-					'length' => 1,
 					'default' => APM_GLOBAL_DB_VERIFY_PEER_DISABLED
 				],
 				'ssl_verify_host' => [
 					'type' => API_INT32,
-					'length' => 1,
 					'default' => APM_GLOBAL_DB_VERIFY_HOST_DISABLED
 				]
 			]
@@ -435,9 +431,9 @@ class CSettings extends CApiService {
 		$apm_global_db += array_intersect_key($db_apm_global_db, array_flip(['url', 'authentication_type', 'db']));
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'url' =>					['type' => API_URL, 'flags' => API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => 2048],
+			'url' =>					['type' => API_URL, 'flags' => API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => self::APM_GLOBAL_DB_SCHEMA['apm_global_db']['fields']['url']['length']],
 			'authentication_type' =>	['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_NONE])],
-			'db' =>						['type' => API_STRING_UTF8, 'length' => 255]
+			'db' =>						['type' => API_STRING_UTF8, 'length' => self::APM_GLOBAL_DB_SCHEMA['apm_global_db']['fields']['db']['length']],
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $apm_global_db, '/apm_global_db', $error)) {
@@ -462,10 +458,10 @@ class CSettings extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'username' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
-										? ['type' => API_STRING_UTF8, 'flags' => $username_api_required | API_NOT_EMPTY, 'length' => 255]
+										? ['type' => API_STRING_UTF8, 'flags' => $username_api_required | API_NOT_EMPTY, 'length' => self::APM_GLOBAL_DB_SCHEMA['apm_global_db']['fields']['username']['length']]
 										: ['type' => API_STRING_UTF8, 'in' => ''],
 			'password' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
-										? ['type' => API_STRING_UTF8, 'flags' => $password_api_required, 'length' => 255]
+										? ['type' => API_STRING_UTF8, 'flags' => $password_api_required, 'length' => self::APM_GLOBAL_DB_SCHEMA['apm_global_db']['fields']['password']['length']]
 										: ['type' => API_STRING_UTF8, 'in' => ''],
 			'ssl_verify_peer' =>	$url_scheme === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS
 										? ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_PEER_DISABLED, APM_GLOBAL_DB_VERIFY_PEER_ENABLED])]
