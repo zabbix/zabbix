@@ -1170,8 +1170,10 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			double	pavailable;
 
 			if (0 != stats.overcommit_limit)
+			{
 				pavailable = (double)(stats.overcommit_limit - stats.overcommit) * 100 /
 						stats.overcommit_limit;
+			}
 			else
 				pavailable = 0;
 
