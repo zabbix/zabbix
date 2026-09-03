@@ -121,10 +121,6 @@ window.itemtestedit_view_popup = new class {
 			return;
 		}
 
-		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
-			element.disabled = !get_value_checked;
-		}
-
 		this.#form_element.querySelector('.js-test-with-proxy').style
 			.display = this.#form.findFieldByName('test_with').getValue() == 0 ? 'none' : '';
 
