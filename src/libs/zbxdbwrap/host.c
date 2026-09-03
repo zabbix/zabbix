@@ -1097,7 +1097,9 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_execute("%s", sql);
+	/* in ORACLE always present begin..end; */
+	if (16 < sql_offset)
+		zbx_db_execute("%s", sql);
 
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
