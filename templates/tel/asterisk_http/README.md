@@ -32,6 +32,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Asterisk", e.g. {$HTTP.TLS.VERIFY:"Asterisk"}.</p>|`full`|
 |{$AMI.URL}|<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p>|`http://asterisk:8088/asterisk/rawman`|
 |{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>|`<SET AMI HOST>`|
 |{$AMI.PORT}|<p>AMI port number for checking service availability.</p>|`5038`|
