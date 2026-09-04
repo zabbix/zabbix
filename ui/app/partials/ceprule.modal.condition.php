@@ -88,7 +88,7 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CLabel(_('Host'), 'ceprule-condition-host'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host'))
 				->setId('ceprule-condition-host')
-				->setAttribute('placeholder', 'host name')
+				->setAttribute('placeholder', 'visible name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
 		])
 		->addItem([
