@@ -32,6 +32,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cloudflare", e.g. {$HTTP.TLS.VERIFY:"Cloudflare"}.</p>|`full`|
 |{$CLOUDFLARE.API.URL}|<p>The URL of Cloudflare API endpoint.</p>|`https://api.cloudflare.com/client/v4`|
 |{$CLOUDFLARE.API.TOKEN}|<p>Your Cloudflare API Token.</p>||
 |{$CLOUDFLARE.ZONE_ID}|<p>Your Cloudflare Site Zone ID.</p>||
