@@ -154,6 +154,7 @@ static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag
 
 	validate_and_add_tag(event, t);
 }
+
 static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vector_item_tag_t *item_tags)
 {
 	zbx_vector_uint64_t	functionids;
