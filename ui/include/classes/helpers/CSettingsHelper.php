@@ -180,14 +180,22 @@ class CSettingsHelper {
 	 *
 	 * @param string $field
 	 *
-	 * @return string|array
+	 * @return string
 	 */
-	public static function getPublic(string $field): string|array {
+	public static function getPublic(string $field): string {
 		if (!self::$params_public) {
 			self::$params_public = CSettings::getPublic();
 		}
 
 		return self::$params_public[$field];
+	}
+
+	public static function getApmGlobalDb(): array {
+		if (!self::$params_public) {
+			self::$params_public = CSettings::getPublic();
+		}
+
+		return self::$params_public[self::APM_GLOBAL_DB];
 	}
 
 	/**
