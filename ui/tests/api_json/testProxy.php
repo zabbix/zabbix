@@ -5488,7 +5488,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes": should be empty.'
 			],
 			'Test proxy.update: missing "signal_type"' => [
 				'proxy' => [
@@ -5503,7 +5503,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
 			],
 			'Test proxy.update: missing "key"' => [
 				'proxy' => [
@@ -5518,7 +5518,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes/1": the parameter "key" is missing.'
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "key" is missing.'
 			],
 			'Test proxy.update: invalid "max_messages_per_second"' => [
 				'proxy' => [
@@ -5527,7 +5527,7 @@ class testProxy extends CAPITest {
 						'max_messages_per_second' => 100
 					]
 				],
-				'expected_error' => 'Invalid parameter "/apm/max_messages_per_second": value must be 0.'
+				'expected_error' => 'Invalid parameter "/1/apm/max_messages_per_second": value must be 0.'
 			]
 		];
 	}
