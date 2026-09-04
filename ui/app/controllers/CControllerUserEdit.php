@@ -290,6 +290,16 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
 
+		$devices = $data['userid'] === null
+			? []
+			: API::Device()->get([
+				'output' => ['uuid', 'name'],
+				'userids' => $data['userid'],
+				'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
+			]);
+
+		$data['devices'] = array_combine(array_column($devices, 'uuid'), $devices);
+
 		$data['js_validation_rules'] = $data['userid'] === null
 			? (new CFormValidator(CControllerUserCreate::getValidationRules()))->getRules()
 			: (new CFormValidator(CControllerUserUpdate::getValidationRules()))->getRules();

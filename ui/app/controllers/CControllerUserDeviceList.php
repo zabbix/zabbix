@@ -220,7 +220,7 @@ class CControllerUserDeviceList extends CController {
 			'device_statuses' => [
 				ZBX_DEVICE_STATUS_NEW => _('New'),
 				ZBX_DEVICE_STATUS_ACTIVATED => _('Active'),
-				ZBX_DEVICE_STATUS_ORPHANED => _('Orphaned')
+				ZBX_DEVICE_STATUS_ORPHANED => _('Unassigned')
 			]
 		];
 
