@@ -1234,7 +1234,7 @@ class CProxy extends CApiService {
 
 			$api_input_rules = self::getApmValidationRules(true);
 
-			if (!CApiInputValidator::validate($api_input_rules, $proxy['apm'], ($i + 1).'/apm', $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $proxy['apm'], '/'.($i + 1).'/apm', $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
