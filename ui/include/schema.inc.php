@@ -10596,13 +10596,13 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'host' => [
+			'host_name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => ''
 			],
-			'host_group' => [
+			'host_group_name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
