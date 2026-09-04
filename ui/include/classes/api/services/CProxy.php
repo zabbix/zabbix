@@ -1223,7 +1223,7 @@ class CProxy extends CApiService {
 	}
 
 	private static function validateApms(array &$proxies, array $db_proxies): void {
-		foreach ($proxies as &$proxy) {
+		foreach ($proxies as $i => &$proxy) {
 			if (!array_key_exists('apm', $proxy)) {
 				continue;
 			}
@@ -1234,7 +1234,7 @@ class CProxy extends CApiService {
 
 			$api_input_rules = self::getApmValidationRules(true);
 
-			if (!CApiInputValidator::validate($api_input_rules, $proxy['apm'], '/apm', $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $proxy['apm'], ($i + 1).'/apm', $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
