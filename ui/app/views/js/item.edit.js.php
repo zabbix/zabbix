@@ -168,10 +168,7 @@ window.item_edit_form = new class {
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
 			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
-			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
-			lookback_limit_hint: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-hint'),
-			lookback_limit_error: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-error'),
-			granularity_hint: this.form_element.querySelector('[for="granularity"] .js-granularity-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint')
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -868,13 +865,11 @@ window.item_edit_form = new class {
 			this.form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
-		const lookback_too_small = lookback_limit !== null && granularity !== null && lookback_limit < granularity;
-		const data_gaps = !lookback_too_small && delay !== null && lookback_limit !== null && lookback_limit < delay;
+		const data_gaps = delay !== null && lookback_limit !== null && lookback_limit < delay;
 		const data_overlap = delay !== null && granularity !== null && granularity > delay;
 
-		this.label.lookback_limit_error.style.display = lookback_too_small ? '' : 'none';
-		this.label.lookback_limit_hint.style.display = data_gaps ? '' : 'none';
-		this.label.granularity_hint.style.display = data_overlap ? '' : 'none';
+		this.form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
+		this.form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
 	}
 
 	#getCurrentDelay() {

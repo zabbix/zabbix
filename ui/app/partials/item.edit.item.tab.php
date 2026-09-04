@@ -918,33 +918,32 @@ $formgrid
 			_('Lookback limit'),
 			makeHelpIcon(
 				_('Limit processing window historical lookup when previous item updates are missing or too old.')
-			),
-			makeWarningIcon(_('Data gaps are possible.'))
-				->addClass('js-lookback-limit-hint')
-				->addStyle('display: none;'),
-			makeWarningIcon(_('Should not be less than the granularity, data will be incomplete.'))
-				->addClass('js-lookback-limit-error')
-				->addStyle('display: none;')
+			)
 		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
-		(new CFormField(
+		(new CFormField([
 			(new CTextBox('lookback_limit', $item['lookback_limit'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->setId('js-item-lookback-limit-field')
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data gaps are possible.')))
+				->addClass('js-lookback-limit-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-lookback-limit-field')
 	])
 	->addItem([
 		(new CLabel([
 			_('Granularity'),
-			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.')),
-			makeWarningIcon(_('Data will likely overlap.'))
-				->addClass('js-granularity-hint')
-				->addStyle('display: none;')
+			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.'))
 		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
-		(new CFormField(
+		(new CFormField([
 			(new CTextBox('granularity', $item['granularity'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->setId('js-item-granularity-field')
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data will likely overlap.')))
+				->addClass('js-granularity-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-granularity-field')
 	]);
 
 /**
