@@ -276,7 +276,7 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 {
 	struct statvfs	*mntbuf;
 	struct zbx_json	j;
-	zbx_fsname_t	fsname;
+	const char	*mpoint;
 	char		*options;
 	int		rc;
 
@@ -291,13 +291,13 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 
 	for (int i = 0; i < rc; i++)
 	{
-		fsname.mpoint = mntbuf[i].f_mntonname;
+		mpoint = mntbuf[i].f_mntonname;
 
-		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(mpoint, mountpoint))
 			continue;
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
 		options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flag & MNT_VISFLAGMASK);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);

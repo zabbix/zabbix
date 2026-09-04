@@ -295,8 +295,7 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 	int		rc, sz, i;
 	struct vmount	*vms = NULL, *vm;
 	struct zbx_json	j;
-	zbx_fsname_t	fsname;
-	char		*mntopts;
+	const char	*mpoint, *mntopts;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -321,13 +320,13 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 
 	for (i = 0, vm = vms; i < rc; i++)
 	{
-		fsname.mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
 		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
-		if (FAIL != match_mountpoint(fsname.mpoint, mountpoint))
+		if (FAIL != match_mountpoint(mpoint, mountpoint))
 		{
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, zbx_get_vfs_name_by_type(vm->vmt_gfstype),
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntopts, ZBX_JSON_TYPE_STRING);

@@ -240,7 +240,7 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 	struct mntent	*mt;
 	FILE		*f;
 	struct zbx_json	j;
-	zbx_fsname_t	fsname;
+	const char	*mpoint;
 
 	if (NULL == (f = setmntent(MNT_MNTTAB, "r")))
 	{
@@ -253,13 +253,13 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 
 	while (NULL != (mt = getmntent(f)))
 	{
-		fsname.mpoint = mt->mnt_dir;
+		mpoint = mt->mnt_dir;
 
-		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(mpoint, mountpoint))
 			continue;
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mt->mnt_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mt->mnt_opts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);

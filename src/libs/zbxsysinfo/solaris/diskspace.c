@@ -243,8 +243,8 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 {
 	struct mnttab	mt;
 	FILE		*f;
+	const char	*mpoint;
 	struct zbx_json	j;
-	zbx_fsname_t	fsname;
 
 	/* opening the mounted filesystems file */
 	if (NULL == (f = fopen("/etc/mnttab", "r")))
@@ -258,13 +258,13 @@ static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
 	/* fill mnttab structure from file */
 	while (-1 != getmntent(f, &mt))
 	{
-		fsname.mpoint = mt.mnt_mountp;
+		mpoint = mt.mnt_mountp;
 
-		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(mpoint, mountpoint))
 			continue;
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mt.mnt_mntopts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
