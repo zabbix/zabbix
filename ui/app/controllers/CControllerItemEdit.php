@@ -73,7 +73,8 @@ class CControllerItemEdit extends CControllerItem {
 				'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
 				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 				'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null,
+				'templated_hosts' => true
 			]);
 
 			if (!$host) {
