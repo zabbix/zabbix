@@ -1,0 +1,1 @@
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
