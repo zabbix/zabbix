@@ -205,7 +205,7 @@ class CCepRule extends CApiService {
 
 		$conditions_options = [
 			'output' => ['cep_conditionid', 'cep_ruleid', 'type', 'operator', 'event_name', 'tag', 'tag_value',
-				'severity', 'host', 'host_group', 'time_period'
+				'severity', 'host_name', 'host_group_name', 'time_period'
 			],
 			'filter' => ['cep_ruleid' => array_keys($cep_rules)]
 		];
@@ -258,6 +258,9 @@ class CCepRule extends CApiService {
 		if ($options['selectWindow'] === null) {
 			return;
 		}
+
+		$window_output = array_flip($options['selectWindow']);
+		$window_defaults = array_merge($window_output, array_intersect_key(self::getWindowDefaults(), $window_output));
 
 		$window_defaults = array_intersect_key(self::getWindowDefaults(), array_flip($options['selectWindow']));
 
@@ -454,41 +457,41 @@ class CCepRule extends CApiService {
 
 	private static function getFilterConditionValidationFields(): array {
 		return [
-			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD])],
-			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TIME_PERIOD])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN])]
+			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME, CCepRuleHelper::CONDITION_HOST_GROUP_NAME, CCepRuleHelper::CONDITION_TIME_PERIOD])],
+			'operator' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME, CCepRuleHelper::CONDITION_HOST_GROUP_NAME])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])],
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL])],
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TIME_PERIOD])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN])]
 			]],
-			'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'event_name')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'event_name')]
+			'event_name' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_EVENT_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'event_name')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'event_name')]
 			]],
-			'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
+			'tag' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
 			]],
-			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag_value')]
+			'tag_value' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag_value')]
 			]],
-			'severity' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_condition', 'severity')]
+			'severity' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
+										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_condition', 'severity')]
 			]],
-			'host' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_HOST])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host')]
+			'host_name' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host_name')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host_name')]
 			]],
-			'host_group' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_HOST_GROUP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host_group')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host_group')]
+			'host_group_name' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_HOST_GROUP_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host_group_name')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host_group_name')]
 			]],
-			'time_period' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TIME_PERIOD])], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'time_period')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'time_period')]
+			'time_period' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TIME_PERIOD])], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'time_period')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'time_period')]
 			]]
 		];
 	}
@@ -883,7 +886,7 @@ class CCepRule extends CApiService {
 		$del_conditionids = [];
 
 		$condition_defaults = array_intersect_key(DB::getDefaults('cep_condition'),
-			array_flip(['event_name', 'tag', 'tag_value', 'severity', 'host', 'host_group', 'time_period'])
+			array_flip(['event_name', 'tag', 'tag_value', 'severity', 'host_name', 'host_group_name', 'time_period'])
 		);
 
 		foreach ($cep_rules as &$cep_rule) {
@@ -1429,7 +1432,7 @@ class CCepRule extends CApiService {
 
 		$options = [
 			'output' => ['cep_conditionid', 'cep_ruleid', 'type', 'operator', 'event_name', 'tag', 'tag_value',
-				'severity', 'host', 'host_group', 'time_period'
+				'severity', 'host_name', 'host_group_name', 'time_period'
 			],
 			'filter' => ['cep_ruleid' => $cep_ruleids]
 		];

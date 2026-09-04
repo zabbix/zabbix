@@ -32,8 +32,8 @@ class CCepRuleHelper {
 	public const CONDITION_TAG = ZBX_CONDITION_TYPE_EVENT_TAG;
 	public const CONDITION_TAG_VALUE = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
 	public const CONDITION_SEVERITY = ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
-	public const CONDITION_HOST = ZBX_CONDITION_TYPE_HOST;
-	public const CONDITION_HOST_GROUP = ZBX_CONDITION_TYPE_HOST_GROUP;
+	public const CONDITION_HOST_VISIBLE_NAME = ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME;
+	public const CONDITION_HOST_GROUP_NAME = ZBX_CONDITION_TYPE_HOST_GROUP_NAME;
 	public const CONDITION_TIME_PERIOD = ZBX_CONDITION_TYPE_TIME_PERIOD;
 
 	public const CONDITION_TYPES = [
@@ -41,8 +41,8 @@ class CCepRuleHelper {
 		ZBX_CONDITION_TYPE_EVENT_TAG,
 		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
 		ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
-		ZBX_CONDITION_TYPE_HOST,
-		ZBX_CONDITION_TYPE_HOST_GROUP,
+		ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME,
+		ZBX_CONDITION_TYPE_HOST_GROUP_NAME,
 		ZBX_CONDITION_TYPE_TIME_PERIOD
 	];
 
@@ -278,8 +278,8 @@ class CCepRuleHelper {
 			self::CONDITION_TAG => _('Tag name'),
 			self::CONDITION_TAG_VALUE => _('Tag value'),
 			self::CONDITION_SEVERITY => _('Severity'),
-			self::CONDITION_HOST => _('Host'),
-			self::CONDITION_HOST_GROUP => _('Host group'),
+			self::CONDITION_HOST_VISIBLE_NAME => _('Host'),
+			self::CONDITION_HOST_GROUP_NAME => _('Host group'),
 			self::CONDITION_TIME_PERIOD => _('Time period')
 		];
 	}
@@ -373,10 +373,10 @@ class CCepRuleHelper {
 				italic(CSeverityHelper::getName($ceprule_condition['severity']))
 			];
 		}
-		elseif (self::CONDITION_HOST == $ceprule_condition['type']) {
+		elseif (self::CONDITION_HOST_VISIBLE_NAME == $ceprule_condition['type']) {
 			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host'])];
 		}
-		elseif (self::CONDITION_HOST_GROUP == $ceprule_condition['type']) {
+		elseif (self::CONDITION_HOST_GROUP_NAME == $ceprule_condition['type']) {
 			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_group'])];
 		}
 		elseif (self::CONDITION_TIME_PERIOD == $ceprule_condition['type']) {

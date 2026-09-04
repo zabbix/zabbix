@@ -63,13 +63,13 @@ window.ceprule_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
 				<?= CONDITION_OPERATOR_EQUAL ?>
 			],
-			[<?= CCepRuleHelper::CONDITION_HOST ?>]: [
+			[<?= CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME ?>]: [
 				<?= CONDITION_OPERATOR_EQUAL ?>,
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LIKE ?>,
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>
 			],
-			[<?= CCepRuleHelper::CONDITION_HOST_GROUP ?>]: [
+			[<?= CCepRuleHelper::CONDITION_HOST_GROUP_NAME ?>]: [
 				<?= CONDITION_OPERATOR_EQUAL ?>,
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LIKE ?>,
@@ -170,10 +170,10 @@ window.ceprule_condition_edit_popup = new class {
 			case <?= CCepRuleHelper::CONDITION_SEVERITY ?>:
 				keep('type', 'operator', 'severity');
 			break;
-			case <?= CCepRuleHelper::CONDITION_HOST ?>:
+			case <?= CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME ?>:
 				keep('type', 'operator', 'host');
 			break;
-			case <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>:
+			case <?= CCepRuleHelper::CONDITION_HOST_GROUP_NAME ?>:
 				keep('type', 'operator', 'host_group');
 			break;
 			case <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>:

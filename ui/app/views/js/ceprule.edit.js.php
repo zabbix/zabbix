@@ -889,10 +889,10 @@ window.ceprule_edit_popup = new class {
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {
 			description_view.value = severity_names[condition.severity];
 		}
-		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST ?>) {
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME ?>) {
 			description_view.value = condition.host;
 		}
-		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>) {
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP_NAME ?>) {
 			description_view.value = condition.host_group;
 		}
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>) {

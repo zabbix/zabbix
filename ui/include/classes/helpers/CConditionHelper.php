@@ -404,8 +404,8 @@ class CConditionHelper {
 				CCepRuleHelper::CONDITION_TAG => ['operator', 'tag'],
 				CCepRuleHelper::CONDITION_TAG_VALUE => ['tag', 'operator', 'tag_value'],
 				CCepRuleHelper::CONDITION_SEVERITY => ['operator', 'severity'],
-				CCepRuleHelper::CONDITION_HOST => ['operator', 'host'],
-				CCepRuleHelper::CONDITION_HOST_GROUP => ['operator', 'host_group'],
+				CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME => ['operator', 'host_name'],
+				CCepRuleHelper::CONDITION_HOST_GROUP_NAME => ['operator', 'host_group_name'],
 				CCepRuleHelper::CONDITION_TIME_PERIOD => ['operator', 'time_period']
 			};
 

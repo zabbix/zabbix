@@ -89,14 +89,14 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('host'))
 				->setId('ceprule-condition-host')
 				->setAttribute('placeholder', 'visible name')
-			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME)
 		])
 		->addItem([
 			(new CLabel(_('Host group'), 'ceprule-condition-host-group'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host_group'))
 				->setId('ceprule-condition-host-group')
 				->setAttribute('placeholder', 'host group name')
-			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP)
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP_NAME)
 		])
 		->addItem([
 			new CLabel(_('Severity')),

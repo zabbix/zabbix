@@ -6105,7 +6105,7 @@ HEREDOC;
 	 */
 	private function buildWindowNoneHostCondition(int $operator, string $host): array {
 		return [
-			'type' => CCepRuleHelper::CONDITION_HOST,
+			'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 			'operator' => $operator,
 			'host' => $host
 		];
@@ -6118,7 +6118,7 @@ HEREDOC;
 	 */
 	private function buildWindowNoneHostGroupCondition(int $operator, string $host_group): array {
 		return [
-			'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
+			'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 			'operator' => $operator,
 			'host_group' => $host_group
 		];

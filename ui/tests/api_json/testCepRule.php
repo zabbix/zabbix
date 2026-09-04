@@ -1310,7 +1310,7 @@ class testCepRule extends CAPITest {
 						'formula' => 'A',
 						'conditions' => [
 							[
-								'type' => CCepRuleHelper::CONDITION_HOST,
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 								'formulaid' => 'A',
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'event_name' => '',
@@ -1397,8 +1397,8 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::CONDITION_TAG,
 					CCepRuleHelper::CONDITION_TAG_VALUE,
 					CCepRuleHelper::CONDITION_SEVERITY,
-					CCepRuleHelper::CONDITION_HOST,
-					CCepRuleHelper::CONDITION_HOST_GROUP,
+					CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+					CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 					CCepRuleHelper::CONDITION_TIME_PERIOD
 				]).'.'
 			],
@@ -1598,7 +1598,7 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
-								'type' => CCepRuleHelper::CONDITION_HOST,
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'host' => 123
 							]
@@ -1623,7 +1623,7 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
-								'type' => CCepRuleHelper::CONDITION_HOST,
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'host' => ''
 							]
@@ -1674,7 +1674,7 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
-								'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
+								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'host_group' => 123
 							]
@@ -1699,7 +1699,7 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
-								'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
+								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'host_group' => ''
 							]
@@ -1857,7 +1857,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST,
+							'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					]
@@ -1877,7 +1877,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
+							'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					]

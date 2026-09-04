@@ -40,7 +40,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'type' => ['integer', 'required', 'in' => [
 						CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG,
 						CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY,
-						CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP,
+						CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME, CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 						CCepRuleHelper::CONDITION_TIME_PERIOD
 					]],
 					'operator' => [
@@ -49,7 +49,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 								CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
 							],
 							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-								CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP
+								CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME, CCepRuleHelper::CONDITION_HOST_GROUP_NAME
 							]]
 						],
 						[
@@ -100,10 +100,10 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 						]
 					],
 					'host' => ['db cep_condition.host', 'required', 'not_empty',
-						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME]]
 					],
 					'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
-						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP_NAME]]
 					],
 					'severity' => ['db cep_condition.severity', 'required',
 						'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION,
