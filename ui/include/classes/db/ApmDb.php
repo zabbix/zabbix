@@ -89,7 +89,7 @@ class ApmDb {
 
 	private function initFromSettings(): void {
 		$this->provider = self::PROVIDER_CLICKHOUSE;
-		$this->config = self::resolveConfig(CSettingsHelper::getPublic(CSettingsHelper::APM_GLOBAL_DB));
+		$this->config = self::resolveConfig(CSettingsHelper::getApmGlobalDb());
 	}
 
 	/**
