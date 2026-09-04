@@ -17,6 +17,7 @@
 #include "telemetry.h"
 
 #include "zbxstr.h"
+#include "zbxeval.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxcommon.h"
@@ -623,27 +624,40 @@ static void	tq_set_column_types(zbx_tq_query_t *query)
 	}
 }
 
-static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, int condition_count, char *error,
+static int	tq_validate_formula_ctx(const zbx_eval_context_t *ctx, zbx_uint64_t condition_count, char *error,
 		size_t max_error_len)
 {
-	if (TQ_FORMULA_NODE_TYPE_LEAF == node->type)
+	for (int i = 0; i < ctx->stack.values_num; i++)
 	{
-		if (0 > node->condition_idx || node->condition_idx >= condition_count)
+		const zbx_eval_token_t	*token = &ctx->stack.values[i];
+		zbx_uint64_t		condition_idx;
+
+		switch (token->type)
 		{
-			return ret_errf(FAIL, error, max_error_len, "Invalid condition id in \"%s\": %d",
-					ZBX_TQ_QUERY_TAG_FORMULA, node->condition_idx);
+			case ZBX_EVAL_TOKEN_FUNCTIONID:
+				break;
+			case ZBX_EVAL_TOKEN_OP_AND:
+			case ZBX_EVAL_TOKEN_OP_OR:
+			case ZBX_EVAL_TOKEN_OP_NOT:
+				continue;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN_MSG("Unexpected token type in \"%s\"",
+						ZBX_TQ_QUERY_TAG_FORMULA);
+				return ret_errf(FAIL, error, max_error_len, "Unexpected token type in \"%s\"",
+						ZBX_TQ_QUERY_TAG_FORMULA);
 		}
 
-		return SUCCEED;
-	}
-
-
-	for (int i = 0; i < node->children.values_num; i++)
-	{
-		if (SUCCEED != tq_validate_formula_node_indices(node->children.values[i], condition_count, error,
-				max_error_len))
+		if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1,
+				token->loc.r - token->loc.l - 1, &condition_idx))
 		{
-			return FAIL;
+			return ret_errf(FAIL, error, max_error_len, "Invalid \"%s\" format starting with \"%s\"",
+					ZBX_TQ_QUERY_TAG_FORMULA, ctx->expression + token->loc.l);
+		}
+
+		if (condition_idx >= condition_count)
+		{
+			return ret_errf(FAIL, error, max_error_len, "Invalid condition id in \"%s\": " ZBX_FS_UI64,
+					ZBX_TQ_QUERY_TAG_FORMULA, condition_idx);
 		}
 	}
 
@@ -777,14 +791,14 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	{
 		if (ZBX_TQ_EVAL_TYPE_EXPRESSION == query->evaltype)
 		{
-			if (NULL == query->formula_parsed)
+			if (NULL == query->formula_ctx)
 			{
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is invalid",
 						ZBX_TQ_QUERY_TAG_FORMULA);
 			}
 
-			if (SUCCEED != tq_validate_formula_node_indices(query->formula_parsed,
-					query->conditions.values_num, error, max_error_len))
+			if (SUCCEED != tq_validate_formula_ctx(query->formula_ctx, query->conditions.values_num,
+					error, max_error_len))
 			{
 				return FAIL;
 			}
@@ -916,10 +930,17 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *erro
 	/* formula being set is enforced by tq_validate_query, if it is set, then it must be either empty or valid */
 	if (NULL != query->formula && '\0' != *query->formula)
 	{
-		if (NULL == (query->formula_parsed = tq_formula_parse(query->formula, error, max_error_len)))
+		char	*parse_error = NULL;
+		query->formula_ctx = zbx_malloc(NULL, sizeof(zbx_eval_context_t));
+
+		if (SUCCEED != zbx_eval_parse_expression(query->formula_ctx, query->formula,
+				ZBX_EVAL_PARSE_TQ_FILTER_EXPRESSION, &parse_error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse formula: %s", error);
+			zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse formula: %s", parse_error);
 			zbx_snprintf(error, max_error_len, "Failed to parse formula");
+
+			zbx_free(query->formula_ctx);
+			zbx_free(parse_error);
 			goto out;
 		}
 	}

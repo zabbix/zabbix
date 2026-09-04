@@ -106,7 +106,7 @@ out:
  *               SUCCEED_PARTIAL - row count exceeded ZBX_TQ_MAX_RESULT_ROWS  *
  *               FAIL            - failed to parse response                   *
  *                                                                            *
- * Comments: modifies resp during parsing but returns it to initial state     *
+ * Comments: modifies resp during parsing but restores it to initial state    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values)

@@ -80,14 +80,14 @@ static int	send_query_http(const char *posts, const zbx_apm_db_config_t *apm_db_
 	return ret;
 }
 
-static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time_t lasttimestamp,
+static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t lasttimestamp,
 		const zbx_apm_db_config_t *apm_db_config, zbx_vector_str_t *values, char **error)
 {
 	int			ret = FAIL;
 	char			*posts = NULL;
 	char			*resp = NULL;
 	int			parse_ret;
-	const zbx_tq_query_t	*query = item->telemetry_query;
+	zbx_tq_query_t		*query = item->telemetry_query;
 	char			*url = NULL;
 	unsigned char		post_type, output_format;
 
@@ -134,7 +134,7 @@ out:
 }
 #endif
 
-int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
+int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
 	int			ret = NOTSUPPORTED;
 	time_t			now, lasttimestamp;

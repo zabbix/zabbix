@@ -38,15 +38,6 @@ typedef enum
 }
 tq_formula_node_type_t;
 
-ZBX_VECTOR_DECL(tq_formula_node_ptr, zbx_tq_formula_node_t *)
-
-struct tq_formula_node
-{
-	tq_formula_node_type_t			type;
-	zbx_vector_tq_formula_node_ptr_t	children;	/* not initialized for TQ_FORMULA_NODE_TYPE_LEAF */
-	int					condition_idx;	/* only for TQ_FORMULA_NODE_TYPE_LEAF */
-};
-
 void	tq_query_init(zbx_tq_query_t *query);
 void	tq_column_init(zbx_tq_column_t *column);
 void	tq_column_clean(zbx_tq_column_t *column);
@@ -67,10 +58,7 @@ zbx_tq_column_type_t	tq_get_base_column_type(zbx_tq_column_type_t type);
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
 int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b);
-void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted);
-
-zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, char *error, size_t max_error_len);
-void			tq_formula_node_free(zbx_tq_formula_node_t *node);
+void	tq_get_conditions_and_or_sorted(zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted);
 
 int	tq_validate_result_column_type(zbx_json_type_t type);
 int	tq_validate_result_aggr_column_type(zbx_json_type_t type);

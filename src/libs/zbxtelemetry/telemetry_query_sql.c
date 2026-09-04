@@ -16,10 +16,12 @@
 
 #include "telemetry.h"
 
+#include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxstr.h"
+#include "zbxvariant.h"
 
 ZBX_PTR_VECTOR_DECL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
@@ -232,7 +234,7 @@ static char	*tq_sql_dyn_get_operand(const char *atom, zbx_tq_column_type_t type,
 	}
 }
 
-static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_columns_to_select(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -240,7 +242,7 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
-		const zbx_tq_column_t	*col = &query->columns.values[i];
+		zbx_tq_column_t		*col = &query->columns.values[i];
 		char			*name_esc = tq_sql_dyn_escape_name(col->column, ctx);
 		char			*col_to_select = tq_sql_dyn_get_operand(name_esc, col->col_type,
 				col->attribute_key, ctx);
@@ -278,7 +280,7 @@ static char	*tq_sql_dyn_get_percentile(const char *atom, double fraction, const 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_aggr_columns_to_select(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -286,7 +288,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 
 	for (int i = 0; i < query->aggregated_columns.values_num; i++)
 	{
-		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
+		zbx_tq_aggr_column_t		*aggr_col = &query->aggregated_columns.values[i];
 		char				*col_name_esc = NULL;
 		char				*operand = NULL;
 
@@ -349,7 +351,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
  *  Return value: escaped and quoted table name                               *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_table_to_select_from(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	const char	*str = NULL;
 	char		*str_esc;
@@ -481,7 +483,7 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_
 	}
 }
 
-static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_array_condition(zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 	char	*col_esc = tq_sql_dyn_escape_name(cond->column, ctx);
@@ -506,7 +508,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 	return str;
 }
 
-static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_condition(zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	if (SUCCEED == tq_column_type_is_array(cond->col_type))
 	{
@@ -524,7 +526,7 @@ static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_s
 	}
 }
 
-static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_conditions_simple(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -532,7 +534,7 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, const
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
-		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+		zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
 		char	*cond_str = tq_sql_dyn_get_condition(cond, ctx);
 
@@ -556,7 +558,7 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, const
 	return str;
 }
 
-static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_conditions_and_or(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char				*str = NULL;
 	size_t				alloc = 0;
@@ -576,7 +578,7 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 
 	for (int i = 0; i < conditions_sorted.values_num; i++)
 	{
-		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
+		zbx_tq_condition_t	*cond = conditions_sorted.values[i];
 		char				*cond_str = tq_sql_dyn_get_condition(cond, ctx);
 
 		zbx_strcpy_alloc(&str, &alloc, &offset, cond_str);
@@ -603,56 +605,51 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 	return str;
 }
 
-static void	tq_sql_add_condition_node(const zbx_tq_query_t *query, const zbx_tq_formula_node_t *node, char **str,
-		size_t *alloc, size_t *offset, const tq_sql_ctx_t *ctx)
+/******************************************************************************
+ *                                                                            *
+ * Comments: modifies query->formula_ctx but restores it to initial state     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_get_conditions_expression(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
-	if (TQ_FORMULA_NODE_TYPE_OR == node->type || TQ_FORMULA_NODE_TYPE_AND == node->type)
+	char	*str = NULL;
+
+	for (int i = 0; i < query->formula_ctx->stack.values_num; i++)
 	{
-		zbx_chrcpy_alloc(str, alloc, offset, '(');
+		zbx_eval_token_t	*token = &query->formula_ctx->stack.values[i];
+		zbx_uint64_t		condition_idx;
 
-		for (int i = 0; i < node->children.values_num; i++)
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (SUCCEED != zbx_is_uint64_n(query->formula_ctx->expression + token->loc.l + 1,
+				token->loc.r - token->loc.l - 1, &condition_idx))
 		{
-			tq_sql_add_condition_node(query, node->children.values[i], str, alloc, offset, ctx);
-
-			if (node->children.values_num - 1 != i)
-			{
-				zbx_strcpy_alloc(str, alloc, offset,
-						(TQ_FORMULA_NODE_TYPE_OR == node->type ? " OR " : " AND "));
-			}
+			THIS_SHOULD_NEVER_HAPPEN;
+			str = zbx_strdup(NULL, "");
+			goto out;
 		}
 
-		zbx_chrcpy_alloc(str, alloc, offset, ')');
+		zbx_variant_set_str(&token->value, tq_sql_dyn_get_condition(&query->conditions.values[condition_idx],
+				ctx));
 	}
-	else if (TQ_FORMULA_NODE_TYPE_NOT == node->type)
+
+	zbx_eval_compose_expression(query->formula_ctx, &str);
+out:
+	for (int i = 0; i < query->formula_ctx->stack.values_num; i++)
 	{
-		zbx_strcpy_alloc(str, alloc, offset, "(NOT ");
+		zbx_eval_token_t	*token = &query->formula_ctx->stack.values[i];
 
-		tq_sql_add_condition_node(query, node->children.values[0], str, alloc, offset, ctx);
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
 
-		zbx_chrcpy_alloc(str, alloc, offset, ')');
+		zbx_variant_clear(&token->value);
 	}
-	else /* TQ_FORMULA_NODE_TYPE_LEAF */
-	{
-		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[node->condition_idx], ctx);
-
-		zbx_strcpy_alloc(str, alloc, offset, cond_str);
-
-		zbx_free(cond_str);
-	}
-}
-
-static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
-{
-	char		*str = NULL;
-	size_t		alloc = 0;
-	size_t		offset = 0;
-
-	tq_sql_add_condition_node(query, query->formula_parsed, &str, &alloc, &offset, ctx);
 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_conditions(zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	if (0 == query->conditions.values_num)
 		return zbx_strdup(NULL, "");
@@ -676,12 +673,12 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, const tq_sql
 	}
 }
 
-static const char	*tq_sql_get_timestamp_column_name(const zbx_tq_query_t *query)
+static const char	*tq_sql_get_timestamp_column_name(zbx_tq_query_t *query)
 {
 	return (ZBX_TQ_SIGNAL_TYPE_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
 }
 
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql)
 {
 	tq_sql_ctx_t	ctx = {
