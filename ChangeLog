@@ -3,6 +3,13 @@ Changes for 7.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
+........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
+.........T [ZBX-25576] fixed bad URL issue in Topdesk webhook (kflorowski)
+.........T [ZBX-23983] fixed typo in the trigger event name for the 'Generic Java JMX' template (smansurovs)
+.........T [ZBX-28087] fixed README.md files for cloud templates (smansurovs)
+.........T [ZBX-26475] fixed error handling in configserver items in MongoDB template (kflorowski)
 .........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
 ..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
 
