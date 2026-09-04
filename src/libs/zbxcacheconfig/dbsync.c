@@ -4247,7 +4247,7 @@ int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_conditionid,cep_ruleid,type,operator,event_name,tag,tag_value,host_name,host_group,"
+			"select cep_conditionid,cep_ruleid,type,operator,event_name,tag,tag_value,host_name,"
 				"host_group_name,time_period,severity from cep_condition");
 
 	dbsync_prepare(sync, 11, NULL);
