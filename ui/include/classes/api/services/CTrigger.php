@@ -567,19 +567,14 @@ class CTrigger extends CTriggerGeneral {
 				$sql_parts = $this->addQuerySelect('t.expression', $sql_parts);
 			}
 
-			$trigger_rtdata = false;
-
 			foreach (['value', 'state', 'lastchange', 'error'] as $field) {
 				if ($this->outputIsRequested($field, $options['output'])) {
 					$sql_parts = $this->addQuerySelect(
 						dbConditionCoalesce('tr.'.$field, DB::getDefault('trigger_rtdata', $field), $field), $sql_parts
 					);
-					$trigger_rtdata = true;
-				}
-			}
 
-			if ($trigger_rtdata) {
-				$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+					$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+				}
 			}
 		}
 
