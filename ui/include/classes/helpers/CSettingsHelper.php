@@ -195,7 +195,7 @@ class CSettingsHelper {
 			self::$params_public = CSettings::getPublic();
 		}
 
-		return self::$params_public['apm_global_db'];
+		return self::$params_public[self::APM_GLOBAL_DB];
 	}
 
 	/**
