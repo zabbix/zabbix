@@ -494,8 +494,6 @@ class CSettings extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $apm_global_db, '/apm_global_db', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$apm_global_db += array_map(static fn(array $field) => $field['default'], self::APM_GLOBAL_DB_SCHEMA);
 	}
 
 	private static function updateApmGlobalDb(array &$settings, array $db_settings): void {
