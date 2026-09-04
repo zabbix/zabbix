@@ -34,6 +34,7 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}|<p>Triggers will be created only for interfaces whose description contains the value of this macro</p>|`CHANGE_IF_NEEDED`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$ZYXEL.ADSL.SNR.MIN}|<p>Type the minimum signal to noise margin (0-31 dB)</p>|`8`|
 |{$ZYXEL.ADSL.ATN.MAX}|<p>Type the maximum signal attenuation</p>|`40`|
 |{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}|<p>Filter by discoverable interface names.</p>|`.*`|
@@ -62,7 +63,7 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |ZYXEL: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL IES-500x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 |ZYXEL: Template does not match hardware|<p>This template is for Zyxel IES-500x, but connected to {ITEM.VALUE}</p>|`not(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5000" or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5005")`|Info|**Manual close**: Yes|
-|ZYXEL: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<10m) or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|ZYXEL: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and change(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime,#2)<42949672.96-(lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)-lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime,#2))) or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and change(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime,#2)<42949672.96-(lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)-lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime,#2)))`|Info|**Manual close**: Yes|
 
 ### LLD rule Slot discovery
 

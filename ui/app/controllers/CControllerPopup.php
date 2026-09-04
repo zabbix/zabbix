@@ -51,6 +51,8 @@ class CControllerPopup extends CController {
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),
 			'item.prototype.edit' => _('Item prototype edit'),
+			'lldrule.edit' => _('Discovery rule edit'),
+			'lldrule.prototype.edit' => _('Discovery prototype edit'),
 			'maintenance.edit' => _('Maintenance edit'),
 			'mediatype.edit' => _('Media type edit'),
 			'module.edit' => _('Module edit'),

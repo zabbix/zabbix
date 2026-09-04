@@ -144,12 +144,81 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
+static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
+{
+	unsigned char	proc_type, snmp_oid_type = 0;
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_DB_MONITOR:
+#ifndef HAVE_UNIXODBC
+			*info = zbx_strdup(NULL, "Support for ODBC was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_IPMI:
+#ifndef HAVE_OPENIPMI
+			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SSH:
+#if !defined(HAVE_SSH) && !defined(HAVE_SSH2)
+			*info = zbx_strdup(NULL, "Support for SSH was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SNMP:
+#ifndef HAVE_NETSNMP
+			*info = zbx_strdup(NULL, "Support for SNMP was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_BROWSER:
+#ifndef HAVE_LIBCURL
+			*info = zbx_strdup(NULL, "Support for libCURL was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+	}
+
+	if (ITEM_TYPE_SNMP == item->type)
+	{
+#		define ZBX_SNMP_OID_TYPE_WALK	3
+#		define ZBX_SNMP_OID_TYPE_GET	4
+
+		if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+		else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
+
+#		undef ZBX_SNMP_OID_TYPE_WALK
+#		undef ZBX_SNMP_OID_TYPE_GET
+	}
+
+	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type) ||
+			ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		return SUCCEED;
+	}
+
+	*info = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+
+	return FAIL;
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_webdriver_url)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -390,7 +459,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			sizeof(item.host.tls_psk));
 #endif
 
-	if (ITEM_TYPE_IPMI == item.type)
+	if (FAIL == process_zero_pollers_items(&item, get_config_forks, info))
+	{
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+	}
+	else if (ITEM_TYPE_IPMI == item.type)
 	{
 		zbx_init_agent_result(&result);
 
@@ -398,21 +472,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		{
 			*info = zbx_dsprintf(NULL, "Invalid port number [%s]", item.interface.port_orig);
 		}
-		else
-		{
 #ifdef HAVE_OPENIPMI
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
-			{
-				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
-						" \"StartIPMIPollers\" is 0.");
-			}
-			else
-				ret = zbx_ipmi_test_item(&item, info);
-#else
-			ZBX_UNUSED(get_config_forks);
-			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+		else
+			ret = zbx_ipmi_test_item(&item, info);
 #endif
-		}
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
@@ -447,7 +510,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
-				config_ssh_key_location, config_webdriver_url, config_denyitemtypes_mask);
+				config_ssh_key_location, config_webdriver_url);
 #ifdef HAVE_NETSNMP
 		if (ITEM_TYPE_SNMP == item.type)
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
@@ -550,8 +613,8 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location, const char *config_webdriver_url,
-		zbx_uint32_t config_denyitemtypes_mask, struct zbx_json *json, char **error)
+		const char *config_ssh_key_location, const char *config_webdriver_url, struct zbx_json *json,
+		char **error)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
@@ -626,7 +689,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, config_denyitemtypes_mask);
+			config_webdriver_url);
 
 	if (FAIL == ret)
 		state = ITEM_STATE_NOTSUPPORTED;
@@ -681,7 +744,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_frontend_allowed_ip)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -696,8 +759,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
 			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
-			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url,
-			config_denyitemtypes_mask, &json, &error)))
+			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url, &json, &error)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);

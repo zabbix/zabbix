@@ -32,7 +32,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -304,6 +304,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -314,7 +339,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -563,6 +589,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -576,6 +604,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -586,7 +639,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -809,6 +863,8 @@ zabbix_export:
               value: '5'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -822,6 +878,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -832,7 +913,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -1056,6 +1138,8 @@ zabbix_export:
               value: '60'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -1317,6 +1401,31 @@ zabbix_export:
           type: SCRIPT
           key: oci.aut.db.state
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -1327,7 +1436,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -1545,6 +1655,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -1871,6 +1983,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Autonomous Database", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Autonomous Database"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a "high" severity event about CPU resource utilization.'
@@ -4297,7 +4425,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -4329,6 +4457,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -4339,7 +4492,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -4565,6 +4719,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Block Volume"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: volume_id
@@ -4615,6 +4771,31 @@ zabbix_export:
           type: SCRIPT
           key: oci.block.volume.state
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -4625,7 +4806,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -4826,6 +5008,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Block Volume"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: volume_id
@@ -4967,6 +5151,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Block Volume", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Block Volume"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.HTTP.PROXY}'
           description: 'Set an HTTP proxy for OCI API requests if needed.'
         - macro: '{$OCI.HTTP.RETURN.CODE.OK}'
@@ -5370,7 +5570,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -5402,6 +5602,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -5412,7 +5637,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -5638,6 +5864,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Boot Volume"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: volume_id
@@ -5688,6 +5916,31 @@ zabbix_export:
           type: SCRIPT
           key: oci.boot.volume.state
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -5698,7 +5951,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -5899,6 +6153,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Boot Volume"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: volume_id
@@ -6041,6 +6297,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Boot Volume", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Boot Volume"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.HTTP.PROXY}'
           description: 'Set an HTTP proxy for OCI API requests if needed.'
         - macro: '{$OCI.HTTP.RETURN.CODE.OK}'
@@ -6568,7 +6840,7 @@ zabbix_export:
         the LLD filter pattern matching value to receive different matching results for a specified value.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -6594,6 +6866,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -6612,7 +6909,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -6801,6 +7099,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -6813,6 +7113,31 @@ zabbix_export:
           key: oci.block.volumes.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -6831,7 +7156,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -7054,6 +7380,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -7071,6 +7399,31 @@ zabbix_export:
           key: oci.boot.volumes.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -7089,7 +7442,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -7312,6 +7666,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -7386,6 +7742,31 @@ zabbix_export:
           key: oci.object.autonomous.db.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -7404,7 +7785,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -7627,6 +8009,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -7644,6 +8028,31 @@ zabbix_export:
           key: oci.object.lb.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -7662,7 +8071,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -7885,6 +8295,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -7902,6 +8314,31 @@ zabbix_export:
           key: oci.object.storage.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -7920,7 +8357,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -8139,6 +8577,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -8152,6 +8592,31 @@ zabbix_export:
           key: oci.vcn.discovery
           delay: 1h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -8170,7 +8635,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -8393,6 +8859,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           lld_macro_paths:
@@ -8420,6 +8888,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud"}.'
+          config:
+            type: LIST
+            priority: '44'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.API.AUTONOMOUS.DB.HOST}'
           description: 'Host for OCI Autonomous Database API endpoint.'
           config:
@@ -8640,7 +9124,7 @@ zabbix_export:
           description: 'Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Other
             label: 'HTTP return code'
             description: 'HTTP return code that represents an OK response from the API.'
@@ -8649,7 +9133,7 @@ zabbix_export:
           description: 'Set an HTTP request timeout.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Other
             label: 'HTTP timeout'
             description: 'Set an HTTP request timeout.'
@@ -8837,7 +9321,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Cloud
       items:
@@ -8847,6 +9331,31 @@ zabbix_export:
           key: oci.compute.availability.get
           delay: 5m
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -8857,7 +9366,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -9053,6 +9563,8 @@ zabbix_export:
               value: '5'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -9292,6 +9804,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -9302,7 +9839,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -9532,6 +10070,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -9586,6 +10126,31 @@ zabbix_export:
           type: SCRIPT
           key: oci.compute.state.get
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -9596,7 +10161,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -9802,6 +10368,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -9826,6 +10394,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -9836,7 +10429,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -10024,6 +10618,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -10159,6 +10755,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(required_params, all_params) {
                 	required_params.forEach(function (field) {
                 		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -10169,7 +10790,8 @@ zabbix_export:
                 
                 function oracleCloudInfra(service, action, params) {
                 	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.hash = function (string) {
                 		return sha256(string);
@@ -10401,6 +11023,8 @@ zabbix_export:
                   value: '1'
                 - name: tenancy_ocid
                   value: '{$OCI.API.TENANCY}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}'
                 - name: user_ocid
                   value: '{$OCI.API.USER}'
                 - name: vnic_id
@@ -10774,6 +11398,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Compute", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Compute"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.COMPUTE.CPU.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a "high" severity event about CPU resource utilization.'
@@ -12298,7 +12938,7 @@ zabbix_export:
         Threshold macros could be used with a context to fine tune threshold for different services, compartments, region and budgets.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -12379,6 +13019,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -12389,7 +13054,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -12584,6 +13250,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Costs"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -12639,6 +13307,36 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 40de2d949f0147859171849a2ceeab8d
+          name: 'Daily average cost'
+          type: CALCULATED
+          key: oci_cost.daily.average.cost
+          value_type: FLOAT
+          params: 'avg(//oci_cost.usage.total.cost.daily.current, 1w)'
+          description: 'Oracle daily average cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 1dcf71b9ba0445eca41bd82a8484d2f7
+          name: 'Get month cost'
+          type: DEPENDENT
+          key: oci_cost.month.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Oracle month cost.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.usage.monthly_cost_history
+          master_item:
+            key: oci_cost.usage.get
+          tags:
+            - tag: component
+              value: raw
         - uuid: 13641e6cf5c44e089bd323f74d7b4d41
           name: 'Region: Count'
           type: DEPENDENT
@@ -12736,6 +13434,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -12746,7 +13469,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -12964,6 +13688,99 @@ zabbix_export:
             	}
             }
             
+            function fetchMonthlyCosts(months_back, result_key, error_label, cost_field, group_by) {
+            	try {
+            		var monthly_cost_array = [],
+            			current_month = new Date();
+            
+            		current_month.setUTCDate(1);
+            		current_month.setUTCHours(0, 0, 0, 0);
+            
+            		var start_month = new Date(Date.UTC(
+            			current_month.getUTCFullYear(),
+            			current_month.getUTCMonth() - (months_back - 1),
+            			1
+            		));
+            
+            		var end_month = new Date(Date.UTC(
+            			current_month.getUTCFullYear(),
+            			current_month.getUTCMonth() + 1,
+            			1
+            		));
+            
+            		var body = {
+            			granularity: 'MONTHLY',
+            			tenantId: params['tenancy_ocid'],
+            			timeUsageStarted: start_month.toISOString(),
+            			timeUsageEnded: end_month.toISOString(),
+            			queryType: 'COST',
+            			isAggregateByTime: 'false',
+            			compartmentDepth: '7'
+            		};
+            
+            		if (group_by && group_by.length > 0) {
+            			body.groupBy = group_by;
+            		}
+            
+            		var response = JSON.parse(
+            			oci.executeRequest('post', '/20200107/usage', '', body, '', true)
+            		);
+            
+            		var monthly_costs = {};
+            
+            		if (response && response.items) {
+            			response.items.forEach(function( item ) {
+            				var month = item.timeUsageStarted
+            					? item.timeUsageStarted.substring(0, 7)
+            					: '';
+            
+            				if (!month) {
+            
+            					return;
+            				}
+            
+            				if (!monthly_costs[month]) {
+            					monthly_costs[month] = {
+            						cost: 0,
+            						currency: ''
+            					};
+            				}
+            
+            				if (item[cost_field] !== undefined && item[cost_field] !== null) {
+            					monthly_costs[month].cost += Number(item[cost_field]);
+            				}
+            
+            				if (item.currency && item.currency.trim() !== '') {
+            					monthly_costs[month].currency = item.currency;
+            				}
+            			});
+            		}
+            
+            		for (var i = months_back - 1; i >= 0; i--) {
+            			var month_start = new Date(Date.UTC(
+            				current_month.getUTCFullYear(),
+            				current_month.getUTCMonth() - i,
+            				1
+            			));
+            
+            			var month = month_start.toISOString().substring(0, 7);
+            
+            			monthly_cost_array.push({
+            				month: month,
+            				cost: monthly_costs[month] ? Number(monthly_costs[month].cost) : 0,
+            				currency: monthly_costs[month] ? monthly_costs[month].currency : ''
+            			});
+            		}
+            
+            		result.usage[result_key] = monthly_cost_array;
+            	}
+            	catch (error) {
+            		result.errors.push(error_label + ': ' + error);
+            
+            		result.usage[result_key] = null;
+            	}
+            }
+            
             var required_fields = [
             		'compartmentName',
             		'service',
@@ -12995,6 +13812,7 @@ zabbix_export:
             fetchUsage('DAILY', today_start, tomorrow_start, 'current_day', 'current_day_usage');
             fetchUsage('MONTHLY', month_previous_start, month_current_start, 'prev_month', 'prev_month_usage');
             fetchUsage('MONTHLY', month_current_start, today_start, 'current_month', 'current_month_usage');
+            fetchMonthlyCosts(12, 'monthly_cost_history', 'monthly_cost_history_usage', 'attributedCost', []);
             
             return JSON.stringify(result);
           description: 'Master item to get usage info.'
@@ -13012,6 +13830,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Costs"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -13431,6 +14251,53 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+        - uuid: 5f21a704cc1d44989a7c10b2226f02de
+          name: 'Month discovery'
+          type: DEPENDENT
+          key: oci_cost.month.discovery
+          description: 'Discovers month cost history.'
+          item_prototypes:
+            - uuid: 7a6ed8050cff4efca8d7f9567467e4e7
+              name: 'Month [{#OCI.MONTH}]: Get data'
+              type: DEPENDENT
+              key: 'oci_cost.month.cost.data.get[{#OCI.MONTH}]'
+              history: '0'
+              value_type: CHAR
+              description: 'Collects month cost history.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.month=="{#OCI.MONTH}")].first()'
+              master_item:
+                key: oci_cost.month.cost.get
+              tags:
+                - tag: month
+                  value: '{#OCI.MONTH}'
+            - uuid: 1ed9b406170b4a56b84927a34b522f81
+              name: 'Month [{#OCI.MONTH}]: Total cost'
+              type: DEPENDENT
+              key: 'oci_cost.month.total.cost[{#OCI.MONTH}]'
+              value_type: FLOAT
+              units: '{#OCI.CURRENCY}'
+              description: 'Oracle `{#OCI.MONTH}` month total cost.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.cost
+              master_item:
+                key: 'oci_cost.month.cost.data.get[{#OCI.MONTH}]'
+              tags:
+                - tag: component
+                  value: billing
+                - tag: month
+                  value: '{#OCI.MONTH}'
+          master_item:
+            key: oci_cost.month.cost.get
+          lld_macro_paths:
+            - lld_macro: '{#OCI.CURRENCY}'
+              path: $.currency
+            - lld_macro: '{#OCI.MONTH}'
+              path: $.month
         - uuid: 72fa5b0c8b454bcc9801d6377674c158
           name: 'Compartment discovery'
           type: DEPENDENT
@@ -14197,11 +15064,27 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Costs", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Costs"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.API.BUDGET.HOST}'
           description: 'Host for OCI budget API endpoint.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'Budget host'
             description: 'Host for OCI budget API endpoint.'
             required: 'YES'
@@ -14210,7 +15093,7 @@ zabbix_export:
           description: 'Fingerprint of private key.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: Fingerprint
             description: 'Fingerprint value here.'
             required: 'YES'
@@ -14219,7 +15102,7 @@ zabbix_export:
           description: 'Entire private key for API access.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'Private key'
             description: 'Contents of private key file.'
             required: 'YES'
@@ -14227,7 +15110,7 @@ zabbix_export:
           description: 'OCID of tenancy.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'OCID tenancy'
             description: 'Tenancy OCID value.'
             required: 'YES'
@@ -14235,7 +15118,7 @@ zabbix_export:
           description: 'Host for OCI usage API endpoint.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'Usage host'
             description: 'Host for OCI usage API endpoint.'
             required: 'YES'
@@ -14243,7 +15126,7 @@ zabbix_export:
           description: 'OCID of user.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'OCID user'
             description: 'User OCID value.'
             required: 'YES'
@@ -14252,7 +15135,7 @@ zabbix_export:
           description: 'Sets the regex string of budget names to allow in discovery.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Budget names include'
             description: 'Budget names to include in discovery.'
@@ -14261,7 +15144,7 @@ zabbix_export:
           description: 'Sets the regex string of budget names to ignore in discovery.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Budget names exclude'
             description: 'Budget names to exclude in discovery.'
@@ -14270,7 +15153,7 @@ zabbix_export:
           description: 'Sets the regex string of budget states to allow in discovery.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Budget states include'
             description: 'Budget states to include in discovery.'
@@ -14279,7 +15162,7 @@ zabbix_export:
           description: 'Sets the regex string of budget states to exclude in discovery.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Budget states exclude'
             description: 'Budget states to exclude in discovery.'
@@ -14288,7 +15171,7 @@ zabbix_export:
           description: 'Budget warning threshold for spend percentage excess. Could be used with a context to define specific budget.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Thresholds
             label: 'Budget spend warning threshold'
             description: 'Budget warning threshold for spend percentage excess. Could be used with a context.'
@@ -14298,7 +15181,7 @@ zabbix_export:
           description: 'Compartment warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific compartment.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Thresholds
             label: 'Compartment day percentage warning'
             description: 'Compartment warning for current day percentage excess. Could be used with a context.'
@@ -14308,7 +15191,7 @@ zabbix_export:
           description: 'Sets the regex string of compartment names to allow in discovery.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Compartment names include'
             description: 'Compartment names to include in discovery.'
@@ -14317,7 +15200,7 @@ zabbix_export:
           description: 'Sets the regex string of compartment names to ignore in discovery.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Compartment names exclude'
             description: 'Compartment names to exclude in discovery.'
@@ -14326,7 +15209,7 @@ zabbix_export:
           description: 'Compartment warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific compartment.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Thresholds
             label: 'Compartment month percentage warning'
             description: 'Compartment warning for current month percentage excess. Could be used with a context.'
@@ -14336,7 +15219,7 @@ zabbix_export:
           description: 'Region warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific region.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Thresholds
             label: 'Region day percentage warning'
             description: 'Region warning for current day percentage excess. Could be used with a context.'
@@ -14346,7 +15229,7 @@ zabbix_export:
           description: 'Sets the regex string of region names to allow in discovery.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Region names include'
             description: 'Region names to include in discovery.'
@@ -14355,7 +15238,7 @@ zabbix_export:
           description: 'Sets the regex string of region names to ignore in discovery.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Region names exclude'
             description: 'Region names to exclude in discovery.'
@@ -14364,7 +15247,7 @@ zabbix_export:
           description: 'Region warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific region.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Thresholds
             label: 'Region month percentage warning'
             description: 'Region warning for current month percentage excess. Could be used with a context.'
@@ -14374,7 +15257,7 @@ zabbix_export:
           description: 'Service warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific service.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Service day percentage warning'
             description: 'Service warning for current day percentage excess. Could be used with a context.'
@@ -14384,7 +15267,7 @@ zabbix_export:
           description: 'Sets the regex string of service names to allow in discovery.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Service names include'
             description: 'Service names to include in discovery.'
@@ -14393,7 +15276,7 @@ zabbix_export:
           description: 'Sets the regex string of service names to ignore in discovery.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Service names exclude'
             description: 'Service names to exclude in discovery.'
@@ -14402,7 +15285,7 @@ zabbix_export:
           description: 'Service warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific service.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Service month percentage warning'
             description: 'Service warning for current month percentage excess. Could be used with a context.'
@@ -14412,7 +15295,7 @@ zabbix_export:
           description: 'Total warning threshold for current day percentage excess, comparing to previous.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Thresholds
             label: 'Total day percentage warning'
             description: 'Total warning for current day percentage excess.'
@@ -14422,7 +15305,7 @@ zabbix_export:
           description: 'Total warning threshold for current month percentage excess, comparing to previous.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Thresholds
             label: 'Total month percentage warning'
             description: 'Total warning for current month percentage excess.'
@@ -14440,7 +15323,7 @@ zabbix_export:
           description: 'Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Other
             label: 'HTTP return code'
             description: 'HTTP return code that represents an OK response from the API.'
@@ -14449,7 +15332,7 @@ zabbix_export:
           description: 'Set a JavaScript timeout.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Other
             label: 'JavaScript timeout'
             description: 'Set a JavaScript timeout.'
@@ -14994,7 +15877,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -15089,6 +15972,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -15099,7 +16007,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -15285,6 +16194,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -15297,6 +16208,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -15307,7 +16243,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -15493,6 +16430,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -15704,6 +16643,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -15714,7 +16678,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -15946,6 +16911,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -16262,6 +17229,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(required_params, all_params) {
                 	required_params.forEach(function (field) {
                 		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -16272,7 +17264,8 @@ zabbix_export:
                 
                 function oracleCloudInfra(service, action, params) {
                 	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.hash = function (string) {
                 		return sha256(string);
@@ -16462,6 +17455,8 @@ zabbix_export:
                   value: '{$OCI.API.PRIVATE.KEY}'
                 - name: tenancy_ocid
                   value: '{$OCI.API.TENANCY}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
                 - name: user_ocid
                   value: '{$OCI.API.USER}'
               tags:
@@ -16800,6 +17795,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(required_params, all_params) {
                 	required_params.forEach(function (field) {
                 		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -16810,7 +17830,8 @@ zabbix_export:
                 
                 function oracleCloudInfra(service, action, params) {
                 	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.hash = function (string) {
                 		return sha256(string);
@@ -16998,6 +18019,8 @@ zabbix_export:
                   value: '{$OCI.API.PRIVATE.KEY}'
                 - name: tenancy_ocid
                   value: '{$OCI.API.TENANCY}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
                 - name: user_ocid
                   value: '{$OCI.API.USER}'
               tags:
@@ -17102,6 +18125,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(required_params, all_params) {
                 	required_params.forEach(function (field) {
                 		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -17112,7 +18160,8 @@ zabbix_export:
                 
                 function oracleCloudInfra(service, action, params) {
                 	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.hash = function (string) {
                 		return sha256(string);
@@ -17355,6 +18404,8 @@ zabbix_export:
                   value: '1'
                 - name: tenancy_ocid
                   value: '{$OCI.API.TENANCY}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}'
                 - name: user_ocid
                   value: '{$OCI.API.USER}'
               tags:
@@ -17807,6 +18858,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Load Balancer", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Load Balancer"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.HTTP.PROXY}'
           description: 'Set an HTTP proxy for OCI API requests if needed.'
         - macro: '{$OCI.HTTP.RETURN.CODE.OK}'
@@ -18779,7 +19846,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -18789,6 +19856,31 @@ zabbix_export:
           key: oci.vcn.state.get
           delay: 5m
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -18799,7 +19891,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -19003,6 +20096,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Networking"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: vcn_id
@@ -19035,6 +20130,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -19045,7 +20165,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -19229,6 +20350,8 @@ zabbix_export:
               value: '{$OCI.API.PRIVATE.KEY}'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Networking"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
             - name: vcn_id
@@ -19334,6 +20457,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Networking", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Networking"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.HTTP.PROXY}'
           description: 'Set an HTTP proxy for OCI API requests if needed.'
         - macro: '{$OCI.HTTP.RETURN.CODE.OK}'
@@ -19391,7 +20530,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -19466,6 +20605,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -19476,7 +20640,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -19702,6 +20867,8 @@ zabbix_export:
               value: '1'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Object Storage"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -19715,6 +20882,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -19725,7 +20917,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -19948,6 +21141,8 @@ zabbix_export:
               value: '60'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Object Storage"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -19959,6 +21154,31 @@ zabbix_export:
           key: oci.obj.storage.metrics.olm.get
           delay: 3h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(required_params, all_params) {
             	required_params.forEach(function (field) {
             		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
@@ -19969,7 +21189,8 @@ zabbix_export:
             
             function oracleCloudInfra(service, action, params) {
             	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.hash = function (string) {
             		return sha256(string);
@@ -20166,6 +21387,8 @@ zabbix_export:
               value: '180'
             - name: tenancy_ocid
               value: '{$OCI.API.TENANCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Oracle Cloud Object Storage"}'
             - name: user_ocid
               value: '{$OCI.API.USER}'
           tags:
@@ -20306,6 +21529,22 @@ zabbix_export:
         - tag: target
           value: oracle-cloud-infrastructure
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Oracle Cloud Object Storage", e.g. {$HTTP.TLS.VERIFY:"Oracle Cloud Object Storage"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$OCI.HTTP.PROXY}'
           description: 'Set an HTTP proxy for OCI API requests if needed.'
         - macro: '{$OCI.HTTP.RETURN.CODE.OK}'
