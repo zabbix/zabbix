@@ -266,7 +266,8 @@ static char	*tq_sql_dyn_get_percentile(const char *atom, double fraction, const 
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(4) ")(%s)", fraction, atom);
+		/* percentage is rounded to 4 digits after the decimal point */
+		str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(6) ")(%s)", fraction, atom);
 	}
 	else
 	{
