@@ -421,7 +421,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	{
 		char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
-		str = zbx_dsprintf(NULL, "mapContainsKey(%s, %s)", atom, key_esc);
+		str = zbx_dsprintf(NULL, "mapContains(%s, %s)", atom, key_esc);
 
 		zbx_free(key_esc);
 	}
