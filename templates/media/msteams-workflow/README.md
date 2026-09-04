@@ -21,6 +21,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"MS Teams Workflow"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "MS Teams Workflow", e.g. {$HTTP.TLS.VERIFY:"MS Teams Workflow"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 
 ### Internal parameters

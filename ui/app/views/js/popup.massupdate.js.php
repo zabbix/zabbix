@@ -339,9 +339,10 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	let overlay = overlays_stack.end();
 
-	$(overlay.$dialogue||document).on('remove', () => {
+	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 		$(document).off('add.popup', processAddfromPopup);
 	});
+
 	$(document).on('add.popup', processAddfromPopup);
 
 	function processAddfromPopup(ev, data) {
