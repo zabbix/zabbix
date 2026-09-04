@@ -474,6 +474,12 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 			{
 				SQLSMALLINT	i;
 
+				if (0 == query_result->col_num)
+				{
+					query_result->row = NULL;
+					goto out;
+				}
+
 				query_result->row = (char **)zbx_malloc(NULL,
 						sizeof(char *) * (size_t)query_result->col_num);
 
@@ -542,7 +548,8 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
  *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - function call was successful, row value is NULL if *
- *                         and only if there are no more rows                 *
+ *                         and only if there are no more rows or if column    *
+ *                         count is 0                                         *
  *               FAIL    - otherwise, error message is written to error,      *
  *                         row value is NULL                                  *
  *                                                                            *
@@ -561,6 +568,12 @@ static int	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result, const char *con
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*row = NULL;
+
+	if (0 == query_result->col_num)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "No rows selected, skipping fetch");
+		goto out;
+	}
 
 	if (SQL_NO_DATA == (rc = SQLFetch(query_result->hstmt)))
 	{
