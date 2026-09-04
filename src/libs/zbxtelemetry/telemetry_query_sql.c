@@ -16,10 +16,10 @@
 
 #include "telemetry.h"
 
-#include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
+#include "zbxeval.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
 
@@ -678,6 +678,11 @@ static const char	*tq_sql_get_timestamp_column_name(zbx_tq_query_t *query)
 	return (ZBX_TQ_SIGNAL_TYPE_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: modifies query but restores it to initial state                  *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql)
 {

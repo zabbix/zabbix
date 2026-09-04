@@ -97,13 +97,13 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 	}
 	zbx_vector_tq_aggr_column_destroy(&query->aggregated_columns);
 
-	zbx_free(query->formula);
-
 	if (NULL != query->formula_ctx)
 	{
 		zbx_eval_clear(query->formula_ctx);
 		zbx_free(query->formula_ctx);
 	}
+
+	zbx_free(query->formula);
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
