@@ -305,12 +305,14 @@ window.item_edit_form = new class {
 		this.field.signal_type.addEventListener('change', () => {
 			this.#refreshTelemetryColumns();
 			this.updateFieldsVisibility();
+			this.#validateTelemetryColumns();
 		});
 
 		for (const radio of this.field.metric_point_type) {
 			radio.addEventListener('change', () => {
 				this.#refreshTelemetryColumns();
 				this.updateFieldsVisibility();
+				this.#validateTelemetryColumns();
 			});
 		}
 
@@ -634,6 +636,18 @@ window.item_edit_form = new class {
 			this.#populateColumnSelect(select);
 			this.#toggleAttributeKey(select);
 		}
+	}
+
+	#validateTelemetryColumns() {
+		const fields = ['columns', 'aggregated_columns', 'conditions'];
+
+		for (const name of fields) {
+			for (const field of Object.values(this.form.findFieldByName(name).getFields())) {
+				field.setChanged();
+			}
+		}
+
+		this.form.validateChanges(fields);
 	}
 
 	#removeRelatedErrorContainer(row) {
