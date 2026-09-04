@@ -259,13 +259,14 @@ class CCepRule extends CApiService {
 			return;
 		}
 
-		$window_output = array_flip($options['selectWindow']);
-		$window_defaults = array_merge($window_output, array_intersect_key(self::getWindowDefaults(), $window_output));
-
-		$window_defaults = array_intersect_key(self::getWindowDefaults(), array_flip($options['selectWindow']));
+		$window_defaults = self::getWindowDefaults();
 
 		foreach ($cep_rules as &$cep_rule) {
-			$cep_rule['window'] = $window_defaults;
+			$cep_rule['window'] = [];
+
+			foreach ($options['selectWindow'] as $field) {
+				$cep_rule['window'][$field] = $window_defaults[$field];
+			}
 		}
 		unset($cep_rule);
 
