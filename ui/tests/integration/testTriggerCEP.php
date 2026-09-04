@@ -6107,7 +6107,7 @@ HEREDOC;
 		return [
 			'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 			'operator' => $operator,
-			'host' => $host
+			'host_name' => $host
 		];
 	}
 
@@ -6120,7 +6120,7 @@ HEREDOC;
 		return [
 			'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 			'operator' => $operator,
-			'host_group' => $host_group
+			'host_group_name' => $host_group
 		];
 	}
 
