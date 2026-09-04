@@ -24,13 +24,11 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  */
 class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 
-	public $link = 'host_discovery.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOSTID;
-	public $ready_link = 'host_discovery.php?form=update&context=host&itemid=';
+	public $link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID;
 	public $button = 'Create discovery rule';
 	public $success_message = 'Discovery rule created';
 	public $fail_message = 'Cannot add discovery rule';
 
-	const IS_LLD = true;
 	const HOSTID = 40001;
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
@@ -285,9 +283,10 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
-
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					'inline_errors' => [
+						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
+					]
 				]
 			]
 		]);
@@ -300,14 +299,14 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CreateAllSteps($data) {
-		$this->checkCreate($data, self::IS_LLD);
+		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getCommonPreprocessingTrailingSpacesData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_TrailingSpaces($data) {
-		$this->checkTrailingSpaces($data, self::IS_LLD);
+		$this->checkTrailingSpaces($data);
 	}
 
 	/**
@@ -324,7 +323,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @onBefore prepareCloneTemplatedLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLLD() {
-		$link = 'host_discovery.php?form=update&context=host&itemid='.self::INHERITANCE_LLDID;
+		$link = 'zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::INHERITANCE_LLDID;
 		$this->checkCloneItem($link, 'Discovery rule', $templated = true);
 	}
 
@@ -342,7 +341,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @onBefore prepareCloneLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneLLD() {
-		$link = 'host_discovery.php?form=update&context=host&itemid='.self::CLONE_LLDID;
+		$link = 'zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::CLONE_LLDID;
 		$this->checkCloneItem($link, 'Discovery rule');
 	}
 
@@ -350,17 +349,18 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @dataProvider getCommonCustomOnFailData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CustomOnFail($data) {
-		$this->checkCustomOnFail($data, self::IS_LLD);
+		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getCommonInheritancePreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'host_discovery.php?filter_set=1&&context=template&filter_hostids%5B0%5D='.self::INHERITANCE_TEMPLATEID;
-		$host_link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::INHERITANCE_HOSTID;
 
-		$this->checkPreprocessingInheritance($data, $host_link, self::IS_LLD);
+		$this->link = 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.self::INHERITANCE_TEMPLATEID;
+		$host_link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOSTID;
+
+		$this->checkPreprocessingInheritance($data, $host_link);
 	}
 
 	/**
@@ -453,7 +453,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
 						],

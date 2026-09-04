@@ -646,9 +646,10 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 				" and t.token='%s'"
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
+				" and t.auth_scheme=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t)))
 	{
 		goto out;
 	}

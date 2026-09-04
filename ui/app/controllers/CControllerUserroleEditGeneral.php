@@ -36,19 +36,17 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	}
 
 	private function getUiSectionRules(int $user_type): array {
-		$ui_rules = array_flip($this->getInput('ui'));
+		$ui_rules = array_flip($this->getInput('ui', []));
 
 		return [
 			'ui' => array_map(
-				function (string $rule) use ($ui_rules): array {
-					return [
-						'name' => str_replace('ui.', '', $rule),
-						'status' => array_key_exists($rule, $ui_rules) ? 1 : 0
-					];
-				},
+				static fn(string $rule): array => [
+					'name' => str_replace('ui.', '', $rule),
+					'status' => array_key_exists($rule, $ui_rules) ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED
+				],
 				CRoleHelper::getUiElementsByUserType($user_type)
 			),
-			'ui.default_access' => $this->getInput('ui_default_access')
+			'ui.default_access' => $this->getInput('ui_default_access', ZBX_ROLE_RULE_ENABLED)
 		];
 	}
 
@@ -62,9 +60,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
 			'services.read.list' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
-					static function (string $serviceid): array {
-						return ['serviceid' => $serviceid];
-					},
+					static fn(string $serviceid): array => ['serviceid' => $serviceid],
 					$this->getInput('service_read_list', []))
 				: [],
 			'services.read.tag' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
@@ -78,9 +74,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
 			'services.write.list' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
-					static function (string $serviceid): array {
-						return ['serviceid' => $serviceid];
-					},
+					static fn(string $serviceid): array => ['serviceid' => $serviceid],
 					$this->getInput('service_write_list', []))
 				: [],
 			'services.write.tag' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
@@ -96,11 +90,10 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	private function getModuleSectionRules(): array {
-		$fields = [];
-
-		if ($this->hasInput('modules_default_access')) {
-			$fields['modules.default_access'] = $this->getInput('modules_default_access');
-		}
+		$fields = [
+			'modules' => [],
+			'modules.default_access' => $this->getInput('modules_default_access', ZBX_ROLE_RULE_ENABLED)
+		];
 
 		if ($this->hasInput('modules')) {
 			$db_modules = API::Module()->get([
@@ -109,12 +102,11 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			]);
 
 			$modules = $this->getInput('modules', []);
-			$fields['modules'] = [];
 
 			foreach (array_keys($db_modules) as $moduleid) {
 				$fields['modules'][] = [
 					'moduleid' => $moduleid,
-					'status' => array_key_exists($moduleid, $modules) ? $modules[$moduleid] : 0
+					'status' => array_key_exists($moduleid, $modules) ? $modules[$moduleid] : ZBX_ROLE_RULE_ENABLED
 				];
 			}
 		}
@@ -125,7 +117,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	private function getApiSectionRules() : array {
 		return  [
 			'api' => $this->getInput('api_methods', []),
-			'api.access' => $this->getInput('api_access'),
+			'api.access' => $this->getInput('api_access', ZBX_ROLE_RULE_ENABLED),
 			'api.mode' => $this->getInput('api_mode', ZBX_ROLE_RULE_API_MODE_DENY)
 		];
 	}
@@ -135,15 +127,13 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 		return [
 			'actions' => array_map(
-				function (string $rule) use ($action_rules): array {
-					return [
-						'name' => str_replace('actions.', '', $rule),
-						'status' => array_key_exists($rule, $action_rules) ? 1 : 0
-					];
-				},
+				static fn(string $rule): array => [
+					'name' => str_replace('actions.', '', $rule),
+					'status' => array_key_exists($rule, $action_rules) ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED
+				],
 				CRoleHelper::getActionsByUserType($user_type)
 			),
-			'actions.default_access' => $this->getInput('actions_default_access')
+			'actions.default_access' => $this->getInput('actions_default_access', ZBX_ROLE_RULE_ENABLED)
 		];
 	}
 
@@ -155,17 +145,19 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		$device_action_rules = array_flip($this->getInput('devices_actions', []));
 
 		return [
-			'devices.access' => $this->getInput('devices_access') ? 1: 0,
+			'devices.access' => $this->getInput('devices_access') ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED,
 			'devices.actions' => array_map(
-				function (string $rule) use ($device_action_rules): array {
-					return [
-						'name' => str_replace('devices.actions.', '', $rule),
-						'status' => array_key_exists($rule, $device_action_rules) ? 1 : 0
-					];
-				},
+				static fn(string $rule): array => [
+					'name' => str_replace('devices.actions.', '', $rule),
+					'status' => array_key_exists($rule, $device_action_rules)
+						? ZBX_ROLE_RULE_ENABLED
+						: ZBX_ROLE_RULE_DISABLED
+				],
 				CRoleHelper::getDeviceActionsByUserType($user_type)
 			),
-			'devices.actions.default_access' => $this->getInput('devices_actions_default_access')
+			'devices.actions.default_access' => $this->getInput('devices_actions_default_access',
+				ZBX_ROLE_RULE_DISABLED
+			)
 		];
 	}
 }

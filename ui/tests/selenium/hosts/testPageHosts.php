@@ -238,9 +238,10 @@ class testPageHosts extends CLegacyWebTest {
 
 		// Apply filtering parameters.
 		$form->fill($data['filter']);
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
 			// Using column Name check that only the expected Hosts are returned in the list.
@@ -446,14 +447,15 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->assertDatatableStats();
 		$filter->invalidate();
 		$filter->getField('Name')->fill('%');
 		$filter->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertDatatableStats();
 	}
@@ -871,9 +873,10 @@ class testPageHosts extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		// Check filtered result.
 		$this->assertDatatableData(CTestArrayHelper::get($data, 'result', []));
 
@@ -910,9 +913,11 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Host for t');
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
 
-		$table_rows_count = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
+		$table_rows_count = $table->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 
