@@ -5920,8 +5920,7 @@ z-sparkline {
     left: 0; }
 
 z-textarea-flexible {
-  display: inline-grid;
-  vertical-align: top; }
+  display: inline-grid; }
   z-textarea-flexible textarea {
     display: block !important;
     width: 100%;
