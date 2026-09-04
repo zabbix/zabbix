@@ -13746,7 +13746,7 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
  *             hosts       - [OUT] - vector of host names                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *hosts)
+void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *names)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
 	const ZBX_DC_ITEM	*dc_item;
@@ -13758,7 +13758,7 @@ void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_reserve(&hostids, (size_t)functionids->values_num);
 
-	zbx_vector_str_reserve(hosts, (size_t)functionids->values_num);
+	zbx_vector_str_reserve(names, (size_t)functionids->values_num);
 
 	RDLOCK_CACHE;
 
@@ -13784,14 +13784,14 @@ void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids
 		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids.values[i])))
 			continue;
 
-		zbx_vector_str_append(hosts, zbx_strdup(NULL, dc_host->host));
+		zbx_vector_str_append(names, zbx_strdup(NULL, dc_host->name));
 	}
 
 	UNLOCK_CACHE;
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, hosts->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, names->values_num);
 }
 
 /******************************************************************************

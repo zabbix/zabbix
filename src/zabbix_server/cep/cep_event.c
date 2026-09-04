@@ -488,16 +488,16 @@ void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event_suppre
  ******************************************************************************/
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
 {
-	if (NULL != ctx->hosts.values)
+	if (NULL != ctx->host_names.values)
 	{
-		zbx_vector_str_clear_ext(&ctx->hosts, zbx_str_free);
-		zbx_vector_str_destroy(&ctx->hosts);
+		zbx_vector_str_clear_ext(&ctx->host_names, zbx_str_free);
+		zbx_vector_str_destroy(&ctx->host_names);
 	}
 
-	if (NULL != ctx->groups.values)
+	if (NULL != ctx->group_names.values)
 	{
-		zbx_vector_str_clear_ext(&ctx->groups, zbx_str_free);
-		zbx_vector_str_destroy(&ctx->groups);
+		zbx_vector_str_clear_ext(&ctx->group_names, zbx_str_free);
+		zbx_vector_str_destroy(&ctx->group_names);
 	}
 
 	if (NULL != ctx->event)
@@ -521,23 +521,23 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
  * Comments: If host names are already loaded then do nothing.                *
  *                                                                            *
  ******************************************************************************/
-const zbx_vector_str_t	*cep_event_context_get_hosts(zbx_cep_event_context_t *ctx)
+const zbx_vector_str_t	*cep_event_context_get_host_names(zbx_cep_event_context_t *ctx)
 {
 	zbx_vector_uint64_t	functionids;
 
-	if (NULL == ctx->hosts.values)
+	if (NULL == ctx->host_names.values)
 	{
 		zbx_vector_uint64_create(&functionids);
 
 		zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
 
-		zbx_vector_str_create(&ctx->hosts);
-		zbx_dc_get_host_names_by_functionids(&functionids, &ctx->hosts);
+		zbx_vector_str_create(&ctx->host_names);
+		zbx_dc_get_host_names_by_functionids(&functionids, &ctx->host_names);
 
 		zbx_vector_uint64_destroy(&functionids);
 	}
 
-	return &ctx->hosts;
+	return &ctx->host_names;
 }
 
 /******************************************************************************
@@ -553,19 +553,19 @@ const zbx_vector_str_t	*cep_event_context_get_groups(zbx_cep_event_context_t *ct
 {
 	zbx_vector_uint64_t	functionids;
 
-	if (NULL == ctx->groups.values)
+	if (NULL == ctx->group_names.values)
 	{
 		zbx_vector_uint64_create(&functionids);
 
 		zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
 
-		zbx_vector_str_create(&ctx->groups);
-		zbx_dc_get_hostgroup_names_by_functionids(&functionids, &ctx->groups);
+		zbx_vector_str_create(&ctx->group_names);
+		zbx_dc_get_hostgroup_names_by_functionids(&functionids, &ctx->group_names);
 
 		zbx_vector_uint64_destroy(&functionids);
 	}
 
-	return &ctx->groups;
+	return &ctx->group_names;
 }
 
 static zbx_uint64_t	cep_event_context_get_functionid(zbx_cep_event_context_t *ctx)

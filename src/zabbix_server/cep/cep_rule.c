@@ -632,7 +632,7 @@ static int	cep_condition_eval_severity(int operator, const zbx_cep_args_severity
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate event host condition                                     *
+ * Purpose: evaluate event host name condition                                *
  *                                                                            *
  * Parameters: operator - [IN] condition operator to apply                    *
  *             args     - [IN] condition arguments containing host to match   *
@@ -644,19 +644,19 @@ static int	cep_condition_eval_severity(int operator, const zbx_cep_args_severity
  *           matches; for negative operators no event host must match.        *
  *                                                                            *
  ******************************************************************************/
-static int	cep_condition_eval_host(int operator, const zbx_cep_args_name_t *args,
+static int	cep_condition_eval_host_name(int operator, const zbx_cep_args_name_t *args,
 		zbx_cep_event_context_t *ctx)
 {
-	const zbx_vector_str_t	*hosts;
+	const zbx_vector_str_t	*names;
 	int			ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->name);
 
-	hosts = cep_event_context_get_hosts(ctx);
+	names = cep_event_context_get_host_names(ctx);
 
-	for (int i = 0; i < hosts->values_num && 0 == ret; i++)
+	for (int i = 0; i < names->values_num && 0 == ret; i++)
 	{
-		ret = cep_condition_eval_value_str_raw(operator, args->name, hosts->values[i]);
+		ret = cep_condition_eval_value_str_raw(operator, args->name, names->values[i]);
 	}
 
 	switch (operator)
@@ -686,7 +686,7 @@ static int	cep_condition_eval_host(int operator, const zbx_cep_args_name_t *args
  *           matches; for negative operators no event host group must match.  *
  *                                                                            *
  ******************************************************************************/
-static int	cep_condition_eval_hostgroup(int operator, const zbx_cep_args_name_t *args,
+static int	cep_condition_eval_hostgroup_name(int operator, const zbx_cep_args_name_t *args,
 		zbx_cep_event_context_t *ctx)
 {
 	const zbx_vector_str_t	*groups;
@@ -779,11 +779,11 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			ret = cep_condition_eval_severity(cond->operator, &cond->args.severity, ctx);
 			break;
-		case ZBX_CONDITION_TYPE_HOST:
-			ret = cep_condition_eval_host(cond->operator, &cond->args.host, ctx);
+		case ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME:
+			ret = cep_condition_eval_host_name(cond->operator, &cond->args.host, ctx);
 			break;
-		case ZBX_CONDITION_TYPE_HOST_GROUP:
-			ret = cep_condition_eval_hostgroup(cond->operator, &cond->args.host_group, ctx);
+		case ZBX_CONDITION_TYPE_HOST_GROUP_NAME:
+			ret = cep_condition_eval_hostgroup_name(cond->operator, &cond->args.host_group, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			ret = cep_condition_eval_time_period(cond->operator, &cond->args.time_period, ctx);

@@ -63,8 +63,8 @@ typedef struct
 	zbx_uint64_t		hostid;		/* first host identifier */
 	zbx_uint64_t		hostgroupid;	/* first host group identifier */
 
-	zbx_vector_str_t	hosts;
-	zbx_vector_str_t	groups;
+	zbx_vector_str_t	host_names;
+	zbx_vector_str_t	group_names;
 
 	zbx_dbconn_pool_t	*dbpool;
 
@@ -85,7 +85,7 @@ zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx);
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str);
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str);
 
-const zbx_vector_str_t	*cep_event_context_get_hosts(zbx_cep_event_context_t *ctx);
+const zbx_vector_str_t	*cep_event_context_get_host_names(zbx_cep_event_context_t *ctx);
 const zbx_vector_str_t	*cep_event_context_get_groups(zbx_cep_event_context_t *ctx);
 zbx_uint64_t	cep_event_context_get_hostid(zbx_cep_event_context_t *ctx);
 zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx);

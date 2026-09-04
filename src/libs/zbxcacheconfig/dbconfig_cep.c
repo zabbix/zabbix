@@ -177,10 +177,10 @@ static void	cep_condition_clear_args(zbx_cep_condition_t *condition)
 			break;
 		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			break;
-		case ZBX_CONDITION_TYPE_HOST:
+		case ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME:
 			zbx_free(condition->args.host.name);
 			break;
-		case ZBX_CONDITION_TYPE_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP_NAME:
 			zbx_free(condition->args.host_group.name);
 			break;
 		case ZBX_CONDITION_TYPE_TIME_PERIOD:
@@ -361,10 +361,10 @@ static void	cep_rule_copy_conditions(zbx_vector_cep_condition_t *dst, const zbx_
 				break;
 			case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 				break;
-			case ZBX_CONDITION_TYPE_HOST:
+			case ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME:
 				cond->args.host.name = zbx_strdup(NULL, cond->args.host.name);
 				break;
-			case ZBX_CONDITION_TYPE_HOST_GROUP:
+			case ZBX_CONDITION_TYPE_HOST_GROUP_NAME:
 				cond->args.host_group.name = zbx_strdup(NULL, cond->args.host_group.name);
 				break;
 			case ZBX_CONDITION_TYPE_TIME_PERIOD:
@@ -712,11 +712,11 @@ static void	cep_condition_dump(zbx_cep_condition_t *condition)
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
 					condition->args.severity.level);
 			break;
-		case ZBX_CONDITION_TYPE_HOST:
+		case ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host:%s",
 					condition->args.host.name);
 			break;
-		case ZBX_CONDITION_TYPE_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP_NAME:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host_group:%s",
 					condition->args.host_group.name);
 			break;
@@ -1123,10 +1123,10 @@ static void	cep_sync_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 			case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 				condition->args.severity.level = atoi(row[10]);
 				break;
-			case ZBX_CONDITION_TYPE_HOST:
+			case ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME:
 				ZBX_DBROW2STR(condition->args.host.name, row[7]);
 				break;
-			case ZBX_CONDITION_TYPE_HOST_GROUP:
+			case ZBX_CONDITION_TYPE_HOST_GROUP_NAME:
 				ZBX_DBROW2STR(condition->args.host_group.name, row[8]);
 				break;
 			case ZBX_CONDITION_TYPE_TIME_PERIOD:

@@ -1601,7 +1601,7 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		ZBX_STR2UINT64(win_local.windowid, row[0]);
 		ZBX_STR2UINT64(ref_local.ruleid, row[1]);
 
-		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)) ||
+		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)) || NULL == rule->window ||
 				SUCCEED != cep_window_get_limits(rule, &duration, &capacity, NULL))
 		{
 			zbx_vector_uint64_append(delete_windowids, win_local.windowid);
