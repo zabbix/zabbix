@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-03-26 20:27+0000\n"
+"PO-Revision-Date: 2026-08-31 22:01+0000\n"
 "Last-Translator: Irmantas <translate@irmantas.tech>\n"
 "Language-Team: none\n"
 "Language: lt\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr "arba"
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -64,7 +64,7 @@ msgstr "reikalinga \"host:key\" pora"
 
 #: app/views/host.wizard.edit.php:1024
 msgid "#{section_name}"
-msgstr ""
+msgstr "#{sekcijos_pavadinimas}"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -82,9 +82,9 @@ msgstr "%1$d simboliai viršiją maksimalų %2$d simbolių ilgį"
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d diena"
+msgstr[1] "%1$d dienos"
+msgstr[2] "%1$d dienos"
 
 #: jsLoader.php:340
 #, c-format
@@ -358,23 +358,23 @@ msgstr[2] ""
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d įtaisą"
-msgstr[1] "%d įtaisus"
-msgstr[2] "%d įtaisų"
+msgstr[0] "%d įrenginį"
+msgstr[1] "%d įrenginiai"
+msgstr[2] "%d įrenginiai"
 
 #: include/users.inc.php:143
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/views/popup.operation.edit.php:84
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - neribotai)"
 
 #: app/views/popup.operation.edit.php:95
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - naudoti standartinį veiksmą)"
 
 #: app/views/configuration.hostgroup.list.php:38
 #: app/views/configuration.templategroup.list.php:36
@@ -409,7 +409,7 @@ msgstr "(nerastas įgaliotasis serveris)"
 
 #: include/classes/setup/CSetupWizard.php:541
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - naudoti standartinį prievadą"
 
 #: include/triggers.inc.php:1218
 msgid "0 or 1"
