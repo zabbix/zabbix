@@ -44,7 +44,7 @@ zabbix_export:
         >Please, refer to the [vendor documentation](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/sdwan-xe-gs-book/cisco-sd-wan-API-cross-site-request-forgery-prevention.html) about the Cisco SD-WAN REST API Token-Based Authentication.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -83,13 +83,40 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	cookies = [],
             	token = "",
             	error_msg = "";
             
             function authenticate(url) {
+            	tls.checkURL(url);
             	var payload = 'j_username=' + encodeURIComponent(params.username)
             		+ '&j_password=' + encodeURIComponent(params.password);
             	request.addHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -117,6 +144,7 @@ zabbix_export:
             };
             
             function getToken(url) {
+            	tls.checkURL(url);
             	response = request.get(url);
             	Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -181,6 +209,8 @@ zabbix_export:
               value: '{$SDWAN.HTTP_PROXY}'
             - name: password
               value: '{$SDWAN.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco SD-WAN"}'
             - name: url
               value: '{$SDWAN.API.URL}'
             - name: username
@@ -199,6 +229,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -206,13 +261,15 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Cisco SD-WAN"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	devices = [],
                   	error_msg = "",
                   	url = "{$SDWAN.API.URL}",
                   	http_proxy = "{$SDWAN.HTTP_PROXY}";
                   
                   function getHttpData(url, token, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	request.addHeader('X-XSRF-TOKEN: ' + token);
                   	response = request.get(url);
@@ -510,6 +567,22 @@ zabbix_export:
         - tag: target
           value: cisco-sdwan-monitor
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco SD-WAN", e.g. {$HTTP.TLS.VERIFY:"Cisco SD-WAN"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$SDWAN.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Cisco SD-WAN Monitor API password.'
@@ -686,7 +759,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -1279,12 +1352,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	device_info = {},
             	error_msg = "";
             
             function getHttpData(url, token, cookie) {
+            	tls.checkURL(url);
             	request.addHeader('Cookie: ' + cookie);
             	request.addHeader('X-XSRF-TOKEN: ' + token);
             	response = request.get(url);
@@ -1377,6 +1477,8 @@ zabbix_export:
               value: '{$SDWAN.DEVICE_ID}'
             - name: http_proxy
               value: '{$SDWAN.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco SD-WAN device"}'
             - name: token
               value: '{$SDWAN.AUTH.TOKEN}'
             - name: url
@@ -1417,12 +1519,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = { "data": [], "error": "" },
             	error_msg = "";
             
             function getHttpData(url, token, cookie) {
+            	tls.checkURL(url);
             	request.addHeader('Cookie: ' + cookie);
             	request.addHeader('X-XSRF-TOKEN: ' + token);
             	response = request.get(url);
@@ -1524,6 +1653,8 @@ zabbix_export:
               value: '{$SDWAN.DEVICE_ID}'
             - name: http_proxy
               value: '{$SDWAN.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco SD-WAN device"}'
             - name: token
               value: '{$SDWAN.AUTH.TOKEN}'
             - name: url
@@ -1565,12 +1696,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = { "data": [], "error": "" },
             	error_msg = "";
             
             function getHttpData(url, data, token, cookie) {
+            	tls.checkURL(url);
             	request.addHeader('Cookie: ' + cookie);
             	request.addHeader('Content-Type: application/json');
             	request.addHeader('X-XSRF-TOKEN: ' + token);
@@ -1723,6 +1881,8 @@ zabbix_export:
               value: '{$SDWAN.HTTP_PROXY}'
             - name: interval
               value: '{$SDWAN.ROUTES.FREQUENCY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco SD-WAN device"}'
             - name: token
               value: '{$SDWAN.AUTH.TOKEN}'
             - name: url
@@ -2606,6 +2766,22 @@ zabbix_export:
         - tag: target
           value: cisco-sdwan-device
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco SD-WAN device", e.g. {$HTTP.TLS.VERIFY:"Cisco SD-WAN device"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$IFCONTROL}'
           value: '1'
           description: 'Macro for operational state of the interface for the link down trigger. Can be used with the interface name as context.'
