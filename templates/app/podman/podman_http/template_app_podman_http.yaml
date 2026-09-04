@@ -41,7 +41,7 @@ zabbix_export:
         2. **Use VPN**: If remote access is required, consider using a VPN to securely connect to the network where the API service is running.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -170,7 +170,7 @@ zabbix_export:
             	},
             
             	getData: function () {
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             
             		if (typeof podman.params.proxy !== 'undefined' && podman.params.proxy !== '') {
             			request.setProxy(podman.params.proxy);

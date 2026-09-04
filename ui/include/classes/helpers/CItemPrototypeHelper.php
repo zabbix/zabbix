@@ -50,7 +50,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			'lldmacros' => true
 		]);
 
-		if ($item['templated'] && $item['valuemap']) {
+		if ($item['templated'] && $item['valuemap'] && !array_key_exists('inaccessible', $item['valuemap'])) {
 			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
 			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
 		}

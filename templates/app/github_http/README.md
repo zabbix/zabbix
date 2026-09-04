@@ -92,6 +92,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |{$GITHUB.INTERVAL:"get_copilot_billing"}|<p>The update interval for the script item that retrieves Copilot billing.</p>|`1h`|
 |{$GITHUB.TIMEOUT}|<p>The timeout threshold for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`15s`|
 |{$GITHUB.HTTP_PROXY}|<p>The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GitHub organization", e.g. {$HTTP.TLS.VERIFY:"GitHub organization"}.</p>|`full`|
 |{$GITHUB.RESULTS_PER_PAGE}|<p>The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).</p>|`100`|
 |{$GITHUB.REPO.NAME.MATCHES}|<p>The repository name regex filter to use in repository discovery - for including.</p>|`.+`|
 |{$GITHUB.REPO.NAME.NOT_MATCHES}|<p>The repository name regex filter to use in repository discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
@@ -376,6 +377,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |{$GITHUB.INTERVAL:regex:"get_commits_count:.+"}|<p>The update interval for the script items that retrieve the commits count in discovered branches.</p>|`1h`|
 |{$GITHUB.TIMEOUT}|<p>The timeout threshold for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`15s`|
 |{$GITHUB.HTTP_PROXY}|<p>The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GitHub repository", e.g. {$HTTP.TLS.VERIFY:"GitHub repository"}.</p>|`full`|
 |{$GITHUB.RESULTS_PER_PAGE}|<p>The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).</p>|`100`|
 |{$GITHUB.WORKFLOW.NAME.MATCHES}|<p>The repository workflow name regex filter to use in workflow-related metric discovery - for including.</p>|`.+`|
 |{$GITHUB.WORKFLOW.NAME.NOT_MATCHES}|<p>The repository workflow name regex filter to use in workflow-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|

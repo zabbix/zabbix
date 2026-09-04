@@ -22,11 +22,11 @@ import (
 	"regexp"
 	"slices"
 
-	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/itemutil"
+	"golang.zabbix.com/sdk/wildcard"
 )
 
 const (
