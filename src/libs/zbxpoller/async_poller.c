@@ -44,6 +44,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxasyncpoller.h"
+#include "zbxcurl.h"
 
 #include <event2/dns.h>
 
@@ -216,9 +217,13 @@ fail:
 
 static void	async_wake(evutil_socket_t fd, short events, void *arg)
 {
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
+
+	if (!ZBX_IS_RUNNING())
+		evtimer_del(poller_config->async_wake_timer);
+
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
-	ZBX_UNUSED(arg);
 }
 
 static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, const char *zbx_progname)
@@ -889,6 +894,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		zbx_destroy_snmp_engineid_cache();
 #endif
 	zbx_ipc_async_socket_close(&rtc);
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

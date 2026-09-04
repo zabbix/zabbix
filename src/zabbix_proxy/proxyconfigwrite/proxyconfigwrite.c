@@ -2459,10 +2459,10 @@ out:
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *server)
+		const char *config_ssl_key_location, const char *server, int *vault_ret)
 {
 	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
-	int				ret;
+	int				ret, locked = 0;
 	struct zbx_json			j;
 	char				*error = NULL;
 	zbx_uint64_t			config_revision, hostmap_revision;
@@ -2485,6 +2485,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	locked = 1;
 	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
 
 	zbx_json_init(&j, 1024);
@@ -2536,7 +2537,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			{
 				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault, config_source_ip,
 						config_ssl_ca_location, config_ssl_cert_location,
-						config_ssl_key_location);
+						config_ssl_key_location, vault_ret);
 			}
 		}
 		else
@@ -2550,14 +2551,17 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
 
 	zbx_dc_sync_unlock();
+	locked = 0;
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
+	if (0 != locked)
+		zbx_dc_sync_unlock();
 #ifdef	HAVE_MALLOC_TRIM
 	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
 	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)

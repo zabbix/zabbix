@@ -135,7 +135,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the organization being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -162,6 +162,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -179,11 +204,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -226,7 +254,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -266,6 +295,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -315,6 +360,8 @@ zabbix_export:
               value: '{$GITHUB.ORG.NAME}'
             - name: pagination_required
               value: 'false'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub organization"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -347,6 +394,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -364,11 +436,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -411,7 +486,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -451,6 +527,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -506,6 +598,8 @@ zabbix_export:
               value: '{$GITHUB.ORG.NAME}'
             - name: pagination_required
               value: 'false'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub organization"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -661,6 +755,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -678,11 +797,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -725,7 +847,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -765,6 +888,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -809,6 +948,8 @@ zabbix_export:
               value: '{$GITHUB.ORG.NAME}'
             - name: pagination_required
               value: 'false'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub organization"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -2320,7 +2461,7 @@ zabbix_export:
           description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Copilot IDE name filter (include)'
             description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
@@ -2329,7 +2470,7 @@ zabbix_export:
           description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Copilot IDE name filter (exclude)'
             description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
@@ -2338,7 +2479,7 @@ zabbix_export:
           description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Copilot language filter (include)'
             description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
@@ -2347,7 +2488,7 @@ zabbix_export:
           description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Copilot language filter (exclude)'
             description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
@@ -2356,7 +2497,7 @@ zabbix_export:
           description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Copilot model name filter (include)'
             description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
@@ -2365,7 +2506,7 @@ zabbix_export:
           description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Copilot model name filter (exclude)'
             description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
@@ -2437,7 +2578,7 @@ zabbix_export:
           description: 'The repository name regex filter to use in repository discovery - for including.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Repository name filter (include)'
             description: 'The repository name regex filter to use in repository discovery - for including.'
@@ -2446,7 +2587,7 @@ zabbix_export:
           description: 'The repository name regex filter to use in repository discovery - for excluding.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Repository name filter (exclude)'
             description: 'The repository name regex filter to use in repository discovery - for excluding.'
@@ -2455,7 +2596,7 @@ zabbix_export:
           description: 'The repository owner regex filter to use in repository discovery - for including.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Repository owner filter (include)'
             description: 'The repository owner regex filter to use in repository discovery - for including.'
@@ -2464,7 +2605,7 @@ zabbix_export:
           description: 'The repository owner regex filter to use in repository discovery - for excluding.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Repository owner filter (exclude)'
             description: 'The repository owner regex filter to use in repository discovery - for excluding.'
@@ -2473,7 +2614,7 @@ zabbix_export:
           description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Other
             label: 'Results per page'
             description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
@@ -2495,6 +2636,22 @@ zabbix_export:
             priority: '2'
             label: 'HTTP user agent'
             description: 'The user agent that is used in headers for HTTP requests.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GitHub organization", e.g. {$HTTP.TLS.VERIFY:"GitHub organization"}.'
+          config:
+            type: LIST
+            priority: '13'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 0f686bf03ab54b5996f66483a831a3ac
           name: '1. Overview'
@@ -3265,7 +3422,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the repository being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -3277,6 +3434,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -3294,11 +3476,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -3341,7 +3526,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3381,6 +3567,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3427,6 +3629,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -3454,6 +3658,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -3471,11 +3700,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -3518,7 +3750,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3558,6 +3791,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3632,6 +3881,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub repository"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -3733,6 +3984,31 @@ zabbix_export:
           key: github.repo.releases.count
           delay: '{$GITHUB.INTERVAL:"get_releases_count"}'
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -3750,11 +4026,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -3797,7 +4076,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3837,6 +4117,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3886,6 +4182,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -3916,6 +4214,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -3933,11 +4256,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -3980,7 +4306,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4020,6 +4347,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4067,6 +4410,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub repository"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -4291,6 +4636,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -4308,11 +4678,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -4355,7 +4728,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4395,6 +4769,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4441,6 +4831,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -4479,6 +4871,31 @@ zabbix_export:
           key: github.repo.tags.count
           delay: '{$GITHUB.INTERVAL:"get_tags_count"}'
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -4496,11 +4913,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -4543,7 +4963,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4583,6 +5004,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4632,6 +5069,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -4645,6 +5084,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var github = {
             	params: {},
             
@@ -4662,11 +5126,14 @@ zabbix_export:
             		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
             			github.params.api_url += '/';
             		}
+            
+            		github.tls = new CTlsConfig(params.tls_verify);
+            		github.tls.checkURL(github.params.api_url);
             	},
             
             	apiRequest: function (url, pagination_required) {
             		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(github.tls.options),
             			response,
             			headers,
             			final_data = {
@@ -4709,7 +5176,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4749,6 +5217,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4801,6 +5285,8 @@ zabbix_export:
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
               value: '{$GITHUB.REPO.OWNER}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GitHub"}'
             - name: user_agent
               value: '{$GITHUB.USER_AGENT}'
           tags:
@@ -4831,6 +5317,31 @@ zabbix_export:
               key: 'github.repo.branches.commits.total[{#BRANCH_NAME}]'
               delay: '{$GITHUB.INTERVAL:"get_commits_count:{#BRANCH_NAME}"}'
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var github = {
                 	params: {},
                 
@@ -4848,11 +5359,14 @@ zabbix_export:
                 		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
                 			github.params.api_url += '/';
                 		}
+                
+                		github.tls = new CTlsConfig(params.tls_verify);
+                		github.tls.checkURL(github.params.api_url);
                 	},
                 
                 	apiRequest: function (url, pagination_required) {
                 		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-                		var request = new HttpRequest(),
+                		var request = new HttpRequest(github.tls.options),
                 			response,
                 			headers,
                 			final_data = {
@@ -4895,7 +5409,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			url = ((headers.link || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -4935,6 +5450,22 @@ zabbix_export:
                 		}
                 
                 		return response_data.data.length;
+                	},
+                
+                	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
+                		var target = name.toLowerCase();
+                
+                		for (var key in headers) {
+                			if (key.toLowerCase() === target) {
+                				return headers[key];
+                			}
+                		}
+                		
+                		return null;
                 	}
                 }
                 
@@ -4984,6 +5515,8 @@ zabbix_export:
                   value: '{$GITHUB.REPO.NAME}'
                 - name: repo_owner
                   value: '{$GITHUB.REPO.OWNER}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"GitHub"}'
                 - name: user_agent
                   value: '{$GITHUB.USER_AGENT}'
               tags:
@@ -5302,6 +5835,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var github = {
                 	params: {},
                 
@@ -5319,11 +5877,14 @@ zabbix_export:
                 		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
                 			github.params.api_url += '/';
                 		}
+                
+                		github.tls = new CTlsConfig(params.tls_verify);
+                		github.tls.checkURL(github.params.api_url);
                 	},
                 
                 	apiRequest: function (url, pagination_required) {
                 		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-                		var request = new HttpRequest(),
+                		var request = new HttpRequest(github.tls.options),
                 			response,
                 			headers,
                 			final_data = {
@@ -5366,7 +5927,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			url = ((headers.link || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -5406,6 +5968,22 @@ zabbix_export:
                 		}
                 
                 		return response_data.data.length;
+                	},
+                
+                	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
+                		var target = name.toLowerCase();
+                
+                		for (var key in headers) {
+                			if (key.toLowerCase() === target) {
+                				return headers[key];
+                			}
+                		}
+                		
+                		return null;
                 	}
                 }
                 
@@ -5455,6 +6033,8 @@ zabbix_export:
                   value: '{$GITHUB.REPO.NAME}'
                 - name: repo_owner
                   value: '{$GITHUB.REPO.OWNER}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"GitHub"}'
                 - name: user_agent
                   value: '{$GITHUB.USER_AGENT}'
               tags:
@@ -5628,7 +6208,7 @@ zabbix_export:
           description: 'The repository branch name regex filter to use in branch-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Branch name filter (include)'
             description: 'The repository branch name regex filter to use in branch-related metric discovery - for including.'
@@ -5637,7 +6217,7 @@ zabbix_export:
           description: 'The repository branch name regex filter to use in branch-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Branch name filter (exclude)'
             description: 'The repository branch name regex filter to use in branch-related metric discovery - for excluding.'
@@ -5733,7 +6313,7 @@ zabbix_export:
           description: 'The threshold percentage of utilized API requests in a High trigger expression.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Thresholds
             label: 'API usage high threshold (%)'
             description: 'The threshold percentage of utilized API requests in a High trigger expression. In the range from 0 to 100 inclusive.'
@@ -5743,7 +6323,7 @@ zabbix_export:
           description: 'The threshold percentage of utilized API requests in a Warning trigger expression.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Thresholds
             label: 'API usage warning threshold (%)'
             description: 'The threshold percentage of utilized API requests in a Warning trigger expression. In the range from 0 to 100 inclusive.'
@@ -5753,7 +6333,7 @@ zabbix_export:
           description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Other
             label: 'Results per page'
             description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
@@ -5763,7 +6343,7 @@ zabbix_export:
           description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for including.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Self-hosted runner name filter (include)'
             description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for including.'
@@ -5772,7 +6352,7 @@ zabbix_export:
           description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Self-hosted runner name filter (exclude)'
             description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
@@ -5781,7 +6361,7 @@ zabbix_export:
           description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for including.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Self-hosted runner OS filter (include)'
             description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for including.'
@@ -5790,7 +6370,7 @@ zabbix_export:
           description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Self-hosted runner OS filter (exclude)'
             description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
@@ -5816,7 +6396,7 @@ zabbix_export:
           description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Workflow name filter (include)'
             description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for including.'
@@ -5825,7 +6405,7 @@ zabbix_export:
           description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Workflow name filter (exclude)'
             description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for excluding.'
@@ -5834,7 +6414,7 @@ zabbix_export:
           description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for including.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Workflow state filter (include)'
             description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for including.'
@@ -5843,7 +6423,7 @@ zabbix_export:
           description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for excluding.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Workflow state filter (exclude)'
             description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for excluding.'
@@ -5852,7 +6432,7 @@ zabbix_export:
           description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Thresholds
             label: 'Workflow queue time high threshold'
             description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
@@ -5861,14 +6441,29 @@ zabbix_export:
           description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Thresholds
             label: 'Workflow queue time warning threshold'
             description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GitHub repository", e.g. {$HTTP.TLS.VERIFY:"GitHub repository"}.'
+          config:
+            type: LIST
+            priority: '16'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 09870c778f4740da8430b1383225b2c6
           name: 'Repository overview'
-          auto_start: 'NO'
           pages:
             - name: 'Repository statistics'
               widgets:

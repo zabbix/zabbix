@@ -119,13 +119,15 @@ $formgrid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('items', 'url'))
 				->setReadonly($readonly)
+				->setErrorContainer('url-error-container')
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->setAttribute('name', 'parseurl')
 				->setAttribute('error-message', _('Failed to parse URL.').BR().BR()._('URL is not properly encoded.'))
-				->setEnabled(!$readonly)
+				->setEnabled(!$readonly),
+			(new CDiv())->setId('url-error-container')
 		]))->setId('js-item-url-field')
 	])
 	->addItem([
@@ -465,39 +467,13 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-	$interface = array_key_exists($item['interfaceid'], $data['host']['interfaces'])
-		? $data['host']['interfaces'][$item['interfaceid']] : [];
-
-	if ($item['discovered']) {
-		$formgrid->addItem(new CVar('interfaceid', $item['interfaceid']));
-
-		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
-		$select_interface = new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true);
-		$label_for = $select_interface->getId();
-	}
-	else {
-		$required = true;
-		$select_interface = getInterfaceSelect($data['host']['interfaces'])
-			->setId('interface-select')
-			->setValue($item['interfaceid'])
-			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-			->setFocusableElementId('interfaceid')
-			->setAriaRequired();
-		$label_for = $select_interface->getFocusableElementId();
-	}
-
-	$formgrid->addItem([
-		(new CLabel(_('Host interface'), $label_for))
-			->setAsteriskMark($required)
-			->setId('js-item-interface-label'),
-		(new CFormField([
-			$select_interface,
-			(new CSpan(_('No interface found')))
-				->setId('interface_not_defined')
-				->addClass(ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_DISPLAY_NONE)
-		]))->setId('js-item-interface-field')
-	]);
+	$formgrid->addItem(
+		new CPartial('host.interface.selector',
+			['interfaces' => $data['host']['interfaces'], 'discovered' => $item['discovered'],
+				'interfaceid' => $item['interfaceid']
+			]
+		)
+	);
 }
 
 $delay_flex_table = (new CTable())
@@ -756,20 +732,9 @@ $formgrid->addItem([
 ]);
 
 $hint = null;
-if ($data['source'] === 'item' && $data['config']['hk_history_global']
+if ($data['source'] === 'item' && $data['history_hint']
 		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$link = _x('global housekeeping settings', 'item_form');
-
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink($link, (new CUrl())
-			->setArgument('action', 'housekeeping.edit')
-			->getUrl()
-		))->setTarget('_blank');
-	}
-
-	$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
-		' ('.$data['config']['hk_history'].')'
-	])))->addClass('js-hint');
+	$hint = (new CSpan(makeWarningIcon('')))->addClass('js-history-hint');
 }
 
 $formgrid->addItem([
@@ -788,25 +753,34 @@ $formgrid->addItem([
 ]);
 
 $hint = null;
-if ($data['source'] === 'item' && $data['config']['hk_trends_global']
+$storage_hint = null;
+if ($data['source'] === 'item'
 		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$link = _x('global housekeeping settings', 'item_form');
+	if ($data['config']['hk_trends_global']) {
+		$link = _x('global housekeeping settings', 'item_form');
 
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink($link, (new CUrl())
-			->setArgument('action', 'housekeeping.edit')
-			->getUrl()
-		))->setTarget('_blank');
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$link = (new CLink($link, (new CUrl())
+				->setArgument('action', 'housekeeping.edit')
+				->getUrl()
+			))->setTarget('_blank');
+		}
+
+		$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
+			' ('.$data['config']['hk_trends'].')'
+		])))->addClass('js-trends-hint');
 	}
 
-	$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
-		' ('.$data['config']['hk_trends'].')'
-	])))->addClass('js-hint');
+	if ($data['trends_storage_hint']) {
+		$storage_hint = (new CSpan(makeWarningIcon(
+			_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.')
+		)))->addClass('js-trends-storage-hint');
+	}
 }
 
 $formgrid
 	->addItem([
-		(new CLabel([_('Trends'), $hint], 'trends'))
+		(new CLabel([_('Trends'), $hint, $storage_hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
@@ -837,7 +811,11 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [['id' => $item['valuemap']['valuemapid'], 'name' => $item['valuemap']['name']]]
+					? [[
+						'id' => $item['valuemap']['valuemapid'],
+						'prefix' => $item['valuemap']['prefix'] ?? '',
+						'name' => $item['valuemap']['name']
+					]]
 					: [],
 				'popup' => [
 					'parameters' => [

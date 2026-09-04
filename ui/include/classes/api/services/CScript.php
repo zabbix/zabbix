@@ -524,11 +524,11 @@ class CScript extends CApiService {
 					}
 				}
 				elseif ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-					$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator']));
+					$unique_value_validator = new CUniqueValuesValidator();
 
-					if (array_unique($manualinput_validator) !== $manualinput_validator) {
+					if (!$unique_value_validator->validate($script['manualinput_validator'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($index + 1).'/manualinput_validator', _('values must be unique')
+							'/'.($index + 1).'/manualinput_validator', $unique_value_validator->getError()
 						));
 					}
 				}

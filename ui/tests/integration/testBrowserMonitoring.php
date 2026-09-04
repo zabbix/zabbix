@@ -73,7 +73,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'DebugLevel' => 4,
+				'DebugLevel' => 3,
 				'WebDriverURL' => PHPUNIT_DRIVER_ADDRESS
 			]
 		];
@@ -87,6 +87,10 @@ class testBrowserMonitoring extends CIntegrationTest {
 	 * @required-components server
 	 */
 	public function testBrowserMonitoring_executeBrowserJs() {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_increase=browser poller');
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_increase=browser poller');
+
 		$response = $this->call('task.create', [
 			'type' => ZBX_TM_TASK_CHECK_NOW,
 			'request' => [
@@ -106,6 +110,9 @@ class testBrowserMonitoring extends CIntegrationTest {
 		$this->assertArrayHasKey('value', $response['result'][0], json_encode($response['result']));
 
 		$result = json_decode($response['result'][0]['value'], true);
+
+		$this->assertIsArray($result, $response['result'][0]['value']);
+		$this->assertArrayNotHasKey('error', $result, isset($result['error']) ? json_encode($result['error']) : json_encode($result));
 
 		$this->assertArrayHasKey('performance_data', $result, json_encode($result));
 		$this->assertArrayHasKey('details', $result['performance_data'], json_encode($result));

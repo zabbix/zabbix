@@ -165,7 +165,10 @@ SERVER_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxvmware \
-	zbxxml
+	zbxxml \
+	zbxcrypto \
+	zbxexec \
+	zbxthreads
 if HAVE_IPMI
 SERVER_SUBDIRS += zbxipmi
 endif
@@ -236,11 +239,21 @@ PROXY_SUBDIRS = \
 	zbxvault \
 	zbxversion \
 	zbxvmware \
-	zbxxml
+	zbxxml \
+	zbxcrypto \
+	zbxexec \
+	zbxthreads
 if HAVE_IPMI
 PROXY_SUBDIRS += zbxipmi
 endif
 endif
+endif
+
+if AGENT
+AGENT_SUBDIRS = \
+	zbxcrypto \
+	zbxexec \
+	zbxthreads
 endif
 
 SUBDIRS = \
@@ -252,9 +265,7 @@ SUBDIRS = \
 	zbxcompress \
 	zbxcalc \
 	zbxcfg \
-	zbxcrypto \
 	zbxcurl \
-	zbxexec \
 	zbxexpr \
 	zbxfile \
 	zbxgetopt \
@@ -273,7 +284,6 @@ SUBDIRS = \
 	zbxregexp \
 	zbxsysinfo \
 	zbxstr \
-	zbxthreads \
 	zbxtime \
 	zbxvariant \
 	zbxversion \

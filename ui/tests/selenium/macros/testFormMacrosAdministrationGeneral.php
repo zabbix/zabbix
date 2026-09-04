@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 require_once __DIR__.'/../common/testFormMacros.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup globalmacro, settings
  *
@@ -169,7 +167,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestAssertElementPresentId('macro_add');
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		for ($i = 0; $i <= $countGlobalMacros; $i++) {
 			if ($i < $countGlobalMacros) {
@@ -255,7 +253,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill($macro);
 		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
@@ -284,7 +282,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill('');
 		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
@@ -314,7 +312,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_MACRO);
 		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
@@ -346,7 +344,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_EMPTY_MACRO);
 		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill('');
@@ -376,7 +374,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_MACRO);
 		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
@@ -627,7 +625,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestClick('macros_'.$countGlobalMacros.'_remove');
 
@@ -733,7 +731,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 9,
+					'index' => 10,
 					'macro' => '{$X_SECRET_2_SECRET}',
 					'value' => [
 						'text' => 'This text is updated and should stay secret'
@@ -743,7 +741,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 10,
+					'index' => 11,
 					'macro' => '{$X_SECRET_2_TEXT}',
 					'value' => [
 						'text' => 'This text is updated and should become visible',
@@ -754,7 +752,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 11,
+					'index' => 12,
 					'macro' => '{$X_TEXT_2_SECRET}',
 					'value' => [
 						'text' => 'This text is updated and should become secret',

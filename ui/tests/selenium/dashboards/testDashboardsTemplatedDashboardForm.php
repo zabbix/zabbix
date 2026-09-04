@@ -20,6 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * @backup dashboard, hosts
@@ -870,6 +871,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'type' => 'radio_button',
 							'possible_values' => ['Analog', 'Digital'],
 							'value' => 'Analog'
+						],
+						[
+							'field' => 'Override time zone',
+							'type' => 'dropdown',
+							'value' => 'Local default: (UTC+03:00) Europe/Riga'
 						]
 					],
 					'hidden' => [
@@ -950,6 +956,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field' => 'Colour',
 									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Format',
+									'type' => 'radio_button',
+									'fieldid' => 'tzone_format',
+									'possible_values' => ['Short', 'Full'],
+									'value' => 'Short'
 								]
 							]
 						]
@@ -2579,7 +2592,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			case 'dropdown':
 				$field = $field->asDropdown();
 				$this->assertEquals($default_value, $field->getValue());
-				$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+
+				if (array_key_exists('possible_values', $field_details)) {
+					$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+				}
 				break;
 
 			case 'radio_button':
@@ -2740,8 +2756,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '!@#$%^&*()_+=-09[]{};:\'"',
-						'Default page display period' => '10 seconds',
-						'Start slideshow automatically' => true
+						'Default slideshow interval' => '10 seconds',
+						'Start slideshow' => true
 					]
 				]
 			],
@@ -2749,7 +2765,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '    Trailing & leading spaces    ',
-						'Start slideshow automatically' => false
+						'Start slideshow' => false
 					],
 					'trim' => 'Name'
 				]
@@ -2758,7 +2774,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '⭐️😀⭐️ Smiley Dashboard ⭐️😀⭐️',
-						'Default page display period' => '1 hour'
+						'Default slideshow interval' => '1 hour'
 					]
 				]
 			]
@@ -2823,8 +2839,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::WIDGET_SQL);
 		$fields = [
 			'Name' => 'Cancel dashboard update',
-			'Default page display period' => '10 minutes',
-			'Start slideshow automatically' => false
+			'Default slideshow interval' => '10 minutes',
+			'Start slideshow' => false
 		];
 
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
@@ -2927,7 +2943,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -2938,7 +2954,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -2949,7 +2965,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4786,7 +4802,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
-			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+			/*
+			 * Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+			 * while being clicked. Retry the click if that happens.
+			 */
+			$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+			try {
+				$add_button->click();
+			}
+			catch (ElementNotInteractableException $exception) {
+				$add_button->click();
+			}
+
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();
 
@@ -4923,8 +4952,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		if ($title === 'Dashboard properties') {
 			$parameters = [
 				'Name' => 'New dashboard',
-				'Default page display period' => '30 seconds',
-				'Start slideshow automatically' => true
+				'Default slideshow interval' => '30 seconds',
+				'Start slideshow' => false
 			];
 			$buttons = ['Apply', 'Cancel'];
 			$display_periods = ['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'];
@@ -4949,7 +4978,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 
 		if ($title === 'Dashboard properties') {
-			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
+			$this->assertEquals($display_periods, $form->getField('Default slideshow interval')->getOptions()->asText());
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',

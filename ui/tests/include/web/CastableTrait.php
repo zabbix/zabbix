@@ -338,4 +338,15 @@ trait CastableTrait {
 	public function asTextareaFlexible($options = []) {
 		return $this->cast(CTextareaFlexibleElement::class, $options);
 	}
+
+	/**
+	 * Cast object to Datatable element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CDatatableElement
+	 */
+	public function asDatatable($options = []) {
+		return $this->cast(CDatatableElement::class, $options);
+	}
 }

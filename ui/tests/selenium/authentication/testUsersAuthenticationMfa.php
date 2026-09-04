@@ -655,8 +655,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationMfa_SaveEmpty() {
 		$mfa_form = $this->openMfaForm();
+		$mfa_form->query('button:Update')->one()->waitUntilClickable()->click();
 		$this->assertScreenshot($this->query('id:tabs')->one(), 'empty_mfa_form');
-		$mfa_form->query('button:Update')->one()->click();
 		$this->assertInlineError($mfa_form, ['xpath:.//div[@data-field-name="mfa_methods"]' => 'This field cannot be empty.']);
 
 		// Take screenshots.
@@ -664,9 +664,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog_form = $dialog->asForm();
 		$this->page->removeFocus();
-		// TODO: unstable screenshot on Jenkins. Remove border radius from button element.
-		$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-				[$dialog->query('button:Add')->one()]);
 		$this->assertScreenshot($dialog, 'type_totp');
 		$dialog_form->fill([
 			'Type' => 'Duo Universal Prompt',

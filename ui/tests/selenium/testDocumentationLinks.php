@@ -510,8 +510,14 @@ class testDocumentationLinks extends CWebTest {
 			// #38 Scheduled report configuration form.
 			[
 				[
-					'url' => 'zabbix.php?action=scheduledreport.edit',
-					'doc_link' => '/en/manual/config/reports#configuration'
+					'url' => 'zabbix.php?action=scheduledreport.list',
+					'doc_link' => '/en/manual/config/reports#configuration',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create report'
+						]
+					]
 				]
 			],
 			// #39 Add scheduled report configuration popup from Dashboard view.
@@ -812,21 +818,29 @@ class testDocumentationLinks extends CWebTest {
 			// #71 Template LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=template',
+					'url' => 'zabbix.php?action=lldrule.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
 			// #72 Template LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=15000&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=15000&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #73 Template LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=15011&context=template',
+
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&context=template&itemid=15011',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -982,7 +996,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
@@ -990,17 +1004,22 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={templateid}'.
-						'&parent_discoveryid={template_discoveryid}&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #91 Template LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
@@ -1008,8 +1027,9 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1212,21 +1232,28 @@ class testDocumentationLinks extends CWebTest {
 			// #114 Host LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=host',
+					'url' => 'zabbix.php?action=lldrule.list&context=host&filter_rst=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
 			// #115 Host LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=40001&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=40001&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #116 Host LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=90001&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&itemid=90001&context=host',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1378,7 +1405,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
@@ -1386,17 +1413,22 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={hostid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #134 Host LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
@@ -1404,8 +1436,9 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1714,14 +1747,14 @@ class testDocumentationLinks extends CWebTest {
 			// #174 Administration -> General -> Regular expressions -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit',
+					'url' => 'zabbix.php?action=popup&popup=regex.edit',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
 			// #175 Administration -> General -> Regular expressions -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit&regexid=3',
+					'url' => 'zabbix.php?action=popup&popup=regex.edit&regexpid=3',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
@@ -1801,7 +1834,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other-parameters'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other'
 				]
 			],
 			// #185 Administration -> Proxy list view.
@@ -2713,6 +2746,11 @@ class testDocumentationLinks extends CWebTest {
 	 * Open the Mass update overlay dialog.
 	 */
 	private function openMassUpdate() {
+		/*
+		 * Wait for loading to finish first, otherwise selecting the checkbox acts on an element that is about to
+		 * be replaced and raises a StaleElementReferenceException.
+		 */
+		$this->query('xpath://*[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 	}

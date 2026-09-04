@@ -57,7 +57,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -483,6 +483,73 @@ zabbix_export:
             - tag: component
               value: messages
       discovery_rules:
+        - uuid: 8655f85b65cc4eb0a0470db45ca1c963
+          name: 'Health Check 3.8.10+ discovery'
+          type: DEPENDENT
+          key: rabbitmq.cluster.healthcheck.v3810.discovery
+          description: 'Specific metrics for the versions: up to and including 3.8.10.'
+          item_prototypes:
+            - uuid: 90db70de99454f7b924d84174a5951fb
+              name: 'Healthcheck: alarms in effect in the cluster{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.alarms[{#SINGLETON}]'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                - type: REGEX
+                  parameters:
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
+                    - \1
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              tags:
+                - tag: component
+                  value: health
+                - tag: component
+                  value: system
+              trigger_prototypes:
+                - uuid: 58592bb4d473497e9942634db2001823
+                  expression: 'last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0'
+                  name: 'RabbitMQ cluster: There are active alarms in the cluster'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  tags:
+                    - tag: scope
+                      value: notice
+          master_item:
+            key: rabbitmq.get_overview
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.management_version
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 689cf8096c0c49099e2b56c5b639d3c6
           name: 'Exchanges discovery'
           type: DEPENDENT
@@ -889,71 +956,6 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 8655f85b65cc4eb0a0470db45ca1c963
-          name: 'Health Check 3.8.10+ discovery'
-          type: DEPENDENT
-          key: rabbitmq.healthcheck.v3810.discovery
-          description: 'Specific metrics for the versions: up to and including 3.8.10.'
-          item_prototypes:
-            - uuid: 90db70de99454f7b924d84174a5951fb
-              name: 'Healthcheck: alarms in effect in the cluster{#SINGLETON}'
-              type: HTTP_AGENT
-              key: 'rabbitmq.healthcheck.alarms[{#SINGLETON}]'
-              authtype: BASIC
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
-              description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
-              valuemap:
-                name: 'RabbitMQ healthcheck'
-              preprocessing:
-                - type: REGEX
-                  parameters:
-                    - 'HTTP\/[\d.]+\s+(\d{3})'
-                    - \1
-                - type: JAVASCRIPT
-                  parameters:
-                    - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
-              tags:
-                - tag: component
-                  value: health
-                - tag: component
-                  value: system
-              trigger_prototypes:
-                - uuid: 58592bb4d473497e9942634db2001823
-                  expression: 'last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0'
-                  name: 'RabbitMQ cluster: There are active alarms in the cluster'
-                  opdata: 'Current state: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
-                  tags:
-                    - tag: scope
-                      value: notice
-          master_item:
-            key: rabbitmq.get_overview
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.management_version
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                  	parseInt(value.split('.')[1]) * 100 +
-                  	parseInt(value.split('.')[2]);
-                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
       tags:
         - tag: class
           value: software
@@ -971,11 +973,13 @@ zabbix_export:
             description: 'The hostname or IP of the API endpoint for the RabbitMQ cluster.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'RabbitMQ API password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'RabbitMQ API password.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
@@ -1003,10 +1007,12 @@ zabbix_export:
                 text: https
         - macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
+          description: 'RabbitMQ API username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'RabbitMQ API username.'
             required: 'YES'
         - macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
@@ -1159,7 +1165,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -1219,7 +1225,7 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns metrics of the nodes.'
-          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true'
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{$RABBITMQ.NODE.NAME}?memory=true'
           tags:
             - tag: component
               value: raw
@@ -1659,10 +1665,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -1704,10 +1712,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -1750,10 +1760,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -1796,10 +1808,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -1841,10 +1855,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){
-                      case '200': return 1
-                      case '503': return 0
-                      default: 2}
+                      var idx = {
+                        '200': 1,
+                        '503': 0
+                      }
+                      
+                      return typeof idx[value] === 'undefined' ? 2 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -1890,7 +1906,7 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#NODE}'
-                value: '{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}'
+                value: '{$RABBITMQ.CLUSTER.NAME}@{$RABBITMQ.NODE.NAME}'
               - macro: '{#QUEUE}'
                 value: '{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}'
               - macro: '{#QUEUE}'
@@ -2390,23 +2406,25 @@ zabbix_export:
           description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: Address
             description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'RabbitMQ API password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'RabbitMQ API password.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
           description: 'The port of the RabbitMQ API endpoint.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: Port
             description: 'The port of the RabbitMQ API endpoint. In the range from 1 to 65535 inclusive.'
             required: 'YES'
@@ -2416,7 +2434,7 @@ zabbix_export:
           description: 'The request scheme, which may be HTTP or HTTPS.'
           config:
             type: LIST
-            priority: '5'
+            priority: '6'
             label: Scheme
             description: 'The request scheme, which may be HTTP or HTTPS.'
             required: 'YES'
@@ -2427,10 +2445,12 @@ zabbix_export:
                 text: https
         - macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
+          description: 'RabbitMQ API username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'RabbitMQ API username.'
             required: 'YES'
         - macro: '{$RABBITMQ.CLUSTER.NAME}'
           value: rabbit
@@ -2446,7 +2466,7 @@ zabbix_export:
           description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for queue (include)'
             description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
@@ -2455,7 +2475,7 @@ zabbix_export:
           description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for queue (exclude)'
             description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
@@ -2464,17 +2484,25 @@ zabbix_export:
           description: 'The maximum number of messages in the queue for a trigger expression.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Messages max warning'
             description: 'The maximum number of messages in the queue for a trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$RABBITMQ.NODE.NAME}'
+          description: 'The name of the RabbitMQ node.'
+          config:
+            type: TEXT
+            priority: '4'
+            label: 'Node name'
+            description: 'The name of the RabbitMQ node.'
+            required: 'YES'
         - macro: '{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
           value: '10'
           description: 'The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Response time max warning'
             description: 'The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.'

@@ -21,7 +21,7 @@ $scrollbar-track-size-outline: 2px;
 	.scrollbar-track {
 		background: $scrollbar-track-color;
 		width: $scrollbar-track-size;
-		border-radius: 2px;
+		border-radius: var(--overlay-border-radius);
 		height: 100%;
 		position: absolute;
 		right: 2px;
@@ -53,7 +53,7 @@ $scrollbar-track-size-outline: 2px;
 
 	.scrollbar-thumb {
 		background: $scrollbar-thumb-color;
-		border-radius: 2px;
+		border-radius: var(--button-border-radius);
 		width: $scrollbar-track-size;
 		position: absolute;
 		height: 0;

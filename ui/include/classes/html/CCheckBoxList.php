@@ -250,6 +250,10 @@ class CCheckBoxList extends CList {
 				$checkbox->setUncheckedValue($value['unchecked_value']);
 			}
 
+			if (array_key_exists('error_container', $value)) {
+				$checkbox->setErrorContainer($value['error_container']);
+			}
+
 			parent::addItem($checkbox);
 		}
 

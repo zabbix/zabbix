@@ -20,7 +20,6 @@ require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
 require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
@@ -2436,7 +2435,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->filterEntriesAndOpenDiscovery($this->host);
-			$this->zbxTestClickLinkTextWait($this->discoveryRule);
+			$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $this->discoveryRule)
+					->query('link:Item prototypes')->waitUntilClickable()->one()->click();
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 			$this->zbxTestCheckHeader('Item prototypes');
 
@@ -2453,7 +2453,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$check_form = $dialog_check->asForm();
 			$this->assertEquals($itemName, $check_form->getField('Name')->getValue());
 			$this->assertEquals($keyName, $check_form->getField('Key')->getValue());
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+			$this->query('id:name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 
 			switch ($type) {
@@ -2530,8 +2530,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->filterEntriesAndOpenDiscovery($this->host);
-			$this->zbxTestClickLinkTextWait($this->discoveryRule);
-			$this->zbxTestClickLinkTextWait('Item prototypes');
+			$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $this->discoveryRule)
+					->query('link:Item prototypes')->waitUntilClickable()->one()->click();
 
 			$this->zbxTestCheckboxSelect("itemids_$itemId");
 			$this->query('button:Delete')->one()->click();
@@ -2548,7 +2548,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-		$table = $this->query('xpath:(//table[@class="list-table"])[1]')->asTable()->one();
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();

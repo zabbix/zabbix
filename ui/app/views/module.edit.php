@@ -68,12 +68,7 @@ $module_form = (new CFormGrid())
 	]);
 
 $form
-	->addItem($module_form)
-	->addItem(
-		(new CScriptTag('module_edit.init('.json_encode([
-			'rules' => $data['js_validation_rules']
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($module_form);
 
 $output = [
 	'header' => _('Module'),
@@ -82,12 +77,16 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Update'),
+			'class' => 'js-submit',
 			'isSubmit' => true,
-			'keepOpen' => true,
-			'action' => 'module_edit.submit();'
+			'keepOpen' => true
 		]
 	],
-	'script_inline' => getPagePostJs().$this->readJsFile('module.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('module.edit.js.php').
+		'module_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'dialogue_class' => 'modal-popup-medium'
 ];
 

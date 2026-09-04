@@ -308,7 +308,7 @@ class CNavigationTree {
 
 		hint.appendChild(value);
 
-		element.dataset.hintboxContents = hint.outerHTML;
+		element.dataset.hintboxHtml = hint.outerHTML;
 	}
 
 	/**
@@ -350,7 +350,7 @@ class CNavigationTree {
 
 		const description = maintenance.description !== '' ? `\n${maintenance.description}` : '';
 
-		element.dataset.hintboxContents = `${escapeHtml(maintenance.name)} [${type}]${escapeHtml(description)}`;
+		element.dataset.hintboxHtml = `${escapeHtml(maintenance.name)} [${type}]${escapeHtml(description)}`;
 	}
 
 	/**
@@ -449,7 +449,7 @@ class CNavigationTree {
 			row.appendChild(count);
 		}
 
-		element.dataset.hintboxContents = hint.outerHTML;
+		element.dataset.hintboxHtml = hint.outerHTML;
 	}
 
 	/**

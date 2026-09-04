@@ -61,7 +61,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT4));
 
 if ($media_types) {
-	$table = new CTableInfo();
+	$table = (new CTableInfo())->addClass(ZBX_STYLE_ROUNDED_SURFACE);
 
 	// Fetch the year of the first alert.
 	if (($first_alert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'))) && $first_alert['clock']) {

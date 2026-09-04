@@ -46,14 +46,14 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 *
 	 * @return array|string
 	 */
-	private function doGet(array $options = [], ?array $permissions = null) {
+	private function doGet(array $options, array $permissions) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'serviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -105,10 +105,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($permissions === null) {
-			$accessible_services = null;
-		}
-		elseif ($options['editable']) {
+		if ($options['editable']) {
 			$accessible_services = $permissions['rw_services'];
 		}
 		elseif ($permissions['r_services'] === null || $permissions['rw_services'] === null) {
@@ -139,7 +136,7 @@ class CService extends CApiService {
 			$limit_services = $accessible_services;
 		}
 
-		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
+		$options['root_services'] = $permissions['root_services'];
 
 		$count_output = $options['countOutput'];
 
@@ -158,7 +155,7 @@ class CService extends CApiService {
 			}
 
 			if (!$count_output && $this->outputIsRequested('readonly', $options['output'])) {
-				$row['readonly'] = $permissions !== null && $permissions['rw_services'] !== null
+				$row['readonly'] = $permissions['rw_services'] !== null
 					&& !array_key_exists($row['serviceid'], $permissions['rw_services']);
 			}
 
@@ -441,17 +438,21 @@ class CService extends CApiService {
 
 			foreach ($db_services as $db_service) {
 				foreach ($db_service['children'] as $child_service) {
-					if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
-						$permissions['rw_services'][$child_service['serviceid']]--;
+					if (array_key_exists($child_service['serviceid'], $db_services)
+							|| $permissions['rw_services'][$child_service['serviceid']] === null
+							|| array_key_exists($child_service['serviceid'], $permissions['rw_tag_services'])) {
+						continue;
+					}
 
-						if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
-							$error_detail = _s('read-write access to the child service "%1$s" must be retained',
-								$child_service['name']
-							);
-							$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+					$permissions['rw_services'][$child_service['serviceid']]--;
 
-							self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
-						}
+					if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
+						$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+							$child_service['name']
+						);
+						$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+
+						self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 					}
 				}
 			}
@@ -599,15 +600,15 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function addRelatedObjects(array $options, array $result, ?array $permissions = null): array {
+	protected function addRelatedObjects(array $options, array $result, array $permissions = []): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedParents($options, $result, $permissions);
@@ -622,13 +623,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedParents(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedParents(array $options, array &$result, array $permissions): void {
 		if ($options['selectParents'] === null) {
 			return;
 		}
@@ -671,13 +672,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedChildren(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedChildren(array $options, array &$result, array $permissions): void {
 		if ($options['selectChildren'] === null) {
 			return;
 		}
@@ -2137,7 +2138,8 @@ class CService extends CApiService {
 				'r_services' => [],
 				'rw_services' => [],
 				'root_services' => [],
-				'rw_tag' => ['tag' => '', 'value' => '']
+				'rw_tag' => ['tag' => '', 'value' => ''],
+				'rw_tag_services' => []
 			];
 		}
 
@@ -2148,7 +2150,8 @@ class CService extends CApiService {
 				'r_services' => null,
 				'rw_services' => null,
 				'root_services' => null,
-				'rw_tag' => ['tag' => '', 'value' => '']
+				'rw_tag' => ['tag' => '', 'value' => ''],
+				'rw_tag_services' => null
 			];
 		}
 
@@ -2180,7 +2183,11 @@ class CService extends CApiService {
 					: ['tag' => $rules['services.write.tag']['tag']]
 			]);
 
-			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
+			$rw_tag_services = array_column($tags, 'serviceid', 'serviceid');
+			$rw_services += array_fill_keys($rw_tag_services, 0);
+		}
+		else {
+			$rw_tag_services = [];
 		}
 
 		$sql_options = [
@@ -2250,7 +2257,8 @@ class CService extends CApiService {
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
 			'root_services' => $root_services,
-			'rw_tag' => $rules['services.write.tag']
+			'rw_tag' => $rules['services.write.tag'],
+			'rw_tag_services' => $rw_tag_services
 		];
 	}
 
@@ -2265,7 +2273,8 @@ class CService extends CApiService {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
-			'rw_tag' => $rw_tag
+			'rw_tag' => $rw_tag,
+			'rw_tag_services' => $rw_tag_services
 		] = $permissions;
 
 		if ($r_services === null || $rw_services === null) {
@@ -2323,69 +2332,6 @@ class CService extends CApiService {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 
-			$is_rw_service = $db_services !== null && array_key_exists($service['serviceid'], $rw_services)
-				&& $rw_services[$service['serviceid']] === null;
-
-			if (!$is_rw_service) {
-				$has_rw_tag = false;
-
-				if ($rw_tag['tag'] !== '') {
-					if (array_key_exists('tags', $service)) {
-						$tags = $service['tags'];
-					}
-					elseif ($db_services !== null) {
-						$tags = $db_services[$service['serviceid']]['tags'];
-					}
-					else {
-						$tags = [];
-					}
-
-					foreach ($tags as $tag) {
-						if ($tag['tag'] === $rw_tag['tag']
-								&& ($tag['value'] === $rw_tag['value'] || $rw_tag['value'] === '')) {
-							$has_rw_tag = true;
-
-							break;
-						}
-					}
-				}
-
-				if ($has_rw_tag && $db_services !== null) {
-					$rw_services[$service['serviceid']] = null;
-				}
-
-				$is_rw_service = $has_rw_tag;
-			}
-
-			if (!$is_rw_service) {
-				if (array_key_exists('parents', $service)) {
-					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
-
-					$has_rw_parents = (bool) array_intersect_key($parent_services, $rw_services);
-
-					if ($has_rw_parents && $db_services !== null) {
-						$rw_services[$service['serviceid']] = null;
-					}
-				}
-				else {
-					$has_rw_parents = $db_services !== null;
-				}
-
-				$is_rw_service = $has_rw_parents;
-			}
-
-			if (!$is_rw_service) {
-				$error_detail = $db_services !== null
-					? _('read-write access to the service must be retained')
-					: _('read-write access to the service is required');
-
-				$error = $db_services !== null
-					? _s('Cannot update service "%1$s": %2$s.', $name, $error_detail)
-					: _s('Cannot create service "%1$s": %2$s.', $name, $error_detail);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
-			}
-
 			if (array_key_exists('children', $service)) {
 				$new_child_services = array_column($service['children'], 'serviceid', 'serviceid');
 				$old_child_services = $db_services !== null
@@ -2426,9 +2372,65 @@ class CService extends CApiService {
 			}
 		}
 
+		foreach ($services as $service) {
+			$is_rw_service = $db_services !== null && $rw_services[$service['serviceid']] === null;
+
+			if (!$is_rw_service) {
+				if ($rw_tag['tag'] !== '') {
+					if (array_key_exists('tags', $service)) {
+						$tags = $service['tags'];
+					}
+					elseif ($db_services !== null) {
+						$tags = $db_services[$service['serviceid']]['tags'];
+					}
+					else {
+						$tags = [];
+					}
+
+					foreach ($tags as $tag) {
+						if ($tag['tag'] === $rw_tag['tag']
+								&& ($tag['value'] === $rw_tag['value'] || $rw_tag['value'] === '')) {
+							$is_rw_service = true;
+
+							break;
+						}
+					}
+				}
+			}
+
+			if (!$is_rw_service) {
+				if (array_key_exists('parents', $service)) {
+					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
+
+					$is_rw_service = (bool) array_intersect_key($parent_services, $rw_services);
+				}
+				else {
+					$is_rw_service = $db_services !== null && $rw_services[$service['serviceid']] > 0;
+				}
+			}
+
+			if (!$is_rw_service) {
+				$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
+
+				$error_detail = $db_services !== null
+					? _('read-write access to the service must be retained')
+					: _('read-write access to the service is required');
+
+				$error = $db_services !== null
+					? _s('Cannot update service "%1$s": %2$s.', $name, $error_detail)
+					: _s('Cannot create service "%1$s": %2$s.', $name, $error_detail);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+
+			if ($db_services !== null) {
+				$rw_services[$service['serviceid']] = null;
+			}
+		}
+
 		if ($db_services !== null) {
 			foreach ($rw_services as $serviceid => $num_rw_parents) {
-				if ($num_rw_parents === null || $num_rw_parents > 0) {
+				if ($num_rw_parents === null || $num_rw_parents > 0 || array_key_exists($serviceid, $rw_tag_services)) {
 					continue;
 				}
 

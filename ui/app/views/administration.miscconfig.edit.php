@@ -32,7 +32,6 @@ $from_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setMaxlength(CSettingsSchema::getFieldLength('url'))
 			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
-			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
 		(new CMultiSelect([

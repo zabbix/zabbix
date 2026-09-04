@@ -1076,7 +1076,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value,
 			evaluate_item.key_orig = item.key_orig;
 
 			if (SUCCEED == evaluate_function_trigger_cb(&var, &evaluate_item, function.function, parameter,
-					&ts, &error) && ZBX_VARIANT_NONE != var.type)
+					&ts, NULL, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);

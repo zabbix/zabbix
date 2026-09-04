@@ -20,6 +20,19 @@
 class CEventNameValidator extends CValidator {
 
 	/**
+	 * Array of allowed hostnames used in expressions.
+	 *
+	 * @var array|null
+	 */
+	protected ?array $hostnames = null;
+
+	/**
+	 * Error message to be displayed in case any expression contains hostname which is not in the allowed list.
+	 * @var string|null
+	 */
+	protected ?string $message_hostnames = null;
+
+	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
 	 *
 	 * @param $value
@@ -48,6 +61,11 @@ class CEventNameValidator extends CValidator {
 				if ($expr_func_macro->parse($value, $p) != CParser::PARSE_FAIL) {
 					$p += $expr_func_macro->getLength();
 
+					if (!$this->validateHostnamesInExpression(
+							$expr_func_macro->getExpressionMacroParser()->getExpressionParser())) {
+						return false;
+					}
+
 					continue;
 				}
 				$p++;
@@ -62,10 +80,37 @@ class CEventNameValidator extends CValidator {
 
 				$p += $expr_macro->getLength();
 
+				if (!$this->validateHostnamesInExpression($expr_macro->getExpressionParser())) {
+					return false;
+				}
+
 				continue;
 			}
 
 			$p++;
+		}
+
+		return true;
+	}
+
+	private function validateHostnamesInExpression(CExpressionParser $expression_parser): bool {
+		if ($this->hostnames === null) {
+			return true;
+		}
+
+		$macro_parser = new CMacroParser(['macros' => ['{HOST.HOST}'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC]);
+		$hosts = $expression_parser->getResult()->getHosts();
+
+		foreach ($hosts as $host) {
+			if ($host !== '' && $macro_parser->parse($host) !== CParser::PARSE_SUCCESS
+					&& !in_array($host, $this->hostnames, true)) {
+				$this->setError($this->message_hostnames === null
+					? _s('host "%1$s" is not allowed in event name', $host)
+					: $this->message_hostnames
+				);
+
+				return false;
+			}
 		}
 
 		return true;

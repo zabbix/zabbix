@@ -74,6 +74,9 @@ class testPageReportsAudit extends CWebTest {
 			);
 		}
 
+		// Check that Export to CSV button is clickable.
+		$this->assertTrue($this->query('button:Export to CSV')->one()->isClickable());
+
 		// Check form labels.
 		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID', 'IP'], $form->getLabels()->asText());
 

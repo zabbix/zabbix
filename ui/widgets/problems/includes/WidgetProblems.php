@@ -41,7 +41,9 @@ class WidgetProblems extends CTableInfo {
 	public function __construct(array $data) {
 		$this->data = $data;
 
-		$this->highlight_rows = $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON;
+		$this->highlight_rows = array_key_exists('highlight_row', $this->data['fields'])
+			? $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON
+			: ZBX_HIGHLIGHT_OFF;
 
 		parent::__construct();
 	}
@@ -171,6 +173,25 @@ class WidgetProblems extends CTableInfo {
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
 	private function addProblemsToTable(array $problems, array $data, $nested): void {
+		if ($data['fields']['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
+			$events = [];
+
+			foreach ($problems as $problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+
+				if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '') {
+					$events[$problem['eventid']] = [
+						'triggerid' => $trigger['triggerid'],
+						'expression' => $trigger['expression'],
+						'opdata' => $trigger['opdata'],
+						'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+						'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+					];
+				}
+			}
+			$events = CMacrosResolverHelper::resolveEventOpdatas($events, ['html' => true]);
+		}
+
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -277,6 +298,7 @@ class WidgetProblems extends CTableInfo {
 					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 						->addClass(ZBX_STYLE_COLOR_ICON)
 						->addClass('js-blink')
+						->setAttribute('aria-label', _('Manually unsuppressed'))
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {
@@ -316,19 +338,7 @@ class WidgetProblems extends CTableInfo {
 					}
 				}
 				else {
-					$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
-						[
-							'triggerid' => $trigger['triggerid'],
-							'expression' => $trigger['expression'],
-							'opdata' => $trigger['opdata'],
-							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-						],
-						[
-							'events' => true,
-							'html' => true
-						]
-					);
+					$opdata = $events[$problem['eventid']]['opdata'];
 
 					if ($data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY) {
 						$opdata = (new CCol($opdata))->addClass('opdata');

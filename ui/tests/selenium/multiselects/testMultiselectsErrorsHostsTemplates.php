@@ -160,9 +160,9 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 		$this->page->login()->open(($data['object'] === 'Hosts') ? 'zabbix.php?action=host.list' : 'zabbix.php?action=template.list');
 
 		if (array_key_exists('sub_object', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
 					->findRow('Name', ($data['object'] === 'Hosts') ? self::HOST : self::TEMPLATE)
-					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 
 			// Add common multiselect fields to data provider.

@@ -244,3 +244,24 @@ out:
 
 	return ret;
 }
+
+int	zbx_pg_stop(char **error)
+{
+	zbx_ipc_socket_t	sock;
+	int			ret;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, error))
+		return FAIL;
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_STOP, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "Cannot send request to proxy group manager service");
+		ret = FAIL;
+	}
+	else
+		ret = SUCCEED;
+
+	zbx_ipc_socket_close(&sock);
+
+	return ret;
+}

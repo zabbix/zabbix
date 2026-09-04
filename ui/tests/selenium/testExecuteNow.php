@@ -15,7 +15,7 @@
 
 require_once __DIR__.'/../include/CWebTest.php';
 require_once __DIR__.'/behaviors/CMessageBehavior.php';
-require_once __DIR__.'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../include/helpers/CDataHelper.php';
 
 /**
@@ -26,14 +26,14 @@ require_once __DIR__.'/../include/helpers/CDataHelper.php';
 class testExecuteNow extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CDatatableBehavior::class
 		];
 	}
 
@@ -184,11 +184,15 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_LatestDataPage($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+
+		$table->waitUntilReady()->invalidate();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 
@@ -249,11 +253,14 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_ContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->waitUntilVisible()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady();
 
 		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -540,7 +547,8 @@ class testExecuteNow extends CWebTest {
 	 */
 	public function testExecuteNow_DiscoveryRulesList($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$hostid)
+				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="discovery"]//table')->asTable()->one()->waitUntilPresent();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
@@ -591,9 +599,10 @@ class testExecuteNow extends CWebTest {
 	 */
 	public function testExecuteNow_DiscoveryRulePage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$hostid)
+				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="discovery"]//table')->asTable()->one()->waitUntilPresent();
-		$this->openItemAndExecuteNow($data, $table, true);
+		$this->openItemAndExecuteNow($data, $table);
 	}
 
 	/**
@@ -603,7 +612,7 @@ class testExecuteNow extends CWebTest {
 	 * @param CElement $table		table element
 	 */
 	private function selectItemsAndExecuteNow($data, $table) {
-		$selected_count = $this->query('id:selected_count')->one();
+		$selected_count = $this->query('class:selected-item-count')->one();
 
 		$table->findRows('Name', $data['items'])->select();
 		$this->assertSelectedCount(count($data['items']));
@@ -633,24 +642,18 @@ class testExecuteNow extends CWebTest {
 	 * @param array $data			data provider
 	 * @param CElement $table		table element
 	 */
-	private function openItemAndExecuteNow($data, $table, $lld = false) {
+	private function openItemAndExecuteNow($data, $table) {
 		$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
 
-		if ($lld === false) {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Disabled "Execute now" button.
 		if (!array_key_exists('expected', $data)) {
-			$lld
-				? $this->query('button:Execute now')->one()->isEnabled(false)
-				: $this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
+			$this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
 			return;
 		}
 
-		$lld
-			? $this->query('button:Execute now')->one()->click()
-			: $dialog->getFooter()->query('button:Execute now')->one()->click();
+		$dialog->getFooter()->query('button:Execute now')->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, $data['message']);

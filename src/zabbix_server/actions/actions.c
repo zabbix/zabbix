@@ -1720,6 +1720,102 @@ static int	check_dservice_port_condition(const zbx_vector_db_event_t *esc_events
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks proxy group condition for discovery                        *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] Condition for matching, outputs          *
+ *                                   event ids that match condition.          *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_proxy_group_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	const char		*operation_and;
+	size_t			sql_alloc = 0;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
+	zbx_vector_uint64_t	objectids[2];
+	zbx_uint64_t		condition_value;
+
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
+		operation_and = " and";
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		operation_and = " and not";
+	else
+		return NOTSUPPORTED;
+
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
+	{
+		size_t	sql_offset = 0;
+
+		if (0 == objectids[i].values_num)
+			continue;
+
+		if (EVENT_OBJECT_DHOST == objects[i])
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select h.dhostid"
+					" from drules r,dhosts h,proxy p"
+					" where r.druleid=h.druleid"
+						" and r.proxyid=p.proxyid"
+						"%s p.proxy_groupid=" ZBX_FS_UI64
+						" and",
+					operation_and,
+					condition_value);
+
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.dhostid", objectids[i].values,
+					objectids[i].values_num);
+		}
+		else	/* EVENT_OBJECT_DSERVICE */
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select s.dserviceid"
+					" from drules r,dhosts h,dservices s,proxy p"
+					" where r.druleid=h.druleid"
+						" and r.proxyid=p.proxyid"
+						" and h.dhostid=s.dhostid"
+						"%s p.proxy_groupid=" ZBX_FS_UI64
+						" and",
+					operation_and,
+					condition_value);
+
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "s.dserviceid",
+					objectids[i].values, objectids[i].values_num);
+		}
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			add_condition_match(esc_events, condition, objectid, objects[i]);
+		}
+		zbx_db_free_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if events match single condition                           *
  *                                                                            *
  * Parameters: event     - [IN] discovery events to check                     *
@@ -1766,6 +1862,9 @@ static void	check_discovery_condition(const zbx_vector_db_event_t *esc_events, z
 			break;
 		case ZBX_CONDITION_TYPE_DSERVICE_PORT:
 			ret = check_dservice_port_condition(esc_events, condition);
+			break;
+		case ZBX_CONDITION_TYPE_PROXY_GROUP:
+			ret = check_proxy_group_condition(esc_events, condition);
 			break;
 		default:
 			ret = FAIL;
@@ -1914,8 +2013,84 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 		zbx_uint64_t	id;
 		zbx_uint64_t	objectid;
 
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			continue;
+
 		ZBX_STR2UINT64(objectid, row[0]);
-		ZBX_DBROW2UINT64(id, row[1]);
+		ZBX_STR2UINT64(id, row[1]);
+
+		switch (condition->op)
+		{
+			case ZBX_CONDITION_OPERATOR_EQUAL:
+				if (id == condition_value)
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+				if (id != condition_value)
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks proxy group condition for auto registration                *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] Condition for matching, outputs          *
+ *                                   event ids that match condition.          *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_areg_proxy_group_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	int			object = EVENT_OBJECT_ZABBIX_ACTIVE;
+	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t		condition_value;
+
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+		return NOTSUPPORTED;
+
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+	get_object_ids(esc_events, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select a.autoreg_hostid,p.proxy_groupid"
+			" from autoreg_host a,proxy p"
+			" where a.proxyid=p.proxyid"
+				" and");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "a.autoreg_hostid",
+			objectids.values, objectids.values_num);
+
+	result = zbx_db_select("%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	id;
+		zbx_uint64_t	objectid;
+
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			continue;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_STR2UINT64(id, row[1]);
 
 		switch (condition->op)
 		{
@@ -1960,6 +2135,9 @@ static void	check_autoregistration_condition(const zbx_vector_db_event_t *esc_ev
 			break;
 		case ZBX_CONDITION_TYPE_PROXY:
 			ret = check_areg_proxy_condition(esc_events, condition);
+			break;
+		case ZBX_CONDITION_TYPE_PROXY_GROUP:
+			ret = check_areg_proxy_group_condition(esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -2677,8 +2855,13 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids, new_optagids,
 				del_optagids;
 	zbx_config_t		cfg;
+	zbx_op_host_t		ophost;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, actionid);
+
+	ophost.hostid = 0;
+	ophost.status = HOST_STATUS_UNKNOWN;
+	ophost.name = NULL;
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_uint64_create(&del_templateids);
@@ -2716,16 +2899,16 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		switch (operationtype)
 		{
 			case ZBX_OPERATION_TYPE_HOST_ADD:
-				op_host_add(event, &cfg);
+				op_host_add(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_REMOVE:
-				op_host_del(event);
+				op_host_del(event, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_ENABLE:
-				op_host_enable(event, &cfg);
+				op_host_enable(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_DISABLE:
-				op_host_disable(event, &cfg);
+				op_host_disable(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
@@ -2784,7 +2967,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				}
 				break;
 			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
-				op_host_inventory_mode(event, &cfg, inventory_mode);
+				op_host_inventory_mode(event, &cfg, inventory_mode, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_TAGS_ADD:
 				if (0 != optagid)
@@ -2804,32 +2987,32 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	{
 		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_del(event, &del_templateids);
+		op_template_del(event, &del_templateids, &ophost);
 	}
 
 	if (0 != lnk_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_add(event, &cfg, &lnk_templateids);
+		op_template_add(event, &cfg, &lnk_templateids, &ophost);
 	}
 
 	if (0 != new_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_groups_add(event, &cfg, &new_groupids);
+		op_groups_add(event, &cfg, &new_groupids, &ophost);
 	}
 
 	if (0 != del_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_groups_del(event, &del_groupids);
+		op_groups_del(event, &del_groupids, &ophost);
 	}
 
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
-		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids);
+		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids, &ophost);
 
 	zbx_config_clean(&cfg);
 
@@ -2841,6 +3024,8 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_destroy(&del_optagids);
 
 	zbx_audit_flush(zbx_map_db_event_to_audit_context(event));
+
+	zbx_free(ophost.name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

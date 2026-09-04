@@ -117,7 +117,8 @@ class CControllerPopupTriggerExprCheck extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function doAction(): void {

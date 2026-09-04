@@ -43,6 +43,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK autoregistration tests.');
+		}
 
 		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
 			throw new Exception('Failed to create lower case PSK file for agent');
@@ -97,7 +100,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			unlink(self::METADATA_FILE);
 		}
 
-		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+		if (file_put_contents(self::METADATA_FILE, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 
@@ -191,7 +194,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+		if (file_put_contents(self::METADATA_FILE, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 

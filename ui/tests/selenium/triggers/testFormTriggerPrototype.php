@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -292,12 +291,11 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickLinkTextWait($discoveryRule);
-		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', $discoveryRule, true)
+				->query('link:Trigger prototypes')->one()->click();
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent($discoveryRule);
 
 		if (isset($data['form'])) {
 			$this->zbxTestClickLinkTextWait($data['form']);
@@ -535,8 +533,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
-		$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);
-		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', self::DISCOVERY_RULE)
+				->query('link:Trigger prototypes')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($description);
 		COverlayDialogElement::find()->waitUntilReady()->one();
@@ -792,7 +790,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],
@@ -969,12 +967,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTriggerPrototype_SimpleCreate($data) {
-
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
-		$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);
-		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$table = $this->query('class:list-table')->waitUntilPresent()->one()->asTable();
+		$table->findRow('Name', self::DISCOVERY_RULE)->query('link:Trigger prototypes')->one()->click();
+
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog_footer = $dialog->getFooter();
@@ -1069,7 +1067,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
 					$text = $this->query('xpath://tr[1]//button[@data-hintbox]')->one()
-							->getAttribute('data-hintbox-contents');
+							->getAttribute('data-hintbox-html');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
@@ -1123,8 +1121,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
-			$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);
-			$this->zbxTestClickLinkTextWait('Trigger prototypes');
+			$table->invalidate();
+			$table->findRow('Name', self::DISCOVERY_RULE)->query('link:Trigger prototypes')->one()->click();
 
 			$this->zbxTestClickLinkTextWait($description);
 			$this->zbxTestAssertElementValue('expression', $expression);
@@ -1151,8 +1149,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
-			$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);
-			$this->zbxTestClickLinkTextWait('Trigger prototypes');
+			$table->invalidate();
+			$table->findRow('Name', self::DISCOVERY_RULE)->query('link:Trigger prototypes')->one()->click();
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
 			$this->query('button:Delete')->one()->click();
 			$this->zbxTestAcceptAlert();
@@ -1238,12 +1236,11 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$form->waitUntilStalled();
-		$table->waitUntilReloaded();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

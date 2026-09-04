@@ -25,6 +25,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -294,7 +295,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if len(params) > 2 {
-		return nil, errors.New(errorTooManyParams)
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) == 2 && params[1] != "" {

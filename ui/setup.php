@@ -54,7 +54,10 @@ $fields = [
 	'vault_prefix_cyberark' =>              [T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_db_path' =>                      [T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_query_string' =>                 [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_auth_type' =>                    [T_ZBX_INT, O_OPT, null,	IN([DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN, DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE]), null],
 	'vault_token' =>                        [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_app_role_id' =>                  [T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_app_secret_id' =>                [T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_certificates' =>                 [T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'vault_cert_file' =>                    [T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_key_file' =>                     [T_ZBX_STR, O_OPT, null,	null,				null],
@@ -94,8 +97,7 @@ if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
-		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
+if (file_exists(APP::getRootDir().CConfigFile::CONFIG_FILE_PATH)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 

@@ -946,7 +946,7 @@ class CTestDataHelper {
 			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
 				$referenced_condition_types = [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST,
 					ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_DRULE,
-					ZBX_CONDITION_TYPE_PROXY
+					ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP
 				];
 
 				foreach ($action['filter']['conditions'] as &$condition) {

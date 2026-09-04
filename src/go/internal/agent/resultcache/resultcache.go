@@ -57,6 +57,7 @@ type ResultCache interface {
 	// TODO: will be used once the runtime configuration reload is implemented
 	UpdateOptions(options *agent.AgentOptions)
 	EnableUpload(bool)
+	IsUploadEnabled() bool
 }
 
 type AgentData struct {
@@ -173,6 +174,11 @@ func (c *cacheData) isUploadEnabled() bool {
 	return c.historyUpload
 }
 
+// IsUploadEnabled returns true if history upload is currently enabled.
+func (c *cacheData) IsUploadEnabled() bool {
+	return c.isUploadEnabled()
+}
+
 func tableName(prefix string, index int) string {
 	return fmt.Sprintf("%s_%d", prefix, index)
 }
@@ -279,9 +285,10 @@ func prepareDiskCache(options *agent.AgentOptions, addresses [][]string, hostnam
 		return err
 	}
 
+	defer rows.Close() //nolint:errcheck // best-effort close.
+
 	for rows.Next() {
 		if err = rows.Scan(&id, &address, &hostname); err != nil {
-			rows.Close()
 			return err
 		}
 		ids = append(ids, id)

@@ -30,6 +30,7 @@ zabbix_export:
         - name: main_drule
           type: TRAP
           key: main_drule
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           item_prototypes:
             - name: 'Active connections to {#DB}'
               key: 'db.connections[{#DB}]'

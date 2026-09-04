@@ -20,14 +20,6 @@
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
-typedef enum
-{
-	ZBX_VALUE_NONE,
-	ZBX_VALUE_SECONDS,
-	ZBX_VALUE_NVALUES
-}
-zbx_value_type_t;
-
 typedef struct
 {
 	char	value[ZBX_VALUEMAP_STRING_LEN];

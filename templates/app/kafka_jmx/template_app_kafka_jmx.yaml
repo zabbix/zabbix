@@ -25,7 +25,7 @@ zabbix_export:
         2. Set the user name and password in host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1099,11 +1099,13 @@ zabbix_export:
             label: 'Network processor min average idle (%)'
             description: 'The minimum Network processor average idle percent for trigger expression.'
         - macro: '{$KAFKA.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'Kafka JMX password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'Kafka JMX password.'
             required: 'YES'
         - macro: '{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}'
           value: '30'
@@ -1134,10 +1136,12 @@ zabbix_export:
             description: 'Filter to exclude discovered topics'
         - macro: '{$KAFKA.USER}'
           value: zabbix
+          description: 'Kafka JMX user.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'Kafka JMX user.'
             required: 'YES'
       dashboards:
         - uuid: 513a8b1df97f4e58882a5a7796954fc6

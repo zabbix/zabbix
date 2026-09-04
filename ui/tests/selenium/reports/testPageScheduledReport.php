@@ -500,6 +500,11 @@ class testPageScheduledReport extends CWebTest {
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+
+		$message = is_string(CTestArrayHelper::get($data, 'Name'))
+			? 'Scheduled report deleted'
+			: 'Scheduled reports deleted';
+		$this->assertMessage(TEST_GOOD, $message);
 		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 
 		if (array_key_exists('delete_all', $data)) {
