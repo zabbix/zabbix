@@ -85,16 +85,16 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
 		])
 		->addItem([
-			(new CLabel(_('Host'), 'ceprule-condition-host'))->setAsteriskMark(),
-			(new CFormField((new CTextAreaFlexible('host'))
-				->setId('ceprule-condition-host')
+			(new CLabel(_('Host'), 'ceprule-condition-host-name'))->setAsteriskMark(),
+			(new CFormField((new CTextAreaFlexible('host_name'))
+				->setId('ceprule-condition-host-name')
 				->setAttribute('placeholder', 'visible name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME)
 		])
 		->addItem([
-			(new CLabel(_('Host group'), 'ceprule-condition-host-group'))->setAsteriskMark(),
-			(new CFormField((new CTextAreaFlexible('host_group'))
-				->setId('ceprule-condition-host-group')
+			(new CLabel(_('Host group'), 'ceprule-condition-host-group-name'))->setAsteriskMark(),
+			(new CFormField((new CTextAreaFlexible('host_group_name'))
+				->setId('ceprule-condition-host-group-name')
 				->setAttribute('placeholder', 'host group name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP_NAME)
 		])

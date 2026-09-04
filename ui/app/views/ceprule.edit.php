@@ -102,8 +102,8 @@ $form = (new CForm())
 					(new CVar('filter[conditions][#{row_index}][tag]', '#{tag}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))->removeId(),
-					(new CVar('filter[conditions][#{row_index}][host]', '#{host}'))->removeId(),
-					(new CVar('filter[conditions][#{row_index}][host_group]', '#{host_group}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host_name]', '#{host_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host_group_name]', '#{host_group_name}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][time_period]', '#{time_period}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()

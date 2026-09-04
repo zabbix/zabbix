@@ -374,10 +374,10 @@ class CCepRuleHelper {
 			];
 		}
 		elseif (self::CONDITION_HOST_VISIBLE_NAME == $ceprule_condition['type']) {
-			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host'])];
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_name'])];
 		}
 		elseif (self::CONDITION_HOST_GROUP_NAME == $ceprule_condition['type']) {
-			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_group'])];
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_group_name'])];
 		}
 		elseif (self::CONDITION_TIME_PERIOD == $ceprule_condition['type']) {
 			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['time_period'])];

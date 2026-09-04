@@ -137,8 +137,8 @@ window.ceprule_condition_edit_popup = new class {
 		const default_condition = {
 			type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 			operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-			host_group: '',
-			host: '',
+			host_group_name: '',
+			host_name: '',
 			severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 			tag: '',
 			tag_name: '',
@@ -171,10 +171,10 @@ window.ceprule_condition_edit_popup = new class {
 				keep('type', 'operator', 'severity');
 			break;
 			case <?= CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME ?>:
-				keep('type', 'operator', 'host');
+				keep('type', 'operator', 'host_name');
 			break;
 			case <?= CCepRuleHelper::CONDITION_HOST_GROUP_NAME ?>:
-				keep('type', 'operator', 'host_group');
+				keep('type', 'operator', 'host_group_name');
 			break;
 			case <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>:
 				keep('type', 'operator', 'time_period');

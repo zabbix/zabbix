@@ -99,10 +99,10 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 							]
 						]
 					],
-					'host' => ['db cep_condition.host', 'required', 'not_empty',
+					'host_name' => ['db cep_condition.host_name', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME]]
 					],
-					'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
+					'host_group_name' => ['db cep_condition.host_group_name', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP_NAME]]
 					],
 					'severity' => ['db cep_condition.severity', 'required',
