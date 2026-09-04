@@ -27,8 +27,7 @@ func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics. "+
-			"vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 	)
 	if err != nil {
@@ -159,39 +158,60 @@ func matchMountpoint(path, mountpoint string) bool {
 	return strings.EqualFold(path, mountpoint)
 }
 
-func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
+func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
 	}
 
-	data = make([]*FsInfoNew, 0)
+	fsmap := make(map[string]*FsInfoNew, len(paths))
+
 	for _, path := range paths {
 		if !matchMountpoint(path, mountpoint) {
 			continue
 		}
-		var info FsInfoNew
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
-			info.FsName = &fsname
-			info.FsType = &fstype
-			info.DriveType = &drivetype
-			info.DriveLabel = &drivelabel
-		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+
+		fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path)
+		if fsErr != nil {
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
 			continue
 		}
-		if stats, fserr := getFsStats(path); fserr == nil {
-			info.Bytes = stats
-			data = append(data, &info)
-		} else {
-			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fserr)
+
+		stats, fsErr := getFsStats(path)
+		if fsErr != nil {
+			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fsErr)
 			continue
+		}
+
+		fsmap[path] = &FsInfoNew{
+			FsName:     &fsname,
+			FsType:     &fstype,
+			DriveType:  &drivetype,
+			DriveLabel: &drivelabel,
+			Bytes:      stats,
 		}
 	}
-	return
+
+	paths, err = getMountPaths()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*FsInfoNew, 0, len(paths))
+	for _, path := range paths {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
+
+		if info, ok := fsmap[path]; ok {
+			data = append(data, info)
+		}
+	}
+
+	return data, nil
 }
 
-func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, err error) {
+func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
 		return

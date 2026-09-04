@@ -31,8 +31,7 @@ func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics. "+
-			"vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
 	)
@@ -68,27 +67,44 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 	fsStatCaller := p.newFSCaller(getFsStats, len(allData))
 	fsInodeCaller := p.newFSCaller(getFsInode, len(allData))
 
-	data := make([]*FsInfoNew, 0)
+	fsmap := make(map[string]*FsInfoNew, len(allData))
+
 	for _, info := range allData {
-		bytes, err := fsStatCaller.run(*info.FsName)
-		if err != nil {
-			p.Debugf(`cannot discern stats for the mount %s: %s`, *info.FsName, err.Error())
+		bytes, fsErr := fsStatCaller.run(*info.FsName)
+		if fsErr != nil {
+			p.Debugf(`cannot discern stats for the mount %s: %s`, *info.FsName, fsErr.Error())
 			continue
 		}
 
-		inodes, err := fsInodeCaller.run(*info.FsName)
-		if err != nil {
-			p.Debugf(`cannot discern inode for the mount %s: %s`, *info.FsName, err.Error())
+		inodes, fsErr := fsInodeCaller.run(*info.FsName)
+		if fsErr != nil {
+			p.Debugf(`cannot discern inode for the mount %s: %s`, *info.FsName, fsErr.Error())
 			continue
 		}
 
-		data = append(data, &FsInfoNew{
+		key := *info.FsName + *info.FsType
+		fsmap[key] = &FsInfoNew{
 			FsName:    info.FsName,
 			FsType:    info.FsType,
 			Bytes:     bytes,
 			Inodes:    inodes,
 			FsOptions: info.FsOptions,
-		})
+		}
+	}
+
+	allData, err = p.getMountedFilesystems()
+	if err != nil {
+		return nil, err
+	}
+
+	allData = filterByMountpoint(allData, mountpoint)
+
+	data := make([]*FsInfoNew, 0, len(allData))
+	for _, info := range allData {
+		key := *info.FsName + *info.FsType
+		if fsInfo, ok := fsmap[key]; ok {
+			data = append(data, fsInfo)
+		}
 	}
 
 	return data, nil
