@@ -421,10 +421,11 @@ class CTrigger extends CTriggerGeneral {
 		// only_true
 		if ($options['only_true'] !== null) {
 			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+
+			$ok_period_start_time = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
 			$sqlParts['where']['ot'] = '(tr.value='.TRIGGER_VALUE_TRUE.
 				' OR (tr.value='.TRIGGER_VALUE_FALSE.
-					' AND tr.lastchange>'.
-					(time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD))).
+					' AND tr.lastchange>'.$ok_period_start_time.
 				')'.
 			')';
 		}
