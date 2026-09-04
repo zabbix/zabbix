@@ -47,6 +47,7 @@ This template has been tested on:
 |{$RIBBON.PASSWORD}|<p>Ribbon SBC user password.</p>||
 |{$RIBBON.URL}|<p>Ribbon SBC API IP.</p>||
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC SWe Core", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC SWe Core"}.</p>|`full`|
 |{$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}|<p>The threshold of DNS errors.</p>|`1000`|
 |{$RIBBON.DNS.ERRORS.PERCENT.TRIGGER.THRESHOLD}|<p>The threshold of DNS errors in percent.</p>|`70`|
 |{$RIBBON.DNS.TIMEOUTS.PERCENT.TRIGGER.THRESHOLD}|<p>The threshold of DNS timeouts in percent.</p>|`70`|
@@ -268,6 +269,7 @@ This template has been tested on:
 |{$RIBBON.PASSWORD}|<p>Ribbon SBC user password.</p>||
 |{$RIBBON.URL}|<p>Ribbon SBC API IP.</p>||
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC SWe CE", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC SWe CE"}.</p>|`full`|
 |{$RIBBON.CE.NAME}|<p>Ribbon SBC CE name.</p>||
 |{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of CPU usage in percent.</p>|`90`|
 |{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of memory usage in percent.</p>|`90`|
