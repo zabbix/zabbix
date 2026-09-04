@@ -256,6 +256,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS", e.g. {$HTTP.TLS.VERIFY:"AWS"}.</p>|`full`|
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
@@ -527,6 +528,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS EC2", e.g. {$HTTP.TLS.VERIFY:"AWS EC2"}.</p>|`full`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -833,6 +835,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS RDS instance", e.g. {$HTTP.TLS.VERIFY:"AWS RDS instance"}.</p>|`full`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -1191,6 +1194,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS S3 bucket", e.g. {$HTTP.TLS.VERIFY:"AWS S3 bucket"}.</p>|`full`|
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1448,6 +1452,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Serverless Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1724,6 +1729,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1999,6 +2005,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Application Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.HTTP.4XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
@@ -2285,6 +2292,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.REGION}|<p>AWS Network Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Network Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
@@ -2560,6 +2568,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Lambda", e.g. {$HTTP.TLS.VERIFY:"AWS Lambda"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
@@ -2788,6 +2797,7 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|-------|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Backup Vault", e.g. {$HTTP.TLS.VERIFY:"AWS Backup Vault"}.</p>|`full`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>AWS backup vault region code.</p>|`us-west-1`|
@@ -3045,6 +3055,7 @@ Additional information about metrics and used API methods:
 |{$AWS.SERVICE.COST.DAILY.HIGH}|<p>Threshold for high AWS service daily cost.</p>|`400`|
 |{$AWS.SERVICE.COST.DAILY.WARN}|<p>Warning threshold for AWS service daily cost.</p>|`200`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Cost Explorer", e.g. {$HTTP.TLS.VERIFY:"AWS Cost Explorer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
 |{$AWS.BILLING.MONTH}|<p>Number of months of historical cost data to get from AWS Cost Explorer API (maximum 12 months).</p>|`11`|
