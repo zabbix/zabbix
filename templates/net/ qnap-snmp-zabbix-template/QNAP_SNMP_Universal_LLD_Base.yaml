@@ -1,0 +1,2198 @@
+zabbix_export:
+  version: "7.4"
+
+  template_groups:
+    - uuid: f2587d2720d6454eaea6f1aafb3d1c06
+      name: "Templates/Network devices"
+
+  hosts: []
+
+  templates:
+    - uuid: 605f422e65104122b30db8c336da0a16
+      template: "QNAP NAS LLD SNMP"
+      name: "QNAP NAS LLD SNMP v1.0.0"
+      description: |
+        Production‑ready SNMP Low‑Level Discovery (LLD) template for QNAP NAS storage devices.
+        Version: 1.0.0
+        Author: Majid Abdollahi
+
+        This is the stable SNMP release.  
+        Note: Modern QNAP models (including TS‑873AeU‑RP) expose only basic SNMP system metrics.
+        Storage‑level SNMP OIDs are not available on QTS 5.x+, so LLD coverage is limited.
+
+        This template provides complete, multi‑layer monitoring coverage for QNAP NAS systems using
+        native SNMP OIDs, with full automatic discovery of disks, RAID groups, storage pools, volumes,
+        fans, temperature sensors (with grouping), PSUs, UPS units, PCIe devices, BBU modules, NVMe
+        devices, SMART attributes, and system health indicators. It is fully aligned with the Zabbix 7.4
+        YAML schema and validated for compatibility with Zabbix 8.x.
+
+        Core Features:
+          • Automatic discovery of all major QNAP hardware components (HDDs, RAID groups, pools,
+            volumes, fans, PSUs, UPS, temperature sensors, PCIe cards, BBU modules, NVMe devices,
+            SMART attributes, system health)
+          • Real‑time monitoring of CPU, memory, uptime, firmware version, SNMP agent availability,
+            and system identity
+          • Storage‑focused metrics including capacity, free space, utilization percentage, IOPS,
+            throughput, temperature, wear‑leveling, remaining‑life, and SMART attribute values
+          • RAID group status monitoring with valuemap‑based state interpretation, rebuild visibility,
+            rebuild ETA estimation, consistency/scrub status, rebuild‑speed analytics, and curve‑fit ETA
+          • Fan speed and health monitoring with alarm‑state mapping
+          • Temperature sensor discovery with per‑sensor thresholds, grouping (CPU/System/HDD/Ambient),
+            trend‑based averaging, drift detection, thermal‑stress scoring, and thermal‑fatigue modeling
+          • UPS, PSU, NVMe, SSD cache, and BBU health monitoring for enterprise‑grade reliability
+          • Dual‑controller awareness (role/failover) and PCIe link health for enterprise chassis
+
+        Advanced Monitoring:
+          • Predictive disk‑failure scoring using temperature, wear‑leveling, remaining‑life, and SMART data
+          • Full SMART attribute discovery with per‑attribute monitoring, anomaly detection, and volatility scoring
+          • SMART anomaly scoring using 7‑day statistical baselines
+          • SMART Volatility Index (SVI) for long‑term attribute stability analysis
+          • Disk lifetime forecasting (remaining days) using multi‑factor health modeling
+          • Disk degradation velocity (DDV) for long‑term wear‑rate tracking
+          • Disk failure‑probability modeling (DFP%) using multi‑factor predictive scoring
+          • NVMe endurance tracking (TBW, remaining endurance %, temperature, thermal throttling)
+          • RAID rebuild ETA calculation using short‑term trend analysis
+          • RAID rebuild‑speed analytics with slow‑rebuild detection
+          • RAID rebuild curve‑fit ETA prediction for long‑duration rebuilds
+          • RAID consistency/scrub monitoring with failure detection
+          • Pool fragmentation and allocation‑efficiency monitoring with 24‑hour trend analysis
+          • Volume I/O latency (read/write), queue‑depth visibility, and performance anomaly scoring
+          • Volume Stability Index (VSI) for long‑term latency variance analysis
+          • Threshold‑based alerting for HDD temperature (warning/critical)
+          • Pool and volume free‑space alarms with customizable thresholds
+          • System‑wide temperature alarms using CPU, chassis, and grouped sensors
+          • Memory and CPU utilization alerts for performance diagnostics
+          • Firmware update detection and firmware integrity deep‑check monitoring
+          • Antivirus engine status, malware scan results, and last scan timestamp
+          • Service‑level monitoring for SMB, AFP, NFS, FTP, SSH
+          • Security‑focused monitoring including failed login bursts, intrusion detection,
+            unexpected reboot detection, and system event log visibility
+          • SLA‑oriented metrics for availability, performance, and capacity with dedicated triggers
+          • Fleet‑level capacity, RAID health, predictive‑risk, anomaly, and failure‑probability aggregation
+          • Trend‑based analytics for IOPS, throughput, temperature, thermal drift, fragmentation,
+            SMART anomalies, volatility, and degradation velocity
+
+        Template Architecture:
+          • Fully LLD‑driven storage, hardware, service, and security monitoring — no manual configuration required
+          • Clean separation of static system items and dynamic LLD components
+          • Optimized polling intervals for performance‑critical vs. slow‑changing metrics
+          • Native Zabbix valuemap support for RAID, PSU, UPS, fan, health, alarm state, security,
+            SLA state, PCIe link state, controller role, NVMe endurance, SMART severity, anomaly levels,
+            volatility, and predictive‑risk scoring
+          • Consistent naming, tagging, and key structure for dashboards, filtering, SLA views,
+            fleet‑level analytics, and multi‑NAS reporting
+          • Predictive analytics for disk health, RAID rebuild forecasting, SMART anomaly detection,
+            thermal stress scoring, degradation velocity, and long‑term performance trend analysis
+
+        Intended Use:
+          • Suitable for all QNAP NAS models supporting SNMP v2/v3
+          • Designed for production environments requiring deep visibility into storage health,
+            performance, security, SLA compliance, and hardware reliability
+          • Ideal for NOC/SOC teams, storage administrators, and environments with multiple QNAP units
+            and enterprise/dual‑controller chassis
+
+        Compatibility:
+          • Fully compatible with Zabbix 7.4
+          • Validated for import and runtime behavior on Zabbix 8.x for version 0.9.0
+
+      groups:
+        - name: "Templates/Network devices"
+
+      macros:
+        - macro: "{$HDD_TEMPERATURE_WARNING}"
+          value: "50"
+        - macro: "{$HDD_TEMPERATURE_ALARM}"
+          value: "60"
+        - macro: "{$CPU_TEMPERATURE_ALARM}"
+          value: "85"
+        - macro: "{$SYSTEM_TEMPERATURE_ALARM}"
+          value: "70"
+        - macro: "{$POOL_SIZE_ALARM}"
+          value: "20"
+        - macro: "{$MEMORY_FREE_ALARM}"
+          value: "10"
+        - macro: "{$TEMP_CPU_GROUP}"
+          value: "CPU"
+        - macro: "{$TEMP_SYS_GROUP}"
+          value: "System"
+        - macro: "{$TEMP_HDD_GROUP}"
+          value: "HDD"
+        - macro: "{$TEMP_AMBIENT_GROUP}"
+          value: "Ambient"
+
+      items:
+        - uuid: 5382956a88ab42b7849c4e32c3c80905
+          name: "CPU temperature"
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.24681.1.3.5.0
+          key: qnap.cpu.temp.legacy
+          delay: 60s
+          units: C
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: 3bee94619f814efe8b15619101aafc00
+          name: "CPU: Temperature"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.24681.1.4.1.1.1.1.4.2.0
+          key: qnap.cpu.temp
+          delay: 30m
+          units: C
+          tags:
+            - { tag: component, value: system }
+          triggers:
+            - uuid: e247fc1786924301a9f045038fb27c6a
+              name: "System: High temperature detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.temp)>{$SYSTEM_TEMPERATURE_ALARM}"
+              priority: HIGH
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: scope, value: availability }
+
+        - uuid: 47f986792b9842369951660e7c5a0dac
+          name: "CPU: Usage"
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.24681.1.3.1.0
+          key: qnap.cpu.usage
+          delay: 60s
+          units: "%"
+          tags:
+            - { tag: component, value: system }
+          triggers:
+            - uuid: bc50e5032b51420c92da2f7b6d764a6c
+              name: "System: CPU usage is too high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.cpu.usage)>90"
+              priority: WARNING
+              tags:
+                - { tag: component, value: cpu }
+                - { tag: scope, value: performance }
+
+        - uuid: 84b4ae3601df4e92ae31cc96072b9395
+          name: "CPU: Load average (1m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.1.0"
+          key: qnap.cpu.load1
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
+
+        - uuid: 89498aa2bb2f46d28cc93d647be66b12
+          name: "CPU: Load average (5m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.2.0"
+          key: qnap.cpu.load5
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
+
+        - uuid: 1d6d232c92ba43b7942f852443d67606
+          name: "CPU: Load average (15m)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.3.10.3.0"
+          key: qnap.cpu.load15
+          delay: 1m
+          tags:
+            - { tag: component, value: cpu }
+
+        - uuid: ecb221080e7c45209ca14c1ea360fea1
+          name: "SLA: Availability %"
+          type: CALCULATED
+          key: qnap.sla.availability
+          params: "100*(last(//icmpping)=1)"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: availability }
+          triggers:
+            - uuid: f0a42913fb0545fc98c849f3fd4ae6a0
+              name: "SLA: Availability below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.availability)<{$SLA_AVAILABILITY_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: availability }
+
+        - uuid: 67a1464b1bb3458ea75436e8732a42d4
+          name: "SLA: Performance %"
+          type: CALCULATED
+          key: qnap.sla.performance
+          params: "100 - avg(//system.cpu.util[,idle],5m)"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: performance }
+          triggers:
+            - uuid: 5900858ddb7847638ffa1ed4b7052973
+              name: "SLA: Performance below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.performance)<{$SLA_PERFORMANCE_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: performance }
+
+        - uuid: 87b4153390c94304bb9d8d3726ccfde3
+          name: "SLA: Capacity %"
+          type: CALCULATED
+          key: qnap.sla.capacity
+          params: "100 - (last(//vfs.fs.size[/,pfree]))"
+          delay: 5m
+          units: "%"
+          tags:
+            - { tag: sla, value: capacity }
+          triggers:
+            - uuid: 41428bb07109480ea10e215a03929f90
+              name: "SLA: Capacity below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.sla.capacity)<{$SLA_CAPACITY_MIN}"
+              priority: WARNING
+              tags:
+                - { tag: sla, value: capacity }
+
+        - uuid: 079d379fe0c94959907dea9c8b6ccac1
+          name: "Fleet: RAID Health Monitor"
+          type: CALCULATED
+          key: qnap.fleet.raid.health
+          params: "0"
+          delay: 1h
+          tags:
+            - { tag: component, value: fleet }
+          triggers:
+            - uuid: acf8bf05b75649848ef51f83f137488d
+              name: "Fleet: Multiple NAS units reporting degraded RAID"
+              expression: "count(/QNAP NAS LLD SNMP/qnap.raid.status[*],#1,ne,1)>2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: fleet }
+
+        - uuid: 43c33929ad1f486e9887d284e35a742e
+          name: "Controller: Role"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.1.0"
+          key: qnap.controller.role
+          valuemap:
+            name: "Controller Role"
+          tags:
+            - { tag: component, value: controller }
+
+        - uuid: 4a515c107fa140598bb4acd81fb50070
+          name: "Controller: Failover State"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.2.0"
+          key: qnap.controller.failover
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: controller }
+
+        - uuid: a8ea9b7a81c54c6faee48c5db9e5486d
+          name: "SNMP agent: Stability counter"
+          type: INTERNAL
+          key: "zabbix[host,snmp,available]"
+          delay: 1m
+          tags:
+            - { tag: component, value: availability }
+            - { tag: scope, value: stability }
+          triggers:
+            - uuid: b5827d0a9d6e4adcb78f876d944cd1cb
+              name: "SNMP agent: Flapping detected"
+              expression: "count(/QNAP NAS LLD SNMP/zabbix[host,snmp,available],5m,0)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: availability }
+                - { tag: scope, value: stability }
+
+        - uuid: 3e0cbd80036d403788ea95b7d024fa7c
+          name: "System: Total memory"
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.24681.1.3.2.0
+          key: qnap.mem.total
+          delay: 1h
+          units: B
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: 8d964dd2a46d468083afa96854c07e70
+          name: "System: Free memory"
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.24681.1.3.3.0
+          key: qnap.mem.free
+          delay: 60s
+          units: B
+          preprocessing:
+            - { type: MULTIPLIER, parameters: ["1000"] }
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: fbe257a949dc40b492055c5f47a1e4e8
+          name: "System: Free memory (%)"
+          type: CALCULATED
+          key: qnap.mem.free.pct
+          delay: 60s
+          value_type: FLOAT
+          units: "%"
+          params: "last(//qnap.mem.free)/(last(//qnap.mem.total)/100)"
+          tags:
+            - { tag: component, value: system }
+          triggers:
+            - uuid: e79579722e48444b8c2b1c9c5340b06d
+              name: "System: Free memory is too low"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.mem.free.pct)<{$MEMORY_FREE_ALARM}"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: capacity }
+
+        - uuid: 36cfce1050a44ecfbcfd2eebb64f1570
+          name: "NVMe Cache: Health status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.1.1.0"
+          key: qnap.nvme.health
+          delay: 5m
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: nvme }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 475ff9f9177947f6a9d0952f189d29f8
+              name: "NVMe Cache: Health issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.health)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: nvme }
+                - { tag: scope, value: availability }
+
+        - uuid: be7587e2789e423caca92a64970fc939
+          name: "SSD Cache: Wear level (%)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.2.1.0"
+          key: qnap.ssd.wear
+          delay: 10m
+          units: "%"
+          tags:
+            - { tag: component, value: ssd }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 971db53b52dd425baaaec09b7de77871
+              name: "SSD Cache: Wear level critical"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.ssd.wear)>80"
+              priority: HIGH
+              tags:
+                - { tag: component, value: ssd }
+                - { tag: scope, value: capacity }
+
+        - uuid: 2739afdabc6f4320ba4780bd04ace024
+          name: "Snapshots: Space used (%)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.80.1.1.0"
+          key: qnap.snapshots.used.pct
+          delay: 10m
+          units: "%"
+          tags:
+            - { tag: component, value: snapshot }
+            - { tag: component, value: storage }
+          triggers:
+            - uuid: 913a06cc167b4645919afe25cb7baef4
+              name: "Snapshots: Space usage high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.snapshots.used.pct)>80"
+              priority: HIGH
+              tags:
+                - { tag: component, value: snapshot }
+                - { tag: scope, value: capacity }
+
+        - uuid: 4f653a0ed56b4483a04075454686c088
+          name: "Replication: Last job status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.100.1.1.0"
+          key: qnap.replication.status
+          delay: 10m
+          valuemap:
+            name: "Alarm state"
+          tags:
+            - { tag: component, value: replication }
+            - { tag: component, value: backup }
+          triggers:
+            - uuid: 1717031dba614d418a1c67f2a7c91947
+              name: "Replication: Last job failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.replication.status)=2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: replication }
+                - { tag: scope, value: availability }
+
+        - uuid: 9a89a7bcf4e24332ba040300a026fb14
+          name: "Antivirus: Last scan time"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.110.1.2.0"
+          key: qnap.antivirus.lastscan
+          delay: 1h
+          value_type: TEXT
+          tags:
+            - { tag: component, value: antivirus }
+
+        - uuid: 042feb89d0a84471b56273f6ecd76f68
+          name: "Antivirus: Engine status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.110.1.1.0"
+          key: qnap.antivirus.status
+          delay: 10m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: antivirus }
+            - { tag: component, value: security }
+          triggers:
+            - uuid: 9f075936fbde4db8b19dbd4b36fa4450
+              name: "Antivirus: Engine is disabled"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.antivirus.status)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: antivirus }
+                - { tag: scope, value: security }
+
+        - uuid: d7cdeec72509409a83f554f35bda0ddc
+          name: "BBU: Status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.50.3.1.0"
+          key: qnap.bbu.status
+          delay: 5m
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: bbu }
+            - { tag: component, value: cache }
+          triggers:
+            - uuid: 62b52ffe3ed044f7895d73feb41fb3ab
+              name: "BBU: Failure detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.bbu.status)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: bbu }
+                - { tag: scope, value: availability }
+
+        - uuid: cc1fa5918a65409db64b7cced02c6a93
+          name: "System: Uptime"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: qnap.system.uptime
+          delay: 60s
+          units: uptime
+          preprocessing:
+            - { type: MULTIPLIER, parameters: ["0.01"] }
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: 4d0e4f136cd94f6489182a861cbfef1c
+          name: "System: Hostname"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.12.4.0
+          key: qnap.system.hostname
+          delay: 2h
+          value_type: TEXT
+          inventory_link: NAME
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: 0e898d890ac740af9bb747ed73404540
+          name: "System: Serial no."
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.12.5.0
+          key: qnap.system.serial
+          delay: 2h
+          value_type: TEXT
+          inventory_link: SERIALNO_A
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: 5450bf634ccd4ec6aae4810f66bb9b67
+          name: "Security: Failed login burst"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.1.2.0"
+          key: qnap.security.failed.burst
+          delay: 1m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: intrusion }
+
+        - uuid: eccb6898dc424b45a6f8d1c6f2987155
+          name: "Security: Firmware integrity (deep)"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.2.2.0"
+          key: qnap.security.fw.integrity.deep
+          delay: 1h
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: integrity }
+          triggers:
+            - uuid: ac246472a01042f2a4a0bc90f577b619
+              name: "Security: Firmware integrity deep check failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.fw.integrity.deep)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: integrity }
+
+        - uuid: 264de4e4acc24dd98749fc797a190a3f
+          name: "System: Firmware version"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.12.6.0
+          key: qnap.system.fw.version
+          value_type: TEXT
+          inventory_link: SERIALNO_B
+          tags:
+            - { tag: component, value: system }
+
+        - uuid: cc3f2780e46e42df94e1fda63e111b8b
+          name: "System: Firmware update available"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.12.7.0
+          key: qnap.system.fw.update.available
+          delay: 1h
+          valuemap:
+            name: "Firmware Version Available"
+          tags:
+            - { tag: component, value: system }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: 1a0992ec7fbb4a3ab86d8c641f80f760
+              name: "System: Firmware update available"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.system.fw.update.available)=1"
+              priority: INFO
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: maintenance }
+
+        - uuid: 133f619e7b694ad0a36f40b2f6b7413d
+          name: "Security: Firmware integrity status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.2.1.0"
+          key: qnap.security.fw.integrity
+          delay: 1h
+          valuemap:
+            name: "Health Status"
+          tags:
+            - { tag: component, value: security }
+            - { tag: component, value: firmware }
+          triggers:
+            - uuid: bba7b42911dd499cb9fc861868dd6327
+              name: "Security: Firmware integrity issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.fw.integrity)<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: integrity }
+
+        - uuid: efebf11efc5f486dabecb5a045329ffb
+          name: "SNMP agent availability"
+          type: INTERNAL
+          key: "zabbix[host,snmp,available]"
+          history: 7d
+          tags:
+            - { tag: component, value: availability }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: fa6ecfbc30b94c3a9e8d981dfc3b6911
+              name: "System: SNMP agent is unavailable"
+              expression: "last(/QNAP NAS LLD SNMP/zabbix[host,snmp,available])=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: availability }
+                - { tag: scope, value: connectivity }
+
+        - uuid: 5b0395c7e75f4c7c86f92133b96a99de
+          name: "Service: SMB status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.1.0"
+          key: qnap.service.smb
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: smb }
+          triggers:
+            - uuid: d30bd6676ad14e8ab54a2d1b5e2dd9a4
+              name: "Service: SMB is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.smb)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 813682d5ad5747b8a3bbe61b1dea5559
+          name: "Service: AFP status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.2.0"
+          key: qnap.service.afp
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: afp }
+
+        - uuid: 5c4f8330c95f4f98b69aa182a88711a7
+          name: "Service: NFS status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.3.0"
+          key: qnap.service.nfs
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: nfs }
+          triggers:
+            - uuid: c517fb796cb44f1ea77dfed63bb4e154
+              name: "Service: NFS is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.nfs)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: b2d636fcae2146e9809e6c602437b970
+          name: "Service: FTP status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.4.0"
+          key: qnap.service.ftp
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: ftp }
+          triggers:
+            - uuid: 19d06efc66344011aa8e001946ac2956
+              name: "Service: FTP is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.ftp)=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: 378a345ea45448e081c6e25b14289ffa
+          name: "Service: SSH status"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.20.1.5.0"
+          key: qnap.service.ssh
+          delay: 5m
+          valuemap:
+            name: "System On/Off"
+          tags:
+            - { tag: component, value: service }
+            - { tag: service, value: ssh }
+          triggers:
+            - uuid: f23505da5ebb4d73b8c27c5b44edbc15
+              name: "Service: SSH is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.service.ssh)=0"
+              priority: HIGH
+              tags:
+                - { tag: component, value: service }
+                - { tag: scope, value: availability }
+
+        - uuid: cc1df56c006d401ba0cd0090d8c56ad6
+          name: "System: Event log error count"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.30.1.1.0"
+          key: qnap.system.event.errors
+          delay: 10m
+          tags:
+            - { tag: component, value: system }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: 6290560509d34f65893ff1d212f9d367
+              name: "System: New error events detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.system.event.errors)>0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: health }
+
+        - uuid: 6a06477757224255a0b0253056d53416
+          name: "Security: Failed login burst"
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.55062.1.40.1.2.0
+          key: qnap.security.failed.burst
+          delay: 1m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: intrusion }
+          triggers:
+            - uuid: 9650c1045e6c4750b84f410f1eba3a1b
+              name: "Security: Possible intrusion detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.failed.burst)>10"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: intrusion }
+
+        - uuid: d233a998cfce432cbf7060080a6a3a67
+          name: "Security: Failed login attempts"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.1.1.0"
+          key: qnap.security.failed.logins
+          delay: 5m
+          tags:
+            - { tag: component, value: security }
+            - { tag: scope, value: authentication }
+          triggers:
+            - uuid: c9f3178053fe4319bb87e34afcdd7a3c
+              name: "Security: Excessive failed login attempts detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.security.failed.logins)>5"
+              priority: HIGH
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: intrusion }
+
+        - uuid: bb0db13a840049a69d441a48a4907673
+          name: "System: Last boot time"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.2.1.25.1.1.0"
+          key: qnap.system.lastboot
+          delay: 10m
+          units: uptime
+          preprocessing:
+            - { type: MULTIPLIER, parameters: ["0.01"] }
+          tags:
+            - { tag: component, value: system }
+            - { tag: component, value: health }
+          triggers:
+            - uuid: e2eda29350d04490bd70518ab895b219
+              name: "System: Unexpected reboot detected"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.system.lastboot)<0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: availability }
+
+        - uuid: 1ea1f7bee1424955a8407efa17d69228
+          name: "Security: Malware scan result"
+          type: SNMP_AGENT
+          snmp_oid: "1.3.6.1.4.1.55062.1.40.3.1.0"
+          key: qnap.security.malware.scan
+          delay: 1h
+          valuemap:
+            name: "Alarm state"
+          tags:
+            - { tag: component, value: security }
+            - { tag: component, value: antivirus }
+          triggers:
+            - uuid: 5f0aac4f9f264c669227e3c3483e90fc
+              name: "Security: Malware detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.security.malware.scan)=2"
+              priority: DISASTER
+              tags:
+                - { tag: component, value: security }
+                - { tag: scope, value: threat }
+
+      discovery_rules:
+        - uuid: 806b9add49e1409aa6111a43f08fc0ef
+          name: "Network Interface LLD (IF-MIB)"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#SNMPINDEX},1.3.6.1.2.1.2.2.1.1,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1]"
+          key: if.discovery
+          delay: 30m
+
+          item_prototypes:
+            - uuid: e475c87807df48d39315eb40c053e64e
+              name: "Interface {#IFNAME}: Incoming traffic"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}"
+              key: "if.in[{#IFNAME}]"
+              delay: 1m
+              units: bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+                - { type: MULTIPLIER, parameters: ["8"] }
+              tags:
+                - { tag: component, value: network }
+
+            - uuid: e1a9c4b7d3f84a1c9b7e2d6f5c3a8e10
+              name: "Interface {#IFNAME}: Outgoing traffic"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}"
+              key: "if.out[{#IFNAME}]"
+              delay: 1m
+              units: bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+                - { type: MULTIPLIER, parameters: ["8"] }
+              tags:
+                - { tag: component, value: network }
+
+            - uuid: d7e1b3c94f2a4e0c9a6d5f3b1c8e7a52
+              name: "Interface {#IFNAME}: Operational status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}"
+              key: "if.status[{#IFNAME}]"
+              delay: 1m
+              valuemap:
+                name: "IF-MIB Operational Status"
+              tags:
+                - { tag: component, value: network }
+
+          trigger_prototypes:
+            - uuid: 7c3e1b9d2f8a4c0e9b6d3f7a1c5e4b92
+              name: "Interface {#IFNAME}: Link down"
+              expression: "last(/QNAP NAS LLD SNMP/if.status[{#IFNAME}])<>1"
+              priority: WARNING
+              tags:
+                - { tag: component, value: network }
+                - { tag: scope, value: availability }
+
+        - uuid: 8b6c14b4b2214b729181573df620a5a2
+          name: "FAN Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#FANINDEX},1.3.6.1.4.1.55062.1.12.9.1.1,{#FANNAME},1.3.6.1.4.1.55062.1.12.9.1.2]"
+          key: qnap.fan.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a019
+              name: "{#FANNAME}: Speed"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.9.1.3.{#FANINDEX}"
+              key: "qnap.fan.speed[{#FANINDEX}]"
+              delay: 30m
+              units: RPM
+              tags:
+                - { tag: component, value: system }
+
+            - uuid: 550e8400e29b41d4a71644665544a01a
+              name: "{#FANNAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.24681.1.4.1.1.1.1.2.2.1.4.{#FANINDEX}"
+              key: "qnap.fan.status[{#FANINDEX}]"
+              delay: 30m
+              valuemap:
+                name: "Alarm state"
+              tags:
+                - { tag: component, value: system }
+                - { tag: component, value: health }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544b105
+              name: "{#FANNAME}: Speed is below safe threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.fan.speed[{#FANINDEX}])<500"
+              priority: WARNING
+              tags:
+                - { tag: component, value: system }
+                - { tag: scope, value: performance }
+
+        - uuid: 3a3b403389af46b3b93cd6bd4ed96ac8
+          name: "Disk Discovery"
+          type: SNMP_AGENT
+          key: qnap.disk.discovery
+          snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.2.1.1,{#HDDSLOT},1.3.6.1.4.1.55062.1.10.2.1.2]"
+          delay: 15m
+
+          item_prototypes:
+            - uuid: f4c7b9e12d8a4f0c9b3e6d5a1c7f2e64
+              name: "HDD {#HDDSLOT}: Capacity"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.9.{#HDDINDEX}"
+              key: qnap.disk.capacity[{#HDDINDEX}]
+              delay: 1h
+              units: B
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 9f3c7e1a4b8d4f0c9a2d6b5f1c7e3a91
+              name: "HDD {#HDDSLOT}: Temperature"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.8.{#HDDINDEX}"
+              key: qnap.disk.temp[{#HDDINDEX}]
+              delay: 5m
+              units: C
+              tags:
+                - { tag: component, value: disk }
+                - { tag: component, value: health }
+
+            - uuid: 550e8400e29b41d4a71644665544a01e
+              name: "HDD {#HDDSLOT}: State"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.2.1.7.{#HDDINDEX}"
+              key: qnap.disk.state[{#HDDINDEX}]
+              delay: 5m
+              value_type: CHAR
+              tags:
+                - { tag: component, value: disk }
+                - { tag: component, value: health }
+
+            - uuid: fbff4f1c2e7f4fd787d8f534ac31fec3
+              name: "Disk {#HDDSLOT}: Wear Leveling Count"
+              type: SNMP_AGENT
+              key: qnap.disk.wear[{#HDDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.17.1.1.{#HDDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: a63c33b69d4245aab0eef2a0a6650d34
+              name: "Disk {#HDDSLOT}: Remaining Life (%)"
+              type: SNMP_AGENT
+              key: qnap.disk.life[{#HDDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.17.1.2.{#HDDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 29ae42ad9dc24887b3623afc9053b7ac
+              name: "Disk {#HDDSLOT}: Predictive Failure Score"
+              type: DEPENDENT
+              key: qnap.disk.predict[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.temp[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var temp = Number(value);
+                      var life = Number(Trend.avg(getValue("qnap.disk.life[{#HDDINDEX}]"), 3600));
+                      var wear = Number(getValue("qnap.disk.wear[{#HDDINDEX}]"));
+                      var score = (temp * 0.4) + ((100 - life) * 0.4) + (wear * 0.2);
+                      return score;
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 9b803ef33d214664943b990cc5ba5206
+              name: "Disk {#HDDSLOT}: SMART 5 Reallocated Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.realloc[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.5.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: 20037de5a3d641cba3145d456f66fe4c
+              name: "Disk {#HDDSLOT}: SMART 197 Pending Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.pending[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.197.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: c7302c666b8c4b56a1413e3cbb07fd80
+              name: "Disk {#HDDSLOT}: SMART 198 Uncorrectable Sectors"
+              type: SNMP_AGENT
+              key: qnap.smart.uncorrect[{#HDDINDEX}]
+              snmp_oid: 1.3.6.1.4.1.55062.1.10.3.1.3.198.{#HDDINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: a23209924f4b40e4a6cf13fe244f2181
+              name: "Disk {#HDDSLOT}: Error Rate Score"
+              type: DEPENDENT
+              key: qnap.disk.error.score[{#HDDINDEX}]
+              master_item:
+                key: qnap.smart.realloc[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var realloc = Number(value);
+                      var pending = Number(getValue("qnap.smart.pending[{#HDDINDEX}]"));
+                      var uncorrect = Number(getValue("qnap.smart.uncorrect[{#HDDINDEX}]"));
+                      return realloc*0.5 + pending*0.3 + uncorrect*0.2;
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 4ecc5769de8b4b52800d3fbaaeac8cb3
+              name: "Disk {#HDDINDEX}: SMART Anomaly Score"
+              type: DEPENDENT
+              key: qnap.smart.anomaly[{#HDDINDEX}]
+              master_item:
+                key: qnap.smart.realloc[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var realloc = Number(value);
+                      var realloc_avg = Number(Trend.avg(getValue("qnap.smart.realloc[{#HDDINDEX}]"), 7*24*3600));
+                      var pending = Number(getValue("qnap.smart.pending[{#HDDINDEX}]"));
+                      var pending_avg = Number(Trend.avg(getValue("qnap.smart.pending[{#HDDINDEX}]"), 7*24*3600));
+                      var uncorrect = Number(getValue("qnap.smart.uncorrect[{#HDDINDEX}]"));
+                      var uncorrect_avg = Number(Trend.avg(getValue("qnap.smart.uncorrect[{#HDDINDEX}]"), 7*24*3600));
+
+                      var score = 0;
+                      if (realloc > realloc_avg*1.5) score += 40;
+                      if (pending > pending_avg*1.5) score += 40;
+                      if (uncorrect > uncorrect_avg*1.5) score += 20;
+
+                      return score;
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: 2c119df762904f62be531cd3c3ac2e6f
+              name: "Disk {#HDDINDEX}: Lifetime Remaining (days)"
+              type: DEPENDENT
+              key: qnap.disk.lifetime.days[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.life[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var life = Number(value); // remaining life %
+                      var wear = Number(getValue("qnap.disk.wear[{#HDDINDEX}]"));
+                      var anomaly = Number(getValue("qnap.smart.anomaly[{#HDDINDEX}]"));
+
+                      // Simple model: lower life + high wear + anomalies = shorter lifespan
+                      var base_days = life * 30; // assume 30 days per 1% life
+                      var penalty = (wear * 0.2) + (anomaly * 0.5);
+                      return Math.max(1, base_days - penalty);
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: e3b86f339dc2457f9a52df2523845cbb
+              name: "Disk {#HDDINDEX}: Thermal Stress Index"
+              type: DEPENDENT
+              key: qnap.disk.tsi[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.temp[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var temp = Number(value);
+                      var drift = Number(getValue("qnap.disk.temp.drift[{#HDDINDEX}]"));
+                      var anomaly = Number(getValue("qnap.smart.anomaly[{#HDDINDEX}]"));
+                      return temp*0.5 + drift*0.3 + anomaly*0.2;
+              tags:
+                - { tag: component, value: temperature }
+
+            - uuid: 80c22472a4e64e289878e073d64c3cfd
+              name: "Disk {#HDDINDEX}: Failure Probability (%)"
+              type: DEPENDENT
+              key: qnap.disk.failure.prob[{#HDDINDEX}]
+              master_item:
+                key: qnap.smart.anomaly[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var anomaly = Number(value);
+                      var life_days = Number(getValue("qnap.disk.lifetime.days[{#HDDINDEX}]"));
+                      var tsi = Number(getValue("qnap.disk.tsi[{#HDDINDEX}]"));
+                      var wear = Number(getValue("qnap.disk.wear[{#HDDINDEX}]"));
+                      var life_pct = Number(getValue("qnap.disk.life[{#HDDINDEX}]"));
+
+                      // Weighted probability model
+                      var score =
+                          anomaly * 0.35 +
+                          tsi * 0.25 +
+                          (100 - life_pct) * 0.20 +
+                          wear * 0.10 +
+                          (life_days < 60 ? 10 : 0);
+
+                      return Math.min(100, Math.max(0, score));
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: e46a600573f64f81bf2933ec7faddb2e
+              name: "Disk {#HDDINDEX}: SMART Volatility Index"
+              type: DEPENDENT
+              key: qnap.smart.volatility[{#HDDINDEX}]
+              master_item:
+                key: qnap.smart.realloc[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      function vol(key) {
+                        var now = Number(getValue(key));
+                        var avg = Number(Trend.avg(getValue(key), 7*24*3600));
+                        return Math.abs(now - avg);
+                      }
+
+                      var v1 = vol("qnap.smart.realloc[{#HDDINDEX}]");
+                      var v2 = vol("qnap.smart.pending[{#HDDINDEX}]");
+                      var v3 = vol("qnap.smart.uncorrect[{#HDDINDEX}]");
+
+                      return v1*0.5 + v2*0.3 + v3*0.2;
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: ecb9705a044348f0ba4f19b498f8505d
+              name: "Disk {#HDDINDEX}: Degradation Velocity"
+              type: DEPENDENT
+              key: qnap.disk.degradation.velocity[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.life[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var now = Number(value);
+                      var avg = Number(Trend.avg(getValue("qnap.disk.life[{#HDDINDEX}]"), 30*24*3600));
+                      return avg - now; // positive = degrading
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 7eb27f519f9b428dbce8855cb156f36a
+              name: "Disk {#HDDINDEX}: Thermal Fatigue Index"
+              type: DEPENDENT
+              key: qnap.disk.tfi[{#HDDINDEX}]
+              master_item:
+                key: qnap.disk.temp[{#HDDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var temp = Number(value);
+                      var drift = Number(getValue("qnap.disk.temp.drift[{#HDDINDEX}]"));
+                      var tsi = Number(getValue("qnap.disk.tsi[{#HDDINDEX}]"));
+                      return temp*0.4 + drift*0.3 + tsi*0.3;
+              tags:
+                - { tag: component, value: temperature }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a034
+              name: "HDD {#HDDSLOT}: Temperature is above warning threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.temp[{#HDDINDEX}])>{$HDD_TEMPERATURE_WARNING}"
+              priority: WARNING
+              tags:
+                - { tag: component, value: disk }
+                - { tag: scope, value: performance }
+
+            - uuid: 550e8400e29b41d4a71644665544a035
+              name: "HDD {#HDDSLOT}: Temperature is above critical threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.temp[{#HDDINDEX}])>{$HDD_TEMPERATURE_ALARM}"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+                - { tag: scope, value: availability }
+
+            - uuid: 50f16f9666864bcbbcf64ea0010acc8b
+              name: "Disk {#HDDSLOT}: Predictive failure risk high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.predict[{#HDDINDEX}])>70"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 02f3cd2f1a1f429f9b513405a9ce215c
+              name: "Disk {#HDDSLOT}: Predictive health degraded"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.predict[{#HDDINDEX}])>70"
+              priority: WARNING
+              tags:
+                - { tag: component, value: sla }
+
+            - uuid: 1d6dff87a1b34b069d3ffded47f0832a
+              name: "Disk {#HDDINDEX}: Error rate high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.error.score[{#HDDINDEX}])>50"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 42bf76b2f0ff413280b7d0c4353e0b05
+              name: "Disk {#HDDINDEX}: SMART anomaly detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.smart.anomaly[{#HDDINDEX}])>50"
+              priority: HIGH
+              tags:
+                - { tag: component, value: smart }
+
+            - uuid: 51c134d5f18f4bc38ffeaabd5e66e5e0
+              name: "Disk {#HDDINDEX}: Lifetime critically low"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.lifetime.days[{#HDDINDEX}])<30"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 92a9e63a816f44ac9eee9315427bf075
+              name: "Disk {#HDDINDEX}: Thermal stress high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.tsi[{#HDDINDEX}])>80"
+              priority: HIGH
+              tags:
+                - { tag: component, value: temperature }
+
+            - uuid: 59c99086b2134f8ebd3472752cc6bc74
+              name: "Disk {#HDDINDEX}: High failure probability"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.failure.prob[{#HDDINDEX}])>70"
+              priority: HIGH
+              tags:
+                - { tag: component, value: disk }
+
+            - uuid: 2e24bdd3dc8746c9b4e325b7fd8ae4d7
+              name: "Disk {#HDDINDEX}: SMART volatility high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.smart.volatility[{#HDDINDEX}])>20"
+              priority: WARNING
+
+            - uuid: 6d01057b738b4c75ae28c291ca9adeba
+              name: "Disk {#HDDINDEX}: Rapid degradation detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.degradation.velocity[{#HDDINDEX}])>5"
+              priority: HIGH
+
+            - uuid: 04673a97e06247e2845684c4005c4b72
+              name: "Disk {#HDDINDEX}: Thermal fatigue high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.disk.tfi[{#HDDINDEX}])>90"
+              priority: HIGH
+
+        - uuid: 0e0c27bbe50b470a98c37b1067835ca0
+          name: "NVMe Discovery"
+          type: SNMP_AGENT
+          key: qnap.nvme.discovery
+          snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.1
+          delay: 1h
+          item_prototypes:
+            - uuid: 5030b474ca15499686a879ab087f1731
+              name: "NVMe {#NVMEINDEX}: TBW Used"
+              type: SNMP_AGENT
+              key: qnap.nvme.tbw[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.3.{#NVMEINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: nvme }
+
+            - uuid: fe72fc536f9642c8adfba9d3166429b1
+              name: "NVMe {#NVMEINDEX}: Endurance Remaining (%)"
+              type: SNMP_AGENT
+              key: qnap.nvme.endurance[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.18.1.4.{#NVMEINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: nvme }
+
+            - uuid: 66826b902cab45668e9dc14a241c12d4
+              name: "NVMe {#NVMEINDEX}: Temperature"
+              type: SNMP_AGENT
+              key: qnap.nvme.temp[{#NVMEINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.50.3.1.{#NVMEINDEX}
+              delay: 1m
+              tags:
+                - { tag: component, value: nvme }
+
+          trigger_prototypes:
+            - uuid: aa1fe48c277e4ca9adc22f71aa0d565c
+              name: "NVMe {#NVMEINDEX}: Endurance below 10%"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.endurance[{#NVMEINDEX}])<10"
+              priority: HIGH
+              tags:
+                - { tag: component, value: nvme }
+
+            - uuid: 19465fa70c2e4a1e980ef168a809c8a4
+              name: "NVMe {#NVMEINDEX}: Temperature high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.nvme.temp[{#NVMEINDEX}])>70"
+              priority: WARNING
+              tags:
+                - { tag: component, value: nvme }
+
+        - uuid: a4c5377b77494114872cf01af603dccc
+          name: "Pool Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#POOLINDEX},1.3.6.1.4.1.55062.1.10.7.1.1]"
+          key: qnap.pool.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: b462676fe0dd4e16b746eed9b1bff381
+              name: "Pool {#POOLINDEX}: Capacity"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.3.{#POOLINDEX}"
+              key: "qnap.pool.capacity[{#POOLINDEX}]"
+              delay: 15m
+              units: B
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: a595530310f84c43a3f51714108d21be
+              name: "Pool {#POOLINDEX}: Free size"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.4.{#POOLINDEX}"
+              key: "qnap.pool.free[{#POOLINDEX}]"
+              delay: 15m
+              units: B
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: b626ded28349449ca9c2a35b7d59bd8a
+              name: "Pool {#POOLINDEX}: Free size in %"
+              type: CALCULATED
+              key: "qnap.pool.free.pct[{#POOLINDEX}]"
+              delay: 15m
+              params: "last(//qnap.pool.free[{#POOLINDEX}]) / (last(//qnap.pool.capacity[{#POOLINDEX}]) / 100)"
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: 9300c91bef9d480baa17533fcb6bae28
+              name: "Pool {#POOLINDEX}: Read IOPS"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.10.{#POOLINDEX}"
+              key: "qnap.pool.iops.read[{#POOLINDEX}]"
+              delay: 1m
+              units: ops
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: c0908d8db9da46498615cdb4ca816e91
+              name: "Pool {#POOLINDEX}: Write IOPS"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.11.{#POOLINDEX}"
+              key: "qnap.pool.iops.write[{#POOLINDEX}]"
+              delay: 1m
+              units: ops
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: e6ab69b97dad4a618ccace4299783eab
+              name: "Pool {#POOLINDEX}: Read throughput"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.12.{#POOLINDEX}"
+              key: "qnap.pool.throughput.read[{#POOLINDEX}]"
+              delay: 1m
+              units: Bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: d929940089ed47a189be4c9bc90c7584
+              name: "Pool {#POOLINDEX}: Write throughput"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.7.1.13.{#POOLINDEX}"
+              key: "qnap.pool.throughput.write[{#POOLINDEX}]"
+              delay: 1m
+              units: Bps
+              preprocessing:
+                - { type: CHANGE_PER_SECOND, parameters: [""] }
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: performance }
+
+            - uuid: 9c7e1a3b5d4f4c0e8b2d6f5a1c7e50fa
+              name: "Pool {#POOLINDEX}: Days until full"
+              type: CALCULATED
+              key: "qnap.pool.days.full[{#POOLINDEX}]"
+              delay: 1h
+              value_type: FLOAT
+              units: "days"
+              params: "forecast(//qnap.pool.free.pct[{#POOLINDEX}],7d,0)"
+              tags:
+                - { tag: component, value: pool }
+                - { tag: component, value: analytics }
+
+            - uuid: 1ae5b8b1b4dd499f8d5e23a5bdc8833b
+              name: "Pool {#POOLINDEX}: Read IOPS (trend)"
+              type: DEPENDENT
+              key: "qnap.pool.iops.read.trend[{#POOLINDEX}]"
+              master_item:
+                key: "qnap.pool.iops.read[{#POOLINDEX}]"
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Compute 1-hour trend average
+                      var trend = Trend.avg(value, 3600);
+                      return trend;
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: 5eb7a1c4bd904fe6afdd68c092b5b348
+              name: "Pool {#POOLINDEX}: Fragmentation (%)"
+              type: SNMP_AGENT
+              key: qnap.pool.fragmentation[{#POOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.16.1.7.{#POOLINDEX}
+              delay: 10m
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: bea6ddfe334949339c3bd51f49690316
+              name: "Pool {#POOLINDEX}: Fragmentation Trend (24h)"
+              type: DEPENDENT
+              key: qnap.pool.fragmentation.trend[{#POOLINDEX}]
+              master_item:
+                key: qnap.pool.fragmentation[{#POOLINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var now = Number(value);
+                      var avg = Number(Trend.avg(getValue("qnap.pool.fragmentation[{#POOLINDEX}]"), 24*3600));
+                      return now - avg;
+              tags:
+                - { tag: component, value: pool }
+
+          trigger_prototypes:
+            - uuid: e3b7c9a14f8d4e0c9d2a6b5f1c7e40bd
+              name: "Pool {#POOLINDEX}: Free space is below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.free.pct[{#POOLINDEX}])<{$POOL_SIZE_ALARM}"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
+                - { tag: scope, value: capacity }
+
+            - uuid: 0ac46d514cd342e1aa2f62bfab6fecf4
+              name: "Pool {#POOLINDEX}: Predicted to run out of space soon"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.days.full[{#POOLINDEX}])<7"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
+                - { tag: scope, value: capacity }
+
+            - uuid: 23d06d6761324515902e5e9ba06fb2c4
+              name: "Pool {#POOLINDEX}: Fragmentation high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.fragmentation[{#POOLINDEX}])>40"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
+
+            - uuid: 1d97dc1ba1b54e83addef227edb9a36b
+              name: "Pool {#POOLINDEX}: Fragmentation increasing rapidly"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pool.fragmentation.trend[{#POOLINDEX}])>10"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pool }
+
+        - uuid: 7e15fe743a3747e0be819108ff7e6017
+          name: "Volume Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#VOLINDEX},1.3.6.1.4.1.55062.1.10.8.1.1,{#VOLNAME},1.3.6.1.4.1.55062.1.10.8.1.2]"
+          key: qnap.volume.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: 82a519148e63432fa2b6085fb333f1d2
+              name: "Volume {#VOLNAME}: Capacity"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.8.1.3.{#VOLINDEX}"
+              key: "qnap.volume.capacity[{#VOLINDEX}]"
+              delay: 15m
+              units: B
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: 1176ac4a90094ab9b39a347a5911f7fc
+              name: "Volume {#VOLNAME}: Free size"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.8.1.4.{#VOLINDEX}"
+              key: "qnap.volume.free[{#VOLINDEX}]"
+              delay: 15m
+              units: B
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: 72ded4c3b20e4ae888c6dd666890dc47
+              name: "Volume {#VOLNAME}: Free size in %"
+              type: CALCULATED
+              key: "qnap.volume.free.pct[{#VOLINDEX}]"
+              delay: 15m
+              params: "last(//qnap.volume.free[{#VOLINDEX}])/last(//qnap.volume.capacity[{#VOLINDEX}])*100"
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: a0c683d6e64e4bde99ca8fdac2be8148
+              name: "Volume {#VOLNAME}: Days until full"
+              type: CALCULATED
+              key: "qnap.volume.days.full[{#VOLINDEX}]"
+              delay: 1h
+              value_type: FLOAT
+              units: "days"
+              params: "forecast(//qnap.volume.free.pct[{#VOLINDEX}],7d,0)"
+              tags:
+                - { tag: component, value: volume }
+                - { tag: component, value: analytics }
+
+            - uuid: 4515fad9fae94597b552df72b7ea4ba4
+              name: "Volume {#VOLINDEX}: Read Latency (ms)"
+              type: SNMP_AGENT
+              key: qnap.vol.latency.read[{#VOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.17.1.5.{#VOLINDEX}
+              delay: 30s
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: 9480097f7aa44a7abd2569b6446d904a
+              name: "Volume {#VOLINDEX}: Write Latency (ms)"
+              type: SNMP_AGENT
+              key: qnap.vol.latency.write[{#VOLINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.17.1.6.{#VOLINDEX}
+              delay: 30s
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: 298ac1df6d504ebf852129de570610d6
+              name: "Volume {#VOLINDEX}: Performance Anomaly Score"
+              type: DEPENDENT
+              key: qnap.vol.anomaly[{#VOLINDEX}]
+              master_item:
+                key: qnap.vol.latency.write[{#VOLINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var read = Number(getValue("qnap.vol.latency.read[{#VOLINDEX}]"));
+                      var write = Number(value);
+                      var read_avg = Number(Trend.avg(getValue("qnap.vol.latency.read[{#VOLINDEX}]"), 3600));
+                      var write_avg = Number(Trend.avg(getValue("qnap.vol.latency.write[{#VOLINDEX}]"), 3600));
+
+                      var score = 0;
+                      if (read > read_avg*1.5) score += 50;
+                      if (write > write_avg*1.5) score += 50;
+                      return score;
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: d87f97cce410437e9a9c9461d63fa0c5
+              name: "Volume {#VOLINDEX}: Stability Index"
+              type: DEPENDENT
+              key: qnap.vol.stability[{#VOLINDEX}]
+              master_item:
+                key: qnap.vol.latency.write[{#VOLINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var read = Number(getValue("qnap.vol.latency.read[{#VOLINDEX}]"));
+                      var write = Number(value);
+                      var read_var = Math.abs(read - Number(Trend.avg(getValue("qnap.vol.latency.read[{#VOLINDEX}]"), 24*3600)));
+                      var write_var = Math.abs(write - Number(Trend.avg(getValue("qnap.vol.latency.write[{#VOLINDEX}]"), 24*3600)));
+                      return read_var*0.4 + write_var*0.6;
+              tags:
+                - { tag: component, value: volume }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a038
+              name: "Volume {#VOLNAME}: Free space is below threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.volume.free.pct[{#VOLINDEX}])<20"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
+                - { tag: scope, value: capacity }
+
+            - uuid: 6a829ed5f36a478895f6c2e1a8d4b907
+              name: "Volume {#VOLNAME}: Predicted to run out of space soon"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.volume.days.full[{#VOLINDEX}])<7"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
+                - { tag: scope, value: capacity }
+
+            - uuid: f6391e02a25145db9a9e143d5e2da43a
+              name: "Volume {#VOLINDEX}: High write latency"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.vol.latency.write[{#VOLINDEX}])>20"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: d71af11a34214a65914925d8ee4394ab
+              name: "Volume {#VOLINDEX}: Performance anomaly detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.vol.anomaly[{#VOLINDEX}])>60"
+              priority: WARNING
+              tags:
+                - { tag: component, value: volume }
+
+            - uuid: c84090a6393549b08ec573e4fd5e791e
+              name: "Volume {#VOLINDEX}: Stability degraded"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.vol.stability[{#VOLINDEX}])>30"
+              priority: WARNING
+
+        - uuid: 03059240e1b94d9c8b900ab981c070fd
+          name: "RAID Group Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#RGINDEX},1.3.6.1.4.1.55062.1.10.6.1.1]"
+          key: qnap.raid.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: bbb5356f0a404fe396ff5e5fa73b37f0
+              name: "RAID Group {#RGINDEX}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.3.{#RGINDEX}"
+              key: "qnap.raid.status[{#RGINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "RAID Status"
+              tags:
+                - { tag: component, value: raid }
+                - { tag: component, value: health }
+
+            - uuid: 50398ab16f2246dbbadb6595e2b391d4
+              name: "RAID Group {#RGINDEX}: Capacity"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.4.{#RGINDEX}"
+              key: "qnap.raid.capacity[{#RGINDEX}]"
+              delay: 1h
+              units: B
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: 550e8400e29b41d4a71644665544a02a
+              name: "RAID Group {#RGINDEX}: Free size"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.5.{#RGINDEX}"
+              key: "qnap.raid.free[{#RGINDEX}]"
+              delay: 1h
+              units: B
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: 550e8400e29b41d4a71644665544a02b
+              name: "RAID Group {#RGINDEX}: Free size in %"
+              type: CALCULATED
+              key: "qnap.raid.free.pct[{#RGINDEX}]"
+              delay: 1h
+              params: "last(//qnap.raid.free[{#RGINDEX}])/last(//qnap.raid.capacity[{#RGINDEX}])*100"
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: b1e0be2869d14c57a1260554db35a23b
+              name: "RAID Group {#RGINDEX}: Rebuild progress (%)"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.6.1.6.{#RGINDEX}"
+              key: "qnap.raid.rebuild.progress[{#RGINDEX}]"
+              delay: 1m
+              units: "%"
+              tags:
+                - { tag: component, value: raid }
+                - { tag: component, value: performance }
+
+            - uuid: abf03a9600fa4da8b252b9147e2c1181
+              name: "RAID {#RAIDINDEX}: Rebuild Progress (%)"
+              type: SNMP_AGENT
+              key: qnap.raid.rebuild.progress[{#RAIDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.24681.1.2.15.1.7.{#RAIDINDEX}
+              delay: 1m
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: a07aa2069dad4295a5238d263a951137
+              name: "RAID {#RAIDINDEX}: Rebuild ETA (minutes)"
+              type: DEPENDENT
+              key: qnap.raid.rebuild.eta[{#RAIDINDEX}]
+              master_item:
+                key: qnap.raid.rebuild.progress[{#RAIDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var progress = Number(value);
+                      if (progress <= 0) return 0;
+                      var rate = Trend.avg(progress, 600); // 10-minute trend
+                      if (rate <= 0) return 0;
+                      return Math.round((100 - progress) / rate);
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: 2d20f89c63724c5babb3c2661b33f8f3
+              name: "RAID {#RAIDINDEX}: Consistency Check Status"
+              type: SNMP_AGENT
+              key: qnap.raid.scrub.status[{#RAIDINDEX}]
+              snmp_oid: .1.3.6.1.4.1.55062.1.15.1.8.{#RAIDINDEX}
+              delay: 5m
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: d48129f7ac814bc2b688d6d0fd43c54e
+              name: "RAID {#RAIDINDEX}: Rebuild Speed (MB/s)"
+              type: DEPENDENT
+              key: qnap.raid.rebuild.speed[{#RAIDINDEX}]
+              master_item:
+                key: qnap.raid.scrub.status[{#RAIDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var progress = Number(getValue("qnap.raid.rebuild.progress[{#RAIDINDEX}]"));
+                      var prev = Number(Trend.avg(getValue("qnap.raid.rebuild.progress[{#RAIDINDEX}]"), 300));
+                      return Math.max(0, (progress - prev) * 20); // MB/s approx
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: 0899ce0580c44614afb5810629bfaf00
+              name: "RAID {#RAIDINDEX}: Rebuild Curve Fit ETA (min)"
+              type: DEPENDENT
+              key: qnap.raid.rebuild.curve.eta[{#RAIDINDEX}]
+              master_item:
+                key: qnap.raid.rebuild.progress[{#RAIDINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var p = Number(value);
+                      var p5 = Number(Trend.avg(getValue("qnap.raid.rebuild.progress[{#RAIDINDEX}]"), 300));
+                      var speed = (p - p5) * 20; // MB/s approx
+                      if (speed <= 0) return 9999;
+                      return Math.max(1, (100 - p) * (1 / (speed / 100)));
+              tags:
+                - { tag: component, value: raid }
+
+          trigger_prototypes:
+            - uuid: 478d3d31f6af4e83a316342dce98bd2a
+              name: "RAID Group {#RGINDEX}: Status is not optimal"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.status[{#RGINDEX}])<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: raid }
+                - { tag: scope, value: availability }
+
+            - uuid: c6c16600dafc4b468068c36b00cf37ca
+              name: "RAID Group {#RGINDEX}: Rebuild in progress"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.progress[{#RGINDEX}])>0"
+              priority: INFO
+              tags:
+                - { tag: component, value: raid }
+                - { tag: scope, value: maintenance }
+
+            - uuid: 8fc8d474969e4840ab546ffceba868c4
+              name: "RAID {#RAIDINDEX}: Rebuild ETA exceeds 24 hours"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.eta[{#RAIDINDEX}])>1440"
+              priority: WARNING
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: eedafcc7aa6245559ea43d738cc61492
+              name: "RAID {#RAIDINDEX}: Consistency check failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.scrub.status[{#RAIDINDEX}])=2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: a790b8491f31496e83490415b59ee093
+              name: "RAID {#RAIDINDEX}: Rebuild speed abnormally low"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.speed[{#RAIDINDEX}])<5"
+              priority: WARNING
+              tags:
+                - { tag: component, value: raid }
+
+            - uuid: 68e011e5432248cead283779a28d95d9
+              name: "RAID {#RAIDINDEX}: Rebuild ETA extremely high"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.raid.rebuild.curve.eta[{#RAIDINDEX}])>1440"
+              priority: HIGH
+
+        - uuid: 6f7bbcc3316b4a1b9e372e6f8f4160f6
+          name: "PSU Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#PSUINDEX},1.3.6.1.4.1.55062.1.12.10.1.1]"
+          key: qnap.psu.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a02d
+              name: "PSU {#PSUINDEX}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.10.1.3.{#PSUINDEX}"
+              key: "qnap.psu.status[{#PSUINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "PSU Status"
+              tags:
+                - { tag: component, value: psu }
+                - { tag: component, value: health }
+
+            - uuid: 550e8400e29b41d4a71644665544b106
+              name: "PSU {#PSUINDEX}: Redundancy state"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.10.1.4.{#PSUINDEX}"
+              key: "qnap.psu.redundancy[{#PSUINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "System On/Off"
+              tags:
+                - { tag: component, value: psu }
+                - { tag: component, value: health }
+
+          trigger_prototypes:
+            - uuid: fc0e6391b70d43648dd17561e53e036c
+              name: "PSU {#PSUINDEX}: Failure detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.psu.status[{#PSUINDEX}])<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: psu }
+                - { tag: scope, value: availability }
+
+        - uuid: d88f629d86a6495fbe9cb2115cc683f9
+          name: "Temperature Sensor Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#TSINDEX},1.3.6.1.4.1.55062.1.12.8.1.1,{#TSNAME},1.3.6.1.4.1.55062.1.12.8.1.2]"
+          key: qnap.temp.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a02f
+              name: "{#TSNAME}: Temperature"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.8.1.3.{#TSINDEX}"
+              key: "qnap.temp.value[{#TSINDEX}]"
+              delay: 5m
+              units: C
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: component, value: health }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
+
+            - uuid: 760e9bd522d043c2bd74f5b9fb9b737e
+              name: "{#TSNAME}: Temperature anomaly score"
+              type: DEPENDENT
+              key: "qnap.temp.anomaly[{#TSINDEX}]"
+              master_item:
+                key: "qnap.temp.value[{#TSINDEX}]"
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var current = value;
+                      var trend = Number(Trend.avg(current, 3600));
+                      return Math.abs(current - trend);
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
+
+            - uuid: d650b6aeeed8408dbe6eca6314f880be
+              name: "{#TSNAME}: Temperature Trend (1h)"
+              type: DEPENDENT
+              key: qnap.temp.trend[{#TSINDEX}]
+              master_item:
+                key: qnap.temp.value[{#TSINDEX}]
+              delay: 0
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return Trend.avg(value, 3600);
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: temp_group, value: "{#TEMP_GROUP}" }
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544a03a
+              name: "{#TSNAME}: Temperature is above CPU alarm threshold"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.temp.value[{#TSINDEX}])>{$CPU_TEMPERATURE_ALARM}"
+              priority: HIGH
+              tags:
+                - { tag: component, value: temperature }
+                - { tag: scope, value: availability }
+
+            - uuid: 92a49977e20a42a08dccd43ffdcfae40
+              name: "{#TSNAME}: Temperature anomaly detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.temp.anomaly[{#TSINDEX}])>5"
+              priority: WARNING
+              tags:
+                - { tag: component, value: temperature }
+
+            - uuid: 848d02b118e2442dad9932eab8b7ece0
+              name: "{#TSNAME}: Temperature drift > 10°C in 1 hour"
+              expression: "abs(last(/QNAP NAS LLD SNMP/qnap.temp.value[{#TSINDEX}]) - last(/QNAP NAS LLD SNMP/qnap.temp.trend[{#TSINDEX}]))>10"
+              priority: WARNING
+              tags:
+                - { tag: component, value: temperature }
+
+        - uuid: d4aeac9dae5d4afc8b79446e0f39f6ef
+          name: "System Health Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#HLTINDEX},1.3.6.1.4.1.55062.1.12.11.1.1,{#HLTNAME},1.3.6.1.4.1.55062.1.12.11.1.2]"
+          key: qnap.health.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: 71dab2edac704f07b174223993cca57e
+              name: "{#HLTNAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.11.1.3.{#HLTINDEX}"
+              key: "qnap.health.status[{#HLTINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "Health Status"
+              tags:
+                - { tag: component, value: health }
+                - { tag: component, value: system }
+
+          trigger_prototypes:
+            - uuid: 0a32c733cf0f4b35917a8e1bea41b6dd
+              name: "{#HLTNAME}: System health issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.health.status[{#HLTINDEX}])<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: health }
+                - { tag: scope, value: availability }
+
+        - uuid: fb0274eb2b304a019cd6794111882039
+          name: "UPS Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#UPSINDEX},1.3.6.1.4.1.55062.1.12.13.1.1]"
+          key: qnap.ups.discovery
+          delay: 15m
+          item_prototypes:
+            - uuid: a795d4d66dc243fda8c296b955f22b18
+              name: "UPS {#UPSINDEX}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.12.13.1.3.{#UPSINDEX}"
+              key: "qnap.ups.status[{#UPSINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "UPS Status"
+              tags:
+                - { tag: component, value: ups }
+                - { tag: component, value: health }
+          trigger_prototypes: [] # ← REQUIRED
+
+        - uuid: 2d0bc6c715f84370a0f90ed9043103bc
+          name: "PCIe Expansion Card Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#PCIEINDEX},1.3.6.1.4.1.55062.1.60.1.1,{#PCIENAME},1.3.6.1.4.1.55062.1.60.1.2]"
+          key: qnap.pcie.discovery
+          delay: 30m
+          item_prototypes:
+            - uuid: 07ace10e5d4e44fe8e049ed01e259e4b
+              name: "PCIe {#PCIENAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.60.1.3.{#PCIEINDEX}"
+              key: "qnap.pcie.status[{#PCIEINDEX}]"
+              delay: 10m
+              valuemap:
+                name: "Health Status"
+              tags:
+                - { tag: component, value: pcie }
+                - { tag: component, value: hardware }
+
+            - uuid: 332c6e61740440fa987fa1b67d009d8d
+              name: "PCIe {#PCIEINDEX}: Link Speed"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.3.{#PCIEINDEX}"
+              key: "qnap.pcie.speed[{#PCIEINDEX}]"
+              tags:
+                - { tag: component, value: pcie }
+
+            - uuid: 7b846d3f48ac45b6893f5265ba0f9257
+              name: "PCIe {#PCIEINDEX}: Link Width"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.4.{#PCIEINDEX}"
+              key: "qnap.pcie.width[{#PCIEINDEX}]"
+              tags:
+                - { tag: component, value: pcie }
+
+            - uuid: 21eae647dfdb46198e61904039c78055
+              name: "PCIe {#PCIEINDEX}: Health State"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.50.1.5.{#PCIEINDEX}"
+              key: "qnap.pcie.health[{#PCIEINDEX}]"
+              valuemap:
+                name: "Health Status"
+              tags:
+                - { tag: component, value: pcie }
+
+          trigger_prototypes:
+            - uuid: 5ca3826443ca4e00bae5bfbe68d0eae3
+              name: "PCIe {#PCIENAME}: Hardware issue detected"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pcie.status[{#PCIEINDEX}])<>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: pcie }
+                - { tag: scope, value: availability }
+
+            - uuid: 72b7fcd88dc24021bafe8a1ce734fe4c
+              name: "PCIe {#PCIEINDEX}: Link degraded"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.pcie.health[{#PCIEINDEX}])<>1"
+              priority: WARNING
+              tags:
+                - { tag: component, value: pcie }
+
+        - uuid: 8a9dd23e55dd4c4db050e71c2b8f5c8c
+          name: "QNAP App Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#APPINDEX},1.3.6.1.4.1.55062.1.70.1.1,{#APPNAME},1.3.6.1.4.1.55062.1.70.1.2]"
+          key: qnap.app.discovery
+          delay: 30m
+
+          item_prototypes:
+            - uuid: 0ab7ececdf084a6e930c28c4adc8b5e8
+              name: "App {#APPNAME}: Status"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.70.1.3.{#APPINDEX}"
+              key: "qnap.app.status[{#APPINDEX}]"
+              delay: 5m
+              valuemap:
+                name: "System On/Off"
+              tags:
+                - { tag: component, value: app }
+                - { tag: app, value: "{#APPNAME}" }
+
+          trigger_prototypes:
+            - uuid: 8678c1025c734e31bd60fbc555a6af29
+              name: "App {#APPNAME}: Service is down"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.app.status[{#APPINDEX}])=0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: app }
+                - { tag: scope, value: availability }
+
+        - uuid: 35a018bf6ecc4f24a06c717c624a74e5
+          name: "Backup Job Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#JOBINDEX},1.3.6.1.4.1.55062.1.90.1.1,{#JOBNAME},1.3.6.1.4.1.55062.1.90.1.2]"
+          key: qnap.backup.discovery
+          delay: 30m
+
+          item_prototypes:
+            - uuid: 2c7e9b1d4f3a4e0c8b1d6f7a9c5e3d12
+              name: "Backup Job {#JOBNAME}: Last result"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.90.1.3.{#JOBINDEX}"
+              key: "qnap.backup.result[{#JOBINDEX}]"
+              delay: 10m
+              valuemap:
+                name: "Alarm state"
+              tags:
+                - { tag: component, value: backup }
+                - { tag: job, value: "{#JOBNAME}" }
+
+          trigger_prototypes:
+            - uuid: e7c3a9f14d8b4f0c9e2d6b5a1f7c3e91
+              name: "Backup Job {#JOBNAME}: Failed"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.backup.result[{#JOBINDEX}])=2"
+              priority: HIGH
+              tags:
+                - { tag: component, value: backup }
+                - { tag: scope, value: availability }
+
+        - uuid: f810560b272745c89a551b5d1f71febf
+          name: "System Event Log Discovery"
+          type: SNMP_AGENT
+          snmp_oid: "discovery[{#EVENTID},1.3.6.1.4.1.55062.1.30.2.1.1]"
+          key: qnap.event.discovery
+          delay: 10m
+
+          item_prototypes:
+            - uuid: 6017a7d5e7144bafb8eb0074805ba037
+              name: "Event {#EVENTID}: Message"
+              type: SNMP_AGENT
+              snmp_oid: "1.3.6.1.4.1.55062.1.30.2.1.2.{#EVENTID}"
+              key: "qnap.event.message[{#EVENTID}]"
+              value_type: TEXT
+              delay: 10m
+              tags:
+                - { tag: component, value: event }
+
+          trigger_prototypes:
+            - uuid: 9b3ec3e34d1843d29500472fb79da3af
+              name: "New system event detected: {#EVENTID}"
+              expression: "change(/QNAP NAS LLD SNMP/qnap.event.message[{#EVENTID}])<>0"
+              priority: WARNING
+              tags:
+                - { tag: component, value: event }
+                - { tag: scope, value: health }
+
+        - uuid: e12a8d5a850a44e8a92778198351b460
+          name: "SMART Attribute Discovery"
+          type: SNMP_AGENT
+          key: qnap.smart.discovery
+          snmp_oid: "discovery[{#HDDINDEX},1.3.6.1.4.1.55062.1.10.3.1.1,{#SMARTID},1.3.6.1.4.1.55062.1.10.3.1.2]"
+          delay: 1h
+          item_prototypes:
+            - uuid: 8318a2c20b784e2898100c0af18fab3b
+              name: "Disk {#HDDINDEX}: SMART {#SMARTID} Value"
+              type: SNMP_AGENT
+              key: qnap.smart.value[{#HDDINDEX},{#SMARTID}]
+              snmp_oid: "1.3.6.1.4.1.55062.1.10.3.1.3.{#SMARTID}"
+              delay: 10m
+              tags:
+                - { tag: component, value: smart }
+          trigger_prototypes:
+            - uuid: 2823637350b540bd8591e4f288dcc1c8
+              name: "Disk {#HDDINDEX}: SMART attribute {#SMARTID} critical"
+              expression: "last(/QNAP NAS LLD SNMP/qnap.smart.value[{#HDDINDEX},{#SMARTID}])>1"
+              priority: HIGH
+              tags:
+                - { tag: component, value: smart }
+
+      valuemaps:
+        - uuid: 550e8400e29b41d4a71644665544a517
+          name: "Firmware Version Available"
+          mappings:
+            - { value: "0", newvalue: "Normal" }
+            - { value: "1", newvalue: "Warning" }
+            - { value: "2", newvalue: "Critical" }
+
+        - uuid: 550e8400e29b41d4a71644665544a041
+          name: "Alarm state"
+          mappings:
+            - { value: "0", newvalue: "Normal" }
+            - { value: "1", newvalue: "Warning" }
+            - { value: "2", newvalue: "Critical" }
+
+        - uuid: 550e8400e29b41d4a71644665544a042
+          name: "PSU Status"
+          mappings:
+            - { value: "0", newvalue: "Not present" }
+            - { value: "1", newvalue: "OK" }
+            - { value: "2", newvalue: "Failure" }
+
+        - uuid: 550e8400e29b41d4a71644665544a043
+          name: "RAID Status"
+          mappings:
+            - { value: "0", newvalue: "Unknown" }
+            - { value: "1", newvalue: "Ready" }
+            - { value: "2", newvalue: "Rebuilding" }
+            - { value: "3", newvalue: "Degraded" }
+            - { value: "4", newvalue: "Crashed" }
+
+        - uuid: 550e8400e29b41d4a71644665544a044
+          name: "Health Status"
+          mappings:
+            - { value: "0", newvalue: "Unknown" }
+            - { value: "1", newvalue: "OK" }
+            - { value: "2", newvalue: "Warning" }
+            - { value: "3", newvalue: "Critical" }
+
+        - uuid: 550e8400e29b41d4a71644665544a045
+          name: "UPS Status"
+          mappings:
+            - { value: "0", newvalue: "Not present" }
+            - { value: "1", newvalue: "Online" }
+            - { value: "2", newvalue: "On battery" }
+            - { value: "3", newvalue: "Low battery" }
+            - { value: "4", newvalue: "Failure" }
+
+        - uuid: 550e8400e29b41d4a71644665544a046
+          name: "System On/Off"
+          mappings:
+            - { value: "0", newvalue: "Off" }
+            - { value: "1", newvalue: "On" }
+
+        - uuid: 550e8400e29b41d4a71644665544b200
+          name: "IF-MIB Operational Status"
+          mappings:
+            - { value: "1", newvalue: "Up" }
+            - { value: "2", newvalue: "Down" }
+            - { value: "3", newvalue: "Testing" }
+            - { value: "4", newvalue: "Unknown" }
+            - { value: "5", newvalue: "Dormant" }
+            - { value: "6", newvalue: "NotPresent" }
+            - { value: "7", newvalue: "LowerLayerDown" }
+
+        - uuid: a1504d0fc3474259a10fb4285ac698e4
+          name: "Controller Role"
+          mappings:
+            - value: "1"
+              newvalue: "Controller A (Active)"
+            - value: "2"
+              newvalue: "Controller B (Standby)"
+            - value: "3"
+              newvalue: "Unknown / Error"
+
+        - uuid: 4959158e6fbd4f75aae18bace42fa33d
+          name: "Disk Remaining Life"
+          mappings:
+            - value: "100"
+              newvalue: "New"
+            - value: "50"
+              newvalue: "Mid-life"
+            - value: "10"
+              newvalue: "Critical"
