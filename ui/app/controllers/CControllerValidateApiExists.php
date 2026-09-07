@@ -22,11 +22,11 @@ class CControllerValidateApiExists extends CController {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 	}
 
-	public static function getValidationRules(): array {
+	private static function getValidationRules(): array {
 		$api_services = ['host', 'template', 'item', 'itemprototype', 'discoveryrule', 'discoveryruleprototype',
 			'hostgroup', 'templategroup', 'iconmap', 'image', 'mediatype', 'proxy', 'proxygroup', 'regexp', 'sla',
 			'token', 'user', 'role', 'usergroup', 'hostprototype', 'maintenance', 'connector', 'correlation',
-			'graph', 'graphprototype', 'report', 'script'
+			'graph', 'graphprototype', 'report', 'script', 'drule'
 		];
 
 		return ['object', 'fields' => [
@@ -63,7 +63,7 @@ class CControllerValidateApiExists extends CController {
 								'name' => ['string', 'required', 'not_empty']
 							], 'when' => ['../api', 'in' => ['hostgroup', 'templategroup', 'iconmap', 'image', 'mediatype',
 								'proxy', 'proxygroup', 'regexp', 'sla', 'role', 'maintenance', 'connector', 'correlation',
-								'usergroup', 'report'
+								'usergroup', 'report', 'drule'
 							]]],
 							['object', 'fields' => [
 								'username' => ['string', 'required', 'not_empty']
@@ -80,7 +80,7 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	protected function checkInput() {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(

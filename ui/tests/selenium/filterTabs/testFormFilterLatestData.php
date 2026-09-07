@@ -26,7 +26,7 @@ require_once __DIR__.'/../common/testFormFilter.php';
 class testFormFilterLatestData extends testFormFilter {
 
 	public $url = 'zabbix.php?action=latest.view';
-	public $table_selector = 'id:latest';
+	public $table_selector = 'id:datatable-latest';
 
 	protected static $users = [
 		'user-delete',

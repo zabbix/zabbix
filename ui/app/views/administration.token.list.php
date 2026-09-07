@@ -35,7 +35,6 @@ $filter = (new CFilter())
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
 			)
 			->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
 				(new CMultiSelect([

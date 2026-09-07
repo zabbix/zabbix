@@ -174,84 +174,75 @@ window.script_edit_popup = new class {
 
 		this.form_element.querySelectorAll('#menu-path-label, #menu-path, #usergroup-label, #usergroup,' +
 				' #host-access-label, #host-access-field, #advanced-configuration').forEach(
-			node => node.style.display = is_scope_manual ? '' : 'none'
+			node => node.hidden = !is_scope_manual
 		);
 
 		const type_url_radio_button = this.form_element.querySelector(
 			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
 		);
 
-		type_url_radio_button.closest('li').style.display = is_scope_manual ? '' : 'none';
+		type_url_radio_button.closest('li').hidden = !is_scope_manual;
 
 		this.form_element.querySelectorAll('#execute-on-label, #execute-on').forEach(
-			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?> ? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>
 		);
 
 		this.form_element.querySelectorAll('#auth-type-label, #auth-type').forEach(
-			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_SSH ?> ? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_SSH ?>
 		);
 
 		this.form_element.querySelectorAll('#username-label, #username-field, #port-label, #port-field').forEach(
-			node => node.style.display =
-				data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
-					|| data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
-				? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_SSH ?> && data.type != <?= ZBX_SCRIPT_TYPE_TELNET ?>
 		);
 
 		this.form_element.querySelectorAll('#password-label, #password-field').forEach(
-			node => node.style.display =
-				data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
+			node => node.hidden =
+				!(data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
 					|| (data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
-						&& data.authtype == <?= ITEM_AUTHTYPE_PASSWORD ?>)
-				? '' : 'none'
+						&& data.authtype == <?= ITEM_AUTHTYPE_PASSWORD ?>))
 		);
 
 		this.form_element.querySelectorAll('#publickey-label, #publickey-field, #privatekey-label, #privatekey-field,' +
 				' #passphrase-label, #passphrase-field').forEach(
-			node => node.style.display =
-				data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
-					&& data.authtype == <?= ITEM_AUTHTYPE_PUBLICKEY ?>
-				? '' : 'none'
+			node => node.hidden =
+				!(data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
+					&& data.authtype == <?= ITEM_AUTHTYPE_PUBLICKEY ?>)
 		);
 
 		this.form_element.querySelectorAll('#commands-label, #commands').forEach(
-			node => node.style.display =
-				data.type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>
+			node => node.hidden =
+				!(data.type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>
 					|| data.type == <?= ZBX_SCRIPT_TYPE_SSH ?>
-					|| data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>
-			? '' : 'none'
+					|| data.type == <?= ZBX_SCRIPT_TYPE_TELNET ?>)
 		);
 
 		this.form_element.querySelectorAll('#command-ipmi-label, #command-ipmi').forEach(
-			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_IPMI ?> ? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_IPMI ?>
 		);
 
 		this.form_element.querySelectorAll('#webhook-parameters-label, #webhook-parameters, #script-label,' +
 				' #js-item-script-field, #timeout-label, #timeout-field').forEach(
-			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> ? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>
 		);
 
 		this.form_element.querySelectorAll('#url-label, #url, #new-window-label, #new-window').forEach(
-			node => node.style.display = data.type == <?= ZBX_SCRIPT_TYPE_URL ?> ? '' : 'none'
+			node => node.hidden = data.type != <?= ZBX_SCRIPT_TYPE_URL ?>
 		);
 
-		document.getElementById('host-group-selection').style.display = data.hgstype == 1 ? '' : 'none';
+		document.getElementById('host-group-selection').hidden = data.hgstype != 1;
 		jQuery(document.getElementById('groupid')).multiSelect(data.hgstype == 1 ? 'enable' : 'disable');
 
 		// Advanced configuration
 
 		this.form_element.querySelectorAll('label[for=manualinput_default_value], label[for=manualinput_validator]')
-			.forEach(
-				node => node.style.display = is_input_type_string ? '' : 'none'
-			);
+			.forEach(node => node.hidden = !is_input_type_string);
 
 		this.form_element.querySelectorAll('#manualinput_default_value, #manualinput_validator').forEach(
-			node => node.parentNode.style.display = is_input_type_string ? '' : 'none'
+			node => node.parentNode.hidden = !is_input_type_string
 		);
 
-		this.form_element.querySelector('label[for=dropdown_options]').style.display = is_input_type_list ? '' : 'none';
-		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_list
-			? '' : 'none';
+		this.form_element.querySelector('label[for=dropdown_options]').hidden = !is_input_type_list;
+		this.form_element.querySelector('#dropdown_options').parentNode.hidden = !is_input_type_list;
 
 		this.form_element.querySelectorAll('#manualinput_prompt, input[name=manualinput_validator_type],' +
 				' #manualinput_default_value, #manualinput_validator, #dropdown_options, #test_user_input').forEach(

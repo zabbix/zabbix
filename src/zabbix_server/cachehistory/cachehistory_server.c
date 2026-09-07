@@ -578,7 +578,7 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 	char	*errmsg = NULL;
 	size_t	value_len;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
+	if (FAIL == zbx_eval_variant_to_value_type(value, value_type, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
@@ -682,8 +682,22 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_JSON:
-				/* JSON values do not need to be truncated since their sizes are already checked */
-				/* before inserting them into history cache. */
+				/* Large JSON entries with size:                                                 */
+				/*        'ZBX_HISTORY_VALUE_LEN_MAX < size <= ZBX_HISTORY_JSON_VALUE_LEN'       */
+				/* do get validated before entering history cache.                               */
+				/* Smaller JSON entries with 'size <= ZBX_HISTORY_VALUE_LEN_MAX' however, could  */
+				/* initially had TEXT item value type and bypass the original JSON validation,   */
+				/* so they must be JSON-validated here.                                          */
+				if (ZBX_HISTORY_VALUE_LEN_MAX >= strlen(hdata->entry.value.str))
+				{
+					char	*err = NULL;
+
+					if (FAIL == zbx_json_validate_ext(hdata->entry.value.str, &err))
+					{
+						dc_history_set_error(hdata, err);
+						break;
+					}
+				}
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */

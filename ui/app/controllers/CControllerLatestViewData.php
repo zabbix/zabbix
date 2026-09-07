@@ -18,8 +18,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
-		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'show_link',
-		'item_icons', 'tags'];
+		'history', 'trends', 'type', 'state', 'last_check', 'value_type', 'last_value', 'last_history_value', 'change',
+		'is_graph', 'show_link', 'item_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -33,6 +33,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 
@@ -137,6 +138,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 				$item_icons[] = makeErrorIcon($item['error']);
 			}
 
+			$item['last_history_value'] = null;
+
 			// Row history data preparation.
 			$last_history = array_key_exists($item['itemid'], $history)
 				? (count($history[$item['itemid']]) > 0 ? $history[$item['itemid']][0] : null)
@@ -151,21 +154,17 @@ class CControllerLatestViewData extends CControllerDataTable {
 					->toString();
 
 				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-					$last_value = italic(_('binary value'))
-						->addClass(ZBX_STYLE_GREY)
-						->toString();
+					$last_value = _('binary value');
 				}
 				else {
-					$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setHint(
-							(new CTrim($last_history['value'], ZBX_HINTBOX_HTML_LIMIT))
-								->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
-								->addClass(ZBX_STYLE_HINTBOX_WRAP),
-							'', true, '', 0
-						)
-						->toString();
+					$last_history_value = $last_history['value'];
+					$last_value = formatHistoryValue($last_history['value'], $item, false);
+
+					if (mb_strlen($last_value) > ZBX_HINTBOX_HTML_LIMIT) {
+						$last_history_value = mb_substr($last_history_value, 0, ZBX_HINTBOX_HTML_LIMIT);
+					}
+
+					$item['last_history_value'] = $last_history_value;
 				}
 
 				$change = '';
@@ -193,7 +192,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 				$item_delay = '';
 			}
 			elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -248,10 +248,17 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['item_icons'] = (string) makeInformationList($item_icons);
 
 			$item['description_expanded'] = (new CObject())
-				->addItem(zbx_str2links($item['description_expanded']))
+				->addItem(zbx_str2links(htmlentities($item['description_expanded'])))
 				->toString();
 		}
 		unset($item);
+
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
+		if ($custom_text) {
+			$this->resolveCustomText($data, $custom_text);
+		}
 
 		$output += [
 			'filter_counters' => $this->getFilterCounters(),
@@ -393,5 +400,20 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'items' => $items,
 			'items_rw' => $items_rw
 		];
+	}
+
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		$items = [];
+
+		foreach ($data['items'] as $itemid => $item) {
+			$items[$itemid] = ['hostid' => $item['hostid']] + $custom_text;
+		}
+
+		$keys = array_keys($custom_text);
+		$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros($items, array_combine($keys, $keys));
+
+		foreach ($items as $itemid => $item) {
+			$data['items'][$itemid]['custom_text'] = array_intersect_key($item, $custom_text);
+		}
 	}
 }

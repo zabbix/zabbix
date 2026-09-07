@@ -9,7 +9,7 @@ $error-focus: #ff9b9b;
 
 $dark-yellow: #e99003;
 $yellow: #a78820;
-$lighter-yellow: #2f280a;
+$lighter-yellow: #252525;
 
 $green: #59db8f;
 $lighter-green: #32453a;
@@ -261,6 +261,84 @@ $datatable-resizer-border-color: #69808d;
 	&.sticky-footer {
 		tfoot tr:first-of-type td {
 			border-color: lighten($table-border-color, 3%);
+		}
+	}
+}
+
+// Datatables.
+.datatable {
+	&.has-highlighted-rows .datatable-body .row {
+		&.row-selected .cell.cell-data {
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				a.link-action {
+					color: $font-color;
+
+					&:hover {
+						color: $link-color;
+					}
+				}
+			}
+		}
+
+		&:not(.row-disabled):not(.row-selected) {
+			.cell.cell-data {
+				color: #000000;
+
+				a {
+					color: #000000;
+				}
+
+				&.na-bg,
+				&.info-bg,
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					color: #000000;
+
+					a.link-action {
+						color: #000000;
+					}
+				}
+			}
+
+			&:hover .cell.cell-data {
+				a {
+					color: $font-color;
+
+					&:hover {
+						color: $link-color;
+					}
+				}
+
+				.timeline-date a {
+					color: $link-color;
+				}
+
+				&.na-bg,
+				&.info-bg,
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					&:not(.cell-bg) {
+						color: $font-color;
+					}
+
+					a.link-action {
+						color: $font-color;
+
+						&:hover {
+							color: $link-color;
+						}
+					}
+				}
+			}
 		}
 	}
 }

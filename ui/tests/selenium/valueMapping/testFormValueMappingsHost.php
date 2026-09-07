@@ -28,7 +28,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	/**
 	 * Function creates the given value mappings for the specified host.
 	 */
-	public static function prepareHostValueMappings() {
+	public function prepareHostValueMappings() {
 		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
 		CDataHelper::call('valuemap.create', [
 			[
@@ -99,6 +99,16 @@ class testFormValueMappingsHost extends testFormValueMappings {
 				]
 			]
 		]);
+
+		// Update hosts datatable layout before the test to make host names fully visible.
+		$layout = '{"columns":[{"id":"name","resized":true,"width":"117px"},{"id":"items","width":"67px"},'.
+				'{"id":"triggers","width":"80px"},{"id":"graphs","width":"68px"},{"id":"discovery","width":"83px"},'.
+				'{"id":"web","width":"53px"},{"id":"interface","width":"100px"},{"id":"proxy","resized":true,"width":"137px"},'.
+				'{"id":"templates","resized":true,"width":"273px"},{"id":"status","width":"62px"},'.
+				'{"id":"availability","resized":true,"width":"149px"},{"id":"encryption","width":"115px"},'.
+				'{"id":"info","width":"40px"},{"id":"tags","width":"334px"},{"id":"tagvalue"},{"id":"custom_text"}],'.
+				'"options":{},"sort_field":"name","sort_order":"ASC"}';
+		$this->updateDatatableLayout($layout, 'web.hosts.datatable');
 	}
 
 	public function testFormValueMappingsHost_Layout() {

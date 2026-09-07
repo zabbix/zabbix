@@ -1,0 +1,40 @@
+---
+test case: write host record to memory buffer
+in:
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
+  rows: 1
+  fail_alloc_at: 0
+out:
+  rows: 1
+---
+test case: ip allocation fails while adding row to memory buffer
+in:
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
+  rows: 2
+  fail_alloc_at: 2
+out:
+  rows: 1
+---
+test case: dns allocation fails while adding row to memory buffer
+in:
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
+  rows: 2
+  fail_alloc_at: 3
+out:
+  rows: 1
+---
+test case: value allocation fails while adding row to memory buffer
+in:
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
+  rows: 2
+  fail_alloc_at: 4
+out:
+  rows: 1

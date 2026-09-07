@@ -140,7 +140,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates UUID version 4 as string of 32 symbols                 *
+ * Purpose: generates UUID version 4 as string of 32 symbols                  *
  *                                                                            *
  * Parameters: seed - [IN] string for seed calculation                        *
  *                                                                            *
@@ -176,4 +176,77 @@ char	*zbx_gen_uuid4(const char *seed)
 	*ptr = '\0';
 
 	return uuid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: generates UUID version 7 as string of 36 symbols (with hyphens)   *
+ *                                                                            *
+ * Return value: uuid string: e.g. 019da0d3-3fc7-710d-adfc-48abece93fc2       *
+ *                                                                            *
+ * Comments: Current implementation is minimal, developed for generating      *
+ *           server ID.                                                       *
+ *           DO NOT use it for generation of multiple identifiers where       *
+ *           cryptographically secure randomness and monotonic time-based     *
+ *           ordering is required                                             *
+ *           (see https://www.rfc-editor.org/rfc/rfc9562).                    *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_gen_uuid7_hyphenated(void)
+{
+#define ZBX_UUID7_BYTES      16
+	const char	*hex = "0123456789abcdef";
+	zbx_timespec_t	ts;
+	unsigned char	uuid7[ZBX_UUID7_BYTES];
+	char		*out, *ptr;
+	uint64_t	ts_ms;
+
+	ptr = out = (char *)zbx_malloc(NULL, 2 * ZBX_UUID7_BYTES +
+			4 +	/* hyphens */
+			1);	/* terminating '\0' */
+
+	zbx_timespec(&ts);
+
+	static int	seeded = 0;
+
+	if (0 == seeded)
+	{
+		srand((unsigned int)ts.sec ^ (unsigned int)ts.ns ^ (unsigned int)getpid());
+		seeded = 1;
+	}
+
+	ts_ms = (uint64_t)ts.sec * 1000 + (uint64_t)ts.ns / 1000000;
+
+	/* 6 bytes Unix timestamp */
+	uuid7[0] = (ts_ms >> 40) & 0xff;
+	uuid7[1] = (ts_ms >> 32) & 0xff;
+	uuid7[2] = (ts_ms >> 24) & 0xff;
+	uuid7[3] = (ts_ms >> 16) & 0xff;
+	uuid7[4] = (ts_ms >> 8) & 0xff;
+	uuid7[5] = ts_ms & 0xff;
+
+	/* 10 remaining random bytes */
+	for (int i = 6; i < ZBX_UUID7_BYTES; i++)
+		uuid7[i] = (unsigned char)(rand() & 0xff);
+
+	/* version */
+	uuid7[6] = (uuid7[6] & 0x0f) | 0x70;
+
+	/* variant */
+	uuid7[8] = (uuid7[8] & 0x3f) | 0x80;
+
+	/* convert to hex */
+	for (int i = 0; i < ZBX_UUID7_BYTES; i++)
+	{
+		*ptr++ = hex[(uuid7[i] >> 4) & 0xf];
+		*ptr++ = hex[uuid7[i] & 0xf];
+
+		if (3 == i || 5 == i || 7 == i || 9 == i)
+			*ptr++ = '-';
+	}
+
+	*ptr = '\0';
+
+	return out;
+#undef ZBX_UUID7_BYTES
 }

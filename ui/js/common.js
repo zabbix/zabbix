@@ -1127,6 +1127,30 @@ function deepCompare(first, second) {
 	return false;
 }
 
+function deepMerge(target, ...sources) {
+	if (!sources.length) {
+		return target;
+	}
+
+	const source = sources.shift();
+
+	if (typeof target === 'object' && typeof source === 'object') {
+		for (const key in source) {
+			if (typeof source[key] === 'object') {
+				if (!target[key]) {
+					Object.assign(target, {[key]: {}});
+				}
+
+				deepMerge(target[key], source[key]);
+			} else {
+				Object.assign(target, {[key]: source[key]});
+			}
+		}
+	}
+
+	return deepMerge(target, ...sources);
+}
+
 /**
  * Set value in multidimensional object.
  *
@@ -1144,6 +1168,14 @@ function objectSetDeepValue(object, path, value) {
 
 		if (!Object.hasOwn(tmp, key)) {
 			tmp[key] = Object.create(null);
+		}
+		else if (tmp[key] === null) {
+			if (value === null) {
+				return object;
+			}
+			else {
+				throw Error('Trying to set value to null object.');
+			}
 		}
 
 		if (typeof tmp[key] !== 'object') {

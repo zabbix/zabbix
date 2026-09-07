@@ -212,6 +212,12 @@ if ($page['type'] != PAGE_TYPE_HTML || defined('ZBX_PAGE_NO_HEADER')) {
 	return null;
 }
 
+if ($page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+	echo (new CLink(_('Skip to main content'), '#' . CHtmlPage::PAGE_TITLE_ID))
+		->addClass(ZBX_STYLE_BTN)
+		->addClass('skip-link');
+}
+
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL && CWebUser::isLoggedIn()) {
 	echo (new CPartial('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''

@@ -28,7 +28,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
         - name: 'Templates/Operating systems'
@@ -2867,7 +2867,6 @@ zabbix_export:
       dashboards:
         - uuid: 68b246ab40c24a9f9057d58bcea37cac
           name: Main
-          auto_start: 'NO'
           pages:
             - name: Overview
               display_period: '60'

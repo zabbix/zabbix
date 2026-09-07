@@ -87,6 +87,12 @@ class CDatatableBehavior extends CBehavior {
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
 		$datatable = $this->getDatatable($selector)->waitUntilReady();
+
+		if ($data) {
+			// Rows are loaded asynchronously after the datatable reports ready, so wait for the expected count.
+			$datatable->waitUntilRowsCount(count($data));
+		}
+
 		$rows = $datatable->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
@@ -162,25 +168,24 @@ class CDatatableBehavior extends CBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_settings as $column => $select_data) {
+			// Wait for the datatable to finish (re)loading so the header button reference does not go stale.
+			$table->waitUntilReady();
+
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one();
-
-			if (!$button->isClickable()) {
-				$table->scrollRightHorizontally();
-			}
+			$button = $table->getHeaderByText($column)->query($button_selector);
 
 			/**
 			 *  When the button is placed under the datatable-options button it is considered clickable.
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->one()->click();
 			}
-			catch (ElementClickInterceptedException $exception) {
+			catch (Exception $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->one()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
@@ -193,9 +198,9 @@ class CDatatableBehavior extends CBehavior {
 				$table->waitUntilReady()->invalidate();
 			}
 
-			// Press Escape key to close the popup.
-			// TODO: replace ENTER key with ESCAPE key when ZBX-27830 will be fixed.
+			// Press Enter key to close the popup.
 			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+
 			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
 	}
@@ -220,11 +225,11 @@ class CDatatableBehavior extends CBehavior {
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->click();
 			}
 			catch (ElementClickInterceptedException $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
