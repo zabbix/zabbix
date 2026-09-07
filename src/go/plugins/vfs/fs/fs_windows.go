@@ -197,7 +197,7 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 		return nil, err
 	}
 
-	data := make([]*FsInfoNew, 0, len(paths))
+	data := make([]*FsInfoNew, 0, len(fsmap))
 	for _, path := range paths {
 		if !matchMountpoint(path, mountpoint) {
 			continue

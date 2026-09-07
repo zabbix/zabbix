@@ -99,7 +99,7 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 
 	allData = filterByMountpoint(allData, mountpoint)
 
-	data := make([]*FsInfoNew, 0, len(allData))
+	data := make([]*FsInfoNew, 0, len(fsmap))
 	for _, info := range allData {
 		key := *info.FsName + *info.FsType
 		if fsInfo, ok := fsmap[key]; ok {
