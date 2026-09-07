@@ -1954,6 +1954,8 @@ if test "x$want_ares" = "xyes"; then
 	fi
 	have_ares="yes"
 fi
+AM_CONDITIONAL(HAVE_ARES, [test "x$have_ares" = "xyes"])
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
 

@@ -20,6 +20,12 @@ sbin_PROGRAMS = zabbix_proxy
 
 zabbix_proxy_SOURCES = proxy.c
 
+if HAVE_ARES
+RESOLVER_LIB = $(top_builddir)/src/libs/zbxresolver/libzbxresolver.a
+else
+RESOLVER_LIB =
+endif
+
 zabbix_proxy_LDADD = \
 	cachehistory/libzbxcachehistory_proxy.a \
 	diag/libzbxdiag_proxy.a \
@@ -90,7 +96,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
+	$(RESOLVER_LIB) \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
