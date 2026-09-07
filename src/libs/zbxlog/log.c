@@ -372,11 +372,11 @@ void	zbx_close_log(void)
  *          to syslog/Windows Event Log (ZBX_LOG_TYPE_SYSTEM) or, if logging  *
  *          has not been configured yet, to stderr (ZBX_LOG_TYPE_UNDEFINED).  *
  *                                                                            *
- * Comments: Kept in its own function, called only for these two log types,   *
- *           so that the MAX_BUFFER_LEN message buffer is not reserved on     *
- *           the stack of log_impl() for every log call - most deployments    *
- *           use ZBX_LOG_TYPE_FILE or ZBX_LOG_TYPE_CONSOLE, which never       *
- *           reach this function.                                             *
+ * Comments: It is required to reduce consumption of limited thread stack     *
+ *           space. Therefore the formatting functionality is kept here, in   *
+ *           a dedicated function, marked with ZBX_ATTR_NOINLINE and called   *
+ *           only for ZBX_LOG_TYPE_SYSTEM and ZBX_LOG_TYPE_UNDEFINED log      *
+ *           types.                                                           *
  *                                                                            *
  ******************************************************************************/
 static ZBX_ATTR_NOINLINE void	zbx_log_dispatch_formatted(int level, const char *component, const char *fmt,
