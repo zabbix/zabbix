@@ -148,6 +148,12 @@ msgstr "%1$s tecken"
 msgid "%1$s characters remaining"
 msgstr "%1$s tecken kvar"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -1678,6 +1684,11 @@ msgstr "Bågens bakgrund"
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
 msgstr "Bågens storlek"
+
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4765,6 +4776,11 @@ msgstr "Det går inte att uppdatera webbscenariot"
 msgid "Cannot update web scenario step"
 msgstr "Det går inte att uppdatera steget i webbscenariot"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Skiftlägeskänslig"
@@ -4808,6 +4824,10 @@ msgstr "Centrera"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "Diplom"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5103,6 +5123,15 @@ msgstr "Klicka och dra till önskad storlek."
 msgid "Click to view or edit"
 msgstr "Klicka för att visa eller redigera"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "Klient ID"
@@ -5262,6 +5291,14 @@ msgstr "Färger"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6360,6 +6397,10 @@ msgstr "Anpassad storlek"
 msgid "Custom templates are not supported."
 msgstr "Anpassade mallar stöds inte."
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6952,6 +6993,10 @@ msgstr "Radera och rensa valda mallar? (Varning: alla länkade värdar kommer at
 #: app/views/template.edit.php:309
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Radera och rensa mall? (Varning: alla länkade värdar kommer att rensas!)"
+
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8247,6 +8292,10 @@ msgstr "Duplicerat \"name\"-värde \"%1$s\" för karta."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicera \"usrgrpid\" \"%1$s\" i användargrupper för karta \"%2$s\"."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8350,6 +8399,10 @@ msgstr "Datum för ikraftträdande"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Effektivt värde"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11773,6 +11826,12 @@ msgstr ""
 msgid "Incorrect characters used for template name."
 msgstr "Felaktiga tecken har använts för mallens namn."
 
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "Felaktigt aktuellt lösenord."
@@ -11807,6 +11866,16 @@ msgstr "Felaktig filuppladdning."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Felaktig funktion används"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12346,12 +12415,20 @@ msgstr "Ärvda makron och värdmakron"
 msgid "Inherited and host prototype macros"
 msgstr "Makron för ärvda prototyper och värdprototyper"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12376,6 +12453,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -13013,6 +13094,11 @@ msgstr "Ogiltigt uttryck för intervall."
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
 msgstr "Ogiltigt intervall."
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -14392,6 +14478,21 @@ msgstr "Manuellt av: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "Manuellt stängd"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15834,6 +15935,10 @@ msgstr "Nästa"
 msgid "Next dashboard"
 msgstr "Nästa kontrollpanel"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15847,6 +15952,10 @@ msgstr "Nästa sida"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Nästa steg"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16552,6 +16661,12 @@ msgstr "Ej ärvda objekt"
 msgid "Not linked"
 msgstr "Inte länkad"
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16706,6 +16821,10 @@ msgstr "Antal säsonger"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Antal steg"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19309,6 +19428,10 @@ msgstr "Bekräftelse av återställning"
 msgid "Reset defaults"
 msgstr "Återställa standardvärden"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "Återställ till ursprunglig vy"
@@ -20823,6 +20946,10 @@ msgstr "Visa sidhuvud"
 msgid "Show hosts in maintenance"
 msgstr "Visa värdar i underhåll"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -20950,6 +21077,10 @@ msgstr "Visa tidsstämpel"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "Visa totalt värde"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21687,6 +21818,10 @@ msgstr "Undertryck tills"
 msgid "Suppressed"
 msgstr "Stoppad adress"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21849,6 +21984,10 @@ msgstr "Tabellen \"%1$s\" finns inte."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "Tabellen \"%1$s\" har inte ett fält med namnet \"%2$s\"."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21907,6 +22046,10 @@ msgstr "Taggnamn"
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
 msgstr "Kombinationen av taggens namn och värde är inte unik."
+
+#: jsLoader.php:292
+msgid "Tag name display"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
@@ -22591,6 +22734,10 @@ msgstr "Denna inställning gäller endast för numeriska data."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Denna inställning gäller endast för numeriska data. Icke-numeriska data kommer alltid att hämtas från historiken."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -22989,6 +23136,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Totalt"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23063,6 +23215,10 @@ msgstr "Behandlas som 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Trendfunktion för cache-statistik. Giltiga parametrar är: all, hits, phits, misses, pmisses, items, pitems och requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23078,6 +23234,11 @@ msgstr "Trendfunktion för cache-statistik. Giltiga parametrar är: all, hits, p
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Trender"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -24013,6 +24174,10 @@ msgstr "Undertryck inte"
 msgid "Unsuppressed"
 msgstr "Oförtryckt"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24193,6 +24358,11 @@ msgstr "Drifttid för Zabbix serverprocess i sekunder."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Upptid/Nedtid"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26056,6 +26226,10 @@ msgstr "Din databas fungerar inte korrekt. Vänta några minuter och försök se
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
 msgstr "Dina framsteg kommer att ignoreras och du kommer att lämna Värdguiden. Är du säker på att du vill avbryta?"
 
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -27134,6 +27308,10 @@ msgstr "finns inte"
 msgid "does not match"
 msgstr "inte överensstämmer med"
 
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - Returnerar Eulers tal"
@@ -27238,6 +27416,10 @@ msgstr "fuzzytime() - Skillnaden mellan objektets värde (som tidsstämpel) och 
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "geografiska koordinater (värden för latitud och longitud separerade med kommatecken) förväntas"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27397,6 +27579,11 @@ msgstr "felaktigt elementantal"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "felaktigt uttryck som börjar från \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

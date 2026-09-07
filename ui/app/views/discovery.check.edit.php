@@ -26,6 +26,21 @@ $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
 $form = (new CForm())->addStyle('display: none;');
 
+$dchecks = array_values($data['dchecks'] ?? []);
+
+$allowedKeys = [
+	'type', 'ports', 'key_', 'snmp_community', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
+	'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'allow_redirect'
+];
+
+foreach ($dchecks as $index => $dcheck) {
+	foreach ($allowedKeys as $key) {
+		if (array_key_exists($key, $dcheck)) {
+			$form->addVar('dchecks['.$index.']['.$key.']', $dcheck[$key]);
+		}
+	}
+}
+
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
@@ -154,22 +169,25 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Allow redirect'), 'allow_redirect'))->setId('allow_redirect_label'),
 		(new CFormField(
-			(new CCheckBox('allow_redirect'))->setChecked($data['params']['allow_redirect'] == 1)
+			(new CCheckBox('allow_redirect'))
+				->setChecked($data['params']['allow_redirect'] == 1)
+				->setUncheckedValue(0)
 		))->setId('allow_redirect_field')
 	]);
 
 $form
 	->addItem([
 		$form_grid,
-		(new CInput('submit', 'submit'))->addStyle('display: none;'),
-		(new CScriptTag(
-			'check_popup.init();'
-		))->setOnDocumentReady()
+		(new CInput('submit', 'submit'))->addStyle('display: none;')
 	]);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => getPagePostJs().$this->readJsFile('discovery.check.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('discovery.check.edit.js.php').
+		'check_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'body' => $form->toString(),
 	'buttons' => [
 		[

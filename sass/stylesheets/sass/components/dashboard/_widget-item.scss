@@ -64,6 +64,9 @@ form.dashboard-widget-item {
 // Widget view.
 
 div.dashboard-widget-item {
+	--text-color-on-dark: var(--theme-text-color-on-dark, #f2f2f2);
+	--text-color-on-light: var(--theme-text-color-on-light, #1f2c33);
+
 	.dashboard-grid-widget-body {
 		$line-height: 1.14;
 

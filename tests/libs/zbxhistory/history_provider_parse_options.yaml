@@ -1,0 +1,129 @@
+---
+test case: Test empty parameter
+in:
+    conf: ''
+out:
+  result: FAIL
+---
+test case: Test parameter ','
+in:
+    conf: ','
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql'
+in:
+    conf: 'sql'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,'
+in:
+    conf: 'sql,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql,key'
+in:
+    conf: 'sql,key'
+out:
+  result: FAIL
+---
+test case: Test parameter 'clickhouse;key='
+in:
+    conf: 'clickhouse;key='
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types='
+in:
+    conf: 'sql;value_types='
+out:
+  name: sql
+  options:
+  - name: value_types
+    value: ''
+  result: SUCCEED
+---
+test case: Test parameter 's l;value_types='
+in:
+    conf: 's l;value_types='
+out:
+  result: FAIL
+---
+test case: Test parameter 's*l;value_types='
+in:
+    conf: 's*l;value_types='
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types=dbl,uint'
+in:
+    conf: 'sql;value_types=dbl,uint'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types="dbl,uint" '
+in:
+    conf: 'sql;value_types="dbl,uint" '
+out:
+  name: sql
+  options:
+  - name: value_types
+    value: 'dbl,uint'
+  result: SUCCEED
+---
+test case: Test parameter 'sql ; value_types = "dbl,uint"'
+in:
+    conf: 'sql ; value_types = "dbl,uint"'
+out:
+  name: sql
+  options:
+  - name: value_types
+    value: 'dbl,uint'
+  result: SUCCEED
+---
+test case: Test parameter 'sql;value_types=str,'
+in:
+    conf: 'sql;value_types=str,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types="str,'
+in:
+    conf: 'sql;value_types="str,'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types="str\x"'
+in:
+    conf: 'sql;value_types="str\x"'
+out:
+  result: FAIL
+---
+test case: Test parameter 'sql;value_types=str,opt="\"\\/\""'
+in:
+    conf: 'sql;value_types=str,opt="\"\\/\""'
+out:
+  name: sql
+  options:
+  - name: value_types
+    value: 'str'
+  - name: opt
+    value: '"\/"'
+  result: SUCCEED
+---
+test case: Test parameter 'sql;value_types=str,opt=1'
+in:
+    conf: 'sql;value_types=str,opt=1'
+out:
+  name: sql
+  options:
+  - name: value_types
+    value: 'str'
+  - name: opt
+    value: '1'
+  result: SUCCEED
+...
+
+

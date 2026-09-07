@@ -42,10 +42,12 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE)
 window.item_edit_form = new class {
 
 	#host_interface_selector;
+	#tabs;
 
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url
+		type_with_key_select, value_type_keys, source, return_url, test_rules, history_override,
+		history_override_hint_html, storage_value_types
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -57,6 +59,9 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
+		this.history_override = source === 'item' ? history_override : [];
+		this.history_override_hint_html = history_override_hint_html;
+		this.storage_value_types = source === 'item' ? storage_value_types : [];
 
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
@@ -75,6 +80,21 @@ window.item_edit_form = new class {
 		this.tags_abort_controller = null;
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
+
+		this.#tabs = {
+			preprocessing: new ItemEditPreprocessingTab({
+				container: document.getElementById('processing-tab'),
+				preprocessing: this.form_data.preprocessing,
+				readonly: this.form_readonly,
+				form: this.form,
+				test_rules: test_rules
+			})
+		}
+
+		this.#tabs.preprocessing.getContainer().addEventListener('test.validated', () => {
+			this.overlay.unsetLoading();
+			this.#updateActionButtons();
+		});
 
 		this.initForm(field_switches);
 		this.initFormCustomIntervals();
@@ -129,8 +149,9 @@ window.item_edit_form = new class {
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
-			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
-			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
+			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
+			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -396,33 +417,9 @@ window.item_edit_form = new class {
 		});
 	}
 
-	#testDialog() {
-		const indexes = [].map.call(
-			this.form_element.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
-			type => type.getAttribute('name').match(/preprocessing\[(?<step>[\d]+)\]/).groups.step
-		);
-
-		// Method requires form name to be set to itemForm.
-		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
-	}
-
-	test({rules}) {
-		this.form.findFieldByName('key').setChanged();
+	test() {
 		this.form.findFieldByName('params_f').setChanged();
-		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
-			field.setChanged();
-		}
-		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules)
-			.then((result) => {
-				this.overlay.unsetLoading();
-				this.#updateActionButtons();
-
-				if (!result) {
-					return;
-				}
-
-				this.#testDialog();
-			});
+		this.#tabs.preprocessing.test(true, true, this.footer.querySelector('.js-test-item'), -2, ['params_f']);
 	}
 
 	delete() {
@@ -504,7 +501,6 @@ window.item_edit_form = new class {
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
-		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';
@@ -653,9 +649,11 @@ window.item_edit_form = new class {
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
 
-				const $tags_table = jQuery(this.tags_table);
+				if (!('readonly' in this.tags_table.dataset)) {
+					const $tags_table = jQuery(this.tags_table);
 
-				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				}
 			})
 			.catch((message) => {
 				if (abort_controller.signal.aborted) {
@@ -737,20 +735,28 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
+			override = this.history_override[parseInt(this.field.value_type.value, 10)];
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+		if (this.label.history_hint !== null) {
+			this.label.history_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || override === undefined);
+			this.label.history_hint.querySelector('[data-hintbox="1"]').dataset.hintboxHtml =
+				this.history_override_hint_html + (override === '' ? '' : ` (${override})`);
+		}
 	}
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly),
+			storage_value_type = this.storage_value_types.indexOf(parseInt(this.field.value_type.value, 10)) !== -1;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
+		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !storage_value_type);
 	}
 
 	#updateValueTypeOptionVisibility() {

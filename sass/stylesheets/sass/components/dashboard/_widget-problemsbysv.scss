@@ -20,6 +20,10 @@ div.dashboard-widget-problemsbysv {
 					flex-direction: column;
 					justify-content: center;
 				}
+
+				&::after {
+					background-position: center;
+				}
 			}
 		}
 	}

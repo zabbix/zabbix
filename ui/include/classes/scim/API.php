@@ -17,8 +17,8 @@
 namespace SCIM;
 
 use CJsonRpc;
+use Exception;
 use APIException;
-use CApiClientResponse;
 use CHttpRequest;
 use SCIM\clients\ScimApiClient;
 
@@ -33,19 +33,52 @@ class API {
 	 * @return HttpResponse
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
+		global $NO_AUTH_DEBUG_MODE;
+
+		$client->debug = $NO_AUTH_DEBUG_MODE;
+
 		$response = new HttpResponse();
 		$endpoint = strtolower($request->getPathInfoSegment(0));
 		$method = strtolower($request->method());
 		$input = $this->getRequestData($request);
 		$response->setRequestDetails($endpoint, $method, $input);
-		$response->setResponse(
-			$client->callMethod($endpoint, $method, $input, [
-				'type' => CJsonRpc::AUTH_TYPE_HEADER,
-				'auth' => $request->getAuthBearerValue()
-			])
-		);
 
-		return $response;
+		$auth_header = $request->getParsedAuthHeader();
+
+		$auth = $auth_header['type'] !== null
+				&& strcasecmp($auth_header['type'], CJsonRpc::HEADER_AUTHENTICATE_BEARER) == 0
+			? ['type' => CJsonRpc::AUTH_TYPE_BEARER, 'auth' => $auth_header['auth']]
+			: ['type' => null, 'auth' => null];
+
+		if (!$client->isValidApi($endpoint)) {
+			throw new APIException(ZBX_API_ERROR_NO_METHOD,
+				_s('The requested endpoint "%1$s" is not supported.', $endpoint)
+			);
+		}
+
+		if (!$client->isValidMethod($endpoint, $method)) {
+			throw new APIException(ZBX_API_ERROR_NO_METHOD,
+				_s('Incorrect method "%1$s.%2$s".', $endpoint, $method)
+			);
+		}
+
+		$requires_authentication = $client->requiresAuthentication($endpoint, $method);
+
+		if (!$requires_authentication && $auth['auth'] !== null) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS,
+				_s('The "%1$s.%2$s" method must be called without authorization header.', $endpoint, $method)
+			);
+		}
+
+		$authenticate_response = null;
+
+		if ($requires_authentication) {
+			$authenticate_response = $client->authenticate($auth);
+		}
+
+		return $authenticate_response === null || $authenticate_response->errorCode === null
+			? $response->setResponse($client->callMethod($endpoint, $method, $input, $auth['type']))
+			: $response->setResponse($authenticate_response);
 	}
 
 	/**

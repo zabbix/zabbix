@@ -82,6 +82,8 @@ window.proxy_edit_popup = new class {
 			document.getElementById(id).disabled = false;
 		}
 
+		document.getElementById('tls_psk_identity').focus();
+
 		this.display_change_psk = false;
 	}
 

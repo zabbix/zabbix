@@ -75,6 +75,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -130,22 +131,22 @@ static const char	*help_message[] = {
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, browser poller, configuration syncer,",
-	"                                 data sender, discovery manager, discovery worker, history syncer,",
+	"                                 data sender, discovery manager, history syncer,",
 	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker",
-	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
-	"                                 vmware collector)",
+	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker,",
+	"                                 self-monitoring, snmp trapper, supervisor, task manager, trapper,",
+	"                                 unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
 	"      Profiling control targets:",
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, browser poller, configuration syncer,",
-	"                                 data sender, discovery manager, discovery worker, history syncer,",
+	"                                 data sender, discovery manager, history syncer,",
 	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker",
+	"                                 http agent poller, snmp poller, preprocessing manager,",
 	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
 	"                                 vmware collector)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
@@ -328,7 +329,9 @@ static char	*config_webdriver_url = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_db_config_t		*zbx_db_config = NULL;
-static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	zbx_config_vault = {.name = NULL, .url = NULL, .token = NULL, .tls_cert_file = NULL,
+						.tls_key_file = NULL, .db_path = NULL, .prefix = NULL,
+						.app_role_id = NULL, .app_secret_id = NULL};
 
 static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
@@ -607,7 +610,7 @@ static void	zbx_set_defaults(void)
 		config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
-		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
 	if (-1 != config_heartbeat_frequency)
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
@@ -705,6 +708,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
 	err |= (FAIL == zbx_check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
 	err |= (FAIL == zbx_check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultAppRoleID", zbx_config_vault.app_role_id, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultAppSecretID", zbx_config_vault.app_secret_id, "cURL library"));
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == zbx_check_cfg_feature_int("StartVMwareCollectors", config_forks[ZBX_PROCESS_TYPE_VMWARE],
@@ -996,6 +1001,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultDBPath",			&zbx_config_vault.db_path,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultAppRoleID",		&(zbx_config_vault.app_role_id),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultAppSecretID",		&(zbx_config_vault.app_secret_id),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBSocket",			&(zbx_db_config->dbsocket),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBPort",			&(zbx_db_config->dbport),	ZBX_CFG_TYPE_INT,
@@ -1198,7 +1207,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	int	sync_mode = (0 == proxy_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
 
-	zbx_free_database_cache(sync_mode, &events_cbs, config_history_storage_pipelines);
+	zbx_free_database_cache(sync_mode, &events_cbs);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
@@ -1583,7 +1592,9 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.discovery_open_cb = zbx_discovery_open_proxy,
 			.discovery_close_cb = zbx_discovery_close_proxy,
 			.discovery_find_host_cb = zbx_discovery_find_host_proxy,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_proxy,
 			.discovery_update_host_cb = zbx_discovery_update_host_proxy,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_proxy,
 			.discovery_update_service_cb = zbx_discovery_update_service_proxy,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_proxy,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_proxy
@@ -1673,6 +1684,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	thread_args.info.program_type = zbx_program_type;
 
 	/* prepare supervisor unit definitions */
+
+	zbx_curl_cleanup();
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_PREPROCMAN] = (zbx_supervisor_unit_def_t){
 			.entry = zbx_pp_manager_thread,
@@ -1832,7 +1845,7 @@ static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t				listen_sock = {0};
-	char					*error = NULL;
+	char					*error = NULL, *old_token = NULL;
 	int					i;
 	pid_t					pid;
 	zbx_rtc_t				rtc;
@@ -2017,20 +2030,30 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
+	if (SUCCEED == zbx_vault_is_configured(&zbx_config_vault))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
-	}
+		if (SUCCEED != zbx_vault_validate_config(&zbx_config_vault, zbx_db_config->dbuser,
+				zbx_db_config->dbpassword, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "invalid vault configuration: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
-			&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
+		zbx_vault_init(zbx_config_vault.name);
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
+
+		if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
+				&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
 	}
 
 	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
@@ -2161,8 +2184,33 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_func);
+			if (ZBX_RTC_VAULT_RELOGIN == message->code)
+			{
+				if (NULL != zbx_config_vault.token &&
+						0 == strcmp(zbx_config_vault.token, (char *)message->data))
+				{
+					zbx_free(zbx_config_vault.token);
+				}
+			}
+			else
+			{
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_func);
+			}
+
 			zbx_ipc_message_free(message);
+		}
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
+
+		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
+		{
+			old_token = zbx_strdup(old_token, zbx_config_vault.token);
+
+			zbx_rtc_notify(&rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_VAULT_NEW_TOKEN,
+					(const char *)zbx_config_vault.token,
+					(zbx_uint32_t)strlen(zbx_config_vault.token) + 1);
 		}
 
 		if (NULL != client)
@@ -2183,9 +2231,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_set_exiting_with_fail();
 			break;
 		}
-
-		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location);
 
 		__zbx_update_env(zbx_time());
 	}

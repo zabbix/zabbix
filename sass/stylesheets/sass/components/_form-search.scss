@@ -12,7 +12,7 @@
 		color: $form-search-color;
 		background: $form-search-bg-color;
 		border: 1px solid $form-search-border-color;
-		border-radius: 3px;
+		border-radius: var(--input-border-radius);
 
 		&:focus {
 			color: $form-search-focused-color;

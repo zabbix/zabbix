@@ -861,7 +861,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
+	int				i, changed, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
 	unsigned char			state;
 	time_t				now, period_start, period_end, running_since, running_until;
 	zbx_dc_config_t			*config = get_dc_config();
@@ -888,6 +888,8 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 
 		if (now >= maintenance->active_since && now < maintenance->active_until)
 		{
+			changed = 0;
+
 			/* find the longest running maintenance period */
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
@@ -901,6 +903,28 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 					{
 						running_since = period_start;
 						running_until = period_end;
+						changed = 1;
+					}
+				}
+			}
+
+			while (1 == changed)
+			{
+				changed = 0;
+
+				for (i = 0; i < maintenance->periods.values_num; i++)
+				{
+					period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
+
+					/* find latest end of overlapping periods */
+					if (SUCCEED == dc_check_maintenance_period(maintenance, period,
+						running_until, &period_start, &period_end))
+					{
+						if (period_end > running_until)
+						{
+							running_until = period_end;
+							changed = 1;
+						}
 					}
 				}
 			}

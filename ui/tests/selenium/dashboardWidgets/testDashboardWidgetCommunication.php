@@ -2873,7 +2873,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 							],
 							[
 								'operation' => 'fill',
-								'element' => ['Item' => 'Unique trapper item']
+								'element' => [
+									'Item' => 'Unique trapper item',
+									'History data' => 'History'
+								]
 							]
 						]
 					],
@@ -2969,7 +2972,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		$dashboard->waitUntilReady();
 		$this->closeOpenedPopup();
 
-		// Go through all updated listeners and theck that no data is available on the listener widget.
+		// Go through all updated listeners and check that no data is available on the listener widget.
 		foreach ($data['expected'] as $listener_name => $outcome) {
 			$listener = $dashboard->getWidget($listener_name);
 
@@ -2978,7 +2981,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'No data':
 				case 'No permissions to referred object or it does not exist!':
 					$class = ($outcome === 'No data') ? 'svg-honeycomb-content' : 'no-data-message';
-					$no_data_message = $listener->query('class', $class)->one();
+					$no_data_message = $listener->query('class', $class)->waitUntilVisible()->one();
 					$this->assertTrue($no_data_message->isDisplayed(), 'No data message is missing.');
 					$this->assertEquals($outcome, $no_data_message->getText());
 					break;

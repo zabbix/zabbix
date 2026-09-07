@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -25,14 +26,15 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 class testFormHost extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, DatatableBehaviour and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -303,7 +305,7 @@ class testFormHost extends CWebTest {
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
+		$this->assertEquals('Max repetition count is applicable to walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
@@ -2241,20 +2243,23 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
-		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+		$this->page->waitUntilReady();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
+		$this->query('name:zbx_filter')->asForm()->one()->waitUntilReady()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
-		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilPresent();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
-			$host_link->one()->click();
+			$host_link->one()->click(true);
 		}
 
 		return COverlayDialogElement::find()->waitUntilReady()->asForm()->one();

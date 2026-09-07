@@ -24,8 +24,10 @@ import (
 )
 
 type accessRules struct {
-	allowRecords conf.Node
-	denyRecords  conf.Node
+	allowRecords       conf.Node
+	denyRecords        conf.Node
+	allowRegexpRecords conf.Node
+	denyRegexpRecords  conf.Node
 }
 
 type scenario struct {
@@ -34,7 +36,8 @@ type scenario struct {
 }
 
 func (r *accessRules) addRule(pattern string, ruleType RuleType) {
-	var n int = len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) + 1
+	n := len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
+		len(r.allowRegexpRecords.Nodes) + len(r.denyRegexpRecords.Nodes) + 1
 
 	if ruleType == ALLOW {
 		r.allowRecords.Nodes = append(r.allowRecords.Nodes, &conf.Value{Value: []byte(pattern), Line: n})
@@ -43,11 +46,27 @@ func (r *accessRules) addRule(pattern string, ruleType RuleType) {
 	}
 }
 
-func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
-	var err error
+func (r *accessRules) addRegexpRule(pattern string, ruleType RuleType) {
+	n := len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
+		len(r.allowRegexpRecords.Nodes) + len(r.denyRegexpRecords.Nodes) + 1
 
-	if err := LoadRules(&rules.allowRecords, &rules.denyRecords); err != nil {
-		t.Errorf("Failed to load rules: %s", err.Error())
+	if ruleType == ALLOW {
+		r.allowRegexpRecords.Nodes = append(r.allowRegexpRecords.Nodes,
+			&conf.Value{Value: []byte(pattern), Line: n})
+	} else {
+		r.denyRegexpRecords.Nodes = append(r.denyRegexpRecords.Nodes,
+			&conf.Value{Value: []byte(pattern), Line: n})
+	}
+}
+
+func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
+
+	loadErr := LoadRules(
+		&rules.allowRecords, &rules.denyRecords,
+		&rules.allowRegexpRecords, &rules.denyRegexpRecords,
+	)
+	if loadErr != nil {
+		t.Errorf("Failed to load rules: %s", loadErr.Error())
 	}
 
 	if numRules != GetNumberOfRules() {
@@ -58,11 +77,13 @@ func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRule
 		var key string
 		var params []string
 
-		if key, params, err = itemutil.ParseKey(test.metric); err != nil {
+		key, params, parseErr := itemutil.ParseKey(test.metric)
+		if parseErr != nil {
 			t.Errorf("Failed to parse metric \"%s\"", test.metric)
 		}
-		if ok := CheckRules(key, params); ok != test.result {
-			t.Errorf("Unexpected result for metric \"%s\"", test.metric)
+
+		if ok := CheckRules(test.metric, key, params); ok != test.result {
+			t.Errorf("Unexpected result for metric \"%s\": got %v, want %v", test.metric, ok, test.result)
 		}
 	}
 }
@@ -458,6 +479,56 @@ func TestNoRulesAfterDenyAll(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
+func TestNoRulesAfterAllowAllRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRegexpRule(".*", ALLOW)     // Will not be added
+	records.addRule("system.run[*]", DENY) // Will not be added
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "vfs.file.size[/etc/systemd.conf]", result: false},
+		{metric: "system.run[echo 1]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 1)
+}
+
+//nolint:paralleltest
+func TestNoRulesAfterDenyAllRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", ALLOW)
+	records.addRegexpRule(".*", DENY)
+	records.addRule("system.run[*]", ALLOW) // Will not be added
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "vfs.file.size[/etc/systemd.conf]", result: true},
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestNonCanonicalMatchAllRegexpIsNotTrimmed(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule("^.*$", ALLOW)
+	records.addRule("vfs.file.*[*]", DENY) // Not trimmed, although unreachable
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "system.run[echo 1]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 3)
+}
+
 func TestIncompleteWhitelist(t *testing.T) {
 	var records accessRules
 
@@ -465,7 +536,10 @@ func TestIncompleteWhitelist(t *testing.T) {
 	records.addRule("system.localtime[*]", ALLOW)
 	// Trailing DenyKey=* is missing
 
-	var err error = LoadRules(&records.allowRecords, &records.denyRecords)
+	err := LoadRules(
+		&records.allowRecords, &records.denyRecords,
+		&records.allowRegexpRecords, &records.denyRegexpRecords,
+	)
 
 	if err == nil {
 		t.Errorf("Failure expected while loading incomplete whitelist")
@@ -489,6 +563,22 @@ func TestNoTrailingAllowRules(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
+func TestTrailingAllowRuleTrimmedAfterSystemRunAllow(t *testing.T) {
+	var records accessRules
+
+	records.addRule("system.*", ALLOW)
+	records.addRule("system.run[*]", ALLOW)
+
+	var scenarios = []scenario{
+		{metric: "system.run[/usr/bin/hostname -f]", result: true},
+		{metric: "system.localtime", result: true},
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 1)
+}
+
 func TestEmptyParametersMatch(t *testing.T) {
 	var records accessRules
 
@@ -504,4 +594,183 @@ func TestEmptyParametersMatch(t *testing.T) {
 	}
 
 	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestRegexpHostnameVariants(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`system\.run\[(?:/usr)?/bin/hostname(?: -[fsd])?\]`, ALLOW)
+
+	var scenarios = []scenario{
+		{metric: "system.run[/bin/hostname]", result: true},
+		{metric: "system.run[/bin/hostname -f]", result: true},
+		{metric: "system.run[/bin/hostname -s]", result: true},
+		{metric: "system.run[/bin/hostname -d]", result: true},
+		{metric: "system.run[/usr/bin/hostname]", result: true},
+		{metric: "system.run[/usr/bin/hostname -f]", result: true},
+		{metric: "system.run[/usr/bin/hostname -s]", result: true},
+		{metric: "system.run[/usr/bin/hostname -d]", result: true},
+		{metric: "system.run[/bin/hostname -x]", result: false},
+		{metric: "system.run[echo 1]", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestRegexpServiceStartRestart(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`system\.run\[sc (?:re)?start ABC[1-4]\]`, ALLOW)
+
+	var scenarios = []scenario{
+		{metric: "system.run[sc start ABC1]", result: true},
+		{metric: "system.run[sc start ABC2]", result: true},
+		{metric: "system.run[sc start ABC3]", result: true},
+		{metric: "system.run[sc start ABC4]", result: true},
+		{metric: "system.run[sc restart ABC1]", result: true},
+		{metric: "system.run[sc restart ABC2]", result: true},
+		{metric: "system.run[sc restart ABC3]", result: true},
+		{metric: "system.run[sc restart ABC4]", result: true},
+		{metric: "system.run[sc stop ABC1]", result: false},
+		{metric: "system.run[sc start ABC5]", result: false},
+		{metric: "system.run[echo 1]", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestMixedWildcardAndRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", ALLOW)
+	records.addRegexpRule(`system\.run\[/bin/hostname\]`, ALLOW)
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.size[/tmp/x]", result: true},
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "system.run[/bin/hostname]", result: true},
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 3)
+}
+
+//nolint:paralleltest
+func TestRegexpDenyBeforeWildcardAllow(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`vfs\.file\.contents\[/etc/passwd\]`, DENY)
+	records.addRule("vfs.file.*[*]", ALLOW)
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "vfs.file.contents[/tmp/test]", result: true},
+		{metric: "vfs.file.size[/tmp/x]", result: true},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 3)
+}
+
+//nolint:paralleltest
+func TestRegexpExplicitAnchorsEnforceFullStringMatch(t *testing.T) {
+	var records accessRules
+
+	// user-supplied patterns are not auto-anchored; use ^...$ for full-string match
+	records.addRegexpRule(`^system\.run$`, ALLOW)
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
+		{metric: "system.run", result: true},
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.run[/bin/hostname]", result: false},
+		{metric: "vfs.file.size[/tmp/x]", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestRegexpInvalidPattern(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`[invalid`, DENY)
+
+	err := LoadRules(
+		&records.allowRecords, &records.denyRecords,
+		&records.allowRegexpRecords, &records.denyRegexpRecords,
+	)
+	if err == nil {
+		t.Errorf("Expected error for invalid regexp pattern, got nil")
+	}
+}
+
+//nolint:paralleltest
+func TestRegexpEmptyPattern(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(``, DENY)
+
+	err := LoadRules(
+		&records.allowRecords, &records.denyRecords,
+		&records.allowRegexpRecords, &records.denyRegexpRecords,
+	)
+	if err == nil {
+		t.Errorf("Expected error for empty regexp pattern, got nil")
+	}
+}
+
+//nolint:paralleltest
+func TestRegexpDuplicatePattern(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`system\.run\[.*\]`, DENY)
+	records.addRegexpRule(`system\.run\[.*\]`, DENY) // exact duplicate: will not be added
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestRegexpConflictingPattern(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule(`system\.run\[.*\]`, DENY)
+	records.addRegexpRule(`system\.run\[.*\]`, ALLOW) // conflicts with: will not be added
+	records.addRule("*", DENY)
+
+	var scenarios = []scenario{
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.run[/bin/hostname]", result: false},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestNoTrailingAllowRulesWithRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRegexpRule(`system\.localtime`, ALLOW)
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "system.localtime", result: true},
+		{metric: "system.run[echo 1]", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 3)
 }

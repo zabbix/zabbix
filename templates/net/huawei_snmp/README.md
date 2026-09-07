@@ -34,6 +34,7 @@ Refer to the vendor documentation.
 |{$FAN_CRIT_STATUS}||`2`|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
 |{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
@@ -73,7 +74,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Huawei VRP: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Huawei VRP: No SNMP data collection</li></ul>|
+|Huawei VRP: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0],#2))) or (last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0],#2)))`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Huawei VRP: No SNMP data collection</li></ul>|
 |Huawei VRP: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Huawei VRP by SNMP/system.name,#1)<>last(/Huawei VRP by SNMP/system.name,#2) and length(last(/Huawei VRP by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Huawei VRP: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Huawei VRP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Huawei VRP: Unavailable by ICMP ping</li></ul>|
 |Huawei VRP: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Huawei VRP by SNMP/icmpping,#3)=0`|High||

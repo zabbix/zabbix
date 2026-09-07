@@ -101,13 +101,15 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[text()="Disable"]');
 
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('User cannot add oneself to a disabled group or a group with disabled GUI access.');
+			$this->assertMessage(TEST_BAD, 'Cannot update user group',
+					'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+			);
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User group updated');
 		}
+		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
 		if ($cannotDisable) {

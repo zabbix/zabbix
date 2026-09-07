@@ -67,12 +67,12 @@ class CControllerRegExTest extends CController {
 	private static function validateRegex(array $expression): void {
 		$validator = new CRegexValidator([
 			'messageInvalid' => _('Regular expression must be a string'),
-			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+			'messageRegex' => _('Incorrect regular expression: "%2$s"')
 		]);
 
 		switch ($expression['expression_type']) {
-			case EXPRESSION_TYPE_TRUE:
-			case EXPRESSION_TYPE_FALSE:
+			case REGEX_TYPE_MATCHES_REGEX:
+			case REGEX_TYPE_NOT_MATCHES_REGEX:
 				if (!$validator->validate($expression['expression'])) {
 					throw new Exception($validator->getError());
 				}

@@ -460,7 +460,6 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 		zbx_db_acknowledge	ack;
 
 		ack.clock = atoi(row[0]);
-		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.message = row[2];
 		ack.acknowledgeid = 0;
 		ack.action = atoi(row[3]);
@@ -468,10 +467,20 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 		ack.new_severity = atoi(row[5]);
 		ack.suppress_until = atoi(row[6]);
 
-		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
-			user_name = zbx_user_string(ack.userid);
+		if (SUCCEED == zbx_db_is_null(row[1]))
+		{
+			ack.userid = ZBX_MAX_UINT64;
+			user_name = "";
+		}
 		else
-			user_name = "Inaccessible user";
+		{
+			ZBX_STR2UINT64(ack.userid, row[1]);
+
+			if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
+				user_name = zbx_user_string(ack.userid);
+			else
+				user_name = "Inaccessible user";
+		}
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
@@ -480,11 +489,12 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 				user_name);
 
 		if (SUCCEED == zbx_problem_get_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
+					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_CLOSE |
+					ZBX_PROBLEM_UPDATE_SEVERITY |
 					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS |
-					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-					tz, &actions))
+					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM |
+					ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS |
+					ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS, tz, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);

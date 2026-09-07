@@ -29,8 +29,7 @@ $html_page = (new CHtmlPage())
 $lang_select = (new CSelect('default_lang'))
 	->setId('default_lang')
 	->setValue($data['default_lang'])
-	->setFocusableElementId('label-default-lang')
-	->setAttribute('autofocus', 'autofocus');
+	->setFocusableElementId('label-default-lang');
 
 $all_locales_available = true;
 
@@ -82,7 +81,6 @@ $gui_tab = (new CFormList())
 			->setFocusableElementId('label-default-theme')
 			->setValue($data['default_theme'])
 			->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
-			->setAttribute('autofocus', 'autofocus')
 			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),

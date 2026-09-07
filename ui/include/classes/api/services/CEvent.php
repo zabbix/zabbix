@@ -42,7 +42,7 @@ class CEvent extends CApiService {
 	 */
 	public function get(array $options = []) {
 		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
-			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname'
+			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname', 'maintenanceid'
 		];
 		$alert_output_fields = array_diff(CAlert::OUTPUT_FIELDS, ['eventid']);
 
@@ -672,7 +672,7 @@ class CEvent extends CApiService {
 		if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid'
+					'suppress_until', 'taskid', 'maintenanceid'
 				]
 				: array_diff($options['selectAcknowledges'], ['username', 'name', 'surname']);
 
@@ -858,10 +858,10 @@ class CEvent extends CApiService {
 			' WHERE '.dbConditionInt('e.eventid', array_keys($result))
 		), 'eventid');
 
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events);
+
 		foreach ($result as $eventid => $event) {
-			$result[$eventid]['opdata'] = array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== ''
-				? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
-				: '';
+			$result[$eventid]['opdata'] = $events[$eventid]['opdata'] ?? '';
 		}
 	}
 

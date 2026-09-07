@@ -21,8 +21,6 @@
 #	include <libxml/tree.h>
 #endif
 
-int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	zbx_xml_free_data_dyn(char **data);
 char	*zbx_xml_escape_dyn(const char *data);
 void	zbx_xml_escape_xpath(char **data);
 

@@ -271,7 +271,7 @@ class testFormTotpEnroll extends testFormTotp {
 			'&period=30$@';
 
 		// The QR code title contains URL-encoded characters (e.g., spaces as %20), so we need to decode it.
-		$qr_title = urldecode($qr_code->getAttribute('title'));
+		$qr_title = urldecode($qr_code->getAttribute('data-ref'));
 		$this->assertEquals(1, preg_match($regex, $qr_title, $matches),
 				"Failed to assert the QR code.\nExpected title regex: ".$regex."\nActual title: ".$qr_title
 		);
@@ -294,6 +294,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:zi-sign-out')->waitUntilPresent();
 	}
 
 	/**

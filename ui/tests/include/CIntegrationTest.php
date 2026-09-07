@@ -28,6 +28,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
+	const WAIT_ITERATIONS_STARTUP		= 15;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
@@ -235,6 +236,26 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Determine which TLS library the server/agent/proxy binaries were built with.
+	 *
+	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
+	 * default to OpenSSL. Read directly from the environment, the same way IntegrationTests::suite()
+	 * reads DB/HISTORY_STORAGE to decide which suites to run.
+	 *
+	 * @return string 'gnutls', 'openssl' or 'none'
+	 */
+	protected static function detectTLSLibrary(): string {
+		switch (strtoupper((string) getenv('ENCRYPTION'))) {
+			case 'GNUTLS':
+				return 'gnutls';
+			case 'NONE':
+				return 'none';
+			default:
+				return 'openssl';
+		}
+	}
+
+	/**
 	 * Callback executed before every test case.
 	 *
 	 * @before
@@ -297,6 +318,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
+		if (is_dir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name)) {
+			$case_name = strtr(get_class($this).'_'.$this->getName(true), [' ' => '-']);
+		}
 		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
 			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
@@ -417,7 +441,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$saved_time = time();
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+		for ($r = 0; $r < self::WAIT_ITERATIONS_STARTUP; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {
@@ -579,7 +603,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY;
+		global $DB, $HISTORY_PROVIDERS;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
@@ -600,9 +624,18 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
-		if (isset($HISTORY)) {
-			$db_history['HistoryStorageURL'] = reset($HISTORY['url']);
-			$db_history['HistoryStorageTypes'] = implode(',', $HISTORY['types']);
+		if (isset($HISTORY_PROVIDERS)) {
+			foreach ($HISTORY_PROVIDERS as $provider) {
+				$provider_str = $provider['provider'].';'.
+					'value_types="'.implode(',', $provider['types']).'",'.
+					'url='.$provider['url'];
+				foreach (['username', 'password', 'db'] as $key) {
+					if (array_key_exists($key, $provider)) {
+						$provider_str .= ','.$key.'='.$provider[$key];
+					}
+				}
+				$db_history['HistoryProvider'][] = $provider_str;
+			}
 		}
 
 		$configuration = [
@@ -686,7 +719,7 @@ class CIntegrationTest extends CAPITest {
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
 			foreach ($values[$component] as $key => $value) {
-				$config = preg_replace('/^(\s*'.$key.'\s*=.*)$/m', '#\1', $config);
+				$config = preg_replace('/^([ \t]*'.$key.'[ \t]*=.*)$/m', '#\1', $config);
 				foreach ((array) $value as $val) {
 					$config .= "\n".$key.'='.$val;
 				}
@@ -973,7 +1006,7 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host, '8.0.0', $proxy);
+		$result = $client->sendAgentDataValues($values, $session, $host, ZABBIX_VERSION, $proxy);
 
 		if ($proxy === null) {
 			$this->assertTrue(array_key_exists('processed', $result),
@@ -1072,9 +1105,27 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		$this->clearLog($component);
+
+		$line = '';
 		$this->reloadConfigurationCache($component, $delayOverride);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'finished forced reloading of the configuration cache');
+
+		switch ($component) {
+			case self::COMPONENT_SERVER:
+			case self::COMPONENT_PROXY:
+			case self::COMPONENT_PROXY_HANODE1:
+				$line = 'finished forced reloading of the configuration cache';
+				break;
+			default:
+				$this->fail('Configuration cache reload wait is not supported for component "'.
+					$component.'".');
+		}
+
+		$this->waitForLogLineToBePresent($component, $line);
 	}
 
 	/**
