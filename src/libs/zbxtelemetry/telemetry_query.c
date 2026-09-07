@@ -18,6 +18,7 @@
 
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxeval.h"
 
 ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)
 ZBX_VECTOR_IMPL(tq_aggr_column, zbx_tq_aggr_column_t)

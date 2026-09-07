@@ -857,7 +857,7 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const delay = this.#getCurrentDelay();
+		const delays = this.#getDelays();
 		const lookback_limit = timeUnitToSeconds(
 			this.form_element.querySelector('[name="lookback_limit"]').value.trim(), false
 		);
@@ -865,16 +865,20 @@ window.item_edit_form = new class {
 			this.form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
-		const data_gaps = delay !== null && lookback_limit !== null && lookback_limit < delay;
-		const data_overlap = delay !== null && granularity !== null && granularity > delay;
+		const data_gaps = lookback_limit !== null && delays.some((delay) => lookback_limit < delay);
+		const data_overlap = granularity !== null && delays.some((delay) => granularity > delay);
 
 		this.form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
 		this.form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
 	}
 
-	#getCurrentDelay() {
+	#getDelays() {
+		const delays = [];
 		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
-		let current_delay = delay > 0 ? delay : null;
+
+		if (delay > 0) {
+			delays.push(delay);
+		}
 
 		for (const row of this.form_element.querySelectorAll('#delay-flex-table .form_row')) {
 			if (row.querySelector('[name$="[type]"]:checked').value != ITEM_DELAY_FLEXIBLE) {
@@ -883,12 +887,12 @@ window.item_edit_form = new class {
 
 			const flexible_delay = timeUnitToSeconds(row.querySelector('[name$="[delay]"]').value.trim(), false);
 
-			if (flexible_delay > 0 && (current_delay === null || flexible_delay < current_delay)) {
-				current_delay = flexible_delay;
+			if (flexible_delay > 0) {
+				delays.push(flexible_delay);
 			}
 		}
 
-		return current_delay;
+		return delays;
 	}
 
 	#showErrorDialog(body, trigger_element) {

@@ -22,6 +22,7 @@
 #include "zbxeval.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
+#include "zbxnum.h"
 
 ZBX_PTR_VECTOR_DECL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
