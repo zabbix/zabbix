@@ -195,9 +195,9 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU Core {#CPU.ID}: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU `{#CPU.ID}` has spent running user processes that are not niced.</p>|Dependent item|system.core.user[multiProcUserTime.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.4.{#SNMPINDEX}`</p></li></ul>|
+|CPU Core {#CPU.ID}: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU `{#CPU.ID}` has spent running user processes that are not niced.</p>|Dependent item|system.core.user[multiProcUserTime.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.2.{#SNMPINDEX}`</p></li></ul>|
 |CPU Core {#CPU.ID}: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU `{#CPU.ID}` has spent running the kernel and its processes.</p>|Dependent item|system.core.system[multiProcSystemTime.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.3.{#SNMPINDEX}`</p></li></ul>|
-|CPU Core {#CPU.ID}: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU `{#CPU.ID}` has spent doing nothing.</p>|Dependent item|system.core.idle[multiProcIdleTime.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.2.{#SNMPINDEX}`</p></li></ul>|
+|CPU Core {#CPU.ID}: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU `{#CPU.ID}` has spent doing nothing.</p>|Dependent item|system.core.idle[multiProcIdleTime.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.4.{#SNMPINDEX}`</p></li></ul>|
 |CPU Core {#CPU.ID}: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU `{#CPU.ID}` utilization in %.</p>|Dependent item|system.core.util[multiProcUsage.{#CPU.ID}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.2620.1.6.7.5.1.5.{#SNMPINDEX}`</p></li></ul>|
 
 ### LLD rule Storage discovery

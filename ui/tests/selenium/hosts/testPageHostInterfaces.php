@@ -19,6 +19,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup hosts
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {

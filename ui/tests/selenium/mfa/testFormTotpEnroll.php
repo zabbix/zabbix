@@ -140,7 +140,7 @@ class testFormTotpEnroll extends testFormTotp {
 		}
 		else {
 			// Verify validation error.
-			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+			$this->assertEquals($data['error'], $form->query('class:red')->waitUntilVisible()->one()->getText());
 		}
 	}
 
@@ -294,6 +294,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:zi-sign-out')->waitUntilPresent();
 	}
 
 	/**

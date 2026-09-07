@@ -34,6 +34,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VeloCloud SD-WAN Edge", e.g. {$HTTP.TLS.VERIFY:"VeloCloud SD-WAN Edge"}.</p>|`full`|
 |{$VELOCLOUD.TOKEN}|<p>VeloCloud SD-WAN Orchestrator API token.</p>||
 |{$VELOCLOUD.URL}|<p>VeloCloud SD-WAN Orchestrator URL, e.g., `vco.velocloud.net`.</p>||
 |{$VELOCLOUD.ENTERPRISE.ID}|<p>SD-WAN Enterprise ID.</p>||
@@ -197,6 +198,7 @@ This template has been tested on:
 |{$VELOCLOUD.SDWAN.FREQUENCY}|<p>Update interval for raw item, expressed in hours.</p>|`1h`|
 |{$VELOCLOUD.SDWAN.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
 |{$VELOCLOUD.HTTP_PROXY}|<p>The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VeloCloud SD-WAN", e.g. {$HTTP.TLS.VERIFY:"VeloCloud SD-WAN"}.</p>|`full`|
 |{$VELOCLOUD.LLD.EDGES.NAME.FILTER.MATCHES}|<p>Filter for discoverable Edges by name.</p>|`.*`|
 |{$VELOCLOUD.LLD.EDGES.NAME.FILTER.NOT_MATCHES}|<p>Filter to exclude discovered Edges by name.</p>|`CHANGE_IF_NEEDED`|
 |{$VELOCLOUD.LLD.EDGES.STATE.FILTER.MATCHES}|<p>Filter for discoverable Edges by state.</p>|`.*`|
