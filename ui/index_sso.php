@@ -239,10 +239,13 @@ try {
 	}
 
 	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
-		$auth->processSLO(true, null, false, null, true);
 		CWebUser::logout();
 
-		redirect($redirect_to->toString());
+		$url = $auth->processSLO(true, null, false, null, true);
+
+		header('Pragma: no-cache');
+		header('Cache-Control: no-cache, must-revalidate');
+		redirect($url);
 	}
 
 	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
