@@ -509,11 +509,11 @@ window.ceprule_edit_popup = new class {
 
 		const overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: t('Condition details'),
+			title: <?= json_encode(_('Condition details')) ?>,
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Update'),
+					title: is_new ? <?= json_encode(_('Add')) ?> : <?= json_encode(_('Update')) ?>,
 					isSubmit: true,
 					action: overlay => ceprule_condition_edit_popup.submit()
 						.then(fields => {
@@ -585,11 +585,11 @@ window.ceprule_edit_popup = new class {
 
 		const overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: t('Operation details'),
+			title: <?= json_encode(_('Operation details')) ?>,
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Update'),
+					title: is_new ? <?= json_encode(_('Add')) ?> : <?= json_encode(_('Update')) ?>,
 					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
