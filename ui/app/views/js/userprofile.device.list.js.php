@@ -56,6 +56,7 @@ const view = new class {
 	}
 
 	#initDevice(target) {
+		target.disabled = true;
 		target.classList.add('is-loading');
 
 		const data = {
@@ -88,6 +89,7 @@ const view = new class {
 			})
 			.finally(() => {
 				target.classList.remove('is-loading');
+				target.disabled = false;
 			});
 	}
 
