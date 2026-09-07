@@ -648,10 +648,12 @@ class testGoAgentDataCollection extends CIntegrationTest {
 								unset($entry['in'][$exclude_key], $entry['out'][$exclude_key]);
 							}
 						}
+						unset($entry);
 					}
+					unset($json);
 
 					// Compare cleaned arrays.
-					$this->assertEquals($a_decoded, $b_decoded);
+					$this->assertEquals($a_decoded, $b_decoded, 'Values do not match for '.$item['key']);
 					break;
 				}
 
