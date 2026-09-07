@@ -12180,7 +12180,8 @@ static void	DCget_apm_db_config(zbx_apm_db_config_t *out, const zbx_config_apm_g
 		const zbx_apm_db_config_t *local_config, const char *config_source_ip,
 		const char *config_ssl_ca_location)
 {
-	if (1 == local_config->status) {
+	if (1 == local_config->status)
+	{
 		zbx_apm_db_config_copy(out, local_config);
 		return;
 	}
