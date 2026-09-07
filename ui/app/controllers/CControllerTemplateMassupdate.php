@@ -63,6 +63,10 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			return false;
+		}
+
 		$templates = API::Template()->get([
 			'output' => [],
 			'templateids' => $this->getInput('ids'),

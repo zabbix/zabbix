@@ -124,6 +124,7 @@ trait traitItemTelemetryQueryTests {
 				[
 					'host' => 'telemetry_query_host',
 					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'templates' => [['templateid' => ':template:telemetry_query_template']],
 					'lld_rules' => [
 						[
 							'name' => 'host lld',
@@ -157,7 +158,7 @@ trait traitItemTelemetryQueryTests {
 													'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 													'conditions' => []
 												]
-											],
+											]
 										]
 									]
 								]
@@ -196,21 +197,28 @@ trait traitItemTelemetryQueryTests {
 			[
 				'time_shift' => '{$M}'
 			],
-			'Invalid parameter "/1": unexpected parameter "time_shift".'
+			'Invalid parameter "/1": cannot update readonly parameter "time_shift" of discovered object.'
 		];
 
 		yield '"lookback_limit" fail' => [
 			[
 				'lookback_limit' => '{$M}'
 			],
-			'Invalid parameter "/1": unexpected parameter "lookback_limit".'
+			'Invalid parameter "/1": cannot update readonly parameter "lookback_limit" of discovered object.'
 		];
 
 		yield '"granularity" fail' => [
 			[
 				'granularity' => '{$M}'
 			],
-			'Invalid parameter "/1": unexpected parameter "granularity".'
+			'Invalid parameter "/1": cannot update readonly parameter "granularity" of discovered object.'
+		];
+
+		yield '"query" fail' => [
+			[
+				'query' => []
+			],
+			'Invalid parameter "/1": cannot update readonly parameter "query" of discovered object.'
 		];
 	}
 

@@ -168,10 +168,7 @@ window.item_edit_form = new class {
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
 			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
-			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
-			lookback_limit_hint: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-hint'),
-			lookback_limit_error: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-error'),
-			granularity_hint: this.form_element.querySelector('[for="granularity"] .js-granularity-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint')
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -265,6 +262,14 @@ window.item_edit_form = new class {
 			else if (e.target.classList.contains('element-table-remove')) {
 				e.target.closest('tr').nextSibling.remove();
 				e.target.closest('tr').remove();
+
+				this.#updateTelemetryIndicators();
+			}
+		});
+
+		table.addEventListener('input', e => {
+			if (e.target.matches('[name$="[delay]"]')) {
+				this.#updateTelemetryIndicators();
 			}
 		});
 	}
@@ -297,12 +302,14 @@ window.item_edit_form = new class {
 		this.field.signal_type.addEventListener('change', () => {
 			this.#refreshTelemetryColumns();
 			this.updateFieldsVisibility();
+			this.#validateTelemetryColumns();
 		});
 
 		for (const radio of this.field.metric_point_type) {
 			radio.addEventListener('change', () => {
 				this.#refreshTelemetryColumns();
 				this.updateFieldsVisibility();
+				this.#validateTelemetryColumns();
 			});
 		}
 
@@ -591,15 +598,23 @@ window.item_edit_form = new class {
 	#populateColumnSelect(select) {
 		const value = select.value;
 		const names = this.#getTelemetryColumns();
+		const is_unavailable = value !== null && value !== '' && !names.includes(value);
+		const options = is_unavailable ? [...names, value].sort() : names;
 
 		select.clearOptions();
-		select.addOptions(names.map((name) => ({value: name, label: name})));
+		select.addOptions(options.map((name) => ({value: name, label: name})));
 
-		if (value !== null && value !== '' && !names.includes(value)) {
-			select.addOption({value: value, label: value});
+		if (value === null || value === '') {
+			select.preselectHightlighted();
+
+			return;
 		}
 
-		select.preselectHightlighted();
+		select.value = value;
+
+		if (is_unavailable) {
+			select.getOptionByValue(value).disabled = true;
+		}
 	}
 
 	#toggleAttributeKey(select) {
@@ -618,6 +633,18 @@ window.item_edit_form = new class {
 			this.#populateColumnSelect(select);
 			this.#toggleAttributeKey(select);
 		}
+	}
+
+	#validateTelemetryColumns() {
+		const fields = ['columns', 'aggregated_columns', 'conditions'];
+
+		for (const name of fields) {
+			for (const field of Object.values(this.form.findFieldByName(name).getFields())) {
+				field.setChanged();
+			}
+		}
+
+		this.form.validateChanges(fields);
 	}
 
 	#removeRelatedErrorContainer(row) {
@@ -830,7 +857,7 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+		const delay = this.#getCurrentDelay();
 		const lookback_limit = timeUnitToSeconds(
 			this.form_element.querySelector('[name="lookback_limit"]').value.trim(), false
 		);
@@ -838,13 +865,30 @@ window.item_edit_form = new class {
 			this.form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
-		const lookback_too_small = lookback_limit !== null && granularity !== null && lookback_limit < granularity;
-		const data_gaps = !lookback_too_small && delay !== null && lookback_limit !== null && lookback_limit < delay;
+		const data_gaps = delay !== null && lookback_limit !== null && lookback_limit < delay;
 		const data_overlap = delay !== null && granularity !== null && granularity > delay;
 
-		this.label.lookback_limit_error.style.display = lookback_too_small ? '' : 'none';
-		this.label.lookback_limit_hint.style.display = data_gaps ? '' : 'none';
-		this.label.granularity_hint.style.display = data_overlap ? '' : 'none';
+		this.form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
+		this.form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
+	}
+
+	#getCurrentDelay() {
+		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+		let current_delay = delay > 0 ? delay : null;
+
+		for (const row of this.form_element.querySelectorAll('#delay-flex-table .form_row')) {
+			if (row.querySelector('[name$="[type]"]:checked').value != ITEM_DELAY_FLEXIBLE) {
+				continue;
+			}
+
+			const flexible_delay = timeUnitToSeconds(row.querySelector('[name$="[delay]"]').value.trim(), false);
+
+			if (flexible_delay > 0 && (current_delay === null || flexible_delay < current_delay)) {
+				current_delay = flexible_delay;
+			}
+		}
+
+		return current_delay;
 	}
 
 	#showErrorDialog(body, trigger_element) {
@@ -1181,6 +1225,8 @@ window.item_edit_form = new class {
 		row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+
+		this.#updateTelemetryIndicators();
 	}
 
 	#valueTypeChangeHandler(e) {

@@ -32,7 +32,7 @@ void	tq_query_init(zbx_tq_query_t *query)
 	zbx_vector_tq_aggr_column_create(&query->aggregated_columns);
 	query->evaltype			= ZBX_TQ_EVAL_TYPE_UNKNOWN;
 	query->formula			= NULL;
-	query->formula_parsed		= NULL;
+	query->formula_ctx		= NULL;
 	zbx_vector_tq_condition_create(&query->conditions);
 }
 
@@ -97,13 +97,13 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 	}
 	zbx_vector_tq_aggr_column_destroy(&query->aggregated_columns);
 
-	zbx_free(query->formula);
-
-	if (NULL != query->formula_parsed)
+	if (NULL != query->formula_ctx)
 	{
-		tq_formula_node_free(query->formula_parsed);
-		query->formula_parsed = NULL;
+		zbx_eval_clear(query->formula_ctx);
+		zbx_free(query->formula_ctx);
 	}
+
+	zbx_free(query->formula);
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
@@ -193,10 +193,8 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 	return strcmp(cond_a->attribute_key, cond_b->attribute_key);
 }
 
-void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
+void	tq_get_conditions_and_or_sorted(zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
 {
-	zbx_vector_tq_condition_ptr_create(conditions_sorted);
-
 	for (int i = 0; i < query->conditions.values_num; i++)
 		zbx_vector_tq_condition_ptr_append(conditions_sorted, &query->conditions.values[i]);
 

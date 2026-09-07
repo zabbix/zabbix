@@ -18,7 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBCURL
 void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetry_query_context)

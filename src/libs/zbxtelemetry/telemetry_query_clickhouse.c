@@ -36,7 +36,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	/* row id */
-	zbx_json_adduint64(&j, "id", row_id);
+	zbx_json_addint64(&j, "id", row_id);
 
 	/* timestamp */
 	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)) ||
@@ -102,10 +102,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: modifies resp during parsing but returns it to initial state     *
- * Return value: SUCCEED         - parsed response successfully                *
+ * Return value: SUCCEED         - parsed response successfully               *
  *               SUCCEED_PARTIAL - row count exceeded ZBX_TQ_MAX_RESULT_ROWS  *
  *               FAIL            - failed to parse response                   *
+ *                                                                            *
+ * Comments: modifies resp during parsing but restores it to initial state    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values)
@@ -113,8 +114,6 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 	int	ret = SUCCEED;
 	char	*start = resp;
 	int	row_count = 0;
-
-	zbx_vector_str_create(values);
 
 	while (1)
 	{
@@ -136,8 +135,7 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 		{
 			ret = FAIL;
 		}
-
-		if (ZBX_TQ_MAX_RESULT_ROWS < row_count)
+		else if (ZBX_TQ_MAX_RESULT_ROWS < row_count)
 		{
 			ret = SUCCEED_PARTIAL;
 			zbx_free(str);
@@ -157,10 +155,7 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 	}
 
 	if (FAIL == ret)
-	{
 		zbx_vector_str_clear_ext(values, zbx_str_free);
-		zbx_vector_str_destroy(values);
-	}
 
 	return ret;
 }

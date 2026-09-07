@@ -546,10 +546,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'conditions' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
 													'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
 												] + $condition_fields],
-												['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
+												['else' => true, 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+													'formulaid' => ['type' => API_STRING_UTF8, 'in' => '']
+												] + $condition_fields]
 				]]
 			]]
 		];

@@ -239,12 +239,14 @@ class CTelemetryHelper {
 	}
 
 	/**
-	 * Column options (name => name) available in the Aggregated columns table, for the given signal/metric type.
+	 * Column options (name => name) available in the Aggregated columns table, sorted alphabetically, for the given
+	 * signal/metric type.
 	 *
 	 * @return array
 	 */
 	public static function getAggregatedColumnOptions(int $signal_type, int $metric_point_type): array {
 		$names = self::getSectionColumns(self::SECTION_AGGREGATED_COLUMNS, $signal_type, $metric_point_type);
+		sort($names);
 
 		return array_combine($names, $names);
 	}

@@ -234,8 +234,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	CURLcode			err_info;
 	zbx_dc_cached_data_t		cached_data;
 
-	zbx_dc_config_cached_data_init(&cached_data);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	poller_config = (zbx_poller_config_t *)arg;
@@ -249,6 +247,9 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	}
 
 	zbx_timespec(&timespec);
+
+	zbx_vector_str_create(&values);
+	zbx_dc_config_cached_data_init(&cached_data);
 
 	item_context = &telemetry_query_context->item_context;
 
@@ -287,8 +288,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			if (SUCCEED_PARTIAL == parse_ret)
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
-						"telemetry query result row limit exceeded for item \"%s:%s\", "
-						"result was truncated", item_context->host_host,
+						"telemetry query result row limit (%d) exceeded for item \"%s:%s\", "
+						"result was truncated", ZBX_TQ_MAX_RESULT_ROWS, item_context->host_host,
 						item_context->key_orig);
 			}
 
@@ -363,11 +364,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		}
 	}
 
-	if (SUCCEED == status)
-	{
-		zbx_vector_str_clear_ext(&values, zbx_str_free);
-		zbx_vector_str_destroy(&values);
-	}
+	zbx_vector_str_clear_ext(&values, zbx_str_free);
+	zbx_vector_str_destroy(&values);
 
 	zbx_free(error);
 	zbx_free(http_resp);

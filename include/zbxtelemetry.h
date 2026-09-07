@@ -16,6 +16,7 @@
 #define ZABBIX_ZBXTELEMETRY_H
 
 #include "zbxalgo.h"
+#include "zbxeval.h"
 #include "zbxvault.h"
 
 #define ZBX_TQ_QUERY_TAG_SIGNAL_TYPE		"signal_type"
@@ -188,8 +189,6 @@ zbx_tq_condition_t;
 
 ZBX_VECTOR_DECL(tq_condition, zbx_tq_condition_t)
 
-typedef struct tq_formula_node zbx_tq_formula_node_t;
-
 typedef struct
 {
 	zbx_tq_signal_type_t		signal_type;
@@ -198,7 +197,7 @@ typedef struct
 	zbx_vector_tq_aggr_column_t	aggregated_columns;
 	zbx_tq_eval_type_t		evaltype;
 	char				*formula;
-	zbx_tq_formula_node_t		*formula_parsed;
+	zbx_eval_context_t		*formula_ctx;
 	zbx_vector_tq_condition_t	conditions;
 }
 zbx_tq_query_t;
@@ -218,7 +217,7 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
 
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql);
 
 void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int granularity, time_t now,

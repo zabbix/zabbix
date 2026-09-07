@@ -47,7 +47,7 @@ zabbix_export:
         - How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters).
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -126,6 +126,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Vcenter = {
             	 params: {},
             	 vmware_api_session_id: '',
@@ -145,6 +170,8 @@ zabbix_export:
             		  params['url'] = params['url'].replace('/sdk','');
             
             		  Vcenter.params = params;
+            		  Vcenter.tls = new CTlsConfig(params.tls_verify);
+            		  Vcenter.tls.checkURL(Vcenter.params.url);
             	 },
             
             	 isGtOrEqVersion: function (first_version, second_version) {
@@ -180,7 +207,7 @@ zabbix_export:
             	  },
             
             	 login: function () {
-            		  var response, request = new HttpRequest();
+            		  var response, request = new HttpRequest(Vcenter.tls.options);
             		  request.setHttpAuth(HTTPAUTH_BASIC, Vcenter.params.username, Vcenter.params.password);
             		  request.addHeader('Accept: application/json');
             		  request.addHeader('Content-Type: application/json');
@@ -248,7 +275,7 @@ zabbix_export:
             	 },
             
             	 request: function (url, method) {
-            		  var response, request = new HttpRequest();
+            		  var response, request = new HttpRequest(Vcenter.tls.options);
             
             		  if (typeof Vcenter.params.proxy !== 'undefined' && Vcenter.params.proxy !== '') {
             			   request.setProxy(Vcenter.params.proxy);
@@ -318,6 +345,8 @@ zabbix_export:
               value: '{$VMWARE.PASSWORD}'
             - name: proxy
               value: '{$VMWARE.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"VMware"}'
             - name: url
               value: '{$VMWARE.URL}'
             - name: username
@@ -731,12 +760,28 @@ zabbix_export:
         - tag: target
           value: vmware
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware", e.g. {$HTTP.TLS.VERIFY:"VMware"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VMWARE.DATASTORE.SPACE.CRIT}'
           value: '10'
           description: 'The critical threshold of the datastore free space.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Critical datastore free space threshold'
             description: 'Critical threshold of the datastore free space. In the range from 0 to 100 inclusive.'
@@ -746,7 +791,7 @@ zabbix_export:
           description: 'The warning threshold of the datastore free space.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Warning datastore free space threshold'
             description: 'Warning threshold of the datastore free space. In the range from 0 to 100 inclusive.'
@@ -756,7 +801,7 @@ zabbix_export:
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
           config:
             type: CHECKBOX
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Monitoring of hardware sensors'
             description: 'Whether it is necessary to monitor of hardware sensors.'
@@ -768,7 +813,7 @@ zabbix_export:
           description: 'Sets the regex string of hardware sensor names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Include hardware sensors filter'
             description: 'Regex string to include hardware sensors by sensors name.'
@@ -777,7 +822,7 @@ zabbix_export:
           description: 'Sets the regex string of hardware sensor names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Exclude hardware sensors filter'
             description: 'Regex string to exclude hardware sensors by sensors name.'
@@ -817,7 +862,7 @@ zabbix_export:
           description: 'Possibility to filter out VMs by power state.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'VMs power state filter'
             description: 'Regex string with desired power state of VMs for discovering.'

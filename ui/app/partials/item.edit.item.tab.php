@@ -650,10 +650,11 @@ $formgrid
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
-		(new CLabel(_('Category'), 'signal_type'))->setId('js-item-signal-type-label'),
+		(new CLabel(_('Category'), 'label-signal-type'))->setId('js-item-signal-type-label'),
 		(new CFormField(
 			(new CSelect('signal_type'))
 				->setId('signal_type')
+				->setFocusableElementId('label-signal-type')
 				->setValue($item['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray([
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES => _('Traces'),
@@ -681,7 +682,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('columns-table')
-					->setHeader(['', _('Name'), '', ''])
+					->setHeader([
+						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
+						(new CColHeader())->setWidth('35%'),
+						(new CColHeader(_('Action')))->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')->setEnabled(!$readonly)
@@ -705,11 +710,9 @@ $formgrid
 							->setErrorLabel(_('Key name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
-						(new CCol(
+						new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')->setEnabled(!$readonly)
-						))
-							->addClass(ZBX_STYLE_RIGHT)
-							->addStyle('width: 100%;')
+						)
 					]))->addClass('form_row'),
 					(new CRow([
 						new CCol(),
@@ -734,7 +737,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('aggregated-columns-table')
-					->setHeader([_('Function'), _('Alias'), _('Actions')])
+					->setHeader([
+						(new CColHeader(_('Function')))->setWidth('20%'),
+						(new CColHeader(_('Alias')))->setWidth('58%'),
+						(new CColHeader(_('Actions')))->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-aggregated-column')
 							->setEnabled(!$readonly)
@@ -774,11 +781,12 @@ $formgrid
 		))->setId('js-item-aggregated-columns-field')
 	])
 	->addItem([
-		(new CLabel(_('Type of calculation'), 'evaltype'))->setId('js-item-evaltype-label'),
+		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('js-item-evaltype-label'),
 		(new CFormField([
 			(new CDiv(
 				(new CSelect('evaltype'))
 					->setId('evaltype')
+					->setFocusableElementId('label-evaltype')
 					->setValue((int) $item['evaltype'])
 					->addOptions(CSelect::createOptionsFromArray([
 						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
@@ -809,7 +817,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('conditions-table')
-					->setHeader([_('Label'), _('Name'), _('Action')])
+					->setHeader([
+						(new CColHeader(_('Label')))->setWidth('20%'),
+						(new CColHeader(_('Name')))->setWidth('58%'),
+						(new CColHeader(_('Action')))->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
 							->setEnabled(!$readonly)
@@ -904,33 +916,32 @@ $formgrid
 			_('Lookback limit'),
 			makeHelpIcon(
 				_('Limit processing window historical lookup when previous item updates are missing or too old.')
-			),
-			makeWarningIcon(_('Data gaps are possible.'))
-				->addClass('js-lookback-limit-hint')
-				->addStyle('display: none;'),
-			makeWarningIcon(_('Should not be less than the granularity, data will be incomplete.'))
-				->addClass('js-lookback-limit-error')
-				->addStyle('display: none;')
+			)
 		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
-		(new CFormField(
+		(new CFormField([
 			(new CTextBox('lookback_limit', $item['lookback_limit'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->setId('js-item-lookback-limit-field')
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data gaps are possible.')))
+				->addClass('js-lookback-limit-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-lookback-limit-field')
 	])
 	->addItem([
 		(new CLabel([
 			_('Granularity'),
-			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.')),
-			makeWarningIcon(_('Data will likely overlap.'))
-				->addClass('js-granularity-hint')
-				->addStyle('display: none;')
+			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.'))
 		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
-		(new CFormField(
+		(new CFormField([
 			(new CTextBox('granularity', $item['granularity'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->setId('js-item-granularity-field')
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data will likely overlap.')))
+				->addClass('js-granularity-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-granularity-field')
 	]);
 
 /**
@@ -1059,11 +1070,13 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [[
-						'id' => $item['valuemap']['valuemapid'],
-						'prefix' => $item['valuemap']['prefix'] ?? '',
-						'name' => $item['valuemap']['name']
-					]]
+					? [
+						[
+							'id' => $item['valuemap']['valuemapid'],
+							'prefix' => $item['valuemap']['prefix'] ?? '',
+							'name' => $item['valuemap']['name']
+						] + (array_key_exists('inaccessible', $item['valuemap']) ? ['inaccessible' => true] : [])
+					]
 					: [],
 				'popup' => [
 					'parameters' => [
