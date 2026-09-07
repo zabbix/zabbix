@@ -85,11 +85,12 @@
 		#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order, sort_field,
 				sort_order, storage_idx, user_configs, severities}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'problem.view.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'problem.view.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			if (!filter.filter_custom_time) {
 				filter.from = this.#global_timerange.from;
@@ -836,12 +837,12 @@
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 

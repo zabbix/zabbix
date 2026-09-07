@@ -46,7 +46,6 @@ class CSideDrawer {
 		if (this.#split_view_element === null) {
 			this.#split_view_element = document.createElement('z-split-view');
 			this.#split_view_element.classList.add('split-view', split_view_class);
-			this.#split_view_element.setAttribute('min', '768px');
 		}
 
 		this.#content_pane_element = document.querySelector(`z-split-view-pane.${content_pane_class}`);
@@ -78,27 +77,11 @@ class CSideDrawer {
 
 		this.#drawer_element.classList.add(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 
-		try {
-			const response = await fetch(url, {...options, signal: this.#abort_controller.signal});
-
-			if (!response.ok) {
-				return;
-			}
-
-			this.#drawer_element.innerHTML = await response.text();
-
-			this.#bindEvents();
-
-			this.dispatchEvent(CSideDrawer.EVENT_OPEN, {side_drawer: this});
-		} catch (error) {
-			if (error.name === 'AbortError') {
-				return;
-			}
-
-			throw error;
-		} finally {
-			this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
-		}
+		return fetch(url, {...options, signal: this.#abort_controller.signal})
+			.then(response => response.json())
+			.finally(() => {
+				this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+			});
 	}
 
 	close() {

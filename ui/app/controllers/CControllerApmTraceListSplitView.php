@@ -65,43 +65,59 @@ class CControllerApmTraceListSplitView extends CController {
 		$spans = API::ApmSpan()->get([
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
-			'traceids' => [$traceid]
+			'traceids' => [$traceid],
+			'sortfield' => 'timestamp',
+			'sortorder' => ZBX_SORT_UP
 		]);
 
-		$span_tree = $this->buildSpanTree($spans);
+		$trace_timestamp = explode('.', $trace['timestamp']);
+		$trace_start = (int) $trace_timestamp[1];
+		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
 
-		$view = (new CPartial('apm.trace.list.split.view', [
-			'trace' => $trace,
-			'span_tree' => $span_tree
-		]));
-
-		$output = [
-			'main_block' => $view->getOutput()
-		];
-
-		$this->setResponse(new CControllerResponseData($output));
-	}
-
-	private function buildSpanTree(array $spans): array {
-		$map = [];
-		$roots = [];
-
+		$trace_view_spans = [];
 		foreach ($spans as $span) {
-			$span['children'] = [];
-			$map[$span['spanid']] = $span;
+			$span_timestamp = explode('.', $span['timestamp']);
+
+			$span_start = ((int) $span_timestamp[1] - $trace_start) * SEC_PER_NANOSEC;
+			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
+
+			$span_events = array_map(static function (array $event) use ($trace_start) {
+				$event_timestamp = explode('.', $event['timestamp']);
+
+				return [
+					'time' => ((int) $event_timestamp[1] - $trace_start) * SEC_PER_NANOSEC,
+					'name' => $event['name'],
+					'description' => json_encode($event['attributes'])
+				];
+			}, $span['events']);
+
+			$trace_view_spans[] = [
+				'id' => $span['spanid'],
+				'parentId' => $span['parent_spanid'] ?: null,
+				'name' => $span['service_name'],
+				'operation' => $span['operation_name'],
+				'start' => $span_start,
+				'end' => $span_end,
+				'color' => null,
+				'events' => $span_events
+			];
 		}
 
-		foreach ($map as &$node) {
-			$parent_spanid = $node['parent_spanid'];
+		$output = json_encode([
+			'trace_view' => (new CPartial('apm.trace.list.split.view'))->getOutput(),
+			'trace_view_data' => [
+				'id' => $traceid,
+				'start' => 0,
+				'end' => $trace_end,
+				'selectedStart' => 0,
+				'selectedEnd' => $trace_end,
+				'spans' => $trace_view_spans
+			]
+		]);
 
-			if (!empty($parent_spanid) && array_key_exists($parent_spanid, $map)) {
-				$map[$parent_spanid]['children'][] = $node;
-			} else {
-				$roots[] = $node;
-			}
-		}
-		unset($node);
-
-		return $roots;
+		$this->setResponse(
+			(new CControllerResponseData(['main_block' => $output]))
+				->disableView()
+		);
 	}
 }

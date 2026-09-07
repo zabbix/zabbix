@@ -17,8 +17,10 @@ body {
 		--min-content-size: 768px;
 
 		.side-drawer {
+			background-color: $ui-bg-color;
 			position: sticky;
 			inset-block-start: 0;
+			z-index: 999;
 		}
 	}
 

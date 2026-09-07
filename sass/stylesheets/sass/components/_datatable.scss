@@ -842,7 +842,7 @@
 		cursor: pointer;
 
 		.cell {
-			background-color: $lighter-yellow;
+			background-color: $ui-hover-bg-color;
 			border-bottom-color: rgba(31, 44, 51, .1);
 		}
 	}

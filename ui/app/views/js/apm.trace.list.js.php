@@ -111,11 +111,12 @@
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
 				user_configs}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'apm.trace.list.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'apm.trace.list.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			this.#datatable = new CDataTable(document.getElementById('datatable-traces'), data_provider)
 				.setColumns([
@@ -332,37 +333,32 @@
 		}
 
 		#openSideDrawer(container, traceid) {
-			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'apm.trace.list.split.view');
+			const url = zabbixUrl({action: 'apm.trace.list.split.view'});
 
-			this.#side_drawer = new CSideDrawer(container, {
-				split_view_class: 'trace-split-view',
-				content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER
-			});
+			this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
+			this.#side_drawer
+				.open(url, {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({traceid})
+				})
+				.then(response => this.#onSideDrawerOpen(response))
+				.catch(error => {
+					if (error.name === 'AbortError') {
+						return;
+					}
 
-			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, this.#onSideDrawerOpen);
-			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, this.#onSideDrawerClose);
-
-			this.#side_drawer.open(url.toString(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({traceid})
-			});
+					throw error;
+				});
 		}
 
-		#onSideDrawerOpen = (e) => {
-			const { side_drawer } = e.detail;
-			const element = side_drawer.getElement();
+		#onSideDrawerOpen = response => {
+			const { trace_view, trace_view_data } = response;
 
-			element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+			const element = this.#side_drawer.getElement();
+			element.innerHTML = trace_view;
 
-			const copy_button = element.querySelector('.js-copy-button');
-			copy_button?.addEventListener('click', e => writeTextClipboard(e.target.getAttribute('data-traceid')));
-		}
-
-		#onSideDrawerClose = () => {
-			const row_selected = this.#datatable.getElement().querySelector(`.${ZBX_STYLE_ROW_SELECTED}`);
-			row_selected?.classList.remove(ZBX_STYLE_ROW_SELECTED);
+			new TraceViewPage(element, trace_view_data);
 		}
 
 		#validateFormChanges() {
@@ -408,12 +404,12 @@
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 

@@ -19,58 +19,60 @@
  * @var array $data
  */
 
-$trace_header_info = (new CDiv([
-	(new CSpan(_s('Trace ID: %s', substr($data['trace']['traceid'], 0, 13)))),
-	(new CButton())
-		->setAttribute('data-traceid', $data['trace']['traceid'])
-		->addClass(ZBX_STYLE_BTN_ICON)
-		->addClass(ZBX_STYLE_BTN_ALT)
-		->addClass('btn-medium')
-		->addClass(ZBX_ICON_COPY)
-		->addClass('js-copy-button')
-]))->addClass('trace-header-info');
+$trace_view = (new CDiv())
+	->setId('trace_view')
+	->addClass('trace-view')
+	->addItem(
+		(new CDiv())
+			->addClass('trace-view-header')
+			->addItem(
+				(new CDiv())->setAttribute('data-trace-id', '')
+			)
+	)
+	->addItem(
+		(new CTag('z-timeline-range-slider', true))
+			->addClass('trace-timeline')
+			->setAttribute('data-trace-timeline', '')
+			->setAttribute('scale', '')
+			->addItem(
+				(new CSvg())
+					->addClass('trace-overview')
+					->setAttribute('data-trace-overview', '')
+			)
+	)
+	->addItem(
+		(new CDiv())
+			->addClass('trace-grid')
+			->addItem(
+				(new CDiv())
+					->addClass('trace-grid-header')
+					->addItem(
+						(new CDiv('Span tree'))
+							->addClass('trace-tree-header')
+					)
+					->addItem(
+						(new CDiv())
+							->addClass('trace-time-header')
+							->setAttribute('data-trace-time-header', '')
+					)
+			)
+	)
+	->addItem(
+		(new CDiv())
+			->addClass('trace-scroll')
+			->setAttribute('data-trace-scroll', '')
+			->addItem(
+				(new CDiv())
+					->addClass('trace-body')
+					->addItem(
+						(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
+					)
+					->addItem(
+						(new CDiv())
+							->addClass('trace-waterfall')
+							->setAttribute('data-trace-waterfall', '')
+					)
+			)
+	);
 
-$trace_header_links = (new CDiv([
-	(new CLink(
-		_('Logs'),
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'apm.log.list')
-			->setArgument('filter_traceid', $data['trace']['traceid'])
-			->setArgument('filter_set', '1')
-	)),
-	(new CLink(
-		_('Metrics'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'apm.metric.list')
-	))
-]))->addClass('trace-header-links');
-
-$close_button = (new CButton())
-	->addClass(ZBX_STYLE_BTN_ICON)
-	->addClass(ZBX_STYLE_BTN_ALT)
-	->addClass('btn-medium')
-	->addClass(ZBX_ICON_CLOSE)
-	->addClass('js-close-button');
-
-$trace_timescale_header = (new CDiv())->addClass('trace-timescale-header');
-
-$trace_timescale_timeline = (new CDiv())->addClass('trace-timescale-timeline');
-
-$trace_span_tree_content = (new CDiv())->addClass('trace-span-tree-content');
-
-$trace_span_tree = (new CDiv([
-	(new CDiv(_('Span tree')))->addClass('trace-span-tree-header'),
-	$trace_span_tree_content
-]))->addClass('trace-span-tree');
-
-$trace_span_timeline = (new CDiv([
-	(new CDiv())->addClass('trace-span-timeline-header'),
-	(new CDiv())->addClass('trace-span-timeline-content')
-]))->addClass('trace-span-timeline');
-
-(new CDiv([
-	(new CDiv([$trace_header_info, $trace_header_links, $close_button]))->addClass('trace-header'),
-	(new CDiv([$trace_timescale_header, $trace_timescale_timeline]))->addClass('trace-timescale'),
-	(new CDiv([$trace_span_tree, $trace_span_timeline]))->addClass('trace-span')
-]))
-	->addClass('trace')
-	->show();
+$trace_view->show();
