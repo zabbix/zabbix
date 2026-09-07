@@ -474,7 +474,7 @@ static void	store_str_setting_local(const zbx_setting_value_t *values, const cha
 	{
 		if (NULL == *target || 0 != strcmp(*target, value_str))
 		{
-			UPDATE_REVISION(revision, name, "%s", *target, value_str);
+			UPDATE_REVISION(revision, name, "%s", ZBX_NULL2STR(*target), value_str);
 			*target = zbx_strdup(*target, value_str);
 		}
 	}
