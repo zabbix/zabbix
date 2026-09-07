@@ -30,12 +30,26 @@
 /* THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see zbxmocktest.c) - triggering it  */
 /* would kill the test process rather than fail one case, and bypasses atexit() so it wouldn't even earn    */
 /* coverage credit.                                                                                          */
+/*                                                                                                          */
+/* All three callbacks call zbx_get_ipmi_sensor() internally, which converts the incoming (fabricated)      */
+/* 'sensor' pointer to an ID via ipmi_sensor_convert_to_id() - wrapped here to echo the pointer back into   */
+/* the ID instead of dereferencing it, matching the pre-registered zbx_ipmi_sensor_t.sensor_id below.       */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
+{
+	ipmi_sensor_id_t	id;
+
+	memset(&id, 0, sizeof(id));
+	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_sensor;
+
+	return id;
+}
 
 static int	dummy_sensor;
 
@@ -68,7 +82,7 @@ void	zbx_mock_test_entry(void **state)
 	h->sensors = (zbx_ipmi_sensor_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_sensor_t));
 	s = &h->sensors[0];
 	memset(s, 0, sizeof(*s));
-	s->sensor = (ipmi_sensor_t *)&dummy_sensor;
+	s->sensor_id = ipmi_sensor_convert_to_id((ipmi_sensor_t *)&dummy_sensor);
 	zbx_strlcpy(s->id, "s1", sizeof(s->id));
 
 	h->done = 0;
@@ -78,7 +92,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		int	err = 0;
 		enum ipmi_value_present_e	vp = IPMI_NO_VALUES_PRESENT;
-		ipmi_sensor_t			*sensor = s->sensor;
+		ipmi_sensor_t			*raw_sensor = (ipmi_sensor_t *)&dummy_sensor;
 
 		if (0 == strcmp(scenario, "err"))
 			err = 5;
@@ -91,12 +105,12 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for thresh_reading: %s", scenario);
 
-		zbx_got_thresh_reading_cb(sensor, err, vp, 0, 0.0, states, h);
+		zbx_got_thresh_reading_cb(raw_sensor, err, vp, 0, 0.0, states, h);
 	}
 	else if (0 == strcmp(cb, "discrete_states"))
 	{
 		int	err = 0;
-		ipmi_sensor_t	*sensor = s->sensor;
+		ipmi_sensor_t	*raw_sensor = (ipmi_sensor_t *)&dummy_sensor;
 
 		if (0 == strcmp(scenario, "scanning_disabled"))
 			states = make_states(0, 0);
@@ -110,7 +124,7 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for discrete_states: %s", scenario);
 
-		zbx_got_discrete_states_cb(sensor, err, states, h);
+		zbx_got_discrete_states_cb(raw_sensor, err, states, h);
 	}
 	else if (0 == strcmp(cb, "thresholds"))
 	{

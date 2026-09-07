@@ -23,12 +23,26 @@
 /* - zbx_got_control_reading_cb()'s "values present" success path dereferences 'control' for real via       */
 /*   ipmi_control_get_entity(), unconditionally - needs a real control object or a wrapped getter, neither  */
 /*   of which this file uses.                                                                                */
+/*                                                                                                          */
+/* Both callbacks call zbx_get_ipmi_control() internally, which converts the incoming (fabricated)          */
+/* 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to echo the pointer back into */
+/* the ID instead of dereferencing it, matching the pre-registered zbx_ipmi_control_t.control_id below.     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
+{
+	ipmi_control_id_t	id;
+
+	memset(&id, 0, sizeof(id));
+	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_control;
+
+	return id;
+}
 
 static int	dummy_control;
 
@@ -51,7 +65,7 @@ void	zbx_mock_test_entry(void **state)
 	h->controls = (zbx_ipmi_control_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_control_t));
 	c = &h->controls[0];
 	memset(c, 0, sizeof(*c));
-	c->control = (ipmi_control_t *)&dummy_control;
+	c->control_id = ipmi_control_convert_to_id((ipmi_control_t *)&dummy_control);
 	c->c_name = zbx_strdup(NULL, "test control");
 	c->num_values = 1;
 	c->val = (int *)zbx_malloc(NULL, sizeof(int));
@@ -61,9 +75,9 @@ void	zbx_mock_test_entry(void **state)
 	h->ret = SUCCEED;
 
 	if (0 == strcmp(cb, "reading"))
-		zbx_got_control_reading_cb(c->control, err, val, h);
+		zbx_got_control_reading_cb((ipmi_control_t *)&dummy_control, err, val, h);
 	else if (0 == strcmp(cb, "setting"))
-		zbx_got_control_setting_cb(c->control, err, h);
+		zbx_got_control_setting_cb((ipmi_control_t *)&dummy_control, err, h);
 	else
 		fail_msg("unknown 'in.cb' value: %s", cb);
 

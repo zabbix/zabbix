@@ -50,6 +50,15 @@ MOCKDATA_WRAP_FUNCS = \
 	-Wl,--wrap=fstat \
 	-Wl,--wrap=__fxstat
 
+# for tests that stand in a fabricated (never-dereferenced) address for a real ipmi_sensor_t*/ipmi_control_t*:
+# ipmi_sensor_convert_to_id()/ipmi_control_convert_to_id() are the only OpenIPMI calls in checks_ipmi.c that
+# would dereference such a pointer, so they are wrapped to echo it back into the ID unchanged instead
+SENSOR_CONVERT_WRAP_FUNCS = \
+	-Wl,--wrap=ipmi_sensor_convert_to_id
+
+CONTROL_CONVERT_WRAP_FUNCS = \
+	-Wl,--wrap=ipmi_control_convert_to_id
+
 #zbx_get_ipmi_host
 
 zbx_get_ipmi_host_SOURCES = \
@@ -142,7 +151,8 @@ zbx_ipmi_sensor_lookup_LDADD = \
 
 zbx_ipmi_sensor_lookup_LDADD += @SERVER_LIBS@
 
-zbx_ipmi_sensor_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_ipmi_sensor_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(SENSOR_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_sensor_lookup_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
@@ -158,7 +168,8 @@ zbx_ipmi_control_lookup_LDADD = \
 
 zbx_ipmi_control_lookup_LDADD += @SERVER_LIBS@
 
-zbx_ipmi_control_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_ipmi_control_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(CONTROL_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_control_lookup_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
@@ -216,7 +227,8 @@ zbx_ipmi_control_callbacks_LDADD = \
 
 zbx_ipmi_control_callbacks_LDADD += @SERVER_LIBS@
 
-zbx_ipmi_control_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_ipmi_control_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(CONTROL_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_control_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
@@ -232,7 +244,8 @@ zbx_ipmi_sensor_callbacks_LDADD = \
 
 zbx_ipmi_sensor_callbacks_LDADD += @SERVER_LIBS@
 
-zbx_ipmi_sensor_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_ipmi_sensor_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(SENSOR_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_sensor_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
@@ -248,7 +261,8 @@ zbx_ipmi_change_callbacks_LDADD = \
 
 zbx_ipmi_change_callbacks_LDADD += @SERVER_LIBS@
 
-zbx_ipmi_change_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_ipmi_change_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(CONTROL_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_change_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
 

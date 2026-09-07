@@ -12,10 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_get_ipmi_sensor(), zbx_get_ipmi_sensor_by_id(), zbx_get_ipmi_sensor_by_full_name() and              */
-/* zbx_delete_ipmi_sensor() only ever scan h->sensors[] by pointer identity or string comparison - none of */
-/* them dereference the OpenIPMI 'sensor' pointer itself, so a fabricated, never-dereferenced address       */
-/* (the address of a local int) stands in for a real ipmi_sensor_t* throughout this file.                  */
+/* zbx_get_ipmi_sensor(), zbx_get_ipmi_sensor_by_id(), zbx_get_ipmi_sensor_by_full_name() and               */
+/* zbx_delete_ipmi_sensor() only ever scan h->sensors[] by ID identity (via ipmi_cmp_sensor_id(), a plain   */
+/* field comparison on a value-type struct - never a dereference) or string comparison, so a fabricated,    */
+/* never-dereferenced address (the address of a local int) stands in for a real ipmi_sensor_t* throughout   */
+/* this file. ipmi_sensor_convert_to_id() itself DOES dereference its argument in the real OpenIPMI         */
+/* implementation, so it is wrapped below to just echo the fabricated pointer back into the ID, preserving  */
+/* pointer-identity semantics for this fixture without ever touching its memory.                            */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -23,9 +26,19 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
+{
+	ipmi_sensor_id_t	id;
+
+	memset(&id, 0, sizeof(id));
+	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_sensor;
+
+	return id;
+}
+
 static int	dummy_a, dummy_b, dummy_c;
 
-static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor, const char *id, const char *full_name,
+static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor, const char *id, const char *full_name,
 		int reading_type)
 {
 	zbx_ipmi_sensor_t	*s;
@@ -35,7 +48,7 @@ static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor, const char *id
 
 	s = &h->sensors[h->sensor_count - 1];
 	memset(s, 0, sizeof(*s));
-	s->sensor = sensor;
+	s->sensor_id = ipmi_sensor_convert_to_id(raw_sensor);
 	zbx_strlcpy(s->id, id, sizeof(s->id));
 	s->id_type = IPMI_ASCII_STR;
 	s->id_sz = (int)strlen(id);

@@ -25,12 +25,27 @@
 /* scope. For any other op, the only thing that could touch 'entity' for real is a debug-level log line     */
 /* (ipmi_entity_get_name()), so the mock log level is lowered below LOG_LEVEL_DEBUG here to skip it -       */
 /* zbx_mock_set_log_level() is the same mechanism the test harness itself uses to turn logging on.          */
+/*                                                                                                          */
+/* zbx_control_change_cb()'s "already exists" path calls zbx_get_ipmi_control() internally, which converts  */
+/* the incoming (fabricated) 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to  */
+/* echo the pointer back into the ID instead of dereferencing it, matching the pre-registered               */
+/* zbx_ipmi_control_t.control_id below.                                                                     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
+{
+	ipmi_control_id_t	id;
+
+	memset(&id, 0, sizeof(id));
+	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_control;
+
+	return id;
+}
 
 static int	dummy_control, dummy_entity, dummy_domain;
 
@@ -68,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 		h->controls = (zbx_ipmi_control_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_control_t));
 		c = &h->controls[0];
 		memset(c, 0, sizeof(*c));
-		c->control = (ipmi_control_t *)&dummy_control;
+		c->control_id = ipmi_control_convert_to_id((ipmi_control_t *)&dummy_control);
 		c->c_name = zbx_strdup(NULL, "test control");
 		c->full_name = zbx_strdup(NULL, "test control");
 		c->num_values = 1;

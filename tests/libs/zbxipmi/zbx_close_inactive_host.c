@@ -15,11 +15,11 @@
 /* zbx_close_inactive_host() and zbx_delete_inactive_ipmi_hosts() are static/exported respectively, and   */
 /* checks_ipmi.c is included directly to reach the static one and the 'hostset' they share.               */
 /*                                                                                                          */
-/* No IPMI domain is ever opened in this test process, so ipmi_domain_iterate_domains() (a real, unmocked  */
+/* No IPMI domain is ever opened in this test process, so ipmi_domain_iterate_domains() (a real, unmocked   */
 /* OpenIPMI call) always finds zero domains - the exact "domain not found" branch zbx_close_inactive_host() */
-/* itself documents as a legitimate case ("Zabbix allocated an IPMI host during network problem and the    */
-/* domain was closed... but the host is still in our list"). That branch frees the host directly without   */
-/* touching any OpenIPMI sensor/control/domain object, so it's fully exercised here without a live BMC.    */
+/* itself documents as a legitimate case ("Zabbix allocated an IPMI host during network problem and the     */
+/* domain was closed... but the host is still in our list"). That branch frees the host directly without    */
+/* touching any OpenIPMI sensor/control/domain object, so it's fully exercised here without a live BMC.     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -27,7 +27,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-/* Wraps for the "domain found by name" path, unreachable above without a live OpenIPMI domain. They let    */
+/* Wraps for the "domain found by name" path, unreachable above without a live OpenIPMI domain. They let     */
 /* zbx_get_domain_id_by_name_cb(), ipmi_domain_pointer_cb() and ipmi_domain_close() be driven end-to-end, in */
 /* particular proving that a domain found by ipmi_domain_iterate_domains() is actually passed to             */
 /* ipmi_domain_close() - the exact step that a RETURN_IF_CB_DATA_INVALID() misuse in                         */
