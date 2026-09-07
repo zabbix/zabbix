@@ -12176,22 +12176,30 @@ out:
 	return num;
 }
 
-static void	DCget_apm_db_config(zbx_apm_db_config_t *out, const zbx_config_apm_global_db_t *global_config,
-		const zbx_apm_db_config_t *local_config, const char *config_source_ip,
-		const char *config_ssl_ca_location)
+void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location)
 {
-	if (1 == local_config->status)
+	const zbx_config_apm_global_db_t	*global_config;
+
+	if (1 == local_apm_db_config->status)
 	{
-		zbx_apm_db_config_copy(out, local_config);
+		zbx_apm_db_config_copy(out, local_apm_db_config);
 		return;
 	}
 
 	memset(out, 0, sizeof(*out));
 
+	RDLOCK_CACHE;
+
+	global_config = &config->config->apm_global_db;
+
 	out->status = (ZBX_APM_GLOBAL_DB_STATUS_CONFIGURED == global_config->status ? 1 : 0);
 
 	if (0 == out->status)
+	{
+		UNLOCK_CACHE;
 		return;
+	}
 
 	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
 	out->url = zbx_strdup(NULL, global_config->url);
@@ -12206,22 +12214,13 @@ static void	DCget_apm_db_config(zbx_apm_db_config_t *out, const zbx_config_apm_g
 	out->ssl_verify_peer = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_ENABLED == global_config->ssl_verify_peer ? 1 : 0);
 	out->ssl_verify_host = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_ENABLED == global_config->ssl_verify_host ? 1 : 0);
 
+	UNLOCK_CACHE;
+
 	if (NULL != config_source_ip)
 		out->source_ip = zbx_strdup(NULL, config_source_ip);
 
 	if (NULL != config_ssl_ca_location)
 		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
-}
-
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location)
-{
-	RDLOCK_CACHE;
-
-	DCget_apm_db_config(out, &config->config->apm_global_db, local_apm_db_config, config_source_ip,
-			config_ssl_ca_location);
-
-	UNLOCK_CACHE;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
