@@ -1221,8 +1221,8 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *
  *             sock     - [IN] connection socket                              *
- *             redirect - [OUT] host redirection data (optional)              *
  *             hostinfo - [OUT]                                               *
+ *             redirect - [OUT] host redirection data (optional)              *
  *                                                                            *
  * Return value: SUCCEED         - host found                                 *
  *               SUCCEED_PARTIAL - redirection data was specified and host is *
@@ -1231,10 +1231,10 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_hostinfo(const char *host, const zbx_socket_t *sock,
-		zbx_comms_redirect_t *redirect, zbx_history_recv_host_t *hostinfo)
+		zbx_history_recv_host_t *hostinfo,zbx_comms_redirect_t *redirect)
 {
 	return dc_config_get_host_by_name(host, sock,
-		ZBX_ITEM_GET_HOSTINFO | ZBX_ITEM_GET_HOST | ZBX_ITEM_GET_HOSTNAME, hostinfo, redirect);
+		ZBX_ITEM_GET_HOSTINFO | ZBX_ITEM_GET_HOST, hostinfo, redirect);
 }
 
 

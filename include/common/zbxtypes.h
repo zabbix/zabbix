@@ -208,5 +208,7 @@ typedef struct zbx_variant zbx_variant_t;
 #define	CONNECT_ERROR	-9
 #define	SEND_ERROR	-10
 #define	RECV_ERROR	-11
+#define	PERMS_ERROR	-12
+#define	HOST_ERROR	-13
 
 #endif

@@ -1706,6 +1706,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
+		ret = CONFIG_ERROR;
 		goto out;
 	}
 
@@ -1733,7 +1734,10 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		if (SUCCEED != peek_hostkey_host(&jp_data, tmp, sizeof(tmp), info))
 		{
 			if (NULL == *info)
+			{
+				*info = zbx_dsprintf(*info, "peek host name failed");
 				ret = CONFIG_ERROR;
+			}
 			goto out;
 		}
 	}
@@ -1746,10 +1750,10 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_hostinfo(tmp, sock, &redirect, &hostinfo)))
+	if (FAIL == (ret = zbx_dc_config_get_hostinfo(tmp, sock, &hostinfo, &redirect)))
 	{
-		/* return CONFIG_ERROR to prevent command to be proceed because of non-existing host */
-		ret = CONFIG_ERROR;
+		/* return HOST_ERROR to prevent command to be proceed because of non-existing host */
+		ret = HOST_ERROR;
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
 		goto out;
 	}
@@ -1768,16 +1772,12 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 
 	if (FAIL == zbx_host_check_permissions(&hostinfo, sock, &error))
 	{
-		ret = FAIL;
+		ret = PERMS_ERROR;
 
 		if (NULL != error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zbx_free(error);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "unknown permissions error for host \"%s\"", hostinfo.host);
 		}
 
 		goto out;
