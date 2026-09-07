@@ -186,17 +186,17 @@ window.ceprule_operation_edit_popup = new class {
 			.replaceWith(this.#buildConditionRow(condition, index, true));
 	}
 
-	#addConditionRow(condition, set_changed) {
+	#addConditionRow(condition) {
 		const row_index = this.#condition_row_index++;
 		const table = this.form_element.querySelector('#ceprule-operation-filter-conditions tbody');
 
-		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index, set_changed));
+		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index));
 		table.insertAdjacentElement('beforeend',
 			this.#condition_error_container_row_template.evaluateToElement({row_index})
 		);
 	}
 
-	#buildConditionRow(condition, row_index, set_changed) {
+	#buildConditionRow(condition, row_index) {
 		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationConditionLabels()
 		) ?>');
@@ -245,12 +245,6 @@ window.ceprule_operation_edit_popup = new class {
 			formulaid: num2letter(row_index),
 			description_html: description_template.evaluate(description_view)
 		});
-
-		if (set_changed) {
-			element.querySelectorAll('input').forEach(input => {
-				input.dataset.changed = '';
-			});
-		}
 
 		return element;
 	}

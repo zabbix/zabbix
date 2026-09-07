@@ -671,12 +671,12 @@ window.ceprule_edit_popup = new class {
 		row.replaceWith(this.#buildOperationRow(operation, true));
 	}
 
-	#addOperationRow(operation, set_changed) {
+	#addOperationRow(operation) {
 		operation.row_index = this.#operation_row_index++;
 		operation.sortorder = this.#getNextSortorder();
 
 		this.form_element.querySelector('#ceprule-operations-table tbody')
-			.append(this.#buildOperationRow(operation, set_changed));
+			.append(this.#buildOperationRow(operation));
 	}
 
 	#toggleOperationsInformation() {
@@ -699,7 +699,7 @@ window.ceprule_edit_popup = new class {
 			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', hide_warning);
 	}
 
-	#buildOperationRow(operation, set_changed) {
+	#buildOperationRow(operation) {
 		const operation_type = Number(operation.type);
 		const execute_when_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationExecuteWhenStrings()
@@ -766,17 +766,17 @@ window.ceprule_edit_popup = new class {
 		const conditions_input_html = Object.values(operation.filter.conditions)
 			.map((condition, condition_index) => (new Template(`
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][type]"
-					type="hidden" value="#{type}"/>
+					type="hidden" value="#{type}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][operator]"
-					type="hidden" value="#{operator}"/>
+					type="hidden" value="#{operator}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag]"
-					type="hidden" value="#{tag}"/>
+					type="hidden" value="#{tag}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_name]"
-					type="hidden" value="#{tag_name}"/>
+					type="hidden" value="#{tag_name}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_value]"
-					type="hidden" value="#{tag_value}"/>
+					type="hidden" value="#{tag_value}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][formulaid]"
-					type="hidden" value="#{formulaid}"/>
+					type="hidden" value="#{formulaid}" data-changed/>
 			`)).evaluate(condition)).join('');
 
 		const condition_label_names = JSON.parse('<?= json_encode(
@@ -831,12 +831,6 @@ window.ceprule_edit_popup = new class {
 		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
 			condition_description_html, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
-
-		if (set_changed) {
-			row.querySelectorAll('input').forEach(input => {
-				input.dataset.changed = '';
-			});
-		}
 
 		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;
 		const rows = new DocumentFragment();

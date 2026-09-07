@@ -60,30 +60,39 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 					(new CInput('hidden', 'filter[conditions][#{row_index}][type]', '#{type}'))
 						->removeId()
 						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
 						->setErrorLabel(_('Type'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
 					(new CInput('hidden', 'filter[conditions][#{row_index}][operator]', '#{operator}'))
 						->removeId()
 						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
 						->setErrorLabel(_('Operator'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
 					(new CInput('hidden', 'filter[conditions][#{row_index}][tag]', '#{tag}'))
 						->removeId()
 						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
 						->setErrorLabel(_('Tag'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
 					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))
 						->removeId()
 						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
 						->setErrorLabel(_('Tag'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
 					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))
 						->removeId()
 						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
 						->setErrorLabel(_('Tag value'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
-					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
-					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
+					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))
+						->setAttribute('data-changed', '')
+						->removeId()
 				]
 			]))->setAttribute('data-row_index', '#{row_index}')
 		]))

@@ -126,21 +126,51 @@ $form = (new CForm())
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
 					'#{*conditions_input_html}',
-					(new CVar('operations[#{row_index}][row_index]', '#{row_index}'))->removeId(),
-					(new CVar('operations[#{row_index}][sortorder]', '#{sortorder}'))->removeId(),
-					(new CVar('operations[#{row_index}][execute_when]', '#{execute_when}'))->removeId(),
-					(new CVar('operations[#{row_index}][type]', '#{type}'))->removeId(),
-					(new CVar('operations[#{row_index}][filter][evaltype]', '#{filter.evaltype}'))->removeId(),
-					(new CVar('operations[#{row_index}][filter][formula]', '#{filter.formula}'))->removeId(),
-					(new CVar('operations[#{row_index}][event_name]', '#{event_name}'))->removeId(),
-					(new CVar('operations[#{row_index}][tag]', '#{tag}'))->removeId(),
-					(new CVar('operations[#{row_index}][old_tag]', '#{old_tag}'))->removeId(),
-					(new CVar('operations[#{row_index}][new_tag]', '#{new_tag}'))->removeId(),
-					(new CVar('operations[#{row_index}][tag_name]', '#{tag_name}'))->removeId(),
-					(new CVar('operations[#{row_index}][tag_value]', '#{tag_value}'))->removeId(),
-					(new CVar('operations[#{row_index}][severity]', '#{severity}'))->removeId(),
-					(new CVar('operations[#{row_index}][suppress_time_option]', '#{suppress_time_option}'))->removeId(),
-					(new CVar('operations[#{row_index}][suppress_duration]', '#{suppress_duration}'))->removeId()
+					(new CVar('operations[#{row_index}][row_index]', '#{row_index}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][sortorder]', '#{sortorder}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][execute_when]', '#{execute_when}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][type]', '#{type}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][filter][evaltype]', '#{filter.evaltype}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][filter][formula]', '#{filter.formula}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][event_name]', '#{event_name}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag]', '#{tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][old_tag]', '#{old_tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][new_tag]', '#{new_tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag_name]', '#{tag_name}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag_value]', '#{tag_value}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][severity]', '#{severity}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][suppress_time_option]', '#{suppress_time_option}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][suppress_duration]', '#{suppress_duration}'))
+						->setAttribute('data-changed', '')
+						->removeId()
 				]
 			]))->setAttribute('data-row_index', '#{row_index}')
 		))
