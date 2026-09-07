@@ -53,7 +53,7 @@ foreach ($operators as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag_name'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
 				->setId('ceprule-condition-tag-name')
-				->setAttribute('placeholder', 'tag')
+				->setAttribute('placeholder', _('tag'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem([
@@ -69,7 +69,7 @@ foreach ($operators as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
 				->setId('ceprule-condition-tag')
-				->setAttribute('placeholder', 'tag')
+				->setAttribute('placeholder', _('tag'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
 		])
 		->addItem([
@@ -77,7 +77,7 @@ foreach ($operators as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag_value'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag_value'))
 				->setId('ceprule-condition-tag-value')
-				->setAttribute('placeholder', 'value')
+				->setAttribute('placeholder', _('value'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem(

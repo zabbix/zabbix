@@ -49,7 +49,7 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag_name'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
 				->setId('ceprule-condition-tag-name')
-				->setAttribute('placeholder', 'tag')
+				->setAttribute('placeholder', _('tag'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem([
@@ -65,7 +65,7 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
 				->setId('ceprule-condition-tag')
-				->setAttribute('placeholder', 'tag')
+				->setAttribute('placeholder', _('tag'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
 		])
 		->addItem([
@@ -73,7 +73,7 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('tag_value'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'tag_value'))
 				->setId('ceprule-condition-tag-value')
-				->setAttribute('placeholder', 'value')
+				->setAttribute('placeholder', _('value'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem([
@@ -81,21 +81,21 @@ foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
 			(new CFormField((new CTextAreaFlexible('event_name'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'event_name'))
 				->setId('ceprule-condition-event-name')
-				->setAttribute('placeholder', 'event name')
+				->setAttribute('placeholder', _('event name'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
 		])
 		->addItem([
 			(new CLabel(_('Host'), 'ceprule-condition-host-name'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host_name'))
 				->setId('ceprule-condition-host-name')
-				->setAttribute('placeholder', 'visible name')
+				->setAttribute('placeholder', _('visible name'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME)
 		])
 		->addItem([
 			(new CLabel(_('Host group'), 'ceprule-condition-host-group-name'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host_group_name'))
 				->setId('ceprule-condition-host-group-name')
-				->setAttribute('placeholder', 'host group name')
+				->setAttribute('placeholder', _('host group name'))
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP_NAME)
 		])
 		->addItem([

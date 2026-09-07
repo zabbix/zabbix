@@ -186,13 +186,13 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 					(new CTextAreaFlexible('event_name'))
 						->addClass(ZBX_STYLE_ALIGN_TOP)
 						->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
-						->setAttribute('placeholder', 'name')
+						->setAttribute('placeholder', _('name'))
 				]))->addClass(ZBX_STYLE_ALIGN_TOP),
 				(new CListItem([
 					(new CTextAreaFlexible('tag'))
 						->addClass(ZBX_STYLE_ALIGN_TOP)
 						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
-						->setAttribute('placeholder', 'tag')
+						->setAttribute('placeholder', _('tag'))
 				]))->addClass(ZBX_STYLE_ALIGN_TOP),
 				(new CListItem([
 					(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE))
