@@ -38,6 +38,8 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxexpr.h"
+#include "zbxexpression.h"
+
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -1278,17 +1280,19 @@ static void	export_add_item_info(zbx_hashset_t *items_info, zbx_vector_uint64_t 
  *           tag vector.                                                      *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_item_tags(zbx_vector_tags_ptr_t *item_tags, zbx_dc_um_handle_t *um_handle,
-		const zbx_history_sync_item_t *item)
+static void	resolve_item_tags(zbx_vector_tags_ptr_t *item_tags, const zbx_history_sync_item_t *item)
 {
 	for (int i = 0; i < item_tags->values_num; i++)
 	{
+		zbx_dc_item_t	dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
 		zbx_tag_t	*item_tag = item_tags->values[i];
 
-		zbx_substitute_macros(&item_tag->tag, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
-				item->host.hostid, item->itemid);
-		zbx_substitute_macros(&item_tag->value, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
-				item->host.hostid, item->itemid);
+		dc_item.host.hostid = item->host.hostid;
+		dc_item.itemid = item->itemid;
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &dc_item, NULL,
+					NULL, NULL, NULL, NULL, &item_tag->tag, ZBX_MACRO_TYPE_ITEM_TAG, NULL, 0);
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &dc_item, NULL,
+					NULL, NULL, NULL, NULL, &item_tag->value, ZBX_MACRO_TYPE_ITEM_TAG, NULL, 0);
 	}
 
 	zbx_vector_tags_ptr_sort(item_tags, zbx_compare_tags);
@@ -1774,7 +1778,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
 	{
 		item = item_info->item;
-		resolve_item_tags(&item_info->item_tags, um_handle, item);
+		resolve_item_tags(&item_info->item_tags, item);
 
 		if (NULL == item_info->name)
 			continue;

@@ -17,8 +17,7 @@ libzbxcacheconfig_a_SOURCES = \
 	vps_monitor.c \
 	vps_monitor.h \
 	proxy_group.c \
-	proxy_group.h \
-	macrotags.c
+	proxy_group.h
 
 libzbxcacheconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
