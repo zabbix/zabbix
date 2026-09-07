@@ -37,8 +37,8 @@ const view = new class {
 			}
 		});
 
-		document.querySelector('.js-create-device')?.addEventListener('click', () => {
-			ZABBIX.PopupManager.open('user.device.init.view', null, {popup_options: {prevent_navigation: false}});
+		document.querySelector('.js-create-device')?.addEventListener('click', (e) => {
+			this.#initDevice(e.target);
 		});
 	}
 
@@ -53,6 +53,42 @@ const view = new class {
 					target.blur();
 				});
 		}
+	}
+
+	#initDevice(target) {
+		target.classList.add('is-loading');
+
+		const data = {
+			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('user')) ?>,
+			admin_mode: 0
+		};
+
+		fetch(zabbixUrl({action: 'user.device.init'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					clearMessages();
+					const title = 'title' in response.error ? response.error.title : null;
+					addMessage(makeMessageBox('bad', response.error.messages, title));
+				}
+				else {
+					ZABBIX.PopupManager.open('user.device.init.view', {admin_mode: 0, qrdata: response},
+						{popup_options: {prevent_navigation: false}}
+					);
+				}
+			})
+			.catch(() => {
+				clearMessages();
+				const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+				addMessage(message_box);
+			})
+			.finally(() => {
+				target.classList.remove('is-loading');
+			});
 	}
 
 	#post(urlparams, data) {
