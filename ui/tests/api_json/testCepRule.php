@@ -387,6 +387,12 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
+			'Sortorder is required' => [
+				'request' => [
+					'name' => 'ceprule',
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "sortorder" is missing.'
+			],
 			'Operations are required unless WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
@@ -1314,7 +1320,7 @@ class testCepRule extends CAPITest {
 								'formulaid' => 'A',
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'event_name' => '',
-								'host' => 'host name'
+								'host_name' => 'host name'
 							]
 						]
 					]
@@ -1600,12 +1606,12 @@ class testCepRule extends CAPITest {
 							[
 								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'host' => 123
+								'host_name' => 123
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": a character string is expected.'
 			],
 			'Filter conditions host must be not empty' => [
 				'request' => [
@@ -1625,12 +1631,12 @@ class testCepRule extends CAPITest {
 							[
 								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'host' => ''
+								'host_name' => ''
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": cannot be empty.'
 			],
 			'Filter conditions host must be empty when type!=CONDITION_HOST' => [
 				'request' => [
@@ -1651,12 +1657,12 @@ class testCepRule extends CAPITest {
 								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
 								'event_name' => 'abc',
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'host' => 'abc'
+								'host_name' => 'abc'
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": value must be empty.'
 			],
 			'Filter conditions host_group must be string' => [
 				'request' => [
@@ -1676,12 +1682,12 @@ class testCepRule extends CAPITest {
 							[
 								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'host_group' => 123
+								'host_group_name' => 123
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": a character string is expected.'
 			],
 			'Filter conditions host_group must be not empty' => [
 				'request' => [
@@ -1701,12 +1707,12 @@ class testCepRule extends CAPITest {
 							[
 								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
-								'host_group' => ''
+								'host_group_name' => ''
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": cannot be empty.'
 			],
 			'Filter conditions host_group must be empty when type=CONDITION_EVENT_NAME' => [
 				'request' => [
@@ -1727,12 +1733,12 @@ class testCepRule extends CAPITest {
 								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'event_name' => 'abc',
-								'host_group' => 'abc'
+								'host_group_name' => 'abc'
 							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": value must be empty.'
 			],
 			'Filter conditions time_period must be string' => [
 				'request' => [
@@ -1862,7 +1868,7 @@ class testCepRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host" is missing.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_name" is missing.'
 			],
 			'Filter conditions requires host_group when type=CONDITION_HOST_GROUP' => [
 				'request' => [
@@ -1882,7 +1888,7 @@ class testCepRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_group" is missing.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_group_name" is missing.'
 			],
 			'Filter conditions requires time_period when type=CONDITION_TIME_PERIOD' => [
 				'request' => [
