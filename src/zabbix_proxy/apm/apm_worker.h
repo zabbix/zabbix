@@ -20,7 +20,7 @@
 
 typedef struct
 {
-	zbx_mw_worker_t			base;
+	zbx_mw_worker_t		base;
 	zbx_apm_exporter_pool_t	*exporters;
 }
 zbx_apm_worker_t;

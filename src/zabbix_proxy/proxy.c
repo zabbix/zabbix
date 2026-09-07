@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zabbix_proxy/apm/zbx_apm.h"
 #include "zbxdbwrap.h"
 
 #include "zbxcfg.h"
@@ -48,6 +47,8 @@
 #include "autoreg/autoreg_proxy.h"
 #include "cachehistory/cachehistory_proxy.h"
 #include "stats/stats_proxy.h"
+#include "zabbix_proxy/apm/zbx_apm.h"
+
 
 #include "zbxcomms.h"
 #include "zbxvault.h"
@@ -1142,8 +1143,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],
-											ZBX_CFG_TYPE_INT,
+		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",		&config_telemetry_provider,		ZBX_CFG_TYPE_STRING,
 					ZBX_CONF_PARM_OPT,	0,			0},

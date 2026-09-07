@@ -24,6 +24,7 @@
 typedef enum
 {
 	APM_EXPORTER_UNKNOWN,
+	APM_EXPORTER_GLOBAL,
 	APM_EXPORTER_CLICKHOUSE
 }
 zbx_apm_exporter_type_t;
@@ -50,7 +51,7 @@ zbx_apm_exporter_conn_t;
 
 typedef struct
 {
-	const zbx_apm_exporter_cfg_t	*cfg;
+	zbx_apm_exporter_cfg_t	cfg;
 	zbx_apm_exporter_conn_t	conn;
 }
 zbx_apm_exporter_t;

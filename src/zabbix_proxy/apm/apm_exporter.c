@@ -75,11 +75,20 @@ static void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 	zbx_free(cfg->password);
 }
 
+static void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src)
+{
+	dst->url = zbx_strdup(NULL, src->url);
+	dst->database = zbx_strdup(NULL, src->database);
+	dst->username = zbx_strdup(NULL, src->username);
+	dst->password = zbx_strdup(NULL, src->password);
+}
+
 static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 {
 	switch (cfg->type)
 	{
 		case APM_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_GLOBAL:
 			break;
 		case APM_EXPORTER_CLICKHOUSE:
 			apm_clickhouse_cfg_clear(&cfg->data.clickhouse);
@@ -88,6 +97,22 @@ static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 
 	zbx_config_option_clear_options(cfg->options.values, cfg->options.values_num);
 	zbx_vector_config_option_destroy(&cfg->options);
+}
+
+static void	apm_exporter_cfg_copy(zbx_apm_exporter_cfg_t *dst, const zbx_apm_exporter_cfg_t *src)
+{
+	dst->type = src->type;
+	zbx_vector_config_option_create(&dst->options);
+
+	switch (src->type)
+	{
+		case APM_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_GLOBAL:
+			break;
+		case APM_EXPORTER_CLICKHOUSE:
+			apm_clickhouse_cfg_copy(&dst->data.clickhouse, &src->data.clickhouse);
+			break;
+	}
 }
 
 zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, char **error)
@@ -118,13 +143,16 @@ static zbx_apm_exporter_t *apm_exporter_create(zbx_apm_exporter_cfg_t *cfg, char
 	int			ret = FAIL;
 
 	exporter = (zbx_apm_exporter_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_exporter_t));
-	exporter->cfg = cfg;
 
 	switch (cfg->type)
 	{
 		case APM_EXPORTER_UNKNOWN:
 			break;
+		case APM_EXPORTER_GLOBAL:
+			/* TODO: get global configuration */
+			break;
 		case APM_EXPORTER_CLICKHOUSE:
+			apm_exporter_cfg_copy(&exporter->cfg, cfg);
 			ret = apm_clickhouse_init(&exporter->conn.clickhouse, &cfg->data.clickhouse, error);
 			break;
 	}
@@ -138,15 +166,17 @@ static zbx_apm_exporter_t *apm_exporter_create(zbx_apm_exporter_cfg_t *cfg, char
 
 static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
 {
-	switch (exporter->cfg->type)
+	switch (exporter->cfg.type)
 	{
 		case APM_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_GLOBAL:
 			break;
 		case APM_EXPORTER_CLICKHOUSE:
 			apm_clickhouse_clear(&exporter->conn.clickhouse);
 			break;
 	}
 
+	apm_exporter_cfg_clear(&exporter->cfg);
 	zbx_free(exporter);
 }
 
@@ -161,6 +191,16 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 	zbx_free(pool);
 }
 
+static int	apm_exporter_validate(const zbx_apm_exporter_t *exporter)
+{
+	if (APM_EXPORTER_GLOBAL != exporter->cfg.type)
+		return SUCCEED;
+
+	/* TODO: get global exporter configuration and compare credentials */
+
+	return SUCCEED;
+}
+
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 {
 	zbx_apm_exporter_t	*exporter;
@@ -168,20 +208,30 @@ zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 
 	pthread_mutex_lock(&pool->lock);
 
-	if (0 == pool->exporters.values_num)
+	do
 	{
-		if (NULL == (exporter = apm_exporter_create(&pool->cfg, &error)))
+		if (0 == pool->exporters.values_num)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot create Open Telemetry exporter: %s", error);
-			zbx_free(error);
-			zbx_exit(EXIT_FAILURE);
+			if (NULL == (exporter = apm_exporter_create(&pool->cfg, &error)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot create Open Telemetry exporter: %s", error);
+				zbx_free(error);
+				zbx_exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			exporter = pool->exporters.values[pool->exporters.values_num - 1];
+			zbx_vector_apm_exporter_ptr_remove(&pool->exporters, pool->exporters.values_num - 1);
+
+			if (SUCCEED != apm_exporter_validate(exporter))
+			{
+				apm_exporter_destroy(exporter);
+				exporter = NULL;
+			}
 		}
 	}
-	else
-	{
-		exporter = pool->exporters.values[pool->exporters.values_num - 1];
-		zbx_vector_apm_exporter_ptr_remove(&pool->exporters, pool->exporters.values_num - 1);
-	}
+	while (NULL == exporter);
 
 	pthread_mutex_unlock(&pool->lock);
 
@@ -199,12 +249,13 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 {
 	int	ret = SUCCEED;
 
-	switch (exporter->cfg->type)
+	switch (exporter->cfg.type)
 	{
 		case APM_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_GLOBAL:
 			break;
 		case APM_EXPORTER_CLICKHOUSE:
-			ret = apm_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
+			ret = apm_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg.data.clickhouse, ds);
 			break;
 	}
 
@@ -213,13 +264,21 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 
 int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char **error)
 {
-#define	APM_EXPORTER_PROVIDER		"clickhouse"
+#define	APM_PROVIDER_CLICKHOUSE		"clickhouse"
 	ssize_t		len;
 	const char	*ptr;
 	int		ret = FAIL;
 
 	memset(cfg, 0, sizeof(zbx_apm_exporter_cfg_t));
 	zbx_vector_config_option_create(&cfg->options);
+
+	if (NULL == options)
+	{
+		cfg->type = APM_EXPORTER_GLOBAL;
+		ret = SUCCEED;
+
+		goto out;
+	}
 
 	len = zbx_config_option_parse_param(options);
 	ptr = options + len;
@@ -238,7 +297,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
 		return FAIL;
 
-	if (0 == strncmp(options, APM_EXPORTER_PROVIDER, ZBX_CONST_STRLEN(APM_EXPORTER_PROVIDER)))
+	if (0 == strncmp(options, APM_PROVIDER_CLICKHOUSE, ZBX_CONST_STRLEN(APM_PROVIDER_CLICKHOUSE)))
 	{
 		cfg->type = APM_EXPORTER_CLICKHOUSE;
 		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
