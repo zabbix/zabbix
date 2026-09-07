@@ -86,18 +86,8 @@ class CDataTable {
 	 */
 	static RESIZE_CLICK_COUNT_RESET_DELAY = 250;
 
-	/**
-	 * Minimum width of the resized column in pixels.
-	 *
-	 * @type {number}
-	 */
-	static RESIZE_MIN_WIDTH = 37;
-
 	/** @type {number} */
 	static COLUMN_INITIAL_MIN_WIDTH = 32;
-
-	/** @type {number} */
-	static COLUMN_TOGGLE_INITIAL_MIN_WIDTH = 150;
 
 	/** @type {number} */
 	static COLUMN_MIN_ALLOWED_CALC_WIDTH = 200;
@@ -318,9 +308,6 @@ class CDataTable {
 
 	/** @type {HTMLElement|null} */
 	#element = null;
-
-	/** @type {HTMLElement|null} */
-	#content = null;
 
 	/** @type {HTMLElement|null} */
 	#header = null;
