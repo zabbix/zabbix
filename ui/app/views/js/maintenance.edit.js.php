@@ -182,9 +182,8 @@ window.maintenance_edit = new class {
 
 			if (Object.keys(fields.timeperiods).length === 1) {
 				const timeperiod = Object.values(fields.timeperiods)[0];
-				const is_adhoc = document.getElementById('name').value.includes('Ad-hoc');
 
-				if (timeperiod.timeperiod_type === '<?= TIMEPERIOD_TYPE_ONETIME ?>' && is_adhoc) {
+				if (timeperiod.timeperiod_type === '<?= TIMEPERIOD_TYPE_ONETIME ?>') {
 					const formatDate = (date) => date.toLocaleString('sv-SE', {
 						hour12: false,
 						timeZone: <?= json_encode(date_default_timezone_get()) ?>
