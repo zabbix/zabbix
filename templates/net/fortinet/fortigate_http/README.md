@@ -48,6 +48,7 @@ For added security, it is strongly recommended to use the latest template versio
 |{$FGATE.API.PORT}|<p>The port of FortiGate API endpoint.</p>|`80`|
 |{$FGATE.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "FortiGate", e.g. {$HTTP.TLS.VERIFY:"FortiGate"}.</p>|`full`|
 |{$FIRMWARE.UPDATES.CONTROL}|<p>This macro is used in "New available firmware found" trigger.</p>|`1`|
 |{$CPU.UTIL.WARN}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`85`|
 |{$CPU.UTIL.CRIT}|<p>Threshold of CPU utilization for critical trigger in %.</p>|`95`|

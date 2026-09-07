@@ -129,6 +129,13 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "%1$s 动作"
 
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -959,6 +966,10 @@ msgstr "从主机添加"
 msgid "Add from template"
 msgstr "从模板添加"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "添加主机"
@@ -977,6 +988,10 @@ msgstr "添加主机触发器"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "添加监控项"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -4255,6 +4270,10 @@ msgstr "更改客户端密钥"
 msgid "Change indicator"
 msgstr "变化指示器"
 
+#: include/classes/html/CMacroValue.php:163
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -4532,10 +4551,18 @@ msgstr "关闭"
 msgid "Close expression constructor"
 msgstr "关闭表达式构造器"
 
+#: jsLoader.php:321
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "关闭新的事件"
+
+#: include/func.inc.php:1690 jsLoader.php:221
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4561,6 +4588,11 @@ msgstr "校验码长度"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "折叠"
+
+#: include/classes/html/CSectionCollapsible.php:41 jsLoader.php:333
+#: jsLoader.php:338
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -5685,6 +5717,10 @@ msgstr "仪表盘 \"%1$s\" 已经存在。"
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "报表 \"%2$s\"中已使用仪表盘 \"%1$s\"。"
 
+#: app/views/monitoring.dashboard.view.php:122
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6039,6 +6075,10 @@ msgstr "默认访问新的模块"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "默认认证方式"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6590,6 +6630,10 @@ msgstr "依赖"
 #: include/items.inc.php:102
 msgid "Dependent item"
 msgstr "相关项目"
+
+#: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7444,6 +7488,10 @@ msgstr "编辑"
 msgid "Edit dashboard"
 msgstr "编辑仪表盘"
 
+#: jsLoader.php:479
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "编辑拓扑图"
@@ -7460,6 +7508,10 @@ msgstr "编辑树元素"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "编辑构件"
+
+#: jsLoader.php:183
+msgid "Edit widget settings"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -7852,6 +7904,10 @@ msgstr "英语 (en_GB)"
 msgid "English (en_US)"
 msgstr "英语(en_US)"
 
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
 #: app/partials/monitoring.latest.filter.php:114
@@ -8133,6 +8189,10 @@ msgstr "执行确认"
 msgid "Exists"
 msgstr "存在"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8145,6 +8205,11 @@ msgstr "扩展"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "展开宏"
+
+#: include/classes/html/CSectionCollapsible.php:44 jsLoader.php:332
+#: jsLoader.php:337
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -8819,6 +8884,10 @@ msgstr "返回首页"
 msgid "Go to last page, %1$s"
 msgstr "跳转到尾页，%1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -8833,6 +8902,10 @@ msgstr "跳转到第 %1$s 页"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "跳转到第 %1$s 页，当前页"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12542,6 +12615,10 @@ msgstr "Windows 性能计数器的对象实例列表，发现的英文对象名�
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Windows 性能计数器的对象实例列表。返回 JSON"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -13701,6 +13778,14 @@ msgstr "严重异常如果下一层都有问题"
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
 msgstr "最重要的子服务"
+
+#: include/classes/html/CFilter.php:254 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:259 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
 
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
@@ -15353,6 +15438,11 @@ msgstr "只计算指派给启用的主机的和相依于启用的监控项的触
 msgid "Open URL"
 msgstr "打开网址"
 
+#: app/views/popup.generic.php:460 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:322
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "在新窗口中打开"
@@ -15360,6 +15450,10 @@ msgstr "在新窗口中打开"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "打开日志"
+
+#: jsLoader.php:184
+msgid "Open widget actions"
+msgstr ""
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -15949,6 +16043,10 @@ msgstr "父服务"
 msgid "Parent templates"
 msgstr "父模板"
 
+#: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
 msgstr "上层触发器"
@@ -16532,6 +16630,21 @@ msgstr "问题恢复"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "问题已解决"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -17305,6 +17418,10 @@ msgstr "自主机群组移除"
 msgid "Remove from host groups"
 msgstr "自主机群组移除"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "移除主机"
@@ -17312,6 +17429,10 @@ msgstr "移除主机"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "删除主机标签"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18441,6 +18562,10 @@ msgstr "选择"
 msgid "Select SLA to display SLA report."
 msgstr "选择 SLA 以显示 SLA 报表。"
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -18899,6 +19024,10 @@ msgstr "查看"
 msgid "Show aggregation function"
 msgstr "显示聚合函数"
 
+#: include/events.inc.php:755
+msgid "Show all tags"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr "显示圆弧"
@@ -18945,6 +19074,10 @@ msgstr "显示图例"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "查看线条"
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"

@@ -545,6 +545,8 @@ function find_period_start($periods, $time) {
 
 		if (array_key_exists($wday, $periods)) {
 			foreach ($periods[$wday] as $period) {
+				$current_timestamp = $date->getTimestamp();
+
 				$date->setTime($period['end_h'], $period['end_m'], 0);
 				$per_end = $date->getTimestamp();
 
@@ -552,6 +554,7 @@ function find_period_start($periods, $time) {
 					continue;
 				}
 
+				$date->setTimestamp($current_timestamp);
 				$date->setTime($period['start_h'], $period['start_m'], 0);
 				$per_start = $date->getTimestamp();
 

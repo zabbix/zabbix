@@ -100,7 +100,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&context=template&parent_discoveryid='.$this->discoveryRuleId);
+		$this->zbxTestLogin('graphs.php?form=create&context=template&parent_discoveryid='.$this->discoveryRuleId);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 

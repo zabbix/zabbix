@@ -42,266 +42,289 @@ zabbix_export:
           value: '<PUT YOUR URGENCY ID>'
         - name: sysaid_url
           value: '<PUT YOUR SYSAID URL>'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"SysAid"}'
         - name: trigger_id
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         var SysAid = {
-            params: {},
+        	params: {},
         
-            setParams: function (params) {
-                var required = ['url', 'auth_user', 'auth_password', 'category_level_1', 'category_level_2',
-                    'category_level_3', 'incident_id', 'template_id', 'urgency_id', 'incident_state',
-                    'default_priority_id'
-                ];
+        	setParams: function (params) {
+        		var required = ['url', 'auth_user', 'auth_password', 'category_level_1', 'category_level_2',
+        			'category_level_3', 'incident_id', 'template_id', 'urgency_id', 'incident_state',
+        			'default_priority_id'
+        		];
         
-                required.forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: "' + field + '".';
-                    }
-                });
+        		required.forEach(function (field) {
+        			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+        				throw 'Required param is not set: "' + field + '".';
+        			}
+        		});
         
-                SysAid.params = params;
-                if (typeof SysAid.params.url === 'string' && !SysAid.params.url.endsWith('/')) {
-                    SysAid.params.url += '/';
-                }
-            },
+        		SysAid.params = params;
+        		if (typeof SysAid.params.url === 'string' && !SysAid.params.url.endsWith('/')) {
+        			SysAid.params.url += '/';
+        		}
+        	},
         
-            login: function () {
-                var result = SysAid.request('post', 'api/v1/login', {
-                    user_name: SysAid.params.auth_user,
-                    password: SysAid.params.auth_password
-                });
+        	login: function () {
+        		var result = SysAid.request('post', 'api/v1/login', {
+        			user_name: SysAid.params.auth_user,
+        			password: SysAid.params.auth_password
+        		});
         
-                return result.response.user.id;
-            },
+        		return result.response.user.id;
+        	},
         
-            request: function (method, query, data) {
-                var response,
-                    request = SysAid.req || (SysAid.req = new HttpRequest()),
-                    url = SysAid.params.url + query;
+        	request: function (method, query, data) {
+        		var response,
+        			request = SysAid.req || (SysAid.req = new HttpRequest(tls.options)),
+        			url = SysAid.params.url + query;
         
-                if (typeof SysAid.HTTPProxy !== 'undefined' && SysAid.HTTPProxy.trim() !== '') {
-                    request.setProxy(SysAid.HTTPProxy);
-                }
+        		if (typeof SysAid.HTTPProxy !== 'undefined' && SysAid.HTTPProxy.trim() !== '') {
+        			request.setProxy(SysAid.HTTPProxy);
+        		}
         
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+        		if (typeof data !== 'undefined') {
+        			data = JSON.stringify(data);
+        		}
         
-                Zabbix.log(4, '[ SysAid Webhook ] Sending request: ' +
-                    url + ((typeof data === 'string') ? (' ' + data) : ''));
+        		Zabbix.log(4, '[ SysAid Webhook ] Sending request: ' +
+        			url + ((typeof data === 'string') ? (' ' + data) : ''));
         
-                switch (method) {
-                    case 'get':
-                        response = request.get(url, data);
-                        break;
+        		switch (method) {
+        			case 'get':
+        				response = request.get(tls.checkURL(url), data);
+        				break;
         
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
+        			case 'post':
+        				response = request.post(tls.checkURL(url), data);
+        				break;
         
-                    case 'put':
-                        response = request.put(url, data);
-                        break;
+        			case 'put':
+        				response = request.put(tls.checkURL(url), data);
+        				break;
         
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
+        			default:
+        				throw 'Unsupported HTTP request method: ' + method;
+        		}
         
-                Zabbix.log(4, '[ SysAid Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
+        		Zabbix.log(4, '[ SysAid Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
         
-                if (request.getStatus() !== 200) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        		if (request.getStatus() !== 200) {
+        			var message = 'Request failed with status code ' + request.getStatus();
         
-                    message += ': ' + response;
-                    throw message + ' Check debug log for more information.';
-                }
+        			message += ': ' + response;
+        			throw message + ' Check debug log for more information.';
+        		}
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ SysAid Webhook ] Failed to parse response received from SysAid');
-                        response = null;
-                    }
-                }
+        		if (response !== null) {
+        			try {
+        				response = JSON.parse(response);
+        			}
+        			catch (error) {
+        				Zabbix.log(4, '[ SysAid Webhook ] Failed to parse response received from SysAid');
+        				response = null;
+        			}
+        		}
         
-                if (response === null || (typeof response.Error !== 'undefined' && Object.keys(response.Error).length > 0)) {
-                    throw 'Request failed: ' + JSON.stringify(response.Error);
-                }
+        		if (response === null || (typeof response.Error !== 'undefined' && Object.keys(response.Error).length > 0)) {
+        			throw 'Request failed: ' + JSON.stringify(response.Error);
+        		}
         
-                return {
-                    status: request.getStatus(),
-                    response: response
-                };
-            },
+        		return {
+        			status: request.getStatus(),
+        			response: response
+        		};
+        	},
         
-            createIncident: function(subject, message, priority) {
-                var result = SysAid.request('post', 'api/v1/sr/?template=' + encodeURIComponent(SysAid.params.template_id), {
-                    info: [
-                        {
-                            key: 'problem_type',
-                            value: [
-                                SysAid.params.category_level_1,
-                                SysAid.params.category_level_2,
-                                SysAid.params.category_level_3
-                            ].join('_')
-                        },
-                        {
-                            key: 'title',
-                            value: subject
-                        },
-                        {
-                            key: 'description',
-                            value: message
-                        },
-                        {
-                            key: 'status',
-                            value: '1'
-                        },
-                        {
-                            key: 'urgency',
-                            value: SysAid.params.urgency_id
-                        },
-                        {
-                            key: 'priority',
-                            value: priority || SysAid.params.default_priority_id,
-                        }
-                    ]
-                });
+        	createIncident: function(subject, message, priority) {
+        		var result = SysAid.request('post', 'api/v1/sr/?template=' + encodeURIComponent(SysAid.params.template_id), {
+        			info: [
+        				{
+        					key: 'problem_type',
+        					value: [
+        						SysAid.params.category_level_1,
+        						SysAid.params.category_level_2,
+        						SysAid.params.category_level_3
+        					].join('_')
+        				},
+        				{
+        					key: 'title',
+        					value: subject
+        				},
+        				{
+        					key: 'description',
+        					value: message
+        				},
+        				{
+        					key: 'status',
+        					value: '1'
+        				},
+        				{
+        					key: 'urgency',
+        					value: SysAid.params.urgency_id
+        				},
+        				{
+        					key: 'priority',
+        					value: priority || SysAid.params.default_priority_id,
+        				}
+        			]
+        		});
         
-                if (result.response.id === 'undefined') {
-                    throw 'Cannot create SysAid incident. Check debug log for more information.';
-                }
+        		if (result.response.id === 'undefined') {
+        			throw 'Cannot create SysAid incident. Check debug log for more information.';
+        		}
         
-                return result.response.id;
-            },
+        		return result.response.id;
+        	},
         
-            updateTicket: function(note) {
-                var date = new Date().getTime();
+        	updateTicket: function(note) {
+        		var date = new Date().getTime();
         
-                SysAid.request('put', 'api/v1/sr/' + encodeURIComponent(SysAid.params.incident_id), {
-                    id: SysAid.params.incident_id,
-                    info: [
-                        {
-                            key: 'update_time',
-                            value: date
-                        },
-                        {
-                            key: 'notes',
-                            value: [
-                                {
-                                    userName: 'Zabbix',
-                                    createDate: date,
-                                    text: note
-                                }
-                            ]
-                        }
-                    ]
-                });
-            }
+        		SysAid.request('put', 'api/v1/sr/' + encodeURIComponent(SysAid.params.incident_id), {
+        			id: SysAid.params.incident_id,
+        			info: [
+        				{
+        					key: 'update_time',
+        					value: date
+        				},
+        				{
+        					key: 'notes',
+        					value: [
+        						{
+        							userName: 'Zabbix',
+        							createDate: date,
+        							text: note
+        						}
+        					]
+        				}
+        			]
+        		});
+        	}
         };
         
         try {
-            var params = JSON.parse(value),
-                params_sysaid = {},
-                params_update = {},
-                result = {tags: {}},
-                required_params = ['alert_subject', 'event_source', 'event_value',  'event_update_status'],
-                severities = [
-                    {name: 'not_classified', color: '#97AAB3'},
-                    {name: 'information', color: '#7499FF'},
-                    {name: 'warning', color: '#FFC859'},
-                    {name: 'average', color: '#FFA059'},
-                    {name: 'high', color: '#E97659'},
-                    {name: 'disaster', color: '#E45959'},
-                    {name: 'resolved', color: '#009900'},
-                    {name: null, color: '#000000'}
-                ],
-                priority;
+        	var params = JSON.parse(value),
+        	tls = new CTlsConfig(params.tls_verify),
+        		params_sysaid = {},
+        		params_update = {},
+        		result = {tags: {}},
+        		required_params = ['alert_subject', 'event_source', 'event_value',  'event_update_status'],
+        		severities = [
+        			{name: 'not_classified', color: '#97AAB3'},
+        			{name: 'information', color: '#7499FF'},
+        			{name: 'warning', color: '#FFC859'},
+        			{name: 'average', color: '#FFA059'},
+        			{name: 'high', color: '#E97659'},
+        			{name: 'disaster', color: '#E45959'},
+        			{name: 'resolved', color: '#009900'},
+        			{name: null, color: '#000000'}
+        		],
+        		priority;
         
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (key.startsWith('sysaid_')) {
-                        params_sysaid[key.substring(7)] = params[key];
-                    }
-                    else if (key.startsWith('event_update_')) {
-                        params_update[key.substring(13)] = params[key];
-                    }
-                    else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
-                        throw 'Parameter "' + key + '" cannot be empty.';
-                    }
-                });
+        	Object.keys(params)
+        		.forEach(function (key) {
+        			if (key.startsWith('sysaid_')) {
+        				params_sysaid[key.substring(7)] = params[key];
+        			}
+        			else if (key.startsWith('event_update_')) {
+        				params_update[key.substring(13)] = params[key];
+        			}
+        			else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+        				throw 'Parameter "' + key + '" cannot be empty.';
+        			}
+        		});
         
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
-            }
+        	if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+        		throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+        	}
         
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
+        	if (params.event_value !== '0' && params.event_value !== '1'
+        		&& (params.event_source === '0' || params.event_source === '3')) {
+        		throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+        	}
         
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
+        	if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+        		throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+        	}
         
-            if (params.event_source !== '0' && params.event_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
-            }
+        	if (params.event_source !== '0' && params.event_value === '0') {
+        		throw 'Recovery operations are supported only for trigger-based actions.';
+        	}
         
-            if (params.event_source === '0' && ((params.event_value === '1' && params.event_update_status === '1')
-                    || (params.event_value === '0' && (params.event_update_status === '0' || params.event_update_status === '1')))
-                    && (isNaN(parseInt(params.sysaid_incident_id)) || parseInt(params.sysaid_incident_id) < 1 )) {
-                throw 'Incorrect "sysaid_incident_id" parameter given: ' + params.sysaid_incident_id + '\nMust be positive integer.';
-            }
+        	if (params.event_source === '0' && ((params.event_value === '1' && params.event_update_status === '1')
+        			|| (params.event_value === '0' && (params.event_update_status === '0' || params.event_update_status === '1')))
+        			&& (isNaN(parseInt(params.sysaid_incident_id)) || parseInt(params.sysaid_incident_id) < 1 )) {
+        		throw 'Incorrect "sysaid_incident_id" parameter given: ' + params.sysaid_incident_id + '\nMust be positive integer.';
+        	}
         
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                params.event_nseverity = '7';
-            }
+        	if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+        		params.event_nseverity = '7';
+        	}
         
-            if (params.event_value === '0') {
-                params.event_nseverity = '6';
-            }
+        	if (params.event_value === '0') {
+        		params.event_nseverity = '6';
+        	}
         
-            priority = params['severity_' + severities[params.event_nseverity].name];
-            priority = priority && priority.trim() || severities[7].name;
+        	priority = params['severity_' + severities[params.event_nseverity].name];
+        	priority = priority && priority.trim() || severities[7].name;
         
-            SysAid.setParams(params_sysaid);
-            SysAid.HTTPProxy = params.HTTPProxy;
-            SysAid.login();
+        	SysAid.setParams(params_sysaid);
+        	SysAid.HTTPProxy = params.HTTPProxy;
+        	SysAid.login();
         
-            if (params.event_source !== '0' && params.event_value !== '0') {
-                // Create ticket for non trigger-based events.
-                SysAid.createIncident(params.alert_subject, params.alert_message, priority);
-            }
-            else if (params.event_value === '1' && params_update.status === '0') {
-                // Create ticket for trigger-based events.
-                var incident_id = SysAid.createIncident(params.alert_subject, params.alert_subject + '\n' + params.alert_message +
-                        '\n' + params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' +
-                        params.trigger_id + '&eventid=' + params.event_id + '\n', priority
-                );
+        	if (params.event_source !== '0' && params.event_value !== '0') {
+        		SysAid.createIncident(params.alert_subject, params.alert_message, priority);
+        	}
+        	else if (params.event_value === '1' && params_update.status === '0') {
+        		var incident_id = SysAid.createIncident(params.alert_subject, params.alert_subject + '\n' + params.alert_message +
+        				'\n' + params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' +
+        				params.trigger_id + '&eventid=' + params.event_id + '\n', priority
+        		);
         
-                result.tags.__zbx_sysaid_incident_id = incident_id;
-                result.tags.__zbx_sysaid_incidentlink = params.sysaid_url +
-                    (params.sysaid_url.endsWith('/') ? '' : '/') + 'SREdit.jsp?id=' + incident_id + '&fromId=IncidentsList';
-            }
-            else {
-                // Update created ticket for trigger-based event.
-                SysAid.updateTicket(params.alert_subject + '\n' + params.alert_message);
-            }
+        		result.tags.__zbx_sysaid_incident_id = incident_id;
+        		result.tags.__zbx_sysaid_incidentlink = params.sysaid_url +
+        			(params.sysaid_url.endsWith('/') ? '' : '/') + 'SREdit.jsp?id=' + incident_id + '&fromId=IncidentsList';
+        	}
+        	else {
+        		SysAid.updateTicket(params.alert_subject + '\n' + params.alert_message);
+        	}
         
-            return JSON.stringify(result);
+        	return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ SysAid Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Zabbix.log(3, '[ SysAid Webhook ] ERROR: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
@@ -321,7 +344,7 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: 'Resolved: {EVENT.NAME}'
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
             Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
@@ -331,12 +354,12 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: 'Updated problem: {EVENT.NAME}'
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
             {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
             {EVENT.UPDATE.MESSAGE}
             
-            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -359,3 +382,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

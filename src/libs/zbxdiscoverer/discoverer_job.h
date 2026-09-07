@@ -16,7 +16,6 @@
 #define ZABBIX_DISCOVERER_JOB_H
 
 #include "zbxdiscovery.h"
-#include "zbxip.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
@@ -24,7 +23,6 @@
 #define DISCOVERER_JOB_STATUS_WAITING	1
 #define DISCOVERER_JOB_STATUS_REMOVING	2
 
-ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
 ZBX_VECTOR_DECL(portrange, zbx_range_t)
 
 typedef struct
