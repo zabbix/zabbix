@@ -912,7 +912,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function validateInheritedTelemetryQueryItems(array $items, array $db_items): void {
-		foreach ($items as $i => $item) {
+		foreach ($items as $item) {
 			if ($item['type'] != ITEM_TYPE_TELEMETRY_QUERY
 					|| (!array_key_exists('granularity', $item) && !array_key_exists('lookback_limit', $item))) {
 				continue;
@@ -920,25 +920,27 @@ abstract class CItemGeneral extends CApiService {
 
 			$item += $db_items[$item['itemid']];
 
-			if (!CItemTypeTelemetryQuery::validateGranularity($item, '/'.($i + 1), $error)) {
-				if (self::isItemPrototype()) {
-					$error = $item['host_status'] == HOST_STATUS_TEMPLATE
-						? _('Cannot update inherited item prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
-						: _('Cannot update inherited item prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
-				}
-				else {
-					$error = $item['host_status'] == HOST_STATUS_TEMPLATE
-						? _('Cannot update inherited item with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
-						: _('Cannot update inherited item with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
-				}
-
-				$hosts = DB::select('hosts', [
-					'output' => ['host'],
-					'hostids' => $item['hostid']
-				]);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $hosts[0]['host']));
+			if (CItemTypeTelemetryQuery::validateGranularity($item, '')) {
+				continue;
 			}
+
+			if (self::isItemPrototype()) {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited item prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited item prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+			else {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited item with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited item with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+
+			$hosts = DB::select('hosts', [
+				'output' => ['host'],
+				'hostids' => $item['hostid']
+			]);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $hosts[0]['host']));
 		}
 	}
 
