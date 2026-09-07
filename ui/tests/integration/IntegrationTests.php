@@ -53,6 +53,7 @@ require_once dirname(__FILE__).'/testAutoregistrationProxyGroup.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
+require_once dirname(__FILE__).'/testIpmiChecks.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
@@ -93,6 +94,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testAutoregistrationProxyGroup');
+		$suite->addTestSuite('testIpmiChecks');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
