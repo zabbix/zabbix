@@ -210,16 +210,14 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		info = NULL;
 		ret = FAIL;
 	}
-	else if (PERMS_ERROR != ret)
-	{
+	else if (AGENT_ERROR != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
-	}
 
 	if (SUCCEED == ret)
 		zbx_process_command_results(jp);
 
 	/* set response as succeed so agent will not retry with the same non-existing host */
-	if (CONFIG_ERROR == ret || HOST_ERROR == ret)
+	if (CONFIG_ERROR == ret || NETWORK_ERROR == ret)
 		ret = SUCCEED;
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);

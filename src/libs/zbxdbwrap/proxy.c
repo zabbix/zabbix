@@ -1752,8 +1752,8 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 
 	if (FAIL == (ret = zbx_dc_config_get_hostinfo(tmp, sock, &hostinfo, &redirect)))
 	{
-		/* return HOST_ERROR to prevent command to be proceed because of non-existing host */
-		ret = HOST_ERROR;
+		/* return NETWORK_ERROR to prevent command to be proceed because of non-existing host */
+		ret = NETWORK_ERROR;
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
 		goto out;
 	}
@@ -1772,7 +1772,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 
 	if (FAIL == zbx_host_check_permissions(&hostinfo, sock, &error))
 	{
-		ret = PERMS_ERROR;
+		ret = AGENT_ERROR;
 
 		if (NULL != error)
 		{
