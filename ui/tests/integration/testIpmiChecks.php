@@ -16,7 +16,7 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for IPMI checks (src/libs/zbxipmi), against a real ipmi_sim simulated BMC.
+ * Test suite for IPMI checks, against a real ipmi_sim simulated BMC.
  *
  * @onAfter clearData
  */
@@ -263,6 +263,10 @@ class testIpmiChecks extends CIntegrationTest {
 			// Neither a sensor nor a control by this name exists - exercises get_value_ipmi()'s not-found
 			// branch for a regular item (as opposed to testIpmiChecks_controlNotFound()'s script path).
 			['host' => self::HOST_NORMAL, 'key' => 'ipmi.badname', 'sensor' => 'does-not-exist'],
+			// Same not-found branch, but via the "name:" prefix - exercises zbx_get_ipmi_sensor_by_full_name()/
+			// zbx_get_ipmi_control_by_full_name() (has_name_prefix()'s other branch), not
+			// zbx_get_ipmi_sensor_by_id()/zbx_get_ipmi_control_by_name() as the bare-name case above does.
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.badname.byname', 'sensor' => 'name:does-not-exist'],
 			// Threshold access disabled at runtime - exercises zbx_read_ipmi_thresholds()'s early-exit branch.
 			['host' => self::HOST_NORMAL, 'key' => 'ipmi.nothresh', 'sensor' => 'NoThresh'],
 			['host' => self::HOST_MACRO, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
@@ -323,6 +327,18 @@ class testIpmiChecks extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptids['power_on'] = $response['result']['scriptids'][0];
+
+		// Same control, but a numeric value - exercises zbx_parse_ipmi_command()'s zbx_is_uint31() branch,
+		// as opposed to the "on"/"off" keyword branch above.
+		$response = $this->call('script.create', [
+			'name' => 'Test IPMI power numeric value',
+			'type' => ZBX_SCRIPT_TYPE_IPMI,
+			'scope' => ZBX_SCRIPT_SCOPE_HOST,
+			'command' => 'power 1',
+			'host_access' => PERM_READ
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		self::$scriptids['power_numeric'] = $response['result']['scriptids'][0];
 
 		return true;
 	}
@@ -390,13 +406,13 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_thresholdSensor() {
+	public function testIpmiChecks_thresholdSensor(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.temp');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
 				'ipmi.temp is unexpectedly unsupported: '.$item['lastvalue']
 		);
-		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001, '');
+		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001);
 	}
 
 	/**
@@ -404,7 +420,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_sensorById() {
+	public function testIpmiChecks_sensorById(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.temp.byid');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
@@ -421,7 +437,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_sensorByFullName() {
+	public function testIpmiChecks_sensorByFullName(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.get');
 		$json = json_decode($item['lastvalue'], true);
 
@@ -463,7 +479,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_discreteSensor() {
+	public function testIpmiChecks_discreteSensor(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.presence');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
@@ -477,7 +493,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_discovery() {
+	public function testIpmiChecks_discovery(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.get');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
@@ -503,29 +519,72 @@ class testIpmiChecks extends CIntegrationTest {
 		$this->assertTrue($find($names, 'Presence'),
 				'Discovery is missing the "Presence" sensor: '.$item['lastvalue']
 		);
+
+		// "Unsupported" (a reserved event_reading_type_code) must be silently skipped by get_discovery_ipmi()
+		// (zbx_read_ipmi_sensor() fails it before any read is attempted), not merely fail elsewhere.
+		$this->assertFalse($find($names, 'Unsupported'),
+				'Discovery should not include the "Unsupported" sensor: '.$item['lastvalue']
+		);
+
+		$find_entry = function(array $json, string $needle) {
+			foreach ($json as $entry) {
+				if (isset($entry['name']) && strpos($entry['name'], $needle) !== false) {
+					return $entry;
+				}
+			}
+
+			return null;
+		};
+
+		// zbx_get_ipmi_units()'s early "percentage" return.
+		$percent = $find_entry($json, 'Percent');
+		$this->assertIsArray($percent, 'Discovery is missing the "Percent" sensor: '.$item['lastvalue']);
+		$this->assertSame('%', $percent['units'], 'Unexpected units for "Percent": '.json_encode($percent));
+
+		// zbx_get_ipmi_units()'s "base OP modifier" branch (not the plain "none" case Temp/etc. hit) - which
+		// of IPMI_MODIFIER_UNIT_BASE_DIV_MOD/_MULT_MOD the SDR's "divide" token maps to at the wire level
+		// turned out empirically to be multiplication ("watts*hour", confirmed against a real OpenIPMI
+		// connection), not division - either branch is a previously-uncovered one, so the sensor is kept
+		// and just asserted against its actual (lowercase, "*") rendering rather than chasing the exact
+		// token/enum mapping further.
+		$wph = $find_entry($json, 'WattsHour');
+		$this->assertIsArray($wph, 'Discovery is missing the "WattsHour" sensor: '.$item['lastvalue']);
+		$this->assertStringContainsString('watts', $wph['units'], 'Unexpected units for "WattsHour": '.
+				json_encode($wph)
+		);
+		$this->assertTrue(preg_match('#[*/]#', $wph['units']) === 1, 'Unexpected units for "WattsHour": '.
+				json_encode($wph)
+		);
 	}
 
-	/**
-	 * Connection-failure scenarios (wrong credentials, an unreachable port) are deliberately not exercised here.
-	 * zbx_perform_openipmi_ops()'s wait loop (checks_ipmi.c) has no overall timeout - only a 10s per-iteration
-	 * chunk it can keep re-entering - and in practice neither a wrong password nor a non-responding port
-	 * resolved (success or NOTSUPPORTED) within 60+ seconds against ipmi_sim in this environment. With a single
-	 * IPMI poller, a stuck connection attempt blocks every other host's checks too. Rather than pick an
-	 * arbitrarily large timeout and risk an occasionally-hanging suite, this suite sticks to the fast,
-	 * deterministic scenarios below.
-	 */
+	/*
+	Connection-failure scenarios (wrong credentials, an unreachable port, a mid-session drop) are deliberately
+	not exercised here. zbx_perform_openipmi_ops()'s wait loop (checks_ipmi.c) has no overall timeout - only a
+	10s per-iteration chunk it can keep re-entering - and in practice a wrong password and a non-responding
+	port never resolved within 60+ seconds against ipmi_sim in this environment. A mid-session drop (killing
+	the simulator after a connection is already up) WAS confirmed, with a small standalone OpenIPMI
+	reproducer using the same connection setup as zbx_init_ipmi_host(), to be detected deterministically in
+	~30s by OpenIPMI's own connection-audit timer - but there is only one simulator instance serving every
+	host in this suite, so killing it to test one host mid-session also breaks every other host's connection
+	at the same time (confirmed: "ipmi-normal"/"ipmi-macro" also logged network errors), and Zabbix's own
+	unreachable-retry backoff on top of that pushed the real end-to-end recovery past 90s-2min. Properly
+	isolating this would need a second, dedicated simulator instance. Given the modest additional coverage
+	(essentially zbx_connection_change_cb()'s error path and zbx_domain_closed_cb()) against that much added
+	complexity, runtime, and risk of destabilizing every other test in this suite, this suite sticks to the
+	fast, deterministic scenarios below instead.
+	*/
 
 	/**
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_portMacro() {
+	public function testIpmiChecks_portMacro(): void {
 		$item = $this->getItemResult(self::HOST_MACRO.':ipmi.temp');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
 				'ipmi.temp via a macro-expanded port is unexpectedly unsupported: '.$item['lastvalue']
 		);
-		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001, '');
+		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001);
 	}
 
 	/**
@@ -541,7 +600,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_controlNotFound() {
+	public function testIpmiChecks_controlNotFound(): void {
 		if (CAPIHelper::getSessionId() === null) {
 			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		}
@@ -568,7 +627,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_powerControlRead() {
+	public function testIpmiChecks_powerControlRead(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.power');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
@@ -585,7 +644,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_powerControlSet() {
+	public function testIpmiChecks_powerControlSet(): void {
 		if (CAPIHelper::getSessionId() === null) {
 			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		}
@@ -602,13 +661,37 @@ class testIpmiChecks extends CIntegrationTest {
 	}
 
 	/**
+	 * Same as testIpmiChecks_powerControlSet(), but with a numeric value ("power 1") instead of the "on"
+	 * keyword - exercises zbx_parse_ipmi_command()'s zbx_is_uint31() success branch.
+	 *
+	 * @depends testIpmiChecks_thresholdSensor
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_powerControlSetNumeric(): void {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$response = CAPIHelper::call('script.execute', [
+			'scriptid' => self::$scriptids['power_numeric'],
+			'hostid' => self::$hostids[self::HOST_NORMAL]
+		]);
+
+		$this->assertArrayHasKey('result', $response, 'script.execute("power 1") failed: '.json_encode($response));
+		$this->assertEquals('success', $response['result']['response'],
+				'script.execute("power 1") did not report success: '.json_encode($response['result'])
+		);
+	}
+
+	/**
 	 * Exercises zbx_ipmi_port_expand_macros()'s "Invalid port value" branch. This is resolved entirely in the
 	 * IPMI manager, before any connection is attempted, so unlike a real connection failure it cannot hang.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_invalidPortMacro() {
+	public function testIpmiChecks_invalidPortMacro(): void {
 		$item = $this->getItemResult(self::HOST_BADPORT.':ipmi.temp');
 
 		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'],
@@ -622,11 +705,28 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_badSensorName() {
+	public function testIpmiChecks_badSensorName(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.badname');
 
 		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'],
 				'A non-existent sensor/control name should make the item unsupported'
+		);
+		$this->assertStringContainsString('does not exist', $item['error']);
+	}
+
+	/**
+	 * Same as testIpmiChecks_badSensorName(), but via the "name:" prefix - exercises
+	 * zbx_get_ipmi_sensor_by_full_name()/zbx_get_ipmi_control_by_full_name()'s not-found path.
+	 *
+	 * @depends testIpmiChecks_thresholdSensor
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_badSensorNameByFullName(): void {
+		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.badname.byname');
+
+		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'],
+				'A non-existent "name:"-prefixed sensor/control name should make the item unsupported'
 		);
 		$this->assertStringContainsString('does not exist', $item['error']);
 	}
@@ -641,7 +741,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testIpmiChecks_noThresholdAccess() {
+	public function testIpmiChecks_noThresholdAccess(): void {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.nothresh');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
@@ -667,6 +767,57 @@ class testIpmiChecks extends CIntegrationTest {
 		);
 		$this->assertSame([], $entry['threshold']['upper'] ?? null,
 				'"NoThresh" should have no populated upper threshold values: '.json_encode($entry)
+		);
+	}
+
+	/**
+	 * @return array<int, array>
+	 */
+	public function malformedIpmiCommandDataProvider(): array {
+		// [command, expected_error_substring]
+		return [
+			['power notanumber', 'IPMI command value is not supported'],
+			[' ', 'IPMI command is empty'],
+			[str_repeat('a', 130).' on', 'IPMI command is too long']
+		];
+	}
+
+	/**
+	 * zbx_parse_ipmi_command() runs entirely locally (before any poller/network involvement), so these
+	 * resolve instantly regardless of ipmi_sim/connection state - each case builds and executes its own
+	 * throwaway script rather than reusing one from prepareData(), since the malformed command itself is
+	 * the thing under test.
+	 *
+	 * @dataProvider malformedIpmiCommandDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_malformedIpmiCommand(string $command, string $expected_error): void {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$response = $this->call('script.create', [
+			'name' => 'Test malformed IPMI command '.md5($command),
+			'type' => ZBX_SCRIPT_TYPE_IPMI,
+			'scope' => ZBX_SCRIPT_SCOPE_HOST,
+			'command' => $command,
+			'host_access' => PERM_READ
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		$scriptid = $response['result']['scriptids'][0];
+		self::$scriptids['malformed_'.md5($command)] = $scriptid;
+
+		$response = CAPIHelper::call('script.execute', [
+			'scriptid' => $scriptid,
+			'hostid' => self::$hostids[self::HOST_NORMAL]
+		]);
+
+		$this->assertArrayHasKey('error', $response, 'script.execute with command "'.$command.'" should fail: '.
+				json_encode($response)
+		);
+		$this->assertStringContainsString($expected_error, $response['error']['data'],
+				'Unexpected error for command "'.$command.'": '.json_encode($response['error'])
 		);
 	}
 }
