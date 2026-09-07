@@ -966,7 +966,7 @@ class CTrigger extends CTriggerGeneral {
 						dbConditionCoalesce('tr.value', DB::getDefault('trigger_rtdata', 'value'), 'value').
 					' FROM trigger_depends d'.
 					' LEFT JOIN trigger_rtdata tr ON tr.triggerid=d.triggerid_up'.
-					' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds)
+					' WHERE '.dbConditionId('d.triggerid_down', $triggerIds)
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.
