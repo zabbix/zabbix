@@ -443,7 +443,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Added raw_sensor: host:'%s' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
+	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
 			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'",
 			zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port), (int)s->id_type, s->id_sz,
 			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),

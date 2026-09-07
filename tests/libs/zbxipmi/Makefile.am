@@ -261,8 +261,16 @@ zbx_ipmi_change_callbacks_LDADD = \
 
 zbx_ipmi_change_callbacks_LDADD += @SERVER_LIBS@
 
+# exercises zbx_sensor_change_cb()/zbx_connection_change_cb() too, which need a few more real OpenIPMI
+# calls wrapped beyond the sensor/control ID conversion above - see the file header comment
+CHANGE_CALLBACKS_EXTRA_WRAP_FUNCS = \
+	-Wl,--wrap=ipmi_sensor_convert_to_id \
+	-Wl,--wrap=ipmi_sensor_get_is_readable \
+	-Wl,--wrap=ipmi_domain_close \
+	-Wl,--wrap=ipmi_domain_add_entity_update_handler
+
 zbx_ipmi_change_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
-	$(CONTROL_CONVERT_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+	$(CONTROL_CONVERT_WRAP_FUNCS) $(CHANGE_CALLBACKS_EXTRA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ipmi_change_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
 

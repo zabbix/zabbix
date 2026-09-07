@@ -20,13 +20,83 @@ in:
 out:
   control_count: 1
 ---
-test case: "4. entity_change: IPMI_DELETED does nothing observable"
+test case: "4. sensor_change: IPMI_ADDED for an already-known sensor is a no-op"
+in:
+  cb: "sensor_change"
+  op: "added"
+out:
+  sensor_count: 1
+---
+test case: "5. sensor_change: IPMI_DELETED removes the sensor"
+in:
+  cb: "sensor_change"
+  op: "deleted"
+out:
+  sensor_count: 0
+---
+test case: "6. sensor_change: IPMI_CHANGED is a no-op"
+in:
+  cb: "sensor_change"
+  op: "changed"
+out:
+  sensor_count: 1
+---
+test case: "7. sensor_change: a non-readable sensor is ignored regardless of op"
+in:
+  cb: "sensor_change_not_readable"
+  op: "added"
+---
+test case: "8. entity_change: IPMI_DELETED does nothing observable"
 in:
   cb: "entity_change"
   op: "deleted"
 ---
-test case: "5. entity_change: IPMI_CHANGED does nothing observable"
+test case: "9. entity_change: IPMI_CHANGED does nothing observable"
 in:
   cb: "entity_change"
   op: "changed"
+---
+test case: "10. connection_change: success adds an entity update handler"
+in:
+  cb: "connection_change"
+  op: "changed"
+  err: 0
+  domain_close_ret: 0
+  entity_handler_ret: 0
+out:
+  domain_close_calls: 0
+  entity_handler_calls: 1
+---
+test case: "11. connection_change: success still adds the handler even when it returns an error"
+in:
+  cb: "connection_change"
+  op: "changed"
+  err: 0
+  domain_close_ret: 0
+  entity_handler_ret: 5
+out:
+  domain_close_calls: 0
+  entity_handler_calls: 1
+---
+test case: "12. connection_change: err!=0 closes the domain instead"
+in:
+  cb: "connection_change"
+  op: "changed"
+  err: 5
+  domain_close_ret: 0
+  entity_handler_ret: 0
+out:
+  domain_close_calls: 1
+  entity_handler_calls: 0
+---
+test case: "13. connection_change: err!=0 and ipmi_domain_close() itself failing is still reported"
+in:
+  cb: "connection_change"
+  op: "changed"
+  err: 5
+  domain_close_ret: 5
+  entity_handler_ret: 0
+out:
+  domain_close_calls: 1
+  entity_handler_calls: 0
 ...
