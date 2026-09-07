@@ -685,7 +685,7 @@ $formgrid
 					->setHeader([
 						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
 						(new CColHeader())->setWidth('35%'),
-						(new CColHeader())->setWidth('22%')
+						(new CColHeader(_('Action')))->setWidth('22%')
 					])
 					->setFooter(new CRow(
 						(new CCol(
@@ -710,11 +710,9 @@ $formgrid
 							->setErrorLabel(_('Key name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
-						(new CCol(
+						new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')->setEnabled(!$readonly)
-						))
-							->addClass(ZBX_STYLE_RIGHT)
-							->addStyle('width: 100%;')
+						)
 					]))->addClass('form_row'),
 					(new CRow([
 						new CCol(),
