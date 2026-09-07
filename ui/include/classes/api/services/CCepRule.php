@@ -555,7 +555,7 @@ class CCepRule extends CApiService {
 				'group_by_host_group' =>	['type' => API_INT32, 'in' => DB::getDefault('cep_rule_window', 'group_by_host_group')],
 				'group_by_host' =>			['type' => API_INT32, 'in' => DB::getDefault('cep_rule_window', 'group_by_host')],
 				'group_by_tags' =>			['type' => API_INT32, 'in' => DB::getDefault('cep_rule_window', 'group_by_tags')],
-				'tags' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule_window', 'tags')],
+				'tags' =>					['type' => API_OBJECTS, 'length' => 0],
 				'event_count_tag' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule_window', 'event_count_tag')],
 				'script' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule_window', 'script')]
 			]]
@@ -593,7 +593,7 @@ class CCepRule extends CApiService {
 			'group_by_tags' =>			['type' => API_ANY],
 			'tags' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'group_by_tags', 'in' => implode(',', [CCepRuleHelper::GROUP_BY_YES])], 'type' => API_STRINGS_UTF8, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule_window', 'tags')]
+											['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'event_count_tag' =>		$cep_rule['window_type'] == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
 											? ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_rule_window', 'event_count_tag')]

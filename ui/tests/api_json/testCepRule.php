@@ -2627,7 +2627,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/tags": cannot be empty.'
 			],
-			'Window tag not accepted if group_by_tags=no' => [
+			'Window tags does not accept non-default value if group_by_tags=no' => [
 				'request' => [
 					'name' => 'ceprule',
 					'sortorder' => 1,
@@ -2646,7 +2646,7 @@ class testCepRule extends CAPITest {
 						'tags' => 'abc'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/tags": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": an array is expected.'
 			],
 			'Properties group_by* are optional' => [
 				'request' => [
@@ -2759,6 +2759,27 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "filter".'
+			],
+			'Window tags accepts default value if group_by_tags=no' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
+					],
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '1h',
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
+						'tags' => []
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
