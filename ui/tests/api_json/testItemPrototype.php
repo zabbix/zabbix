@@ -111,6 +111,47 @@ class testItemPrototype extends CAPITest {
 		$this->call('item.update', $item, $expected_error);
 	}
 
+	public function testTemplateItemPrototypeTelemetryQueryUpdateConflictingWithInheritedItem(): void {
+		$template_itemid = CTestDataHelper::getConvertedValueReference(':item_prototype:template_item_prototype_telemetry_query[{#M}]');
+		$hostid = CTestDataHelper::getConvertedValueReference(':host:telemetry_query_host');
+
+		$this->call('itemprototype.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '10m',
+			'granularity' => '1m'
+		]);
+
+		['result' => $result] = $this->call('itemprototype.get', [
+			'output' => ['itemid'],
+			'hostids' => $hostid,
+			'filter' => ['key_' => 'template_item_prototype_telemetry_query[{#M}]'],
+			'inherited' => true
+		]);
+		$this->assertCount(1, $result);
+		$inherited_itemid = $result[0]['itemid'];
+
+		$this->call('itemprototype.update', [
+			'itemid' => $inherited_itemid,
+			'granularity' => '5m'
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '2m'
+		], 'Cannot update inherited item prototype with key "template_item_prototype_telemetry_query[{#M}]" on host "telemetry_query_host" because granularity cannot be greater than lookback limit.');
+
+		['result' => $result] = $this->call('itemprototype.get', [
+			'output' => ['lookback_limit', 'granularity'],
+			'itemids' => [$template_itemid, $inherited_itemid],
+			'preservekeys' => true
+		]);
+
+		$this->assertSame('10m', $result[$template_itemid]['lookback_limit']);
+		$this->assertSame('1m', $result[$template_itemid]['granularity']);
+		$this->assertSame('10m', $result[$inherited_itemid]['lookback_limit']);
+		$this->assertSame('5m', $result[$inherited_itemid]['granularity']);
+	}
+
 	public static function getItemPrototypeCreateData() {
 		$valid_item_types = [
 			ITEM_TYPE_ZABBIX => '50022',

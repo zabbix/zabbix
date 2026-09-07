@@ -900,6 +900,48 @@ abstract class CItemGeneral extends CApiService {
 		return $chunks;
 	}
 
+	/**
+	 * Validate effective granularity and lookback limit values of inherited telemetry query items and item prototypes.
+	 *
+	 * An inherited item can override these fields. Therefore, a valid template update can become invalid when combined
+	 * with a value already stored on a child item.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected static function validateInheritedTelemetryQueryItems(array $items, array $db_items): void {
+		foreach ($items as $i => $item) {
+			if ($item['type'] != ITEM_TYPE_TELEMETRY_QUERY
+					|| (!array_key_exists('granularity', $item) && !array_key_exists('lookback_limit', $item))) {
+				continue;
+			}
+
+			$item += $db_items[$item['itemid']];
+
+			if (!CItemTypeTelemetryQuery::validateGranularity($item, '/'.($i + 1), $error)) {
+				if (self::isItemPrototype()) {
+					$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+						? _('Cannot update inherited item prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+						: _('Cannot update inherited item prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+				}
+				else {
+					$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+						? _('Cannot update inherited item with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+						: _('Cannot update inherited item with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+				}
+
+				$hosts = DB::select('hosts', [
+					'output' => ['host'],
+					'hostids' => $item['hostid']
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $hosts[0]['host']));
+			}
+		}
+	}
+
 	protected static function showObjectMismatchError(array $item, array $upd_db_item): void {
 		if ($upd_db_item['flags'] != $item['flags']) {
 			self::showObjectMismatchErrorByFlags($item, $upd_db_item);

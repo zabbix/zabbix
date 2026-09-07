@@ -124,6 +124,7 @@ trait traitItemTelemetryQueryTests {
 				[
 					'host' => 'telemetry_query_host',
 					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'templates' => [['templateid' => ':template:telemetry_query_template']],
 					'lld_rules' => [
 						[
 							'name' => 'host lld',
