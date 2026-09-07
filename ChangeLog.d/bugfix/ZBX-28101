@@ -1,1 +1,1 @@
-..F....... [ZBX-28101] fixed missing templated host querying from database in template Discovery rules (scernisenko)
+..F....... [ZBX-28101] fixed proper context passing for the templated host editing in template Discovery rules (scernisenko)
