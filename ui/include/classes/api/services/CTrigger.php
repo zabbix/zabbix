@@ -523,7 +523,7 @@ class CTrigger extends CTriggerGeneral {
 			$result = array_values($result);
 		}
 
-		$result = $this->unsetExtraFields($result, ['state', 'expression'], $options['output']);
+		$result = $this->unsetExtraFields($result, ['expression'], $options['output']);
 
 		// Triggers share table with trigger prototypes. Therefore remove trigger unrelated fields.
 		if ($this->outputIsRequested('discover', $options['output'])) {
