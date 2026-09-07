@@ -58,6 +58,31 @@ class testIpmiChecks extends CIntegrationTest {
 		return sys_get_temp_dir().'/zbx_ipmi_sim_state';
 	}
 
+	/**
+	 * Absolute path to an executable found via "which", or null if it is not on PATH.
+	 *
+	 * @param string $tool
+	 *
+	 * @return string|null
+	 */
+	private static function findTool(string $tool): ?string {
+		$path = trim((string) shell_exec('which '.escapeshellarg($tool).' 2>/dev/null'));
+
+		return ($path === '') ? null : $path;
+	}
+
+	/**
+	 * @param string $tool
+	 * @param string $hint  shown in the exception if the tool is missing
+	 *
+	 * @throws Exception  if $tool is not on PATH
+	 */
+	private static function checkToolAvailable(string $tool, string $hint): void {
+		if (self::findTool($tool) === null) {
+			throw new Exception('"'.$tool.'" is not installed or not on PATH ('.$hint.')');
+		}
+	}
+
 	private static function ipmiSimStop(): void {
 		// Match on the (unique) state dir rather than the exact command line: ipmiSimStart() writes a
 		// resolved copy of lan.conf into the state dir, so the running process's "-c" argument does not
@@ -78,16 +103,20 @@ class testIpmiChecks extends CIntegrationTest {
 			throw new Exception('Cannot create ipmi_sim state directory "'.$mcdir.'"');
 		}
 
-		$bsdr = $statedir.'/test.bsdr';
-		$compile_out = shell_exec('sdrcomp -o '.escapeshellarg($bsdr).' '.escapeshellarg($datadir.'/test.sdrs').
-				' 2>&1'
+		self::checkToolAvailable('ipmi_sim',
+				'apt install openipmi (or equivalent) - required to run the simulated BMC'
+		);
+		self::checkToolAvailable('ipmitool',
+				'apt install ipmitool (or equivalent) - required to talk to the simulated BMC'
 		);
 
-		if (!is_file($bsdr)) {
-			throw new Exception('Failed to compile ipmi_sim SDRs with sdrcomp: '.$compile_out);
+		// data/ipmi_sim/test.bsdr is a pre-compiled copy of test.sdrs, checked in so this test never depends
+		// on sdrcomp being installed (see the comment at the top of test.sdrs for how to regenerate it after
+		// editing test.sdrs - sdrcomp itself is only needed for that one-off regeneration, never at test run
+		// time; some environments ship ipmi_sim/ipmitool without the rest of the openipmi package).
+		if (!copy($datadir.'/test.bsdr', $mcdir.'/sdr.20.main')) {
+			throw new Exception('Cannot read pre-compiled SDR fixture "'.$datadir.'/test.bsdr"');
 		}
-
-		copy($bsdr, $mcdir.'/sdr.20.main');
 
 		// lan.conf references the chassis-control hook script by an absolute path substituted here,
 		// since ipmi_sim rejects every Chassis Control (power/reset) command without one configured.
