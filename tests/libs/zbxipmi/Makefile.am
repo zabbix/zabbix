@@ -174,7 +174,17 @@ zbx_close_inactive_host_LDADD = \
 
 zbx_close_inactive_host_LDADD += @SERVER_LIBS@
 
-zbx_close_inactive_host_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+# exercises the "domain found by name" path (ipmi_domain_iterate_domains -> ipmi_domain_pointer_cb ->
+# ipmi_domain_close), which needs a live OpenIPMI domain above and so is wrapped here instead
+CLOSE_INACTIVE_HOST_WRAP_FUNCS = \
+	-Wl,--wrap=ipmi_domain_iterate_domains \
+	-Wl,--wrap=ipmi_domain_get_name \
+	-Wl,--wrap=ipmi_domain_convert_to_id \
+	-Wl,--wrap=ipmi_domain_pointer_cb \
+	-Wl,--wrap=ipmi_domain_close
+
+zbx_close_inactive_host_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	$(CLOSE_INACTIVE_HOST_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_close_inactive_host_CFLAGS = $(IPMI_COMPILER_FLAGS)
 

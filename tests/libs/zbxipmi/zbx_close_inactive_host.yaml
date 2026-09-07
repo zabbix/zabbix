@@ -14,4 +14,8 @@ in:
 test case: "4. multiple stale hosts are all removed, active host survives"
 in:
   scenario: "multiple_stale"
+---
+test case: "5. a domain found by name is actually closed via ipmi_domain_close()"
+in:
+  scenario: "domain_found_and_closed"
 ...

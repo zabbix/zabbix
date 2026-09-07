@@ -27,6 +27,67 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+/* Wraps for the "domain found by name" path, unreachable above without a live OpenIPMI domain. They let    */
+/* zbx_get_domain_id_by_name_cb(), ipmi_domain_pointer_cb() and ipmi_domain_close() be driven end-to-end, in */
+/* particular proving that a domain found by ipmi_domain_iterate_domains() is actually passed to             */
+/* ipmi_domain_close() - the exact step that a RETURN_IF_CB_DATA_INVALID() misuse in                         */
+/* zbx_get_domain_id_by_name_cb() used to skip, silently leaking the OpenIPMI domain instead of closing it.  */
+static void	*wrap_iterate_cb_data;
+static int	wrap_domain_pointer_cb_calls;
+static int	wrap_domain_close_calls;
+
+void	__wrap_ipmi_domain_iterate_domains(ipmi_domain_ptr_cb handler, void *cb_data)
+{
+	wrap_iterate_cb_data = cb_data;
+
+	/* the domain pointer itself is never dereferenced by __wrap_ipmi_domain_get_name() below, so any */
+	/* non-NULL value stands in for a real ipmi_domain_t* */
+	handler((ipmi_domain_t *)0x1, cb_data);
+}
+
+int	__wrap_ipmi_domain_get_name(ipmi_domain_t *domain, char *name, int length)
+{
+	ZBX_UNUSED(domain);
+
+	/* echo back the exact name zbx_close_inactive_host() is searching for, simulating "domain found" */
+	zbx_strlcpy(name, (const char *)wrap_iterate_cb_data, (size_t)length);
+
+	return (int)strlen(name);
+}
+
+ipmi_domain_id_t	__wrap_ipmi_domain_convert_to_id(ipmi_domain_t *domain)
+{
+	ipmi_domain_id_t	id;
+
+	ZBX_UNUSED(domain);
+	memset(&id, 0, sizeof(id));
+
+	return id;
+}
+
+int	__wrap_ipmi_domain_pointer_cb(ipmi_domain_id_t id, ipmi_domain_ptr_cb handler, void *cb_data)
+{
+	ZBX_UNUSED(id);
+
+	wrap_domain_pointer_cb_calls++;
+	handler((ipmi_domain_t *)0x1, cb_data);
+
+	return 0;
+}
+
+int	__wrap_ipmi_domain_close(ipmi_domain_t *domain, ipmi_domain_close_done_cb close_done, void *cb_data)
+{
+	ZBX_UNUSED(domain);
+
+	wrap_domain_close_calls++;
+
+	/* invoke the completion callback synchronously so zbx_perform_openipmi_ops() sees h->done already set  */
+	/* and never touches the (uninitialized, in this test process) os_hnd event loop */
+	close_done(cb_data);
+
+	return 0;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*scenario = zbx_mock_get_parameter_string("in.scenario");
@@ -104,6 +165,26 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_free_ipmi_host(fresh);
 		zbx_hashset_remove(&hostset, &fresh);
+	}
+	else if (0 == strcmp(scenario, "domain_found_and_closed"))
+	{
+		zbx_ipmi_host_t	*h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
+		int		ret;
+
+		wrap_domain_pointer_cb_calls = 0;
+		wrap_domain_close_calls = 0;
+
+		ret = zbx_close_inactive_host(h);
+
+		zbx_mock_assert_int_eq("zbx_close_inactive_host() return value", SUCCEED, ret);
+
+		/* the whole point of this scenario: a domain found by name must actually be looked up and closed, */
+		/* not silently skipped as it was while zbx_get_domain_id_by_name_cb() misused                     */
+		/* RETURN_IF_CB_DATA_INVALID() on a cb_data that was never a zbx_ipmi_host_t* */
+		zbx_mock_assert_int_eq("ipmi_domain_pointer_cb() call count", 1, wrap_domain_pointer_cb_calls);
+		zbx_mock_assert_int_eq("ipmi_domain_close() call count", 1, wrap_domain_close_calls);
+
+		zbx_hashset_remove(&hostset, &h);
 	}
 	else
 		fail_msg("unknown 'in.scenario' value: %s", scenario);

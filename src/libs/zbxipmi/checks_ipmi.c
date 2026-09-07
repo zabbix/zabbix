@@ -1617,7 +1617,18 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = (char *)cb_data;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data);
+	/* Unlike every other callback in this file, 'cb_data' here is NOT a zbx_ipmi_host_t* - it is the        */
+	/* 'domain_name' local (a small stack buffer) passed by zbx_close_inactive_host() via                    */
+	/* ipmi_domain_iterate_domains(), used purely as a search key. RETURN_IF_CB_DATA_INVALID() must not be   */
+	/* used here: it looks 'cb_data' up in 'hostset', which only ever contains zbx_ipmi_host_t* pointers, so  */
+	/* it would always fail to find this string pointer and always return early - silently breaking domain   */
+	/* lookup by name, so zbx_close_inactive_host() would always take the "domain not found" branch and leak */
+	/* the underlying OpenIPMI domain (ipmi_domain_close() would never be called) instead of closing it.     */
+	if (NULL == cb_data)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", __func__);
+		return;
+	}
 
 	/* from 'domain' pointer find the domain name */
 	ipmi_domain_get_name(domain, name, sizeof(name));
