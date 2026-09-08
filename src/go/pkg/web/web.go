@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -29,6 +28,7 @@ import (
 	"golang.org/x/text/transform"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -43,7 +43,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("Cannot create new request: %w", err)
+		return "", errs.Wrap(err, "cannot create new request")
 	}
 
 	req.Header = map[string][]string{
@@ -66,10 +66,10 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 	resp, err := client.Do(req)
 	if err != nil {
 		if errors.Is(err, errTooManyRedirects) {
-			return "", fmt.Errorf("Maximum (%d) redirects followed.", redirectLimit)
+			return "", errs.Wrapf(err, "maximum (%d) redirects followed", redirectLimit)
 		}
 
-		return "", fmt.Errorf("Cannot get content of web page: %w", err)
+		return "", errs.Wrap(err, "cannot get content of web page")
 	}
 
 	defer resp.Body.Close()
@@ -80,7 +80,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %w", err)
+		return "", errs.Wrap(err, "cannot get content of web page")
 	}
 
 	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
@@ -94,11 +94,11 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 
 	b, err = io.ReadAll(r)
 	if err != nil {
-		return "", fmt.Errorf("Cannot decode content of web page: %w", err)
+		return "", errs.Wrap(err, "cannot decode content of web page")
 	}
 	h, err := httputil.DumpResponse(resp, false)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get header of web page: %w", err)
+		return "", errs.Wrap(err, "cannot get header of web page")
 	}
 
 	return string(bytes.Join(chain, nil)) + string(h) + string(b), nil
@@ -109,7 +109,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
 		if limit <= 0 {
-			return http.ErrUseLastResponse
+			return errs.Wrap(http.ErrUseLastResponse, "redirects are disabled")
 		}
 
 		if len(via) > limit {
@@ -118,7 +118,7 @@ func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*h
 
 		h, err := httputil.DumpResponse(req.Response, false)
 		if err != nil {
-			return fmt.Errorf("Cannot get header of web page: %w", err)
+			return errs.Wrap(err, "cannot get header of web page")
 		}
 
 		*chain = append(*chain, h)
