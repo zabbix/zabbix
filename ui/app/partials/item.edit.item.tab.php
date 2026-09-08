@@ -820,7 +820,7 @@ $formgrid
 					->setHeader([
 						(new CColHeader(_('Label')))->setWidth('20%'),
 						(new CColHeader(_('Name')))->setWidth('58%'),
-						(new CColHeader(_('Action')))->setWidth('22%')
+						(new CColHeader(_('Actions')))->setWidth('22%')
 					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
@@ -849,7 +849,10 @@ $formgrid
 							'#{column}', ' ', new CTag('em', true, '#{attribute_key_name}'), ' ',
 							'#{operator_name}', ' ', new CTag('em', true, '#{value_name}')
 						]))->addClass(ZBX_STYLE_WORDWRAP),
-						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
+						(new CCol(new CHorList([
+							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
+							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
+						])))
 					]))->setAttribute('data-row_index', '#{row_index}'),
 					(new CRow([
 						(new CCol())

@@ -39,6 +39,9 @@ window.telemetry_condition_popup = new class {
 		}
 
 		this.#update();
+
+		this.#form.findFieldByName('column').setChanged();
+		this.#form.validateChanges(['column']);
 	}
 
 	#update() {
