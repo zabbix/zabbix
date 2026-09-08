@@ -71,6 +71,37 @@ abstract class CControllerHostUpdateGeneral extends CController {
 		];
 	}
 
+	protected function checkInputInterfaces(): bool {
+		$ret = true;
+
+		foreach ($this->getInput('interfaces') as $key => $interface) {
+			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+				$interface_validation_rules = [];
+
+				if ($interface['details']['version'] != SNMP_V3) {
+					$interface_validation_rules['community'] = 'db interface_snmp.community|required|not_empty';
+				}
+
+				if ($interface['details']['version'] != SNMP_V1) {
+					$interface_validation_rules['max_repetitions']
+						= 'db interface_snmp.max_repetitions|required|ge 1|le '.ZBX_MAX_INT32;
+				}
+
+				$validator = new CNewValidator($interface['details'], $interface_validation_rules);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info('interfaces/'.$key.': '.$error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+		}
+
+		return $ret;
+	}
+
 	/**
 	 * Prepare host interfaces.
 	 *
