@@ -475,7 +475,9 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			],
-			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
+			'conditions' => ['objects', 'required',
+				'uniq' => [['formulaid'], ['column', 'attribute_key', 'operator', 'value']],
+				'messages' => ['uniq' => _('Condition is not unique.')],
 				'fields' => [
 					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
