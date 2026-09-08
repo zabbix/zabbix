@@ -101,7 +101,10 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CCheckBox('ssl_verify_peer'))
 				->setUncheckedValue(APM_GLOBAL_DB_VERIFY_PEER_DISABLED)
-				->setChecked($data['values']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED),
+				->setChecked(
+					array_key_exists('ssl_verify_peer', $data['values'])
+						&& $data['values']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED
+				),
 		))->addClass('js-ssl-verify-peer')
 	])
 	->addItem([
@@ -110,7 +113,10 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CCheckBox('ssl_verify_host'))
 				->setUncheckedValue(APM_GLOBAL_DB_VERIFY_HOST_DISABLED)
-				->setChecked($data['values']['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED),
+				->setChecked(
+					array_key_exists('ssl_verify_host', $data['values'])
+						&& $data['values']['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED
+				),
 		))->addClass('js-ssl-verify-host')
 	]);
 
