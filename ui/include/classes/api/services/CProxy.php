@@ -1252,7 +1252,7 @@ class CProxy extends CApiService {
 													['if' => ['field' => 'data_collection_status', 'in' => PROXY_APM_DATA_COLLECTION_ENABLED], 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
 				'key' =>								['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => $attributes_schema['key']['length']],
 				'value' => 								['type' => API_STRING_UTF8, 'length' => $attributes_schema['value']['length']],
-				'signal_type' =>						['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS])]
+				'signal_type' =>						['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS])]
 													]],
 													['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
