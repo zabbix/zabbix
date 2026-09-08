@@ -1,3 +1,24 @@
+Changes for 7.0.31rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
+........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
+.........T [ZBX-25576] fixed bad URL issue in Topdesk webhook (kflorowski)
+.........T [ZBX-23983] fixed typo in the trigger event name for the 'Generic Java JMX' template (smansurovs)
+.........T [ZBX-28087] fixed README.md files for cloud templates (smansurovs)
+.........T [ZBX-26475] fixed error handling in configserver items in MongoDB template (kflorowski)
+.........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
+..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30
+
+7.0.30rc1 was released as 7.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.30rc1
 
 New features:
@@ -4188,6 +4209,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.49rc1
 
 New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 
 Bug fixes:
 
