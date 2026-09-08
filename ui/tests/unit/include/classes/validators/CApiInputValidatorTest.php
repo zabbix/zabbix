@@ -856,7 +856,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
 				123,
 				'/1/int',
-				123
+				'123'
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
@@ -868,7 +868,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
 				2147483647,
 				'/1/int',
-				2147483647
+				'2147483647'
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 4],
@@ -908,6 +908,72 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_USER_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 5],
+				'{#MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_LLD_MACRO, 'in' => '0,60:900', 'length' => 5],
 				null,
 				'/1/int',
 				null
