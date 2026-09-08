@@ -23,6 +23,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 
 	private static function getValidationRules(): array {
 		return ['object', 'fields' => [
+			'edit' => ['integer', 'in' => [1]],
 			'row_index' => ['integer', 'required'],
 			'signal_type' => ['integer', 'required',
 				'in' => [
@@ -38,7 +39,11 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
 					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
-			]
+			],
+			'column' => ['string'],
+			'attribute_key' => ['string'],
+			'operator' => ['integer'],
+			'value' => ['string']
 		]];
 	}
 
@@ -83,7 +88,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			],
-			'column' => ['string', 'required', 'not_empty'],
+			'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
 			'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 				'when' => ['column', 'in' => $complex_columns]
 			],
@@ -113,13 +118,14 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 	protected function doAction(): void {
 		$data = [
 			'action' => $this->getAction(),
+			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
 			'signal_type' => $this->getInput('signal_type'),
 			'metric_point_type' => $this->getInput('metric_point_type'),
-			'column' => '',
-			'attribute_key' => '',
-			'operator' => CONDITION_OPERATOR_EQUAL,
-			'value' => '',
+			'column' => $this->getInput('column', ''),
+			'attribute_key' => $this->getInput('attribute_key', ''),
+			'operator' => $this->getInput('operator', CONDITION_OPERATOR_EQUAL),
+			'value' => $this->getInput('value', ''),
 			'js_validation_rules' => (new CFormValidator(self::getFormValidationRules()))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -129,6 +135,11 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 		$data['columns'] = CTelemetryHelper::getConditionColumnOptions($data['signal_type'],
 			$data['metric_point_type']
 		);
+
+		if ($data['column'] !== '' && !array_key_exists($data['column'], $data['columns'])) {
+			$data['columns'][$data['column']] = ['label' => $data['column'], 'disabled' => true];
+			ksort($data['columns']);
+		}
 		$data['operators'] = CTelemetryHelper::getOperatorLabels();
 		$data['complex_columns'] = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
 		$data['condition_operators'] = CTelemetryHelper::getConditionOperators();

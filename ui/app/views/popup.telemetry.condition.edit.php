@@ -76,7 +76,7 @@ $form_grid = (new CFormGrid())
 $form->addItem($form_grid);
 
 $output = [
-	'header' => _('New condition'),
+	'header' => $data['is_edit'] ? _('Condition') : _('New condition'),
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.telemetry.condition.edit.js.php').
 		'telemetry_condition_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
@@ -86,7 +86,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => _('Add'),
+			'title' => $data['is_edit'] ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,

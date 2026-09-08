@@ -299,18 +299,10 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
-		this.field.signal_type.addEventListener('change', () => {
-			this.#refreshTelemetryColumns();
-			this.updateFieldsVisibility();
-			this.#validateTelemetryColumns();
-		});
+		this.field.signal_type.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
 
 		for (const radio of this.field.metric_point_type) {
-			radio.addEventListener('change', () => {
-				this.#refreshTelemetryColumns();
-				this.updateFieldsVisibility();
-				this.#validateTelemetryColumns();
-			});
+			radio.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
 		}
 
 		this.field.evaltype.addEventListener('change', this.updateFieldsVisibility.bind(this));
@@ -348,6 +340,12 @@ window.item_edit_form = new class {
 		this.form_element.querySelector('#aggregated-columns-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-edit-row')) {
 				this.#openAggregatedColumnModal(e.target, e.target.closest('tr'));
+			}
+		});
+
+		this.form_element.querySelector('#conditions-table').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-row')) {
+				this.#openConditionModal(e.target, e.target.closest('tr'));
 			}
 		});
 
@@ -635,16 +633,10 @@ window.item_edit_form = new class {
 		}
 	}
 
-	#validateTelemetryColumns() {
-		const fields = ['columns', 'aggregated_columns', 'conditions'];
-
-		for (const name of fields) {
-			for (const field of Object.values(this.form.findFieldByName(name).getFields())) {
-				field.setChanged();
-			}
-		}
-
-		this.form.validateChanges(fields);
+	#telemetrySignalChangeHandler() {
+		this.#refreshTelemetryColumns();
+		this.updateFieldsVisibility();
+		this.form.validateChanges(['columns', 'aggregated_columns', 'conditions']);
 	}
 
 	#removeRelatedErrorContainer(row) {
@@ -705,21 +697,36 @@ window.item_edit_form = new class {
 		);
 	}
 
-	#openConditionModal(trigger) {
-		let row_index = 0;
-
-		while (this.form_element.querySelector(`#conditions-table [data-row_index="${row_index}"]`) !== null) {
-			row_index++;
-		}
-
+	#openConditionModal(trigger, row = null) {
 		const signal_type = this.field.signal_type.value;
 		const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
 
-		const overlay = PopUp('popup.telemetry.condition.edit', {
+		const parameters = {
 			signal_type: signal_type,
-			metric_point_type: metric_point_type,
-			row_index
-		}, {
+			metric_point_type: metric_point_type
+		};
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			parameters.edit = '1';
+			parameters.row_index = row_index;
+			parameters.column = row.querySelector(`[name="conditions[${row_index}][column]"]`).value;
+			parameters.attribute_key = row.querySelector(`[name="conditions[${row_index}][attribute_key]"]`).value;
+			parameters.operator = row.querySelector(`[name="conditions[${row_index}][operator]"]`).value;
+			parameters.value = row.querySelector(`[name="conditions[${row_index}][value]"]`).value;
+		}
+		else {
+			let row_index = 0;
+
+			while (this.form_element.querySelector(`#conditions-table [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
+
+			parameters.row_index = row_index;
+		}
+
+		const overlay = PopUp('popup.telemetry.condition.edit', parameters, {
 			dialogueid: 'telemetry-condition',
 			dialogue_class: 'modal-popup-medium',
 			trigger_element: trigger
@@ -771,8 +778,17 @@ window.item_edit_form = new class {
 			operator_name: this.telemetry_operator_labels[data.operator],
 			value_name: is_exists ? '' : data.value
 		});
+		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
-		tbody.querySelector('.js-add-condition').closest('tr').insertAdjacentHTML('beforebegin', html);
+		if (existing !== null) {
+			this.#removeRelatedErrorContainer(existing);
+
+			existing.insertAdjacentHTML('afterend', html);
+			existing.remove();
+		}
+		else {
+			tbody.querySelector('.js-add-condition').closest('tr').insertAdjacentHTML('beforebegin', html);
+		}
 	}
 
 	#initTelemetryRows() {

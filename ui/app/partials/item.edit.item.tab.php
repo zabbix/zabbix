@@ -699,6 +699,7 @@ $formgrid
 							->addClass('js-column')
 							->setValue('#{column}')
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->setReadonly($readonly),
@@ -707,6 +708,7 @@ $formgrid
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('placeholder', _('Key name'))
 							->setAttribute('data-notrim', '')
+							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Key name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
@@ -752,11 +754,13 @@ $formgrid
 						[
 							(new CInput('hidden', 'aggregated_columns[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
 							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
 							(new CInput('hidden', 'aggregated_columns[#{row_index}][alias]', '#{alias}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							'#{function_label}'
 						],
@@ -820,7 +824,7 @@ $formgrid
 					->setHeader([
 						(new CColHeader(_('Label')))->setWidth('20%'),
 						(new CColHeader(_('Name')))->setWidth('58%'),
-						(new CColHeader(_('Action')))->setWidth('22%')
+						(new CColHeader(_('Actions')))->setWidth('22%')
 					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
@@ -832,24 +836,31 @@ $formgrid
 						[
 							(new CInput('hidden', 'conditions[#{row_index}][formulaid]', '#{formulaid}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('conditions_#{row_index}_error_container'),
 							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('conditions_#{row_index}_error_container'),
 							(new CInput('hidden', 'conditions[#{row_index}][attribute_key]', '#{attribute_key}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setAttribute('data-notrim', ''),
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
 							(new CInput('hidden', 'conditions[#{row_index}][value]', '#{value}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setAttribute('data-notrim', ''),
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
 							'#{formulaid}'
 						],
 						(new CCol([
 							'#{column}', ' ', new CTag('em', true, '#{attribute_key_name}'), ' ',
 							'#{operator_name}', ' ', new CTag('em', true, '#{value_name}')
 						]))->addClass(ZBX_STYLE_WORDWRAP),
-						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
+						(new CCol(new CHorList([
+							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
+							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
+						])))
 					]))->setAttribute('data-row_index', '#{row_index}'),
 					(new CRow([
 						(new CCol())
