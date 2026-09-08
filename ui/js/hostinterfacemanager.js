@@ -249,8 +249,8 @@ class HostInterfaceManager {
 			main: '0',
 			details: {
 				version: HostInterfaceManager.SNMP_V2C,
-				community: '{$SNMP_COMMUNITY}',
-				max_repetitions: 10,
+				community: HostInterfaceManager.SNMP_COMMUNITY,
+				max_repetitions: HostInterfaceManager.SNMP_MAX_REPETITIONS,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,
