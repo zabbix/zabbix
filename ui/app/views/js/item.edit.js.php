@@ -299,18 +299,10 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
-		this.field.signal_type.addEventListener('change', () => {
-			this.#refreshTelemetryColumns();
-			this.updateFieldsVisibility();
-			this.#validateTelemetryColumns();
-		});
+		this.field.signal_type.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
 
 		for (const radio of this.field.metric_point_type) {
-			radio.addEventListener('change', () => {
-				this.#refreshTelemetryColumns();
-				this.updateFieldsVisibility();
-				this.#validateTelemetryColumns();
-			});
+			radio.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
 		}
 
 		this.field.evaltype.addEventListener('change', this.updateFieldsVisibility.bind(this));
@@ -641,16 +633,10 @@ window.item_edit_form = new class {
 		}
 	}
 
-	#validateTelemetryColumns() {
-		const fields = ['columns', 'aggregated_columns', 'conditions'];
-
-		for (const name of fields) {
-			for (const field of Object.values(this.form.findFieldByName(name).getFields())) {
-				field.setChanged();
-			}
-		}
-
-		this.form.validateChanges(fields);
+	#telemetrySignalChangeHandler() {
+		this.#refreshTelemetryColumns();
+		this.updateFieldsVisibility();
+		this.form.validateChanges(['columns', 'aggregated_columns', 'conditions']);
 	}
 
 	#removeRelatedErrorContainer(row) {

@@ -699,6 +699,7 @@ $formgrid
 							->addClass('js-column')
 							->setValue('#{column}')
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->setReadonly($readonly),
@@ -707,6 +708,7 @@ $formgrid
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('placeholder', _('Key name'))
 							->setAttribute('data-notrim', '')
+							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Key name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
@@ -752,11 +754,13 @@ $formgrid
 						[
 							(new CInput('hidden', 'aggregated_columns[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
 							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
 							(new CInput('hidden', 'aggregated_columns[#{row_index}][alias]', '#{alias}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							'#{function_label}'
 						],
@@ -832,17 +836,21 @@ $formgrid
 						[
 							(new CInput('hidden', 'conditions[#{row_index}][formulaid]', '#{formulaid}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('conditions_#{row_index}_error_container'),
 							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
 								->setErrorContainer('conditions_#{row_index}_error_container'),
 							(new CInput('hidden', 'conditions[#{row_index}][attribute_key]', '#{attribute_key}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setAttribute('data-notrim', ''),
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
 							(new CInput('hidden', 'conditions[#{row_index}][value]', '#{value}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setAttribute('data-notrim', ''),
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
 							'#{formulaid}'
 						],
 						(new CCol([
