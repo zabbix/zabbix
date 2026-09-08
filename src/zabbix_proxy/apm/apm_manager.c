@@ -184,6 +184,15 @@ static void	apm_manager_commit_tasks(zbx_apm_manager_t *manager, zbx_apm_config_
 	manager->commit_task_num++;
 }
 
+static int	apm_manager_global_config_active(zbx_apm_manager_t *manager)
+{
+	if (NULL == manager->exporters || APM_EXPORTER_GLOBAL != manager->exporters->cfg.type)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 static zbx_apm_config_tls_t	*apm_manager_validate_tls(zbx_apm_config_tls_t *tls)
 {
 	if (NULL == tls->ca_file || '\0' == *tls->ca_file)
@@ -282,6 +291,11 @@ void	*zbx_apm_manager_thread(void *args)
 			proxy_apm_config = zbx_dc_get_apm_config(proxy_apm_config, &cfg_revision);
 			if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
 				apm_config_reset(&apm_config);
+
+			if (SUCCEED == apm_manager_global_config_active(manager))
+			{
+				/* TODO: override apm_config.status when global confg is active and disabled */
+			}
 
 			if (apm_status != apm_config.status)
 			{
