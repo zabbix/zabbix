@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,7 +35,7 @@ class Widget extends CWidget {
 	public function getInitialFieldsValues(): array {
 		return [
 			'sections' => [
-				CWidgetFieldItemSections::SECTION_METRICS,
+				CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE,
 				CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION,
 				CWidgetFieldItemSections::SECTION_HOST_INTERFACE,
 				CWidgetFieldItemSections::SECTION_TYPE

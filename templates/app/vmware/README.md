@@ -10,6 +10,8 @@ This template set is designed for the effortless deployment of VMware vCenter an
 
 For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
 
+**Note:** VMware alarm item/trigger prototype names include the alarm entity name since template version 7.4.10. The entity name value itself is only returned by Zabbix server 7.4.12 and higher - on earlier servers, `{#VMWARE.ALARMS.ENTITY.NAME}` will remain unresolved.
+
 ## Requirements
 
 Zabbix version: 7.4 and higher.
@@ -25,23 +27,23 @@ This template has been tested on:
 
 ## Setup
 
-1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
-3. Create a new host
-4. If you want to use a separate user for monitoring, make sure that the user is a member of the `SystemConfiguration.ReadOnly` and `vStatsGroup` groups
+1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`).
+2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more.
+3. Create a new host.
+4. If you want to use a separate user for monitoring, make sure that the user is a member of the `SystemConfiguration.ReadOnly` and `vStatsGroup` groups.
 Set the host macros (on the host or template level) required for VMware authentication:
 ```text
 {$VMWARE.URL}
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to the host created earlier
+5. Link the template to the host created earlier.
 
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
 Additional resources:
-- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring/vmware_keys#footnotes)
-- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.4/manual/appendix/items/perf_counters)
+- How to [create a custom performance counter](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring/vmware_keys#footnotes).
+- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/7.4/manual/appendix/items/perf_counters).
 
 ### Macros used
 
@@ -51,6 +53,7 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware", e.g. {$HTTP.TLS.VERIFY:"VMware"}.</p>|`full`|
 |{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 |{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
@@ -87,13 +90,13 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#VMWARE.ALARMS.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for VMware alarm discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: {#VMWARE.ALARMS.NAME}|<p>{#VMWARE.ALARMS.DESC}</p>|`last(/VMware/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
+|VMware: {#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>'{#VMWARE.ALARMS.DESC}'<br>Type: {#VMWARE.ALARMS.ENTITY.TYPE} <br>UUID: {#VMWARE.ALARMS.ENTITY.UUID}<br>ID: {#VMWARE.ALARMS.ENTITY.ID}</p>|`last(/VMware/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
 
 ### LLD rule VMware cluster discovery
 
@@ -168,12 +171,12 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Snapshot consolidation needed|<p>Displays whether snapshot consolidation is needed or not. One of the following:</p><p>- True;</p><p>- False.</p>|Simple check|vmware.vm.consolidationneeded[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Snapshot consolidation needed|<p>Displays whether snapshot consolidation is needed or not. One of the following:</p><p>- True;</p><p>- False.</p>|Simple check|vmware.vm.consolidationneeded[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Snapshot count|<p>Snapshot count of the guest VM.</p>|Dependent item|vmware.vm.snapshot.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Get snapshots|<p>Snapshots of the guest VM.</p>|Simple check|vmware.vm.snapshot.get[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Snapshot latest date|<p>Latest snapshot date of the guest VM.</p>|Dependent item|vmware.vm.snapshot.latestdate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.latestdate`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|VM state|<p>VMware virtual machine state. One of the following:</p><p>- Not running;</p><p>- Resetting;</p><p>- Running;</p><p>- Shutting down;</p><p>- Standby;</p><p>- Unknown.</p>|Simple check|vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|VMware Tools status|<p>Monitoring of VMware Tools. One of the following:</p><p>- Guest tools executing scripts: VMware Tools is starting.</p><p>- Guest tools not running: VMware Tools is not running.</p><p>- Guest tools running: VMware Tools is running.</p>|Simple check|vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM state|<p>VMware virtual machine state. One of the following:</p><p>- Not running;</p><p>- Resetting;</p><p>- Running;</p><p>- Shutting down;</p><p>- Standby;</p><p>- Unknown.</p>|Simple check|vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|VMware Tools status|<p>Monitoring of VMware Tools. One of the following:</p><p>- Guest tools executing scripts: VMware Tools is starting.</p><p>- Guest tools not running: VMware Tools is not running.</p><p>- Guest tools running: VMware Tools is running.</p>|Simple check|vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |VMware Tools version|<p>Monitoring of the VMware Tools version.</p>|Simple check|vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Cluster name|<p>Cluster name of the guest VM.</p>|Simple check|vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Number of virtual CPUs|<p>Number of virtual CPUs assigned to the guest.</p>|Simple check|vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
@@ -195,7 +198,7 @@ Additional resources:
 |Uncommitted storage space|<p>Additional storage space, in bytes, potentially used by this VM on all datastores.</p>|Simple check|vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Unshared storage space|<p>Total storage space, in bytes, occupied by the VM across all datastores that is not shared with any other VM.</p>|Simple check|vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Uptime|<p>System uptime.</p>|Simple check|vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
-|Boot time|<p>System boot time.</p>|Simple check|vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return Math.floor(Date.parse(value)/1000);`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Boot time|<p>System boot time.</p>|Simple check|vmware.vm.property[{$VMWARE.URL},{$VMWARE.VM.UUID},runtime.bootTime]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `return Math.floor(Date.parse(value)/1000);`</p></li></ul>|
 |Guest memory swapped|<p>Amount of guest physical memory that is swapped out to the swap space.</p>|Simple check|vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory consumed|<p>Amount of host physical memory consumed for backing up guest physical memory pages.</p>|Simple check|vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Host memory usage in percent|<p>Percentage of host physical memory that has been consumed.</p>|Simple check|vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -300,9 +303,9 @@ This template has been tested on:
 ## Setup
 
 To use this template as manually linked to a host:
-  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
-  3. Create a new host
+  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`).
+  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more.
+  3. Create a new host.
   4. Set the host macros (on the host or template level) required for VMware authentication:
   ```text
   {$VMWARE.URL}
@@ -314,8 +317,8 @@ To use this template as manually linked to a host:
   ```text
   vim-cmd hostsvc/hostsummary | grep uuid
   ```
-  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
-  8. Link the template to the host created earlier
+  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor.
+  8. Link the template to the host created earlier.
 
 ### Macros used
 
@@ -335,7 +338,7 @@ To use this template as manually linked to a host:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Connection state|<p>VMware hypervisor connection state. One of the following:</p><p>- Connected;</p><p>- Disconnected;</p><p>- Not responding.</p>|Simple check|vmware.hv.connectionstate[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connection state|<p>VMware hypervisor connection state. One of the following:</p><p>- Connected;</p><p>- Disconnected;</p><p>- Not responding.</p>|Simple check|vmware.hv.connectionstate[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Number of errors received|<p>VMware hypervisor network input statistics (errors).</p>|Simple check|vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},errors]|
 |Number of broadcasts received|<p>VMware hypervisor network input statistics (broadcasts).</p>|Simple check|vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},broadcast]|
 |Number of dropped received packets|<p>VMware hypervisor network input statistics (packets dropped).</p>|Simple check|vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},dropped]|
@@ -420,7 +423,7 @@ To use this template as manually linked to a host:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Serial number discovery|<p>VMware hypervisor serial number discovery. This item works only with VMware hypervisor versions above 6.7.</p>|Dependent item|vmware.hv.serial.number.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Serial number discovery|<p>VMware hypervisor serial number discovery. This item works only with VMware hypervisor versions above 6.7.</p>|Dependent item|vmware.hv.serial.number.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Serial number discovery
 
@@ -432,13 +435,13 @@ To use this template as manually linked to a host:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery.</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery.</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Healthcheck discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health state rollup|<p>The host's Rollup Health State sensor value. One of the following:</p><p>- Gray: Unknown;</p><p>- Green: OK;</p><p>- Yellow: It might have a problem;</p><p>- Red: It has a problem.</p>|Dependent item|vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Health state rollup|<p>The host's Rollup Health State sensor value. One of the following:</p><p>- Gray: Unknown;</p><p>- Green: OK;</p><p>- Yellow: It might have a problem;</p><p>- Red: It has a problem.</p>|Dependent item|vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Healthcheck discovery
 
@@ -457,7 +460,7 @@ To use this template as manually linked to a host:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Sensor [{#NAME}] health state|<p>VMware hardware sensor health state. One of the following:</p><p>- Gray: Unknown;</p><p>- Green: OK;</p><p>- Yellow: It might have a problem;</p><p>- Red: It has a problem.</p>|Dependent item|vmware.hv.sensor.state["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Sensor [{#NAME}] health state|<p>VMware hardware sensor health state. One of the following:</p><p>- Gray: Unknown;</p><p>- Green: OK;</p><p>- Yellow: It might have a problem;</p><p>- Red: It has a problem.</p>|Dependent item|vmware.hv.sensor.state["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Sensor discovery
 

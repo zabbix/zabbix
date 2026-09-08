@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -51,6 +51,15 @@ class CControllerTriggerMassupdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		$has_access = match ($this->getInput('context')) {
+			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		};
+
+		if (!$has_access) {
+			return false;
+		}
+
 		$parent_lld = [];
 
 		if ($this->hasInput('prototype')) {

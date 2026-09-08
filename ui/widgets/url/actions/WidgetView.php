@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,9 +18,9 @@ namespace Widgets\Url\Actions;
 
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CHtmlUrlValidator,
 	CMacrosResolverHelper,
-	CSettingsHelper;
+	CSettingsHelper,
+	CUrlValidator;
 
 use Zabbix\Core\CWidget;
 
@@ -59,8 +59,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			if (!$error && !CHtmlUrlValidator::validate($this->fields_values['url'], ['allow_user_macro' => false])) {
-				$error = _s('Provided URL "%1$s" is invalid.', $this->fields_values['url']);
+			if (!$error) {
+				$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+				if (!$url_validator->validate($this->fields_values['url'])) {
+					$error = _s('Provided URL "%1$s" is invalid.', $this->fields_values['url']);
+				}
 			}
 		}
 

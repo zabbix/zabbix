@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,8 +26,6 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-
-#define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
 
 #define ZBX_IPC_DATA_DUMP_SIZE		128
 

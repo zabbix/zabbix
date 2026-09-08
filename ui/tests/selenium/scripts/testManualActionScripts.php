@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -952,7 +952,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #29 Host url with confirmation message andwith input type - dropdown.
+			// #29 Host url with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2292,6 +2292,10 @@ class testManualActionScripts extends CWebTest {
 					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
 					$this->assertEquals($host_name, $this->query('id:host')->waitUntilVisible()->one()->getValue());
 					COverlayDialogElement::find()->one()->close();
+					$this->page->waitUntilReady();
+
+					// Wait for the underlying list to finish reloading so its late load does not override the next open.
+					$this->query('xpath://*[contains(@class, "is-loading")]')->waitUntilNotPresent();
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();

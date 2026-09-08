@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -177,11 +177,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->getItemValue($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])) {
 			$this->prepareItemDelay($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->prepareItemHistoryAndTrends($item);
 		}

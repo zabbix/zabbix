@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -75,6 +75,16 @@ class CSidebar extends CBaseComponent {
 			this.addClass('focus-off');
 		}
 		this.setViewMode(this._view_mode);
+
+		this._target.querySelector('.button-compact').setAttribute('aria-expanded', 'true');
+		this._target.querySelector('.button-expand').setAttribute('aria-expanded', 'false');
+		this._target.querySelector('.button-hide').setAttribute('aria-expanded', 'true');
+		this._target.querySelector('.button-show').setAttribute('aria-expanded', 'false');
+
+		// For cases where the page has no header.
+		if (this._sidebar_toggle !== null) {
+			this._sidebar_toggle.setAttribute('aria-expanded', 'false');
+		}
 	}
 
 	open() {
@@ -158,6 +168,7 @@ class CSidebar extends CBaseComponent {
 	setViewMode(view_mode) {
 		if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
 			this._is_opened = false;
+			this._target.style.zIndex = '';
 			this.removeClass('is-opened');
 		}
 		this.toggleClass('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,7 +38,7 @@ class CFieldHidden extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
@@ -55,6 +55,10 @@ class CFieldHidden extends CField {
 		return value.trim();
 	}
 
+	isDisabled() {
+		return this._field.disabled;
+	}
+
 	setErrors({message, level}) {
 		if (this._error_container !== null) {
 			super.setErrors({message, level});
@@ -63,7 +67,7 @@ class CFieldHidden extends CField {
 			this.setGlobalError(message);
 		}
 		else {
-			this._global_errors = {};
+			this._global_errors = Object.create(null);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1001,6 +1001,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
 		alerter->client = client;
+		zbx_ipc_client_addref(client);
 
 		/* sizeof(zbx_am_alerter_t *) in the following line returns size of 'alerter' pointer. */
 		/* sizeof(alerter) is not used to avoid analyzer warning */
@@ -1025,7 +1026,10 @@ static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client
 		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
 	}
 	else
+	{
 		manager->syncer_client = client;
+		zbx_ipc_client_addref(client);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2378,6 +2382,14 @@ static int	am_source_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	am_compare_source_stats_alerts_num_func(const void *d1, const void *d2)
+{
+	zbx_am_source_stats_t	*m1 = *(zbx_am_source_stats_t * const *)d1;
+	zbx_am_source_stats_t	*m2 = *(zbx_am_source_stats_t * const *)d2;
+
+	return m2->alerts_num - m1->alerts_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes top alert sources by queued alerts                      *
@@ -2428,7 +2440,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 		}
 	}
 
-	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_source_stats_alerts_num_func);
 	sources_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_sources_result(&data, (zbx_am_source_stats_t **)view.values, sources_num);

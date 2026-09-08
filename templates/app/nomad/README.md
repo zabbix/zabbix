@@ -48,6 +48,7 @@ This template has been tested on:
 |{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>|`<PUT YOUR AUTH TOKEN>`|
 |{$NOMAD.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$NOMAD.HTTP.PROXY}|<p>Sets the HTTP proxy for script and HTTP agent items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HashiCorp Nomad", e.g. {$HTTP.TLS.VERIFY:"HashiCorp Nomad"}.</p>|`full`|
 |{$NOMAD.API.RESPONSE.SUCCESS}|<p>HTTP API successful response code. Availability triggers threshold. Change, if needed.</p>|`200`|
 |{$NOMAD.SERVER.NAME.MATCHES}|<p>The filter to include HashiCorp Nomad servers by name.</p>|`.*`|
 |{$NOMAD.SERVER.NAME.NOT_MATCHES}|<p>The filter to exclude HashiCorp Nomad servers by name.</p>|`CHANGE_IF_NEEDED`|

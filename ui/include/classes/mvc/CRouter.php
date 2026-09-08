@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -405,6 +405,7 @@ class CRouter {
 		'userrole.list'								=> [CControllerUserroleList::class,									'layout.htmlpage',		'administration.userrole.list'],
 		'userrole.update'							=> [CControllerUserroleUpdate::class,								null,					null],
 		'validate'									=> [CControllerValidate::class,										'layout.json',			null],
+		'validate.api.exists'						=> [CControllerValidateApiExists::class, 							'layout.json',			null],
 		'web.view'									=> [CControllerWebView::class,										'layout.htmlpage',		'monitoring.web.view'],
 		'webscenario.step.check'					=> [CControllerWebScenarioStepCheck::class,							'layout.json',			null],
 		'webscenario.step.edit'						=> [CControllerWebScenarioStepEdit::class,							'layout.json',			'webscenario.step.edit'],

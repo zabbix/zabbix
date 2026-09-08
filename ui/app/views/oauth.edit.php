@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,8 +81,8 @@ $form_grid = (new CFormGrid())
 	]);
 
 if (array_key_exists('client_secret', $data)) {
-	$client_secrect = [
-		(new CTextBox('client_secret', $data['client_secret']))
+	$client_secret = [
+		(new CPassBox('client_secret', $data['client_secret']))
 			->disableAutocomplete()
 			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -90,17 +90,22 @@ if (array_key_exists('client_secret', $data)) {
 	];
 }
 else {
-	$client_secrect = [
+	$client_secret = [
 		(new CSimpleButton(_('Change client secret')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setName('client_secret_button'),
-		(new CTextBox('client_secret', ''))
+		(new CPassBox('client_secret', ''))
 			->disableAutocomplete()
 			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
-			->setEnabled(false)
+			->setEnabled(false),
+		makeWarningIcon(
+			_('The client secret was cleared due to a token endpoint change. Please enter the new client secret.')
+		)
+			->addStyle('display: none;')
+			->addClass('js-client-secret-warning')
 	];
 }
 
@@ -111,7 +116,7 @@ $form_grid->addItem([
 	], 'client_secret'))
 		->setAsteriskMark()
 		->setId('oauth-client-secret-label'),
-	(new CFormField($client_secrect))->setId('oauth-client-secret-field')
+	(new CFormField($client_secret))->setId('oauth-client-secret-field')
 ]);
 
 if ($data['advanced_form']) {
@@ -234,7 +239,7 @@ $form_grid->addItem(
 );
 
 $output = [
-	'header' => $data['update'] ? _('OAuth') : _('New oauth'),
+	'header' => $data['update'] ? _('OAuth') : _('New OAuth'),
 	'body' => $form->addItem($form_grid)->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('oauth.edit.js.php')

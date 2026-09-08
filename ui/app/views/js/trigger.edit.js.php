@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,17 +76,6 @@ window.trigger_edit_popup = new class {
 				}
 			);
 			this.name.dispatchEvent(new Event('input'));
-		});
-
-		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
-		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
-			if (e.key === 'Enter') {
-				if (e.target.readOnly) {
-					return;
-				}
-
-				$(this.form_element).submit();
-			}
 		});
 
 		// Tags tab events.
@@ -702,7 +691,6 @@ window.trigger_edit_popup = new class {
 		let form_fields = {
 			dependencies: [],
 			discover: String(<?= TRIGGER_NO_DISCOVER ?>),
-			manual_close: String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>),
 			status: String(<?= TRIGGER_STATUS_DISABLED ?>),
 			...this.#getFormFields()
 		}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup hosts
@@ -614,7 +612,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
+			$this->query('xpath://button[contains(@onclick,"unlink")]')->waitUntilClickable()->one()->click()
+					->waitUntilNotPresent();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -869,7 +868,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
-		$this->zbxTestClickWait('clone');
+		$form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->waitUntilStalled();
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
@@ -989,9 +990,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');

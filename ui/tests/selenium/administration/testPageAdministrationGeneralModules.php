@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -713,7 +713,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		// Check value af every field in Module details form.
+		// Check value of every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
@@ -1314,13 +1314,16 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status);
 
 		// Open Kiosk mode and check widget display again.
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
+
+		// Kiosk mode hides the dashboard controls; wait for them to be restored before editing.
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->waitUntilVisible();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
 		if (array_key_exists('template', $module)) {
@@ -1365,12 +1368,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Switch to kiosk mode if required.
 		if ($mode === 'kiosk') {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
 		}
 
 		if ($status === 'enabled') {
-			// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
+			// Check that widget with required name is shown and that is doesn't have the inaccessible widget string in it.
 			$widget = $dashboard->getWidget($module['widget_name']);
 			$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
 					"]")->one(false)->isValid()
@@ -1620,7 +1623,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function changeModuleStatusFromPage($name, $current_status) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $name);
-		$row->query('link', $current_status)->one()->click();
+		$row->query('link', $current_status)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 	}
 

@@ -135,6 +135,13 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "액션 %1$s건"
 
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -284,6 +291,24 @@ msgstr "%1$s.php 클래스는 %3$s에 있는 모듈에 대해 %2$s를 확장해�
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -991,6 +1016,10 @@ msgstr "호스트에서 추가"
 msgid "Add from template"
 msgstr "템플릿에서 추가"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "호스트 추가"
@@ -1013,6 +1042,10 @@ msgstr "호스트 트리거 추가"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "항목 추가"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -2018,6 +2051,10 @@ msgstr "수집 간격 동안 가상 디스크에 대한 미해결 쓰기 요청�
 msgid "Avoid easy-to-guess passwords"
 msgstr "추측하기 쉬운 암호를 피하십시오"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "데이터 대기 중"
@@ -2195,6 +2232,13 @@ msgstr ""
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Both passwords must be equal."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3492,6 +3536,10 @@ msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr ""
@@ -4020,6 +4068,11 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML을 읽을 수 없습니다: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4080,6 +4133,10 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "\"전체\" 유형의 항목이 차트에 추가되면 \"데이터 세트 집계\"를 설정할 수 없습니다."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4606,6 +4663,10 @@ msgstr "클라이언트 암호 변경"
 msgid "Change indicator"
 msgstr "변경 표시기"
 
+#: include/classes/html/CMacroValue.php:243
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -4909,10 +4970,18 @@ msgstr "닫기"
 msgid "Close expression constructor"
 msgstr "조건식 빌더를 닫는다"
 
+#: jsLoader.php:416
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "새 이벤트를 닫기"
+
+#: include/func.inc.php:1653 jsLoader.php:290
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4938,6 +5007,12 @@ msgstr "코드 길이"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "축소"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:428
+#: jsLoader.php:460
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -6143,6 +6218,10 @@ msgstr "대시보드 \"%1$s\"는 이미 존재합니다."
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "대시보드 \"%1$s\"은 보고서 \"%2$s\"에서 사용됩니다."
 
+#: app/views/monitoring.dashboard.view.php:97
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6509,6 +6588,10 @@ msgstr "새 모듈에 대한 기본 액세스"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "디폴트 인증"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -7073,6 +7156,10 @@ msgstr "의존처"
 msgid "Dependent item"
 msgstr "의존 아이템"
 
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
+
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
 #: widgets/trigover/includes/ViewHelper.php:101
@@ -7171,6 +7258,10 @@ msgstr "웹 시나리오 세부 내용"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "감지된 TimescaleDB 라이센스는 압축을 지원하지 않습니다. 압축은 TimescaleDB Community Edition에서 지원됩니다."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7988,6 +8079,10 @@ msgstr "편집"
 msgid "Edit dashboard"
 msgstr "대시보드의 변경"
 
+#: jsLoader.php:597
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "맵 변경"
@@ -8004,6 +8099,10 @@ msgstr "트리 요소의 변경"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "위젯의 변경"
+
+#: jsLoader.php:242
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8425,6 +8524,14 @@ msgstr "영어 (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr ""
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -8739,6 +8846,10 @@ msgstr "실행 확인"
 msgid "Exists"
 msgstr "존재함"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8751,6 +8862,12 @@ msgstr "전개"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "매크로의 전개"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:427
+#: jsLoader.php:459
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9450,6 +9567,10 @@ msgstr "첫 페이지로 이동"
 msgid "Go to last page, %1$s"
 msgstr "마지막 페이지로 이동, %1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9464,6 +9585,10 @@ msgstr "%1$s 페이지로 이동"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "페이지 %1$s, 현재 페이지로 이동"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12058,10 +12183,21 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "갱신 간격"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "사용자 역할 \"%1$s\"에 대한 API 메서드 \"%2$s\"이(가) 잘못되었습니다."
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12151,6 +12287,11 @@ msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12533,6 +12674,11 @@ msgstr ""
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "태그 \"%1$s\"가 올바르지 않습니다: %2$s"
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13426,6 +13572,10 @@ msgstr "영어로 된 개체 이름을 사용하여 검색된 Windows 성능 카
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Windows 성능 카운터의 개체 인스턴스 목록입니다. 반환 JSON"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -14052,6 +14202,11 @@ msgstr "최대 반복 횟수"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "최대 반복 횟수는 디스커버리와 워크에만 적용됩니다."
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "최대 확대/축소 수준"
@@ -14081,6 +14236,11 @@ msgstr "최대 행 수"
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "필요한 최대 %1$s 데이터베이스 버전은 %2$s입니다."
+
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14421,6 +14581,12 @@ msgstr "PHP 스크립트의 입력 구문 분석 시간에 필요한 최소 제�
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "PHP 게시물의 최소 필수 크기는 %1$s입니다(구성 옵션 \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14619,6 +14785,14 @@ msgstr "모든 하위 항목에 문제가 있을 경우 가장 중요합니다"
 msgid "Most critical of child services"
 msgstr "가장 중요한 하위 서비스"
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -14648,8 +14822,18 @@ msgstr "복수"
 msgid "Multiple PROBLEM events"
 msgstr "장애이벤트를 계속해서 생성"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -14966,6 +15150,10 @@ msgstr "새 LDAP 서버"
 msgid "New MFA method"
 msgstr "새 MFA 방식"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "새 SLA"
@@ -15158,6 +15346,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "다음 대시보드"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15171,6 +15363,10 @@ msgstr "다음 페이지"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "다음 스텝"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15361,6 +15557,11 @@ msgstr "맵이 추가되어 있지 않습니다."
 msgid "No matches found"
 msgstr "조건에 일치하는 데이터가 없습니다"
 
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "새 모듈이 발견되지 않음"
@@ -15419,6 +15620,66 @@ msgstr "시스템 액세스 권한이 없습니다."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "\"%1$s.%2$s\"를 호출할 권한이 없습니다."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16276,6 +16537,11 @@ msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 msgid "Open URL"
 msgstr "URL 열기"
 
+#: app/views/popup.generic.php:436 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:417
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "새 창에서 열기"
@@ -16288,6 +16554,10 @@ msgstr ""
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "로그 열기"
+
+#: jsLoader.php:243
+msgid "Open widget actions"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -16621,6 +16891,10 @@ msgstr "PHP ctype모듈이 존재하지 않습니다 (PHP 설정 파라미터 --
 msgid "PHP curl"
 msgstr "PHP curl"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl 확장이 누락됨."
@@ -16912,6 +17186,10 @@ msgstr "상위 서비스"
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
 msgstr "상위 템플릿"
+
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -17513,6 +17791,21 @@ msgstr "장애 복구"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "장애 해결됨"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -18310,6 +18603,10 @@ msgstr "호스트 그룹에서 삭제"
 msgid "Remove from host groups"
 msgstr "호스트 그룹에서 삭제"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "호스트 삭제"
@@ -18317,6 +18614,10 @@ msgstr "호스트 삭제"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "호스트 태그 제거"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18585,6 +18886,11 @@ msgstr "응답 코드"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "응답 시간"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19473,6 +19779,10 @@ msgstr "SLA 보고서를 표시하려면 SLA를 선택합니다."
 msgid "Select a template"
 msgstr ""
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -19941,6 +20251,18 @@ msgstr "짧게"
 msgid "Shortened"
 msgstr "단축"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19964,6 +20286,10 @@ msgstr "보이기"
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
 msgstr "집계 함수 표시"
+
+#: include/events.inc.php:761
+msgid "Show all tags"
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -20024,6 +20350,10 @@ msgstr "표시할 행 수"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
+msgstr ""
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
@@ -20875,6 +21205,10 @@ msgstr "스왑 용량의 사이즈. 바이트 단위라면 integer를 리턴하�
 msgid "Swedish (sv_SE)"
 msgstr "스웨덴어 (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "인증방식을 변경하면 현재 세션이외에는 모두 리셋됩니다! 실행하시겠습니까?"
@@ -21497,6 +21831,10 @@ msgstr ""
 msgid "The client secret registered within the authorization server."
 msgstr ""
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "복제된 호스트에는 \"비밀 텍스트\" 유형의 사용자 정의 매크로가 포함되어 있습니다. 이러한 매크로의 값과 유형이 재설정되었습니다."
@@ -21587,6 +21925,10 @@ msgstr "프로세스 수. integer를 리턴."
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "사용자 속성에서 \"%1$s\" 매개변수가 누락되었습니다."
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22779,6 +23121,14 @@ msgstr "TimescaleDB 압축 지원 상태를 가져올 수 없습니다."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "TimescaleDB 버전을 가져올 수 없습니다."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -22852,6 +23202,10 @@ msgstr "장애 인지를 취소."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -23066,6 +23420,11 @@ msgstr "지원되지 않는 %1$s 데이터베이스 서버 버전입니다. %2$s
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "지원되지 않는 %1$s 데이터베이스 서버 버전입니다. %2$s보다 높을 수 없습니다."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24511,6 +24870,11 @@ msgstr "경고"
 msgid "Warning message"
 msgstr "경고 메시지"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "경고! Oracle DB에 대한 지원은 Zabbix 7.0부터 더 이상 사용되지 않으며 향후 버전에서는 제거될 예정입니다."
@@ -24681,6 +25045,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25065,6 +25433,10 @@ msgstr "현재 선택 항목에 대한 템플릿을 전환할 수 없습니다."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "조작 가능한 권한이 없습니다."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26097,6 +26469,10 @@ msgstr "설명"
 msgid "directory cannot be empty"
 msgstr "디렉토리는 비워둘 수 없음"
 
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
 #, c-format
@@ -26467,6 +26843,11 @@ msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "잘못된 데이터 유형"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -27629,6 +28010,10 @@ msgstr "검색 문자열을 입력"
 msgid "unacceptable URL"
 msgstr "허용되지 않는 URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -27866,6 +28251,11 @@ msgstr "값은 \"%1$s\"에서 \"%2$s\" 사이여야 함"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "값은 비어 있어야 함"
@@ -27881,6 +28271,16 @@ msgstr[0] ""
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "값은 \"%1$s\"보다 커야 함"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

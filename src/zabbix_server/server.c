@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -156,27 +156,33 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
-	"                                  (alerter, alert manager, availability manager, browser poller,",
-	"                                  configuration syncer, configuration syncer worker, connector manager,",
-	"                                  connector worker, discovery manager, escalator, ha manager, history poller,",
-	"                                  history syncer, housekeeper, http poller, icmp pinger, internal poller,",
-	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
-	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
-	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
+	"                                  (alerter, alert manager, alert syncer, availability manager,",
+	"                                  browser poller, configuration syncer, configuration syncer worker,",
+	"                                  connector manager, connector worker, discovery manager, escalator,",
+	"                                  ha manager, history poller, history syncer, housekeeper,",
+	"                                  http poller, http agent poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, lld manager, lld worker,",
+	"                                  odbc poller, poller, agent poller, preprocessing manager,",
+	"                                  preprocessing worker, proxy poller, proxy group manager, report manager,",
+	"                                  report writer, self-monitoring, service manager, snmp poller, snmp trapper,",
+	"                                  task manager, timer, trapper, trigger housekeeper, unreachable poller,",
+	"                                  vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
 	"",
 	"      Profiling control targets:",
 	"        process-type              All processes of specified type",
-	"                                  (alerter, alert manager, availability manager, browser poller,",
-	"                                  configuration syncer, configuration syncer worker, connector manager,",
-	"                                  connector worker, discovery manager, escalator, ha manager, history poller,",
-	"                                  history syncer, housekeeper, http poller, icmp pinger, internal poller,",
-	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
-	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
-	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
+	"                                  (alerter, alert manager, alert syncer, availability manager,",
+	"                                  browser poller, configuration syncer, configuration syncer worker,",
+	"                                  connector manager, connector worker, discovery manager, escalator,",
+	"                                  ha manager, history poller, history syncer, housekeeper,",
+	"                                  http poller, http agent poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, lld manager, lld worker,",
+	"                                  odbc poller, poller, agent poller, preprocessing manager,",
+	"                                  proxy poller, proxy group manager, report manager,",
+	"                                  report writer, self-monitoring, service manager, snmp poller, snmp trapper,",
+	"                                  task manager, timer, trapper, trigger housekeeper, unreachable poller,",
+	"                                  vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
 	"        scope                     Profiling scope",
@@ -1213,7 +1219,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1248,6 +1254,8 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		/* free vmware support */
 		zbx_vmware_destroy();
 	}
+
+	zbx_db_deinit();
 
 	zbx_free_selfmon_collector();
 
@@ -1663,7 +1671,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.discovery_open_cb = zbx_discovery_open_server,
 			.discovery_close_cb = zbx_discovery_close_server,
 			.discovery_find_host_cb = zbx_discovery_find_host_server,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_server,
 			.discovery_update_host_cb = zbx_discovery_update_host_server,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_server,
 			.discovery_update_service_cb = zbx_discovery_update_service_server,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_server,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_server
@@ -1916,7 +1926,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				thread_args.args = &service_manager_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -1997,12 +2007,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2035,7 +2045,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2069,11 +2079,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				thread_args.args = &connector_manager_args;
 				zbx_thread_start(connector_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2082,7 +2092,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(connector_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				zbx_thread_start(zbx_dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
@@ -2103,16 +2113,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
@@ -2140,13 +2153,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
-	}
-
-	if (SUCCEED != zbx_db_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
 	}
 
 out:
@@ -2233,7 +2239,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
-	zbx_db_deinit();
+	zbx_db_clear_idcache();
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
@@ -2710,7 +2716,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
 				zbx_set_exiting_with_fail();
 				break;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -477,6 +477,21 @@ fail:
 		else
 			zbx_vector_eventdata_append(vect_eventdata, eventdata);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare events to sort by highest severity and host name          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_eventdata_compare(const void *a1, const void *a2)
+{
+	const zbx_eventdata_t	*d1 = (const zbx_eventdata_t *)a1;
+	const zbx_eventdata_t	*d2 = (const zbx_eventdata_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
+
+	return strcmp(d1->host, d2->host);
 }
 
 /******************************************************************************

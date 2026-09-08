@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,7 +95,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	now = time(NULL);
 
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
+	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, connection_type, now);
 
 	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
@@ -170,8 +170,8 @@ out:
  *                FAIL - error occurred or host not found                           *
  *                                                                                  *
  * Comments: NB! adds host to the database if it does not exist or if it            *
- *           exists but metadata, interface, interface type or port has             *
- *           changed                                                                *
+ *           exists but metadata, interface, interface type, connection type        *
+ *           or port has changed                                                    *
  *                                                                                  *
  ************************************************************************************/
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
@@ -185,7 +185,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 
 	char		*ch_error;
 	int		ret = FAIL;
-	int		autoreg = AUTOREG_ENABLED;
+	int		autoreg = AUTOREG_ENABLED, change_flags = 0;
 	unsigned char	status, monitored_by;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
@@ -197,19 +197,26 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		goto out;
 	}
 
-	/* if host exists then check host connection permissions */
-	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
-			&ch_error))
-	{
-		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
-		zbx_free(ch_error);
-		goto out;
-	}
-
 	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		if (0 == zbx_dc_get_auto_registration_action_count())
 			autoreg = AUTOREG_DISABLED;
+	}
+
+	/* First check if autoregistration host has changed */
+	if (AUTOREG_ENABLED == autoreg)
+	{
+		change_flags = zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				sock->connection_type, (int)time(NULL));
+	}
+
+	/* if host exists then check host connection permissions */
+	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
+			change_flags, &ch_error))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
+		zbx_free(ch_error);
+		goto out;
 	}
 
 	/* if host does not exist then check autoregistration connection permissions */
@@ -219,8 +226,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		autoreg = AUTOREG_DISABLED;
 	}
 
-	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
-			interface, (int)time(NULL)))
+	/* Register host if autoregistration is enabled and host does not exist yet or has changed */
+	if (AUTOREG_ENABLED == autoreg && 0 != change_flags)
 	{
 		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, events_cbs,
 				config_timeout, autoreg_update_host_func_cb);
@@ -464,12 +471,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
-				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
+				error[MAX_STRING_LEN], host_metadata[MAX_BUFFER_LEN], *interface = NULL,
+				*buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, version, num = 0;
 	zbx_uint64_t		hostid, revision, agent_config_revision;
-	size_t			host_metadata_alloc = 1,	/* for at least NUL-terminated string */
-				interface_alloc = 1,		/* for at least NUL-terminated string */
+	size_t			interface_alloc = 1,		/* for at least NUL-terminated string */
 				buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
@@ -489,12 +496,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		goto error;
 	}
 
-	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
-
-	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
-			&host_metadata, &host_metadata_alloc, NULL))
+	if (NULL == zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA))
 	{
 		*host_metadata = '\0';
+	}
+	else if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA, host_metadata,
+			sizeof(host_metadata), NULL))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host metadata is too long");
+		goto error;
 	}
 
 	interface = (char *)zbx_malloc(interface, interface_alloc);
@@ -785,7 +795,6 @@ out:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_expression_destroy(&regexps);
 
-	zbx_free(host_metadata);
 	zbx_free(interface);
 	zbx_free(buffer);
 

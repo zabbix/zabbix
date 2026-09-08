@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,5 +38,33 @@ class CRegexHelper {
 			'.' => '.',
 			'/' => '/'
 		];
+	}
+
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	public static function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
+		$backslash_count = 0;
+
+		for ($p = 0; isset($regex[$p]); $p++) {
+			if ($regex[$p] === '\\') {
+				$backslash_count++;
+			}
+			else {
+				if ($regex[$p] === '/' && $backslash_count % 2 == 0) {
+					$formatted_regex .= '\\';
+				}
+				$backslash_count = 0;
+			}
+
+			$formatted_regex .= $regex[$p];
+		}
+
+		return $formatted_regex;
 	}
 }

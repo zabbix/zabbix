@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,7 @@
 /******************************************************************************
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stoires DBMS version as integer: MMmmuu                           *
+ *          stores DBMS version as integer: MMmmuu                            *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = patch version part                                            *
@@ -308,8 +308,8 @@ out:
 
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
-#define ZBX_TSDB_TRENDS_TABLES "'history_bin','trends','trends_uint'"
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin'"
+#define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
 	version_info->history_compressed_chunks =
 			(SUCCEED == dbconn_tsdb_table_has_compressed_chunks(db, ZBX_TSDB_HISTORY_TABLES)) ? 1 : 0;
@@ -434,7 +434,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
- * Return value: compression availability as as integer                       *
+ * Return value: compression availability as integer                          *
  *               0 (OFF): compression is not available                        *
  *               1 (ON): compression is available                             *
  *                                                                            *

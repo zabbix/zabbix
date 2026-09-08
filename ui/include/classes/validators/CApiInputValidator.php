@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1019,23 +1019,11 @@ class CApiInputValidator {
 			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				$value = (float) $number_parser->getMatch();
 			}
+			elseif ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data))) {
+				return true;
+			}
 			else {
-				$macro_parsers = [];
-				if ($flags & API_ALLOW_USER_MACRO) {
-					$macro_parsers[] = new CUserMacroParser();
-					$macro_parsers[] = new CUserMacroFunctionParser();
-				}
-				if ($flags & API_ALLOW_LLD_MACRO) {
-					$macro_parsers[] = new CLLDMacroParser();
-					$macro_parsers[] = new CLLDMacroFunctionParser();
-				}
-
-				foreach ($macro_parsers as $macro_parser) {
-					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-						return true;
-					}
-				}
-
 				$value = NAN;
 			}
 		}
@@ -1529,8 +1517,23 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
-				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+				$compare_field_name = $field_rule['compare']['field'];
+				$compare_field_value = $data[$compare_field_name];
+				$compare_field_flags = array_key_exists('flags', $rule['fields'][$compare_field_name])
+					? $rule['fields'][$compare_field_name]['flags']
+					: 0x00;
+
+				if (is_string($compare_field_value)
+						&& ((($compare_field_flags & API_ALLOW_USER_MACRO)
+							&& self::checkValueIsUserMacro($compare_field_value))
+						|| (($compare_field_flags & API_ALLOW_LLD_MACRO)
+							&& self::checkValueIsLldMacro($compare_field_value)))) {
+					unset($field_rule['compare']);
+				}
+				else {
+					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$compare_field_name;
+					$field_rule['compare']['value'] = $compare_field_value;
+				}
 			}
 
 			if (array_key_exists('preproc_type', $field_rule)) {
@@ -2171,8 +2174,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (@preg_match('('.$data.')', '') === false) {
+		if (!(new CRegexValidator)->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
+
 			return false;
 		}
 
@@ -2612,7 +2616,11 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_EVENT_TAGS_MACRO, API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_MANUALINPUT_MACRO,
+	 *                                API_ALLOW_EVENT_TAGS_MACRO.
+	 * @param array  $rule['schemes'] (optional) Validate the URL scheme against the provided list. If not given,
+	 *                                the CSettingsHelper::getAllowedUriSchemes() list will be used by default.
+	 *                                Scheme validation won't take place if the URL does not contain a scheme component.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2626,19 +2634,33 @@ class CApiInputValidator {
 			return false;
 		}
 
+		if ($data === '') {
+			return true;
+		}
+
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
 		$options = [
-			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
-			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
-			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
+			'user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
+			'event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
-		if ($data !== '' && CHtmlUrlValidator::validate($data, $options) === false) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));
+		if (array_key_exists('schemes', $rule)) {
+			$options['schemes'] = $rule['schemes'];
+		}
+		else {
+			$options['schemes'] = CSettingsHelper::getAllowedUriSchemes();
+		}
+
+		$validator = new CUrlValidator($options);
+
+		if (!$validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $validator->getError());
 			return false;
 		}
 
@@ -4362,5 +4384,29 @@ class CApiInputValidator {
 		return is_string($data)
 			? self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error)
 			: self::validateId([], $data, $path, $error);
+	}
+
+	private static function checkValueIsUserMacro(string $value): bool {
+		$macro_parsers = [new CUserMacroParser(), new CUserMacroFunctionParser()];
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function checkValueIsLldMacro(string $value): bool {
+		$macro_parsers = [new CLLDMacroParser(), new CLLDMacroFunctionParser()];
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
  */
 class testAuditlogAutoregistration extends testAuditlogCommon {
 
+	/**
+	 * Resource type Autoregistration
+	 */
+	const RESOURCE_TYPE = 38;
+
 	public function testAuditlogAutoregistration_Update() {
 		$updated = json_encode([
 			'autoregistration.tls_accept' => ['update', '3', '1'],
@@ -34,6 +39,6 @@ class testAuditlogAutoregistration extends testAuditlogCommon {
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, null);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, null, self::RESOURCE_TYPE);
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -439,7 +439,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": unacceptable URL.',
+					'details' => 'Invalid parameter "/1/url": unacceptable URL scheme.',
 					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
@@ -2009,7 +2009,7 @@ class testFormAlertsScripts extends CWebTest {
 				$this->openScriptForm(self::$ids['URI schemes'], false);
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
+				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL scheme.');
 				CMessageElement::find()->one()->close();
 			}
 		}

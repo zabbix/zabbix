@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -127,7 +127,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		self::$agent_script_output_file = '/tmp/agent_script_exec_' . $now->format('Hms_dmy');
 		$response = $this->call('script.create', [
 			'name' => 'Timeout test: script on agent',
-			'command' => 'sleep ' . self::SCRIPT_OUTPUT_TIMEOUT .' && echo 1 > ' . self::$agent_script_output_file ,
+			'command' => 'sleep ' . self::SCRIPT_OUTPUT_TIMEOUT .' && echo 1 > ' . self::$agent_script_output_file,
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
@@ -241,7 +241,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		];
 
 		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8,
-			10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
+			10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
 		);
 		$result = $server->testItem($item_test_data, self::$sid);
 

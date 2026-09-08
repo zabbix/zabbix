@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -148,7 +148,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows(this.parent_discoveryid, response.keepids ?? []);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -157,7 +157,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows(this.parent_discoveryid);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 					}
 
 					location.href = location.href;

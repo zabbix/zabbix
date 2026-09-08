@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -394,14 +394,22 @@ function convertUnitsUptime($value) {
 /**
  * Convert time period to a human-readable format.
  * The following units will be used: years, months, days, hours, minutes, seconds and milliseconds.
- * Only the 3 most significant units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting empty ones.
+ * Only the 3 most significant allowed units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting
+ * empty ones.
  *
- * @param int  $value            Time period in seconds.
- * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
+ * @param int   $value                            Time period in seconds.
+ * @param array $options
+ * @param bool  $options ['ignore_milliseconds']  Without ms (1s 200 ms = 1.2s). Default: false.
+ * @param bool  $options ['with_year']            Output can contain years (y) and months (M). Default: true.
  *
  * @return string
  */
-function convertUnitsS($value, $ignore_millisec = false) {
+function convertUnitsS($value, array $options = []) {
+	$options += [
+		'ignore_milliseconds' => false,
+		'with_year' => true
+	];
+
 	$value = (float) $value;
 	$value_abs = abs($value);
 
@@ -410,19 +418,19 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$value_abs_int = floor($value_abs);
 
-	if (($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
+	if ($options['with_year'] && ($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
 		$parts['years'] = $v;
 		$value_abs_int -= $v * SEC_PER_YEAR;
 		$start = 0;
 	}
 
 	$v = floor($value_abs_int / SEC_PER_MONTH);
-	if ($v == 12) {
+	if ($options['with_year'] && $v == 12) {
 		$parts['years'] = $start === null ? 1 : $parts['years'] + 1;
 		$start = 0;
 	}
 	elseif ($start === null || ceil(log10($parts['years'])) <= ZBX_FLOAT_DIG) {
-		if ($v > 0) {
+		if ($options['with_year'] && $v > 0) {
 			$parts['months'] = $v;
 			$value_abs_int -= $v * SEC_PER_MONTH;
 			$start = $start === null ? 1 : $start;
@@ -449,7 +457,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		}
 
 		if ($start === null || $start >= 3) {
-			if ($ignore_millisec) {
+			if ($options['ignore_milliseconds']) {
 				$v = $value_abs_int + round(fmod($value_abs, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
 
 				if ($v > 0) {
@@ -663,7 +671,7 @@ function convertUnitsRaw(array $options): array {
 		}
 
 		return [
-			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'value' => convertUnitsS($value, ['ignore_milliseconds' => $options['ignore_milliseconds']]),
 			'units' => '',
 			'is_numeric' => false
 		];
@@ -748,11 +756,12 @@ function convertUnitsRaw(array $options): array {
  * Examples: '100' => '100'; '10m' => '600'; '-10m' => '-600'; '3d' => '259200'.
  *
  * @param string $time       Decimal integer with optional time suffix.
- * @param bool   $with_year  Additionally parse year suffixes.
+ * @param bool   $with_year  Additionally parse year and month suffixes.
  *
- * @return int|null  Decimal integer seconds or null on error.
+ * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
+ *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false) {
+function timeUnitToSeconds($time, $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
 	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
@@ -838,10 +847,10 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
-	$first = zbx_toHash($first);
+	$first = zbx_toHash($first, '');
 
 	$second = array_diff($fields2, $fields1);
-	$second = zbx_toHash($second);
+	$second = zbx_toHash($second, '');
 
 	$result = [
 		'first' => [],
@@ -1069,10 +1078,11 @@ function createParentToChildRelation(&$chain, $link, $parentField, $childField) 
 }
 
 // object or array of objects to hash
-function zbx_toHash($value, $field = null) {
+function zbx_toHash(mixed $value, string $field): ?array {
 	if (is_null($value)) {
 		return $value;
 	}
+
 	$result = [];
 
 	if (!is_array($value)) {
@@ -1308,7 +1318,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 /**
  * Format floating-point number in the best possible way for displaying.
  *
- * @param float $number   Valid number in decimal or scientific notation.
+ * @param float $number   Valid floating point number.
  * @param array $options  Formatting options.
  *
  * $options = [
@@ -1324,14 +1334,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @return string
  */
 function formatFloat(float $number, array $options = []): string {
-	if ($number == INF) {
-		return _('Infinity');
-	}
-
-	if ($number == -INF) {
-		return '-'._('Infinity');
-	}
-
 	$defaults = [
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => 0,
@@ -1348,75 +1350,75 @@ function formatFloat(float $number, array $options = []): string {
 		'zero_as_zero' => $zero_as_zero
 	] = $options + $defaults;
 
-	if ($zero_as_zero && $number == 0) {
-		return '0';
-	}
+	$round_fn = static function (float $mantissa, int $exponent, int $decimals): array {
+		$mantissa_rounded = abs(round($mantissa, $decimals));
 
-	$number_original = $number;
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		for ($i = 1; $i >= 0; $i--) {
-			$round_precision = $decimals - $exponent - $i;
-
-			// PHP rounding bug when precision is set more than 294.
-			if ($round_precision > 294) {
-				$decimal_shift = pow(10, $round_precision - 294);
-				$test = round($number * $decimal_shift, 294) / $decimal_shift;
-			}
-			else {
-				$test = round($number, $round_precision);
-			}
-
-			$test_number = sprintf('%.'.($precision - 1).'E', $test);
-			$test_digits = $precision == 1
-				? 1
-				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
-
-			if (!$small_scientific || $test_digits - $exponent < $precision) {
-				break;
-			}
-		}
-		$number = $test_number;
-		$digits = $test_digits;
-	}
-	else {
-		if ($exponent >= $precision) {
-			if ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-					|| round($number, $precision - $exponent - 1) != $number) {
-				$number = round($number, $decimals - $exponent);
-			}
-		}
-		else {
-			$number = round($number, min($decimals, $precision - $exponent - 1));
+		if ($mantissa_rounded >= 10) {
+			$mantissa_rounded = 1;
+			$exponent++;
+			$decimals++;
 		}
 
-		$number = sprintf('%.'.($precision - 1).'E', $number);
-		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
-	}
+		$digits = $decimals >= 0
+			? rtrim(str_replace('.', '', sprintf('%.'.$decimals.'F', $mantissa_rounded)), '0')
+			: '';
+
+		return [$digits, $exponent, $mantissa_rounded == abs($mantissa)];
+	};
+
+	$format_fn = static function (string $sign, string $integer, string $fraction, ?int $exponent = null)
+			use ($decimals, $decimals_exact): string {
+		if ($decimals_exact) {
+			$fraction = str_pad($fraction, $decimals, '0');
+		}
+
+		return $sign.$integer.($fraction !== '' ? '.'.$fraction : '').
+			($exponent !== null ? 'E'.($exponent >= 0 ? '+' : '').$exponent : '');
+	};
 
 	if ($zero_as_zero && $number == 0) {
 		return '0';
 	}
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		if (!$small_scientific
-				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, '.', '');
-		}
-		else {
-			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
-		}
+	elseif ($number == INF) {
+		return _('Infinity');
 	}
-	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-			|| ($exponent >= $precision && $number != $number_original)) {
-		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+	elseif ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
+	$sign = $number < 0 ? '-' : '';
+
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
+
+	$mantissa = (float) $mantissa;
+	$exponent = (int) $exponent;
+
+	[$digits_dec, $exponent_dec, $precise_dec] = $round_fn($mantissa, $exponent,
+		$exponent >= 0
+			? min($exponent + $decimals, $precision - 1)
+			: ($decimals_exact
+				? $exponent + $decimals
+				: $decimals - 1
+			)
+	);
+
+	[$digits_sci, $exponent_sci] = $round_fn($mantissa, $exponent, $decimals);
+
+	if ($exponent_dec >= ($precise_dec ? min(PHP_FLOAT_DIG, $precision + 3) : $precision)
+			|| $small_scientific && (
+				$decimals_exact && $exponent_sci < -1 && -$exponent_sci + strlen($digits_sci) > $decimals + 1
+					|| !$decimals_exact && -$exponent_sci + strlen($digits_sci) > min(PHP_FLOAT_DIG, $precision + 3))) {
+		return $format_fn($sign, $digits_sci[0], substr($digits_sci, 1), $exponent_sci);
+	}
+	elseif ($exponent_dec >= 0) {
+		return $format_fn($sign, str_pad(substr($digits_dec, 0, $exponent_dec + 1), $exponent_dec + 1, '0'),
+			substr($digits_dec, $exponent_dec + 1)
+		);
 	}
 	else {
-		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)), '.', '');
+		return $digits_dec !== ''
+			? $format_fn($sign, '0', str_repeat('0', -$exponent_dec - 1).$digits_dec)
+			: $format_fn('', '0', '');
 	}
 }
 
@@ -1648,7 +1650,7 @@ function makeMessageBox(string $class, array $messages, mixed $title = null, boo
 			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-				->setTitle(_('Close'))
+				->setAttribute('aria-label', _('Close notification'))
 		);
 	}
 
@@ -1813,7 +1815,6 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			}
 
 			imageOut($canvas);
-			imagedestroy($canvas);
 			break;
 
 		default:
@@ -2001,23 +2002,30 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriods() as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
-			return null;
-		}
+	foreach ($time_periods_parser->getPeriodsParts() as $period_parts) {
+		$start_day = (int) $period_parts['wd_from'];
+		$end_day = (int) $period_parts['wd_till'];
 
-		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
-			if (!isset($out[$i])) {
-				$out[$i] = [];
-			}
-			array_push($out[$i], [
-				'start_h' => $matches[3],
-				'start_m' => $matches[4],
-				'end_h' => $matches[5],
-				'end_m' => $matches[6]
-			]);
+		for ($day = $start_day; $day <= $end_day; $day++) {
+			$out[$day][] = [
+				'start_h' => $period_parts['h_from'],
+				'start_m' => $period_parts['m_from'],
+				'end_h' => $period_parts['h_till'],
+				'end_m' => $period_parts['m_till']
+			];
 		}
 	}
+
+	foreach ($out as &$periods) {
+		usort($periods, static function(array $p1, array $p2): int {
+			if ($p1['start_h'] == $p2['start_h']) {
+				return $p1['start_m'] <=> $p2['start_m'];
+			}
+
+			return $p1['start_h'] <=> $p2['start_h'];
+		});
+	}
+	unset($periods);
 
 	return $out;
 }

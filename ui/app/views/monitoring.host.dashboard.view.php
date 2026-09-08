@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,21 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.dashboard.js');
-$this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.placeholder.js');
-$this->addJsFile('class.widgets-data.js');
-$this->addJsFile('class.widget-base.js');
-$this->addJsFile('class.widget.js');
-$this->addJsFile('class.widget.inaccessible.js');
-$this->addJsFile('class.widget.iterator.js');
-$this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.create-placeholder.js');
-$this->addJsFile('class.widget-field.js');
-$this->addJsFile('class.widget-field-event.js');
-$this->addJsFile('class.widget-form.js');
-$this->addJsFile('class.widget-form-event.js');
-
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
 }
@@ -48,15 +33,6 @@ if (array_key_exists('no_data', $data)) {
 	return;
 }
 
-$this->addJsFile('class.csvggraph.js');
-$this->addJsFile('class.imagecache.js');
-$this->addJsFile('class.svgcanvas.js');
-$this->addJsFile('class.svgtextarea.js');
-$this->addJsFile('class.svgelement.js');
-$this->addJsFile('class.svgmap.js');
-$this->addJsFile('class.svgmapelement.js');
-$this->addJsFile('class.svgmaplink.js');
-$this->addJsFile('class.svgmapshape.js');
 $this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');

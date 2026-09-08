@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,9 @@ use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup role, module, users, report, services
- * @dataSource ExecuteNowAction
+ *
+ * @dataSource ExecuteNowAction, MonitoringOverview
+ *
  * @onBefore prepareUserData, prepareReportData, prepareServiceData, prepareCauseAndSymptomData
  */
 class testUserRolesPermissions extends CWebTest {
@@ -47,6 +49,13 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	protected static $super_roleid;
 	protected static $super_roleid2;
+
+	/**
+	 * Id of created dashboard.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid;
 
 	/**
 	 * Id of user that created for future checks.
@@ -113,6 +122,22 @@ class testUserRolesPermissions extends CWebTest {
 	 * Scheduled report.
 	 */
 	public function prepareReportData() {
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Admin share testing',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]],
+				'users' => [
+					[
+						'userid' => '9',
+						'permission' => 2
+					]
+				]
+			]
+		]);
+		self::$dashboardid = $response['dashboardids'][0];
+
 		$response = CDataHelper::call('report.create', [
 			[
 				'userid' => self::$super_user,
@@ -267,12 +292,13 @@ class testUserRolesPermissions extends CWebTest {
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
 					'action' => 'Create and edit maps',
-					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
+					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=create']
 				]
 			],
 			// Dashboard creation/edit.
 			[
 				[
+					'replace_link' => true,
 					'page_buttons' => [
 						'Create dashboard',
 						'Delete'
@@ -281,7 +307,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Edit dashboard'
 					],
 					'list_link' => 'zabbix.php?action=dashboard.list',
-					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=1220',
+					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=',
 					'action' => 'Create and edit dashboards',
 					'check_links' => ['zabbix.php?action=dashboard.view&new=1']
 				]
@@ -289,7 +315,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Manage scheduled reports.
 			[
 				[
-					'report' => true,
+					'replace_link' => true,
 					'page_buttons' => [
 						'Create report',
 						'Enable',
@@ -304,6 +330,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Cancel'
 					],
 					'list_link' => 'zabbix.php?action=scheduledreport.list',
+					'action_link' => 'zabbix.php?action=scheduledreport.edit&reportid=',
 					'action' => 'Manage scheduled reports',
 					'check_links' => ['zabbix.php?action=scheduledreport.edit']
 				]
@@ -327,8 +354,13 @@ class testUserRolesPermissions extends CWebTest {
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
 
-			$this->page->open(array_key_exists('report', $data) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
-					self::$reportid : $data['action_link'])->waitUntilReady();
+			$entity_id = (array_key_exists('replace_link', $data) && $data['action'] === 'Manage scheduled reports')
+				? self::$reportid
+				: self::$dashboardid;
+
+			$this->page->open(array_key_exists('replace_link', $data)
+				? $data['action_link'].$entity_id
+				: $data['action_link'])->waitUntilReady();
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
@@ -429,6 +461,13 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getProblemActionsData
 	 */
 	public function testUserRolesPermissions_ProblemAction($data) {
+		// Remove event status blinking to get correct status in table column.
+		CAPIHelper::authorize('user_for_role', 'zabbixzabbix');
+		CAPIHelper::call('settings.update', [
+			'blink_period' => 0
+		]);
+		CAPIHelper::reset();
+
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
@@ -1639,11 +1678,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->page->waituntilReady();
 
 		$this->assertTableDataColumn($column_content, 'Name');
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {
@@ -1854,10 +1894,12 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ExecuteNowContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
-		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$this->page->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
+		$table = $this->getTable();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		foreach ($data['test_cases'] as $test_case) {

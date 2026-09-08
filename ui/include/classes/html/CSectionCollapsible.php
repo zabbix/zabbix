@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -51,16 +51,22 @@ class CSectionCollapsible extends CSection {
 		if ($this->toggle_label !== '') {
 			$toggle = (new CSimpleButton(new CTag('h4', true, $this->toggle_label)))
 				->addClass($this->is_expanded ? ZBX_ICON_CHEVRON_UP : ZBX_ICON_CHEVRON_DOWN)
-				->setTitle($this->is_expanded ? _('Collapse') : _('Expand'));
+				->setAttribute('aria-label', $this->is_expanded ? _('Collapse section') : _('Expand section'))
+				->setAttribute('aria-expanded', $this->is_expanded ? 'true' : 'false');
 		}
 		else {
 			$toggle = $this->is_expanded
-				? new CButtonIcon(ZBX_ICON_CHEVRON_UP, _('Collapse'))
-				: new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand'));
+				? (new CButtonIcon(ZBX_ICON_CHEVRON_UP))
+					->setAttribute('aria-label', _('Collapse section'))
+					->setAttribute('aria-expanded', 'true')
+				: (new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))
+					->setAttribute('aria-label', _('Expand section'))
+					->setAttribute('aria-expanded', 'false');
 		}
 
 		$toggle
 			->addClass(ZBX_STYLE_TOGGLE)
+			->setAttribute('aria-controls', $this->getId())
 			->onClick('toggleSection(this, "'.$this->profile_key.'");');
 
 		if ($this->header === null) {

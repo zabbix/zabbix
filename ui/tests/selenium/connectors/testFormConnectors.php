@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -296,7 +296,7 @@ class testFormConnectors extends CWebTest {
 
 					],
 					'error' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+						'Invalid parameter "/1/url": unacceptable URL scheme.'
 					]
 				]
 			],
@@ -309,7 +309,7 @@ class testFormConnectors extends CWebTest {
 
 					],
 					'error' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+						'Invalid parameter "/1/url": unacceptable URL scheme.'
 					]
 				]
 			],
@@ -1400,7 +1400,7 @@ class testFormConnectors extends CWebTest {
 				$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update connector', 'Invalid parameter "/1/url": unacceptable URL.');
+				$this->assertMessage(TEST_BAD, 'Cannot update connector', 'Invalid parameter "/1/url": unacceptable URL scheme.');
 				$message->close();
 			}
 		}

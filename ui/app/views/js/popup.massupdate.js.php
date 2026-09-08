@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -339,9 +339,10 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	let overlay = overlays_stack.end();
 
-	$(overlay.$dialogue||document).on('remove', () => {
+	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 		$(document).off('add.popup', processAddfromPopup);
 	});
+
 	$(document).on('add.popup', processAddfromPopup);
 
 	function processAddfromPopup(ev, data) {

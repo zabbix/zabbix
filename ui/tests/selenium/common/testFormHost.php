@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -302,13 +302,13 @@ class testFormHost extends CWebTest {
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
+		$this->assertEquals('Max repetition count is applicable to walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
-		// Check the value of the "Monitored by" field and the present/absence of the corresponding mulitselect.
+		// Check the value of the "Monitored by" field and the present/absence of the corresponding multiselect.
 		$monitored_by = $form->getField('Monitored by');
 		$this->assertEquals('Proxy', $monitored_by->getValue());
 		$this->assertEquals(['Test Host Proxy'], $monitored_by->query('xpath:./../following-sibling::div')->asMultiselect()->one()->getValue());
@@ -1732,13 +1732,13 @@ class testFormHost extends CWebTest {
 		];
 
 		$form = $this->openForm($this->link, self::HOST_UPDATE_VISIBLE_NAME);
-		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
+		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$this->page->removeFocus();
 
 		if (!array_key_exists('inline_errors', $data) || CTestArrayHelper::get($data, 'submit_form')) {
@@ -2069,10 +2069,16 @@ class testFormHost extends CWebTest {
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
-			$form_type->query('button', $data['action'])->one()->click();
-		}
-		if ($data['action'] === 'Delete') {
-			$this->page->dismissAlert();
+			$button = $form_type->query('button', $data['action'])->one();
+			$button->click();
+
+			if ($data['action'] === 'Delete') {
+				$this->page->dismissAlert();
+			}
+			else {
+				$button->waitUntilNotVisible();
+				$form->waitUntilStalled();
+			}
 		}
 
 		$this->page->waitUntilReady();

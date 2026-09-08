@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -118,7 +118,10 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	$triggers_table->addRow([
 		(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 			->setLabel(CSeverityHelper::getName($severity))
-			->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
+			->setChecked(
+				array_key_exists($severity, $data['messages']['triggers.severities'])
+					&& $data['messages']['triggers.severities'][$severity] == TRIGGER_SEVERITY_ON
+			)
 			->setUncheckedValue(0),
 		[
 			(new CSelect('messages[sounds.'.$severity.']'))

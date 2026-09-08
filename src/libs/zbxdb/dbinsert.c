@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -342,7 +342,7 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 	if (0 == binary_data_len)
 		goto out;
 #if defined (HAVE_MYSQL)
-		escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len + 1);
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 

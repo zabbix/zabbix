@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -165,7 +165,8 @@ static char	*pp_error_format_value(const zbx_variant_t *value)
 	}
 	else
 	{
-		value_str = zbx_malloc(NULL, (len = strlen(value_desc)) + 1);
+		len = strlen(value_desc);
+		value_str = zbx_malloc(NULL, len + 1);
 		memcpy(value_str, value_desc, len + 1);
 	}
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -805,7 +805,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup', 'acknowledge.edit');
-		url.setArgument('eventid', options.eventid);
+		url.setArgument('eventids[]', options.eventid);
 
 		sections.push({
 			label: t('Actions'),
@@ -1809,7 +1809,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('aria-expanded', 'true');
+			event.target.setAttribute('aria-expanded', 'true');
 
 			let $menu_popup = $('<ul>', {
 				'role': 'menu',
@@ -1820,6 +1820,11 @@ jQuery(function($) {
 			// Add custom class, if specified.
 			if ('class' in options) {
 				$menu_popup.addClass(options.class);
+			}
+
+			// Add dynamic ID, if specified.
+			if ('id' in options) {
+				$menu_popup.prop('id', options.id);
 			}
 
 			$opener.data({

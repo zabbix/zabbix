@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -97,10 +97,13 @@ $form_grid = (new CFormGrid())
 				),
 			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}'))
+					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}',
+						$data['provisioned'] == CUser::PROVISION_STATUS_YES
+					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAriaRequired(),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)
 				]))->addClass('form_row')
 			)
 		]))->addClass('js-field-sendto-emails')

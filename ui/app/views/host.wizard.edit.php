@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -285,7 +285,7 @@ function stepSelectTemplate($old_template_count): array {
 		),
 		new CTemplateTag('host-wizard-template-tags-more',
 			(new CButtonIcon(ZBX_ICON_MORE))
-				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP)
+				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER)
 		)
 	];
 }
@@ -319,6 +319,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'host_new',
 							'object_name' => 'hosts',
 							'add_new' => true,
+							'maxlength' => DB::getFieldLength('hosts', 'host'),
 							'multiple' => false,
 							'popup' => [
 								'parameters' => [
@@ -345,6 +346,7 @@ function stepCreateHost($form): CTemplateTag {
 							'new_item_name' => 'groups_new[]',
 							'object_name' => 'hostGroup',
 							'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+							'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'host_groups',
@@ -465,7 +467,10 @@ function stepInstallAgent($agent_script_data): array {
 											DB::getFieldLength('hosts', 'tls_psk_identity')
 										))->setAriaRequired(),
 										(new CDiv(
-											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
+										(new CDiv(
+											_('Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input'),
 									(new CFormField([
@@ -744,7 +749,7 @@ function stepAddHostInterface(): array {
 							(new CFormField([
 								(new CLabel([
 									_('Max repetition count'),
-									makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 								], 'interfaces[#{row_index}][details][max_repetitions]')),
 								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
 									false, false, false

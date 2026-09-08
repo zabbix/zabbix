@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,13 +41,16 @@
 #define ZBX_RTC_SHUTDOWN			101
 #define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
 #define ZBX_RTC_SUBSCRIBE_SERVICE		103
-#define ZBX_RTC_NOTIFY				104
+#define ZBX_RTC_UNSUBSCRIBE_SERVICE		104
+#define ZBX_RTC_NOTIFY				105
+
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
 #define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 #define ZBX_RTC_HISTORY_SYNC_NOTIFY		9997
 #define ZBX_RTC_ESCALATOR_NOTIFY		9996
+#define ZBX_RTC_TASK_MANAGER_NOTIFY		9995
 
 #define ZBX_IPC_RTC_MAX				9999
 

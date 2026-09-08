@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -162,7 +162,7 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					case 'fields':
@@ -213,6 +213,10 @@ class CFormValidator {
 						break;
 
 					case 'use':
+						if (!is_array($value) || count($value) > 2) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain an array with up to two elements (Path: '.$rule_path.')');
+						}
+
 						$result[$key] = $value;
 						break;
 
@@ -230,6 +234,9 @@ class CFormValidator {
 						}
 
 						foreach ($value as &$api_uniq_check) {
+							if (count(explode('.', $api_uniq_check[0])) !== 2) {
+								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+							}
 							$api_uniq_check += [1 => [], 2 => null, 3 => null];
 						}
 						unset($api_uniq_check);
@@ -447,7 +454,7 @@ class CFormValidator {
 
 					case 'not_in':
 					case 'in':
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					default:
@@ -625,18 +632,20 @@ class CFormValidator {
 	}
 
 	/**
-	 * Base field validation method.
+	 * Base field validation method. Returns false if validation is not done.
 	 *
 	 * @param array  $rule    Validation rules.
 	 * @param array  $data    Data to validate.
 	 * @param string $field   Field to validate.
 	 * @param string $path    Path of field.
+	 *
+	 * @return bool
 	 */
-	private function validateField(array $rules, &$data, string $field, string $path): void {
+	private function validateField(array $rules, &$data, string $field, string $path): bool {
 		if (array_key_exists('when', $rules)) {
 			foreach ($rules['when'] as $when) {
 				if ($this->testWhenCondition($when, $path) === false) {
-					return;
+					return false;
 				}
 			}
 		}
@@ -653,7 +662,7 @@ class CFormValidator {
 				);
 			}
 
-			return;
+			return true;
 		}
 
 		if (array_key_exists('type', $rules)) {
@@ -662,7 +671,7 @@ class CFormValidator {
 					if (!self::validateId($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -670,7 +679,7 @@ class CFormValidator {
 					if (!self::validateInt32($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -678,7 +687,7 @@ class CFormValidator {
 					if (!self::validateFloat($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -686,7 +695,7 @@ class CFormValidator {
 					if (!self::validateStringUtf8($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 
 					if (!self::validateUse($rules, $data[$field], $error)) {
@@ -694,7 +703,7 @@ class CFormValidator {
 
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -702,7 +711,7 @@ class CFormValidator {
 					if (!$this->validateArray($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -710,7 +719,7 @@ class CFormValidator {
 					if (!$this->validateObject($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -718,11 +727,13 @@ class CFormValidator {
 					if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -942,19 +953,19 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value_check)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
 		}
 
-		if (!self::checkStringIn($rules, $value, $error)) {
+		if (!self::checkStringIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'in', $error);
 
 			return false;
 		}
 
-		if (!self::checkStringNotIn($rules, $value, $error)) {
+		if (!self::checkStringNotIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'not_in', $error);
 
 			return false;
@@ -977,35 +988,13 @@ class CFormValidator {
 
 		$error = '';
 
-		[$class_name, $class_options, $more_options] = $rules['use'] + [1 => null, 2 => []];
+		$class = $rules['use'][0];
 
-		switch ($class_name) {
-			case 'CRegexValidator':
-				$class_options = $class_options ?: [
-					'messageInvalid' => _('invalid regular expression'),
-					'messageRegex' => _('invalid regular expression')
-				];
-				break;
+		if (is_subclass_of($class, CParser::class)) {
+			self::validateUseCParser($rules['use'], $class, $value, $error);
 		}
-
-		$instance = $class_options
-			? new $class_name($class_options)
-			: new $class_name();
-
-		if ($instance instanceof CParser) {
-			if (in_array($instance->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
-				$error = $instance->getError();
-
-				// Some parsers may return empty string as error.
-				if ($error === '') {
-					$error = _('Invalid string.');
-				}
-			}
-		}
-		elseif ($instance instanceof CValidator) {
-			if ($instance->validate($value) === false) {
-				$error = $instance->getError() ?? _('Invalid string.');
-			}
+		elseif (is_subclass_of($class, CValidator::class)) {
+			self::validateUseCValidator($rules['use'], $class, $value, $error);
 		}
 		else {
 			throw new Exception('Method not found', -32601);
@@ -1020,31 +1009,46 @@ class CFormValidator {
 		}
 		$error = ucfirst($error);
 
-		// Parser specific checks not supported by parser itself.
-		if ($error === '') {
-			if ($instance instanceof CAbsoluteTimeParser) {
-				if (array_key_exists('min', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['min']));
-				}
+		return $error === '';
+	}
 
-				if (array_key_exists('max', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
-				}
-			}
-			elseif ($instance instanceof CSimpleIntervalParser) {
-				if (array_key_exists('min', $more_options) && timeUnitToSeconds($value, true) < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', $more_options['min']);
-				}
+	private static function validateUseCParser(array $use, string $parser_class, string $value, string &$error): void {
+		$parser_args = array_key_exists(1, $use) ? $use[1] : [];
 
-				if (array_key_exists('max', $more_options) && timeUnitToSeconds($value, true) > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', $more_options['max']);
-				}
+		$parser = $parser_args
+			? new $parser_class($parser_args)
+			: new $parser_class();
+
+		if (in_array($parser->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
+			$error = $parser->getError();
+
+			// Some parsers may return empty string as error.
+			if ($error === '') {
+				$error = _('Invalid string.');
 			}
 		}
+	}
 
-		return $error === '';
+	private static function validateUseCValidator(array $use, string $validator_class, string $value, string &$error)
+			: void {
+		$validator_args = array_key_exists(1, $use) ? $use[1] : [];
+
+		switch ($validator_class) {
+			case CRegexValidator::class:
+				$validator_args = $validator_args ?: [
+					'messageInvalid' => _('invalid regular expression'),
+					'messageRegex' => _('invalid regular expression')
+				];
+				break;
+		}
+
+		$validator = $validator_args
+			? new $validator_class($validator_args)
+			: new $validator_class();
+
+		if ($validator->validate($value) === false) {
+			$error = $validator->getError() ?? _('Invalid string.');
+		}
 	}
 
 	/**
@@ -1067,8 +1071,18 @@ class CFormValidator {
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
-			foreach ($rule_sets as $rule_set) {
-				$this->validateField($rule_set, $value, $field, $path.'/'.$field);
+			if (count($rule_sets) > 0) {
+				$validated = false;
+
+				foreach ($rule_sets as $rule_set) {
+					if ($this->validateField($rule_set, $value, $field, $path.'/'.$field)) {
+						$validated = true;
+					}
+				}
+
+				if (!$validated) {
+					unset($value[$field]);
+				}
 			}
 		}
 
@@ -1154,17 +1168,19 @@ class CFormValidator {
 
 		$array_values = array_filter($array_values, fn ($value) => !is_null($value));
 
+		if (array_key_exists('field', $rules)) {
+			foreach (array_keys($array_values) as $index) {
+				if (!$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index)) {
+					unset($array_values[$index]);
+				}
+			}
+			unset($value);
+		}
+
 		if (array_key_exists('not_empty', $rules) && count($array_values) == 0) {
 			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
-		}
-
-		if (array_key_exists('field', $rules)) {
-			foreach (array_keys($array_values) as $index) {
-				$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index);
-			}
-			unset($value);
 		}
 
 		return true;
@@ -1187,7 +1203,7 @@ class CFormValidator {
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
-				if (in_array($entry, $unique_values)) {
+				if (in_array($entry, $unique_values, true)) {
 					$value = implode(', ', array_map(fn ($k, $v) => $k.'='.$v, array_keys($entry), $entry));
 					$error = self::getMessage($rules, 'uniq', _s('Entry "%1$s" is not unique.', $value));
 					$path = $path.'/'.$key.'/'.$field_names[0];
@@ -1202,9 +1218,44 @@ class CFormValidator {
 		return true;
 	}
 
+	/**
+	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 *
+	 * @param string $api
+	 * @param array $options
+	 * @param string|null $exclude_primary_id
+	 * @return bool
+	 */
+	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['output'] = [];
+		$options['preservekeys'] = true;
+		$auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => CWebUser::$data['sessionid']
+		];
+
+		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, $auth);
+
+		if ($response->errorCode) {
+			throw new Exception($response->errorMessage);
+		}
+
+		$result = $response->data;
+
+		if ($result) {
+			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
+
+			if (count($matches) > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
-		[$api, $method] = explode('.', $method);
+		[$api] = explode('.', $method);
 
 		$field_path = null;
 
@@ -1229,34 +1280,17 @@ class CFormValidator {
 			return true;
 		}
 
-		$parameters = [
-			'output' => [],
-			'filter' => $parameters,
-			'preservekeys' => true
-		];
-
-		$auth = [
-			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
-			'auth' => CWebUser::$data['sessionid']
-		];
-
-		$response = API::getWrapper()->getClient()->callMethod($api, $method, $parameters, $auth);
-
-		if ($response->errorCode) {
-			throw new Exception($response->errorMessage);
-		}
-
-		$result = $response->data;
-
 		if ($exclude_id !== null) {
 			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
 
-			if ($exclude_id_field_data['type'] === 'id') {
-				unset($result[$exclude_id_field_data['value']]);
-			}
+			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
 
-		if (count($result)) {
+		$parameters = [
+			'filter' => $parameters
+		];
+
+		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
 
 			if ($path === '') {
@@ -1448,19 +1482,27 @@ class CFormValidator {
 	/**
 	 * Check if given value matches one of values inside $rules['in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array  	  $rules
+	 * @param array 	  $rules['in']  (optional)
+	 * @param string	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
-			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
+	private static function checkStringIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('in', $rules)) {
+			$allowed = array_map('strval', $rules['in']);
 
-			return false;
+			if (!in_array($value, $allowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $allowed));
+				$error = _n(
+					'This value must be %1$s.',
+					'This value must be one of %1$s.',
+					$values, count($allowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1469,19 +1511,27 @@ class CFormValidator {
 	/**
 	 * Check if given value is not one of values inside $rules['not_in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['not_in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array		  $rules
+	 * @param array		  $rules['not_in']  (optional)
+	 * @param string 	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
-			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
+	private static function checkStringNotIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('not_in', $rules)) {
+			$disallowed = array_map('strval', $rules['not_in']);
 
-			return false;
+			if (in_array($value, $disallowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $disallowed));
+				$error = _n(
+					'This value cannot be %1$s.',
+					'This value cannot be one of %1$s.',
+					$values, count($disallowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1645,10 +1695,6 @@ class CFormValidator {
 	 * depth. This is a helper function for resolveWhenFields.
 	 */
 	private function scanObject(array $rules, $data, string $path): void {
-		if (!is_array($data)) {
-			return;
-		}
-
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
 				foreach ($api_check[1] as $param) {
@@ -1670,7 +1716,7 @@ class CFormValidator {
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
-			$field_data = array_key_exists($field, $data) ? $data[$field] : null;
+			$field_data = is_array($data) && array_key_exists($field, $data) ? $data[$field] : null;
 
 			foreach ($rule_sets as $rule_set) {
 				$this->checkField($rule_set, $field_data, $path.'/'.$field);
@@ -1688,11 +1734,11 @@ class CFormValidator {
 			}
 		}
 
-		if (!$data || !is_array($data)) {
-			return;
-		}
-
 		if ($rule_set['type'] === 'objects') {
+			if (!$data || !is_array($data)) {
+				return;
+			}
+
 			foreach ($data as $field => $value) {
 				$this->scanObject($rule_set, $value, $rule_path.'/'.$field);
 			}

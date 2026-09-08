@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,6 +108,11 @@ ZBX_PTR_VECTOR_IMPL(tag_filter_ptr, zbx_tag_filter_t*)
 
 ZBX_PTR_VECTOR_DECL(db_escalation_ptr, zbx_db_escalation*)
 ZBX_PTR_VECTOR_IMPL(db_escalation_ptr, zbx_db_escalation*)
+
+static void	db_escalation_free(zbx_db_escalation *de)
+{
+	zbx_free(de);
+}
 
 static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 {
@@ -1250,11 +1255,12 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				/* selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
+				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid"
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" from opcommand o,hosts_groups hg,hosts h,scripts s"
+				" from opcommand o,hosts_groups hg,scripts s,hosts h"
+					" left join host_proxy hp on h.hostid=hp.hostid"
 				" where o.operationid=" ZBX_FS_UI64
 					" and o.scriptid=s.scriptid"
 					" and hg.hostid=h.hostid"
@@ -1278,10 +1284,11 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid"
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,hosts h,scripts s"
+			" from opcommand o,opcommand_hst oh,scripts s,hosts h"
+				" left join host_proxy hp on h.hostid=hp.hostid"
 			" where o.operationid=oh.operationid"
 				" and o.scriptid=s.scriptid"
 				" and oh.hostid=h.hostid"
@@ -1298,7 +1305,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				",0,2,null,null");
 #endif
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				",null,null,null,null,0");
+				",null,null,null,null,0,null");
 	if (EVENT_SOURCE_SERVICE == event->source)
 	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -1446,6 +1453,9 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 				ZBX_STR2UCHAR(host.monitored_by, row[22 + ZBX_IPMI_FIELDS_NUM]);
+
+				if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+					ZBX_DBROW2UINT64(host.proxyid, row[23 + ZBX_IPMI_FIELDS_NUM]);
 			}
 		}
 
@@ -2790,6 +2800,11 @@ zbx_escalation_diff_t;
 ZBX_PTR_VECTOR_DECL(escalation_diff_ptr, zbx_escalation_diff_t*)
 ZBX_PTR_VECTOR_IMPL(escalation_diff_ptr, zbx_escalation_diff_t*)
 
+static void	escalation_diff_free(zbx_escalation_diff_t *ed)
+{
+	zbx_free(ed);
+}
+
 #define ZBX_DIFF_ESCALATION_UNSET			__UINT64_C(0x0000)
 #define ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK		__UINT64_C(0x0001)
 #define ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP		__UINT64_C(0x0002)
@@ -3100,6 +3115,11 @@ static void	service_role_clean(zbx_service_role_t *role)
 	zbx_vector_uint64_destroy(&role->serviceids);
 }
 
+static void	service_role_clean_wrapper(void *data)
+{
+	service_role_clean((zbx_service_role_t*)data);
+}
+
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalation_ptr_t *escalations,
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
 		const char *default_timezone, int config_timeout, int config_trapper_timeout,
@@ -3130,7 +3150,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_db_service_create(&services);
 
 	zbx_hashset_create_ext(&service_roles, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_role_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_role_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
@@ -3445,7 +3465,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 out:
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, (void (*)(zbx_escalation_diff_t *))zbx_ptr_free);
+	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, escalation_diff_free);
 	zbx_vector_escalation_diff_ptr_destroy(&diffs);
 
 	zbx_vector_db_action_ptr_clear_ext(&actions, free_db_action);
@@ -3650,8 +3670,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 					&actionids, default_timezone, config_timeout, config_trapper_timeout,
 					config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
-			zbx_vector_db_escalation_ptr_clear_ext(&escalations,
-					(void (*)(zbx_db_escalation *))zbx_ptr_free);
+			zbx_vector_db_escalation_ptr_clear_ext(&escalations, db_escalation_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
 			zbx_vector_uint64_clear(&problem_eventids);
@@ -3666,7 +3685,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 				&actionids, default_timezone, config_timeout, config_trapper_timeout,
 				config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
-		zbx_vector_db_escalation_ptr_clear_ext(&escalations, (void (*)(zbx_db_escalation *))zbx_ptr_free);
+		zbx_vector_db_escalation_ptr_clear_ext(&escalations, db_escalation_free);
 	}
 
 	zbx_vector_db_escalation_ptr_destroy(&escalations);

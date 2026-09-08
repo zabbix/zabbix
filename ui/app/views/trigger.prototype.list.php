@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -191,7 +191,7 @@ foreach ($data['triggers'] as $trigger) {
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status_toggle->addClass(triggerIndicatorStyle($trigger['status'])),
 		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-		$data['tags'][$triggerid]
+		(new CDiv($data['tags'][$triggerid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

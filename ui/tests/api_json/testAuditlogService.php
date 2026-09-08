@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,6 +40,11 @@ class testAuditlogService extends testAuditlogCommon {
 	 * Created service problems tag ID (before update).
 	 */
 	protected static $problem_tagid;
+
+	/**
+	 * Resource type Service
+	 */
+	const RESOURCE_TYPE = 18;
 
 	public function testAuditlogService_Create() {
 		$create = $this->call('service.create', [
@@ -114,7 +119,7 @@ class testAuditlogService extends testAuditlogCommon {
 			'service.serviceid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -192,7 +197,7 @@ class testAuditlogService extends testAuditlogCommon {
 					=> ['add', $upd_problem_tagid['service_problem_tagid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -200,6 +205,6 @@ class testAuditlogService extends testAuditlogCommon {
 	 */
 	public function testAuditlogService_Delete() {
 		$this->call('service.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Update service audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Update service audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

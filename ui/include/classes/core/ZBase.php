@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -569,7 +569,10 @@ class ZBase {
 			throw new Exception(_('Session initialization error.'));
 		}
 
-		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		if (CSessionHelper::get('sessionid') !== CWebUser::$data['sessionid']) {
+			CSessionHelper::unset(['saml_data']);
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		}
 
 		if (CWebUser::isAutologinEnabled()) {
 			$session->lifetime = time() + SEC_PER_MONTH;

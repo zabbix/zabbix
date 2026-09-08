@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1591,7 +1591,22 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CONFIG_REVISION, dc_revision.config);
 
+#ifdef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, j->buffer);
+#else
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		{
+			char	*log_json;
+
+			if (NULL != (log_json = zbx_sanitize_proxyconfig_json(j->buffer)))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, log_json);
+				zbx_free(log_json);
+			}
+			else
+				zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: invalid JSON", __func__);
+		}
+#endif
 	}
 	else
 	{

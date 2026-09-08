@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -987,7 +987,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 		start = time_start / 60;
 		end = time_end / 60;
 
-		tm = localtime(&time_start);
+		tm = zbx_localtime(&time_start, NULL);
 		dst_start = tm->tm_isdst;
 
 		while (end > start + 1)
@@ -995,7 +995,7 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
 			mid = (start + end) / 2;
 			time_mid = mid * 60;
 
-			tm = localtime(&time_mid);
+			tm = zbx_localtime(&time_mid, NULL);
 
 			if (tm->tm_isdst == dst_start)
 				start = mid;
@@ -1419,14 +1419,14 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 		}
 		while (-1 == (current_nextcheck = mktime(&tm)));
 
-		tm_dst = *(localtime(&current_nextcheck));
+		tm_dst = *(zbx_localtime(&current_nextcheck, NULL));
 		if (tm_dst.tm_isdst != tm_start.tm_isdst)
 		{
 			int	dst = tm_dst.tm_isdst;
 			time_t	time_dst;
 
 			time_dst = scheduler_find_dst_change(now, current_nextcheck);
-			tm_dst = *localtime(&time_dst);
+			tm_dst = *zbx_localtime(&time_dst, NULL);
 
 			scheduler_apply_day_filter(interval, &tm_dst);
 			scheduler_apply_hour_filter(interval, &tm_dst);
@@ -1686,12 +1686,11 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
  ******************************************************************************/
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time)
 {
-	struct tm	*tm;
+	struct tm	tm;
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	if (NULL == (tm = localtime(&yesterday)))
-		return -1;
+	tm = *zbx_localtime(&yesterday, NULL);	/* zbx_tm_(add/sub) should call zbx_localtime again */
 
 	tm_sec = start_time % 60;
 	start_time /= 60;
@@ -1702,36 +1701,37 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	do
 	{
 		/* handle midnight startup times */
-		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
-			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+		if (0 == tm.tm_sec && 0 == tm.tm_min && 0 == tm.tm_hour)
+			zbx_tm_add(&tm, 1, ZBX_TIME_UNIT_DAY);
 
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_YEAR);
 				break;
 			case ZBX_REPORT_CYCLE_MONTHLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_MONTH);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
 				if (0 == weekdays)
 					return -1;
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_DAY);
 
-				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
-					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+				while (0 == (weekdays & (1 << (tm.tm_wday + 6) % 7)))
+					zbx_tm_add(&tm, 1, ZBX_TIME_UNIT_DAY);
 
 				break;
 			case ZBX_REPORT_CYCLE_DAILY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_DAY);
 				break;
 		}
 
-		tm->tm_sec = tm_sec;
-		tm->tm_min = tm_min;
-		tm->tm_hour = tm_hour;
+		tm.tm_sec = tm_sec;
+		tm.tm_min = tm_min;
+		tm.tm_hour = tm_hour;
+		tm.tm_isdst = -1;	/* we don't know DST state after the time change */
 
-		nextcheck = (int)mktime(tm);
+		nextcheck = (int)mktime(&tm);
 	}
 	while (-1 != nextcheck && nextcheck <= now);
 

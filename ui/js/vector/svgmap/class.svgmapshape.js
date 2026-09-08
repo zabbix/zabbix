@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -91,10 +91,11 @@ class SVGMapShape {
 			}
 		];
 
-		mapping.forEach((map) => {
-			const color = `#${options[map.key].toString().trim()}`;
+		mapping.forEach(({ key, value }) => {
+			const raw_color = options[key]?.trim();
+			const color = raw_color ? `#${raw_color}` : null;
 
-			attributes[map.value] = isColorHex(color) ? color : 'none';
+			attributes[value] = isColorHex(color) ? color : 'none';
 		});
 
 		if (options.border_width !== undefined) {

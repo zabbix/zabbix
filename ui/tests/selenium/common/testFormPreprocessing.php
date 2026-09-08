@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1524,7 +1524,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
 					],
 					'inline_errors' => [
-						'id:preprocessing_0_params_0' => 'Seconds: Value must be one of 1-788400000.'
+						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
@@ -1540,7 +1540,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
 					],
 					'inline_errors' => [
-						'id:preprocessing_0_params_0' => 'Seconds: Value must be one of 1-788400000.'
+						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
@@ -3162,7 +3162,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 		else {
 			if (array_key_exists('inline_errors', $data) && !$lld) {
-				COverlayDialogElement::find(0)->waitUntilReady();
+				$overlay = COverlayDialogElement::find(0)->waitUntilReady()->one();
+				$overlay->getFooter()->query('button:Add')->one()->waitUntilClassesNotPresent('is-loading');
+
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 			else {
@@ -4126,7 +4128,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
 						],
@@ -4260,7 +4262,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Hint is present only for Items and Item prototypes.
 		if (!$lld) {
 			$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilReady();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->one()->waitUntilReady();
 			$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
 					" It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.".
 					"\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".

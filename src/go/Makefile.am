@@ -20,6 +20,7 @@ AGENT_GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 WEBSERVICE_GOLDFLAGS = ${GOLDFLAGS}
 WEBSERVICE_GOLDFLAGS += -X main.applicationName=zabbix_web_service
+WEBSERVICE_GOLDFLAGS += -X main.confDefault=${WEBSERVICE_CONFIG_FILE}
 
 if HAVE_PCRE2
 AGENT_GOTAGS = pcre2
@@ -63,6 +64,7 @@ clean: clean-go-build clean-sbom
 
 clean-go-build:
 	-$(GO) clean ./...
+	-$(GO) clean -cache
 	-rm -f bin/mock_server
 	-rm -f bin/zabbix_agent2
 	-rm -f bin/zabbix_web_service

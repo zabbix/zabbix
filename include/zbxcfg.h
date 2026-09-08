@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,6 +40,7 @@
 #define	ZBX_CFG_ENVVAR_USE	0
 #define	ZBX_CFG_ENVVAR_IGNORE	1
 
+#define ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -53,8 +53,8 @@ class LinkForm {
 					filter: {
 						value_type: allowed_item_value_types
 					},
-					real_hosts: true,
-					resolve_macros: true
+					real_hosts: 1,
+					resolve_macros: 1
 				},
 				popup: {
 					parameters: {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,9 +36,15 @@ if ($data['form_refresh'] == 0) {
 }
 
 $url = (new CUrl('host_prototypes.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('context', $data['context']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('hostid', $host_prototype['hostid']);
+}
+
+$url = $url->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
@@ -68,7 +74,7 @@ if ($data['is_discovered_prototype']) {
 	$host_tab->addRow(_('Discovered by'), (new CLink($data['source_link_data']['name'], $discovered_url)));
 }
 
-if ($data['templates']) {
+if ($data['templates'] && $data['form'] !== 'clone') {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
 
@@ -611,7 +617,7 @@ $encryption_tab = (new CFormList('encryption'))
 
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 
-if ($host_prototype['hostid'] != 0) {
+if ($data['form'] === 'update') {
 	$tabs->setFooter(makeFormFooter(
 		(new CSubmit('update', _('Update')))->setEnabled(!$data['is_discovered_prototype']),
 		[
@@ -637,6 +643,8 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

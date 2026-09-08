@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -120,23 +120,25 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, configuration syncer, data sender, browser poller,",
-	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
-	"                                 odbc poller, poller, agent poller, http agent poller,",
-	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
-	"                                 task manager, trapper, unreachable poller, vmware collector)",
+	"                                 (availability manager, browser poller, configuration syncer,",
+	"                                 data sender, discovery manager, history syncer,",
+	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
+	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper,",
+	"                                 unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
 	"      Profiling control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, configuration syncer, data sender, browser poller,",
-	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
-	"                                 odbc poller, poller, agent poller, http agent poller,",
-	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
-	"                                 task manager, trapper, unreachable poller, vmware collector)",
+	"                                 (availability manager, browser poller, configuration syncer,",
+	"                                 data sender, discovery manager, history syncer,",
+	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
+	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                 http agent poller, snmp poller, preprocessing manager,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
+	"                                 vmware collector)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
 	"        scope                    Profiling scope",
@@ -1157,7 +1159,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1564,7 +1566,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			.discovery_open_cb = zbx_discovery_open_proxy,
 			.discovery_close_cb = zbx_discovery_close_proxy,
 			.discovery_find_host_cb = zbx_discovery_find_host_proxy,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_proxy,
 			.discovery_update_host_cb = zbx_discovery_update_host_proxy,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_proxy,
 			.discovery_update_service_cb = zbx_discovery_update_service_proxy,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_proxy,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_proxy
@@ -1942,12 +1946,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -1981,12 +1985,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -2042,7 +2046,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
 				zbx_set_exiting_with_fail();
 				break;

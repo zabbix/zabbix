@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -422,7 +421,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
-		$hint = $this->query('xpath:.//div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 
 		// Assert text.
 		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
@@ -793,7 +792,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],
@@ -1042,7 +1041,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$button = $this->query('button:Expression constructor')->one()->click();
+
 			$constructor = $data['constructor'];
 			// TODO: If after DEV-4259 inline validation will cover all errors, the TEST_BAD case will not be required.
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
@@ -1050,6 +1050,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
+				$button->waitUntilNotVisible();
 				$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='and_expression']");
@@ -1088,7 +1089,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$dialog_footer->query('button:Add')->one()->click();
+			$dialog_footer->query('button:Add')->waitUntilClickable()->one()->click();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype added');
@@ -1243,10 +1244,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$form->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

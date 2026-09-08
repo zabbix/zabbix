@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,8 +96,8 @@ class testFormFilter extends CWebTest {
 		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
-		// Checking if home tab is selected.
-		if ($filter->getSelectedTabName() !== 'Home') {
+		// Checking if default filter tab is selected.
+		if ($filter->getSelectedTabName() !== 'Default filter tab') {
 			$filter->selectTab();
 			$this->page->waitUntilReady();
 		}
@@ -262,8 +262,8 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
-		// Checking if home tab is selected.
-		if ($filter->getSelectedTabName() !== 'Home') {
+		// Checking if Default filter tab is selected.
+		if ($filter->getSelectedTabName() !== 'Default filter tab') {
 			$filter->selectTab();
 			$this->page->waitUntilReady();
 		}

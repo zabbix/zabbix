@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -174,7 +174,6 @@
 						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('filter_set', 1);
 
 						event.setRedirectUrl(url.href);
 					}
@@ -205,7 +204,6 @@
 					let list_url = new Curl('host_discovery.php');
 
 					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}

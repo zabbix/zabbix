@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,13 +72,6 @@ foreach ($data['items'] as $item) {
 		$data['allowed_ui_conf_templates']
 	);
 
-	$item_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'item.edit')
-		->setArgument('context', $data['context'])
-		->setArgument('itemid', $item['itemid'])
-		->getUrl();
-
 	if ($item['discoveryRule']) {
 		$name[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
@@ -96,7 +89,14 @@ foreach ($data['items'] as $item) {
 			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$name[] = (new CLink($item['master_item']['name'], $item_url))
+			$name[] = (new CLink($item['master_item']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.edit')
+					->setArgument('context', $data['context'])
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL);
 		}
@@ -104,7 +104,14 @@ foreach ($data['items'] as $item) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = new CLink($item['name'], $item_url);
+	$name[] = new CLink($item['name'],
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'item.edit')
+			->setArgument('context', $data['context'])
+			->setArgument('itemid', $item['itemid'])
+			->getUrl()
+	);
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -230,7 +237,7 @@ foreach ($data['items'] as $item) {
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
-		$data['tags'][$item['itemid']],
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$info_cell
 	];
 
@@ -338,7 +345,8 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostid' => $data['hostid'],
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+		'filter_values' => $data['filter_values']
 	]).');
 '))
 	->setOnDocumentReady()

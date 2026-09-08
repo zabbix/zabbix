@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,7 @@ class CWidgetFieldItemSections extends CWidgetField {
 
 	public const SECTION_DESCRIPTION = 0;
 	public const SECTION_ERROR_TEXT = 1;
-	public const SECTION_METRICS = 2;
+	public const SECTION_INTERVAL_AND_STORAGE = 2;
 	public const SECTION_LATEST_DATA = 3;
 	public const SECTION_TYPE_OF_INFORMATION = 4;
 	public const SECTION_TRIGGERS = 5;
@@ -42,7 +42,7 @@ class CWidgetFieldItemSections extends CWidgetField {
 			->setValidationRules(['type' => API_INTS32, 'flags' => API_NORMALIZE, 'uniq' => true, 'in' => implode(',', [
 				self::SECTION_DESCRIPTION,
 				self::SECTION_ERROR_TEXT,
-				self::SECTION_METRICS,
+				self::SECTION_INTERVAL_AND_STORAGE,
 				self::SECTION_LATEST_DATA,
 				self::SECTION_TYPE_OF_INFORMATION,
 				self::SECTION_TRIGGERS,

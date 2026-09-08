@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,7 +43,7 @@ class CControllerOauthAuthorize extends CController {
 		$result = $curl_status['result'] == CFrontendSetup::CHECK_OK;
 
 		if (!$result) {
-			error($curl_status['error']);
+			error($curl_status['error'], true);
 		}
 
 		return $result;
@@ -53,22 +53,49 @@ class CControllerOauthAuthorize extends CController {
 		$state = json_decode(base64_decode($state), true);
 
 		if (!is_array($state)) {
-			error(_('Invalid request.'));
+			error(_('Invalid request.'), true);
 
 			return false;
 		}
 
-		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url']);
+		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url', 'sign']);
 		$result = !array_diff_key($mandatory_all, $state);
 
 		$mandatory_one = array_flip(['mediatypeid', 'client_secret']);
 		$result = $result && array_intersect_key($mandatory_one, $state);
 
 		if (!$result) {
-			error(_('Invalid request.'));
+			error(_('Invalid request.'), true);
+
+			return false;
 		}
 
-		return $result;
+		if (!array_key_exists('client_secret', $state)) {
+			$db_mediatype_token_url = (bool) API::MediaType()->get([
+				'output' => ['token_url'],
+				'mediatypeids' => [$state['mediatypeid']],
+				'search' => ['token_url' => $state['token_url']],
+				'startSearch' => true
+			]);
+
+			if (!$db_mediatype_token_url) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')), true);
+
+				return false;
+			}
+		}
+
+		$state_sign = $state['sign'];
+		unset($state['sign']);
+		$sign = CEncryptHelper::sign(json_encode($state));
+
+		if (!CEncryptHelper::checkSign($state_sign, $sign)) {
+			error(_('Invalid request.'), true);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -102,7 +129,8 @@ class CControllerOauthAuthorize extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'tokens' => $this->exchangeCodeToTokens($token_url, $data)
+			'tokens' => $this->exchangeCodeToTokens($token_url, $data),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		]));
 	}
 
@@ -111,10 +139,9 @@ class CControllerOauthAuthorize extends CController {
 	 *
 	 * @param array $oauth  OAuth data to be sent.
 	 *
-	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token'.
+	 * @return array of 'tokens_status', 'access_token', 'access_expires_in' and 'refresh_token' or empty array on error.
 	 */
 	protected function exchangeCodeToTokens(string $token_url, array $data): array {
-		$result = [];
 		$handle = curl_init();
 		$curl_options = [
 			CURLOPT_URL => $token_url,
@@ -123,38 +150,48 @@ class CControllerOauthAuthorize extends CController {
 			CURLOPT_POSTFIELDS => http_build_query($data),
 			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
 			CURLOPT_TIMEOUT => 30,
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2
 		];
+
+		if (defined('CURLOPT_PROTOCOLS_STR')) {
+			$curl_options[CURLOPT_PROTOCOLS_STR] = 'https,http';
+			$curl_options[CURLOPT_REDIR_PROTOCOLS_STR] = 'https,http';
+		}
+		else {
+			$curl_options[CURLOPT_PROTOCOLS] = CURLPROTO_HTTPS | CURLPROTO_HTTP;
+			$curl_options[CURLOPT_REDIR_PROTOCOLS] = CURLPROTO_HTTPS | CURLPROTO_HTTP;
+		}
 
 		curl_setopt_array($handle, $curl_options);
 
 		$raw_response = curl_exec($handle);
 
 		if (curl_errno($handle)) {
-			CMessageHelper::setErrorTitle(_('CURL Error'));
-			CMessageHelper::addError(curl_error($handle));
-			curl_close($handle);
+			error(curl_error($handle), true);
 
-			return $result;
+			return [];
 		}
 
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-		curl_close($handle);
 
 		if ($http_code != 200) {
-			CMessageHelper::setErrorTitle(_('Unexpected HTTP response status code.'));
+			error(_('Unexpected HTTP response status code.'), true);
+			error(_('Response')."\n".$raw_response, true);
 
-			return $result + ['raw_response' => $raw_response];
+			return [];
 		}
 
 		$response = json_decode($raw_response, true);
 		$mandatory_all = array_flip(['access_token', 'refresh_token', 'expires_in']);
 
 		if (!is_array($response) || array_diff_key($mandatory_all, $response)) {
-			CMessageHelper::setErrorTitle(_('OAuth response missing mandatory fields.'));
+			error(_('OAuth response missing mandatory fields.'), true);
+			error(_('Response')."\n".$raw_response, true);
 
-			return $result + ['raw_response' => $raw_response];
+			return [];
 		}
 
 		return [

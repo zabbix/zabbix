@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,6 +55,7 @@ require_once dirname(__FILE__).'/testHostImport.php';
 require_once dirname(__FILE__).'/testHostInventory.php';
 require_once dirname(__FILE__).'/testHostPrototype.php';
 require_once dirname(__FILE__).'/testHostPrototypeInventory.php';
+require_once dirname(__FILE__).'/testHousekeeping.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testItem.php';
 require_once dirname(__FILE__).'/testItemPrototype.php';
@@ -136,6 +137,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testHostInventory');
 		$suite->addTestSuite('testHostPrototype');
 		$suite->addTestSuite('testHostPrototypeInventory');
+		$suite->addTestSuite('testHousekeeping');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');
 		$suite->addTestSuite('testItemPrototype');

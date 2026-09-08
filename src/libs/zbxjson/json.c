@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -61,7 +61,7 @@ void	zbx_set_json_strerror(const char *fmt, ...)
 
 static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 {
-	int	realloc = 0;
+	int	realloc_json = 0;
 
 	if (NULL == j->buffer)
 	{
@@ -84,10 +84,10 @@ static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 			j->buffer_allocated = 1024;
 		else
 			j->buffer_allocated *= 2;
-		realloc = 1;
+		realloc_json = 1;
 	}
 
-	if (1 == realloc)
+	if (1 == realloc_json)
 	{
 		if (j->buffer == j->buf_stat)
 		{

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,13 +74,13 @@ window.graph_edit_popup = new class {
 
 		document.getElementById('items-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-name')) {
-				this.#openItemPopup(e.target);
+				this.#openEditItemPopup(e.target);
 			}
 			else if (e.target.classList.contains('js-add-item')) {
-				this.#openItemSelectPopup();
+				this.#openAddItemPopup();
 			}
 			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup({writeonly: '1', multiselect: '1', graphtype: this.graph_type});
+				this.#openAddItemPopup(true);
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeItem(e.target);
@@ -311,75 +311,89 @@ window.graph_edit_popup = new class {
 	}
 
 	#recalculateSortOrder() {
-		document.querySelectorAll('#items-table tbody tr.graph-item [id]').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
 		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
-			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
+			row.id = row.id.replace(/\d+/, `${index}`);
 
-			row.querySelectorAll('[id]').forEach(element => {
-				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
+			row.querySelectorAll('input, z-select').forEach(input => {
+				input.id = input.id.replace(/\d+/, `${index}`);
+				input.name = input.name.replace(/\d+/, `${index}`);
 
-				if (element.id.includes('sortorder')) {
-					element.value = index;
+				if (input.name.includes('[sortorder]')) {
+					input.value = index;
 				}
 			});
 
-			row.querySelectorAll('[name]').forEach(element => {
-				element.name = element.name.replace(/\d+/, `${index}`);
-			});
-		}
+			const color_picker = row.querySelector('z-color-picker');
+			color_picker.setAttribute('color-field-name', color_picker.querySelector('input').name);
 
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
-			const remove_element = document.getElementById('items_' + index + '_remove');
+			const color_picker_button = color_picker.querySelector('button');
+			color_picker_button.id = color_picker_button.id.replace(/\d+/, `${index}`);
+
+			const item_name_field = row.querySelector('.js-item-name');
+			item_name_field.id = item_name_field.id.replace(/\d+/, `${index}`)
+
+			const remove_element = row.querySelector('.js-remove');
 
 			if (remove_element) {
-				remove_element.setAttribute('data-remove', index);
+				remove_element.id = remove_element.id.replace(/\d+/, `${index}`);
+				remove_element.dataset.remove = index;
 			}
-		});
+		}
 	}
 
-	#openItemPopup(target) {
+	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
+		const is_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+		const parameters = this.#getItemPopupParameters(item_num, is_prototype);
+
+		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+	}
+
+	#openAddItemPopup(is_prototype = false) {
+		const parameters = this.#getItemPopupParameters(null, is_prototype);
+
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
+
+	#getItemPopupParameters(item_num = null, is_prototype = false) {
 		const parameters = {
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form_name,
-			dstfld1: 'items_' + item_num + '_itemid',
-			dstfld2: 'items_' + item_num + '_name',
 			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
+			writeonly: 1
 		};
 
-		if (document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-			parameters['srctbl'] = 'item_prototypes';
-			parameters['srcfld3'] = 'flags';
-			parameters['dstfld3'] = 'items_' + item_num + '_flags';
-			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
+		if (item_num === null) {
+			parameters.multiselect = 1;
 		}
 		else {
-			parameters['srctbl'] = 'items';
+			parameters.dstfld1 = 'items_' + item_num + '_itemid';
+			parameters.dstfld2 = 'items_' + item_num + '_name';
 		}
 
-		if (!this.graph.parent_discoveryid && this.graph.hostid) {
-			parameters['hostid'] = this.graph.hostid;
+		if (is_prototype) {
+			parameters.srctbl = 'item_prototypes';
+			parameters.parent_discoveryid = this.graph.parent_discoveryid;
+
+			if (item_num !== null) {
+				parameters.srcfld3 = 'flags';
+				parameters.dstfld3 = 'items_' + item_num + '_flags';
+			}
+		}
+		else {
+			parameters.srctbl = 'items';
 		}
 
 		if (this.graph.is_template) {
-			parameters['only_hostid'] = this.graph.hostid
+			parameters.only_hostid = this.graph.hostid
 		}
 		else {
-			parameters['real_hosts'] = '1';
-			parameters['hostid'] = this.graph.hostid;
+			parameters.real_hosts = 1;
+			parameters.hostid = this.graph.hostid;
 		}
 
-		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
+		return parameters;
 	}
 
 	#removeItem(target) {
@@ -431,25 +445,6 @@ window.graph_edit_popup = new class {
 		$('#item-buttons-row').before($row);
 	}
 
-	#openItemSelectPopup() {
-		const parameters = {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			hostid: this.hostid
-		};
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
-	}
-
 	#openItemPrototypeSelectPopup(popup_parameters = {}) {
 		const parameters = {
 			srctbl: 'item_prototypes',
@@ -461,10 +456,6 @@ window.graph_edit_popup = new class {
 		}
 
 		Object.assign(parameters, popup_parameters);
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}

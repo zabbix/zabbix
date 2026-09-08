@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,12 +69,14 @@ class CControllerQueueDetails extends CController {
 			}
 
 			$hosts = API::Host()->get([
-				'output' => ['proxyid'],
+				'output' => ['proxyid', 'assigned_proxyid'],
 				'hostids' => array_unique(array_column($items, 'hostid')),
 				'preservekeys' => true
 			]);
 
-			$proxyids = array_flip(array_column($hosts, 'proxyid'));
+			$proxyids = array_flip(array_merge(array_column($hosts, 'proxyid'),
+				array_column($hosts, 'assigned_proxyid'))
+			);
 			unset($proxyids[0]);
 
 			$proxies = $proxyids

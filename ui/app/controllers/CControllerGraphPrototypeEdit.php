@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,7 +55,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'discover' =>			'db graphs.discover|in '.implode(',', [
 				ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER
 			]),
-			'normal_only' =>		'in 1',
 			'clone' =>				'in 1',
 			'visible' =>			'array'
 		];
@@ -118,7 +117,6 @@ class CControllerGraphPrototypeEdit extends CController {
 			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
 			'hostid' => $this->parent_discovery['hostid'],
 			'context' => $this->getInput('context'),
-			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => $this->getInput('readonly', 0),
 			'discovered' => false,
 			'is_discovered_prototype' => false

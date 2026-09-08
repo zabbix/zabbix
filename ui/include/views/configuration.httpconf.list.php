@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -158,9 +158,9 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
+			->setArgument('context', $data['context'])
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
-			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
@@ -213,13 +213,12 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status'])),
-		$data['tags'][$httpTest['httptestid']],
+		(new CDiv($data['tags'][$httpTest['httptestid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
@@ -265,6 +264,8 @@ $httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptesti
 $html_page
 	->addItem($httpForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -333,6 +333,39 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 		$sortedItems[$key] = $items[$key];
 	}
 	$items = $sortedItems;
+}
+
+/**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return array
+ */
+function filterAndSortThresholds(array $thresholds, bool $is_binary_size = false): array {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	$filtered_thresholds = [];
+
+	foreach ($thresholds as $index => $threshold) {
+		if ($number_parser->parse(trim($threshold['threshold'])) == CParser::PARSE_SUCCESS) {
+			$filtered_thresholds[$index] = ['order_threshold' => $number_parser->calcValue()] + $threshold;
+		}
+	}
+
+	uasort($filtered_thresholds, static fn (array $t1, array $t2) => $t1['order_threshold'] <=> $t2['order_threshold']);
+
+	foreach ($filtered_thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+	unset($threshold);
+
+	return $filtered_thresholds;
 }
 
 /**
@@ -1172,33 +1205,6 @@ function checkTimePeriod($period, $now) {
 	$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
 	return $d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2;
-}
-
-/**
- * Get item minimum delay.
- *
- * @param string $delay
- * @param array $flexible_intervals
- *
- * @return string
- */
-function getItemDelay($delay, array $flexible_intervals) {
-	$delay = timeUnitToSeconds($delay);
-
-	if ($delay != 0 || !$flexible_intervals) {
-		return $delay;
-	}
-
-	$min_delay = SEC_PER_YEAR;
-
-	foreach ($flexible_intervals as $flexible_interval) {
-		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
-
-		$min_delay = min($min_delay, $flexible_delay);
-	}
-
-	return $min_delay;
 }
 
 /**
@@ -2301,9 +2307,7 @@ function getTypeItemFieldNames(array $input): array {
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			return $input['templateid'] == 0
-				? ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay']
-				: ['interfaceid', 'username', 'password', 'delay'];
+			return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_SNMPTRAP:
 			return ['interfaceid'];

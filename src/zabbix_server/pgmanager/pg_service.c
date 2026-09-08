@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -360,6 +360,10 @@ static void	*pg_service_entry(void *data)
 	zbx_timespec_t		timeout = {1, 0};
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
+	int			err;
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

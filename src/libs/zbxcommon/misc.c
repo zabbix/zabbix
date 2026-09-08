@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -82,15 +82,14 @@ const char	*get_program_name(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
+ * Purpose: checks result of calloc()                                         *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to newly allocated memory or terminates    *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	/* old pointer must be NULL */
 	if (NULL != old)
 	{
@@ -108,12 +107,9 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)nmemb, (zbx_fs_size_t)size);
 	}
-	nmemb = MAX(nmemb, 1);
-	size = MAX(size, 1);
 
-	ptr = calloc(nmemb, size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
@@ -124,15 +120,14 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates size bytes of memory                                    *
+ * Purpose: checks result of malloc()                                         *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to newly allocated memory or terminates    *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	/* old pointer must be NULL */
 	if (NULL != old)
 	{
@@ -145,20 +140,17 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	if (0 == size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,
-				"[file:%s,line:%d] zbx_malloc: "
-				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
+				"[file:%s,line:%d] zbx_malloc: allocating 0 bytes. "
 				"Please report this to Zabbix developers.",
-				filename, line, (zbx_fs_size_t)size);
+				filename, line);
 	}
-	size = MAX(size, 1);
 
-	ptr = malloc(size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_malloc: out of memory. "
-			"Requested " ZBX_FS_SIZE_T " bytes.",
+			"Requested " ZBX_FS_SIZE_T " byte(s).",
 			filename, line, (zbx_fs_size_t)size);
 
 	exit(EXIT_FAILURE);
@@ -166,29 +158,24 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: changes the size of the memory block pointed to by old            *
- *          to size bytes                                                     *
+ * Purpose: checks result of realloc()                                        *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to reallocated memory or terminates        *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_realloc2(const char *filename, int line, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	if (0 == size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,
-				"[file:%s,line:%d] zbx_realloc: "
-				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
+				"[file:%s,line:%d] zbx_realloc: reallocating to 0 bytes. "
 				"Please report this to Zabbix developers.",
-				filename, line, (zbx_fs_size_t)size);
+				filename, line);
 	}
-	size = MAX(size, 1);
 
-	ptr = realloc(old, size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
@@ -236,7 +223,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2025 Zabbix SIA\n"
+	"Copyright (C) 2026 Zabbix SIA\n"
 	"License AGPLv3: GNU Affero General Public License version 3 <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -258,7 +245,8 @@ void	zbx_print_version(const char *title_message)
  *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
  *                                                                            *
- * Parameters: hostname - [IN] hostname string to be checked                  *
+ * Parameters: hostname -     [IN] hostname string to be checked              *
+ *             hostname_len - [IN] length of the hostname string              *
  *                                                                            *
  * Return value: SUCCEED - could be a valid hostname,                         *
  *               FAIL - definitely not a valid hostname                       *
@@ -269,7 +257,7 @@ void	zbx_print_version(const char *title_message)
  *         - underscores ('_') allowed in domain name, but not in hostname.   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_validate_hostname(const char *hostname)
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len)
 {
 	int		component;	/* periods ('.') are only allowed when they serve to delimit components */
 	int		len = ZBX_MAX_DNSNAME_LEN;
@@ -280,7 +268,7 @@ int	zbx_validate_hostname(const char *hostname)
 		return FAIL;
 
 	/* check only up to the first 'len' characters, the 1st character is already successfully checked */
-	for (p = hostname + 1, component = 1; '\0' != *p; p++)
+	for (p = hostname + 1, component = 1; p < hostname + hostname_len; p++)
 	{
 		if (0 == --len)				/* hostname too long */
 			return FAIL;
@@ -295,6 +283,27 @@ int	zbx_validate_hostname(const char *hostname)
 	}
 
 	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is a valid internet hostname                      *
+ *                                                                            *
+ * Parameters: hostname - [IN] hostname string to be checked                  *
+ *                                                                            *
+ * Return value: SUCCEED - could be a valid hostname,                         *
+ *               FAIL - definitely not a valid hostname                       *
+ * Comments:                                                                  *
+ *     Validation is not strict. Restrictions not checked:                    *
+ *         - individual label (component) length 1-63,                        *
+ *         - hyphens ('-') allowed only as interior characters in labels,     *
+ *         - underscores ('_') allowed in domain name, but not in hostname.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_hostname(const char *hostname)
+{
+	return zbx_validate_hostname_len(hostname, strlen(hostname));
 }
 
 /******************************************************************************

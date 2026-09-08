@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -560,7 +560,10 @@ func (m *Manager) run() {
 	lastTick := time.Now()
 	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
 run:
 	for {
 		select {

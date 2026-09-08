@@ -33,6 +33,7 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HashiCorp Vault", e.g. {$HTTP.TLS.VERIFY:"HashiCorp Vault"}.</p>|`full`|
 |{$VAULT.API.PORT}|<p>Vault port.</p>|`8200`|
 |{$VAULT.API.SCHEME}|<p>Vault API scheme.</p>|`http`|
 |{$VAULT.HOST}|<p>Vault host name.</p>|`<PUT YOUR VAULT HOST>`|

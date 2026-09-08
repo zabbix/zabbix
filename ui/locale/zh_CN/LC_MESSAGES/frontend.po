@@ -138,6 +138,13 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "%1$s 动作"
 
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -287,6 +294,24 @@ msgstr "%1$s.php 类必须为位于 %3$s 的模块扩展 %2$s。"
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -994,6 +1019,10 @@ msgstr "从主机添加"
 msgid "Add from template"
 msgstr "从模板添加"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "添加主机"
@@ -1016,6 +1045,10 @@ msgstr "添加主机触发器"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "添加监控项"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -2021,6 +2054,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "等待数据"
@@ -2198,6 +2235,13 @@ msgstr "在更改连接加密的预共享密钥（PSK）时，必须同时指定
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "两次密码必须相同。"
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3495,6 +3539,10 @@ msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "在'%4$s'上找不到发现规则原型'%3$s'的监控项原型'%2$s'所使用的值映射'%1$s'"
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "无法获取授权码"
@@ -4023,6 +4071,11 @@ msgstr "无法读取XML： %1$s 。"
 msgid "Cannot read YAML: %1$s."
 msgstr "无法读取YAML: %1$s。"
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4083,6 +4136,10 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "当类型为“总计”的监控项添加到图表时，无法设置“数据集聚合”。"
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4609,6 +4666,10 @@ msgstr "更改客户端密钥"
 msgid "Change indicator"
 msgstr "变化指示器"
 
+#: include/classes/html/CMacroValue.php:243
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -4912,10 +4973,18 @@ msgstr "关闭"
 msgid "Close expression constructor"
 msgstr "关闭表达式构造器"
 
+#: jsLoader.php:416
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "关闭新的事件"
+
+#: include/func.inc.php:1653 jsLoader.php:290
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4941,6 +5010,12 @@ msgstr "校验码长度"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "折叠"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:428
+#: jsLoader.php:460
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -6146,6 +6221,10 @@ msgstr "仪表盘 \"%1$s\" 已经存在。"
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "报表 \"%2$s\"中已使用仪表盘 \"%1$s\"。"
 
+#: app/views/monitoring.dashboard.view.php:97
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6512,6 +6591,10 @@ msgstr "默认访问新的模块"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "默认认证方式"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -7076,6 +7159,10 @@ msgstr "依赖"
 msgid "Dependent item"
 msgstr "相关项目"
 
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
+
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
 #: widgets/trigover/includes/ViewHelper.php:101
@@ -7174,6 +7261,10 @@ msgstr "Web 场景详情"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7990,6 +8081,10 @@ msgstr "编辑"
 msgid "Edit dashboard"
 msgstr "编辑仪表盘"
 
+#: jsLoader.php:597
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "编辑拓扑图"
@@ -8006,6 +8101,10 @@ msgstr "编辑树元素"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "编辑构件"
+
+#: jsLoader.php:242
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8427,6 +8526,14 @@ msgstr "英语(en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数据"
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "输入安装在监控目标上的Zabbix agent的IP/DNS地址和端口"
@@ -8741,6 +8848,10 @@ msgstr "执行确认"
 msgid "Exists"
 msgstr "存在"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8753,6 +8864,12 @@ msgstr "扩展"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "展开宏"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:427
+#: jsLoader.php:459
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9452,6 +9569,10 @@ msgstr "返回首页"
 msgid "Go to last page, %1$s"
 msgstr "跳转到尾页，%1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9466,6 +9587,10 @@ msgstr "跳转到第 %1$s 页"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "跳转到第 %1$s 页，当前页"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12060,10 +12185,21 @@ msgstr "IE浏览器"
 msgid "Interval"
 msgstr "间隔"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "用户角色 \"%1$s\" 的 API 方法 \"%2$s\" 无效。"
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12153,6 +12289,11 @@ msgstr "无效 email 地址 \"%1$s\"。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "媒介类型 ID: \"%1$s\" 的 email 地址无效。"
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12535,6 +12676,11 @@ msgstr "无效的字符串"
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "标签无效 \"%1$s\": %2$s。"
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13428,6 +13574,10 @@ msgstr "Windows 性能计数器的对象实例列表，发现的英文对象名�
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Windows 性能计数器的对象实例列表。返回 JSON"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -14054,6 +14204,11 @@ msgstr "最大重复次数"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "最大重复计数仅适用于自动发现和遍历。"
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "最大缩放级别"
@@ -14083,6 +14238,11 @@ msgstr "最大行数"
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
+
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14423,6 +14583,12 @@ msgstr "所要求的PHP脚本最小解析时间是%1$s (配置项\"max_input_tim
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14621,6 +14787,14 @@ msgstr "严重异常如果下一层都有问题"
 msgid "Most critical of child services"
 msgstr "最重要的子服务"
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -14650,9 +14824,19 @@ msgstr "多重"
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
 msgstr "必须选择"
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14968,6 +15152,10 @@ msgstr "添加LDAP 服务器"
 msgid "New MFA method"
 msgstr "新的MFA方法"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "添加 SLA"
@@ -15160,6 +15348,10 @@ msgstr "下一步"
 msgid "Next dashboard"
 msgstr "下一个仪表板"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15173,6 +15365,10 @@ msgstr "下一页"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "下一步"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15363,6 +15559,11 @@ msgstr "未添加拓扑图."
 msgid "No matches found"
 msgstr "没有找到匹配"
 
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "未发现新模块"
@@ -15421,6 +15622,66 @@ msgstr "没有系统访问权限。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "没有调用“%1$s.%2$s”的权限。"
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16278,6 +16539,11 @@ msgstr "只计算指派给启用的主机的和相依于启用的监控项的触
 msgid "Open URL"
 msgstr "打开网址"
 
+#: app/views/popup.generic.php:436 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:417
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "在新窗口中打开"
@@ -16290,6 +16556,10 @@ msgstr "打开安装说明"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "打开日志"
+
+#: jsLoader.php:243
+msgid "Open widget actions"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -16623,6 +16893,10 @@ msgstr "PHP不支持ctype扩展(PHP配置参数--enable-ctype)."
 msgid "PHP curl"
 msgstr "PHP curl扩展"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl扩展缺失。"
@@ -16914,6 +17188,10 @@ msgstr "父服务"
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
 msgstr "父模板"
+
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -17515,6 +17793,21 @@ msgstr "问题恢复"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "问题已解决"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -18312,6 +18605,10 @@ msgstr "自主机群组移除"
 msgid "Remove from host groups"
 msgstr "自主机群组移除"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "移除主机"
@@ -18319,6 +18616,10 @@ msgstr "移除主机"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "删除主机标签"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18587,6 +18888,11 @@ msgstr "响应代码"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "响应时间"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19475,6 +19781,10 @@ msgstr "选择 SLA 以显示 SLA 报表。"
 msgid "Select a template"
 msgstr "选择模板"
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -19943,6 +20253,18 @@ msgstr "短针"
 msgid "Shortened"
 msgstr "精简"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19966,6 +20288,10 @@ msgstr "查看"
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
 msgstr "显示聚合函数"
+
+#: include/events.inc.php:761
+msgid "Show all tags"
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -20027,6 +20353,10 @@ msgstr "查看线条"
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
 msgstr "显示链接标签"
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
@@ -20877,6 +21207,10 @@ msgstr "交换分区空间大小，字节或从总百分比。从字节返回整
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
@@ -21499,6 +21833,10 @@ msgstr "在授权服务器中注册的客户端标识符"
 msgid "The client secret registered within the authorization server."
 msgstr "在授权服务器中注册的客户端密钥"
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "克隆的主机包含用户定义的“秘密文本”类型的宏。这些宏的值和类型已重置。"
@@ -21589,6 +21927,10 @@ msgstr "进程数。返回整数"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "用户属性中缺少参数“%1$s”。"
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22781,6 +23123,14 @@ msgstr "无法检索 TimescaleDB 压缩支持状态。"
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "无法检索 TimescaleDB 版本。"
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -22855,6 +23205,10 @@ msgstr "撤消问题确认。"
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "意外的HTTP响应状态码"
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -23068,6 +23422,11 @@ msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24513,6 +24872,11 @@ msgstr "告警"
 msgid "Warning message"
 msgstr "告警信息"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "警告！自 Zabbix 7.0 起已弃用对 Oracle DB 的支持，并将在未来版本中删除。"
@@ -24683,6 +25047,10 @@ msgstr "部件配置将被还原"
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "小组件已弃用。"
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25067,6 +25435,10 @@ msgstr "当前所选不能切换模板。"
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "您没有权限来完成此操作."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26098,6 +26470,10 @@ msgstr "描述"
 msgid "directory cannot be empty"
 msgstr "目录不能为空"
 
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
 #, c-format
@@ -26468,6 +26844,11 @@ msgstr "UTF-8中无效的字节排序"
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "无效的数据类型"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -27630,6 +28011,10 @@ msgstr "在此输入搜索"
 msgid "unacceptable URL"
 msgstr "不可用的URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -27867,6 +28252,11 @@ msgstr "值必须介于“%1$s”和“%2$s”之间"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "值必须在'%1$s'到'%2$s'之间，且小数点后不超过'%3$s'位"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "值必须为空"
@@ -27882,6 +28272,16 @@ msgstr[0] "值必须为空或 %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "值必须大于“%1$s”"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

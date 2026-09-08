@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,8 +41,22 @@ class testFormUserMedia extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareMediaTypeData() {
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			]
+		]);
+
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
-				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
+				"'Test script', 'MS Teams Workflow', 'Slack', 'Zendesk')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -114,7 +128,7 @@ class testFormUserMedia extends CWebTest {
 					],
 					'additional media' => [
 						[
-							'Type' => 'MS Teams',
+							'Type' => 'MS Teams Workflow',
 							'Send to' => 'MS Teams channel 666'
 						],
 						[
@@ -231,12 +245,12 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Invalid email address "person @zabbix.com".'
 				]
 			],
-			// Empty MS Teams channel name.
+			// Empty MS Teams Workflow channel name.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'MS Teams',
+						'Type' => 'MS Teams Workflow',
 						'Send to' => ''
 					],
 					'error_message' => 'Incorrect value for field "sendto": cannot be empty.'
@@ -727,7 +741,7 @@ class testFormUserMedia extends CWebTest {
 		// Check the value of the "Send to" field.
 		if (array_key_exists('emails', $data)) {
 			$row->getColumn('Send to')->hoverMouse();
-			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one()->getText();
+			$get_send_to = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilVisible()->one()->getText();
 
 			$media_emails = [];
 			foreach ($data['emails'] as $email) {

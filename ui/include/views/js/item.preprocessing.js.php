@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -209,6 +209,7 @@
 			->setErrorContainer('preprocessing-#{rowNum}-error-container'),
 		(new CCheckBox('preprocessing[#{rowNum}][params_2]', ZBX_PREPROC_CSV_HEADER))
 			->setLabel(_('With header row'))
+			->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 			->setChecked(true)
 	]) ?>
 </script>

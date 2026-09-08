@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,7 +18,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup hosts
@@ -113,8 +112,13 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilVisible()->one();
+
 		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
+
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
@@ -192,7 +196,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
 
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
+			$this->query('id:template_name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
 			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');
@@ -286,10 +290,10 @@ class testFormTemplate extends CLegacyWebTest {
 	public function filterAndOpenTemplate($name) {
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Name')->query('link', $name)->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
 	}
 

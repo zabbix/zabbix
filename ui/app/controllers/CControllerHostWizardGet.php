@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,8 +81,8 @@ class CControllerHostWizardGet extends CController {
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-					'tls_connect', 'tls_accept'
+				'output' => ['hostid', 'host', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+					'ipmi_password', 'tls_connect', 'tls_accept'
 				],
 				'selectHostGroups' => ['groupid'],
 				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip', 'details'],

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1734,7 +1734,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	{
 		if (err_msg)
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": %s.\n", trigger->description, operation_msg, err_msg);
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": %s.\n", operation_msg,
+					trigger->description, err_msg);
 			zbx_free(err_msg);
 		}
 		goto out;

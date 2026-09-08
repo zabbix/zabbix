@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,8 +21,6 @@
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxexpr.h"
-
-#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 {
@@ -170,6 +168,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 
@@ -202,72 +201,16 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids)
 {
 	zbx_uint64_t	checks_count = 0;
-	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
+	char		ip[ZBX_INTERFACE_IP_LEN_MAX], err[MAX_STRING_LEN];
 	unsigned int	uniq_ips_num = 0;
-	int		i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s'", __func__, drule->name);
 
-	/* i = 1 to guarantee at least 1 iprange */
-	for (i = 1; NULL != (start = strchr(start, ',')); i++, start++);
-
-	zbx_vector_iprange_reserve(ipranges, (size_t)i);
-
-	for (start = drule->iprange; '\0' != *start;)
+	if (FAIL == zbx_discovery_process_drule_iprange(drule, ipranges, err, sizeof(err)))
 	{
-		zbx_iprange_t	ipr;
-		int		res, ip_first[ZBX_IPRANGE_GROUPS_V6], z[ZBX_IPRANGE_GROUPS_V6] = {0};
-
-		if (NULL != (comma = strchr(start, ',')))
-			*comma = '\0';
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __func__, start);
-
-		if (SUCCEED == (res = zbx_iprange_parse(&ipr, start)))
-			zbx_iprange_first(&ipr, ip_first);
-
-		if (SUCCEED != res || 0 == memcmp(ip_first, z, sizeof(int) *
-				(ZBX_IPRANGE_V4 == ipr.type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6)))
-		{
-			char	err[MAX_STRING_LEN];
-
-			zbx_snprintf(err, sizeof(err), "Wrong format of IP range \"%s\"", start);
-			discoverer_queue_append_error(drule_errors, drule->druleid, err);
-			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto out;
-		}
-
-		if (ZBX_DISCOVERER_IPRANGE_LIMIT < zbx_iprange_volume(&ipr))
-		{
-			char	err[MAX_STRING_LEN];
-
-			zbx_snprintf(err, sizeof(err), "IP range \"%s\" exceeds %d address limit", start,
-					ZBX_DISCOVERER_IPRANGE_LIMIT);
-			discoverer_queue_append_error(drule_errors, drule->druleid, err);
-			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto out;
-		}
-#ifndef HAVE_IPV6
-		if (ZBX_IPRANGE_V6 == ipr.type)
-		{
-			char	err[MAX_STRING_LEN];
-
-			zbx_snprintf(err, sizeof(err), "Encountered IP range \"%s\","
-					" but IPv6 support not compiled in", start);
-			discoverer_queue_append_error(drule_errors, drule->druleid, err);
-			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto out;
-		}
-#endif
-		zbx_vector_iprange_append(ipranges, ipr);
-
-		if (NULL != comma)
-		{
-			*comma = ',';
-			start = comma + 1;
-		}
-		else
-			break;
+		discoverer_queue_append_error(drule_errors, drule->druleid, err);
+		zbx_vector_uint64_append(err_druleids, drule->druleid);
+		goto out;
 	}
 
 	if (0 != drule->unique_dcheckid)
@@ -287,6 +230,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		dcc.druleid = drule->druleid;
 		zbx_strlcpy(dcc.ip, ip, sizeof(dcc.ip));
 		dcc.count = checks_count;
+		dcc.revision = drule->revision;
 		zbx_hashset_insert(check_counts, &dcc, sizeof(zbx_discoverer_check_count_t));
 		uniq_ips_num++;
 	}

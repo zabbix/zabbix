@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -82,7 +82,7 @@ func Stop() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Errf("cannot gacefully stop status listener: %s", err.Error())
+		log.Errf("cannot gracefully stop status listener: %s", err.Error())
 	} else {
 		log.Debugf("status listener has been stopped")
 	}

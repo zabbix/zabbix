@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,7 @@ class CFrontendSetup {
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
+	const MIN_PHP_CURL_VERSION = '7.19.4';
 	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
@@ -76,9 +77,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
-		if (extension_loaded('mbstring')) {
-			$result[] = $this->checkPhpMbstringFuncOverload();
-		}
 		$result[] = $this->checkPhpSockets();
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
@@ -262,7 +260,7 @@ class CFrontendSetup {
 		$allowed_db = [];
 
 		if (zbx_is_callable(['mysqli_close', 'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_init', 'mysqli_query',
-				'mysqli_real_escape_string', 'mysqli_report'])) {
+				'mysqli_real_escape_string', 'mysqli_report', 'mysqli_set_charset'])) {
 			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 
@@ -315,27 +313,6 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP mbstring extension missing (PHP configuration parameter --enable-mbstring).')
-		];
-	}
-
-	/**
-	 * Checks for PHP mbstring.func_overload value.
-	 *
-	 * Note: disabling mbstring functions completely, mbstring.func_overload returns false.
-	 * checkPhpMbstringFuncOverload() will be called after successful checkPhpMbstring(), to avoid duplicate
-	 * error messages. mbstring.func_overload value in php.ini file represents a combination of bitmasks.
-	 *
-	 * @return array
-	 */
-	public function checkPhpMbstringFuncOverload() {
-		$current = ini_get('mbstring.func_overload');
-
-		return [
-			'name' => _s('PHP option "%1$s"', 'mbstring.func_overload'),
-			'current' => ($current & 2) ? _('on') : _('off'),
-			'required' => _('off'),
-			'result' => ($current & 2) ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _('PHP string function overloading must be disabled.')
 		];
 	}
 
@@ -718,14 +695,18 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpCurlModule() {
-		$current = function_exists('curl_init');
+		$enabled = function_exists('curl_init') && function_exists('curl_errno') && function_exists('curl_error')
+			&& function_exists('curl_exec') && function_exists('curl_setopt') && function_exists('curl_setopt_array')
+			&& function_exists('curl_version');
+		$current_version = $enabled ? curl_version()['version'] : '';
+		$enabled = $enabled && version_compare($current_version, self::MIN_PHP_CURL_VERSION, '>=');
 
 		return [
 			'name' => _('PHP curl'),
-			'current' => $current ? _('on') : _('off'),
-			'required' => null,
-			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
-			'error' => _('PHP curl extension missing.')
+			'current' => $current_version,
+			'required' => self::MIN_PHP_CURL_VERSION,
+			'result' => $enabled ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP curl extension is missing or outdated.')
 		];
 	}
 }

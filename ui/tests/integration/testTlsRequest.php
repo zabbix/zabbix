@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -167,7 +167,7 @@ class testTlsRequest extends TlsCaseBase {
 		// in agent configuration.
 
 		$tls_config = [
-			'ACTIVE' => '1',
+			'ACTIVE' => true,
 			'CA_FILE' => $ca_crt,
 			'KEY_FILE' => $agent_key,
 			'CERT_FILE' => $agent_crt,

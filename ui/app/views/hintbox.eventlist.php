@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,7 +34,9 @@ if (array_key_exists('problems', $data)) {
 	}
 
 	if ($data['trigger']['url'] !== '') {
-		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+		$trigger_url = $url_validator->validate($data['trigger']['url'])
 			? $data['trigger']['url']
 			: 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url'])).');';
 
@@ -193,7 +195,7 @@ if (array_key_exists('problems', $data)) {
 			))
 				->addClass(ZBX_STYLE_NOWRAP),
 			$problem_update_link,
-			($data['show_tags'] != SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? (new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 		]));
 	}
 

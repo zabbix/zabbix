@@ -37,7 +37,7 @@ zbx_check_service_default_addr_SOURCES = \
 	../../zbxmockdir.c
 
 SYSINFO_SERVER_LIBS = \
-	$(SYSINFO_SERVER_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -63,7 +63,7 @@ endif
 
 if AGENT
 AGENT_LIB_FILES = \
-	$(SYSINFO_AGENT_DEPS) \
+	$(AGENT_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

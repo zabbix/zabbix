@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -413,6 +413,14 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
 #endif
 		}
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+	}
+	else if (ITEM_TYPE_CALCULATED == item.type && 0 == get_config_forks(ZBX_PROCESS_TYPE_HISTORYPOLLER))
+	{
+		*info = zbx_strdup(NULL, "Cannot perform Calculate Item request: configuration parameter"
+				" \"StartHistoryPollers\" is 0.");
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);

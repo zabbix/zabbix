@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -305,16 +305,13 @@ class CControllerMenuPopup extends CController {
 			$is_executable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$is_writable = true;
-				}
-				elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
-					$is_writable = (bool) API::Host()->get([
+				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					? true
+					: (bool) API::Host()->get([
 						'output' => ['hostid'],
 						'hostids' => $db_item['hostid'],
 						'editable' => true
 					]);
-				}
 			}
 
 			if (in_array($db_item['type'], checkNowAllowedTypes())) {
@@ -403,8 +400,10 @@ class CControllerMenuPopup extends CController {
 	 * @return array
 	 */
 	private static function sanitizeMapElementUrls(array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		foreach ($urls as &$url) {
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+			if (!$url_validator->validate($url['url'])) {
 				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
 			}
 		}
@@ -952,6 +951,8 @@ class CControllerMenuPopup extends CController {
 	}
 
 	private static function addUrls(array $menu_data, array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
 			'manualinput_validator', 'manualinput_default_value'
 		];
@@ -967,7 +968,7 @@ class CControllerMenuPopup extends CController {
 				? '_blank'
 				: '';
 
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+			if ($url_validator->validate($url['url'])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
 					'target' => $target

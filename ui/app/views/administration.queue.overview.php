@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,21 +20,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Queue overview'))
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => [
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview')
-					->getUrl() => _('Queue overview'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview.proxy')
-					->getUrl() => _('Queue overview by proxy'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.details')
-					->getUrl() => _('Queue details')
-			]
-		]
-	])
+	->setTitleSubmenu(getAdministrationQueueSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_OVERVIEW));
 
 $table = (new CTableInfo())->setHeader([

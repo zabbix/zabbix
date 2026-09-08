@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,9 @@
 
 
 require_once 'vendor/autoload.php';
-
 require_once __DIR__.'/../CElement.php';
+
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Table element.
@@ -188,7 +189,13 @@ class CTableElement extends CElement {
 	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value, $contains = false) {
-		$headers = $this->getColumnNames();
+		try {
+			$headers = $this->getColumnNames();
+		}
+		catch (StaleElementReferenceException $exception) {
+			$this->invalidate();
+			$headers = $this->getColumnNames();
+		}
 
 		if (is_string($column)) {
 			$index = array_search($column, $headers);

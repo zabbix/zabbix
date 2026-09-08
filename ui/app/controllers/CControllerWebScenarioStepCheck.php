@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -70,8 +70,13 @@ class CControllerWebScenarioStepCheck extends CController {
 			$ret = false;
 		}
 
-		if (CHtmlUrlValidator::validate($this->getInput('url')) === false) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'url', _('unacceptable URL')));
+		$url_validator = new CUrlValidator([
+			'user_macro' => true,
+			'schemes' => CSettingsHelper::getAllowedUriSchemes()
+		]);
+
+		if (!$url_validator->validate($this->getInput('url'))) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'url', $url_validator->getError()));
 
 			$ret = false;
 		}

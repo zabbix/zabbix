@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -190,7 +190,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
 		}
 
-		// Check the pressence and amount of hintboxes in media table for disabled media.
+		// Check the presence and amount of hintboxes in media table for disabled media.
 		$media_with_hints = ['MantisBT', 'OTRS CE', 'Rocket.Chat', 'Zendesk'];
 
 		foreach ($media_with_hints as $media_type) {
@@ -424,13 +424,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		}
-
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
+		}
 
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
@@ -477,8 +477,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Check that LDAP provisioned user can add and remove non-provisioned media.
 	 */
-	// TODO: Uncomment this check, after ZBX-26064 is fixed.
-	/*
 	public function testFormUserLdapMediaJit_AddRemoveMedia() {
 		// Media type configuration.
 		$data = [
@@ -540,7 +538,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 		$this->assertFalse($form->getField('Media')->asTable()->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
-	*/
 
 	public function getUpdateMediaMappings() {
 		return [
@@ -830,12 +827,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'MS Teams',
+								'Media type' => 'GLPI',
 								'Use if severity' => ['High', 'Disaster']
 							],
 							'expected' => [
 								'fields' => [
-									'Type' => 'MS Teams',
+									'Type' => 'GLPI',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
 									'Use if severity' => [
@@ -897,20 +894,23 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Open media mapping to update.
 		$form = $this->openLdapForm();
-		$table = $form->query('id:ldap-servers')->asTable()->one();
+		$table = $form->query('id:ldap-servers')->waitUntilVisible()->asTable()->one();
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		foreach ($data['media_types'] as $media_type) {
-			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
+			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->waitUntilVisible()->asTable()->one();
 			$media_table->query('link', $media_type['name'])->one()->click();
-			$media_form = COverlayDialogElement::find()->all()->last()->asForm();
+			$media_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$media_form = $media_dialog->asForm();
 			$media_form->fill($media_type['update']);
 			$media_form->submit();
+			$media_dialog->waitUntilNotPresent();
 		}
 
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
@@ -1250,7 +1250,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_mapping_form->fill($data['mapping']);
 		$media_mapping_form->submit()->waitUntilNotVisible();
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		// Log in as LDAP user to check that media mapping was processed correctly.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
@@ -1304,13 +1305,15 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click()->waitUntilNotPresent();
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$this->page->waitUntilReady();
 
 		// Check that media is not present for LDAP provisioned user.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
-		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
+		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->waitUntilClickable()->one()->click();
 		$user_media_table = $this->getUserMediaTable();
 		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams Workflow', true)->isPresent());
 	}
@@ -1378,8 +1381,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @return CFormElement
 	 */
 	protected function openLdapForm() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('LDAP settings');
 
 		return $form;

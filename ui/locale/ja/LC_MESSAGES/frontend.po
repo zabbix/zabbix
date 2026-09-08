@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-17 05:42+0000\n"
+"PO-Revision-Date: 2025-10-12 12:46+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -134,6 +134,13 @@ msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "アクション%1$s件"
+
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
 
 #: jsLoader.php:321
 #, c-format
@@ -284,6 +291,24 @@ msgstr "%1$s.phpクラスは、%3$sにあるモジュールの%2$sを拡張し�
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: ファイルは読み取りできません。"
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: 無効なパスであるかファイルが見つかりません。"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -991,6 +1016,10 @@ msgstr "ホストから追加"
 msgid "Add from template"
 msgstr "テンプレートから追加"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "ホストを追加"
@@ -1013,6 +1042,10 @@ msgstr "ホストトリガーを追加"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "アイテムを追加"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -2018,6 +2051,10 @@ msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリク
 msgid "Avoid easy-to-guess passwords"
 msgstr "推測されやすいパスワードの回避"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr "機密データを含めないようにしてください。"
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "データを待っています"
@@ -2195,6 +2232,13 @@ msgstr "接続の暗号化用の 事前共有鍵を変更する場合は、\"tls
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "両方のパスワードが一致している必要があります。"
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3492,6 +3536,10 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプ�
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "認証トークンを取得できません"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "認可コードを取得できません。"
@@ -4020,6 +4068,11 @@ msgstr "XML: %1$sが読み込めません。"
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML: %1$sが読み込めません。"
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4080,6 +4133,10 @@ msgstr "グラフのプロトタイプ\"%2$s\"に\"%1$s\"を設定できませ�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "\"合計\" タイプの項目がグラフに追加されている場合、 \"データ セットの集計\" を設定できません。"
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4606,6 +4663,10 @@ msgstr "クライアントシークレットの変更"
 msgid "Change indicator"
 msgstr "変化表示"
 
+#: include/classes/html/CMacroValue.php:243
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -4909,10 +4970,18 @@ msgstr "閉じる"
 msgid "Close expression constructor"
 msgstr "条件式ビルダーを閉じる"
 
+#: jsLoader.php:416
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "新しいイベントのクローズ"
+
+#: include/func.inc.php:1653 jsLoader.php:290
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4938,6 +5007,12 @@ msgstr "認証コード長"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "縮小"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:428
+#: jsLoader.php:460
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -6143,6 +6218,10 @@ msgstr "ダッシュボード\"%1$s\"はすでに存在します。"
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "ダッシュボード\"%1$s\"はレポート\"%2$s\"で使用しています。"
 
+#: app/views/monitoring.dashboard.view.php:97
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6509,6 +6588,10 @@ msgstr "デフォルトで新しいモジュールに対してアクセス"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "デフォルトの認証"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -7073,6 +7156,10 @@ msgstr "依存先"
 msgid "Dependent item"
 msgstr "依存アイテム"
 
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
+
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
 #: widgets/trigover/includes/ViewHelper.php:101
@@ -7171,6 +7258,10 @@ msgstr "Webシナリオの詳細"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポートしてません。圧縮はTimescaleDBのCommunity Editionでサポートされています。"
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "検出されたライセンスは圧縮をサポートしていません。TimescaleDB Community Editionでは圧縮がサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7987,6 +8078,10 @@ msgstr "変更"
 msgid "Edit dashboard"
 msgstr "ダッシュボードの変更"
 
+#: jsLoader.php:597
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "マップの変更"
@@ -8003,6 +8098,10 @@ msgstr "ツリー要素の変更"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "ウィジェットの変更"
+
+#: jsLoader.php:242
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8424,6 +8523,14 @@ msgstr "英語 (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "非秘密の事前共有キーID文字列を入力してください。機密データは含めないでください。"
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr "Zabbix コンポーネントが事前共有キーを認識するために使用する一意の名前を入力します。"
+
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "監視対象にインストールされているZabbixエージェントのIP/DNSアドレスとポートを入力してください。"
@@ -8738,6 +8845,10 @@ msgstr "実行の確認"
 msgid "Exists"
 msgstr "存在する"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8750,6 +8861,12 @@ msgstr "展開"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "マクロの展開"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:427
+#: jsLoader.php:459
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9449,6 +9566,10 @@ msgstr "最初のページへ"
 msgid "Go to last page, %1$s"
 msgstr "最後のページ%1$sへ"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9463,6 +9584,10 @@ msgstr "ページ%1$sへ"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "ページ%1$sへ、現在のページです"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12057,10 +12182,21 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "監視間隔"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "周期と保存"
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "ユーザーの役割\"%1$s\"のためのAPIメソッド\"%2$s\"が正しくありません。"
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12150,6 +12286,11 @@ msgstr "メールアドレス\"%1$s\"が正しくありません。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが正しくありません。"
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12532,6 +12673,11 @@ msgstr "無効な文字列です。"
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "タグ\"%1$s\"が正しくありません: %2$s。"
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13425,6 +13571,10 @@ msgstr "英語のオブジェクト名を使用して検出されたWindowsパ�
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONを返す"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -14051,6 +14201,11 @@ msgstr "最大繰り返し回数"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用されます。"
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "最大ズームレベル"
@@ -14080,6 +14235,11 @@ msgstr "最大の行数"
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "要求される%1$sデータベースの最大バージョンは%2$sです。"
+
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "必要な最大バージョンは %1$s です。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14420,6 +14580,12 @@ msgstr "PHPスクリプトの入力パース時間の最小値は%1$sです(\"ma
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "PHPのpostサイズの最小値は%1$sです(\"post_max_size\"設定オプション)。"
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "最低限必要なバージョンは%1$sです。"
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14618,6 +14784,14 @@ msgstr "すべての子が障害であったときに最も重要"
 msgid "Most critical of child services"
 msgstr "子サービスで最も重要"
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -14647,9 +14821,19 @@ msgstr "複数"
 msgid "Multiple PROBLEM events"
 msgstr "障害イベントを継続して生成"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "少なくとも%1$sである必要があります。"
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
 msgstr "選択する必要があります。"
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "%1$s より高くすることはできません。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14965,6 +15149,10 @@ msgstr "新規LDAPサーバー"
 msgid "New MFA method"
 msgstr "新しい多要素認証(MFA)方式"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "新規SLA"
@@ -15157,6 +15345,10 @@ msgstr "次"
 msgid "Next dashboard"
 msgstr "次のダッシュボード"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15170,6 +15362,10 @@ msgstr "次のページ"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "次のステップ"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15360,6 +15556,11 @@ msgstr "マップが追加されていません。"
 msgid "No matches found"
 msgstr "条件に一致するデータはありません"
 
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "新しいモジュールは見つかりませんでした"
@@ -15418,6 +15619,66 @@ msgstr "システムへのアクセス権がありません。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "ディスカバリルールをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "グラフをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "ホスト グループをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "ホストをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "イメージをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "アイテムをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "マップをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "メディア タイプをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "テンプレートダッシュボードをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "テンプレート グループをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "テンプレートリンクをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "テンプレートをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "トリガーをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "値マップをインポートする権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "Web シナリオをインポートする権限がありません。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16275,6 +16536,11 @@ msgstr "有効なホストとアイテムのトリガーのみカウント"
 msgid "Open URL"
 msgstr "URLを開く。"
 
+#: app/views/popup.generic.php:436 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:417
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "新しいウィンドウで開く"
@@ -16287,6 +16553,10 @@ msgstr "インストール手順を開く"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "ログ表示"
+
+#: jsLoader.php:243
+msgid "Open widget actions"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -16620,6 +16890,10 @@ msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパ�
 msgid "PHP curl"
 msgstr "PHP curl"
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "PHP curl 拡張機能が見つからないか、失効しています。"
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr "PHP curl拡張機能が存在しません。"
@@ -16911,6 +17185,10 @@ msgstr "親サービス"
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
 msgstr "親テンプレート"
+
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -17512,6 +17790,21 @@ msgstr "障害復旧"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "障害解決済"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -18309,6 +18602,10 @@ msgstr "ホストグループから削除"
 msgid "Remove from host groups"
 msgstr "ホストグループから削除"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "ホストを削除"
@@ -18316,6 +18613,10 @@ msgstr "ホストを削除"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "ホストのタグを削除"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18584,6 +18885,11 @@ msgstr "レスポンスコード"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "レスポンスタイム"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Zabbix サーバー \"%2$s\" への接続時に、%1$s の応答タイムアウトが発生しました。"
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19472,6 +19778,10 @@ msgstr "選択したSLAのSLAレポートを表示。"
 msgid "Select a template"
 msgstr "テンプレートを選択"
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -19940,6 +20250,18 @@ msgstr "短縮"
 msgid "Shortened"
 msgstr "短縮"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "少なくとも%1$sである必要があります。"
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "%1$s より上にしないでください。"
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19963,6 +20285,10 @@ msgstr "表示"
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
 msgstr "アグリゲーション関数を表示"
+
+#: include/events.inc.php:761
+msgid "Show all tags"
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -20024,6 +20350,10 @@ msgstr "表示する行数"
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
 msgstr "リンクラベルを表示"
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
@@ -20874,6 +21204,10 @@ msgstr "スワップ容量。返り値: 整数値 - バイト単位, 浮動小�
 msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
@@ -21496,6 +21830,10 @@ msgstr "認可サーバーに登録されたクライアント識別子。"
 msgid "The client secret registered within the authorization server."
 msgstr "認可サーバーに登録されたクライアント秘密鍵。"
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "クローンしたホストは\"隠しテキスト\"タイプのユーザー定義マクロを含んでいます。それらのマクロの値とタイプはリセットされました。"
@@ -21586,6 +21924,10 @@ msgstr "プロセス数。整数値を返す。"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "ユーザー属性にパラメータ\"%1$s\"がありません。"
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "ホストが変更されたことより、以前のパスワードは消去されました。新しいパスワードを入力してください。"
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22778,6 +23120,14 @@ msgstr "TimescaleDBの圧縮サポートステータスを取得できません�
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "TimescaleDBのバージョンを取得できません。"
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "PostgreSQL の TimescaleDB 時系列データベース拡張機能の圧縮サポート ステータスを取得できません。"
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "PostgreSQL の TimescaleDB 時系列データベース拡張機能のバージョンを取得できません。"
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -22852,6 +23202,10 @@ msgstr "障害確認の解除"
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "予期しない HTTP レスポンスステータス コード"
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -23065,6 +23419,11 @@ msgstr "データベースサーバーのバージョン%1$sはサポートさ�
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "データベースサーバーのバージョン%1$sはサポートされていません。%2$sより高いバージョンは使用できません。"
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "PostgreSQL ではサポートされていない TimescaleDB 時系列データベース拡張機能が使用されています。"
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24510,6 +24869,11 @@ msgstr "警告"
 msgid "Warning message"
 msgstr "警告メッセージ"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "警告！"
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "Warning! Oracle DBのサポートはZabbix 7.0以降非推奨となり、将来のバージョンでは削除される予定です。"
@@ -24680,6 +25044,10 @@ msgstr "ウィジェットの設定が元に戻ります。"
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "ウィジェットは廃止予定です。"
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25064,6 +25432,10 @@ msgstr "現在選択しているテンプレートを切り替えることはで
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "操作に対する権限がありません。"
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26095,6 +26467,10 @@ msgstr "説明"
 msgid "directory cannot be empty"
 msgstr "ディレクトリを指定してください"
 
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "ディスカバリルール"
+
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
 #, c-format
@@ -26465,6 +26841,11 @@ msgstr "UTF-8のバイトシーケンスが正しくありません"
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "データタイプが正しくありません"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -27627,6 +28008,10 @@ msgstr "検索文字列を入力"
 msgid "unacceptable URL"
 msgstr "アクセスできないURLです"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -27864,6 +28249,11 @@ msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "値は \"%1$s\" から \"%2$s\" の範囲で、小数点以下は \"%3$s\" 桁以下である必要があります。"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "値は空にしてください"
@@ -27879,6 +28269,16 @@ msgstr[0] "値は空か%1$sを指定してください"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "指定する値は\"%1$s\"以上にしてください。"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

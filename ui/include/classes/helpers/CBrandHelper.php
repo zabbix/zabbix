@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -77,7 +77,7 @@ class CBrandHelper {
 	 */
 	public static function getHelpUrl() {
 		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/'.
-			(preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version) ? $version[0].'/' : '')
+			(preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version) ? $version[0].'/en/manual' : '')
 		);
 	}
 

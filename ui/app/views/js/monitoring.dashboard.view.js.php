@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -54,12 +54,17 @@
 		/**
 		 * @type {number|null}
 		 */
-		#time_selector_toggle_timeout = null;
+		#time_period_update_timeout = null;
 
 		/**
 		 * @type {number|null}
 		 */
 		#host_override_toggle_timeout = null;
+
+		/**
+		 * @type {number}
+		 */
+		#web_layout_mode;
 
 		init({
 			dashboard,
@@ -74,6 +79,7 @@
 			this.#dashboard = dashboard;
 			this.#dashboard_time_period = dashboard_time_period;
 			this.#clone = clone;
+			this.#web_layout_mode = web_layout_mode;
 
 			timeControl.refreshPage = false;
 
@@ -570,18 +576,20 @@
 		#onReferredUpdate(e) {
 			switch (e.detail.type) {
 				case CWidgetsData.DATA_TYPE_TIME_PERIOD:
-					if (this.#time_selector_toggle_timeout !== null) {
-						clearTimeout(this.#time_selector_toggle_timeout);
+					if (this.#time_period_update_timeout !== null) {
+						clearTimeout(this.#time_period_update_timeout);
 					}
 
-					this.#time_selector_toggle_timeout = setTimeout(() => {
-						this.#time_selector_toggle_timeout = null;
+					this.#time_period_update_timeout = setTimeout(() => {
+						this.#time_period_update_timeout = null;
 
 						if (this.#dashboard.dashboardid !== null && !this.#clone) {
 							this.#updateHistory({add_new: false});
 						}
 
-						this.#toggleTimeSelector(e.detail.is_referred);
+						if (this.#web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+							this.#toggleTimeSelector(e.detail.is_referred);
+						}
 					});
 
 					break;

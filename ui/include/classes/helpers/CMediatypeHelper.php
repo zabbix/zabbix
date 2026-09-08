@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,6 +46,8 @@ class CMediatypeHelper {
 		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
 		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
 	];
+
+	public const OAUTH_URL_SCHEMES = ['http', 'https'];
 
 	/**
 	 * Returns an array of Email providers default settings.

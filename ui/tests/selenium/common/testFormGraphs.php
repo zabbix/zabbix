@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -214,8 +214,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => ['exists' => true, 'visible' => false], // Y axis MAX value dropdown.
 						'id:yaxismin' => ['exists' => true, 'visible' => false], // Y axis MIN fixed value input.
 						'id:yaxismax' => ['exists' => true, 'visible' => false], // Y axis MAX fixed value input.
-						'id:ymin_itemid' =>  ['visible' => false], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['visible' => false], // Y axis MAX item input.
+						'id:ymin_itemid' => ['visible' => false], // Y axis MIN item input.
+						'id:ymax_itemid' => ['visible' => false], // Y axis MAX item input.
 						'id:show_3d' => ['value' => false],
 						'id:items-table' => ['visible' => true]
 					],
@@ -231,39 +231,39 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
+						'Graph type' => 'Normal',
 						'id:visible_percent_left' => true, // Percentile line (left) checkbox.
 						'id:visible_percent_right' => true // Percentile line (right) checkbox.
 					],
 					'check_fields' => [
-						'id:percent_left' =>  ['value' => 0, 'visible' => true], // Percentile line (left) input.
-						'id:percent_right' =>  ['value' => 0, 'visible' => true] // Percentile line (right) input.
+						'id:percent_left' => ['value' => 0, 'visible' => true], // Percentile line (left) input.
+						'id:percent_right' => ['value' => 0, 'visible' => true] // Percentile line (right) input.
 					]
 				]
 			],
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
+						'Graph type' => 'Normal',
+						'id:ymin_type' => 'Fixed', // Y axis MIN value dropdown.
+						'id:ymax_type' => 'Fixed' // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:yaxismin' =>  ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
-						'id:yaxismax' =>  ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
+						'id:yaxismin' => ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
+						'id:yaxismax' => ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
 					]
 				]
 			],
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
+						'Graph type' => 'Normal',
+						'id:ymin_type' => 'Item', // Y axis MIN value dropdown.
+						'id:ymax_type' => 'Item' // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:ymin_itemid' =>  ['value' => '', 'visible' => true], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['value' => '', 'visible' => true] // Y axis MAX item input.
+						'id:ymin_itemid' => ['value' => '', 'visible' => true], // Y axis MIN item input.
+						'id:ymax_itemid' => ['value' => '', 'visible' => true] // Y axis MAX item input.
 					]
 				]
 			]
@@ -275,7 +275,7 @@ class testFormGraphs extends CWebTest {
 		$object = 'Graph'.$this->getGraphSuffix();
 		$this->query('button', 'Create '.lcfirst($object))->waitUntilClickable()->one()->click();
 		$this->page->assertTitle('Configuration of '.lcfirst($object).'s');
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
@@ -401,8 +401,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true,
 						'id:percent_left' => -2,
 						'id:percent_right' => -200,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => '',
 						'id:yaxismax' => ''
 					],
@@ -629,7 +629,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Comma in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
 						'id:yaxismin' => '88,9'
 					],
 					'items' => [
@@ -653,7 +653,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'String in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
 						'id:yaxismin' => 'text'
 					],
 					'items' => [
@@ -677,7 +677,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Comma in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismax' => '88,9'
 					],
 					'items' => [
@@ -701,7 +701,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'String in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismax' => 'value'
 					],
 					'items' => [
@@ -725,8 +725,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Y_min is greater than Y_max'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 10,
 						'id:yaxismax' => 9
 					],
@@ -799,8 +799,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty Y MIN and MAX items',
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'items' => [
 						[
@@ -865,7 +865,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				if ($this->prototype) {
 					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
-					$yaxis_items_dialog  = COverlayDialogElement::find()->all()->waitUntilReady()->last();
+					$yaxis_items_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 					$yaxis_items_dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
 					$yaxis_items_dialog->waitUntilNotPresent();
 				}
@@ -972,8 +972,8 @@ class testFormGraphs extends CWebTest {
 
 				// Check lines color.
 				if (array_key_exists('color', $item)) {
-					$this->assertEquals($item['color'],
-							$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+					$this->assertEquals($item['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+							->one()->getValue()
 					);
 				}
 			}
@@ -997,12 +997,12 @@ class testFormGraphs extends CWebTest {
 						'Name' => 'New Cloned graph name with Items in Y axis',
 						'Width' => 205,
 						'Height' => 399,
-						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
+						'Graph type' => 'Stacked',
 						'Show legend' => false,
 						'Show working time' => false,
 						'Show triggers' => false,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'yaxis_items' => [
 						'min' => 'Failed step of scenario "Scenario for Update".',
@@ -1027,8 +1027,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true,
 						'id:percent_left' => 3,
 						'id:percent_right' => 20,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 1,
 						'id:yaxismax' => 99
 					],
@@ -1052,7 +1052,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$dialog->waitUntilReady();
 		$form = $dialog->asForm();
 
@@ -1122,8 +1122,8 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Check lines color.
-			$this->assertEquals($data['items'][0]['color'],
-					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+			$this->assertEquals($data['items'][0]['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+					->one()->getValue()
 			);
 		}
 	}
@@ -1238,8 +1238,8 @@ class testFormGraphs extends CWebTest {
 			);
 		}
 
-		$this->assertEquals($data['expected']['color'],
-				$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+		$this->assertEquals($data['expected']['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+				->one()->getValue()
 		);
 	}
 
@@ -1253,6 +1253,10 @@ class testFormGraphs extends CWebTest {
 		$this->page->acceptAlert();
 		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' deleted');
+		$title = ($this->prototype)
+			? 'Configuration of graph prototypes'
+			: 'Configuration of graphs';
+		$this->page->assertTitle($title);
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
 	}
 
@@ -1288,7 +1292,7 @@ class testFormGraphs extends CWebTest {
 		$item_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 
 		// Assert that text items are not present in dialog.
-		foreach ($data['items'] as  $item) {
+		foreach ($data['items'] as $item) {
 			$this->assertFalse($item_dialog->query('link', $item)->exists());
 		}
 

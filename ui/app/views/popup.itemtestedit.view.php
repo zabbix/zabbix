@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,21 +69,24 @@ $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
+			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
 				->removeAttribute('name')
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
-		(new CCol(
-			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
+		(new CCol([
+			new CVar('macro_names['.$i.']', $macro_name),
+			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
 				->removeId()
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
+
+	$i++;
 }
 
 $form_grid = (new CFormGrid())
@@ -447,10 +450,10 @@ $form->addItem([
 			(new CSpan('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->setHint('#{result_hint}', 'hintbox-wrap')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass('item-test-result')
-			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	),
 	(new CTemplateTag('preprocessing-step-result-warning'))->addItem(
 		(new CDiv([

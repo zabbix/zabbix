@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@ class CField {
 	_changed = false;
 	_error_msg = null;
 	_error_level = -1;
-	_global_errors = {};
+	_global_errors = Object.create(null);
 	_error_container = null;
 	_error_label;
 	_allow_trim;
@@ -106,8 +106,20 @@ class CField {
 		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
+	isDisabled() {
+		return false;
+	}
+
 	isSameField(field) {
 		return field == this._field;
+	}
+
+	/**
+	 * This method is called when field is rediscovered. Together with this.isSameField().
+	 * Its purpose is to update field's state if rediscovery could have been triggered by this change.
+	 */
+	updateState() {
+		// blank
 	}
 
 	setTabId(tab_id) {
@@ -127,7 +139,7 @@ class CField {
 			if (this._error_level >= level) {
 				this._error_msg = null;
 				this._error_level = -1;
-				this._global_errors = {};
+				this._global_errors = Object.create(null);
 			}
 		}
 		else {

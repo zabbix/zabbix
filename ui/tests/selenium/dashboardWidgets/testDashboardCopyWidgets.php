@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,13 +27,13 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Constants for regular dashboard cases.
 	const NEW_PAGE_NAME = 'Test_page';
-	const PASTE_DASHBOARD_NAME = 'Dashboard for Paste widgets';
+	const PASTE_DASHBOARD_NAME = 'Widget pasting dashboard';
 
 	// Constants for templated dashboard cases.
 	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
 	const EMPTY_DASHBOARD_NAME = 'Dashboard without widgets';
-	const MODULES_DASHBOARD_NAME = 'Dashboard for Copying widgets _1';
+	const MODULES_DASHBOARD_NAME = 'Widget copy dashboard 1';
 	private static $templated_dashboardid;
 	private static $templated_empty_dashboardid;
 	private static $modules_dashboardid;
@@ -52,7 +52,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/**
-	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
+	 *  Get all widgets from dashboards with name starting with "Widget copy dashboard".
 	 */
 	public static function getDashboardsData() {
 		static $data = null;
@@ -67,7 +67,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					' JOIN dashboard_page dp ON w.dashboard_pageid=dp.dashboard_pageid'.
 					' WHERE dp.dashboardid IN ('.
 						'SELECT dashboardid FROM dashboard '.
-						'WHERE name LIKE \'%Dashboard for Copying widgets%\''.
+						'WHERE name LIKE \'%Widget copy dashboard%\''.
 					') ORDER BY w.widgetid DESC'
 			);
 		}
@@ -155,7 +155,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		else {
 			$dashboardid = $start_dashboardid;
 			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard for Paste widgets')
+					zbx_dbstr('Widget pasting dashboard')
 			);
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
@@ -210,7 +210,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			$dashboard->pasteWidget();
 		}
 
-		/* On the dashboard the widget has a unique name, except when copied/pasted within the same dashboard.
+		/*
+		 * On the dashboard the widget has a unique name, except when copied/pasted within the same dashboard.
 		 * $new_dashboard contains widget with name 'Test copy Map navigation tree' so name index should be 2 for this case.
 		 */
 		if ($new_page || $new_dashboard) {
@@ -220,15 +221,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$name_index = '[2]';
 		}
 
-		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the content block without the loading appear first,
-		 * and only after that the loading appears.
-		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
-		 */
 		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
 				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
-				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')->waitUntilPresent()->asWidget()->one();
-		sleep(1);
+				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')
+				->waitUntilPresent()->asWidget()->one();
 		$copied_widget->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
@@ -241,6 +237,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
+		// The widget can briefly re-render with an empty header after copy; wait for the name before asserting.
+		$copied_widget->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4'
+		)->waitUntilTextPresent($widget_name);
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields()->filter(CElementFilter::VISIBLE);
 
@@ -335,6 +335,24 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -407,6 +425,24 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -438,12 +474,30 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
-					'copy to' => 'another page'
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another dashboard'
 				]
 			],
 			[
 				[
 					'name' => 'Item value widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -492,6 +546,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
 					'copy to' => 'another template'
 				]
 			]
@@ -623,6 +689,13 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'module_name' => 'Favorite maps',
+					'widget_name' => 'Test copy Favorite maps',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
 					'module_name' => 'Item history',
 					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
@@ -688,7 +761,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
 		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
-		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
+		// Template dashboard are always in edit mode, so entering edit mode is only required for regular dashboards.
 		if(!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}
@@ -734,6 +807,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		CDashboardElement::find()->waitUntilReady();
 	}
 
 	/**

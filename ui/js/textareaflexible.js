@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -79,6 +79,7 @@
 			// Calculation of scrollHeight property in firefox do not count placeholder dimension when value is empty.
 			const $clone = $textarea.clone()
 				.css('position', 'absolute')
+				.attr('data-temp-field', true)
 				.insertAfter($textarea)
 				.height(0)
 				.val($textarea.attr('placeholder'));

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
  * @backup sessions
  *
  * @backupConfig
+ *
+ * @onAfter waitUntilConfigRestored
  */
 class testFormSetup extends CWebTest {
 
@@ -67,7 +69,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -84,7 +86,6 @@ class testFormSetup extends CWebTest {
 			'PHP databases support',
 			'PHP bcmath',
 			'PHP mbstring',
-			'PHP option "mbstring.func_overload"',
 			'PHP sockets',
 			'PHP gd',
 			'PHP gd PNG support',
@@ -296,6 +297,7 @@ class testFormSetup extends CWebTest {
 
 		// Select Dark theme.
 		$this->query('id:default-theme')->one()->asDropdown()->select('Dark');
+		$form->waitUntilReloaded();
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
@@ -306,9 +308,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complete the setup and check in DB that the default timezone was applied.
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Finish')->waitUntilVisible()->one()->click();
 
 		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
 				' \'default_timezone\') ORDER BY name', 'value_str'
@@ -324,8 +326,8 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
-		$this->query('button:Next step')->one()->click();
+		$this->query('id:zbx_server_name')->waitUntilVisible()->one()->fill('Zabbix server name');
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
 				'to change configuration parameters.';
@@ -366,10 +368,14 @@ class testFormSetup extends CWebTest {
 
 		// Check screenshot of the Pre-installation summary section.
 		$skip_fields = [];
-		foreach(['Database server', 'Database port', 'Database name'] as $skip_field) {
+		foreach(['Database server', 'Database port'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
 			$skip_fields[] = $this->query($xpath)->one();
 		}
+		// Remove database name due to unstable screenshot, one pixel visible.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://span[text()="Database name"]/../../div[@class="table-forms-td-right"]')->one()]
+		);
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
@@ -382,7 +388,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $this->query('xpath://p')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Finish')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}
@@ -668,7 +674,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
@@ -856,19 +862,19 @@ class testFormSetup extends CWebTest {
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form.
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Settings', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Configure DB connection', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click();
+		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
 		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
@@ -879,7 +885,9 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$text		text that should be present in a paragraph of the current setup form section
 	 */
 	private function checkPageTextElements($title, $text = null) {
-		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
+		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->waitUntilVisible()
+				->one()->isValid()
+		);
 		$this->checkSections($title);
 		if ($text) {
 			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
@@ -964,8 +972,8 @@ class testFormSetup extends CWebTest {
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;
@@ -1034,5 +1042,14 @@ class testFormSetup extends CWebTest {
 		// Uncheck the Database TLS encryption and verify that Verify database certificate field is hidden.
 		$tls_encryption->uncheck();
 		$this->assertFalse($verify_certificate->isDisplayed());
+	}
+
+	/**
+	 * Wait for frontend to get the restored config from zabbix.conf.php file. Otherwise the next tests are
+	 * executed with the configuration file written by the setup form, where Zabbix server name and Zabbix
+	 * server address are empty.
+	 */
+	public static function waitUntilConfigRestored() {
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 	}
 }

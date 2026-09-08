@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,6 @@
 #include "zbxdb.h"
 #include "zbxhttp.h"
 #include "audit/zbxaudit.h"
-#include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
@@ -295,17 +294,23 @@ static void	oauth_db_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, in
 	}
 	else
 	{
+		char	*access_token_esc = zbx_db_dyn_escape_string(data->access_token);
+
 		data->tokens_status |= (ZBX_OAUTH_TOKEN_ACCESS_VALID | ZBX_OAUTH_TOKEN_REFRESH_VALID);
 
 		if (NULL != data->old_refresh_token)	 /* data->refresh_token has changed */
 		{
+			char	*refresh_token_esc = zbx_db_dyn_escape_string(data->refresh_token);
+
 			zbx_db_execute("update media_type_oauth set"
 					" access_token='%s',access_token_updated=" ZBX_FS_TIME_T ","
 					"access_expires_in=%d,refresh_token='%s',tokens_status=%hhu"
 					" where mediatypeid="ZBX_FS_UI64,
-					data->access_token, data->access_token_updated, data->access_expires_in,
-					data->refresh_token, data->tokens_status,
+					access_token_esc, data->access_token_updated, data->access_expires_in,
+					refresh_token_esc, data->tokens_status,
 					mediatypeid);
+
+			zbx_free(refresh_token_esc);
 		}
 		else
 		{
@@ -313,10 +318,12 @@ static void	oauth_db_update(zbx_uint64_t mediatypeid, zbx_oauth_data_t *data, in
 					" access_token='%s',access_token_updated=" ZBX_FS_TIME_T ","
 					"access_expires_in=%d,tokens_status=%hhu"
 					" where mediatypeid="ZBX_FS_UI64,
-					data->access_token, data->access_token_updated, data->access_expires_in,
+					access_token_esc, data->access_token_updated, data->access_expires_in,
 					data->tokens_status,
 					mediatypeid);
 		}
+
+		zbx_free(access_token_esc);
 	}
 }
 
@@ -338,8 +345,8 @@ static void	oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const 
 
 		if (SUCCEED == fetch_result)
 		{
-			zbx_audit_entry_update_string(entry, "access_token", ZBX_MACRO_SECRET_MASK,
-					ZBX_MACRO_SECRET_MASK);
+			zbx_audit_entry_update_string(entry, "access_token", ZBX_SECRET_MASK,
+					ZBX_SECRET_MASK);
 			zbx_audit_entry_update_int(entry, "access_expires_in", data->old_access_expires_in,
 					data->access_expires_in);
 			zbx_audit_entry_update_int(entry, "access_token_updated", (int)data->old_access_token_updated,
@@ -347,8 +354,8 @@ static void	oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const 
 
 			if (NULL != data->old_refresh_token)
 			{
-				zbx_audit_entry_update_string(entry, "refresh_token", ZBX_MACRO_SECRET_MASK,
-						ZBX_MACRO_SECRET_MASK);
+				zbx_audit_entry_update_string(entry, "refresh_token", ZBX_SECRET_MASK,
+						ZBX_SECRET_MASK);
 			}
 		}
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -49,7 +49,6 @@ class CControllerGraphEdit extends CController {
 			'ymin_itemid' =>		'db graphs.ymin_itemid',
 			'ymax_itemid' =>		'db graphs.ymax_itemid',
 			'items' =>				'array',
-			'normal_only' =>		'in 1',
 			'clone' =>				'in 1',
 			'visible' =>			'array'
 		];
@@ -96,7 +95,6 @@ class CControllerGraphEdit extends CController {
 			'graphid' => $this->getInput('graphid', 0),
 			'hostid' => $this->getInput('hostid', 0),
 			'context' => $this->getInput('context'),
-			'normal_only' => $this->getInput('normal_only', 0),
 			'readonly' => false,
 			'discovered' => false,
 			'discovered_prototype' => false

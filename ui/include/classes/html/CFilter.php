@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -251,9 +251,14 @@ class CFilter extends CDiv {
 
 		if ($visible) {
 			$this->addTab(new CDiv([
-				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->addClass('js-btn-time-left'),
-				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
-				(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->addClass('js-btn-time-right')
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))
+					->addClass('js-btn-time-left')
+					->setAttribute('aria-label', _('Move time range backward')),
+				(new CSimpleButton(_('Zoom out')))
+					->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
+				(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))
+					->addClass('js-btn-time-right')
+					->setAttribute('aria-label', _('Move time range forward'))
 			]), null);
 
 			$predefined_ranges = [];

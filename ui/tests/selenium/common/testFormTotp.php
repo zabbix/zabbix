@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,7 +81,7 @@ class testFormTotp extends CWebTest {
 	 */
 	protected function testTotpLayout() {
 		// Container of most elements.
-		$container = $this->page->query('class:signin-container')->one();
+		$container = $this->page->query('class:signin-container')->waitUntilVisible()->one();
 
 		// Assert Zabbix logo.
 		$this->assertTrue($container->query('class:zabbix-logo')->one()->isVisible());
@@ -107,8 +107,8 @@ class testFormTotp extends CWebTest {
 
 		$help_link = $links->query('link:Help')->one();
 		$this->assertTrue($help_link->isClickable());
-		$this->assertEquals(1,
-				preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
+		$this->assertEquals('https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual',
+				$help_link->getAttribute('href')
 		);
 		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
 
@@ -245,12 +245,12 @@ class testFormTotp extends CWebTest {
 	protected function testTotpBlocking() {
 		// Open the form.
 		$this->userLogin();
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->page->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Enter the incorrect TOTP several times to get blocked.
 		for ($i = 1; $i <= self::BLOCK_COUNT; $i++) {
 			$form->getField('id:verification_code')->fill('999999');
-			$form->query('button:Sign in')->one()->click();
+			$form->query('button:Sign in')->one()->click()->waitUntilStalled();
 
 			if ($i !== self::BLOCK_COUNT) {
 				// Validate the validation error message first n-1 times.

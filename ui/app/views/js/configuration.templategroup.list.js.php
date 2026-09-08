@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,17 +24,22 @@
 		init({delete_url}) {
 			this.delete_url = delete_url;
 
-			document.querySelector('.js-create-templategroup').addEventListener('click', () => {
-				ZABBIX.PopupManager.open('templategroup.edit');
-			});
-
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-massdelete-templategroup')) {
-					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-			});
-
+			this.#initActionButtons();
 			this.#initPopupListeners();
+		}
+
+		#initActionButtons() {
+			const create_templategroup_button = document.querySelector('.js-create-templategroup');
+
+			if (create_templategroup_button !== null) {
+				create_templategroup_button.addEventListener('click', () => {
+					ZABBIX.PopupManager.open('templategroup.edit');
+				});
+			}
+
+			document.querySelector('.js-massdelete-templategroup').addEventListener('click', (e) => {
+				this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+			});
 		}
 
 		delete(target, groupids) {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1054,7 +1054,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
-				ZBX_CONF_PARM_OPT,	0,			3600},
+				ZBX_CONF_PARM_OPT,	0,			ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX},
 		{0}
 	};
 
@@ -1482,7 +1482,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &ws, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
 				zbx_set_exiting_with_fail();
 				break;
@@ -1517,7 +1517,7 @@ void	zbx_free_service_resources(void)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, SUCCEED);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);

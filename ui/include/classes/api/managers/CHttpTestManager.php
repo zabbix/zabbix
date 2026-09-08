@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1383,6 +1383,7 @@ class CHttpTestManager {
 			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.templateid', array_column($httptests, 'hostid')).
+				' AND '.dbConditionInt('flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 				$hostids_condition
 		);
 

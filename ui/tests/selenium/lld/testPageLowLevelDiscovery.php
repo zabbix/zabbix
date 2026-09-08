@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,7 +43,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	const SELECTOR = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public static function prepareLLDData() {
-		CDataHelper::createHosts([
+		$host_responce = CDataHelper::createHosts([
 			[
 				'host' => 'Host with LLD',
 				'groups' => [['groupid' => 4]], // Zabbix servers.
@@ -55,6 +55,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			]
+		]);
+
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'Multiple   spaces   in LLD name',
+			'key_' => '123lld_rule321',
+			'hostid' =>  $host_responce['hostids']['Host with LLD'],
+			'type' => ITEM_TYPE_TRAPPER
 		]);
 	}
 
@@ -140,6 +147,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -167,13 +175,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
 		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
+			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
+			$this->assertMessage(TEST_GOOD, 'Discovery rule '.$message_action);
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr('Discovery rule 2').' and hostid='
 				.self::HOST_ID);
 			$this->assertEquals($expected_status, $status);
-			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
-			$this->assertEquals('Discovery rule '.$message_action, CMessageElement::find()->one()->getTitle());
 			$link_color = ($action === 'Enabled') ? 'red' : 'green';
 			$this->assertTrue($row->query('xpath://td/a[@class="link-action '.$link_color.'"]')->one()->isPresent());
+			CMessageElement::find()->one()->close();
 		}
 	}
 
@@ -269,10 +278,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
-			case 'template';
+			case 'template':
 				$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
 				break;
-			case 'trapper';
+			case 'trapper':
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
 			default:
@@ -300,14 +309,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// #0.
+			// #0. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 100
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Databases']
+					]
 				]
 			],
 			// #1.
@@ -372,6 +383,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in LLD name',
 						'Test discovery rule',
 						'Trapper LLD for filter'
 					]
@@ -470,6 +482,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -497,7 +510,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #12. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
@@ -505,7 +518,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 23
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Operating systems'],
+						'filter' => ['type' => ITEM_TYPE_DEPENDENT]
+					]
 				]
 			],
 			// #13.
@@ -572,6 +588,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Test discovery rule'
 					]
 				]
+			],
+			// #18.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in LLD name']
+				]
 			]
 		];
 	}
@@ -585,10 +610,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query(self::SELECTOR)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
 			$this->assertTableDataColumn($data['expected'], 'Name', self::SELECTOR);
@@ -597,6 +623,20 @@ class testPageLowLevelDiscovery extends CWebTest {
 		if (array_key_exists('rows', $data)) {
 			$this->assertEquals($data['rows'], $table->getRows()->count());
 		}
+
+		// Use API to get the expected row count dynamically, as the number of LLD rules in template can change.
+		if (array_key_exists('api_filter', $data)) {
+			$groups = CDataHelper::call('templategroup.get', [
+				'output' => ['groupid'],
+				'filter' => ['name' => $data['api_filter']['templateGroupids']]
+			]);
+			unset($data['api_filter']['templateGroupids']);
+			$this->assertEquals(CDataHelper::call('discoveryrule.get', [
+				'groupids' => array_column($groups, 'groupid'),
+				'templated' => true,
+				'countOutput' => true
+			] + $data['api_filter']), $table->getRows()->count());
+		}
 	}
 
 	private function massChangeStatus($action) {
@@ -604,6 +644,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 		CMessageElement::find()->one()->close();
@@ -654,7 +695,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

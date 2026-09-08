@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -813,7 +813,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 	else
 		zbx_tcp_send(sock, j.buffer);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

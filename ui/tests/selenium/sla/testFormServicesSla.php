@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -219,6 +219,8 @@ class testFormServicesSla extends CWebTest {
 		$this->checkTableElements($downtimes_table_elements, $downtimes_table);
 
 		$downtimes_table->query('button:Add')->one()->click();
+		$downtime_start = date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00';
+
 		$downtimes_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$this->assertEquals('New excluded downtime', $downtimes_dialog->getTitle());
 
@@ -229,7 +231,7 @@ class testFormServicesSla extends CWebTest {
 
 		$downtime_default_values = [
 			'Name' => '',
-			'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+			'Start time' => $downtime_start,
 			'id:duration_days' => '0',
 			'name:duration_hours' => '1',
 			'name:duration_minutes' => '0'
@@ -262,7 +264,7 @@ class testFormServicesSla extends CWebTest {
 				'field' => 'id:start_time',
 				'maxlength' => 16,
 				'placeholder' => 'YYYY-MM-DD hh:mm',
-				'value' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00'
+				'value' => $downtime_start
 			],
 			[
 				'field' => 'id:duration_days',
@@ -287,7 +289,7 @@ class testFormServicesSla extends CWebTest {
 
 		$table_data = [
 			[
-				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+				'Start time' => $downtime_start,
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
 				'Actions' => 'Edit Remove'
@@ -920,7 +922,7 @@ class testFormServicesSla extends CWebTest {
 			'Effective date' => '2022-09-10',
 			'id:service_tags_0_tag' => 'tag',
 			'id:service_tags_0_value' => 'value',
-			'Description' => 'SLA descruption',
+			'Description' => 'SLA description',
 			'Enabled' => false
 		];
 		$old_hash = CDBHelper::getHash(self::$sla_sql);
@@ -1053,6 +1055,7 @@ class testFormServicesSla extends CWebTest {
 				return;
 			}
 		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 

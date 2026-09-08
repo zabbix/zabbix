@@ -5,9 +5,9 @@
 
 ### Known Issues
 
-Description: no if(in|out)(Errors|Discards) are available for vlan ifType
-Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
-Device: C2911, C7600
+- Description: no if(in|out)(Errors|Discards) are available for vlan ifType
+  - Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
+  - Device: C2911, C7600
 
 ## Requirements
 
@@ -32,22 +32,22 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT}||`60`|
-|{$TEMP_WARN:"CPU"}||`70`|
-|{$TEMP_CRIT:"CPU"}||`75`|
-|{$TEMP_WARN_STATUS}||`2`|
-|{$TEMP_CRIT_STATUS}||`3`|
-|{$TEMP_DISASTER_STATUS}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
-|{$PSU_CRIT_STATUS:"critical"}||`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
-|{$FAN_CRIT_STATUS:"critical"}||`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold for low temperature.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold for temperature.</p>|`50`|
+|{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
+|{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
+|{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -182,7 +182,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cisco IOS: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"} or last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}`|Warning|**Depends on**:<br><ul><li>Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
+|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available.<br>It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold<br>reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means<br>the device does not report a threshold for this test point, so that check is skipped.</p>|`avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or (avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0) or last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
 |Cisco IOS: {#SNMPVALUE}: Temperature is too low||`avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ### LLD rule PSU Discovery
@@ -299,22 +299,22 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT}||`60`|
-|{$TEMP_WARN:"CPU"}||`70`|
-|{$TEMP_CRIT:"CPU"}||`75`|
-|{$TEMP_WARN_STATUS}||`2`|
-|{$TEMP_CRIT_STATUS}||`3`|
-|{$TEMP_DISASTER_STATUS}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
-|{$PSU_CRIT_STATUS:"critical"}||`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
-|{$FAN_CRIT_STATUS:"critical"}||`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold for low temperature.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold for temperature.</p>|`50`|
+|{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
+|{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
+|{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -448,7 +448,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cisco IOS: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"} or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}`|Warning|**Depends on**:<br><ul><li>Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
+|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available.<br>It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold<br>reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means<br>the device does not report a threshold for this test point, so that check is skipped.</p>|`avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or (avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0) or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
 |Cisco IOS: {#SNMPVALUE}: Temperature is too low||`avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ### LLD rule PSU Discovery
@@ -547,22 +547,22 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT}||`60`|
-|{$TEMP_WARN:"CPU"}||`70`|
-|{$TEMP_CRIT:"CPU"}||`75`|
-|{$TEMP_WARN_STATUS}||`2`|
-|{$TEMP_CRIT_STATUS}||`3`|
-|{$TEMP_DISASTER_STATUS}||`4`|
-|{$PSU_WARN_STATUS:"warning"}||`2`|
-|{$PSU_CRIT_STATUS:"critical"}||`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}||`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}||`6`|
-|{$FAN_WARN_STATUS:"warning"}||`2`|
-|{$FAN_CRIT_STATUS:"critical"}||`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}||`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}||`6`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold for low temperature.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold for temperature.</p>|`50`|
+|{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
+|{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
+|{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -663,7 +663,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cisco IOS: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"} or last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}`|Warning|**Depends on**:<br><ul><li>Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
+|Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available.<br>It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold<br>reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means<br>the device does not report a threshold for this test point, so that check is skipped.</p>|`avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"} or (avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0) or last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS} or last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}`|High||
 |Cisco IOS: {#SNMPVALUE}: Temperature is too low||`avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ### LLD rule PSU Discovery

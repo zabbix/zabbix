@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -222,9 +222,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 2,
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -260,9 +260,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 2,
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -327,9 +327,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -593,7 +593,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	public function testHostConnMacroValidation_testInvalidMacroAutoregistration() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$c = new CAutoregClient('localhost', self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051), 3, 3,
-			ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => '0']
+			ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
 		);
 		$c->sendRequest(self::HOST_NAME, '127.250.250.250;uname');
 

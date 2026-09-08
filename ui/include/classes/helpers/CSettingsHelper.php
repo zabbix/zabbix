@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -233,5 +233,18 @@ class CSettingsHelper {
 
 	public static function isSoftwareUpdateCheckEnabled(): bool {
 		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
+	}
+
+	/**
+	 * Get an array of allowed URI schemes if validation is required, or null otherwise.
+	 *
+	 * @return array|null
+	 */
+	public static function getAllowedUriSchemes(): ?array {
+		if (self::get(self::VALIDATE_URI_SCHEMES) != 1) {
+			return null;
+		}
+
+		return preg_split('/\s*,\s*/', strtolower(self::get(self::URI_VALID_SCHEMES)), -1, PREG_SPLIT_NO_EMPTY);
 	}
 }
