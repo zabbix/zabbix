@@ -528,6 +528,12 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 						"trigger \"%s\" has items from template \"%s\"",
 						error_row[0], error_row[1]);
 			}
+			else
+			{
+				zbx_snprintf(error, max_error_len,
+						"Failed to retrieve trigger or host for the matching items");
+			}
+
 			ret = FAIL;
 			zbx_db_free_result(error_result);
 		}
