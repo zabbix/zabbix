@@ -206,12 +206,6 @@ class CMaintenance extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-
-
-	/*	echo PHP_EOL."<br>====================================<br>".PHP_EOL;
-		print_r(self::createSelectQueryFromParts($sqlParts));
-		echo PHP_EOL."<br>====================================<br>".PHP_EOL;*/
-
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($maintenance = DBfetch($res)) {
 			if ($options['countOutput']) {
