@@ -470,10 +470,6 @@
 			}
 
 			&:last-of-type {
-				border-right: 0;
-			}
-
-			&:last-child {
 				border-top-right-radius: 2px;
 
 				.header-link {
@@ -777,16 +773,6 @@
 
 		&.datatable-cell-compact {
 			padding: 0;
-		}
-	}
-
-	&.datatable-customizable {
-		.datatable-header .datatable-cell.datatable-cell-header:last-of-type {
-			padding-right: 8px;
-
-			&:has(.datatable-options-link) {
-				padding-right: 32px;
-			}
 		}
 	}
 

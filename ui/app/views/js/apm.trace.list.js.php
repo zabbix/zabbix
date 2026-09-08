@@ -37,6 +37,8 @@
 		#refresh_message_box = null;
 		/** @type {CSideDrawer|null} */
 		#side_drawer = null;
+		/** @type {string|null} */
+		#selected_traceid = null;
 
 		init({
 			csrf_token,
@@ -310,6 +312,12 @@
 					const rows = datatable_element.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`);
 
 					for (const row of rows) {
+						const traceid = row.getAttribute('data-traceid');
+
+						if (this.#selected_traceid === traceid) {
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+						}
+
 						row.addEventListener('click', () => {
 							const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 							row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
@@ -317,7 +325,8 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 							const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
-							const traceid = row.getAttribute('data-traceid');
+
+							this.#selected_traceid = traceid;
 
 							this.#openSideDrawer(wrapper, traceid);
 						});

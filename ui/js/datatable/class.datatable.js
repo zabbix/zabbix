@@ -2860,8 +2860,13 @@ class CDataTable {
 
 		const options_link = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_LINK}`);
 
-		if (right_offset > 0 && column.getOptionsPopupHandler()) {
-			options_link?.style.setProperty('margin-right', `${right_offset - 1}px`);
+		if (right_offset > 0) {
+			if (column.getOptionsPopupHandler()) {
+				options_link?.style.setProperty('margin-right', `${right_offset - 1}px`);
+			}
+			else {
+				header_cell.target.style.paddingRight = `${right_offset + CDataTable.COLUMN_HEADER_PADDING - 1}px`;
+			}
 		} else {
 			options_link?.style.removeProperty('margin-right');
 
