@@ -2834,7 +2834,10 @@ class CDataTable {
 			: 0;
 
 		if (right_offset > 0) {
-			const padding_right = right_offset + CDataTable.COLUMN_HEADER_PADDING;
+			let padding_right = right_offset;
+			if (!column.getOptionsPopupHandler()) {
+				padding_right += CDataTable.COLUMN_HEADER_PADDING;
+			}
 
 			header_cell.target.style.paddingRight = `${padding_right}px`;
 		} else {
