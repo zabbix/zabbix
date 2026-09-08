@@ -457,41 +457,39 @@ class CProxy extends CApiService {
 
 			$proxy['apm'] = array_merge(self::APM_SCHEMA, $proxy['apm']);
 
-			if (array_key_exists('additional_resource_attributes', $proxy['apm'])) {
-				$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
+			$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
 
-				$db_attributes = [];
-				$last_id = '-1';
+			$db_attributes = [];
+			$last_id = '-1';
 
-				if ($db_proxy !== null) {
-					foreach ($db_proxy['apm']['additional_resource_attributes'] as $db_attribute) {
-						$db_attributes[$db_attribute['signal_type']][$db_attribute['key']] = $db_attribute;
+			if ($db_proxy !== null) {
+				foreach ($db_proxy['apm']['additional_resource_attributes'] as $db_attribute) {
+					$db_attributes[$db_attribute['signal_type']][$db_attribute['key']] = $db_attribute;
 
-						if (bccomp($db_attribute['id'], $last_id, 0) == 1) {
-							$last_id = $db_attribute['id'];
-						}
+					if (bccomp($db_attribute['id'], $last_id, 0) == 1) {
+						$last_id = $db_attribute['id'];
 					}
 				}
-
-				foreach ($proxy['apm']['additional_resource_attributes'] as &$attribute) {
-					$attribute += array_map(static fn(array $field) => $field['default'], $attributes_schema);
-					$attribute = array_merge($attributes_schema, $attribute);
-
-					if (array_key_exists($attribute['signal_type'], $db_attributes)
-							&& array_key_exists($attribute['key'], $db_attributes[$attribute['signal_type']])) {
-						$id = $db_attributes[$attribute['signal_type']][$attribute['key']]['id'];
-
-						unset($db_attributes[$attribute['signal_type']][$attribute['key']]);
-					}
-					else {
-						$id = bcadd($last_id, '1', 0);
-						$last_id = $id;
-					}
-
-					$attribute = ['id' => $id] + $attribute;
-				}
-				unset($attribute);
 			}
+
+			foreach ($proxy['apm']['additional_resource_attributes'] as &$attribute) {
+				$attribute += array_map(static fn(array $field) => $field['default'], $attributes_schema);
+				$attribute = array_merge($attributes_schema, $attribute);
+
+				if (array_key_exists($attribute['signal_type'], $db_attributes)
+						&& array_key_exists($attribute['key'], $db_attributes[$attribute['signal_type']])) {
+					$id = $db_attributes[$attribute['signal_type']][$attribute['key']]['id'];
+
+					unset($db_attributes[$attribute['signal_type']][$attribute['key']]);
+				}
+				else {
+					$id = bcadd($last_id, '1', 0);
+					$last_id = $id;
+				}
+
+				$attribute = ['id' => $id] + $attribute;
+			}
+			unset($attribute);
 
 			if ($db_proxy === null || $proxy['apm'] != $db_proxy['apm']) {
 				$upd_proxies[] = [
