@@ -635,7 +635,7 @@ out:
 static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_lookup_mode_t mode,
 		const char *device_uuid, zbx_user_t *user)
 {
-	char		*device_uuid_esc = NULL;
+	char		*formatted_auth_token_hash_esc = NULL, *device_uuid_esc = NULL;
 	int		ret = FAIL;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
@@ -646,6 +646,8 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
 		goto out;
 	}
+
+	formatted_auth_token_hash_esc = zbx_db_dyn_escape_string(formatted_auth_token_hash);
 
 	switch (mode)
 	{
@@ -658,8 +660,8 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 						" and u.roleid=r.roleid"
 						" and t.status=%d"
 						" and t.auth_scheme=%d"
-						" and (t.expires_at=%d or t.expires_at > %lu)",
-					formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+						" and (t.expires_at=%d or t.expires_at>%lu)",
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
 					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
 			break;
 		case ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD:
@@ -671,7 +673,7 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 						" and t.token='%s'"
 						" and u.roleid=r.roleid"
 						" and t.status=%d"
-						" and (t.expires_at=%d or t.expires_at > %lu)"
+						" and (t.expires_at=%d or t.expires_at>%lu)"
 						" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
 							"select null from token_device td,device d"
 							" where td.tokenid=t.tokenid"
@@ -679,7 +681,7 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 								" and d.uuid='%s'"
 								" and d.userid=t.userid"
 								" and d.status=%d)))",
-					formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
 					(unsigned long)t, ZBX_AUTH_SCHEME_BEARER, ZBX_AUTH_SCHEME_DPOP, device_uuid_esc,
 					ZBX_DEVICE_STATUS_ACTIVATED);
 			break;
@@ -698,6 +700,7 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(formatted_auth_token_hash_esc);
 	zbx_free(device_uuid_esc);
 
 	return ret;
