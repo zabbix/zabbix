@@ -16,9 +16,8 @@ package vfsfs
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -32,13 +31,13 @@ const (
 
 var (
 	//nolint:revive,staticcheck
-	errInvalidParameters = errors.New("Invalid number of parameters.")
+	errInvalidParameters = errs.New("invalid number of parameters")
 	//nolint:revive,staticcheck
-	errTooManyParameters = errors.New("Too many parameters.")
+	errTooManyParameters = errs.New("too many parameters")
 	//nolint:revive,staticcheck
-	errInvalidFirstParameter = errors.New("Invalid first parameter.")
+	errInvalidFirstParameter = errs.New("invalid first parameter")
 	//nolint:revive,staticcheck
-	errInvalidSecondParameter = errors.New("Invalid second parameter.")
+	errInvalidSecondParameter = errs.New("invalid second parameter")
 )
 
 type FsStats struct {
@@ -103,7 +102,7 @@ func (p *Plugin) exportDiscovery(params []string) (any, error) {
 
 	b, marshalErr := json.Marshal(&d)
 	if marshalErr != nil {
-		return nil, fmt.Errorf("cannot marshal filesystem discovery data: %w", marshalErr)
+		return nil, errs.Wrap(marshalErr, "cannot marshal filesystem discovery data")
 	}
 
 	return string(b), nil
@@ -144,7 +143,7 @@ func (p *Plugin) exportGet(params []string) (any, error) {
 
 	b, err := json.Marshal(data)
 	if err != nil {
-		return nil, fmt.Errorf("cannot marshal filesystem data: %w", err)
+		return nil, errs.Wrap(err, "cannot marshal filesystem data")
 	}
 
 	return string(b), nil
