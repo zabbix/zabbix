@@ -430,7 +430,7 @@ class CProxy extends CApiService {
 	private static function updateApms(array &$proxies, ?array $db_proxies = null): void {
 		$upd_proxies = [];
 
-		foreach ($proxies as &$proxy) {
+		foreach ($proxies as $i => &$proxy) {
 			if (!array_key_exists('apm', $proxy) || !$proxy['apm']) {
 				continue;
 			}
@@ -492,8 +492,16 @@ class CProxy extends CApiService {
 			unset($attribute);
 
 			if ($db_proxy === null || $proxy['apm'] != $db_proxy['apm']) {
+				$upd_apm = json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE);
+
+				if ($upd_apm !== false && strlen($upd_apm) > DB::getFieldLength('proxy', 'apm')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/apm', _('value is too long')
+					));
+				}
+
 				$upd_proxies[] = [
-					'values' => ['apm' => json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE)],
+					'values' => ['apm' => $upd_apm],
 					'where' => ['proxyid' => $proxy['proxyid']]
 				];
 			}
