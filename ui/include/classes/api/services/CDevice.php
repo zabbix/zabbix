@@ -125,8 +125,8 @@ class CDevice extends CApiService {
 
 		if (!$options['countOutput']) {
 			if (in_array('lastaccess', $options['output'])) {
-				$sql_parts = $this->addQuerySelect(dbConditionCoalesce('t.lastaccess',
-					DB::getDefault('token', 'lastaccess'), 'lastaccess'),
+				$sql_parts = $this->addQuerySelect(
+					dbConditionCoalesce('t.lastaccess', DB::getDefault('token', 'lastaccess'), 'lastaccess'),
 					$sql_parts
 				);
 				$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'token_device', 'using' => 'deviceid'];
