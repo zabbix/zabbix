@@ -693,7 +693,10 @@ class CTrigger extends CTriggerGeneral {
 		$hostids = [];
 
 		foreach ($triggers as $trigger) {
-			if (array_key_exists('hosts', $db_triggers[$trigger['triggerid']])) {
+			$db_trigger = $db_triggers[$trigger['triggerid']];
+
+			if ($trigger['expression'] !== $db_trigger['expression']
+					|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']) {
 				$triggerids[$trigger['triggerid']] = true;
 				$hostids += $db_triggers[$trigger['triggerid']]['hosts'];
 			}
