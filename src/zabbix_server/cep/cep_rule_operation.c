@@ -892,7 +892,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
-		zbx_cep_event_pos_t pos, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
+		zbx_uint32_t pos, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_event_t	*event;
 	zbx_db_event	*db_event;
@@ -902,7 +902,7 @@ static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " pos:%d", __func__, op->operationid, pos);
 
-	if (ctx->pos != pos)
+	if (0 == (ctx->pos & pos))
 		goto out;
 
 	if (NULL == (event = cep_event_context_get_event(ctx)))

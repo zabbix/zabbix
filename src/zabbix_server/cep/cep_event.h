@@ -42,13 +42,9 @@ int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag);
 int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags);
 int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value, int *match_index);
 
-typedef enum
-{
-	CEP_POS_UNKNOWN,
-	CEP_POS_FIRST,
-	CEP_POS_LAST
-}
-zbx_cep_event_pos_t;
+#define CEP_POS_UNKNOWN	0x00
+#define CEP_POS_FIRST	0x01
+#define CEP_POS_LAST	0x02
 
 typedef struct
 {
@@ -56,8 +52,6 @@ typedef struct
 	zbx_db_event		*db_event_local;
 	zbx_cep_event_t		*event;
 	zbx_cep_event_handle_t	hevent;
-
-	zbx_cep_event_pos_t	pos;
 
 	zbx_uint64_t		functionid;	/* first function identifier */
 	zbx_uint64_t		hostid;		/* first host identifier */
@@ -68,12 +62,14 @@ typedef struct
 
 	zbx_dbconn_pool_t	*dbpool;
 
+	zbx_uint32_t		pos;
+
 	zbx_uint32_t		sync_flags;
 }
 zbx_cep_event_context_t;
 
 void	cep_event_context_init_with_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent,
-	zbx_cep_event_pos_t pos, zbx_dbconn_pool_t *dbpool);
+	zbx_uint32_t pos, zbx_dbconn_pool_t *dbpool);
 void	cep_event_context_init_with_event(zbx_cep_event_context_t *ctx, zbx_cep_event_t *event,
 	zbx_db_event *db_event, zbx_dbconn_pool_t *dbpool);
 

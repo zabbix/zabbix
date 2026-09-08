@@ -389,15 +389,17 @@ static void	cep_window_ref_clear(void *a)
  *               CEP_POS_UNKNOWN - event is neither first nor last            *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_event_pos_t	cep_window_event_pos(int index, int events_num)
+static zbx_uint32_t	cep_window_event_pos(int index, int events_num)
 {
+	zbx_uint32_t	pos = CEP_POS_UNKNOWN;
+
 	if (0 == index)
-		return CEP_POS_FIRST;
+		pos |= CEP_POS_FIRST;
 
 	if (index == events_num - 1)
-		return CEP_POS_LAST;
+		pos |= CEP_POS_LAST;
 
-	return CEP_POS_UNKNOWN;
+	return pos;
 }
 
 static zbx_uint64_t	cep_window_execute_operations(const zbx_cep_rule_t *rule, zbx_cep_window_t *window,
@@ -533,7 +535,10 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	else
 	{
 		if (0 == zbx_queue_ptr_values_num(&window->hevents))
+		{
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx->event));
+			ctx->pos |= CEP_POS_FIRST;
+		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
@@ -541,6 +546,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, NULL, tasks);
+		ctx->pos &= CEP_POS_FIRST;
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
@@ -856,6 +862,8 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 			cep_window_set_event_cause(ctx, h, &ack);
 		}
+		else
+			ctx->pos |= CEP_POS_FIRST;
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
@@ -866,6 +874,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, &ack, tasks);
+		ctx->pos &= ~CEP_POS_FIRST;
 
 		if (SUCCEED == cep_acknowledge_is_set(&ack))
 		{
@@ -876,7 +885,6 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 			zbx_vector_mw_task_ptr_append(tasks, task);
 			cep_acknowledge_clear(&ack);
 		}
-
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
@@ -1030,7 +1038,10 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	else
 	{
 		if (0 == zbx_queue_ptr_values_num(&window->hevents))
+		{
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
+			ctx->pos |= CEP_POS_FIRST;
+		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
@@ -1038,6 +1049,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, NULL, tasks);
+		ctx->pos &= ~CEP_POS_FIRST;
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))

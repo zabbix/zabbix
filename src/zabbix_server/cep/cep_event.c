@@ -857,7 +857,7 @@ void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **s
  *                                                                            *
  ******************************************************************************/
 void	cep_event_context_init_with_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent,
-		zbx_cep_event_pos_t pos, zbx_dbconn_pool_t *dbpool)
+		zbx_uint32_t pos, zbx_dbconn_pool_t *dbpool)
 {
 	memset(ctx, 0, sizeof(zbx_cep_event_context_t));
 	ctx->hevent = hevent;

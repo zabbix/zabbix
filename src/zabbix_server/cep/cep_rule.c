@@ -229,9 +229,9 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 		case ZBX_CONDITION_TYPE_EVENT_OPEN:
 			return cep_operation_condition_eval_open(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_FIRST:
-			return cep_operation_condition_eval_state(condition, (CEP_POS_FIRST == ctx->pos));
+			return cep_operation_condition_eval_state(condition, 0 != (ctx->pos & CEP_POS_FIRST));
 		case ZBX_CONDITION_TYPE_EVENT_LAST:
-			return cep_operation_condition_eval_state(condition, (CEP_POS_LAST == ctx->pos));
+			return cep_operation_condition_eval_state(condition, 0 != (ctx->pos & CEP_POS_LAST));
 		case ZBX_CONDITION_TYPE_EVENT_SYMPTOM:
 			return cep_operation_condition_eval_symptom(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_COPIED:
