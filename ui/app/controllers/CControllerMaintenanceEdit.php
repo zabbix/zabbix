@@ -29,8 +29,8 @@ class CControllerMaintenanceEdit extends CController {
 	protected function checkInput(): bool {
 		$rules = ['object', 'fields' => [
 			'maintenanceid' => ['db maintenances.maintenanceid'],
-			'context' 		=> ['string'],
-			'eventids' 		=> ['array']
+			'context' 		=> ['string', 'in' => ['host', 'trigger', 'event_name', 'event_tags']],
+			'eventids' 		=> ['array', 'field' => ['db events.eventid']]
 		]];
 
 		$ret = $this->validateInput($rules, true);
