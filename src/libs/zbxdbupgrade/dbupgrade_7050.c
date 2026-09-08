@@ -1254,6 +1254,41 @@ static int	DBpatch_7050091(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050092(void)
+{
+	const zbx_db_field_t	field = {"sign_messages", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050093(void)
+{
+	const zbx_db_field_t	field = {"sign_assertions", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050094(void)
+{
+	const zbx_db_field_t	field = {"sign_authn_requests", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050095(void)
+{
+	const zbx_db_field_t	field = {"sign_logout_requests", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("userdirectory_saml", &field);
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_field_t	field = {"sign_logout_responses", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("userdirectory_saml", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1352,5 +1387,10 @@ DBPATCH_ADD(7050088, 0, 1)
 DBPATCH_ADD(7050089, 0, 1)
 DBPATCH_ADD(7050090, 0, 1)
 DBPATCH_ADD(7050091, 0, 1)
+DBPATCH_ADD(7050092, 0, 1)
+DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
 
 DBPATCH_END()
