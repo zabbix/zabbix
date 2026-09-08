@@ -211,21 +211,22 @@ class HostInterfaceManager {
 				);
 			}
 
-			if (e.target.value != HostInterfaceManager.SNMP_V1) {
-				const input = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
+			const input_max_rep = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
 
-				if (input && !input.value) {
-					input.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
-				}
+			if (input_max_rep.value.trim() === '' || input_max_rep.value.trim() === '0') {
+				input_max_rep.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
 			}
 
-			if (e.target.value != HostInterfaceManager.SNMP_V3) {
-				const input = document.getElementById(`interfaces_${iface.interfaceid}_details_community`);
+			const input_community = document.getElementById(`interfaces_${iface.interfaceid}_details_community`);
 
-				if (input && !input.value) {
-					input.value = HostInterfaceManager.SNMP_COMMUNITY;
-				}
+			if (input_community.value.trim() === '') {
+				input_community.value = HostInterfaceManager.SNMP_COMMUNITY;
 			}
+
+			input_community.dispatchEvent(new CustomEvent('field.change',
+				{detail: {source_fields: [input_max_rep.name, input_community.name]} }
+			));
+
 		}).trigger('change');
 	}
 
