@@ -211,21 +211,26 @@ class HostInterfaceManager {
 				);
 			}
 
+			const changed_field_names = [];
 			const input_max_rep = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
 
 			if (input_max_rep.value.trim() === '' || input_max_rep.value.trim() === '0') {
 				input_max_rep.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
+				changed_field_names.push(input_max_rep.name);
 			}
 
 			const input_community = document.getElementById(`interfaces_${iface.interfaceid}_details_community`);
 
 			if (input_community.value.trim() === '') {
 				input_community.value = HostInterfaceManager.SNMP_COMMUNITY;
+				changed_field_names.push(input_community.name);
 			}
 
-			input_community.dispatchEvent(new CustomEvent('field.change',
-				{detail: {source_fields: [input_max_rep.name, input_community.name]} }
-			));
+			if (changed_field_names.length > 0) {
+				input_community.dispatchEvent(new CustomEvent('field.change',
+					{detail: {source_fields: changed_field_names} }
+				));
+			}
 
 		}).trigger('change');
 	}
