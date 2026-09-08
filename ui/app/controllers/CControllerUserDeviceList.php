@@ -140,6 +140,9 @@ class CControllerUserDeviceList extends CController {
 
 	private function getDevices(array $filter): array {
 		$options = [
+			'output' => ['deviceid', 'userid', 'uuid', 'name', 'status', 'activated_at', 'lastaccess',
+				'enrollment_token_expires_at'
+			],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 

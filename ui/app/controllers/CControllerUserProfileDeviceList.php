@@ -88,6 +88,7 @@ class CControllerUserProfileDeviceList extends CController {
 		$options = [
 			'userids' => CWebUser::$data['userid'],
 			'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED],
+			'output' => ['deviceid', 'uuid', 'name', 'activated_at', 'lastaccess'],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 

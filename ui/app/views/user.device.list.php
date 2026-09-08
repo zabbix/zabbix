@@ -139,7 +139,9 @@ foreach ($data['devices'] as $device) {
 		$device['user_role'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
-		$data['device_statuses'][$device['status']],
+		$device['status'] == ZBX_DEVICE_STATUS_NEW && $device['enrollment_token_expires_at'] < time()
+			? _('Expired')
+			: $data['device_statuses'][$device['status']],
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] && $can_manage
 			? (new CButton('', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
