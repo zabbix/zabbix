@@ -140,7 +140,8 @@ foreach ($data['devices'] as $device) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
 		$device['status'] == ZBX_DEVICE_STATUS_NEW && $device['enrollment_token_expires_at'] < time()
-			? _('Expired')
+			? (new CSpan($data['device_statuses'][$device['status']].' ('._('Token expired').')'))
+				->addClass(ZBX_STYLE_RED)
 			: $data['device_statuses'][$device['status']],
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] && $can_manage
 			? (new CButton('', _('Remove')))
