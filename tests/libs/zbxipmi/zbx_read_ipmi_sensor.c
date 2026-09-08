@@ -29,7 +29,10 @@
 /* closed) via IPMI_SENSOR_ID_INVALID, the same way the ZBX-25759 cb_data scenario is simulated in         */
 /* zbx_domain_closed_cb.c. Real OpenIPMI (not mocked) is exercised - ipmi_sensor_id_get_reading()/         */
 /* get_states() reject the invalid id synchronously with an error, without ever invoking their callback    */
-/* (verified against the real library, not assumed).                                                       */
+/* (verified against the real library, not assumed). 'out.err_contains' pins down the exact wording each   */
+/* branch produces (naming the specific OpenIPMI call that failed, or - for case 3 - the cached            */
+/* reading_type_str), so a case can only pass if the matching switch branch actually ran, not just any     */
+/* branch that happens to also set h->ret to NOTSUPPORTED.                                                 */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -42,6 +45,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_ipmi_host_t		h;
 	zbx_ipmi_sensor_t	s;
 	int			reading_type = zbx_mock_get_parameter_int("in.reading_type");
+	const char		*err_contains = zbx_mock_get_parameter_string("out.err_contains");
 
 	ZBX_UNUSED(state);
 
@@ -61,9 +65,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("h.ret", NOTSUPPORTED, h.ret);
 
-	if (NULL == h.err || '\0' == *h.err)
-		fail_msg("h.err should describe why the sensor could not be read, got %s",
-				NULL == h.err ? "NULL" : "an empty string");
+	if (NULL == h.err || NULL == strstr(h.err, err_contains))
+	{
+		fail_msg("h.err should mention '%s' (proving the matching switch branch actually ran), got: %s",
+				err_contains, NULL == h.err ? "NULL" : h.err);
+	}
 
 	zbx_free(h.err);
 	zbx_hashset_destroy(&hostset);

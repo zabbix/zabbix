@@ -21,7 +21,9 @@
 /* reaches the id-based call being verified, rather than short-circuiting on the capability check.          */
 /*                                                                                                          */
 /* An IPMI_CONTROL_ID_INVALID control_id stands in for a control OpenIPMI has since destroyed. Real         */
-/* OpenIPMI (not mocked) is exercised throughout.                                                           */
+/* OpenIPMI (not mocked) is exercised throughout. 'out.err_contains' pins down the exact wording each       */
+/* branch produces, so a case can only pass if the matching branch actually ran - not just any branch       */
+/* that happens to also set h->ret to NOTSUPPORTED.                                                         */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -35,6 +37,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_ipmi_control_t	c;
 	int			val = 0;
 	const char		*op = zbx_mock_get_parameter_string("in.op");
+	const char		*err_contains = zbx_mock_get_parameter_string("out.err_contains");
 
 	ZBX_UNUSED(state);
 
@@ -63,9 +66,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("h.ret", NOTSUPPORTED, h.ret);
 
-	if (NULL == h.err || '\0' == *h.err)
-		fail_msg("h.err should describe why the control could not be accessed, got %s",
-				NULL == h.err ? "NULL" : "an empty string");
+	if (NULL == h.err || NULL == strstr(h.err, err_contains))
+	{
+		fail_msg("h.err should mention '%s' (proving the matching branch actually ran), got: %s",
+				err_contains, NULL == h.err ? "NULL" : h.err);
+	}
 
 	zbx_free(h.err);
 	zbx_hashset_destroy(&hostset);

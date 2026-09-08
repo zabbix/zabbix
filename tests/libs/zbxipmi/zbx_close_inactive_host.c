@@ -12,14 +12,17 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_close_inactive_host() and zbx_delete_inactive_ipmi_hosts() are static/exported respectively, and   */
-/* checks_ipmi.c is included directly to reach the static one and the 'hostset' they share.               */
+/* zbx_close_inactive_host() and zbx_delete_inactive_ipmi_hosts() are static/exported respectively, and    */
+/* checks_ipmi.c is included directly to reach the static one and the 'hostset' they share.                */
 /*                                                                                                          */
-/* No IPMI domain is ever opened in this test process, so ipmi_domain_iterate_domains() (a real, unmocked   */
-/* OpenIPMI call) always finds zero domains - the exact "domain not found" branch zbx_close_inactive_host() */
-/* itself documents as a legitimate case ("Zabbix allocated an IPMI host during network problem and the     */
-/* domain was closed... but the host is still in our list"). That branch frees the host directly without    */
-/* touching any OpenIPMI sensor/control/domain object, so it's fully exercised here without a live BMC.     */
+/* Every host's domain-close attempt goes through ipmi_domain_iterate_domains()/ipmi_domain_close(),        */
+/* wrapped below so 'in.domain_found' can drive both branches without a live OpenIPMI domain:               */
+/* "no" leaves __wrap_ipmi_domain_iterate_domains() a no-op, exactly matching a real process with zero      */
+/* open domains - the "domain not found" branch zbx_close_inactive_host() itself documents as legitimate.   */
+/* "yes" makes it report a match, driving the full zbx_get_domain_id_by_name_cb() -> ipmi_domain_pointer_cb */
+/* () -> zbx_domain_close_cb() -> ipmi_domain_close() chain end to end - the exact path a                   */
+/* RETURN_IF_CB_DATA_INVALID() misuse in zbx_get_domain_id_by_name_cb() used to skip, silently leaking the  */
+/* OpenIPMI domain instead of closing it.                                                                  */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -27,29 +30,26 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-/* Wraps for the "domain found by name" path, unreachable above without a live OpenIPMI domain. They let     */
-/* zbx_get_domain_id_by_name_cb(), ipmi_domain_pointer_cb() and ipmi_domain_close() be driven end-to-end, in */
-/* particular proving that a domain found by ipmi_domain_iterate_domains() is actually passed to             */
-/* ipmi_domain_close() - the exact step that a RETURN_IF_CB_DATA_INVALID() misuse in                         */
-/* zbx_get_domain_id_by_name_cb() used to skip, silently leaking the OpenIPMI domain instead of closing it.  */
 static void	*wrap_iterate_cb_data;
-static int	wrap_domain_pointer_cb_calls;
-static int	wrap_domain_close_calls;
+static int	domain_found;
+static int	domain_pointer_cb_calls;
+static int	domain_close_calls;
 
 void	__wrap_ipmi_domain_iterate_domains(ipmi_domain_ptr_cb handler, void *cb_data)
 {
 	wrap_iterate_cb_data = cb_data;
 
-	/* the domain pointer itself is never dereferenced by __wrap_ipmi_domain_get_name() below, so any */
-	/* non-NULL value stands in for a real ipmi_domain_t* */
-	handler((ipmi_domain_t *)0x1, cb_data);
+	/* a real process with zero open domains never invokes 'handler' at all - see the file header comment */
+	if (0 != domain_found)
+		handler((ipmi_domain_t *)0x1, cb_data);
 }
 
 int	__wrap_ipmi_domain_get_name(ipmi_domain_t *domain, char *name, int length)
 {
 	ZBX_UNUSED(domain);
 
-	/* echo back the exact name zbx_close_inactive_host() is searching for, simulating "domain found" */
+	/* only reached when domain_found is set, so echoing back the exact name being searched for */
+	/* (ipmi_domain_iterate_domains()'s own cb_data) simulates "found" */
 	zbx_strlcpy(name, (const char *)wrap_iterate_cb_data, (size_t)length);
 
 	return (int)strlen(name);
@@ -69,7 +69,7 @@ int	__wrap_ipmi_domain_pointer_cb(ipmi_domain_id_t id, ipmi_domain_ptr_cb handle
 {
 	ZBX_UNUSED(id);
 
-	wrap_domain_pointer_cb_calls++;
+	domain_pointer_cb_calls++;
 	handler((ipmi_domain_t *)0x1, cb_data);
 
 	return 0;
@@ -79,115 +79,123 @@ int	__wrap_ipmi_domain_close(ipmi_domain_t *domain, ipmi_domain_close_done_cb cl
 {
 	ZBX_UNUSED(domain);
 
-	wrap_domain_close_calls++;
+	domain_close_calls++;
 
-	/* invoke the completion callback synchronously so zbx_perform_openipmi_ops() sees h->done already set  */
+	/* invoke the completion callback synchronously so zbx_perform_openipmi_ops() sees h->done already set */
 	/* and never touches the (uninitialized, in this test process) os_hnd event loop */
 	close_done(cb_data);
 
 	return 0;
 }
 
+static zbx_ipmi_host_t	*allocate_host_from_yaml(zbx_mock_handle_t hhost, time_t now)
+{
+	zbx_ipmi_host_t	*h;
+
+	h = zbx_allocate_ipmi_host(zbx_mock_get_object_member_string(hhost, "ip"), 623, 2, 4, "user", "pass");
+	h->lastaccess = now - zbx_mock_get_object_member_int(hhost, "lastaccess_hours_ago") * SEC_PER_HOUR;
+
+	return h;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*scenario = zbx_mock_get_parameter_string("in.scenario");
+	const char		*op = zbx_mock_get_parameter_string("in.op");
+	time_t			now = time(NULL);
+	zbx_mock_handle_t	hhosts, hhost;
+	zbx_vector_ptr_t	hosts;
 
 	ZBX_UNUSED(state);
 
 	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_create(&hosts);
 
-	if (0 == strcmp(scenario, "close_directly"))
+	domain_found = (0 == strcmp(zbx_mock_get_parameter_string("in.domain_found"), "yes")) ? 1 : 0;
+	domain_pointer_cb_calls = 0;
+	domain_close_calls = 0;
+
+	hhosts = zbx_mock_get_parameter_handle("in.hosts");
+	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(hhosts, &hhost))
+		zbx_vector_ptr_append(&hosts, allocate_host_from_yaml(hhost, now));
+
+	if (0 == strcmp(op, "close_single"))
 	{
-		zbx_ipmi_host_t	*h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
-		int		ret = zbx_close_inactive_host(h);	/* frees h on SUCCEED - domain not found */
+		zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)hosts.values[0];
+		int		ret = zbx_close_inactive_host(h);	/* frees h on SUCCEED - see comment below */
 
-		zbx_mock_assert_int_eq("zbx_close_inactive_host() return value", SUCCEED, ret);
+		zbx_mock_assert_int_eq("zbx_close_inactive_host() return value",
+				zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.close_ret")), ret);
+		zbx_mock_assert_int_eq("ipmi_domain_pointer_cb() call count",
+				zbx_mock_get_parameter_int("out.domain_pointer_cb_calls"), domain_pointer_cb_calls);
+		zbx_mock_assert_int_eq("ipmi_domain_close() call count",
+				zbx_mock_get_parameter_int("out.domain_close_calls"), domain_close_calls);
 
-		/* zbx_close_inactive_host() only frees the host, it never removes it from 'hostset' - that's   */
-		/* the caller's job (zbx_delete_inactive_ipmi_hosts() does it via zbx_hashset_iter_remove()) */
+		/* zbx_close_inactive_host() only frees the host on SUCCEED; it never removes it from 'hostset' - */
+		/* that's the caller's job (zbx_delete_inactive_ipmi_hosts() does it via                          */
+		/* zbx_hashset_iter_remove()) */
+		if (SUCCEED != ret)
+			zbx_free_ipmi_host(h);
 		zbx_hashset_remove(&hostset, &h);
 	}
-	else if (0 == strcmp(scenario, "delete_inactive"))
+	else if (0 == strcmp(op, "sweep"))
 	{
-		time_t	now = time(NULL);
-		zbx_ipmi_host_t	*stale = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
-		zbx_ipmi_host_t	*fresh = zbx_allocate_ipmi_host("127.0.0.2", 623, 2, 4, "user", "pass");
+		zbx_mock_handle_t	hips, hip;
+		zbx_vector_str_t	exp_ips;
+		zbx_hashset_iter_t	iter;
+		zbx_ipmi_host_t		**phost;
 
-		stale->lastaccess = now - 4 * SEC_PER_HOUR;	/* older than the 3h INACTIVE_HOST_LIMIT */
-		fresh->lastaccess = now;
+		zbx_vector_str_create(&exp_ips);
+		hips = zbx_mock_get_parameter_handle("out.surviving_ips");
+		while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(hips, &hip))
+		{
+			const char	*ip;
+
+			zbx_mock_string(hip, &ip);
+			zbx_vector_str_append(&exp_ips, zbx_strdup(NULL, ip));
+		}
 
 		zbx_delete_inactive_ipmi_hosts(now);
 
-		zbx_mock_assert_int_eq("hosts remaining in hostset", 1, hostset.num_data);
+		zbx_mock_assert_int_eq("hosts remaining in hostset", exp_ips.values_num, (int)hostset.num_data);
 
-		if (NULL == zbx_hashset_search(&hostset, &fresh))
-			fail_msg("the recently-active host should still be in 'hostset'");
-		if (NULL != zbx_hashset_search(&hostset, &stale))
-			fail_msg("the inactive host should have been removed from 'hostset'");
+		/* the sweep can close a stale host's domain too - assert the same call counts as 'close_single' */
+		/* whenever the test case cares to specify them, so 'domain_found: yes' proves the domain was    */
+		/* actually closed here as well, not just that the host left 'hostset' (which happens either way, */
+		/* via the buggy "domain not found" fallback, even when the domain never gets closed for real)   */
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.domain_pointer_cb_calls"))
+		{
+			zbx_mock_assert_int_eq("ipmi_domain_pointer_cb() call count",
+					zbx_mock_get_parameter_int("out.domain_pointer_cb_calls"),
+					domain_pointer_cb_calls);
+		}
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.domain_close_calls"))
+		{
+			zbx_mock_assert_int_eq("ipmi_domain_close() call count",
+					zbx_mock_get_parameter_int("out.domain_close_calls"), domain_close_calls);
+		}
 
-		zbx_free_ipmi_host(fresh);
-		zbx_hashset_remove(&hostset, &fresh);
-	}
-	else if (0 == strcmp(scenario, "boundary_not_deleted"))
-	{
-		time_t	now = time(NULL);
-		/* exactly at INACTIVE_HOST_LIMIT (3h) - the check is "last_check - lastaccess > LIMIT", so a */
-		/* host exactly at the boundary must survive */
-		zbx_ipmi_host_t	*h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
+		zbx_hashset_iter_reset(&hostset, &iter);
+		while (NULL != (phost = (zbx_ipmi_host_t **)zbx_hashset_iter_next(&iter)))
+		{
+			if (FAIL == zbx_vector_str_search(&exp_ips, (*phost)->ip, ZBX_DEFAULT_STR_COMPARE_FUNC))
+				fail_msg("host '%s' survived the sweep but was not expected to", (*phost)->ip);
+		}
 
-		h->lastaccess = now - 3 * SEC_PER_HOUR;
+		for (int i = 0; i < exp_ips.values_num; i++)
+			zbx_free(exp_ips.values[i]);
+		zbx_vector_str_destroy(&exp_ips);
 
-		zbx_delete_inactive_ipmi_hosts(now);
-
-		zbx_mock_assert_int_eq("hosts remaining in hostset", 1, hostset.num_data);
-		if (NULL == zbx_hashset_search(&hostset, &h))
-			fail_msg("a host exactly at the inactivity boundary should not have been removed");
-
-		zbx_free_ipmi_host(h);
-		zbx_hashset_remove(&hostset, &h);
-	}
-	else if (0 == strcmp(scenario, "multiple_stale"))
-	{
-		time_t	now = time(NULL);
-		zbx_ipmi_host_t	*stale1 = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
-		zbx_ipmi_host_t	*stale2 = zbx_allocate_ipmi_host("127.0.0.2", 623, 2, 4, "user", "pass");
-		zbx_ipmi_host_t	*fresh = zbx_allocate_ipmi_host("127.0.0.3", 623, 2, 4, "user", "pass");
-
-		stale1->lastaccess = now - 4 * SEC_PER_HOUR;
-		stale2->lastaccess = now - 10 * SEC_PER_HOUR;
-		fresh->lastaccess = now;
-
-		zbx_delete_inactive_ipmi_hosts(now);
-
-		zbx_mock_assert_int_eq("hosts remaining in hostset", 1, hostset.num_data);
-		if (NULL == zbx_hashset_search(&hostset, &fresh))
-			fail_msg("the recently-active host should still be in 'hostset'");
-
-		zbx_free_ipmi_host(fresh);
-		zbx_hashset_remove(&hostset, &fresh);
-	}
-	else if (0 == strcmp(scenario, "domain_found_and_closed"))
-	{
-		zbx_ipmi_host_t	*h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
-		int		ret;
-
-		wrap_domain_pointer_cb_calls = 0;
-		wrap_domain_close_calls = 0;
-
-		ret = zbx_close_inactive_host(h);
-
-		zbx_mock_assert_int_eq("zbx_close_inactive_host() return value", SUCCEED, ret);
-
-		/* the whole point of this scenario: a domain found by name must actually be looked up and closed, */
-		/* not silently skipped as it was while zbx_get_domain_id_by_name_cb() misused                     */
-		/* RETURN_IF_CB_DATA_INVALID() on a cb_data that was never a zbx_ipmi_host_t* */
-		zbx_mock_assert_int_eq("ipmi_domain_pointer_cb() call count", 1, wrap_domain_pointer_cb_calls);
-		zbx_mock_assert_int_eq("ipmi_domain_close() call count", 1, wrap_domain_close_calls);
-
-		zbx_hashset_remove(&hostset, &h);
+		/* free whatever the sweep left behind */
+		zbx_hashset_iter_reset(&hostset, &iter);
+		while (NULL != (phost = (zbx_ipmi_host_t **)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_free_ipmi_host(*phost);
+			zbx_hashset_iter_remove(&iter);
+		}
 	}
 	else
-		fail_msg("unknown 'in.scenario' value: %s", scenario);
+		fail_msg("unknown 'in.op' value: %s", op);
 
+	zbx_vector_ptr_destroy(&hosts);
 	zbx_hashset_destroy(&hostset);
 }

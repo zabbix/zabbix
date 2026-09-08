@@ -1,21 +1,76 @@
 ---
 test case: "1. closing a host whose domain is not found frees it and returns SUCCEED"
 in:
-  scenario: "close_directly"
+  op: "close_single"
+  domain_found: "no"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 0
+out:
+  close_ret: "SUCCEED"
+  domain_pointer_cb_calls: 0
+  domain_close_calls: 0
 ---
-test case: "2. zbx_delete_inactive_ipmi_hosts removes only the inactive host"
+test case: "2. a domain found by name is actually closed via ipmi_domain_close()"
 in:
-  scenario: "delete_inactive"
+  op: "close_single"
+  domain_found: "yes"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 0
+out:
+  close_ret: "SUCCEED"
+  domain_pointer_cb_calls: 1
+  domain_close_calls: 1
 ---
-test case: "3. a host exactly at the inactivity boundary is not removed"
+test case: "3. zbx_delete_inactive_ipmi_hosts removes only the inactive host"
 in:
-  scenario: "boundary_not_deleted"
+  op: "sweep"
+  domain_found: "no"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 4
+    - ip: "127.0.0.2"
+      lastaccess_hours_ago: 0
+out:
+  surviving_ips:
+    - "127.0.0.2"
 ---
-test case: "4. multiple stale hosts are all removed, active host survives"
+test case: "4. a host exactly at the inactivity boundary is not removed"
 in:
-  scenario: "multiple_stale"
+  op: "sweep"
+  domain_found: "no"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 3
+out:
+  surviving_ips:
+    - "127.0.0.1"
 ---
-test case: "5. a domain found by name is actually closed via ipmi_domain_close()"
+test case: "5. multiple stale hosts are all removed, active host survives"
 in:
-  scenario: "domain_found_and_closed"
+  op: "sweep"
+  domain_found: "no"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 4
+    - ip: "127.0.0.2"
+      lastaccess_hours_ago: 10
+    - ip: "127.0.0.3"
+      lastaccess_hours_ago: 0
+out:
+  surviving_ips:
+    - "127.0.0.3"
+---
+test case: "6. a stale host whose domain is found is closed via the sweep too"
+in:
+  op: "sweep"
+  domain_found: "yes"
+  hosts:
+    - ip: "127.0.0.1"
+      lastaccess_hours_ago: 4
+out:
+  surviving_ips: []
+  domain_pointer_cb_calls: 1
+  domain_close_calls: 1
 ...

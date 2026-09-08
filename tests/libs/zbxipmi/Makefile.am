@@ -211,7 +211,11 @@ zbx_read_ipmi_thresholds_LDADD = \
 
 zbx_read_ipmi_thresholds_LDADD += @SERVER_LIBS@
 
-zbx_read_ipmi_thresholds_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+# wraps ipmi_sensor_id_get_thresholds() purely to count calls (forwarding to the real implementation via
+# __real_) so the two "not accessible"/"fixed" cases can be told apart from the "readable" one - see the
+# file header comment
+zbx_read_ipmi_thresholds_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
+	-Wl,--wrap=ipmi_sensor_id_get_thresholds $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_read_ipmi_thresholds_CFLAGS = $(IPMI_COMPILER_FLAGS)
 

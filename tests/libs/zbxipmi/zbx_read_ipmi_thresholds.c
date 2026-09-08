@@ -18,12 +18,31 @@
 /* sensor_id (a vanished sensor) without ever invoking its callback, exercised here against the real       */
 /* library. thr_access is a cached, static field (see zbx_ipmi_sensor_t.thr_access), so it's just set      */
 /* directly here rather than needing revalidation.                                                         */
+/*                                                                                                          */
+/* zbx_read_ipmi_thresholds() never sets h->err and h->done stays 0 on every path exercised here, so        */
+/* there is no return value that tells "not accessible"/"fixed" apart from "readable but the sensor is      */
+/* gone" - the thr_access check either skips ipmi_sensor_id_get_thresholds() entirely or calls it. That     */
+/* call is wrapped below purely to count it (forwarding to the real, unmocked implementation via            */
+/* __real_ipmi_sensor_id_get_thresholds() so the "real library" property above still holds), so             */
+/* 'out.get_thresholds_calls' proves which branch actually ran.                                             */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+
+static int	get_thresholds_calls;
+
+extern int	__real_ipmi_sensor_id_get_thresholds(ipmi_sensor_id_t id, ipmi_sensor_thresholds_cb done,
+		void *cb_data);
+
+int	__wrap_ipmi_sensor_id_get_thresholds(ipmi_sensor_id_t id, ipmi_sensor_thresholds_cb done, void *cb_data)
+{
+	get_thresholds_calls++;
+
+	return __real_ipmi_sensor_id_get_thresholds(id, done, cb_data);
+}
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -43,10 +62,14 @@ void	zbx_mock_test_entry(void **state)
 	/* stands in for a sensor OpenIPMI has already destroyed - see zbx_read_ipmi_sensor.c */
 	s.sensor_id = (ipmi_sensor_id_t)IPMI_SENSOR_ID_INVALID;
 
+	get_thresholds_calls = 0;
+
 	zbx_read_ipmi_thresholds(&h, &s);
 
 	/* zbx_read_ipmi_thresholds() never touches h->ret; h->done stays 0 on every failure path taken here */
 	zbx_mock_assert_int_eq("h.done", 0, h.done);
+	zbx_mock_assert_int_eq("ipmi_sensor_id_get_thresholds() call count",
+			zbx_mock_get_parameter_int("out.get_thresholds_calls"), get_thresholds_calls);
 
 	zbx_free(h.err);
 	zbx_hashset_destroy(&hostset);

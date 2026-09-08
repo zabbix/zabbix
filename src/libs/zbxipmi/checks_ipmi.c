@@ -150,8 +150,8 @@ typedef struct zbx_ipmi_host
 zbx_ipmi_host_t;
 
 static unsigned int	domain_nr = 0;		/* for making a sequence of domain names "0", "1", "2", ... */
-static os_handler_t	*os_hnd;
 static zbx_hashset_t	hostset;		/* set of monitored hosts */
+static os_handler_t	*os_hnd;
 
 static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
 {
@@ -571,7 +571,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	ipmi_control_get_name(raw_control, full_name, sizeof(full_name));
 	dm_sz = get_domain_offset(h, full_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added raw_control: host'%s' id:'%s' domain:'%u' name:'%s'", __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s' id:'%s' domain:'%u' name:'%s'", __func__,
 			zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port), c_name, h->domain_nr,
 			full_name + dm_sz);
 
@@ -1826,9 +1826,9 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		return h->ret;
 	}
 
-	/* zbx_read_ipmi_sensor()/zbx_read_ipmi_control() process the OpenIPMI event queue                    */
-	/* (zbx_perform_openipmi_ops()), which can run unrelated sensor/control add or delete events for this */
-	/* same host - h->sensors/h->controls can get zbx_realloc()'d to a new address, or memmove()'d and    */
+	/* zbx_read_ipmi_sensor()/zbx_read_ipmi_control() process the OpenIPMI event queue                     */
+	/* (zbx_perform_openipmi_ops()), which can run unrelated sensor/control add or delete events for this  */
+	/* same host - h->sensors/h->controls can get zbx_realloc()'d to a new address, or memmove()'d and     */
 	/* shift indices, in the meantime. Re-resolve 's'/'c' by their stable string key instead of            */
 	/* dereferencing the pointer obtained before the read.                                                 */
 	if (NULL != s)
