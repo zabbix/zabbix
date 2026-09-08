@@ -848,23 +848,24 @@ int	zbx_xmlnode_to_json(void *xml_node, char **jstr)
  * Parameters: jp             - [IN] JSON parse structure                     *
  *             arr_name       - [IN] name of parent array                     *
  *             deep           - [IN] node depth level                         *
+ *             nodevalue      - [IN] node value buffer                        *
+ *             buffersize     - [IN] size of node buffer                      *
  *             doc            - [IN/OUT] xml document structure               *
  *             parent_node    - [IN/OUT] parent XML node                      *
  *             attr           - [OUT] node attribute name                     *
  *             attr_val       - [OUT] node attribute value                    *
  *             text           - [OUT] node content                            *
- *             nodevalue      - [IN] node value buffer                        *
  *                                                                            *
  * Return value: SUCCEED - the value was processed successfully               *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, xmlDoc *doc, xmlNode *parent_node,
-		char **attr, char **attr_val, char **text, char *nodevalue)
+static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, char *nodevalue, int buffersize,
+		xmlDoc *doc, xmlNode *parent_node, char **attr, char **attr_val, char **text)
 {
 	const char		*json_string_ptr = NULL, *json_string_ptr_old = NULL;
 	char			*array_loc, *pname, *attr_loc = NULL,
-			*attr_val_loc = NULL, *text_loc = NULL, *value = NULL, *name = NULL;
+				*attr_val_loc = NULL, *text_loc = NULL, *value = NULL, *name = NULL;
 	int			set_attr, set_text, idx = 0, ret = SUCCEED;
 	zbx_json_type_t		type;
 	xmlNode			*node;
@@ -873,13 +874,15 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 	if (ZBX_MAX_JSON_DEPTH < deep)
 		return FAIL;
 
+	name = zbx_malloc(NULL, MAX_STRING_LEN);
+	name[0] = '\0';
+
 	do
 	{
 		set_attr = 0;
 		set_text = 0;
 		array_loc = NULL;
 		pname = NULL;
-		name = zbx_malloc(NULL, MAX_STRING_LEN);
 
 		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, MAX_STRING_LEN)))
 		{
@@ -897,6 +900,7 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 		else
 		{
 			json_string_ptr = json_string_ptr_old;
+
 			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr,
 					nodevalue, MAX_STRING_LEN, &type)))
 			{
@@ -931,7 +935,7 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 
 			if (ZBX_JSON_TYPE_ARRAY == type)
 			{
-				array_loc = name;
+				array_loc = ('\0' != name[0]) ? name : arr_name;
 				node = parent_node;
 			}
 			else if (ZBX_JSON_TYPE_OBJECT == type || ZBX_JSON_TYPE_UNKNOWN == type)
@@ -956,10 +960,14 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 
 			if (SUCCEED == zbx_json_brackets_open(json_string_ptr, &jp_data))
 			{
-				if (SUCCEED != json_to_xmlnode(&jp_data, array_loc, deep + 1, doc, node,
-						&attr_loc, &attr_val_loc, &text_loc, nodevalue))
+				if (SUCCEED != json_to_xmlnode(&jp_data, array_loc, deep + 1, nodevalue, buffersize,
+						doc, node, &attr_loc, &attr_val_loc, &text_loc))
 				{
 					ret = FAIL;
+					zbx_free(attr_loc);
+					zbx_free(attr_val_loc);
+					zbx_free(text_loc);
+
 					break;
 				}
 			}
@@ -974,7 +982,6 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 		zbx_free(attr_val_loc);
 		zbx_free(text_loc);
 		zbx_free(value);
-		zbx_free(name);
 		idx++;
 	}
 	while (NULL != json_string_ptr);
@@ -1029,7 +1036,8 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 		goto clean;
 	}
 
-	if (SUCCEED != json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text, json_value))
+	if (SUCCEED != json_to_xmlnode(&jp, NULL, 0, json_value, sizeof(json_value), doc, NULL,
+			&attr, &attr_val, &text))
 	{
 		*errmsg = zbx_strdup(*errmsg, "convert to xml node failed");
 		goto clean;
