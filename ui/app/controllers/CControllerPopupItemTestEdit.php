@@ -177,9 +177,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
-			'conditions' => ['objects', 'required',
-				'uniq' => [['formulaid'], ['column', 'attribute_key', 'operator', 'value']],
-				'messages' => ['uniq' => _('Condition is not unique.')],
+			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
 				'fields' => [
 					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),

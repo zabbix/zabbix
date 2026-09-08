@@ -771,16 +771,12 @@ window.item_edit_form = new class {
 		const is_complex = config.complex.includes(data.column);
 		const is_exists = data.operator == <?= CONDITION_OPERATOR_EXISTS ?>;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
-		const attribute_key = is_complex ? data.attribute_key : '';
-		const value = is_exists ? '' : data.value;
 		const html = new Template(source).evaluate({
 			...data,
-			attribute_key,
-			value,
 			formulaid: num2letter(data.row_index),
-			attribute_key_name: attribute_key,
+			attribute_key_name: is_complex ? data.attribute_key : '',
 			operator_name: this.telemetry_operator_labels[data.operator],
-			value_name: value
+			value_name: is_exists ? '' : data.value
 		});
 		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
