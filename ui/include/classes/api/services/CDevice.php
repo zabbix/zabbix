@@ -126,7 +126,9 @@ class CDevice extends CApiService {
 		if (!$options['countOutput']) {
 			if (in_array('lastaccess', $options['output'])) {
 				$sql_parts = $this->addQuerySelect(dbConditionCoalesce('t.lastaccess',
-					DB::getDefault('token', 'lastaccess'), 'lastaccess'), $sql_parts);
+					DB::getDefault('token', 'lastaccess'), 'lastaccess'),
+					$sql_parts
+				);
 				$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'token_device', 'using' => 'deviceid'];
 				$sql_parts['join']['t'] = ['type' => 'left', 'left_table' => 'td', 'table' => 'token',
 					'using' => 'tokenid'
@@ -134,9 +136,12 @@ class CDevice extends CApiService {
 			}
 
 			if (in_array('enrollment_token_expires_at', $options['output'])) {
-				$sql_parts = $this->addQuerySelect(dbConditionCoalesce('det.expires_at',
-					DB::getDefault('device_enrollment_token', 'expires_at'),
-					'enrollment_token_expires_at'), $sql_parts);
+				$sql_parts = $this->addQuerySelect(
+					dbConditionCoalesce('det.expires_at', DB::getDefault('device_enrollment_token', 'expires_at'),
+						'enrollment_token_expires_at'
+					),
+					$sql_parts
+				);
 				$sql_parts['join']['det'] = ['type' => 'left', 'table' => 'device_enrollment_token',
 					'using' => 'deviceid'
 				];
