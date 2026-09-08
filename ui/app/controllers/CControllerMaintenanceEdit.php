@@ -140,35 +140,17 @@ class CControllerMaintenanceEdit extends CController {
 			$db_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'maintenanceids' => $data['maintenanceid'],
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$db_groups_rw = API::HostGroup()->get([
-				'output' => [],
-				'editable' => true,
-				'preservekeys' => true
+				'editable' => true
 			]);
 
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'selectHosts' => ['name'],
-				'selectHostGroups' => ['groupid'],
 				'maintenanceids' => $data['maintenanceid'],
 				'editable' => true
 			]);
 
-			foreach ($db_triggers as $i => &$trigger) {
-				$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
-
-				foreach ($trigger_groupids as $trigger_groupid) {
-					if (!array_key_exists($trigger_groupid, $db_groups_rw)) {
-						unset($db_triggers[$i]);
-
-						continue 2;
-					}
-				};
-
+			foreach ($db_triggers as &$trigger) {
 				$trigger['description'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
 			}
 			unset($trigger);
@@ -317,14 +299,6 @@ class CControllerMaintenanceEdit extends CController {
 
 			case 'trigger':
 				foreach ($db_triggers as $trigger) {
-					$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
-
-					foreach ($trigger_groupids as $groupid) {
-						if (!array_key_exists($groupid, $host_groups)) {
-							continue 2;
-						}
-					}
-
 					$data['triggers_ms'][$trigger['triggerid']] = [
 						'id' => $trigger['triggerid'],
 						'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']

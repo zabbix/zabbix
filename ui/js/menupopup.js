@@ -943,8 +943,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	const has_eventid = options.eventid !== undefined && Number(options.eventid) > 0;
 
-	if (options.trigger_can_be_suppressed && options.allowed_host_edit && options.allowed_edit_maintenance
-			&& has_eventid) {
+	if (options.allowed_host_edit && options.allowed_edit_maintenance && has_eventid) {
 		const item_urls = [];
 
 		const maintenance = [

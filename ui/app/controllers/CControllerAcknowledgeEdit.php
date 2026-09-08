@@ -88,7 +88,6 @@ class CControllerAcknowledgeEdit extends CController {
 			'problem_can_be_unsuppressed' => false,
 			'problem_severity_can_be_changed' => false,
 			'problem_can_change_rank' => false,
-			'trigger_can_be_suppressed' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
 			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
@@ -142,31 +141,13 @@ class CControllerAcknowledgeEdit extends CController {
 		$editable_triggers = API::Trigger()->get([
 			'output' => ['manual_close'],
 			'triggerids' => $triggerids,
-			'selectHostGroups' => ['groupid'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$data['selected_triggers'] = count($editable_triggers);
 
-		$groups_rw = API::HostGroup()->get([
-			'output' => [],
-			'triggerids' => $triggerids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
 		$ack_count = 0;
-
-		$trigger_can_be_suppressed = true;
-		foreach ($editable_triggers as $trigger) {
-			foreach ($trigger['hostgroups'] as $hostgroup) {
-				if (!array_key_exists($hostgroup['groupid'], $groups_rw)) {
-					$trigger_can_be_suppressed = false;
-					break 2;
-				}
-			}
-		}
 
 		// Loop through events to figure out what operations should be allowed.
 		foreach ($events as $event) {
@@ -225,8 +206,6 @@ class CControllerAcknowledgeEdit extends CController {
 
 		$data['has_ack_events'] = ($ack_count > 0);
 		$data['has_unack_events'] = ($ack_count != count($events));
-
-		$data['trigger_can_be_suppressed'] = $trigger_can_be_suppressed;
 
 		// Severity can be changed only for editable triggers.
 		$data['problem_severity_can_be_changed'] = (bool) $editable_triggers;

@@ -653,7 +653,6 @@ class CControllerMenuPopup extends CController {
 	private static function getMenuDataTrigger(array $data): ?array {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
-			'selectHostGroups' => ['groupid'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
@@ -683,21 +682,6 @@ class CControllerMenuPopup extends CController {
 
 				if ($host['status'] != HOST_STATUS_MONITORED) {
 					$show_events = false;
-				}
-			}
-
-			$groups_rw = API::HostGroup()->get([
-				'output' => [],
-				'triggerids' => $data['triggerid'],
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$trigger_can_be_suppressed = true;
-			foreach ($db_trigger['hostgroups'] as $hostgroup) {
-				if (!array_key_exists($hostgroup['groupid'], $groups_rw)) {
-					$trigger_can_be_suppressed = false;
-					break;
 				}
 			}
 
@@ -738,7 +722,6 @@ class CControllerMenuPopup extends CController {
 				'backurl' => $data['backurl'],
 				'items' => $items,
 				'show_events' => $show_events,
-				'trigger_can_be_suppressed' => $trigger_can_be_suppressed,
 				'allowed_host_edit' => $allowed_host_edit,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
