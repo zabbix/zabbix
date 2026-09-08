@@ -23,7 +23,6 @@ $this->includeJsFile('administration.apm.db.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('APM'))
-	->setTitleSubmenu(getAdministrationDataSourceSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_DATA_SOURCE_APM_EDIT));
 
 $apm_tab = (new CFormGrid())
