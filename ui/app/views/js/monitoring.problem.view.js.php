@@ -341,7 +341,7 @@
 						const td = document.createElement('div');
 						td.classList.add('timeline-td');
 
-						cell.classList.add('cell-timeline');
+						cell.classList.add('datatable-cell-timeline');
 						cell.append(axis, td);
 					}
 				})

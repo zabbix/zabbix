@@ -138,8 +138,7 @@
 							number_of_attributes: 3
 						})
 						.setFields(['span_attributes'])
-						.setRenderer('attributes')
-						.setWidth('minmax(auto, max-content)'),
+						.setRenderer('attributes'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
@@ -312,10 +311,10 @@
 
 					for (const row of rows) {
 						row.addEventListener('click', () => {
-							const row_selected = datatable_element.querySelector(`.${ZBX_STYLE_ROW_SELECTED}`);
-							row_selected?.classList.remove(ZBX_STYLE_ROW_SELECTED);
+							const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+							row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-							row.classList.add(ZBX_STYLE_ROW_SELECTED);
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 							const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
 							const traceid = row.getAttribute('data-traceid');

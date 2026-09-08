@@ -5,6 +5,8 @@
 }
 
 .datatable {
+	--datatable-columns: none;
+
 	position: relative;
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius);
@@ -20,7 +22,7 @@
 
 	&.compact-view {
 		.datatable-body {
-			.cell.cell-data {
+			.datatable-cell.datatable-cell-data {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
 				padding: 2px 8px;
@@ -62,20 +64,20 @@
 					@extend %overflow-ellipsis;
 				}
 
-				&.cell-checkbox .flex-wrapper {
+				&.datatable-cell-checkbox .flex-wrapper {
 					column-gap: 5px;
 				}
 			}
 
-			.row-spacer {
+			.datatable-row-spacer {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
 			}
 		}
 	}
 
-	&.has-highlighted-rows .datatable-body .row:not(.row-disabled) {
-		&:not(.row-selected) {
+	&.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled) {
+		&:not(.datatable-row-selected) {
 			&:not(:hover) {
 				.btn-icon,
 				.icon {
@@ -83,8 +85,8 @@
 				}
 			}
 
-			&:hover .cell.cell-data {
-				&:not(.cell-bg) {
+			&:hover .datatable-cell.datatable-cell-data {
+				&:not(.datatable-cell-bg) {
 					background-color: $ui-hover-bg-color;
 					border-bottom-color: $ui-border-color;
 				}
@@ -220,6 +222,7 @@
 
 	.datatable-header {
 		display: grid;
+		grid-template-columns: var(--datatable-columns);
 		height: calc(var(--datatable-row-height) + 1px);
 		overflow: hidden;
 		background-color: $ui-bg-color;
@@ -304,6 +307,7 @@
 
 	.datatable-body {
 		display: grid;
+		grid-template-columns: var(--datatable-columns);
 		align-items: center;
 		width: 100%;
 		overflow-x: auto;
@@ -320,20 +324,22 @@
 			padding: 100px 0;
 		}
 
-		.row {
-			display: contents;
+		.datatable-row {
+			display: grid;
+			grid-column: 1 / -1;
+			grid-template-columns: subgrid;
 
-			&:not(.row-selected):not(.row-disabled):hover {
-				.row-spacer,
-				.cell.cell-data:not(.cell-bg) {
+			&:not(.datatable-row-selected):not(.datatable-row-disabled):hover {
+				.datatable-row-spacer,
+				.datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
 					background-color: $ui-hover-bg-color;
 				}
 			}
 
 			&.nested {
-				&:not(.row-selected) {
-					.row-spacer,
-					.cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
+				&:not(.datatable-row-selected) {
+					.datatable-row-spacer,
+					.datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
 						background-color: darken($ui-bg-color, 5%);
 					}
 				}
@@ -341,15 +347,15 @@
 				&.nested-small {
 					font-size: 11px;
 
-					.cell.cell-data .flex-wrapper {
+					.datatable-cell.datatable-cell-data .flex-wrapper {
 						justify-content: flex-end;
 					}
 				}
 			}
 
-			&.row-selected {
-				.row-spacer,
-				.cell:not(.cell-bg) {
+			&.datatable-row-selected {
+				.datatable-row-spacer,
+				.datatable-cell:not(.datatable-cell-bg) {
 					background-color: $lighter-yellow;
 					border-bottom-color: rgba(31, 44, 51, .1);
 				}
@@ -429,7 +435,7 @@
 		}
 	}
 
-	.cell {
+	.datatable-cell {
 		position: relative;
 		box-sizing: border-box;
 		height: 100%;
@@ -439,7 +445,7 @@
 		border-bottom: 1px solid $ui-border-color;
 		padding: 7px 8px;
 
-		&:not(.cell-bg) {
+		&:not(.datatable-cell-bg) {
 			color: $font-color;
 		}
 
@@ -447,7 +453,7 @@
 			grid-column-start: 1;
 		}
 
-		&.cell-header {
+		&.datatable-cell-header {
 			top: 0;
 			box-sizing: border-box;
 			display: flex;
@@ -479,7 +485,7 @@
 				outline: none;
 			}
 
-			&.cell-header-link {
+			&.datatable-cell-header-link {
 				padding: 0;
 
 				.header-link {
@@ -529,10 +535,10 @@
 				}
 			}
 
-			&.cell-sticky:first-child {
+			&.datatable-cell-sticky:first-child {
 				border-right: 1px solid $ui-border-color;
 
-				& + .cell-header {
+				& + .datatable-cell-header {
 					border-left: none;
 				}
 			}
@@ -562,7 +568,7 @@
 				}
 			}
 
-			&.cell-context {
+			&.datatable-cell-context {
 				padding: 0;
 
 				.header-name {
@@ -572,20 +578,20 @@
 			}
 		}
 
-		&.cell-sticky {
+		&.datatable-cell-sticky {
 			position: sticky;
 			z-index: 4;
 		}
 
-		&.cell-data {
+		&.datatable-cell-data {
 			align-items: flex-start;
 			overflow: hidden;
 
-			&.cell-sticky:not(.cell-bg-hover) {
+			&.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
 				background-color: $ui-bg-color;
 			}
 
-			&.cell-error {
+			&.datatable-cell-error {
 				color: $red;
 			}
 
@@ -648,7 +654,7 @@
 				}
 			}
 
-			&:not(.cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
+			&:not(.datatable-cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
 				margin-left: 5px;
 			}
 
@@ -739,7 +745,7 @@
 			}
 		}
 
-		&.cell-checkbox {
+		&.datatable-cell-checkbox {
 			position: sticky;
 			justify-content: flex-start;
 			padding: 6px 8px;
@@ -759,7 +765,7 @@
 			}
 		}
 
-		&.cell-timeline {
+		&.datatable-cell-timeline {
 			display: flex;
 			padding: 0;
 
@@ -769,12 +775,12 @@
 			}
 		}
 
-		&.cell-compact {
+		&.datatable-cell-compact {
 			padding: 0;
 		}
 	}
 
-	.row-spacer {
+	.datatable-row-spacer {
 		box-sizing: border-box;
 		height: 100%;
 		min-width: 0;
@@ -831,17 +837,17 @@
 		pointer-events: none;
 		-webkit-user-select: none;
 
-		.cell.cell-resizing .header-resizer {
+		.datatable-cell.datatable-cell-resizing .header-resizer {
 			z-index: 4;
 		}
 	}
 }
 
 #datatable-traces {
-	.row:hover {
+	.datatable-row:not(.datatable-row-selected):hover {
 		cursor: pointer;
 
-		.cell {
+		.datatable-cell {
 			background-color: $ui-hover-bg-color;
 			border-bottom-color: rgba(31, 44, 51, .1);
 		}

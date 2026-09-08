@@ -182,7 +182,8 @@
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('host')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('auto'),
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setColumnOptions({
 							show_item_key: filter.show_item_key == 1

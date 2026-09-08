@@ -19,7 +19,7 @@
 
 .sidebar .server-name, .form-grid > label,
 .form-grid .collapsible > label,
-.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .cell.cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .cell.cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .cell.cell-header .header-name, .datatable .cell.cell-header.cell-header-link .header-link, .datatable .cell.cell-header.cell-header-link .header-link .name, .datatable .cell.cell-data .timeline-date, .list-table .action-container .link-action, .tag, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .timeline-date, .list-table .action-container .link-action, .tag, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
@@ -2448,6 +2448,7 @@ button {
   --datatable-scrollbar-height: 11px; }
 
 .datatable {
+  --datatable-columns: none;
   position: relative;
   border: 1px solid #444444;
   border-radius: var(--surface-border-radius); }
@@ -2456,35 +2457,35 @@ button {
   .datatable.is-loading::before {
     z-index: 20;
     background-color: rgba(0, 0, 0, 0.5); }
-  .datatable.compact-view .datatable-body .cell.cell-data {
+  .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial;
     padding: 2px 8px; }
-    .datatable.compact-view .datatable-body .cell.cell-data .symptoms {
+    .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .symptoms {
       margin-top: 0;
       height: calc(var(--datatable-compact-row-height) - 4px); }
-      .datatable.compact-view .datatable-body .cell.cell-data .symptoms .btn-icon {
+      .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .symptoms .btn-icon {
         height: calc(var(--datatable-compact-row-height) - 6px); }
-    .datatable.compact-view .datatable-body .cell.cell-data .table-stats {
+    .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .table-stats {
       position: absolute;
       right: 0;
       padding: 0; }
-    .datatable.compact-view .datatable-body .cell.cell-data .flex-wrapper {
+    .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper {
       flex-wrap: nowrap;
       column-gap: 0; }
-    .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper {
+    .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper {
       flex-wrap: nowrap; }
-      .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper .tag {
+      .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag {
         min-width: 24px; }
-    .datatable.compact-view .datatable-body .cell.cell-data.cell-checkbox .flex-wrapper {
+    .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data.datatable-cell-checkbox .flex-wrapper {
       column-gap: 5px; }
-  .datatable.compact-view .datatable-body .row-spacer {
+  .datatable.compact-view .datatable-body .datatable-row-spacer {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial; }
-  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .btn-icon,
-  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .icon {
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):not(:hover) .btn-icon,
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):not(:hover) .icon {
     background-color: #000000; }
-  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data:not(.cell-bg) {
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
     background-color: #222222;
     border-bottom-color: #444444; }
   .datatable .hidden {
@@ -2570,6 +2571,7 @@ button {
       margin-top: 5px; }
   .datatable .datatable-header {
     display: grid;
+    grid-template-columns: var(--datatable-columns);
     height: calc(var(--datatable-row-height) + 1px);
     overflow: hidden;
     background-color: #000000;
@@ -2630,6 +2632,7 @@ button {
           border-left-color: #444444; }
   .datatable .datatable-body {
     display: grid;
+    grid-template-columns: var(--datatable-columns);
     align-items: center;
     width: 100%;
     overflow-x: auto;
@@ -2641,23 +2644,25 @@ button {
       display: none; }
     .datatable .datatable-body.no-data-message {
       padding: 100px 0; }
-    .datatable .datatable-body .row {
-      display: contents; }
-      .datatable .datatable-body .row:not(.row-selected):not(.row-disabled):hover .row-spacer,
-      .datatable .datatable-body .row:not(.row-selected):not(.row-disabled):hover .cell.cell-data:not(.cell-bg) {
+    .datatable .datatable-body .datatable-row {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid; }
+      .datatable .datatable-body .datatable-row:not(.datatable-row-selected):not(.datatable-row-disabled):hover .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row:not(.datatable-row-selected):not(.datatable-row-disabled):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
         background-color: #222222; }
-      .datatable .datatable-body .row.nested:not(.row-selected) .row-spacer,
-      .datatable .datatable-body .row.nested:not(.row-selected) .cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
+      .datatable .datatable-body .datatable-row.nested:not(.datatable-row-selected) .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row.nested:not(.datatable-row-selected) .datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
         background-color: black; }
-      .datatable .datatable-body .row.nested.nested-small {
+      .datatable .datatable-body .datatable-row.nested.nested-small {
         font-size: 11px; }
-        .datatable .datatable-body .row.nested.nested-small .cell.cell-data .flex-wrapper {
+        .datatable .datatable-body .datatable-row.nested.nested-small .datatable-cell.datatable-cell-data .flex-wrapper {
           justify-content: flex-end; }
-      .datatable .datatable-body .row.row-selected .row-spacer,
-      .datatable .datatable-body .row.row-selected .cell:not(.cell-bg) {
+      .datatable .datatable-body .datatable-row.datatable-row-selected .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row.datatable-row-selected .datatable-cell:not(.datatable-cell-bg) {
         background-color: #222222;
         border-bottom-color: rgba(31, 44, 51, 0.1); }
-      .datatable .datatable-body .row .table-stats.table-stats-small {
+      .datatable .datatable-body .datatable-row .table-stats.table-stats-small {
         font-size: 11px; }
     .datatable .datatable-body:focus, .datatable .datatable-body:focus-visible {
       outline: none; }
@@ -2706,7 +2711,7 @@ button {
       .datatable .datatable-footer.pager .table-stats {
         position: static;
         justify-self: end; }
-  .datatable .cell {
+  .datatable .datatable-cell {
     position: relative;
     box-sizing: border-box;
     height: 100%;
@@ -2715,11 +2720,11 @@ button {
     text-align: left;
     border-bottom: 1px solid #444444;
     padding: 7px 8px; }
-    .datatable .cell:not(.cell-bg) {
+    .datatable .datatable-cell:not(.datatable-cell-bg) {
       color: #ffffff; }
-    .datatable .cell:first-of-type {
+    .datatable .datatable-cell:first-of-type {
       grid-column-start: 1; }
-    .datatable .cell.cell-header {
+    .datatable .datatable-cell.datatable-cell-header {
       top: 0;
       box-sizing: border-box;
       display: flex;
@@ -2730,17 +2735,17 @@ button {
       user-select: none;
       background-color: #000000;
       border-right: 1px solid #444444; }
-      .datatable .cell.cell-header:last-of-type {
+      .datatable .datatable-cell.datatable-cell-header:last-of-type {
         border-right: 0; }
-      .datatable .cell.cell-header:last-child {
+      .datatable .datatable-cell.datatable-cell-header:last-child {
         border-top-right-radius: 2px; }
-        .datatable .cell.cell-header:last-child .header-link {
+        .datatable .datatable-cell.datatable-cell-header:last-child .header-link {
           border-top-right-radius: 2px; }
-      .datatable .cell.cell-header:focus {
+      .datatable .datatable-cell.datatable-cell-header:focus {
         outline: none; }
-      .datatable .cell.cell-header.cell-header-link {
+      .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link {
         padding: 0; }
-        .datatable .cell.cell-header.cell-header-link .header-link {
+        .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link {
           box-sizing: border-box;
           display: flex;
           align-items: center;
@@ -2751,27 +2756,27 @@ button {
           color: #f8f8f8;
           text-decoration: none;
           border: none; }
-          .datatable .cell.cell-header.cell-header-link .header-link:hover, .datatable .cell.cell-header.cell-header-link .header-link:focus {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link:hover, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link:focus {
             background-color: #222222; }
-          .datatable .cell.cell-header.cell-header-link .header-link .name {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name {
             pointer-events: none; }
-          .datatable .cell.cell-header.cell-header-link .header-link .arrow-up {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .arrow-up {
             flex-shrink: 0;
             border-bottom-color: #cacaca;
             pointer-events: none; }
-          .datatable .cell.cell-header.cell-header-link .header-link .arrow-down {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .arrow-down {
             flex-shrink: 0;
             border-top-color: #cacaca;
             pointer-events: none; }
-          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-up {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link.header-link-sorted .arrow-up {
             border-bottom-color: #cacaca; }
-          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-down {
+          .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link.header-link-sorted .arrow-down {
             border-top-color: #cacaca; }
-      .datatable .cell.cell-header.cell-sticky:first-child {
+      .datatable .datatable-cell.datatable-cell-header.datatable-cell-sticky:first-child {
         border-right: 1px solid #444444; }
-        .datatable .cell.cell-header.cell-sticky:first-child + .cell-header {
+        .datatable .datatable-cell.datatable-cell-header.datatable-cell-sticky:first-child + .datatable-cell-header {
           border-left: none; }
-      .datatable .cell.cell-header .header-resizer {
+      .datatable .datatable-cell.datatable-cell-header .header-resizer {
         position: absolute;
         right: -6px;
         top: 0;
@@ -2781,99 +2786,99 @@ button {
         cursor: col-resize;
         user-select: none;
         touch-action: none; }
-        .datatable .cell.cell-header .header-resizer::after {
+        .datatable .datatable-cell.datatable-cell-header .header-resizer::after {
           position: absolute;
           top: 0;
           bottom: 0;
           left: 5px;
           content: '';
           border-left: 1px solid transparent; }
-        .datatable .cell.cell-header .header-resizer:hover::after {
+        .datatable .datatable-cell.datatable-cell-header .header-resizer:hover::after {
           border-color: #0275b8; }
-      .datatable .cell.cell-header.cell-context {
+      .datatable .datatable-cell.datatable-cell-header.datatable-cell-context {
         padding: 0; }
-        .datatable .cell.cell-header.cell-context .header-name {
+        .datatable .datatable-cell.datatable-cell-header.datatable-cell-context .header-name {
           flex-grow: 1;
           padding: 7px 8px; }
-    .datatable .cell.cell-sticky {
+    .datatable .datatable-cell.datatable-cell-sticky {
       position: sticky;
       z-index: 4; }
-    .datatable .cell.cell-data {
+    .datatable .datatable-cell.datatable-cell-data {
       align-items: flex-start;
       overflow: hidden; }
-      .datatable .cell.cell-data.cell-sticky:not(.cell-bg-hover) {
+      .datatable .datatable-cell.datatable-cell-data.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
         background-color: #000000; }
-      .datatable .cell.cell-data.cell-error {
+      .datatable .datatable-cell.datatable-cell-data.datatable-cell-error {
         color: #ff5050; }
-      .datatable .cell.cell-data.na-bg {
+      .datatable .datatable-cell.datatable-cell-data.na-bg {
         border-bottom-color: var(--severity-color-na-bg); }
-      .datatable .cell.cell-data.info-bg {
+      .datatable .datatable-cell.datatable-cell-data.info-bg {
         border-bottom-color: var(--severity-color-info-bg); }
-      .datatable .cell.cell-data.warning-bg {
+      .datatable .datatable-cell.datatable-cell-data.warning-bg {
         border-bottom-color: var(--severity-color-warning-bg); }
-      .datatable .cell.cell-data.average-bg {
+      .datatable .datatable-cell.datatable-cell-data.average-bg {
         border-bottom-color: var(--severity-color-average-bg); }
-      .datatable .cell.cell-data.high-bg {
+      .datatable .datatable-cell.datatable-cell-data.high-bg {
         border-bottom-color: var(--severity-color-high-bg); }
-      .datatable .cell.cell-data.disaster-bg {
+      .datatable .datatable-cell.datatable-cell-data.disaster-bg {
         border-bottom-color: var(--severity-color-disaster-bg); }
-      .datatable .cell.cell-data:first-child {
+      .datatable .datatable-cell.datatable-cell-data:first-child {
         border-right: 1px solid transparent; }
-      .datatable .cell.cell-data .wordbreak {
+      .datatable .datatable-cell.datatable-cell-data .wordbreak {
         white-space: normal; }
-      .datatable .cell.cell-data .flex-wrapper {
+      .datatable .datatable-cell.datatable-cell-data .flex-wrapper {
         display: flex;
         flex-wrap: wrap;
         column-gap: 5px;
         min-height: 16px; }
-      .datatable .cell.cell-data .tags-wrapper .tag {
+      .datatable .datatable-cell.datatable-cell-data .tags-wrapper .tag {
         margin: 0;
         height: 16px; }
-      .datatable .cell.cell-data .tags-wrapper .btn-icon {
+      .datatable .datatable-cell.datatable-cell-data .tags-wrapper .btn-icon {
         height: 16px; }
-      .datatable .cell.cell-data .btn-icon {
+      .datatable .datatable-cell.datatable-cell-data .btn-icon {
         min-width: 18px;
         height: 18px; }
-        .datatable .cell.cell-data .btn-icon:not(.no-indent):not(:first-child) {
+        .datatable .datatable-cell.datatable-cell-data .btn-icon:not(.no-indent):not(:first-child) {
           margin-left: 2px; }
-      .datatable .cell.cell-data:not(.cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
+      .datatable .datatable-cell.datatable-cell-data:not(.datatable-cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
         margin-left: 5px; }
-      .datatable .cell.cell-data .action-wrapper {
+      .datatable .datatable-cell.datatable-cell-data .action-wrapper {
         display: flex;
         flex-wrap: wrap;
         gap: 1px 5px; }
-        .datatable .cell.cell-data .action-wrapper .btn-icon:not(.no-indent):not(:first-child) {
+        .datatable .datatable-cell.datatable-cell-data .action-wrapper .btn-icon:not(.no-indent):not(:first-child) {
           margin-left: 0; }
-      .datatable .cell.cell-data .symptoms {
+      .datatable .datatable-cell.datatable-cell-data .symptoms {
         display: flex;
         justify-content: flex-start;
         align-items: center;
         flex-shrink: 0;
         gap: 3px;
         margin-top: 2px; }
-        .datatable .cell.cell-data .symptoms .symptoms-left {
+        .datatable .datatable-cell.datatable-cell-data .symptoms .symptoms-left {
           min-width: 17px;
           max-width: 3ch;
           height: 16px;
           text-align: center; }
-        .datatable .cell.cell-data .symptoms .symptoms-right {
+        .datatable .datatable-cell.datatable-cell-data .symptoms .symptoms-right {
           width: 18px;
           height: 16px;
           margin: 5px 0 0 2px; }
-      .datatable .cell.cell-data .timeline-date,
-      .datatable .cell.cell-data .timeline-axis,
-      .datatable .cell.cell-data .timeline-td {
+      .datatable .datatable-cell.datatable-cell-data .timeline-date,
+      .datatable .datatable-cell.datatable-cell-data .timeline-axis,
+      .datatable .datatable-cell.datatable-cell-data .timeline-td {
         border-bottom-color: transparent; }
-      .datatable .cell.cell-data .timeline-date {
+      .datatable .datatable-cell.datatable-cell-data .timeline-date {
         text-align: right; }
-      .datatable .cell.cell-data .timeline-axis,
-      .datatable .cell.cell-data .timeline-th,
-      .datatable .cell.cell-data .timeline-td {
+      .datatable .datatable-cell.datatable-cell-data .timeline-axis,
+      .datatable .datatable-cell.datatable-cell-data .timeline-th,
+      .datatable .datatable-cell.datatable-cell-data .timeline-td {
         position: relative;
         width: 6px;
         height: 100%;
         padding: 0; }
-      .datatable .cell.cell-data .timeline-axis::before {
+      .datatable .datatable-cell.datatable-cell-data .timeline-axis::before {
         position: absolute;
         top: 0;
         right: 0;
@@ -2881,65 +2886,65 @@ button {
         width: 2px;
         content: '';
         background-color: #aad7f0; }
-      .datatable .cell.cell-data .timeline-dot::after,
-      .datatable .cell.cell-data .timeline-dot-big::after {
+      .datatable .datatable-cell.datatable-cell-data .timeline-dot::after,
+      .datatable .datatable-cell.datatable-cell-data .timeline-dot-big::after {
         position: absolute;
         right: -3px;
         width: 4px;
         height: 4px;
         content: '';
         border-radius: 50%; }
-      .datatable .cell.cell-data .timeline-dot::after {
+      .datatable .datatable-cell.datatable-cell-data .timeline-dot::after {
         top: 11px;
         background-color: #e0e0e0;
         border: 2px solid #000000; }
-      .datatable .cell.cell-data .timeline-dot-big::after {
+      .datatable .datatable-cell.datatable-cell-data .timeline-dot-big::after {
         top: 11px;
         background-color: #000000;
         border: 2px solid #e0e0e0; }
-    .datatable .cell.cell-checkbox {
+    .datatable .datatable-cell.datatable-cell-checkbox {
       position: sticky;
       justify-content: flex-start;
       padding: 6px 8px; }
-      .datatable .cell.cell-checkbox .checkbox-radio {
+      .datatable .datatable-cell.datatable-cell-checkbox .checkbox-radio {
         margin: 0; }
-        .datatable .cell.cell-checkbox .checkbox-radio + label {
+        .datatable .datatable-cell.datatable-cell-checkbox .checkbox-radio + label {
           display: inline-block;
           height: 16px;
           margin-top: 1px; }
-          .datatable .cell.cell-checkbox .checkbox-radio + label span {
+          .datatable .datatable-cell.datatable-cell-checkbox .checkbox-radio + label span {
             margin: 0; }
-    .datatable .cell.cell-timeline {
+    .datatable .datatable-cell.datatable-cell-timeline {
       display: flex;
       padding: 0; }
-      .datatable .cell.cell-timeline .timeline-date {
+      .datatable .datatable-cell.datatable-cell-timeline .timeline-date {
         flex-grow: 1;
         padding: 7px 8px; }
-    .datatable .cell.cell-compact {
+    .datatable .datatable-cell.datatable-cell-compact {
       padding: 0; }
-  .datatable .row-spacer {
+  .datatable .datatable-row-spacer {
     box-sizing: border-box;
     height: 100%;
     min-width: 0;
     min-height: var(--datatable-row-height);
     background-color: #000000;
     border-bottom: 1px solid #444444; }
-    .datatable .row-spacer.na-bg {
+    .datatable .datatable-row-spacer.na-bg {
       background-color: var(--severity-color-na-bg);
       border-bottom-color: var(--severity-color-na-bg); }
-    .datatable .row-spacer.info-bg {
+    .datatable .datatable-row-spacer.info-bg {
       background-color: var(--severity-color-info-bg);
       border-bottom-color: var(--severity-color-info-bg); }
-    .datatable .row-spacer.warning-bg {
+    .datatable .datatable-row-spacer.warning-bg {
       background-color: var(--severity-color-warning-bg);
       border-bottom-color: var(--severity-color-warning-bg); }
-    .datatable .row-spacer.average-bg {
+    .datatable .datatable-row-spacer.average-bg {
       background-color: var(--severity-color-average-bg);
       border-bottom-color: var(--severity-color-average-bg); }
-    .datatable .row-spacer.high-bg {
+    .datatable .datatable-row-spacer.high-bg {
       background-color: var(--severity-color-high-bg);
       border-bottom-color: var(--severity-color-high-bg); }
-    .datatable .row-spacer.disaster-bg {
+    .datatable .datatable-row-spacer.disaster-bg {
       background-color: var(--severity-color-disaster-bg);
       border-bottom-color: var(--severity-color-disaster-bg); }
   .datatable .no-data-message {
@@ -2954,12 +2959,12 @@ button {
   user-select: none;
   pointer-events: none;
   -webkit-user-select: none; }
-  .datatable-resizing .datatable .cell.cell-resizing .header-resizer {
+  .datatable-resizing .datatable .datatable-cell.datatable-cell-resizing .header-resizer {
     z-index: 4; }
 
-#datatable-traces .row:hover {
+#datatable-traces .datatable-row:not(.datatable-row-selected):hover {
   cursor: pointer; }
-  #datatable-traces .row:hover .cell {
+  #datatable-traces .datatable-row:not(.datatable-row-selected):hover .datatable-cell {
     background-color: #222222;
     border-bottom-color: rgba(31, 44, 51, 0.1); }
 #datatable-traces .span-count {
