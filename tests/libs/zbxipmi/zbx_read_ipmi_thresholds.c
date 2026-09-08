@@ -12,12 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_read_ipmi_thresholds() is static, so the source file is included directly to reach it. See         */
-/* zbx_read_ipmi_sensor.c for the pointer-lifetime rationale - this covers the same class of regression    */
-/* for the threshold-reading path: ipmi_sensor_id_get_thresholds() must reject an IPMI_SENSOR_ID_INVALID   */
+/* zbx_read_ipmi_thresholds() is static, so the source file is included directly to reach it. See           */
+/* zbx_read_ipmi_sensor.c for the pointer-lifetime rationale - this covers the same class of regression     */
+/* for the threshold-reading path: ipmi_sensor_id_get_thresholds() must reject an IPMI_SENSOR_ID_INVALID    */
 /* sensor_id (a vanished sensor) without ever invoking its callback, exercised here against the real       */
-/* library. thr_access is a cached, static field (see zbx_ipmi_sensor_t.thr_access), so it's just set      */
-/* directly here rather than needing revalidation.                                                         */
+/* library. threshold_access is a cached, static field (see zbx_ipmi_sensor_t.threshold_access), so it's    */
+/* just set directly here rather than needing revalidation.                                                 */
 /*                                                                                                          */
 /* zbx_read_ipmi_thresholds() never sets h->err and h->done stays 0 on every path exercised here, so        */
 /* there is no return value that tells "not accessible"/"fixed" apart from "readable but the sensor is      */
@@ -58,7 +58,7 @@ void	zbx_mock_test_entry(void **state)
 	h.port = 623;
 
 	memset(&s, 0, sizeof(s));
-	s.thr_access = zbx_mock_get_parameter_int("in.thr_access");
+	s.threshold_access = zbx_mock_get_parameter_int("in.thr_access");
 	/* stands in for a sensor OpenIPMI has already destroyed - see zbx_read_ipmi_sensor.c */
 	s.sensor_id = (ipmi_sensor_id_t)IPMI_SENSOR_ID_INVALID;
 

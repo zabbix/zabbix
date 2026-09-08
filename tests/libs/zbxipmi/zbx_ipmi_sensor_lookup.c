@@ -49,13 +49,13 @@ static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor, const char
 	s = &h->sensors[h->sensor_count - 1];
 	memset(s, 0, sizeof(*s));
 	s->sensor_id = ipmi_sensor_convert_to_id(raw_sensor);
-	zbx_strlcpy(s->id, id, sizeof(s->id));
-	s->id_type = IPMI_ASCII_STR;
-	s->id_sz = (int)strlen(id);
+	zbx_strlcpy(s->sdr_id, id, sizeof(s->sdr_id));
+	s->sdr_id_type = IPMI_ASCII_STR;
+	s->sdr_id_sz = (int)strlen(id);
 	s->full_name = zbx_strdup(NULL, full_name);
-	s->type_str = zbx_strdup(NULL, "type");
-	s->reading_type_str = zbx_strdup(NULL, "reading_type");
-	s->reading_type = reading_type;
+	s->sensor_type_str = zbx_strdup(NULL, "type");
+	s->event_reading_type_str = zbx_strdup(NULL, "reading_type");
+	s->event_reading_type = reading_type;
 }
 
 static void	free_sensors(zbx_ipmi_host_t *h)
@@ -63,8 +63,8 @@ static void	free_sensors(zbx_ipmi_host_t *h)
 	for (int i = 0; i < h->sensor_count; i++)
 	{
 		zbx_free(h->sensors[i].full_name);
-		zbx_free(h->sensors[i].type_str);
-		zbx_free(h->sensors[i].reading_type_str);
+		zbx_free(h->sensors[i].sensor_type_str);
+		zbx_free(h->sensors[i].event_reading_type_str);
 	}
 	zbx_free(h->sensors);
 }

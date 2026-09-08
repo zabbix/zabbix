@@ -23,7 +23,7 @@
 /* The sensor argument, by contrast, is never dereferenced in any branch covered here - only compared by   */
 /* identity via zbx_get_ipmi_sensor(), or (for zbx_got_discrete_states_cb()'s err!=0 branch) not used at    */
 /* all once the sensor has been identified, since the error message is built purely from the already-owned */
-/* s->id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a real              */
+/* s->sdr_id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a real          */
 /* ipmi_sensor_*() getter on it (zbx_got_thresh_reading_cb()'s IPMI_BOTH_VALUES_PRESENT success path,       */
 /* zbx_got_thresholds_cb()'s "found" path, zbx_got_discrete_states_cb()'s state-processing loop) are out of */
 /* scope here. Also deliberately out of scope: every "sensor not found" branch, since all three call        */
@@ -83,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 	s = &h->sensors[0];
 	memset(s, 0, sizeof(*s));
 	s->sensor_id = ipmi_sensor_convert_to_id((ipmi_sensor_t *)&dummy_sensor);
-	zbx_strlcpy(s->id, "s1", sizeof(s->id));
+	zbx_strlcpy(s->sdr_id, "s1", sizeof(s->sdr_id));
 
 	h->done = 0;
 	h->ret = SUCCEED;

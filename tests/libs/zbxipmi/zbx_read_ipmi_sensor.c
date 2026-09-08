@@ -13,17 +13,17 @@
 **/
 
 /* zbx_read_ipmi_sensor() is static, so the source file is included directly to reach it. */
-/*                                                                                                        */
-/* Regression coverage for the OpenIPMI pointer-lifetime rule documented in <OpenIPMI/ipmiif.h> and in    */
-/* IPMI.pdf section 2.2.4: "The pointer is only valid inside a callback... the id is good outside         */
-/* callbacks." zbx_ipmi_sensor_t caches a raw ipmi_sensor_t* (needed only for identity matching inside    */
-/* real OpenIPMI callbacks) alongside an ipmi_sensor_id_t, and zbx_read_ipmi_sensor() must only ever      */
-/* issue a *new* read through the latter - via ipmi_sensor_id_get_reading()/get_states(), which           */
-/* internally revalidate the id through ipmi_sensor_pointer_cb() - never via the former from outside a    */
-/* callback. The sensor's static properties (reading_type_str and friends) are a separate matter: per the */
-/* same section of IPMI.pdf ("collect all the static information that you need from an object when it is */
-/* reported to you"), those are captured once in zbx_allocate_ipmi_sensor() and simply read back here, no */
-/* revalidation needed - case 3 below exercises that a cached string is used as-is.                       */
+/*                                                                                                         */
+/* Regression coverage for the OpenIPMI pointer-lifetime rule documented in <OpenIPMI/ipmiif.h> and in     */
+/* IPMI.pdf section 2.2.4: "The pointer is only valid inside a callback... the id is good outside          */
+/* callbacks." zbx_ipmi_sensor_t caches a raw ipmi_sensor_t* (needed only for identity matching inside     */
+/* real OpenIPMI callbacks) alongside an ipmi_sensor_id_t, and zbx_read_ipmi_sensor() must only ever       */
+/* issue a *new* read through the latter - via ipmi_sensor_id_get_reading()/get_states(), which            */
+/* internally revalidate the id through ipmi_sensor_pointer_cb() - never via the former from outside a     */
+/* callback. The sensor's static properties (reading_type_str and friends) are a separate matter: per the  */
+/* same section of IPMI.pdf ("collect all the static information that you need from an object when it is   */
+/* reported to you"), those are captured once in zbx_allocate_ipmi_sensor() and simply read back here, no  */
+/* revalidation needed - case 3 below exercises that a cached string is used as-is.                        */
 /*                                                                                                         */
 /* Case 1 and 2 simulate a sensor OpenIPMI has since destroyed (e.g. entity/sensor removed, or its domain  */
 /* closed) via IPMI_SENSOR_ID_INVALID, the same way the ZBX-25759 cb_data scenario is simulated in         */
@@ -56,8 +56,9 @@ void	zbx_mock_test_entry(void **state)
 	h.port = 623;
 
 	memset(&s, 0, sizeof(s));
-	s.reading_type = reading_type;
-	s.reading_type_str = "unassigned";	/* as if cached at allocation time - see the file header comment */
+	s.event_reading_type = reading_type;
+	s.event_reading_type_str = "unassigned"; /* as if cached at allocation time - see the file header comment */
+
 	/* stands in for a sensor OpenIPMI has already destroyed - see the file header comment */
 	s.sensor_id = (ipmi_sensor_id_t)IPMI_SENSOR_ID_INVALID;
 
