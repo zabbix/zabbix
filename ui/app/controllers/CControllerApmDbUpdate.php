@@ -38,7 +38,7 @@ class CControllerApmDbUpdate extends CController {
 			],
 			'username' => ['string', 'required', 'not_empty', 'length' => 255,
 				'when' => [$status_configured, $auth_type_password]],
-			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_configured, $auth_type_password]],
+			'password' => ['string', 'length' => 255, 'when' => [$status_configured, $auth_type_password]],
 			'db' => ['string', 'required', 'length' => 255, 'when' => $status_configured],
 			'ssl_verify_peer' => ['integer', 'required', 'when' => [$status_configured, $url_scheme_https]],
 			'ssl_verify_host' => ['integer', 'required',

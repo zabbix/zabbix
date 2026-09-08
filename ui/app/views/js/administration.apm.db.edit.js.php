@@ -84,8 +84,10 @@ const view = new class {
 		this.#change_password_btn?.addEventListener('click', e => {
 			this.#password_changed = true;
 
-			this.#updateDisplayState([this.#password_input], true);
 			this.#password_input?.focus();
+
+			this.#updateDisplayState([this.#password_input], true);
+			this.#updateDisabledState([this.#password_input], false);
 
 			e.target.hidden = true;
 		});
@@ -149,6 +151,8 @@ const view = new class {
 			&& values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 			&& !this.#url_changed
 			&& !this.#password_changed;
+
+		this.#updateDisabledState([this.#password_input], show_change_password_btn);
 
 		this.#password_warning?.setAttribute('hidden', '');
 
