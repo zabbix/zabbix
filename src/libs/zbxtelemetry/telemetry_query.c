@@ -40,7 +40,7 @@ void	tq_query_init(zbx_tq_query_t *query)
 void	tq_column_init(zbx_tq_column_t *column)
 {
 	column->column		= NULL;
-	column->col_type	= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	column->col_info	= NULL;
 	column->attribute_key	= NULL;
 }
 
@@ -53,7 +53,7 @@ void	tq_column_clean(zbx_tq_column_t *column)
 void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column)
 {
 	aggr_column->column		= NULL;
-	aggr_column->col_type		= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	aggr_column->col_info		= NULL;
 	aggr_column->function		= ZBX_TQ_FUNCTION_UNKNOWN;
 	zbx_vector_str_create(&aggr_column->parameters);
 	aggr_column->alias		= NULL;
@@ -71,7 +71,7 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
 void	tq_condition_init(zbx_tq_condition_t *condition)
 {
 	condition->column		= NULL;
-	condition->col_type		= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	condition->col_info		= NULL;
 	condition->attribute_key	= NULL;
 	condition->value		= NULL;
 	condition->operator		= ZBX_TQ_OPERATOR_UNKNOWN;
@@ -163,7 +163,7 @@ void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 {
-	if (SUCCEED == tq_column_type_is_attributes(col->col_type))
+	if (SUCCEED == tq_column_type_is_attributes(col->col_info->type))
 		return zbx_dsprintf(NULL, "%s.%s", col->column, col->attribute_key);
 	else
 		return zbx_strdup(NULL, col->column);
@@ -180,8 +180,8 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 	if (0 != column_name_cmp_res)
 		return column_name_cmp_res;
 
-	is_attr_a = tq_column_type_is_attributes(cond_a->col_type);
-	is_attr_b = tq_column_type_is_attributes(cond_b->col_type);
+	is_attr_a = tq_column_type_is_attributes(cond_a->col_info->type);
+	is_attr_b = tq_column_type_is_attributes(cond_b->col_info->type);
 
 	if (SUCCEED != is_attr_a || SUCCEED != is_attr_b)
 	{

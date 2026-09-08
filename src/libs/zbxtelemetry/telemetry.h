@@ -16,18 +16,7 @@
 #define ZABBIX_TELEMETRY_H
 
 #include "zbxtelemetry.h"
-#include "zbxalgo.h"
 #include "zbxjson.h"
-
-#define TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	0x01
-
-typedef struct
-{
-	const char		*name;
-	zbx_tq_column_type_t	type;
-	int			flags;
-}
-tq_column_info_t;
 
 typedef enum
 {
@@ -46,9 +35,7 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column);
 void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
 
-const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
-		zbx_tq_metric_point_type_t metric_point_type, const char *column);
-zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
+const zbx_tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 		zbx_tq_metric_point_type_t metric_point_type, const char *column);
 
 int	tq_column_type_is_array(zbx_tq_column_type_t type);

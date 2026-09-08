@@ -16,7 +16,7 @@
 
 #include "telemetry.h"
 
-static const tq_column_info_t	column_info_traces[] = {
+static const zbx_tq_column_info_t	column_info_traces[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -37,11 +37,11 @@ static const tq_column_info_t	column_info_traces[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_logs[] = {
+static const zbx_tq_column_info_t	column_info_logs[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,	0	},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
 	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
-	{"TraceFlags",		ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"TraceFlags",		ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"SeverityText",	ZBX_TQ_COLUMN_TYPE_STR,		0	},
 	{"SeverityNumber",	ZBX_TQ_COLUMN_TYPE_NUM,		0	},
 	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
@@ -57,7 +57,7 @@ static const tq_column_info_t	column_info_logs[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_metrics_sum[] = {
+static const zbx_tq_column_info_t	column_info_metrics_sum[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -73,14 +73,14 @@ static const tq_column_info_t	column_info_metrics_sum[] = {
 	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_BOOL,	0		},
 	{0}
 };
 
-static const tq_column_info_t	column_info_metrics_gauge[] = {
+static const zbx_tq_column_info_t	column_info_metrics_gauge[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -96,12 +96,12 @@ static const tq_column_info_t	column_info_metrics_gauge[] = {
 	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{0}
 };
 
-static const tq_column_info_t	column_info_metrics_histogram[] = {
+static const zbx_tq_column_info_t	column_info_metrics_histogram[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -119,14 +119,14 @@ static const tq_column_info_t	column_info_metrics_histogram[] = {
 	{"Count",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
-static const tq_column_info_t	column_info_metrics_exponential_histogram[] = {
+static const zbx_tq_column_info_t	column_info_metrics_exponential_histogram[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -148,14 +148,14 @@ static const tq_column_info_t	column_info_metrics_exponential_histogram[] = {
 	{"PositiveOffset",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"NegativeOffset",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
-static const tq_column_info_t	*get_column_info_from_arr(const tq_column_info_t *arr, const char *str)
+static const zbx_tq_column_info_t	*get_column_info_from_arr(const zbx_tq_column_info_t *arr, const char *str)
 {
 	for (int i = 0; NULL != arr[i].name; i++)
 	{
@@ -166,7 +166,7 @@ static const tq_column_info_t	*get_column_info_from_arr(const tq_column_info_t *
 	return NULL;
 }
 
-const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
+const zbx_tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 		zbx_tq_metric_point_type_t metric_point_type, const char *column)
 {
 	if (NULL == column)
@@ -199,14 +199,6 @@ const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 		default:
 			return NULL;
 	}
-}
-
-zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
-		zbx_tq_metric_point_type_t metric_point_type, const char *column)
-{
-	const tq_column_info_t	*info = tq_get_column_info(signal_type, metric_point_type, column);
-
-	return NULL == info ? ZBX_TQ_COLUMN_TYPE_UNKNOWN : info->type;
 }
 
 int	tq_column_type_is_array(zbx_tq_column_type_t type)
