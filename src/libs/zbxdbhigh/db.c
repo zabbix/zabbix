@@ -681,9 +681,9 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 								" and d.uuid='%s'"
 								" and d.userid=t.userid"
 								" and d.status=%d)))",
-					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-					(unsigned long)t, ZBX_AUTH_SCHEME_BEARER, ZBX_AUTH_SCHEME_DPOP, device_uuid_esc,
-					ZBX_DEVICE_STATUS_ACTIVATED);
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_SCHEME_DPOP, device_uuid_esc, ZBX_DEVICE_STATUS_ACTIVATED);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected auth lookup mode:%d", (int)mode);
