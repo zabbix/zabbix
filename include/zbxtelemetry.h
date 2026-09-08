@@ -35,6 +35,8 @@
 #define ZBX_TQ_QUERY_TAG_OPERATOR		"operator"
 #define ZBX_TQ_QUERY_TAG_VALUE			"value"
 
+#define ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	0x01
+
 /* SYNC WITH PHP! */
 #define ZBX_TQ_TIME_SHIFT_MIN		0
 #define ZBX_TQ_TIME_SHIFT_MAX		SEC_PER_DAY
@@ -103,6 +105,14 @@ typedef enum
 }
 zbx_tq_column_type_t;
 
+typedef struct
+{
+	const char		*name;
+	zbx_tq_column_type_t	type;
+	int			flags;
+}
+zbx_tq_column_info_t;
+
 typedef enum
 {
 	ZBX_TQ_SIGNAL_TYPE_UNKNOWN	= -1,
@@ -157,9 +167,9 @@ zbx_tq_operator_t;
 
 typedef struct
 {
-	char			*column;
-	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
-	char			*attribute_key;
+	char				*column;
+	const zbx_tq_column_info_t	*col_info; /* stored here in order to not look it up every time */
+	char				*attribute_key;
 }
 zbx_tq_column_t;
 
@@ -167,11 +177,11 @@ ZBX_VECTOR_DECL(tq_column, zbx_tq_column_t)
 
 typedef struct
 {
-	char			*column;
-	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
-	zbx_tq_function_type_t	function;
-	zbx_vector_str_t	parameters;
-	char			*alias;
+	char				*column;
+	const zbx_tq_column_info_t	*col_info; /* stored here in order to not look it up every time */
+	zbx_tq_function_type_t		function;
+	zbx_vector_str_t		parameters;
+	char				*alias;
 }
 zbx_tq_aggr_column_t;
 
@@ -179,11 +189,11 @@ ZBX_VECTOR_DECL(tq_aggr_column, zbx_tq_aggr_column_t)
 
 typedef struct
 {
-	char			*column;
-	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
-	char			*attribute_key;
-	char			*value;
-	zbx_tq_operator_t	operator;
+	char				*column;
+	const zbx_tq_column_info_t	*col_info; /* stored here in order to not look it up every time */
+	char				*attribute_key;
+	char				*value;
+	zbx_tq_operator_t		operator;
 }
 zbx_tq_condition_t;
 

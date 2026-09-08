@@ -240,9 +240,9 @@ static char	*tq_sql_dyn_get_columns_to_select(zbx_tq_query_t *query, const tq_sq
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
-		zbx_tq_column_t		*col = &query->columns.values[i];
-		char			*name_esc = tq_sql_dyn_escape_name(col->column, ctx);
-		char			*col_to_select = tq_sql_dyn_get_operand(name_esc, col->col_type,
+		zbx_tq_column_t	*col = &query->columns.values[i];
+		char		*name_esc = tq_sql_dyn_escape_name(col->column, ctx);
+		char		*col_to_select = tq_sql_dyn_get_operand(name_esc, col->col_info->type,
 				col->attribute_key, ctx);
 
 		zbx_strcpy_alloc(&str, &alloc, &offset, col_to_select);
@@ -293,7 +293,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(zbx_tq_query_t *query, const 
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
 		{
 			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column, ctx);
-			operand = tq_sql_dyn_get_operand(col_name_esc, aggr_col->col_type, NULL, ctx);
+			operand = tq_sql_dyn_get_operand(col_name_esc, aggr_col->col_info->type, NULL, ctx);
 		}
 
 		switch (aggr_col->function)
@@ -488,7 +488,7 @@ static char	*tq_sql_dyn_get_array_condition(zbx_tq_condition_t *cond, const tq_s
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_get_base_column_type(cond->col_type),
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_get_base_column_type(cond->col_info->type),
 				cond->attribute_key, cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s)", elem_cond, col_esc);
@@ -508,15 +508,15 @@ static char	*tq_sql_dyn_get_array_condition(zbx_tq_condition_t *cond, const tq_s
 
 static char	*tq_sql_dyn_get_condition(zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
-	if (SUCCEED == tq_column_type_is_array(cond->col_type))
+	if (SUCCEED == tq_column_type_is_array(cond->col_info->type))
 	{
 		return tq_sql_dyn_get_array_condition(cond, ctx);
 	}
 	else
 	{
 		char	*name_esc = tq_sql_dyn_escape_name(cond->column, ctx);
-		char	*str = tq_sql_dyn_get_atom_condition(name_esc, cond->col_type, cond->attribute_key, cond->value,
-				cond->operator, ctx);
+		char	*str = tq_sql_dyn_get_atom_condition(name_esc, cond->col_info->type, cond->attribute_key,
+				cond->value, cond->operator, ctx);
 
 		zbx_free(name_esc);
 
