@@ -32,12 +32,12 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-var errTooManyRedirects = errors.New("too many redirects")
+var errTooManyRedirects = errs.New("too many redirects")
 
-// Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
-// parameter is set. At most redirectLimit redirects are followed, zero means that redirects are not followed.
-// When redirects are followed the dump contains the headers of every response in the chain, followed by the
-// body of the last one.
+// Get fetches the specified URL content with a timeout. If dump is true,
+// it returns the response headers (including all responses if following redirects)
+// concatenated with the final response body. Parameter redirectLimit specifies
+// the maximum number of redirects to follow; a value of 0 disables redirect following.
 func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (string, error) {
 	var chain [][]byte
 
@@ -66,7 +66,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 	resp, err := client.Do(req)
 	if err != nil {
 		if errors.Is(err, errTooManyRedirects) {
-			return "", errs.Wrapf(err, "maximum (%d) redirects followed", redirectLimit)
+			return "", errs.Wrapf(err, "maximum number of redirects (%d) exceeded", redirectLimit)
 		}
 
 		return "", errs.Wrap(err, "cannot get content of web page")

@@ -140,7 +140,7 @@ static int	parse_redirect_limit(const char *str, int *redirect_limit, char **err
 
 	if (SUCCEED != zbx_is_uint_range(str, redirect_limit, 0, ZBX_MAX_REDIRECT_LIMIT))
 	{
-		*error = zbx_dsprintf(*error, "value must be between 0 and %d", ZBX_MAX_REDIRECT_LIMIT);
+		*error = zbx_dsprintf(*error, "value must be from 0 up to and including %d", ZBX_MAX_REDIRECT_LIMIT);
 		return FAIL;
 	}
 
@@ -228,7 +228,7 @@ static int	curl_page_get(char *url, int redirect_limit, int timeout, char **buff
 	}
 	else if (CURLE_TOO_MANY_REDIRECTS == err)
 	{
-		*error = zbx_dsprintf(*error, "Maximum (%d) redirects followed.", redirect_limit);
+		*error = zbx_dsprintf(*error, "Maximum number of redirects (%d) exceeded.", redirect_limit);
 	}
 	else
 	{
