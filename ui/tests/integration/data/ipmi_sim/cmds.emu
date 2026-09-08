@@ -1,0 +1,37 @@
+# ipmi_sim command file for the testIpmiChecks integration test BMC.
+
+mc_setbmc 0x20
+mc_add 0x20 0 no-device-sdrs 0x23 9 8 0x9f 0x1291 0xf02 persist_sdr
+mc_enable 0x20
+
+# Threshold temperature sensor (sensor number 1), matching the "Temp" SDR.
+sensor_add 0x20 0 1 1 0x01
+sensor_set_threshold 0x20 0 1 readable 111111 90 80 70 20 10 5
+sensor_set_value 0x20 0 1 50 1
+
+# Discrete presence sensor (sensor number 2), matching the "Presence" SDR.
+sensor_add 0x20 0 2 37 0x6f
+sensor_set_event_support 0x20 0 2 enable scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
+sensor_set_bit 0x20 0 2 0 1 1
+
+# Threshold sensor with threshold access explicitly off (sensor number 3), matching
+# the "NoThresh" SDR.
+sensor_add 0x20 0 3 1 0x01
+sensor_set_threshold 0x20 0 3 none 000000 0 0 0 0 0 0
+sensor_set_value 0x20 0 3 42 0
+
+# Sensor with a reserved event_reading_type_code (sensor number 4), matching the
+# "Unsupported" SDR.
+sensor_add 0x20 0 4 1 0x20
+sensor_set_value 0x20 0 4 1 0
+
+# Percentage threshold sensor (sensor number 5), matching the "Percent" SDR.
+sensor_add 0x20 0 5 1 0x01
+sensor_set_threshold 0x20 0 5 none 000000 0 0 0 0 0 0
+sensor_set_value 0x20 0 5 75 0
+
+# Base/modifier-unit threshold sensor (sensor number 6), matching the "WattsHour" SDR.
+sensor_add 0x20 0 6 1 0x01
+sensor_set_threshold 0x20 0 6 none 000000 0 0 0 0 0 0
+sensor_set_value 0x20 0 6 30 0

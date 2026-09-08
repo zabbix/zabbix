@@ -1,0 +1,207 @@
+# SDR definitions for the testIpmiChecks integration test BMC, installed as the persistent main SDR
+# repository of the simulated BMC (mc address 0x20).
+#
+# testIpmiChecks.php compiles this at runtime with sdrcomp if it is installed; otherwise it falls back
+# to the pre-compiled test.bsdr checked in alongside this file (some environments ship ipmi_sim/ipmitool
+# without the rest of the openipmi package, i.e. without sdrcomp). After editing this file, regenerate
+# test.bsdr so the fallback stays in sync:
+#
+#   sdrcomp -o test.bsdr test.sdrs
+
+sdr type 18
+	device_slave_address	0x20
+	device_channel_number	0
+	chassis			true
+	ipmb_event_gen		false
+	ipmb_event_recv		false
+	fru_inventory		true
+	sel			true
+	sdr			true
+	sensor			true
+	entity_id		system_board
+	entity_instance		1
+	id_string		"zbxtest BMC"
+endsdr
+
+# Threshold (analog) temperature sensor, sensor number 1.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		1
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	id_string		"Temp"
+endsdr
+
+# Discrete presence sensor, sensor number 2.
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		2
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"Presence"
+endsdr
+
+# A second threshold sensor with threshold access explicitly disabled at runtime
+# (see cmds.emu), to exercise zbx_read_ipmi_thresholds()'s "cannot access thresholds"
+# branch (sensor value is still readable, just without threshold classification).
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		3
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"NoThresh"
+endsdr
+
+# A sensor with a reserved/unrecognized event_reading_type_code, to exercise
+# zbx_read_ipmi_sensor()'s "IPMI reading type is not supported" default branch.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		4
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	0x20
+	analog_data_format	unsigned
+	base_unit		degrees_C
+	id_string		"Unsupported"
+endsdr
+
+# A percentage threshold sensor, to exercise zbx_get_ipmi_units()'s early "%" return.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		5
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		true
+	base_unit		unspecified
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		100
+	sensor_minimum		0
+	id_string		"Percent"
+endsdr
+
+# A threshold sensor with a "base OP modifier" unit (modifier_unit "divide" below), to exercise
+# zbx_get_ipmi_units()'s base/modifier branch instead of its plain "none" one - see the comment on
+# the "WattsHour" assertion in testIpmiChecks.php for why this isn't asserted as "Watts/hour".
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		6
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		divide
+	percentage		false
+	base_unit		Watts
+	modifier_unit_code	hour
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"WattsHour"
+endsdr
