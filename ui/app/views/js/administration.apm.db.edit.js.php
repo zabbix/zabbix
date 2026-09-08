@@ -78,7 +78,7 @@ const view = new class {
 		});
 
 		this.#change_password_btn?.addEventListener('click', e => {
-			this.#password_changed = this.#password_input?.value !== '';
+			this.#password_changed = true;
 
 			this.#updateDisplayState([this.#password_input], true);
 			this.#password_input?.focus();
@@ -149,7 +149,7 @@ const view = new class {
 		this.#password_warning?.setAttribute('hidden', '');
 
 		if (this.#password_input !== null) {
-			if (this.#url_changed && this.#password_input.value !== '') {
+			if (this.#url_changed) {
 				this.#password_input.value = '';
 
 				this.#password_warning?.removeAttribute('hidden');
