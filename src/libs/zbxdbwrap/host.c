@@ -489,7 +489,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i1.hostid,f1.triggerid,i2.hostid"
+				"select f1.triggerid,i2.hostid"
 				" from items i1"
 				" join functions f1 on f1.itemid=i1.itemid"
 				" join functions f2 on f2.triggerid=f1.triggerid"
@@ -509,8 +509,8 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			zbx_db_result_t	error_result;
 			zbx_db_row_t	error_row;
 
-			ZBX_STR2UINT64(triggerid, row[1]);
-			ZBX_STR2UINT64(hostid, row[2]);
+			ZBX_STR2UINT64(triggerid, row[0]);
+			ZBX_STR2UINT64(hostid, row[1]);
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
