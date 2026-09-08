@@ -521,7 +521,7 @@ form {
 }
 
 .list-check-radio {
-	li {
+	> li {
 		display: block;
 		line-height: 24px;
 	}

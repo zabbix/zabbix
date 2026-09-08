@@ -8148,7 +8148,7 @@ form.is-loading {
 .border-left {
   border-left: 1px solid #383838; }
 
-.list-check-radio li {
+.list-check-radio > li {
   display: block;
   line-height: 24px; }
 .list-check-radio.hor-list li {

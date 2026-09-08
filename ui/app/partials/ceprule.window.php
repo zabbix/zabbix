@@ -80,34 +80,35 @@ zbx_add_post_js($tags->getPostJS());
 	)
 
 	->addItem((new CLabel(_('Group by'), 'ceprule-window-groupby'))->setId('ceprule-groupby-label'))
-	->addItem(new CFormField((new CList([
-		(new CListItem())
-			->addItem((new CCheckBox('window[group_by_host_group]', CCepRuleHelper::GROUP_BY_YES))
+	->addItem(new CFormField(
+		(new CList([
+			(new CCheckBox('window[group_by_host_group]', CCepRuleHelper::GROUP_BY_YES))
+				->setId('ceprule-window-groupby-opt-group')
 				->setUncheckedValue(CCepRuleHelper::GROUP_BY_NO)
 				->setChecked($data['window']['group_by_host_group'] == CCepRuleHelper::GROUP_BY_YES)
-				->setId('ceprule-window-groupby-opt-group')
-			)
-			->addItem(new CLabel(_('Host group'), 'ceprule-window-groupby-opt-group')),
-
-		(new CListItem())
-			->addItem((new CCheckBox('window[group_by_host]', CCepRuleHelper::GROUP_BY_YES))
+				->setLabel(_('Host group')),
+			(new CCheckBox('window[group_by_host]', CCepRuleHelper::GROUP_BY_YES))
+				->setId('ceprule-window-groupby-opt-host')
 				->setUncheckedValue(CCepRuleHelper::GROUP_BY_NO)
 				->setChecked($data['window']['group_by_host'] == CCepRuleHelper::GROUP_BY_YES)
-				->setId('ceprule-window-groupby-opt-host')
-			)
-			->addItem(new CLabel(_('Host'), 'ceprule-window-groupby-opt-host')),
-
-		(new CListItem())
-			->addItem((new CCheckBox('window[group_by_tags]', CCepRuleHelper::GROUP_BY_YES))
-				->setUncheckedValue(CCepRuleHelper::GROUP_BY_NO)
-				->setChecked($data['window']['group_by_tags'] == CCepRuleHelper::GROUP_BY_YES)
-				->setId('ceprule-window-groupby-opt-tag')
-			)
-			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
-			->addItem(new CObject('&nbsp;'))
-			->addItem($tags)
-	]))->setId('ceprule-window-groupby')))
-
+				->setLabel(_('Host')),
+			new CHorList([
+				(new CListItem([
+					(new CCheckBox('window[group_by_tags]', CCepRuleHelper::GROUP_BY_YES))
+						->setId('ceprule-window-groupby-opt-tag')
+						->setUncheckedValue(CCepRuleHelper::GROUP_BY_NO)
+						->setChecked($data['window']['group_by_tags'] == CCepRuleHelper::GROUP_BY_YES)
+						->setLabel(_('Tag')),
+					makeHelpIcon(
+						_('Groups tags by value and applies the first available tag match.')
+					)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				$tags
+			])
+		]))
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->setId('ceprule-window-groupby')
+	))
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
 	->addItem((new CFormField())
 		->addItem((new CRadioButtonList('window[event_count_tag_enabled]',
