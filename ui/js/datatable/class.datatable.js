@@ -48,7 +48,7 @@ class CDataTable {
 	static ZBX_STYLE_HEADER = 'datatable-header';
 	static ZBX_STYLE_HEADER_STICKY = 'datatable-header-sticky';
 	static ZBX_STYLE_ROW = 'datatable-row';
-	static ZBX_STYLE_ROW_SELECTED = 'datatable-row-selected';
+	static ZBX_STYLE_ROW_SELECTED = 'row-selected';
 	static ZBX_STYLE_ROW_DISABLED = 'datatable-row-disabled';
 	static ZBX_STYLE_ROW_SPACER = 'datatable-row-spacer';
 	static ZBX_STYLE_FOOTER = 'datatable-footer';

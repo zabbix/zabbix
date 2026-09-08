@@ -2545,10 +2545,10 @@ button {
   .datatable.compact-view .datatable-body .datatable-row-spacer {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial; }
-  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):not(:hover) .btn-icon,
-  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):not(:hover) .icon {
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.row-selected):not(:hover) .btn-icon,
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.row-selected):not(:hover) .icon {
     background-color: #2b2b2b; }
-  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.datatable-row-selected):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
+  .datatable.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled):not(.row-selected):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
     background-color: #383838;
     border-bottom-color: #303030; }
   .datatable .hidden {
@@ -2711,18 +2711,18 @@ button {
       display: grid;
       grid-column: 1 / -1;
       grid-template-columns: subgrid; }
-      .datatable .datatable-body .datatable-row:not(.datatable-row-selected):not(.datatable-row-disabled):hover .datatable-row-spacer,
-      .datatable .datatable-body .datatable-row:not(.datatable-row-selected):not(.datatable-row-disabled):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
+      .datatable .datatable-body .datatable-row:not(.row-selected):not(.datatable-row-disabled):hover .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row:not(.row-selected):not(.datatable-row-disabled):hover .datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
         background-color: #383838; }
-      .datatable .datatable-body .datatable-row.nested:not(.datatable-row-selected) .datatable-row-spacer,
-      .datatable .datatable-body .datatable-row.nested:not(.datatable-row-selected) .datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
+      .datatable .datatable-body .datatable-row.nested:not(.row-selected) .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row.nested:not(.row-selected) .datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
         background-color: #1e1e1e; }
       .datatable .datatable-body .datatable-row.nested.nested-small {
         font-size: 11px; }
         .datatable .datatable-body .datatable-row.nested.nested-small .datatable-cell.datatable-cell-data .flex-wrapper {
           justify-content: flex-end; }
-      .datatable .datatable-body .datatable-row.datatable-row-selected .datatable-row-spacer,
-      .datatable .datatable-body .datatable-row.datatable-row-selected .datatable-cell:not(.datatable-cell-bg) {
+      .datatable .datatable-body .datatable-row.row-selected .datatable-row-spacer,
+      .datatable .datatable-body .datatable-row.row-selected .datatable-cell:not(.datatable-cell-bg) {
         background-color: #252525;
         border-bottom-color: rgba(31, 44, 51, 0.1); }
       .datatable .datatable-body .datatable-row .table-stats.table-stats-small {
@@ -3025,9 +3025,9 @@ button {
   .datatable-resizing .datatable .datatable-cell.datatable-cell-resizing .header-resizer {
     z-index: 4; }
 
-#datatable-traces .datatable-row:not(.datatable-row-selected):hover {
+#datatable-traces .datatable-row:not(.row-selected):hover {
   cursor: pointer; }
-  #datatable-traces .datatable-row:not(.datatable-row-selected):hover .datatable-cell {
+  #datatable-traces .datatable-row:not(.row-selected):hover .datatable-cell {
     background-color: #383838;
     border-bottom-color: rgba(31, 44, 51, 0.1); }
 #datatable-traces .span-count {

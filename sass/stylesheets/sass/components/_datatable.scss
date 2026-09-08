@@ -77,7 +77,7 @@
 	}
 
 	&.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled) {
-		&:not(.datatable-row-selected) {
+		&:not(.row-selected) {
 			&:not(:hover) {
 				.btn-icon,
 				.icon {
@@ -329,7 +329,7 @@
 			grid-column: 1 / -1;
 			grid-template-columns: subgrid;
 
-			&:not(.datatable-row-selected):not(.datatable-row-disabled):hover {
+			&:not(.row-selected):not(.datatable-row-disabled):hover {
 				.datatable-row-spacer,
 				.datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
 					background-color: $ui-hover-bg-color;
@@ -337,7 +337,7 @@
 			}
 
 			&.nested {
-				&:not(.datatable-row-selected) {
+				&:not(.row-selected) {
 					.datatable-row-spacer,
 					.datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
 						background-color: darken($ui-bg-color, 5%);
@@ -353,7 +353,7 @@
 				}
 			}
 
-			&.datatable-row-selected {
+			&.row-selected {
 				.datatable-row-spacer,
 				.datatable-cell:not(.datatable-cell-bg) {
 					background-color: $lighter-yellow;
@@ -844,7 +844,7 @@
 }
 
 #datatable-traces {
-	.datatable-row:not(.datatable-row-selected):hover {
+	.datatable-row:not(.row-selected):hover {
 		cursor: pointer;
 
 		.datatable-cell {
