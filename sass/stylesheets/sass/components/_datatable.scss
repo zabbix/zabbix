@@ -780,6 +780,16 @@
 		}
 	}
 
+	&.datatable-customizable {
+		.datatable-header .datatable-cell.datatable-cell-header:last-of-type {
+			padding-right: 8px;
+
+			&:has(.datatable-options-link) {
+				padding-right: 32px;
+			}
+		}
+	}
+
 	.datatable-row-spacer {
 		box-sizing: border-box;
 		height: 100%;

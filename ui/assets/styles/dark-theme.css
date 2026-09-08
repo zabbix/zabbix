@@ -2990,6 +2990,10 @@ button {
         padding: 7px 8px; }
     .datatable .datatable-cell.datatable-cell-compact {
       padding: 0; }
+  .datatable.datatable-customizable .datatable-header .datatable-cell.datatable-cell-header:last-of-type {
+    padding-right: 8px; }
+    .datatable.datatable-customizable .datatable-header .datatable-cell.datatable-cell-header:last-of-type:has(.datatable-options-link) {
+      padding-right: 32px; }
   .datatable .datatable-row-spacer {
     box-sizing: border-box;
     height: 100%;

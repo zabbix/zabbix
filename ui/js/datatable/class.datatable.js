@@ -42,6 +42,7 @@ class CDataTable {
 	static EVENT_OPTIONS_POPUP_UPDATE = 'options:update';
 
 	static ZBX_STYLE_DATATABLE = 'datatable';
+	static ZBS_STYLE_DATATABLE_CUSTOMIZABLE = 'datatable-customizable';
 	static ZBX_STYLE_RESIZING = 'datatable-resizing';
 	static ZBX_STYLE_SCROLLABLE = 'datatable-scrollable';
 	static ZBX_STYLE_BODY = 'datatable-body';
@@ -832,6 +833,11 @@ class CDataTable {
 		this.#renderHeaderCells();
 
 		this.#element.classList.add(CDataTable.ZBX_STYLE_DATATABLE, CDataTable.ZBX_STYLE_SCROLLABLE);
+
+		if (this.isCustomizable()) {
+			this.#element.classList.add(CDataTable.ZBS_STYLE_DATATABLE_CUSTOMIZABLE);
+		}
+
 		this.#element.innerHTML = '';
 		this.#element.append(this.#header, this.#body, this.#footer);
 
@@ -1073,6 +1079,7 @@ class CDataTable {
 		this.#lockHeight();
 		this.#clearBody();
 		this.#recalculateColumnSpans();
+		this.#renderHeaderCells();
 		this.#renderBody(response);
 		this.#afterRender(response);
 	}
@@ -1399,7 +1406,7 @@ class CDataTable {
 		this.#resizing = true;
 		this.#resize_column_index = column_index;
 		this.#resize_start_x = x;
-		this.#resize_start_width = this.#getWidthWithoutUnit(column.getWidth());
+		this.#resize_start_width = column.getHeaderCell()?.target?.offsetWidth ?? 0;
 
 		document.body.classList.add(CDataTable.ZBX_STYLE_RESIZING);
 
@@ -2188,7 +2195,7 @@ class CDataTable {
 	#renderHeaderCellContents(column, header_cell) {
 		header_cell.innerHTML = '';
 
-		if (this.#resizable && column.isResizable()) {
+		if (this.#has_data && this.#resizable && column.isResizable()) {
 			const resize_handle = document.createElement('div');
 			resize_handle.classList.add(CDataTable.ZBX_STYLE_HEADER_RESIZER);
 
@@ -2303,16 +2310,23 @@ class CDataTable {
 			return;
 		}
 
-		const ghost_row = document.createElement('div');
-		ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
-		ghost_row.style.height = '0px';
-		ghost_row.style.visibility = 'hidden';
+		let ghost_row = null;
 
-		for (const column of this.#visible_columns) {
-			ghost_row.appendChild(column.getHeaderCell()?.target?.cloneNode(true));
+		if (this.#has_data) {
+			ghost_row = document.createElement('div');
+			ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
+			ghost_row.style.height = '0px';
+			ghost_row.style.visibility = 'hidden';
+
+			this.#body.appendChild(ghost_row);
+
+			for (const column of this.#visible_columns) {
+				const header_cell = column.getHeaderCell()?.target?.cloneNode(true);
+				if (header_cell !== null) {
+					ghost_row.appendChild(header_cell);
+				}
+			}
 		}
-
-		this.#body.appendChild(ghost_row);
 
 		for (const column of this.#columns.filter(column => !column.isResized())) {
 			this.#resetCalculatedOverrides(column);
@@ -2333,7 +2347,7 @@ class CDataTable {
 				this.#calculateColumnWidth(column);
 			}
 
-			ghost_row.remove();
+			ghost_row?.remove();
 
 			this.#applyColumnWidths();
 		});
@@ -2346,12 +2360,14 @@ class CDataTable {
 
 		const overrides = column.getOverrides();
 		const min_width = this.#getColumnMinWidth(column);
+		const enough_columns = this.#visible_columns.length > 2;
+		const is_last_column = this.#visible_columns.at(-1) === column;
 
 		let header_width = Math.ceil(column.getHeaderCell()?.target?.offsetWidth ?? 0);
-		if (!('width' in overrides) && this.#visible_columns.length > 2
-				&& this.#visible_columns.at(-1) === column && column.getDefaults().getWidth() !== 'auto') {
-			header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
-		}
+
+		// if (this.isCustomizable() && !('width' in overrides) && enough_columns && is_last_column) {
+		// 	header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
+		// }
 
 		const data_width = Math.ceil(column.getDataCells().at(0)?.target?.offsetWidth ?? 0);
 
@@ -2375,16 +2391,25 @@ class CDataTable {
 			column.setHeaderCell(null);
 		}
 
+		if (this.isCustomizable()) {
+			this.createRowSpacer(this.#header);
+		}
+
 		for (const column of this.#visible_columns) {
 			const header_cell = this.#createHeaderCell(column);
 			column.setHeaderCell(header_cell);
 
-			this.#header.appendChild(header_cell.target);
+			if (this.isCustomizable()) {
+				const row_spacer = this.findRowSpacer(this.#header);
+
+				this.#header.insertBefore(header_cell.target, row_spacer);
+			}
+			else {
+				this.#header.appendChild(header_cell.target);
+			}
 		}
 
 		if (this.isCustomizable()) {
-			this.createRowSpacer(this.#header);
-
 			this.#createTableOptionsButton();
 			this.#updateTableOptionsButtonPosition();
 		}
@@ -2833,14 +2858,13 @@ class CDataTable {
 			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 
-		if (right_offset > 0) {
-			let padding_right = right_offset;
-			if (!column.getOptionsPopupHandler()) {
-				padding_right += CDataTable.COLUMN_HEADER_PADDING;
-			}
+		const options_link = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_LINK}`);
 
-			header_cell.target.style.paddingRight = `${padding_right}px`;
+		if (right_offset > 0 && column.getOptionsPopupHandler()) {
+			options_link?.style.setProperty('margin-right', `${right_offset - 1}px`);
 		} else {
+			options_link?.style.removeProperty('margin-right');
+
 			header_cell.target.style.paddingRight = null;
 		}
 
