@@ -110,6 +110,8 @@ class CMaintenance extends CApiService {
 					$permission_condition.
 			')';
 
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM maintenance_trigger mt'.
@@ -119,11 +121,13 @@ class CMaintenance extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE m.maintenanceid=mt.maintenanceid'.
-					$permission_condition.
+				' GROUP by mt.triggerid'.
+				' HAVING COUNT(p.permission) < COUNT(*)'.
+					' OR MIN(p.permission)='.PERM_DENY.
+					' OR MAX(p.permission)<'.zbx_dbstr($permission).
 			')';
 
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -202,6 +206,12 @@ class CMaintenance extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
+
+	/*	echo PHP_EOL."<br>====================================<br>".PHP_EOL;
+		print_r(self::createSelectQueryFromParts($sqlParts));
+		echo PHP_EOL."<br>====================================<br>".PHP_EOL;*/
+
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($maintenance = DBfetch($res)) {
 			if ($options['countOutput']) {
