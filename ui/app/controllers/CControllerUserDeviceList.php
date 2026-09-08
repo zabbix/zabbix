@@ -184,7 +184,8 @@ class CControllerUserDeviceList extends CController {
 			}
 
 			CArrayHelper::sort($devices, [
-				['field' => $filter['sort'], 'order' => $filter['sortorder']]
+				['field' => $filter['sort'], 'order' => $filter['sortorder']],
+				['field' => 'deviceid', 'order' => ZBX_SORT_DOWN]
 			]);
 		}
 

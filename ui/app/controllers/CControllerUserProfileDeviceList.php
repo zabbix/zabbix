@@ -95,7 +95,8 @@ class CControllerUserProfileDeviceList extends CController {
 		$devices = API::Device()->get($options);
 
 		CArrayHelper::sort($devices, [
-			['field' => $filter['sort'], 'order' => $filter['sortorder']]
+			['field' => $filter['sort'], 'order' => $filter['sortorder']],
+			['field' => 'deviceid', 'order' => ZBX_SORT_DOWN]
 		]);
 
 		return $devices;
