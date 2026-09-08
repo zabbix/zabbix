@@ -475,7 +475,10 @@ class CCepRule extends CApiService {
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
 			]],
 			'tag_value' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
+										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_condition', 'tag_value')]
+										]],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag_value')]
 			]],
 			'severity' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -754,8 +757,11 @@ class CCepRule extends CApiService {
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_condition', 'tag')],
 								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation_condition', 'tag')]
 			]],
-			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation_condition', 'tag_value')],
+			'tag_value' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE])], 'type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_condition', 'tag_value')],
+									['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation_condition', 'tag_value')]
+								]],
 								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation_condition', 'tag_value')]
 			]]
 		];
