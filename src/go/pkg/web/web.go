@@ -109,7 +109,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
 		if limit <= 0 {
-			return errs.Wrap(http.ErrUseLastResponse, "redirects are disabled")
+			return http.ErrUseLastResponse
 		}
 
 		if len(via) > limit {
