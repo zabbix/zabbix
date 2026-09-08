@@ -92,12 +92,6 @@ class CDataTable {
 	static COLUMN_INITIAL_MIN_WIDTH = 32;
 
 	/** @type {number} */
-	static COLUMN_MIN_ALLOWED_CALC_WIDTH = 200;
-
-	/** @type {number} */
-	static COLUMN_MAX_ALLOWED_CALC_WIDTH = 400;
-
-	/** @type {number} */
 	static COLUMN_HEADER_PADDING = 8;
 
 	/** @type {number} */
@@ -105,9 +99,6 @@ class CDataTable {
 
 	/** @type {number} */
 	static COLUMN_SORTABLE_ARROW_WIDTH = 10;
-
-	/** @type {number} */
-	static TABLE_OPTIONS_BUTTON_WIDTH = 34;
 
 	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
@@ -1076,6 +1067,7 @@ class CDataTable {
 
 		this.#visible_columns = this.getVisibleColumns();
 
+		this.#stopColumnResizing();
 		this.#lockHeight();
 		this.#clearBody();
 		this.#recalculateColumnSpans();
@@ -1427,12 +1419,7 @@ class CDataTable {
 
 		column.getHeaderCell().target.classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING);
 
-		this.#resizing = false;
-		this.#resize_column_index = -1;
-		this.#resize_start_x = 0;
-		this.#resize_start_width = 0;
-
-		document.body.classList.remove(CDataTable.ZBX_STYLE_RESIZING);
+		this.#stopColumnResizing();
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
@@ -2359,16 +2346,7 @@ class CDataTable {
 		}
 
 		const overrides = column.getOverrides();
-		const min_width = this.#getColumnMinWidth(column);
-		const enough_columns = this.#visible_columns.length > 2;
-		const is_last_column = this.#visible_columns.at(-1) === column;
-
-		let header_width = Math.ceil(column.getHeaderCell()?.target?.offsetWidth ?? 0);
-
-		// if (this.isCustomizable() && !('width' in overrides) && enough_columns && is_last_column) {
-		// 	header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
-		// }
-
+		const header_width = Math.ceil(column.getHeaderCell()?.target?.offsetWidth ?? 0);
 		const data_width = Math.ceil(column.getDataCells().at(0)?.target?.offsetWidth ?? 0);
 
 		let width;
@@ -2376,6 +2354,8 @@ class CDataTable {
 			width = Math.max(header_width + 1, data_width + 1);
 		}
 		else {
+			const min_width = this.#getColumnMinWidth(column);
+
 			width = Math.max(min_width, data_width);
 		}
 
@@ -2574,6 +2554,15 @@ class CDataTable {
 			this.#calculateColumnWidths();
 			this.#handleScrollbar();
 		}, 0)
+	}
+
+	#stopColumnResizing() {
+		this.#resizing = false;
+		this.#resize_column_index = -1;
+		this.#resize_start_x = 0;
+		this.#resize_start_width = 0;
+
+		document.body.classList.remove(CDataTable.ZBX_STYLE_RESIZING);
 	}
 
 	onWindowBeforeUnload = () => {
