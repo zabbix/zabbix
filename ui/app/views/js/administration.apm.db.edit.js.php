@@ -74,6 +74,10 @@ const view = new class {
 		this.#url_input?.addEventListener('input', () => {
 			this.#url_changed = true;
 
+			if (this.#password_input !== null) {
+				this.#password_input.value = '';
+			}
+
 			this.#updateForm({initial_values});
 		});
 
@@ -150,8 +154,6 @@ const view = new class {
 
 		if (this.#password_input !== null) {
 			if (this.#url_changed) {
-				this.#password_input.value = '';
-
 				this.#password_warning?.removeAttribute('hidden');
 			}
 
