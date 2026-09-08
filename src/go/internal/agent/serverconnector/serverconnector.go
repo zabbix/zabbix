@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,7 +37,11 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-const defaultAgentPort = 10050
+const (
+	defaultAgentPort = 10050
+	retryIntervalMin = 2
+	retryIntervalMax = 60
+)
 
 type Connector struct {
 	clientID                   uint64
@@ -208,6 +212,7 @@ func (c *Connector) refreshActiveChecks() bool {
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
+		c.configRevision = 0
 
 		return false
 	} else if c.firstActiveChecksLog {
@@ -229,11 +234,13 @@ func (c *Connector) refreshActiveChecks() bool {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.address.Get())
+
+			return false
 		} else {
 			parseSuccess = true
 		}
 
-		return false
+		return true
 	}
 
 	c.configRevision = response.ConfigRevision
@@ -348,7 +355,7 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)
-	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of sendHeartbeatMsg() from %s", c.clientID, c.address)
 
 	request, err := json.Marshal(&h)
 	if err != nil {
@@ -379,13 +386,16 @@ func (c *Connector) sendHeartbeatMsg() {
 }
 
 func (c *Connector) run() {
-	var nextRefresh, lastFlush, lastHeartbeat int64
+	var nextRefresh, lastFlush, lastHeartbeat, retryAfter int64
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
 
 	time.Sleep(time.Duration(1e9 - time.Now().Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
 run:
 	for {
 		select {
@@ -401,10 +411,27 @@ run:
 
 				nextRefresh = time.Now().Unix()
 				if !ret {
-					nextRefresh += 60
+					if retryAfter == 0 {
+						retryAfter = retryIntervalMin
+					} else {
+						retryAfter *= 2
+					}
+
+					if retryAfter > retryIntervalMax {
+						retryAfter = retryIntervalMax
+					}
+
+					nextRefresh += retryAfter
 				} else {
 					nextRefresh += int64(c.options.RefreshActiveChecks)
+
+					if retryAfter != 0 {
+						retryAfter = 0
+					}
 				}
+			} else if !c.resultCache.IsUploadEnabled() && (now+retryIntervalMax) < nextRefresh {
+				retryAfter = retryIntervalMin
+				nextRefresh = now + retryAfter
 			}
 			if c.options.HeartbeatFrequency > 0 {
 				if (now - lastHeartbeat) >= int64(c.options.HeartbeatFrequency) {

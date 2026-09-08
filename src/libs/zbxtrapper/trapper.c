@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,10 +48,9 @@
 #include "zbxthreads.h"
 #include "zbxvault.h"
 #include "zbxautoreg.h"
-
-#ifdef HAVE_NETSNMP
-#	include "zbxrtc.h"
-#endif
+#include "zbxrtc.h"
+#include "zbxcfg.h"
+#include "zbxexpr.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -314,9 +313,10 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
+static int	queue_compare_by_nextcheck_asc(const void *a1, const void *a2)
 {
-	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
+	const zbx_queue_item_t	*i1 = *(const zbx_queue_item_t * const *)a1;
+	const zbx_queue_item_t	*i2 = *(const zbx_queue_item_t * const *)a2;
 
 	return i1->nextcheck - i2->nextcheck;
 }
@@ -443,7 +443,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
@@ -1003,37 +1003,71 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 {
 	char			host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 				hbfreq[ZBX_MAX_UINT64_LEN];
-	zbx_history_recv_host_t	recv_host;
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len;
-	zbx_comms_redirect_t	redirect;
-	int			ret;
+	zbx_comms_redirect_t	redirect = {0};
+	zbx_uint64_t		hostid, revision;
+	unsigned char		status, monitored_by;
+	char			*error = NULL;
+	int			freq;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
 
-	if (FAIL == (ret = zbx_dc_config_get_host_by_name(host, sock, &recv_host, &redirect)))
-		return FAIL;
-
-	if (SUCCEED_PARTIAL == ret)
+	if (FAIL == zbx_check_hostname(host, &error))
 	{
-		struct zbx_json	j;
-
-		zbx_json_init(&j, 1024);
-		zbx_add_redirect_response(&j, &redirect);
-		zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
-		zbx_json_free(&j);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid host name \"%s\" for heartbeat: %s", host, error);
+		zbx_free(error);
 
 		return FAIL;
 	}
 
-	if (HOST_MONITORED_BY_SERVER != recv_host.monitored_by || HOST_STATUS_NOT_MONITORED == recv_host.status)
+	if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+			&revision, &redirect, ZBX_AUTOREG_NO_CHANGES, &error))
+	{
+		if (0 != redirect.revision || ZBX_REDIRECT_NONE != redirect.reset)
+		{
+			struct zbx_json	j;
+
+			zbx_json_init(&j, 1024);
+			zbx_add_redirect_response(&j, &redirect);
+			(void)zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
+			zbx_json_free(&j);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process heartbeat from host \"%s\": %s", host, error);
+		}
+
+		zbx_free(error);
+
+		return FAIL;
+	}
+
+	if (0 == hostid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process heartbeat from host \"%s\": host not found", host);
+		return FAIL;
+	}
+
+	if (HOST_MONITORED_BY_SERVER != monitored_by || HOST_STATUS_NOT_MONITORED == status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat message \"%s\"", sock->peer);
 		return FAIL;
+	}
 
-	data_len = zbx_availability_serialize_active_heartbeat(&data, recv_host.hostid, atoi(hbfreq));
+	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX < freq)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat frequency \"%s\" from \"%s\"", hbfreq,
+				sock->peer);
+
+		return FAIL;
+	}
+
+	data_len = zbx_availability_serialize_active_heartbeat(&data, hostid, freq);
 	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
 
 	zbx_free(data);
@@ -1141,13 +1175,15 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
 	zbx_rtrim(s, " \r\n");
 
+#ifdef ZBX_DEBUG
 	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 
 	if ('{' == *s)	/* JSON protocol */
 	{
@@ -1165,12 +1201,22 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got request '%s'", value);
+#endif
+
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
+#ifndef ZBX_DEBUG
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
+#ifndef ZBX_DEBUG
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
@@ -1180,6 +1226,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
+#ifndef ZBX_DEBUG
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 					autoreg_update_host_cb);
 		}
@@ -1189,7 +1238,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						config_ssh_key_location, get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts,
+						zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1228,7 +1278,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			ret = process_active_check_heartbeat(sock, &jp, config_comms->config_timeout);
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
-				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks, rtc))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1236,6 +1286,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for list of active checks");
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
 				autoreg_update_host_cb);
 	}
@@ -1249,6 +1300,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		zbx_host_key_t		hk = {host, key};
 		zbx_history_recv_item_t	item;
 		int			errcode;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for history data");
 
 		if (SUCCEED == zbx_vps_monitor_capped())
 		{
@@ -1295,13 +1348,48 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			av.severity = 0;
 		}
 
-		zbx_timespec(&av.ts);
-
-		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
-			av.state = ITEM_STATE_NOTSUPPORTED;
-
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
+
+		if (SUCCEED == errcode)
+		{
+			struct zbx_json		json;
+			struct zbx_json_parse	jp;
+			char			*info = NULL;
+
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, av.value, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.timestamp)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, (zbx_uint64_t)av.timestamp);
+
+			if (0 != av.lastlogsize)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
+
+			if (NULL != av.source && '\0' != *av.source)
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, av.source, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.severity)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, (zbx_uint64_t)av.severity);
+
+			zbx_json_close(&json);
+			zbx_json_close(&json);
+
+			if (SUCCEED == zbx_json_open(json.buffer, &jp))
+			{
+				if (ITEM_TYPE_ZABBIX_ACTIVE == item.type)
+					zbx_process_agent_history_data(sock, &jp, ts, &info);
+				else
+					zbx_process_sender_history_data(sock, &jp, ts, &info);
+
+				zbx_free(info);
+			}
+
+			zbx_json_free(&json);
+		}
 
 		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
@@ -1318,7 +1406,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1327,7 +1415,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb);
+			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1341,10 +1429,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 	int			ret = SUCCEED, server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-#ifdef HAVE_NETSNMP
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	zbx_ipc_async_socket_t	rtc;
-#endif
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
@@ -1363,18 +1448,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-#ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
-			trapper_args_in->config_comms->config_timeout, &rtc);
-#endif
+	zbx_rtc_subscribe(process_type, process_num, NULL, 0, trapper_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
-#ifdef HAVE_NETSNMP
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		int		snmp_reload = 0;
-#endif
 
 		if (TIMEOUT_ERROR != ret)
 		{
@@ -1407,22 +1486,15 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
-#ifdef HAVE_NETSNMP
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 			{
-				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
-				{
-					zbx_clear_cache_snmp(process_type, process_num);
-					snmp_reload = 1;
-				}
-				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				{
 					zbx_tcp_unaccept(&s);
 					goto out;
 				}
-
 			}
-#endif
+
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
@@ -1437,7 +1509,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_ssh_key_location,
 					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
-					trapper_args_in->autoreg_update_host_cb);
+					trapper_args_in->autoreg_update_host_cb, &rtc);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);
@@ -1448,10 +1520,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
-#ifdef HAVE_NETSNMP
 out:
 	zbx_ipc_async_socket_close(&rtc);
-#endif
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

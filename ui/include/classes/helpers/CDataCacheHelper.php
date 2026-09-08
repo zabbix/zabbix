@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -105,7 +105,17 @@ class CDataCacheHelper {
 			self::deleteCacheFile();
 		}
 		else {
-			file_put_contents(self::getDataCacheFileName(), json_encode(self::$data));
+			$file_name = self::getDataCacheFileName();
+			$tmp_file_name = tempnam(dirname($file_name), basename($file_name).'.tmp');
+
+			if ($tmp_file_name === false) {
+				return;
+			}
+
+			if (file_put_contents($tmp_file_name, json_encode(self::$data)) === false
+					|| !rename($tmp_file_name, $file_name)) {
+				unlink($tmp_file_name);
+			}
 		}
 	}
 

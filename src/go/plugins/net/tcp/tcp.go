@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,7 @@ package tcpudp
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -95,9 +96,20 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	if _, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Second); err != nil {
+	dialer := net.Dialer{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	conn, err := dialer.DialContext(context.Background(), "tcp", address)
+	if err != nil {
 		return 0, nil
 	}
+
+	closeErr := conn.Close()
+	if closeErr != nil {
+		log.Debugf("failed to close net tcp port check connection: %s", closeErr)
+	}
+
 	return 1, nil
 }
 
@@ -283,15 +295,20 @@ func removeScheme(in string) (scheme string, host string, err error) {
 
 func encloseIPv6(in string) string {
 	parsedIP := net.ParseIP(in)
-	if parsedIP != nil {
-		ipv6 := parsedIP.To16()
-		if ipv6 != nil {
-			out := ipv6.String()
-			return fmt.Sprintf("[%s]", out)
-		}
+	if parsedIP == nil {
+		return in
 	}
 
-	return in
+	if parsedIP.To4() != nil {
+		return parsedIP.String()
+	}
+
+	ipv6 := parsedIP.To16()
+	if ipv6 == nil {
+		return in
+	}
+
+	return fmt.Sprintf("[%s]", ipv6.String())
 }
 
 func (p *Plugin) httpsExpect(ip string, port string, timeout int) int {

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,9 +35,15 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('context', $data['context']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('graphid', $data['graphid']);
+}
+
+$url = $url->getUrl();
 
 // Create form.
 $graphForm = (new CForm('post', $url))
@@ -60,7 +66,7 @@ if ($data['graphid'] != 0) {
 $graphFormList = new CFormList('graphFormList');
 
 $is_templated = (bool) $data['templates'];
-if ($is_templated) {
+if ($is_templated && $data['form'] !== 'clone') {
 	$graphFormList->addRow(_('Parent graphs'), $data['templates']);
 }
 
@@ -70,7 +76,7 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 }
 
 $readonly = false;
-if ($is_templated || $discovered_graph) {
+if (($is_templated || $discovered_graph) && $data['form'] !== 'clone') {
 	$readonly = true;
 	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
@@ -405,9 +411,7 @@ $parameters_add = [
 	'writeonly' => '1',
 	'multiselect' => '1'
 ];
-if ($data['normal_only']) {
-	$parameters_add['normal_only'] = '1';
-}
+
 if ($data['hostid']) {
 	$parameters_add['hostid'] = $data['hostid'];
 }
@@ -422,9 +426,7 @@ $parameters_add_prototype = [
 	'multiselect' => '1',
 	'graphtype' => $data['graphtype']
 ];
-if ($data['normal_only']) {
-	$parameters_add_prototype['normal_only'] = '1';
-}
+
 if ($data['parent_discoveryid']) {
 	$parameters_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
 }
@@ -493,7 +495,7 @@ $graphPreviewTable = (new CTable())
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // Append buttons to form.
-if ($data['graphid'] != 0) {
+if ($data['graphid'] != 0 && $data['form'] !== 'clone') {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
@@ -538,6 +540,8 @@ $html_page
 	->addItem($graphForm)
 	->show();
 
+zbx_add_post_js("history.replaceState({}, '');");
+
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $graphForm->getName(),
@@ -547,7 +551,6 @@ $html_page
 			'readonly' => $readonly,
 			'hostid' => $data['hostid'],
 			'is_template' => $data['is_template'],
-			'normal_only' => $data['normal_only'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		],
 		'items' => $data['items'],

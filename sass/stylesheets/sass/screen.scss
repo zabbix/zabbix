@@ -41,6 +41,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/buttons";
 @import "components/icons-extended";
+@import "components/calendar";
 @import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/columns-wrapper";
@@ -844,6 +845,20 @@ form {
 	.wordbreak {
 		white-space: normal;
 	}
+
+	.tags-wrapper {
+		@media screen and (min-width: 1200px) {
+			max-width: 266px;
+		}
+
+		@media screen and (min-width: 1400px) {
+			max-width: 359px;
+		}
+
+		@media screen and (min-width: 1600px) {
+			max-width: 452px;
+		}
+	}
 }
 
 .border-left {
@@ -1046,12 +1061,6 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
-	}
-}
-
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
 	}
 }
 
@@ -1659,13 +1668,8 @@ div {
 	width: 100%;
 }
 
-.qr-code {
-	height: 190px;
-	width: 190px;
-	margin: 20px auto;
-}
-
 .qr-code img {
+	margin: 20px auto;
 	image-rendering: pixelated;
 }
 
@@ -1787,10 +1791,6 @@ div {
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-
-	.wordbreak {
-		white-space: normal;
-	}
 
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
@@ -1921,6 +1921,12 @@ div {
 		&.modal-popup-static {
 			max-width: 700px;
 			width: 100%;
+
+			&.modal-popup-sla-edit,
+			&.modal-popup-proxy-edit,
+			&.modal-popup-connector-edit {
+				max-width: 750px;
+			}
 		}
 
 		&.modal-popup-preprocessing {
@@ -1931,6 +1937,37 @@ div {
 		&.modal-popup-fullscreen {
 			width: calc(100vw - 40px);
 			max-width: calc(100vw - 40px);
+		}
+	}
+
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		overflow: hidden;
+		padding-top: 20px;
+
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-header {
+				height: 20px;
+			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+			padding-bottom: 1px; // for table correct size
+
+			@extend %webkit-scrollbar;
 		}
 	}
 
@@ -2196,121 +2233,6 @@ div {
 	opacity: .35;
 }
 
-.calendar {
-	width: 200px;
-
-	.calendar-year,
-	.calendar-month {
-		&.highlighted {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			outline: none;
-		}
-	}
-
-	table {
-		width: 100%;
-		margin: 5px 0;
-
-		thead {
-			text-transform: $font-transform;
-			color: $font-alt-color;
-		}
-
-		tbody {
-			text-align: center;
-
-			td {
-				@if $ui-transitions {
-					transition: background-color $ui-controls-transition-duration ease-out;
-				}
-
-				&.selected {
-					background-color: $ui-bg-selected-color;
-					color: $white;
-
-					&:hover {
-						background-color: darken($ui-bg-selected-color, 4%);
-					}
-				}
-
-				&:hover {
-					background-color: $action-hover-color;
-					cursor: pointer;
-				}
-
-				&.highlighted {
-					@include btn-hover-active($btn-color, $btn-bg-color);
-					cursor: pointer;
-				}
-
-				&:focus {
-					outline: none;
-				}
-
-				span {
-					z-index: -1;
-					padding: 4px;
-					display: block;
-				}
-			}
-		}
-	}
-}
-
-.calendar-header {
-	text-align: center;
-
-	.btn-grey {
-		border: 0;
-		background-color: transparent;
-	}
-}
-
-.calendar-year {
-	height: 24px;
-	line-height: 26px;
-	display: table;
-	width: 100%;
-
-	button:first-child {
-		float: left;
-	}
-
-	button:last-child {
-		float: right;
-	}
-
-	button:hover {
-		background-color: $action-hover-color;
-		cursor: pointer;
-	}
-}
-
-.calendar-month {
-	@extend .calendar-year;
-}
-
-.calendar-time {
-	text-align: center;
-
-	input[type="text"] {
-		width: 32px;
-	}
-}
-
-.calendar-footer {
-	margin: 26px 0 0;
-	text-align: right;
-
-	.btn-grey {
-		float: left;
-		margin-top: 0;
-	}
-}
-
 // Problem notification overlay.
 .notif.overlay-dialogue {
 	width: 250px;
@@ -2441,18 +2363,7 @@ div {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
-
-	.table-paging {
-		min-height: 18px;
-		padding: 0 0 2px;
-		border: 0;
-		top: 2px;
-
-		.paging-btn-container {
-			min-height: inherit;
-		}
-	}
+	min-width: 160px;
 
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
@@ -2460,15 +2371,17 @@ div {
 	}
 
 	li {
-		padding-left: 23px;
+		display: flex;
+		width: fit-content;
+		align-items: center;
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
-			margin: 3px 10px 3px -20px;
-			width: 10px;
+			display: inline-block;
+			min-width: 10px;
 			height: 10px;
-			float: left;
-			display: block;
+			margin-left: 3px;
+			margin-right: 10px;
 		}
 
 		.svg-graph-hintbox-trigger-color {
@@ -2478,6 +2391,14 @@ div {
 
 	.header {
 		margin: 0 0 10px 3px;
+	}
+}
+
+.svg-hintbox-footer {
+	&.table-stats {
+		position: relative;
+		padding: 5px 0 0 0;
+		text-align: right;
 	}
 }
 
@@ -2509,6 +2430,10 @@ div {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
@@ -2547,17 +2472,34 @@ div {
 	background-attachment: local, local, scroll, scroll;
 }
 
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
 	line-height: 1em;
-	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
+	box-sizing: border-box;
 
 	a.link-action {
 		color: inherit !important;
@@ -2592,23 +2534,6 @@ div {
 
 .yellow-bg {
 	background-color: $alt-yellow;
-}
-
-// Severity statuses.
-@if $theme-name == 'blue' or $theme-name == 'dark' {
-	td[class] {
-		+ {
-			td.na-bg,
-			td.normal-bg,
-			td.info-bg,
-			td.average-bg,
-			td.warning-bg,
-			td.high-bg,
-			td.disaster-bg {
-				border-left: 1px dotted $table-border-color;
-			}
-		}
-	}
 }
 
 @each $severity-type, $color in (

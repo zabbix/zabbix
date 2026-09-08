@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-12 07:55+0000\n"
+"PO-Revision-Date: 2025-12-03 10:06+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -131,6 +131,15 @@ msgid_plural "%1$s actions"
 msgstr[0] "%1$s akce"
 msgstr[1] "%1$s akcí"
 msgstr[2] "%1$s akcí"
+
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: jsLoader.php:321
 #, c-format
@@ -1002,6 +1011,10 @@ msgstr "Přidat z hosta"
 msgid "Add from template"
 msgstr "Přidat ze šablony"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "Přidat hostitele"
@@ -1020,6 +1033,10 @@ msgstr "Přidat spouštěč hostitele"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "Přidat item"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -3850,6 +3867,11 @@ msgstr "Nelze číst XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Nelze číst YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Nelze přečíst odpověď ze Zabbix serveru \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3912,6 +3934,10 @@ msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Nelze nastavit \"Agregaci datové sady\", když je do grafu přidán item typu \"Celkem\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Nelze nastavit znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4449,6 +4475,10 @@ msgstr "Změnit tajný klíč klienta"
 msgid "Change indicator"
 msgstr "Změnit indikátor"
 
+#: include/classes/html/CMacroValue.php:163
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -4726,10 +4756,18 @@ msgstr "Zavřít"
 msgid "Close expression constructor"
 msgstr "Zavřít kunstruktéra výrazu"
 
+#: jsLoader.php:321
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "Zavřít novou událost"
+
+#: include/func.inc.php:1690 jsLoader.php:221
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4755,6 +4793,11 @@ msgstr "Délka kódu"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "Zhroucení"
+
+#: include/classes/html/CSectionCollapsible.php:41 jsLoader.php:333
+#: jsLoader.php:338
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -5891,6 +5934,10 @@ msgstr "Dashbord \"%1$s\" již existuje."
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "Nástěnka \"%1$s\" je použita v reportu \"%2$s\"."
 
+#: app/views/monitoring.dashboard.view.php:122
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6247,6 +6294,10 @@ msgstr "Výchozí přístup k novým modulům"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "Výchozí autentizace"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6799,6 +6850,10 @@ msgstr "Závisející"
 msgid "Dependent item"
 msgstr "Závislý item"
 
+#: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
+
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
 #: widgets/trigover/includes/ViewHelper.php:101
@@ -6893,6 +6948,10 @@ msgstr "Detaily web scénáře"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "Detekovaná licence TimescaleDB nepodporuje kompresi. Komprese je podporována v Komunitní edici TimescaleDB."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "Detekovaná licence nepodporuje kompresi. Komprese je podporována v TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7654,6 +7713,10 @@ msgstr "Upravit"
 msgid "Edit dashboard"
 msgstr "Upravit dashboard"
 
+#: jsLoader.php:479
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "Aktualizovat mapu"
@@ -7670,6 +7733,10 @@ msgstr "Upravit prvek stromu"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Upravit widget"
+
+#: jsLoader.php:183
+msgid "Edit widget settings"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8062,6 +8129,10 @@ msgstr "Anglicky (en_GB)"
 msgid "English (en_US)"
 msgstr "Anglicky (en_US)"
 
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
 #: app/partials/monitoring.latest.filter.php:114
@@ -8351,6 +8422,10 @@ msgstr "Potvrzení vykonání"
 msgid "Exists"
 msgstr "Existuje"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8363,6 +8438,11 @@ msgstr "Rozbalit"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "Rozbalte makra"
+
+#: include/classes/html/CSectionCollapsible.php:44 jsLoader.php:332
+#: jsLoader.php:337
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9037,6 +9117,10 @@ msgstr "Přejděte na první stránku"
 msgid "Go to last page, %1$s"
 msgstr "Přejít na poslední stránku, %1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9051,6 +9135,10 @@ msgstr "Přejít na stranu %1$s"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "Přejít na stránku %1$s, aktuální stránka"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12812,6 +12900,10 @@ msgstr "Seznam instancí objektů čítačů výkonu systému Windows, objevený
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Seznam instancí objektů čítačů výkonu systému Windows. Vrátí JSON"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -13438,6 +13530,11 @@ msgstr "Maximální počet řádků"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "Maximální požadovaná verze databáze %1$s je %2$s."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "Maximální požadovaná verze je %1$s."
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13777,6 +13874,12 @@ msgstr "Minimální požadovaný limit doby provádění PHP skriptu je %s (Nast
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "Minimální požadovaný PHP upload limit je %s (Nastavení \"upload_max_filesize\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "Minimální požadovaná verze je %1$s."
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -13981,6 +14084,14 @@ msgstr "Nejkritičtější, pokud všechny podřízené mají problémy"
 msgid "Most critical of child services"
 msgstr "Nejkritičtější z podřízených službeb"
 
+#: include/classes/html/CFilter.php:254 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:259 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -14009,6 +14120,16 @@ msgstr "Násobek"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Multiple PROBLEM události"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "Musí být alespoň %1$s."
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "Nesmí být vyšší než %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14494,6 +14615,10 @@ msgstr "Nové hodnoty"
 msgid "Next dashboard"
 msgstr "Další dashboard"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14507,6 +14632,10 @@ msgstr "Další stránka"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Další krok"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -14751,6 +14880,66 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Žádná oprávnění k volání \"%1$s.%2$s“."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "Žádná oprávnění k importu pravidel vyhledávání."
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "Žádná oprávnění k importu grafů."
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "Žádná oprávnění k importu skupin hostitelů."
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "Žádná oprávnění k importu hostitelů."
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "Žádná oprávnění k importu obrázků."
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "Žádná oprávnění k importu položek."
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "Žádná oprávnění k importu map."
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "Žádná oprávnění k importu typů médií."
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "Žádná oprávnění k importu šablon dashboardů."
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "Žádná oprávnění k importu skupin šablon."
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "Žádná oprávnění k importu odkazů ze šablon."
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "Žádná oprávnění k importu šablon."
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "Žádná oprávnění k importu triggerů."
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "Žádná oprávnění k importu map hodnot."
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "Žádná oprávnění k importu webových scénářů."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -15558,6 +15747,11 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 msgid "Open URL"
 msgstr "Otevřít adresu URL"
 
+#: app/views/popup.generic.php:460 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:322
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Otevřít v novém okně"
@@ -15565,6 +15759,10 @@ msgstr "Otevřít v novém okně"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "Otevřít log"
+
+#: jsLoader.php:184
+msgid "Open widget actions"
+msgstr ""
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16154,6 +16352,10 @@ msgstr "Nadřazené služby"
 msgid "Parent templates"
 msgstr "Mateřské šablony"
 
+#: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
 msgstr "Nadřazené spouštěče"
@@ -16737,6 +16939,21 @@ msgstr "Vyřešení problému"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "Problém vyřešen"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -17516,6 +17733,10 @@ msgstr "Odstranit ze skupiny"
 msgid "Remove from host groups"
 msgstr "Odstranit ze skupin"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "Smazat hostitele"
@@ -17523,6 +17744,10 @@ msgstr "Smazat hostitele"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "Odstranit tagy hosta"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -17783,6 +18008,11 @@ msgstr "Kód odpovědi"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Odezva"
+
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Časový limit odezvy %1$s sekund byl překročen při připojování k Zabbix serveru \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -18661,6 +18891,10 @@ msgstr "Vybrat"
 msgid "Select SLA to display SLA report."
 msgstr "Vyberte SLA pro zobrazení SLA reportu."
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -19085,6 +19319,18 @@ msgstr "Krátký"
 msgid "Shortened"
 msgstr "Zkrácený"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "Mělo by být alespoň %1$s."
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "Nemělo by být vyšší než %1$s."
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19108,6 +19354,10 @@ msgstr "Zobrazit"
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
 msgstr "Zobrazit agregační funkce"
+
+#: include/events.inc.php:755
+msgid "Show all tags"
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -19155,6 +19405,10 @@ msgstr "Zobrazit legendu"
 #: widgets/problems/includes/WidgetForm.php:162
 msgid "Show lines"
 msgstr "Zobrazit řádků"
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
@@ -19948,6 +20202,10 @@ msgstr "Swap velikost prostoru v bytech nebo v procentech z celkového počtu. N
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mimo Vašeho! Pokračovat?"
@@ -20606,7 +20864,7 @@ msgstr "V uživatelských atributech chybí parametr \"%1$s\"."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "Předchozí heslo bylo vymazáno z důvodu změny hostitele. Zadejte prosím nové heslo."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21665,6 +21923,14 @@ msgstr "Nelze získat stav podpory komprese TimescaleDB."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Nelze získat verzi TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "Nelze načíst stav podpory komprese rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "Nelze načíst verzi rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21942,6 +22208,11 @@ msgstr "Nepodporovaná verze databázového serveru %1$s. Musí být nejméně %
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Nepodporovaná verze databázového serveru %1$s. Nesmí být vyšší než %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "Používá se nepodporované rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23363,6 +23634,11 @@ msgstr "Varování"
 msgid "Warning message"
 msgstr "Varovná zpráva"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "Varování!"
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "Varování! Podpora pro Oracle DB je od Zabbix 7.0 zastaralá a v budoucích verzích bude odstraněna."
@@ -23895,6 +24171,10 @@ msgstr "Nemůžete změnit šablony pro aktuální označení."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnění na vykonání této operace."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

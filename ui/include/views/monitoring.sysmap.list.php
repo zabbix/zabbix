@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,7 +28,9 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CForm('get'))
 						->addItem(
-							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
+							(new CRedirectButton(_('Create map'), (new CUrl('sysmaps.php'))
+								->setArgument('form', 'create')
+							))->setEnabled($data['allowed_edit'])
 						)
 				)
 				->addItem(
@@ -144,3 +146,5 @@ $sysmapForm->addItem([
 $html_page
 	->addItem($sysmapForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");

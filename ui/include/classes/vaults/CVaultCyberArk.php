@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,10 +69,7 @@ class CVaultCyberArk extends CVault {
 		if ($this->cert_file !== '' && $this->key_file !== '') {
 			$context['ssl'] = [
 				'local_cert'		=> $this->cert_file,
-				'local_pk'			=> $this->key_file,
-				'verify_peer'		=> false,
-				'verify_peer_name'	=> false,
-				'allow_self_signed'	=> true
+				'local_pk'			=> $this->key_file
 			];
 		}
 

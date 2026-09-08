@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,7 +72,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (*Plugin) Validate(options any) error {
 	var opts PluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)

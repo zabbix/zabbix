@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1053,7 +1053,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
-				ZBX_CONF_PARM_OPT,	0,			3600},
+				ZBX_CONF_PARM_OPT,	0,			ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX},
 		{0}
 	};
 

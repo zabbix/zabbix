@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -212,8 +212,8 @@ window.script_edit_popup = new class {
 		}
 
 		if (typeof fields.parameters !== 'undefined') {
-			fields.parameters.name = fields.parameters.name.map(name => name.trim());
-			fields.parameters.value = fields.parameters.value.map(value => value.trim());
+			fields.parameters.name = Object.values(fields.parameters.name).map(name => name.trim());
+			fields.parameters.value = Object.values(fields.parameters.value).map(value => value.trim());
 		}
 
 		const curl = new Curl('zabbix.php');

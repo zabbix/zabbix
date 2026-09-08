@@ -264,6 +264,7 @@ button {
 	height: auto;
 	outline: none;
 	border: none;
+	box-sizing: content-box;
 
 	&:hover {
 		text-decoration: underline;

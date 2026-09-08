@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -614,7 +614,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
+			$this->query('xpath://button[contains(@onclick,"unlink")]')->waitUntilClickable()->one()->click()
+					->waitUntilNotPresent();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -868,7 +869,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
-		$this->zbxTestClickWait('clone');
+		$form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->waitUntilStalled();
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);

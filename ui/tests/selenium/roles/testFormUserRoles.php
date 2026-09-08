@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -866,10 +866,10 @@ class testFormUserRoles extends CWebTest {
 						'mediatype.get', 'module.get', 'problem.get', 'proxy.get', 'proxygroup.get', 'role.get',
 						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get',
-						'sla.getsli', 'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create',
-						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get',
-						'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get',
-						'valuemap.get'
+						'sla.getsli', 'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get',
+						'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get',
+						'trigger.get', 'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
+						'usermacro.get', 'valuemap.get'
 					]
 				]
 			],
@@ -903,17 +903,17 @@ class testFormUserRoles extends CWebTest {
 						'proxygroup.get', 'report.create', 'report.delete', 'report.get', 'report.update', 'role.get',
 						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.create',
-						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create', 'template.delete',
-						'template.get', 'template.massadd', 'template.massremove', 'template.massupdate', 'template.update',
-						'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'templategroup.delete', 'templategroup.get', 'templategroup.massadd',
-						'templategroup.massremove', 'templategroup.massupdate', 'templategroup.update', 'token.create',
-						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
-						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
-						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.get',
-						'user.logout', 'user.update', 'usergroup.get', 'usermacro.create', 'usermacro.delete',
-						'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
-						'valuemap.update'
+						'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'template.create',
+						'template.delete', 'template.get', 'template.massadd', 'template.massremove',
+						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'templategroup.delete', 'templategroup.get',
+						'templategroup.massadd', 'templategroup.massremove', 'templategroup.massupdate',
+						'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update',
+						'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
+						'usermacro.create', 'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create',
+						'valuemap.delete', 'valuemap.get', 'valuemap.update'
 					]
 				]
 			],
@@ -1002,6 +1002,7 @@ class testFormUserRoles extends CWebTest {
 		$overlay->close();
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role created');
 		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
 				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
@@ -1409,8 +1410,8 @@ class testFormUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Service for delete 2',
-				'Tags' => ['3rd_tag: 3rd_value', '4th_tag: 4th_value', 'remove_tag_1: remove_value_1', 'remove_tag_2: remove_value_2'],
-				'Problem tags' => ['tag1: value1', 'tag2: value2', 'tag3: value3', 'tag4: value4']
+				'Tags' => ["3rd_tag: 3rd_value\n", "4th_tag: 4th_value\n", 'remove_tag_1: remove_value_1', 'remove_tag_2: remove_value_2'],
+				'Problem tags' => ["tag1: value1\n", "tag2: value2\n", 'tag3: value3', 'tag4: value4']
 			]
 		];
 
@@ -1446,7 +1447,11 @@ class testFormUserRoles extends CWebTest {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
 									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
-							foreach ($tags as $tag) {
+
+							// Create a temporary array without newlines for checking if tag exists.
+							$expected_tags = str_replace("\n", '', $tags);
+
+							foreach ($expected_tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//span[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);

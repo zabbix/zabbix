@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
  * @backup dashboard
+ *
+ * @dataSource HostAvailabilityWidget
  *
  * @onBefore prepareData
  */
@@ -593,6 +595,8 @@ class testDashboardProblemHostsWidget extends testWidgets {
 		// Close widget edit form and cancel editing.
 		COverlayDialogElement::find()->one()->close();
 		$dashboard->waitUntilReady()->cancelEditing();
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		$dashboard->waitUntilReady();
 	}
 
 	public function testDashboardProblemHostsWidget_SimpleUpdate() {

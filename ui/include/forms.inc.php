@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -185,7 +185,7 @@ JAVASCRIPT;
 	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
-		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['limited'] = ($data['item']['templateid'] != 0) && $data['form'] !== 'clone';
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// discovery rule

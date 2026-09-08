@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -673,8 +673,9 @@ class testPageReportsActionLog extends CWebTest {
 			if ($filter_tab->exists()) {
 				$filter_tab->one()->click();
 			}
-
+			$table = $this->getTable();
 			$form->fill($data['fields'])->submit();
+			$table->waitUntilReloaded();
 		}
 
 		$this->page->waitUntilReady();
@@ -709,9 +710,9 @@ class testPageReportsActionLog extends CWebTest {
 		// Check hintbox.
 		$table->findRow('Status', 'Failed')->getColumn('Info')->query("xpath:.//button[@data-hintbox]")
 				->waitUntilClickable()->one()->click();
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hintbox = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 		$this->assertEquals('Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',
-				$hintbox->one()->getText()
+				$hintbox->getText()
 		);
 
 		// Close hintbox.
@@ -724,6 +725,7 @@ class testPageReportsActionLog extends CWebTest {
 	public function testPageReportsActionLog_CheckResetButton() {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
 				'filter_messages=&filter_set=1')->waitUntilReady();
+		$table = $this->getTable();
 
 		// If the filter is not visible - enable it.
 		$filter_tab = $this->query('xpath:.//li[@aria-labelledby="ui-id-2" and @aria-selected="false"]');
@@ -759,12 +761,14 @@ class testPageReportsActionLog extends CWebTest {
 
 			if ($submit) {
 				$form->submit();
+				$table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 				$this->assertTableStats(0);
 			}
 
 			$form->invalidate()->checkValue($filled_form);
 			$form->query('button:Reset')->one()->click();
+			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 			$form->invalidate()->checkValue($empty_form);
 			$this->assertTableStats(10);

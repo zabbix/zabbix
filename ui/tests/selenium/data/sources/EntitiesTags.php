@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1002,6 +1002,85 @@ class EntitiesTags {
 					[
 						'tag' => 'connector tag',
 						'operator' => 2
+					]
+				]
+			]
+		]);
+
+		// Create Maintenance periods for tags testing.
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance with tags for updating',
+				'active_since' => 1681765260,
+				'active_till' => 1899410340,
+				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'timeperiods' => [
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+						'period' => 3600
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'maintenance action',
+						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
+						'value' => 'maintenance update'
+					],
+					[
+						'tag' => 'maintenance tag without value',
+						'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL,
+						'value' => ''
+					],
+					[
+						'tag' => 'zz maintenance tag 1',
+						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
+						'value' => 'value 1'
+					]
+				]
+			],
+			[
+				'name' => 'Maintenance with tags for cloning',
+				'active_since' => 1681765260,
+				'active_till' => 1899410340,
+				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+				'groups' => [['groupid' => 4]],
+				'timeperiods' => [
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+						'period' => 3600
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'tag1',
+						'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL,
+						'value' => 'value1'
+					],
+					[
+						'tag' => 'tag2',
+						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
+						'value' => 'value2'
+					]
+				]
+			],
+			[
+				'name' => 'Maintenance for removing tags',
+				'active_since' => 1681765260,
+				'active_till' => 1899410340,
+				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+				'groups' => [['groupid' => 4]],
+				'timeperiods' => [
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+						'period' => 3600
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'tag_to_remove',
+						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
+						'value' => 'value'
 					]
 				]
 			]

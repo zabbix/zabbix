@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -49,7 +49,7 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 	double			value_dbl;
 	struct tm		tm, tm_now;
 
-	tm_now = *localtime(&now);
+	tm_now = *zbx_localtime(&now, NULL);
 
 	for (i = 0; i < season_num; i++)
 	{
@@ -129,7 +129,7 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 		return FAIL;
 
 	time_tmp = end;
-	tm_end = *localtime(&time_tmp);
+	tm_end = *zbx_localtime(&time_tmp, NULL);
 
 	for (i = 0; i < season_num; i++)
 	{

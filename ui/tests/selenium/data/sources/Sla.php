@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -262,6 +262,20 @@ class Sla {
 				'service_tags' => [
 					[
 						'tag' => 'problem',
+						'operator' => 2,
+						'value' => 'e'
+					]
+				]
+			],
+			[
+				'name' => 'Multiple   spaces   in SLA name',
+				'period' => 1,
+				'slo' => '33.55',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'problems',
 						'operator' => 2,
 						'value' => 'e'
 					]

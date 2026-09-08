@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -771,7 +771,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->page->waitUntilReady();
 			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
-			$this->query('button:Login')-> one()->click();
+			$this->query('button:Login')-> one()->click()->waitUntilStalled();
 		}
 
 		$this->page->waitUntilReady();
@@ -783,11 +783,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 		// Check the header of the page that was displayed to the user after login.
 		$header = CTestArrayHelper::get($data, 'header', 'Global view');
-		$this->assertEquals($header, $this->query('tag:h1')->one()->getText());
+		$this->assertEquals($header, $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:signin-logo')->waitUntilVisible()->one();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentUrl());
 	}
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
  * @backup config
  */
 class testAuditlogHousekeeping extends testAuditlogCommon {
+
+	/**
+	 * Resource type Housekeeping
+	 */
+	const RESOURCE_TYPE = 41;
 
 	public function testAuditlogHousekeeping_Update() {
 		$this->call('housekeeping.update', [
@@ -62,6 +67,6 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.compress_older' => ['update', '788400000', '7d']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 1, self::RESOURCE_TYPE);
 	}
 }

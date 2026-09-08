@@ -1,0 +1,122 @@
+---
+test case: macro inside function
+in:
+  buffer: '{"disk":"sda"}'
+  data: 'strlen({#DISK}) > 0'
+  macros:
+    - { macro: '{#DISK}', path: $.disk }
+out:
+  data: 'strlen("sda") > 0'
+  return: SUCCEED
+---
+test case: item query with lld macro
+in:
+  buffer: '{"ifname":"eth0"}'
+  data: 'last(/host/net.if.discovery[{#IFNAME}])'
+  macros:
+    - { macro: '{#IFNAME}', path: $.ifname }
+out:
+  data: 'last(/host/net.if.discovery[eth0])'
+  return: SUCCEED
+---
+test case: item query with lld macro and filter mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))
+in:
+  buffer: '{"ifname":"eth0"}'
+  data:  'mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+  macros:
+    - { macro: '{#LLDMACRO}', path: $.ifname }
+out:
+  data: 'mad(bucket_rate_foreach(/*/some.zabbix.key[eth0]?[group="{HOSTGROUPLLD}"],1d))'
+  return: SUCCEED
+---
+test case: item query with lld macro and filter stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))
+in:
+  buffer: '{"ifname":"eth0"}'
+  data:  'stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+  macros:
+    - { macro: '{#LLDMACRO}', path: $.ifname }
+out:
+  data: 'stddevpop(exists_foreach(/*/some.zabbix.key[eth0]?[group="{HOSTGROUPLLD}"],1d))'
+  return: SUCCEED
+---
+test case: '{#IFNAME}'
+in:
+  buffer: '{"ifname":"eth0"}'
+  data: '{#IFNAME}'
+  macros:
+    - { macro: '{#IFNAME}', path: $.ifname }
+out:
+  data: '"eth0"'
+  return: SUCCEED
+---
+test case: 'min(/host/key,#{{#LLD}.func})'
+in:
+  buffer: '{"ifname":"test"}'
+  data:  'min(/host/key,#{{#LLD}.func})'
+  macros:
+    - { macro: '{#LLD}', path: $.ifname }
+out:
+  data: 'min(/host/key,#{test.func})'
+  return: SUCCEED
+---
+test case: '{#INDEX} numeric'
+in:
+  buffer: '{"index":42}'
+  data: '{#INDEX}+5'
+  macros:
+    - { macro: '{#INDEX}', path: $.index }
+out:
+  data: '42+5'
+  return: SUCCEED
+---
+test case: '{#DISK} in string'
+in:
+  buffer: '{"disk":"sda1"}'
+  data: '"Device: {#DISK}"'
+  macros:
+    - { macro: '{#DISK}', path: $.disk }
+out:
+  data: '"Device: sda1"'
+  return: SUCCEED
+---
+test case: 'Multiple LLD macros'
+in:
+  buffer: '{"host":"srv1","ifname":"eth0"}'
+  data: '{#HOST}.{#IFNAME}'
+  macros:
+    - { macro: '{#HOST}', path: $.host }
+    - { macro: '{#IFNAME}', path: $.ifname }
+out:
+  data: "srv1.eth0"
+  return: SUCCEED
+---
+test case: 'LLD macro in condition'
+in:
+  buffer: '{"state":1}'
+  data: '{#STATE} = 1'
+  macros:
+    - { macro: '{#STATE}', path: $.state }
+out:
+  data: '1 = 1'
+  return: SUCCEED
+---
+test case: 'LLD macro in condition all printable ASCII characters'
+in:
+  buffer: '{"state":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}'
+  data: '{#STATE} = 1'
+  macros:
+    - { macro: '{#STATE}', path: $.state }
+out:
+  data: '"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~" = 1'
+  return: SUCCEED
+---
+test case: 'LLD macro in condition emojis'
+in:
+  buffer: '{"state":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}'
+  data: '{#STATE} = 1'
+  macros:
+    - { macro: '{#STATE}', path: $.state }
+out:
+  data: '"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭" = 1'
+  return: SUCCEED
+...

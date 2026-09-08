@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,7 +21,7 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
- * @dataSource GlobalMacros
+ * @dataSource GlobalMacros, MonitoringOverview
  *
  * @onBefore prepareTestData
  */
@@ -110,6 +110,12 @@ class testPageMonitoringLatestData extends CWebTest {
 					[
 						'name' => 'Trapper',
 						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Multiple   spaces   in item name',
+						'key_' => 'msiin',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
@@ -256,6 +262,17 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'result' => [
 						['Name' => '3_item']
+					]
+				]
+			],
+			// Multiple spaces in field name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
 					]
 				]
 			],
@@ -418,7 +435,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Show tags' => '2',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_value']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value"]
 					]
 				]
 			],
@@ -431,7 +448,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'Show tags' => '3',
 					'Tags name' => 'Full',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_valuetag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
 				]
 			],
@@ -443,7 +460,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Tags name' => 'Shortened',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'com: name:tag_item_1tag: filtering_valuetag: 0']
+						['Name' => 'tag_item_1', 'Tags' => "com: name:tag_item_1\ntag: filtering_value\ntag: 0"]
 					]
 				]
 			],
@@ -455,7 +472,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Tags name' => 'None',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'name:tag_item_1filtering_value0']
+						['Name' => 'tag_item_1', 'Tags' => "name:tag_item_1\nfiltering_value\n0"]
 					]
 				]
 			],
@@ -467,7 +484,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag_'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_valuetag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
 				]
 			],
@@ -479,7 +496,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag_number,tag,component'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'tag_number: 0tag: filtering_valuecomponent: name:tag_item_1']
+						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
 					]
 				]
 			],
@@ -491,7 +508,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'tag: filtering_valuecomponent: name:tag_item_1tag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "tag: filtering_value\ncomponent: name:tag_item_1\ntag_number: 0"]
 					]
 				]
 			]
@@ -613,12 +630,15 @@ class testPageMonitoringLatestData extends CWebTest {
 			: 'zabbix.php?action=latest.view&name=item';
 
 		$this->page->login()->open($link)->waitUntilReady();
+		$results_table = $this->query('xpath://form/table')->waitUntilPresent()->asTable()->one();
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
+				$results_table->waitUntilReloaded();
+				$results_table->invalidate();
 			}
 		}
 
@@ -665,9 +685,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Exit full screen mode"]')->exists());
 		}
 
 		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
@@ -688,9 +708,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->assertTableData($data, $this->getTableSelector());
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Enter full screen mode"]')->exists());
 			$this->assertTableData($data, $this->getTableSelector());
 		}
 		else {
@@ -853,7 +873,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
+			$overlay = $this->query('css:div.overlay-dialogue.wordbreak')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());
@@ -867,7 +887,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			}
 
 			// Verify that the tool-tip can be closed.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$overlay->query('xpath:.//button[@title="Close"]')->one()->click();
 			$this->assertFalse($overlay->isDisplayed());
 		}
 		// If the item has no description the description icon should not be there.

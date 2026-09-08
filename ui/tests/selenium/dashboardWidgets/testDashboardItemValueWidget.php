@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -249,12 +249,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:units_bold' => true,
 					'Aggregation function' => 'not used',
 					'Time period' => 'Dashboard',
-					'id:time_period_reference' => '',
+					'Widget' => '',
 					'id:time_period_from' => 'now-1h',
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'
 				];
-
 				foreach ($default_values_advanced as $field => $value) {
 					$this->assertEquals($value, $form->getField($field)->getValue());
 				}
@@ -272,7 +271,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 				// Check Thresholds warning icon text.
 				$thresholds_icon->click();
-				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+				$hint_dialog = $this->query('css:div.overlay-dialogue.wordbreak')->one()->waitUntilVisible();
 				$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint_dialog->waitUntilNotPresent();
@@ -314,7 +313,7 @@ class testDashboardItemValueWidget extends testWidgets {
 							$warning_button->click();
 
 							// Check hintbox text.
-							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+							$hint_dialog = $this->query('css:div.overlay-dialogue.wordbreak')->one()->waitUntilVisible();
 							$this->assertEquals($hint_text, $hint_dialog->getText());
 
 							// Close the hintbox.
@@ -364,8 +363,8 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:thresholds_0_threshold' => [
 						'maxlength' => 255
 					],
-					'xpath:.//input[@id="thresholds_0_color"]/..' => [
-						'color' => 'FF465C'
+					'id:thresholds_0_color' => [
+						'value' => 'FF465C'
 					],
 					'id:time_period_from' => [
 						'maxlength' => 255,
@@ -385,12 +384,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -412,6 +406,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							$element = str_replace('/..', '', $element);
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
@@ -2159,7 +2154,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilVisible()->one();
 			$this->assertEquals($data['warning_message'], $hint->getText());
 
 			// Close the hint-box.
@@ -3001,7 +2996,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
 		// Close the hint-box.

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * @backup dashboard, hosts
@@ -624,6 +625,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
 		self::$dashboardid_for_update = $response['dashboardids'][2];
+
+		// Insert favorite map and graph into profiles table for checking the data that is displayed by favorite maps and favorite graphs widgets.
+		$insert_favorite = [
+			[
+				'profileid' => 1,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.sysmapids'),
+				'value_id' => 1, // Map:Local network.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('sysmapid'),
+				'type' => 1
+			],
+			[
+				'profileid' => 2,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.graphids'),
+				'value_id' => 42258, // Item:CPU iowait time.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('itemid'),
+				'type' => 1
+			]
+		];
+		foreach ($insert_favorite as $data) {
+			DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($data)).') VALUES ('.implode(', ', $data).')');
+		}
 	}
 
 	/**
@@ -2422,7 +2448,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				break;
 
 			case 'color_picker':
-				$field = $field->asColorPicker();
+				$field = $field->query('xpath://div[@class="color-picker"]')->asColorPicker()->one();
 				$this->assertEquals($default_value, $field->getValue());
 				break;
 
@@ -2703,7 +2729,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -2714,7 +2740,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -2725,7 +2751,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4320,7 +4346,18 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
-			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+			// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+			// while being clicked. Retry the click if that happens.
+			$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+			try {
+				$add_button->click();
+			}
+			catch (ElementNotInteractableException $exception) {
+				$add_button->click();
+			}
+
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();
 
@@ -4337,7 +4374,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $type => $action_element) {
 				if ($type === 'click') {
-					$form->query($action_element)->one()->click();
+					$form->query($action_element)->waitUntilClickable()->one()->click();
 				}
 				else {
 					foreach ($action_element as $field => $value) {

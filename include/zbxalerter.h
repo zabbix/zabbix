@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -88,6 +88,8 @@ zbx_thread_alert_syncer_args;
 ZBX_THREAD_ENTRY(zbx_alerter_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args);
+
+void	zbx_am_source_stats_free(zbx_am_source_stats_t *as);
 
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error);
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error);

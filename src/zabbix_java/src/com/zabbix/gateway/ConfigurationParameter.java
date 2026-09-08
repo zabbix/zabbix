@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,6 +22,7 @@ class ConfigurationParameter
 	static final int TYPE_INTEGER = 0;
 	static final int TYPE_INETADDRESS = 1;
 	static final int TYPE_FILE = 2;
+	static final int TYPE_STRING = 3;
 
 	private String name;
 	private int type;
@@ -69,6 +70,9 @@ class ConfigurationParameter
 					break;
 				case TYPE_FILE:
 					userValue = new File(text);
+					break;
+				case TYPE_STRING:
+					userValue = text;
 					break;
 				default:
 					throw new IllegalArgumentException(String.format("unknown type %d", type));

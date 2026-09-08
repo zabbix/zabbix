@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -100,7 +100,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&context=template&parent_discoveryid='.$this->discoveryRuleId);
+		$this->zbxTestLogin('graphs.php?form=create&context=template&parent_discoveryid='.$this->discoveryRuleId);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 

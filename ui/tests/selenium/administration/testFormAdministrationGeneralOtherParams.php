@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -126,7 +126,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 
 		// Check X-Frame-Options hintbox.
 		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilPresent()->one();
 
 		$hint_text = "X-Frame-Options HTTP header supported values:\n".
 				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".

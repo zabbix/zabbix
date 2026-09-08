@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -526,8 +526,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 	size_t		i;
 	zbx_token_t	token;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
-
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() data:'%s'", __func__, *data);
+#endif
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 	{
 		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
@@ -585,7 +587,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		pos++;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:'%s'", __func__, *data);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

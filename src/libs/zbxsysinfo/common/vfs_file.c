@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1271,7 +1271,7 @@ static char	*get_print_time(time_t st_raw)
 	char		*st_str;
 
 	st_str = zbx_malloc(NULL, MAX_TIME_STR_LEN);
-	localtime_r(&st_raw, &st);
+	st = *zbx_localtime(&st_raw, NULL);
 	strftime(st_str, MAX_TIME_STR_LEN, "%Y-%m-%dT%T%z", &st);
 
 	return st_str;

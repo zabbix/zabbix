@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,5 +52,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error);
 
 void	zbx_addrs_failover(zbx_vector_addr_ptr_t *addrs);
+
+char	*zbx_sanitize_proxyconfig_json(char *jbuffer);
 
 #endif // ZABBIX_COMMSHIGH_H

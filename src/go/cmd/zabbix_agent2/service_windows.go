@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -642,7 +642,11 @@ loop:
 		select {
 		case c := <-r:
 			switch c.Cmd {
+			case svc.Interrogate:
+				log.Debugf("interrogated by SCM")
+				changes <- c.CurrentStatus
 			case svc.Stop, svc.Shutdown:
+				log.Debugf("got '%s' command from SCM", getCmdName(c.Cmd))
 				changes <- svc.Status{State: svc.StopPending}
 				winServiceWg.Add(1)
 				closeChan <- true
@@ -656,6 +660,7 @@ loop:
 				log.Debugf("unsupported windows service command '%s' received", getCmdName(c.Cmd))
 			}
 		case <-stopChan:
+			log.Warningf("stopping service due to syscall signal")
 			changes <- svc.Status{State: svc.StopPending}
 			winServiceWg.Wait()
 			changes <- svc.Status{State: svc.Stopped}

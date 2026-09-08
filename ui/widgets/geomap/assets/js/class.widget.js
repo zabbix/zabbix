@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,11 +26,14 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_DISASTER = 5;
 
 	/**
-	 * Geomap's data from response.
-	 *
+	 * @type {Array}
+	 */
+	#hosts = [];
+
+	/**
 	 * @type {Object|null}
 	 */
-	#geomap = null;
+	#config = null;
 
 	/**
 	 * ID of selected host
@@ -49,6 +52,12 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
+	onResize() {
+		if (this._map !== null) {
+			this._map.invalidateSize();
+		}
+	}
+
 	promiseReady() {
 		if (this._map === null){
 			return super.promiseReady();
@@ -65,31 +74,27 @@ class CWidgetGeoMap extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			initial_load: this._initial_load ? 1 : 0,
-			unique_id: this._unique_id
+			unique_id: this._unique_id,
+			with_config: this._initial_load ? 1 : undefined
 		};
 	}
 
 	setContents(response) {
 		if (this._initial_load) {
 			super.setContents(response);
+			this._initMap(response.config);
+
+			this.#config = response.config;
 		}
 
-		if (response.geomap === undefined) {
-			this._initial_load = false;
-			return;
-		}
+		this.#hosts = response.hosts;
 
-		this.#geomap = response.geomap;
+		this._addMarkers(this.#hosts);
 
-		if (this.#geomap.config !== undefined) {
-			this._initMap(this.#geomap.config);
-		}
-
-		this._addMarkers(this.#geomap.hosts);
-
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_hostid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_hostid === null || !this.#hasSelectable()) {
+				this.#selected_hostid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostid !== null) {
 				this.#updateHintboxes();
@@ -113,13 +118,28 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	#getDefaultSelectable() {
-		return this.#geomap.hosts.length > 0
-			? this.#getClosestHost(this.#geomap.config, this.#geomap.hosts).properties.hostid
-			: null;
+		if (this.#config === null) {
+			return null;
+		}
+
+		const center_point = L.latLng(this.#config.center.latitude, this.#config.center.longitude);
+
+		return this.#hosts.reduce((closest, current) => {
+			const current_point = L.latLng(current.geometry.coordinates[1], current.geometry.coordinates[0]);
+			const closest_point = L.latLng(closest.geometry.coordinates[1], closest.geometry.coordinates[0]);
+
+			return current_point.distanceTo(center_point) < closest_point.distanceTo(center_point)
+				? current
+				: closest;
+		}).properties.hostid;
+	}
+
+	#hasSelectable() {
+		return this.#hosts.some(host => host.properties.hostid === this.#selected_hostid);
 	}
 
 	onReferredUpdate() {
-		if (this.#geomap === null) {
+		if (this.#hosts === null) {
 			return;
 		}
 
@@ -233,7 +253,6 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
 			node.hintBoxItem = hintBox.createBox(cluster.originalEvent, node, hintbox, '', true);
@@ -241,16 +260,8 @@ class CWidgetGeoMap extends CWidget {
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(cluster.originalEvent, node, node.hintBoxItem);
 
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._markers.on('click keypress', (e) => {
@@ -260,7 +271,7 @@ class CWidgetGeoMap extends CWidget {
 			this.#updateMarkers();
 			this.#broadcast();
 
-			const node = e.originalEvent.srcElement;
+			const node = e.originalEvent.target;
 
 			if ('hintBoxItem' in node) {
 				return;
@@ -276,7 +287,6 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent([e.layer.feature]));
 
 			node.hintBoxItem = hintBox.createBox(e.originalEvent, node, hintbox, '', true);
@@ -285,16 +295,8 @@ class CWidgetGeoMap extends CWidget {
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(e.originalEvent, node, node.hintBoxItem);
 
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {
@@ -347,44 +349,6 @@ class CWidgetGeoMap extends CWidget {
 			this._map.remove();
 			this._map = null;
 		}
-	}
-
-	/**
-	 * Get the closest host to the map center defined in the config.
-	 *
-	 * @param {Object}        config
-	 * @param {Array<Object>} hosts
-	 *
-	 * @returns {Object}
-	 */
-	#getClosestHost(config, hosts) {
-		const center_point = L.latLng(config.center.latitude, config.center.longitude);
-
-		return hosts.reduce((closest, current) => {
-			const current_point = L.latLng(current.geometry.coordinates[1], current.geometry.coordinates[0]);
-			const closest_point = L.latLng(closest.geometry.coordinates[1], closest.geometry.coordinates[0]);
-
-			return current_point.distanceTo(center_point) < closest_point.distanceTo(center_point)
-				? current
-				: closest;
-		});
-	}
-
-	/**
-	 * Update style for selected marker and cluster and broadcast _hostid.
-	 *
-	 * @param {string} hostid
-	 */
-	#broadcastSelected(hostid) {
-		this.#selected_hostid = hostid;
-
-		this.broadcast({
-			[CWidgetsData.DATA_TYPE_HOST_ID]: [this.#selected_hostid],
-			[CWidgetsData.DATA_TYPE_HOST_IDS]: [this.#selected_hostid]
-		});
-
-		this.#updateHintboxes();
-		this.#updateMarkers();
 	}
 
 	/**

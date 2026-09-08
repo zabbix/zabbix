@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2401,6 +2401,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$setting_form = $this->query('name:otherForm')->asForm()->one();
 		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
 		$setting_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Try to create macros with Vault type different from settings.
 		$form = $this->openMacrosTab($url, $source, false, $name);
@@ -2422,6 +2423,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		// Change Vault in settings to correct one.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$setting_form->fill(['Vault provider' => 'HashiCorp Vault'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Check simple update.
 		$this->openMacrosTab($url, $source, false, $name);
@@ -2498,6 +2500,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
 			$this->query('button:Update')->one()->click();
+			$this->assertMessage(TEST_GOOD, 'Macros updated');
 		}
 
 		$this->checkItemFields($url, $data['name'], $data['key_secret']);

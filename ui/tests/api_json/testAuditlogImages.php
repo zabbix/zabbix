@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ class testAuditlogImages extends testAuditlogCommon {
 	 * Existing Image ID.
 	 */
 	protected const IMAGEID = 5;
+
+	/**
+	 * Resource type Images
+	 */
+	const RESOURCE_TYPE = 16;
 
 	public function testAuditlogImages_Create() {
 		$create = $this->call('image.create', [
@@ -53,7 +58,7 @@ class testAuditlogImages extends testAuditlogCommon {
 			'image.imageid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -82,11 +87,11 @@ class testAuditlogImages extends testAuditlogCommon {
 			'image.image' => ['update']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::IMAGEID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::IMAGEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogImages_Delete() {
 		$this->call('image.delete', [self::IMAGEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated image', self::IMAGEID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated image', self::IMAGEID, self::RESOURCE_TYPE);
 	}
 }

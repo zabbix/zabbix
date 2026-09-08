@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -180,7 +180,7 @@ window.service_edit_popup = new class {
 		this.child_template = new Template(`
 			<tr data-serviceid="#{serviceid}">
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP.' '.ZBX_STYLE_TAGS_WRAPPER ?>">#{*problem_tags_html}</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 				</td>

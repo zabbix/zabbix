@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,10 +17,15 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Color picker element.
  */
 class CColorPickerElement extends CElement {
+
+	const USE_DEFAULT = null;
 
 	/**
 	 * Get input field of color pick form.
@@ -28,7 +33,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->one();
+		return $this->query('xpath:./input')->one();
 	}
 
 	/**
@@ -39,17 +44,16 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function overwrite($color) {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
+		$overlay = $this->open();
 
-		if ($color === null) {
-			$overlay->query('button:Use default')->one()->click();
+		if ($color === self::USE_DEFAULT) {
+			$overlay->query('button:Use default')->one()->click()->waitUntilNotVisible();
+			return $this;
 		}
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
+			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 		}
-
-		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		return $this;
 	}
@@ -76,6 +80,34 @@ class CColorPickerElement extends CElement {
 	 */
 	public function getText() {
 		return $this->getValue();
+	}
+
+	/**
+	 * Open color picker.
+	 *
+	 * @return CElement
+	 */
+	public function open() {
+		$button = $this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one();
+
+		/*
+		 * The color picker closes itself on any scroll event. WebDriver scrolls the button into view when clicking
+		 * it, and that scroll can dismiss the just-opened dialog. Scroll the button into view first to minimise the
+		 * click scroll; if the dialog still gets dismissed, click again (button is in view, so it does not scroll).
+		 */
+		$button->scrollIntoView();
+		$button->click();
+
+		$popup = new CElementQuery('id:color_picker');
+
+		try {
+			return $popup->waitUntilVisible(3)->one();
+		}
+		catch (TimeoutException $exception) {
+			$button->click();
+
+			return $popup->waitUntilVisible()->one();
+		}
 	}
 
 	/**

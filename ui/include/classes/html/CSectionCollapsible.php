@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,11 +37,16 @@ class CSectionCollapsible extends CSection {
 		$this->addClass($this->is_expanded ? null : ZBX_STYLE_COLLAPSED);
 
 		$toggle = $this->is_expanded
-			? new CButtonIcon(ZBX_ICON_CHEVRON_UP, _('Collapse'))
-			: new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand'));
+			? (new CButtonIcon(ZBX_ICON_CHEVRON_UP))
+				->setAttribute('aria-label', _('Collapse section'))
+				->setAttribute('aria-expanded', 'true')
+			: (new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))
+				->setAttribute('aria-label', _('Expand section'))
+				->setAttribute('aria-expanded', 'false');
 
 		$toggle
 			->addClass(self::ZBX_STYLE_TOGGLE)
+			->setAttribute('aria-controls', $this->getId())
 			->onClick('toggleSection("'.$this->getId().'", "'.$this->profile_key.'");');
 
 		if ($this->header === null) {

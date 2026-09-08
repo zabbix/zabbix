@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -92,8 +92,6 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		int config_trapper_timeout, char **info, char *error, size_t max_error_len)
 {
 	zbx_uint64_t	taskid;
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
 
 	if (0 == host->proxyid)
 	{
@@ -108,8 +106,15 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (int time_start = time(NULL); config_trapper_timeout > time(NULL) - time_start; sleep(1))
+	for (int time_start = time(NULL), i = 0; config_trapper_timeout > time(NULL) - time_start; i++)
 	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		int		sleep_ms = 3 > i ? 500 : 1000;
+		struct timespec	poll_delay = {.tv_sec = sleep_ms / 1000, .tv_nsec = sleep_ms % 1000 * 1000000};
+
+		nanosleep(&poll_delay, NULL);
+
 		result = zbx_db_select(
 				"select tr.status,tr.info"
 				" from task t"
@@ -309,7 +314,7 @@ static int	validate_manualinput(const char *manualinput, const char *validator,
 	switch (validator_type)
 	{
 		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_REGEX:
-			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
+			ret = (NULL != zbx_regexp_match_full(manualinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
 		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_LIST:
 			ret = zbx_str_in_list(validator, manualinput, ',');
@@ -414,6 +419,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
 		}
+
+		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+		{
+			zbx_uint64_t	proxyid;
+
+			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
+				host.proxyid = proxyid;
+			else
+				host.proxyid = 0;
+		}
 	}
 	else /* eventid */
 	{
@@ -487,6 +502,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			goto fail;
 		}
+	}
+
+	if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by && 0 == host.proxyid &&
+			ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on &&
+			ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+	{
+		zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		goto fail;
 	}
 
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
@@ -834,7 +858,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		}
 	}
 
-	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
+	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
 	/* which do not pass our current IPv6 address validation. In the future, when we   */
 	/* fix our IPv6 address validation we could consider adding it here.               */
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))

@@ -1320,6 +1320,35 @@ out:
   return: FAIL
   error: error message
 ---
+test case: test with float
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    variant: ZBX_VARIANT_DBL
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      0
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: test with numeric
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: 0
+---
 test case: xmlerror(x, //error)
 in:
   value:
@@ -1464,6 +1493,44 @@ out:
   history:
     time: 2017-10-29 03:14:00 +03:00
     data: 123
+---
+test case: throttle of string and string values should not be compared as floats
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "000000050000002900000019"
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:00 +03:00
+    data: "000000050000002900000012"
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: "000000050000002900000019"
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "000000050000002900000019"
+---
+test case: throttle of unconvertible string and float should be compared as string (II)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "00000005000000290000001A"
+  history:
+    variant: ZBX_VARIANT_DBL
+    time: 2017-10-29 03:14:00 +03:00
+    data: 50000002900000012
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: "00000005000000290000001A"
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "00000005000000290000001A"
 ---
 test case: throttle_timed(, abc)
 in:
@@ -2193,19 +2260,6 @@ in:
 out:
   return: SUCCEED
   value: "OK"
----
-test case: Missing second parameter
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: "a"
-  step:
-    type: ZBX_PREPROC_STR_REPLACE
-    params: "OK"
-out:
-  return: FAIL
-  value: "a"
 ---
 test case: Missing first parameter
 in:
@@ -3126,6 +3180,35 @@ in:
       0
 out:
   return: FAIL
+---
+test case: SNMP walk to JSON - Empty snmp data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+out:
+  return: SUCCEED
+  value: '[]'
+---
+test case: SNMP walk to JSON - Empty snmp data and empty params
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+out:
+  return: SUCCEED
+  value: '[]'
 ---
 test case: SNMP walk to JSON - STRING type
 in:

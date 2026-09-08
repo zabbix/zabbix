@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -462,6 +462,30 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets last IP address from specified range                         *
+ *                                                                            *
+ * Parameters: iprange - [IN]                                                 *
+ *             address - [OUT]                                                *
+ *                                                                            *
+ * Comments: IP address is returned as number array                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_iprange_last(const zbx_iprange_t *iprange, int *address)
+{
+	int	i, groups;
+
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
+
+	for (i = 0; i < groups; i++)
+		address[i] = iprange->range[i].to;
+
+	/* exclude broadcast address if the IPv4 range was specified with network mask */
+	if (ZBX_IPRANGE_V4 == iprange->type && 0 != iprange->mask)
+		address[groups - 1]--;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets next unique IP address from specified range                  *
  *                                                                            *
  * Parameters: ipranges - [IN] array of ipranges                              *
@@ -544,6 +568,37 @@ int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx
 	while (i != *idx);	/* skipping ip from overlapping ipranges */
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets last IP address from array of ranges                         *
+ *                                                                            *
+ * Parameters: ipranges - [IN] array of ipranges                              *
+ *             num      - [IN] size of ipranges array                         *
+ *             ip       - [OUT] string with last address from IP ranges       *
+ *             len      - [IN] size of string buffer for ip address           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_iprange_uniq_last(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
+{
+	int	randge_address[ZBX_IPRANGE_GROUPS_V6] = {0}, address[ZBX_IPRANGE_GROUPS_V6] = {0};
+
+	for (int range_idx = 0; range_idx < num; range_idx++)
+	{
+		zbx_iprange_last(&ipranges[range_idx], randge_address);
+
+		for (int i = 0; i < ZBX_IPRANGE_GROUPS_V6; i++)
+		{
+			if (address[i] < randge_address[i])
+			{
+				memcpy(address, randge_address, sizeof(address));
+				break;
+			}
+		}
+	}
+
+	zbx_iprange_ip2str(ipranges[0].type, address, ip, len);
 }
 
 /******************************************************************************

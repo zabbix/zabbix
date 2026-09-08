@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -221,6 +221,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS) ||
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS))
 				? (new CMenuItem(_('Actions')))
+					->setId('main-menu-actions')
 					->setSubMenu(new CMenu(array_filter([
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)
 							? (new CMenuItem(_('Trigger actions')))
@@ -331,6 +332,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
+					->setId('main-menu-general')
 					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
@@ -385,6 +387,7 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
 				? (new CMenuItem(_('Queue')))
+					->setId('main-menu-queue')
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Queue overview')))
 							->setAction('queue.overview'),
@@ -459,6 +462,7 @@ class CMenuHelper {
 		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
+					->setId('user-menu-user-settings')
 					->setIcon(ZBX_ICON_USER_SETTINGS)
 					->setTitle(getUserFullname($user))
 					->setSubMenu(new CMenu([

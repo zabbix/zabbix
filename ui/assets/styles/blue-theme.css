@@ -1357,7 +1357,8 @@ button {
 .btn-tag {
   height: auto;
   outline: none;
-  border: none; }
+  border: none;
+  box-sizing: content-box; }
   .btn-tag:hover {
     text-decoration: underline;
     background-color: #768d99; }
@@ -1448,6 +1449,75 @@ button {
 
 .zi-widget-empty-references-large::before {
   color: #e33734; }
+
+.calendar {
+  width: 200px; }
+  .calendar .calendar-header {
+    text-align: center; }
+    .calendar .calendar-header .btn-grey {
+      border: 0;
+      background-color: transparent; }
+  .calendar .calendar-year, .calendar .calendar-month {
+    height: 24px;
+    line-height: 26px;
+    display: table;
+    width: 100%; }
+    .calendar .calendar-year button:first-child, .calendar .calendar-month button:first-child {
+      float: left; }
+    .calendar .calendar-year button:last-child, .calendar .calendar-month button:last-child {
+      float: right; }
+    .calendar .calendar-year button:hover, .calendar .calendar-month button:hover {
+      background-color: #e8f5ff;
+      cursor: pointer; }
+  .calendar .calendar-time {
+    text-align: center; }
+    .calendar .calendar-time input[type="text"] {
+      width: 32px; }
+  .calendar .calendar-footer {
+    margin: 26px 0 0;
+    text-align: right; }
+    .calendar .calendar-footer .btn-grey {
+      float: left;
+      margin-top: 0; }
+  .calendar .btn-month-prev.highlighted,
+  .calendar .btn-month-next.highlighted,
+  .calendar .btn-year-prev.highlighted,
+  .calendar .btn-year-next.highlighted {
+    background-color: #e8f5ff; }
+  .calendar .btn-month-prev:focus,
+  .calendar .btn-month-next:focus,
+  .calendar .btn-year-prev:focus,
+  .calendar .btn-year-next:focus {
+    outline: none; }
+  .calendar table {
+    width: 100%;
+    margin: 5px 0; }
+    .calendar table thead {
+      text-transform: uppercase;
+      color: #768d99; }
+    .calendar table tbody {
+      text-align: center; }
+      .calendar table tbody td {
+        transition: background-color 0.2s ease-out; }
+        .calendar table tbody td.selected {
+          background-color: #768d99;
+          color: #ffffff; }
+          .calendar table tbody td.selected:hover {
+            background-color: #6b8390; }
+        .calendar table tbody td:hover {
+          background-color: #e8f5ff;
+          cursor: pointer; }
+        .calendar table tbody td.highlighted {
+          color: #ffffff;
+          background-color: #02659f;
+          border-color: #02659f;
+          cursor: pointer; }
+        .calendar table tbody td:focus {
+          outline: none; }
+        .calendar table tbody td span {
+          z-index: -1;
+          padding: 4px;
+          display: block; }
 
 .checkbox-list {
   display: grid;
@@ -2154,16 +2224,11 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .status-green {
-  background-color: #2f9f5e;
-  border-color: #2f9f5e; }
-.dashboard-list .status-yellow {
-  background-color: #e79e0b;
-  border-color: #e79e0b; }
-
 .overlay-dialogue.modal-popup.modal-widget-configuration {
-  max-width: calc(100vw - 40px);
-  min-width: 650px; }
+  width: auto;
+  max-width: calc(100vw - 20px);
+  min-width: 650px;
+  box-sizing: border-box; }
   .overlay-dialogue.modal-popup.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
@@ -2431,13 +2496,14 @@ button {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #768d99;
@@ -2461,10 +2527,7 @@ button {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .entity-count,
-.list-table .tag {
-  margin-top: 1px;
-  margin-bottom: 1px;
+.list-table .entity-count {
   vertical-align: top; }
 
 .list-table thead th.column-tags-1 {
@@ -2500,6 +2563,15 @@ button {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+@media screen and (min-width: 1200px) {
+  .list-table .tags-wrapper {
+    max-width: 266px; } }
+@media screen and (min-width: 1400px) {
+  .list-table .tags-wrapper {
+    max-width: 359px; } }
+@media screen and (min-width: 1600px) {
+  .list-table .tags-wrapper {
+    max-width: 452px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -2569,23 +2641,33 @@ button {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: rgba(31, 44, 51, 0.5); }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0;
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
+  color: #1f2c33;
+  border-bottom-color: #1f2c33; }
+.list-table.has-highlighted-rows .entity-count {
   border: 1px solid #ffffff; }
 
 .no-data-message {
@@ -2873,7 +2955,10 @@ output {
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    padding-right: 10px;
+    word-break: break-all;
+    white-space: normal; }
   output .msg-buttons {
     margin-top: 4px;
     text-align: right; }
@@ -2893,7 +2978,7 @@ output {
         output .msg-details li:only-child::before {
           display: none; }
   output.collapsible {
-    grid-template: 16.8px 1fr / max-content 1fr;
+    grid-template: minmax(16.8px, max-content) 1fr/max-content 1fr;
     grid-gap: 6px 10px;
     transition: grid-template-rows 0.3s, grid-row-gap 0.3s; }
     output.collapsible .link-action {
@@ -2913,7 +2998,7 @@ output {
       transform: scaleY(1) translateY(0);
       transition: padding-top 0.3s, opacity 0.3s, transform 0.3s; }
     output.collapsible.collapsed {
-      grid-template-rows: 32px 0fr;
+      grid-template-rows: minmax(32px, max-content) 0fr;
       grid-row-gap: 0; }
       output.collapsible.collapsed .msg-details {
         padding-top: 0;
@@ -3382,6 +3467,11 @@ section {
     padding: 10px 10px 0; }
     .service-info .service-info-grid:last-of-type {
       padding-bottom: 10px; }
+    .service-info .service-info-grid .tags-wrapper {
+      min-width: 1%; }
+      .service-info .service-info-grid .tags-wrapper .btn-icon {
+        height: 18px;
+        width: 18px; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
@@ -4534,6 +4624,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #acbbc2; }
 
+div.dashboard-widget-itemhistory .list-table iframe {
+  vertical-align: top; }
 div.dashboard-widget-itemhistory .list-table pre {
   font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
@@ -4815,8 +4907,8 @@ div.dashboard-widget-navtree .treeview {
 
 form.dashboard-widget-piechart {
   max-width: 1330px;
-  min-width: 1110px;
-  width: 100vw; }
+  min-width: 1120px;
+  width: calc(100vw - 42px); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -4952,8 +5044,8 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;
-  min-width: 1110px;
-  width: 100vw; }
+  min-width: 1120px;
+  width: calc(100vw - 42px); }
   form.dashboard-widget-svggraph .svg-graph-preview,
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
@@ -5652,6 +5744,15 @@ form.is-loading {
   position: relative; }
   .table-forms-separator .wordbreak {
     white-space: normal; }
+  @media screen and (min-width: 1200px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 452px; } }
 
 .border-left {
   border-left: 1px solid #ebeef0; }
@@ -5735,9 +5836,6 @@ select {
   select[readonly] {
     color: #1f2c33 !important;
     pointer-events: none; }
-
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
 
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
@@ -6116,12 +6214,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   padding: 9px 5px;
   width: 100%; }
 
-.qr-code {
-  height: 190px;
-  width: 190px;
-  margin: 20px auto; }
-
 .qr-code img {
+  margin: 20px auto;
   image-rendering: pixelated; }
 
 .menu-popup-overlay {
@@ -6208,8 +6302,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
@@ -6282,12 +6374,31 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
+      .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-sla-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-proxy-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-connector-edit {
+        max-width: 750px; }
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
       max-width: 900px;
       width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
+  .overlay-dialogue.hintbox {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding-top: 20px; }
+    .overlay-dialogue.hintbox.hintbox-position-fixed {
+      position: fixed; }
+    .overlay-dialogue.hintbox:not(.hintbox-static) {
+      pointer-events: none; }
+    .overlay-dialogue.hintbox.hintbox-static {
+      padding-top: 0; }
+      .overlay-dialogue.hintbox.hintbox-static .hintbox-header {
+        height: 20px; }
+    .overlay-dialogue.hintbox .hintbox-container {
+      overflow: auto;
+      padding-bottom: 1px; }
   .overlay-dialogue .hintbox-raw-data {
     white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
@@ -6449,75 +6560,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   left: 0;
   opacity: .35; }
 
-.calendar {
-  width: 200px; }
-  .calendar .calendar-year.highlighted, .calendar .highlighted.calendar-month,
-  .calendar .calendar-month.highlighted {
-    background-color: #e8f5ff; }
-  .calendar .calendar-year:focus, .calendar .calendar-month:focus,
-  .calendar .calendar-month:focus {
-    outline: none; }
-  .calendar table {
-    width: 100%;
-    margin: 5px 0; }
-    .calendar table thead {
-      text-transform: uppercase;
-      color: #768d99; }
-    .calendar table tbody {
-      text-align: center; }
-      .calendar table tbody td {
-        transition: background-color 0.2s ease-out; }
-        .calendar table tbody td.selected {
-          background-color: #768d99;
-          color: #ffffff; }
-          .calendar table tbody td.selected:hover {
-            background-color: #6b8390; }
-        .calendar table tbody td:hover {
-          background-color: #e8f5ff;
-          cursor: pointer; }
-        .calendar table tbody td.highlighted {
-          color: #ffffff;
-          background-color: #02659f;
-          border-color: #02659f;
-          cursor: pointer; }
-        .calendar table tbody td:focus {
-          outline: none; }
-        .calendar table tbody td span {
-          z-index: -1;
-          padding: 4px;
-          display: block; }
-
-.calendar-header {
-  text-align: center; }
-  .calendar-header .btn-grey {
-    border: 0;
-    background-color: transparent; }
-
-.calendar-year, .calendar-month {
-  height: 24px;
-  line-height: 26px;
-  display: table;
-  width: 100%; }
-  .calendar-year button:first-child, .calendar-month button:first-child {
-    float: left; }
-  .calendar-year button:last-child, .calendar-month button:last-child {
-    float: right; }
-  .calendar-year button:hover, .calendar-month button:hover {
-    background-color: #e8f5ff;
-    cursor: pointer; }
-
-.calendar-time {
-  text-align: center; }
-  .calendar-time input[type="text"] {
-    width: 32px; }
-
-.calendar-footer {
-  margin: 26px 0 0;
-  text-align: right; }
-  .calendar-footer .btn-grey {
-    float: left;
-    margin-top: 0; }
-
 .notif.overlay-dialogue {
   width: 250px; }
   .notif.overlay-dialogue .overlay-dialogue-header ul {
@@ -6609,30 +6651,30 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
-  min-width: 145px; }
-  .svg-graph-hintbox .table-paging {
-    min-height: 18px;
-    padding: 0 0 2px;
-    border: 0;
-    top: 2px; }
-    .svg-graph-hintbox .table-paging .paging-btn-container {
-      min-height: inherit; }
+  min-width: 160px; }
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }
   .svg-graph-hintbox li {
-    padding-left: 23px; }
+    display: flex;
+    width: fit-content;
+    align-items: center; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
-      margin: 3px 10px 3px -20px;
-      width: 10px;
+      display: inline-block;
+      min-width: 10px;
       height: 10px;
-      float: left;
-      display: block; }
+      margin-left: 3px;
+      margin-right: 10px; }
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       border-radius: 50%; }
   .svg-graph-hintbox .header {
     margin: 0 0 10px 3px; }
+
+.svg-hintbox-footer.table-stats {
+  position: relative;
+  padding: 5px 0 0 0;
+  text-align: right; }
 
 .ui-selectable-helper {
   position: absolute;
@@ -6655,6 +6697,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   margin: 10px;
   background-color: #fcf7c2;
   border: 1px solid #dfe4e7; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;
@@ -6674,16 +6718,26 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+  .tags-wrapper .tag {
+    margin-top: 1px;
+    margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
+
 .tag {
   display: inline-block;
   color: #ffffff;
   background-color: #768d99;
-  margin: 1px 3px 1px 0;
   padding: 2px 3px;
   line-height: 1em;
-  max-width: 133px;
   vertical-align: middle;
-  border-radius: 2px; }
+  border-radius: 2px;
+  box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;
     border-bottom: none; }
@@ -6705,15 +6759,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .yellow-bg {
   background-color: #ffc859; }
-
-td[class] + td.na-bg,
-td[class] + td.normal-bg,
-td[class] + td.info-bg,
-td[class] + td.average-bg,
-td[class] + td.warning-bg,
-td[class] + td.high-bg,
-td[class] + td.disaster-bg {
-  border-left: 1px dotted #ebeef0; }
 
 .na-bg {
   color: #2a353a;
@@ -6987,26 +7032,26 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
-  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
+  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px;
     height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
-  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
+  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: rgba(172, 187, 194, 0.55); }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
-  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
+  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: rgba(135, 135, 135, 0.85);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -142,7 +142,7 @@ class testDashboardsHostDashboardPage extends CWebTest {
 		$this->openDashboardsForHost(self::HOST_NAME);
 
 		// Test Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.
@@ -173,7 +173,7 @@ class testDashboardsHostDashboardPage extends CWebTest {
 					CXPathHelper::fromClass('btn-dashboard-kioskmode-toggle-slideshow').']')->one()->click();
 		}
 
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->hoverMouse()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->hoverMouse()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -981,7 +981,8 @@ ZABBIX.apps.map = (function($) {
 					var value = parseInt(this.value, 10),
 						last_value = parseInt($('#shapeForm #last_shape_type').val(), 10);
 
-					$('#shape-text-row, #shape-background-row').toggle(value !== SVGMapShape.TYPE_LINE);
+					$('#shape-text-row, #shape-background-row')
+						.css('display', value !== SVGMapShape.TYPE_LINE ? '' : 'none');
 					$('.switchable-content').each(function (i, element) {
 						element.textContent = element.hasAttribute('data-value-' + value) ?
 								element.getAttribute('data-value-' + value) :
@@ -2785,7 +2786,7 @@ ZABBIX.apps.map = (function($) {
 				object_name: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					real_hosts: true
+					real_hosts: 1
 				},
 				popup: {
 					parameters: {

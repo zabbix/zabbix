@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,8 +31,17 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$url = (new CUrl('sysmaps.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update');
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('sysmapid', $data['sysmap']['sysmapid']);
+}
+
+$url = $url->getUrl();
+
 // Create sysmap form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
@@ -71,16 +80,28 @@ $multiselect_data = [
 $map_ownerid = $data['sysmap']['userid'];
 
 if ($map_ownerid != 0) {
-	$multiselect_data['data'][] = array_key_exists($map_ownerid, $data['users'])
-		? [
-			'id' => $map_ownerid,
-			'name' => getUserFullname($data['users'][$map_ownerid])
-		]
-		: [
-			'id' => $map_ownerid,
-			'name' => _('Inaccessible user'),
-			'inaccessible' => true
+	$is_owner_accessible = array_key_exists($map_ownerid, $data['users']);
+
+	if ($data['form'] === 'clone' && !$is_owner_accessible) {
+		$userid = $data['current_user_userid'];
+
+		$multiselect_data['data'][] = [
+			'id' => $userid,
+			'name' => getUserFullname($data['users'][$userid])
 		];
+	}
+	else {
+		$multiselect_data['data'][] = $is_owner_accessible
+			? [
+				'id' => $map_ownerid,
+				'name' => getUserFullname($data['users'][$map_ownerid])
+			]
+			: [
+				'id' => $map_ownerid,
+				'name' => _('Inaccessible user'),
+				'inaccessible' => true
+			];
+	}
 }
 
 // Append multiselect to map tab.
@@ -171,6 +192,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_hostgroup'))
 			->disableSpellcheck()
 	);
 
@@ -186,6 +208,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_host'))
 			->disableSpellcheck()
 	);
 
@@ -201,6 +224,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_trigger'))
 			->disableSpellcheck()
 	);
 
@@ -216,6 +240,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_map'))
 			->disableSpellcheck()
 	);
 
@@ -231,6 +256,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('sysmaps', 'label_string_image'))
 			->disableSpellcheck()
 	);
 
@@ -410,11 +436,11 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
+if ($data['sysmap']['sysmapid'] > 0 && $data['form'] !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new	CButton('clone', _('Clone')),
+			new	CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
 				CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),
@@ -434,3 +460,5 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");

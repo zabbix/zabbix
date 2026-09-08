@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,6 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup icon_map
@@ -421,7 +419,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_name'));
+			$this->query('id:iconmap_name')->waitUntilVisible()->one();
 			$this->zbxTestInputType('iconmap_name', $data['name']);
 		}
 
@@ -772,6 +770,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($data['old_name']);
 		$this->zbxTestClickWait('clone');
+		$this->query('button:Update')->waitUntilNotVisible();
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
 		}
@@ -894,11 +893,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Icon map "'.$name.'" cannot be deleted. Used in map');
 
 		// Check the results in DB.
-		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
-	private function checkFormFields($data) {
+	protected function checkFormFields($data) {
 		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestAssertElementValue('iconmap_name', $data['name']);
 		$this->zbxTestAssertElementValue('iconmap_mappings_0_expression', $data['mappings'][0]['expression']);
@@ -907,7 +905,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('iconmap[default_iconid]', $data['default_icon']);
 	}
 
-	private function processExpressionRows($rows) {
+	protected function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
 			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
 				case 'add':
@@ -920,7 +918,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				case 'update':
 					if (!$this->zbxTestElementPresentId('iconmap_mappings_'.$i.'_expression')) {
 						$this->zbxTestClick('addMapping');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_mappings_'.$i.'_expression'));
+						$this->query('id:iconmap_mappings_'.$i.'_expression')->waitUntilVisible()->one();
 					}
 					$this->zbxTestInputType('iconmap_mappings_'.$i.'_expression', $mapping_row['expression']);
 					break;

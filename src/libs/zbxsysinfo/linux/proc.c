@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,6 +104,11 @@ static void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 	zbx_free(proc->cmdline);
 
 	zbx_free(proc);
+}
+
+static void	zbx_sysinfo_proc_free_wrapper(void *data)
+{
+	zbx_sysinfo_proc_free((zbx_sysinfo_proc_t*)data);
 }
 
 /******************************************************************************
@@ -715,7 +720,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				ret = SYSINFO_RET_FAIL;
 				goto clean_re;
@@ -1099,7 +1104,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				ret = SYSINFO_RET_FAIL;
 				goto clean;
@@ -1639,7 +1644,7 @@ out:
  ******************************************************************************/
 void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 {
-	zbx_vector_ptr_clear_ext(processes, (zbx_mem_free_func_t)zbx_sysinfo_proc_free);
+	zbx_vector_ptr_clear_ext(processes, zbx_sysinfo_proc_free_wrapper);
 }
 
 /******************************************************************************
@@ -2013,7 +2018,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				return SYSINFO_RET_FAIL;
 			}

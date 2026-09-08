@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -188,6 +188,11 @@ void	zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashse
 	async_task_queue_unlock(&manager->queue);
 
 	zbx_hashset_clear(interfaces);
+}
+
+void	zbx_interface_status_clean_wrapper(void *data)
+{
+	zbx_interface_status_clean((zbx_interface_status_t *)data);
 }
 
 void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)

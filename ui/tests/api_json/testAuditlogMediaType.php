@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ class testAuditlogMediaType extends testAuditlogCommon {
 	 * Existing Media type ID.
 	 */
 	private const MEDIATYPEID = 1;
+
+	/**
+	 * Resource type Media type
+	 */
+	const RESOURCE_TYPE = 3;
 
 	public function testAuditlogMediaType_Create() {
 		$create = $this->call('mediatype.create', [
@@ -74,7 +79,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			'mediatype.mediatypeid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMediaType_Update() {
@@ -127,11 +132,11 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			'mediatype.attempt_interval' => ['update', '30s', '10s']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MEDIATYPEID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MEDIATYPEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMediaType_Delete() {
 		$this->call('mediatype.delete', [self::MEDIATYPEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_email_media', self::MEDIATYPEID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_email_media', self::MEDIATYPEID, self::RESOURCE_TYPE);
 	}
 }

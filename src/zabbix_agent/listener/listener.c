@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,7 +108,12 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			{
+				if (0 == strcmp(*value, ZBX_NOTSUPPORTED))
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, "", ZBX_JSON_TYPE_STRING);
+				else
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			}
 			else
 				zbx_json_addraw(&j, ZBX_PROTO_TAG_VALUE, "null");
 		}
