@@ -74,7 +74,7 @@ $form_list
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->addClass('js-operation-checkbox')
 				->setChecked($data['change_severity'])
-				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
+				->setEnabled($data['allowed_change_severity'] && $data['editable_triggers_count'] > 0),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
 			->addClass(ZBX_STYLE_INLINE_LIST)
@@ -146,15 +146,6 @@ else {
 	);
 }
 
-$maintenance_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'popup')
-	->setArgument('popup', 'maintenance.edit')
-	->setArgument('context', 'trigger');
-
-	foreach ($data['eventids'] as $key => $eventid) {
-		$maintenance_url->setArgument("eventids[{$key}]", $eventid);
-	}
-
 $form_list
 	->addRow(
 		new CLabel([_('Convert to cause'),
@@ -171,9 +162,18 @@ $form_list
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	);
 
-if ($data['allowed_edit_maintenance'] && $data['problem_severity_can_be_changed']) {
+if ($data['allowed_edit_maintenance'] && $data['editable_triggers_count'] > 0) {
+	$maintenance_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'maintenance.edit')
+		->setArgument('context', 'trigger');
+
+	foreach ($data['eventids'] as $key => $eventid) {
+		$maintenance_url->setArgument("eventids[{$key}]", $eventid);
+	}
+
 	$form_list->addRow('',
-		(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['selected_triggers']), $maintenance_url))
+		(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['editable_triggers_count']), $maintenance_url))
 	);
 }
 

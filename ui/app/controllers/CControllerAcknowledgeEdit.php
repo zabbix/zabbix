@@ -86,7 +86,6 @@ class CControllerAcknowledgeEdit extends CController {
 			'problem_can_be_closed' => false,
 			'problem_can_be_suppressed' => false,
 			'problem_can_be_unsuppressed' => false,
-			'problem_severity_can_be_changed' => false,
 			'problem_can_change_rank' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
@@ -145,7 +144,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'preservekeys' => true
 		]);
 
-		$data['selected_triggers'] = count($editable_triggers);
+		$data['editable_triggers_count'] = count($editable_triggers);
 
 		$ack_count = 0;
 
@@ -206,9 +205,6 @@ class CControllerAcknowledgeEdit extends CController {
 
 		$data['has_ack_events'] = ($ack_count > 0);
 		$data['has_unack_events'] = ($ack_count != count($events));
-
-		// Severity can be changed only for editable triggers.
-		$data['problem_severity_can_be_changed'] = (bool) $editable_triggers;
 
 		// Add number of selected and related problem events to count of selected resolved events.
 		$data['related_problems_count'] += API::Problem()->get([
