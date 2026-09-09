@@ -92,7 +92,7 @@ zabbix_export:
         **Note:** the discovered nodes will be created as separate hosts in Zabbix with the Linux template automatically assigned to them.
       vendor:
         name: Zabbix
-        version: 7.4-6
+        version: 7.4-7
       groups:
         - name: Templates/Applications
       items:
@@ -104,6 +104,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Kube = {
             	params: {},
             	pods_limit: 1000,
@@ -125,10 +150,13 @@ zabbix_export:
             		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
             			Kube.params.api_url += '/';
             		}
+            
+            		Kube.tls = new CTlsConfig(params.tls_verify);
+            		Kube.tls.checkURL(Kube.params.api_url);
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(Kube.tls.options),
             			response,
             			url = encodeURI(Kube.params.api_url + query);
             		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
@@ -479,6 +507,8 @@ zabbix_export:
               value: '{$KUBE.POD.FILTER.ANNOTATIONS}'
             - name: pod_filter_labels
               value: '{$KUBE.POD.FILTER.LABELS}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Kubernetes nodes"}'
           tags:
             - tag: component
               value: raw
@@ -1619,6 +1649,22 @@ zabbix_export:
         - tag: target
           value: nodes
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Kubernetes nodes", e.g. {$HTTP.TLS.VERIFY:"Kubernetes nodes"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$KUBE.API.TOKEN}'
           type: SECRET_TEXT
           description: 'Service account bearer token.'
@@ -1649,7 +1695,7 @@ zabbix_export:
           description: 'Filter of discoverable nodes.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Node Matches Filter'
             description: 'A regex to filter discoverable nodes.'
@@ -1658,7 +1704,7 @@ zabbix_export:
           description: 'Filter to exclude discovered nodes.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Node Exclusion Filter'
             description: 'A regex to exclude discovered nodes.'
@@ -1667,7 +1713,7 @@ zabbix_export:
           description: 'Filter of discoverable nodes by role.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Node Role Matches Filter'
             description: 'A regex to filter discoverable nodes by role.'
@@ -1676,7 +1722,7 @@ zabbix_export:
           description: 'Filter to exclude discovered node by role.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Node Role Exclusion Filter'
             description: 'A regex to exclude discovered nodes by role.'
@@ -1685,7 +1731,7 @@ zabbix_export:
           description: 'Filter of discoverable pods by namespace.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Pod Namespace Matches Filter'
             description: 'A regex to filter discoverable pods by namespace.'
@@ -1694,7 +1740,7 @@ zabbix_export:
           description: 'Filter to exclude discovered pods by namespace.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Pod Namespace Exclusion Filter'
             description: 'A regex to exclude discovered pods by namespace.'
@@ -1702,7 +1748,7 @@ zabbix_export:
           description: 'Annotations to filter nodes (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Node Annotations Filter'
             description: 'Annotations to filter nodes.'
@@ -1710,7 +1756,7 @@ zabbix_export:
           description: 'Labels to filter nodes (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Node Labels Filter'
             description: 'Labels to filter nodes.'
@@ -1719,14 +1765,14 @@ zabbix_export:
           description: 'Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Nodes Endpoint Name'
             description: 'The Kubernetes nodes endpoint name.'
         - macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Pod Annotations Filter'
             description: 'Annotations to filter pods.'
@@ -1734,7 +1780,7 @@ zabbix_export:
           description: 'Labels to filter Pods (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Pod Labels Filter'
             description: 'Labels to filter pods.'

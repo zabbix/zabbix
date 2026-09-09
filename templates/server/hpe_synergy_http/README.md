@@ -29,6 +29,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE Synergy", e.g. {$HTTP.TLS.VERIFY:"HPE Synergy"}.</p>|`full`|
 |{$HPE.SYNERGY.API.PASSWORD}|<p>Specify password for API.</p>||
 |{$HPE.SYNERGY.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
 |{$HPE.SYNERGY.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|

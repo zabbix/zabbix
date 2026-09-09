@@ -21,6 +21,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
  * @backup sessions
  *
  * @backupConfig
+ *
+ * @onAfter waitUntilConfigRestored
  */
 class testFormSetup extends CWebTest {
 
@@ -1040,5 +1042,14 @@ class testFormSetup extends CWebTest {
 		// Uncheck the Database TLS encryption and verify that Verify database certificate field is hidden.
 		$tls_encryption->uncheck();
 		$this->assertFalse($verify_certificate->isDisplayed());
+	}
+
+	/**
+	 * Wait for frontend to get the restored config from zabbix.conf.php file. Otherwise the next tests are
+	 * executed with the configuration file written by the setup form, where Zabbix server name and Zabbix
+	 * server address are empty.
+	 */
+	public static function waitUntilConfigRestored() {
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 	}
 }

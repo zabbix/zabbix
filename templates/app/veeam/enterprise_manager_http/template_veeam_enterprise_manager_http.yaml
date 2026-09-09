@@ -64,7 +64,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 7.4-2
       groups:
         - name: Templates/Applications
       items:
@@ -133,9 +133,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Veeam = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             	session_id: '',
             
             	setParams: function (params) {
@@ -150,6 +175,10 @@ zabbix_export:
             		if (typeof Veeam.params.api_endpoint === 'string' && Veeam.params.api_endpoint.slice(-1) !== '/') {
             			Veeam.params.api_endpoint += '/';
             		}
+            
+            		Veeam.tls = new CTlsConfig(params.tls_verify);
+            		Veeam.tls.checkURL(Veeam.params.api_endpoint);
+            		Veeam.request = new HttpRequest(Veeam.tls.options);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -276,6 +305,8 @@ zabbix_export:
               value: '{$VEEAM.MANAGER.HTTP.PROXY}'
             - name: password
               value: '{$VEEAM.MANAGER.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Veeam Backup Enterprise Manager"}'
             - name: user
               value: '{$VEEAM.MANAGER.USER}'
           tags:
@@ -926,7 +957,7 @@ zabbix_export:
           description: 'Filter of discoverable backups by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Backup name filter (include)'
             description: 'A regex pattern to include backups by name.'
@@ -935,7 +966,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable backups by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Backup name filter (exclude)'
             description: 'A regex pattern to exclude backups by name.'
@@ -944,7 +975,7 @@ zabbix_export:
           description: 'Filter of discoverable backups by type.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Backup type filter (include)'
             description: 'A regex pattern to include backups by type.'
@@ -953,10 +984,26 @@ zabbix_export:
           description: 'Filter to exclude discoverable backups by type.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Backup type filter (exclude)'
             description: 'A regex pattern to exclude backups by type.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup Enterprise Manager", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup Enterprise Manager"}.'
+          config:
+            type: LIST
+            priority: '3'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VEEAM.MANAGER.API.URL}'
           value: 'https://localhost:9398'
           description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.'
@@ -971,7 +1018,7 @@ zabbix_export:
           description: 'The update interval for the get metrics item.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'Update data interval'
             description: 'The update interval for the get metrics item.'
@@ -980,7 +1027,7 @@ zabbix_export:
           description: 'A response timeout for API.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'API response timeout'
             description: 'A response timeout for API.'
@@ -997,7 +1044,7 @@ zabbix_export:
           description: 'The maximum score of failed jobs (for a trigger expression).'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Max score of failed jobs'
             description: 'The maximum score of failed jobs (for a trigger expression).'
@@ -1007,7 +1054,7 @@ zabbix_export:
           description: 'The maximum score of warning jobs (for a trigger expression).'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Max score of warning jobs'
             description: 'The maximum score of warning jobs (for a trigger expression).'
@@ -1017,7 +1064,7 @@ zabbix_export:
           description: 'The `password` of the Veeam Backup Enterprise Manager account.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: Password
             description: 'The `password` of the Veeam Backup Enterprise Manager account.'
             required: 'YES'
@@ -1026,7 +1073,7 @@ zabbix_export:
           description: 'The minimum free space percentage for a critical trigger expression (percent).'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Min repository free space (critical, %)'
             description: 'The minimum free space percentage for a critical trigger expression (percent).'
@@ -1036,7 +1083,7 @@ zabbix_export:
           description: 'The minimum free space percentage for a warning trigger expression (percent).'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'Min repository free space (warning, %)'
             description: 'The minimum free space percentage for a warning trigger expression (percent).'
@@ -1046,7 +1093,7 @@ zabbix_export:
           description: 'The `user name` of the Veeam Backup Enterprise Manager account.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: Username
             description: 'The `user name` of the Veeam Backup Enterprise Manager account.'
             required: 'YES'
@@ -1055,7 +1102,7 @@ zabbix_export:
           description: 'Filter of discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Repository name filter (include)'
             description: 'A regex pattern to include repositories by name.'
@@ -1064,7 +1111,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Repository name filter (exclude)'
             description: 'A regex pattern to exclude repositories by name.'

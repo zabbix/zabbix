@@ -39,6 +39,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"GLPI"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "GLPI", e.g. {$HTTP.TLS.VERIFY:"GLPI"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 |glpi_legacy_api|false|Boolean value (true/false) to set API version: `false` (default) enables Modern API v2 with OAuth2 Bearer token authentication, `true` enables Legacy API v1 with Session-Token authentication.|
 |glpi_app_token||GLPI application token (optional; specify if the token is set in the API client settings).|
