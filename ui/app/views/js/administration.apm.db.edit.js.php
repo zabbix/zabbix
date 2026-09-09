@@ -40,6 +40,9 @@ const view = new class {
 	/** @type {boolean} */
 	#password_changed = false;
 
+	/** @type {boolean} */
+	#password_cleared = false;
+
 	/** @type {HTMLInputElement|null} */
 	#password_input = null;
 
@@ -75,6 +78,7 @@ const view = new class {
 			this.#url_changed = true;
 
 			if (this.#password_input !== null) {
+				this.#password_cleared = this.#password_input.value.length > 0;
 				this.#password_input.value = '';
 			}
 
@@ -154,19 +158,14 @@ const view = new class {
 
 		this.#updateDisabledState([this.#password_input], show_change_password_btn);
 
-		this.#password_warning?.setAttribute('hidden', '');
+		const show_password_warning = this.#url_changed && this.#password_cleared;
 
-		if (this.#password_input !== null) {
-			if (this.#url_changed) {
-				this.#password_warning?.removeAttribute('hidden');
-			}
+		this.#password_warning?.toggleAttribute('hidden', !show_password_warning);
 
-			this.#updateDisplayState([this.#password_input], !show_change_password_btn);
-		}
+		this.#updateDisplayState([this.#password_input], !show_change_password_btn);
+		this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
 
-		if (this.#change_password_btn !== null) {
-			this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
-		}
+		this.#password_cleared = false;
 	}
 
 	#getFormField(name) {
