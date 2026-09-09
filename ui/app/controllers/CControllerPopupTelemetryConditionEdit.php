@@ -40,9 +40,17 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			],
-			'column' => ['string'],
+			'column' => ['string', 'in' => array_unique(array_merge(
+				CItemTypeTelemetryQuery::TRACES_CONDITIONS_COLUMN,
+				CItemTypeTelemetryQuery::LOGS_CONDITIONS_COLUMN,
+				...CItemTypeTelemetryQuery::METRICS_CONDITIONS_COLUMN
+			))],
 			'attribute_key' => ['string'],
-			'operator' => ['integer'],
+			'operator' => ['integer',
+				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS
+				]
+			],
 			'value' => ['string']
 		]];
 	}
