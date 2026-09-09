@@ -243,7 +243,7 @@ class CControllerMaintenanceEdit extends CController {
 		$hostids = [];
 		foreach ($db_triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				if (!in_array($host['hostid'], $hostids)) {
+				if (!array_key_exists($host['hostid'], $hostids)) {
 					$hostids[$host['hostid']] = true;
 				}
 			}
