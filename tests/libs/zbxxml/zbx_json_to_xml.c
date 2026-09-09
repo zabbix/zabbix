@@ -12,8 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include <pthread.h>
-
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 
