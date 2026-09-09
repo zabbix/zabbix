@@ -280,6 +280,8 @@ final class CClickHouseHelper {
 			}
 
 			$where[] = implode(' AND ', $where_and);
+
+			$index++;
 		}
 
 		if ($where) {
