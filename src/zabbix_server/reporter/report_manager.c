@@ -1513,6 +1513,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
 				mediatypeids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by mediatypeid");
 
 		result = zbx_db_select("%s", sql);
 
