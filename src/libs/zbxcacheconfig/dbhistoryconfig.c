@@ -1226,17 +1226,16 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
  *                                                                            *
  * Return value: SUCCEED         - host found                                 *
  *               SUCCEED_PARTIAL - redirection data was specified and host is *
- *                                 not monitored by the this instance         *
+ *                                 not monitored by this instance             *
  *               FAIL            - host not found                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_hostinfo(const char *host, const zbx_socket_t *sock,
-		zbx_history_recv_host_t *hostinfo,zbx_comms_redirect_t *redirect)
+		zbx_history_recv_host_t *hostinfo, zbx_comms_redirect_t *redirect)
 {
 	return dc_config_get_host_by_name(host, sock,
 		ZBX_ITEM_GET_HOSTINFO | ZBX_ITEM_GET_HOST, hostinfo, redirect);
 }
-
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
 
