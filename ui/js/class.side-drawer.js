@@ -69,7 +69,10 @@ class CSideDrawer {
 		return this.#drawer_element;
 	}
 
-	async open(url, options = {}) {
+	/**
+	 * @returns {Promise<any>}
+	 */
+	open(url, options = {}) {
 		this.#abort_controller?.abort();
 		this.#abort_controller = new AbortController();
 
@@ -79,18 +82,26 @@ class CSideDrawer {
 
 		return fetch(url, {...options, signal: this.#abort_controller.signal})
 			.then(response => response.json())
+			.then(response => {
+				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
+			})
 			.finally(() => {
 				this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 			});
 	}
 
+	/**
+	 * @returns {Promise<any>}
+	 */
 	close() {
 		this.#abort_controller?.abort();
 		this.#abort_controller = null;
 
-		this.#unmount();
+		return Promise.resolve().then(() => {
+			this.#unmount();
 
-		this.dispatchEvent(CSideDrawer.EVENT_CLOSE, { side_drawer: this });
+			this.dispatchEvent(CSideDrawer.EVENT_CLOSE);
+		});
 	}
 
 	on(event, callback, options = undefined) {

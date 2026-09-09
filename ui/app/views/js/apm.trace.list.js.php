@@ -344,13 +344,15 @@
 			const url = zabbixUrl({action: 'apm.trace.list.split.view'});
 
 			this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
+			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
+			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e))
+
 			this.#side_drawer
 				.open(url, {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify({traceid})
 				})
-				.then(response => this.#onSideDrawerOpen(response))
 				.catch(error => {
 					if (error.name === 'AbortError') {
 						return;
@@ -360,13 +362,23 @@
 				});
 		}
 
-		#onSideDrawerOpen = response => {
+		#onSideDrawerOpen = e => {
+			const {response} = e.detail;
 			const { trace_view, trace_view_data } = response;
 
 			const element = this.#side_drawer.getElement();
 			element.innerHTML = trace_view;
 
 			new TraceViewPage(element, trace_view_data);
+		}
+
+		#onSideDrawerClose = () => {
+			const datatable_element = this.#datatable.getElement();
+
+			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			this.#selected_traceid = null;
 		}
 
 		#validateFormChanges() {
