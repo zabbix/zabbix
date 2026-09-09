@@ -149,9 +149,9 @@ class CApmTrace extends CApmGeneral {
 				|| $options['resource_attributes'] !== null || $options['span_attributes'] !== null) {
 			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema, [
 				'output' => ['TraceId'],
-				...array_intersect_key($options, array_flip(
-					['filter', 'search', 'searchByAny', 'startSearch', 'excludeSearch', 'searchWildcardsEnabled']
-				))
+				...array_intersect_key($options, array_flip(['filter', 'search', 'searchByAny', 'startSearch',
+					'excludeSearch', 'searchWildcardsEnabled', 'limit'
+				]))
 			]))
 				->linkQuery($inner_query)
 				->where('to.TraceId IN ('.$inner_query->getSql().')')
@@ -170,6 +170,8 @@ class CApmTrace extends CApmGeneral {
 			}
 		}
 		else {
+			$inner_query->limit($options['limit']);
+
 			$outer_query = $inner_query;
 		}
 
