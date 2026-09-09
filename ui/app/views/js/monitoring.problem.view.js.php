@@ -829,10 +829,8 @@
 		}
 
 		#removeRefreshMessage() {
-			if (this.#refresh_message_box !== null) {
-				this.#refresh_message_box.remove();
-				this.#refresh_message_box = null;
-			}
+			this.#refresh_message_box?.remove();
+			this.#refresh_message_box = null;
 		}
 
 		#refreshDebug(debug) {
@@ -876,7 +874,7 @@
 					check_changes: false,
 					force_load: true,
 					loading_fadein,
-					onSuccess: response => this.#onDataDone(response),
+					onSuccess: response => this.#onSuccess(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
 		}
@@ -925,7 +923,7 @@
 			}
 		}
 
-		#onDataDone(response) {
+		#onSuccess(response) {
 			this.#removeRefreshMessage();
 
 			if ('messages' in response) {

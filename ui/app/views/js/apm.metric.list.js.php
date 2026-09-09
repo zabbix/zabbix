@@ -51,6 +51,8 @@
 			this.#initFilter(filter_options);
 			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
 				storage_idx, user_configs});
+
+			this.#scheduleRefresh();
 		}
 
 		#initEvents(filter_options) {
@@ -160,10 +162,8 @@
 		}
 
 		#removeRefreshMessage() {
-			if (this.#refresh_message_box !== null) {
-				this.#refresh_message_box.remove();
-				this.#refresh_message_box = null;
-			}
+			this.#refresh_message_box?.remove();
+			this.#refresh_message_box = null;
 		}
 
 		#refreshDebug(debug) {
@@ -197,7 +197,7 @@
 					check_changes: false,
 					force_load: true,
 					loading_fadein,
-					onSuccess: response => this.#onDataDone(response),
+					onSuccess: response => this.#onSuccess(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
 		}
@@ -218,7 +218,7 @@
 			this.#refresh_interval_id = null;
 		}
 
-		#onDataDone(response) {
+		#onSuccess(response) {
 			this.#removeRefreshMessage();
 
 			if ('messages' in response) {
