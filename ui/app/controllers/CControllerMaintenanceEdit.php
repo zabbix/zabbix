@@ -249,14 +249,6 @@ class CControllerMaintenanceEdit extends CController {
 			}
 		}
 
-		$db_hosts = $hostids
-			? API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'hostids' => array_keys($hostids),
-				'editable' => true,
-			])
-			: [];
-
 		$groups = $hostids
 			? API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -289,6 +281,14 @@ class CControllerMaintenanceEdit extends CController {
 
 		switch ($this->getInput('context')) {
 			case 'host':
+				$db_hosts = $hostids
+					? API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'hostids' => array_keys($hostids),
+						'editable' => true,
+					])
+					: [];
+
 				foreach (CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']) as $host) {
 					$data['hosts_ms'][$host['id']] = $host;
 				}
