@@ -162,7 +162,6 @@ final class CMathFunctionData {
 	 * @var array
 	 */
 	private const CALCULATED_ONLY = [
-		'count',
 		'histogram_quantile'
 	];
 
