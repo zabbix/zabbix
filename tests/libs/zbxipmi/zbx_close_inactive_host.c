@@ -126,8 +126,14 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 == strcmp(op, "close_single"))
 	{
-		zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)hosts.values[0];
-		int		ret = zbx_close_inactive_host(h);	/* frees h on SUCCEED - see comment below */
+		zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)hosts.values[0];
+		zbx_hashset_iter_t	iter;
+		int			ret;
+
+		/* 'h' must stay in 'hostset' for the duration of the call: zbx_domain_close_cb() (reached          */
+		/* synchronously below when domain_found is "yes") resolves its cb_data back to a host via          */
+		/* RETURN_IF_CB_DATA_INVALID(), which looks 'h' up in 'hostset' by domain_nr.                       */
+		ret = zbx_close_inactive_host(h);	/* frees h on SUCCEED - see comment below */
 
 		zbx_mock_assert_int_eq("zbx_close_inactive_host() return value",
 				zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.close_ret")), ret);
@@ -136,12 +142,18 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_int_eq("ipmi_domain_close() call count",
 				zbx_mock_get_parameter_int("out.domain_close_calls"), domain_close_calls);
 
-		/* zbx_close_inactive_host() only frees the host on SUCCEED; it never removes it from 'hostset' - */
-		/* that's the caller's job (zbx_delete_inactive_ipmi_hosts() does it via                          */
-		/* zbx_hashset_iter_remove()) */
 		if (SUCCEED != ret)
 			zbx_free_ipmi_host(h);
-		zbx_hashset_remove(&hostset, &h);
+
+		/* zbx_close_inactive_host() never removes 'h' from 'hostset' itself - that's the caller's job      */
+		/* (zbx_delete_inactive_ipmi_hosts() does it via zbx_hashset_iter_remove()). By this point 'h' is   */
+		/* freed either way (above, or internally on SUCCEED), so the removal below goes through the same   */
+		/* iterator-based zbx_hashset_iter_remove(): unlike zbx_hashset_remove(), it never calls            */
+		/* compare_func() - i.e. never dereferences the now-dangling stored copy of 'h' - since the         */
+		/* iterator already knows the entry's slot directly.                                                */
+		zbx_hashset_iter_reset(&hostset, &iter);
+		if (NULL != zbx_hashset_iter_next(&iter))
+			zbx_hashset_iter_remove(&iter);
 	}
 	else if (0 == strcmp(op, "sweep"))
 	{
