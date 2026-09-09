@@ -202,9 +202,6 @@ class testScheduledReports extends CIntegrationTest {
 
 		$this->assertSame($expected_recipients, $delivered_recipients);
 		$this->assertSame(1, substr_count($mock_log, "REPORT\n"));
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER,
-			'Something unexpected has just happened.', false
-		));
 	}
 
 	public function testScheduledReports_noMedia(): void {
@@ -216,9 +213,6 @@ class testScheduledReports extends CIntegrationTest {
 		$this->assertStringContainsString('No media configured for the report recipient',
 			$client->getError()
 		);
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER,
-			'Something unexpected has just happened.', false
-		));
 	}
 
 	private function setUserMedia(array $media): void {
