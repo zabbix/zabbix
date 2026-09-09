@@ -97,9 +97,9 @@ const view = new class {
 		}
 	}
 
-	#getAllValues() {
+	#getAllValues(raw_fields = []) {
 		/** @type {Object<string, any>} */
-		let values = this.#form.getAllValues();
+		let values = this.#form.getAllValues(raw_fields);
 
 		for (const field of ['status', 'ssl_verify_peer', 'ssl_verify_host']) {
 			if (field in values) {
@@ -214,7 +214,7 @@ const view = new class {
 		e.preventDefault();
 		this.#setLoadingStatus('js-submit');
 		clearMessages();
-		const values = this.#getAllValues();
+		const values = this.#getAllValues(['password']);
 
 		this.#form.validateSubmit(values)
 			.then(result => {
