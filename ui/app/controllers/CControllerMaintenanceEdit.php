@@ -210,7 +210,7 @@ class CControllerMaintenanceEdit extends CController {
 	 * @param array $data
 	 */
 	protected function applyProblemContextPreset(array $events, array &$data): void {
-		$now = strtotime('now');
+		$now = time();
 		$default_maintenance_period = timeUnitToSeconds(CWebUser::$data['default_maintenance_period']);
 
 		$data['name'] = CMaintenanceHelper::getNextIndexedName(_s('Ad-hoc: %1$s', $events[0]['name']));
@@ -225,7 +225,7 @@ class CControllerMaintenanceEdit extends CController {
 			'day' => 0,
 			'start_time' => 0,
 			'period' => $default_maintenance_period,
-			'start_date' => strtotime('now'),
+			'start_date' => $now,
 			'formatted_type' => _('One time only'),
 			'formatted_period' => zbx_date2age(0, $default_maintenance_period)
 		];
