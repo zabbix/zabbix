@@ -177,34 +177,40 @@ class CApmTrace extends CApmGeneral {
 			array_intersect_key($options, array_flip(['countOutput', 'limit']))
 		))
 			->linkQuery($outer_query)
-			->where('t.TraceId IN ('.$outer_query->getSql().')')
-			->group('t.TraceId');
+			->where('t.TraceId IN ('.$outer_query->getSql().')');
 
-		foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
-			$query->select(match($field) {
-				'TraceId' => 't.TraceId',
-				'span_count' => 'count()',
-				'error_count' => 'countIf(t.StatusCode=\'Error\')',
-				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-			}, $field);
+		if ($options['countOutput']) {
+			$query->where('t.ParentSpanId=\'\'');
 		}
+		else {
+			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
+				$query->select(match($field) {
+					'TraceId' => 't.TraceId',
+					'span_count' => 'count()',
+					'error_count' => 'countIf(t.StatusCode=\'Error\')',
+					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
+				}, $field);
+			}
 
-		foreach ($options['sortfield'] as $i => $field) {
-			$order_by = match($field) {
-				'TraceId' => 't.TraceId',
-				'span_count' => 't.span_count',
-				'error_count' => 't.error_count',
-				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-			};
+			foreach ($options['sortfield'] as $i => $field) {
+				$order_by = match($field) {
+					'TraceId' => 't.TraceId',
+					'span_count' => 't.span_count',
+					'error_count' => 't.error_count',
+					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
+				};
 
-			$sort_order = $options['sortorder'];
-			$sort_order = match(true) {
-				is_string($sort_order) => $sort_order,
-				is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
-				default => ZBX_SORT_UP
-			};
+				$sort_order = $options['sortorder'];
+				$sort_order = match(true) {
+					is_string($sort_order) => $sort_order,
+					is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
+					default => ZBX_SORT_UP
+				};
 
-			$query->order($order_by, $sort_order);
+				$query->order($order_by, $sort_order);
+			}
+
+			$query->group('t.TraceId');
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
