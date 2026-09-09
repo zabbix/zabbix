@@ -651,6 +651,138 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 1
+		],
+		[
+			'key' => 'net.if.get',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				'config' => [
+					['name' => 'lo', 'type' => 'loopback']
+				],
+				'values' => [
+					['name' => 'lo']
+				]
+			]
+		],
+		[
+			'key' => 'net.if.get',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				'config' => [
+					['name' => 'lo', 'type' => 'loopback']
+				],
+				'values' => [
+					['name' => 'lo']
+				]
+			]
+		],
+		[
+			'key' => 'net.if.get[NONEXISTENT_INTERFACE_12345]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => '{"config":[],"values":[]}'
+		],
+		[
+			'key' => 'net.if.get[NONEXISTENT_INTERFACE_12345]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'result' => '{"config":[],"values":[]}'
+		],
+		[
+			'key' => 'net.if.get[^lo$]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				'config' => [
+					[
+						'name' => 'lo',
+						'type' => 'loopback',
+						'mac' => '00:00:00:00:00:00',
+						'administrative_state' => 'up',
+						'operational_state' => 'unknown',
+						'carrier' => 1
+					]
+				],
+				'values' => [
+					[
+						'name' => 'lo',
+						'mac' => '00:00:00:00:00:00',
+						'carrier' => 1,
+						'carrier_changes' => 0,
+						'carrier_up_count' => 0,
+						'carrier_down_count' => 0,
+						'in' => [
+							'errors' => 0,
+							'dropped' => 0,
+							'overruns' => 0,
+							'frame' => 0,
+							'compressed' => 0
+						],
+						'out' => [
+							'errors' => 0,
+							'dropped' => 0,
+							'overruns' => 0,
+							'collisions' => 0,
+							'carrier' => 0,
+							'compressed' => 0
+						]
+					]
+				]
+			]
+		],
+		[
+			'key' => 'net.if.get[^lo$]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				'config' => [
+					[
+						'name' => 'lo',
+						'type' => 'loopback',
+						'mac' => '00:00:00:00:00:00',
+						'administrative_state' => 'up',
+						'operational_state' => 'unknown',
+						'carrier' => 1
+					]
+				],
+				'values' => [
+					[
+						'name' => 'lo',
+						'mac' => '00:00:00:00:00:00',
+						'carrier' => 1,
+						'carrier_changes' => 0,
+						'carrier_up_count' => 0,
+						'carrier_down_count' => 0,
+						'in' => [
+							'errors' => 0,
+							'dropped' => 0,
+							'overruns' => 0,
+							'frame' => 0,
+							'compressed' => 0
+						],
+						'out' => [
+							'errors' => 0,
+							'dropped' => 0,
+							'overruns' => 0,
+							'collisions' => 0,
+							'carrier' => 0,
+							'compressed' => 0
+						]
+					]
+				]
+			]
 		]
 	];
 
