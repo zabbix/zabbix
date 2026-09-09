@@ -943,9 +943,9 @@ class CScript extends CApiService {
 		$db_script = $db_scripts[0];
 
 		if (!CSettingsHelper::isGlobalScriptsEnabled() && $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
-				&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
-					|| ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0
-						&& $db_hosts[0]['monitored_by'] != ZBX_MONITORED_BY_PROXY_GROUP))) {
+			&& in_array($db_script['execute_on'], [ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])
+			&& $db_hosts[0]['monitored_by'] == ZBX_MONITORED_BY_SERVER
+		) {
 			self::exception(ZBX_API_ERROR_INTERNAL,
 				_('Global script execution on Zabbix server is disabled by server configuration.')
 			);
