@@ -64,8 +64,8 @@ class CControllerMaintenanceEdit extends CController {
 				'selectTimeperiods' => ['timeperiod_type', 'every', 'month', 'dayofweek', 'day', 'start_time', 'period',
 					'start_date'
 				],
-				'editable' => true,
-				'maintenanceids' => $this->getInput('maintenanceid')
+				'maintenanceids' => $this->getInput('maintenanceid'),
+				'editable' => true
 			]);
 
 			if (!$this->maintenance) {
@@ -177,8 +177,8 @@ class CControllerMaintenanceEdit extends CController {
 			if ($this->hasInput('context') && $this->hasInput('eventids')) {
 				$db_events = API::Event()->get([
 					'output' => ['name', 'objectid'],
-					'eventids' => $this->getInput('eventids'),
-					'selectTags' => ['tag', 'value']
+					'selectTags' => ['tag', 'value'],
+					'eventids' => $this->getInput('eventids')
 				]);
 
 				if ($db_events) {
@@ -236,9 +236,9 @@ class CControllerMaintenanceEdit extends CController {
 
 		$db_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description'],
-			'triggerids' => $triggerids,
 			'selectHosts' => ['hostid', 'name'],
 			'selectHostGroups' => ['groupid'],
+			'triggerids' => $triggerids,
 			'editable' => true
 		]);
 
