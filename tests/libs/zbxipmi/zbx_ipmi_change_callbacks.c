@@ -12,9 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_control_change_cb(), zbx_sensor_change_cb(), zbx_entity_change_cb() and zbx_connection_change_cb()  */
-/* are OpenIPMI callbacks; checks_ipmi.c is included directly to reach them and the 'hostset'              */
-/* RETURN_IF_CB_DATA_INVALID(cb_data) needs.                                                                */
+/* zbx_control_change_cb(), zbx_sensor_change_cb(), zbx_entity_change_cb() and zbx_connection_change_cb()   */
+/* are OpenIPMI callbacks; checks_ipmi.c is included directly to reach them and the 'hostset'               */
+/* RETURN_IF_CB_DATA_INVALID(cb_data, h) needs.                                                             */
 /*                                                                                                          */
 /* zbx_control_change_cb()/zbx_sensor_change_cb(): IPMI_ADDED only calls                                    */
 /* zbx_allocate_ipmi_control_within_cb_only()/ zbx_allocate_ipmi_sensor_within_cb_only() (a real            */
@@ -135,7 +135,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
@@ -154,7 +154,8 @@ void	zbx_mock_test_entry(void **state)
 		c->num_values = 1;
 		c->val = (int *)zbx_malloc(NULL, sizeof(int));
 
-		zbx_control_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_control_t *)&dummy_control, h);
+		zbx_control_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_control_t *)&dummy_control,
+				ZBX_IPMI_HOST_CB_DATA(h));
 
 		zbx_mock_assert_int_eq("control_count", exp_count, h->control_count);
 
@@ -180,7 +181,8 @@ void	zbx_mock_test_entry(void **state)
 		s->sensor_id = ipmi_sensor_convert_to_id((ipmi_sensor_t *)&dummy_sensor);
 		s->full_name = zbx_strdup(NULL, "test sensor");
 
-		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor, h);
+		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor,
+				ZBX_IPMI_HOST_CB_DATA(h));
 
 		zbx_mock_assert_int_eq("sensor_count", exp_count, h->sensor_count);
 
@@ -195,7 +197,8 @@ void	zbx_mock_test_entry(void **state)
 		h->sensor_count = 0;
 		h->sensors = NULL;
 
-		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor, h);
+		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor,
+				ZBX_IPMI_HOST_CB_DATA(h));
 
 		/* the readability gate must reject the sensor before zbx_allocate_ipmi_sensor_within_cb_only() */
 		/* (a real dereference) is ever reached */
@@ -206,7 +209,8 @@ void	zbx_mock_test_entry(void **state)
 		/* skip the debug-only ipmi_entity_get_name() call - see the file header comment */
 		zbx_mock_set_log_level(LOG_LEVEL_WARNING);
 
-		zbx_entity_change_cb(op, (ipmi_domain_t *)&dummy_domain, (ipmi_entity_t *)&dummy_entity, h);
+		zbx_entity_change_cb(op, (ipmi_domain_t *)&dummy_domain, (ipmi_entity_t *)&dummy_entity,
+				ZBX_IPMI_HOST_CB_DATA(h));
 
 		zbx_mock_set_log_level(LOG_LEVEL_TRACE);
 
@@ -223,7 +227,7 @@ void	zbx_mock_test_entry(void **state)
 		entity_handler_calls = 0;
 		entity_handler_ret = zbx_mock_get_parameter_int("in.entity_handler_ret");
 
-		zbx_connection_change_cb((ipmi_domain_t *)&dummy_domain, err, 0, 0, 1, h);
+		zbx_connection_change_cb((ipmi_domain_t *)&dummy_domain, err, 0, 0, 1, ZBX_IPMI_HOST_CB_DATA(h));
 
 		zbx_mock_assert_int_eq("ipmi_domain_close() call count",
 				zbx_mock_get_parameter_int("out.domain_close_calls"), domain_close_calls);

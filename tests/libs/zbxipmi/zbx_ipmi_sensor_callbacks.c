@@ -77,7 +77,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
@@ -108,7 +108,7 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for thresh_reading: %s", scenario);
 
-		zbx_got_thresh_reading_cb(raw_sensor, err, vp, 0, 0.0, states, h);
+		zbx_got_thresh_reading_cb(raw_sensor, err, vp, 0, 0.0, states, ZBX_IPMI_HOST_CB_DATA(h));
 	}
 	else if (0 == strcmp(cb, "discrete_states"))
 	{
@@ -127,14 +127,14 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for discrete_states: %s", scenario);
 
-		zbx_got_discrete_states_cb(raw_sensor, err, states, h);
+		zbx_got_discrete_states_cb(raw_sensor, err, states, ZBX_IPMI_HOST_CB_DATA(h));
 	}
 	else if (0 == strcmp(cb, "thresholds"))
 	{
 		if (0 != strcmp(scenario, "err"))
 			fail_msg("only the 'err' scenario is covered for zbx_got_thresholds_cb() here");
 
-		zbx_got_thresholds_cb(NULL, 5, NULL, h);
+		zbx_got_thresholds_cb(NULL, 5, NULL, ZBX_IPMI_HOST_CB_DATA(h));
 	}
 	else
 		fail_msg("unknown 'in.cb' value: %s", cb);

@@ -41,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	memset(&h, 0, sizeof(h));
 	h.ip = "127.0.0.1";

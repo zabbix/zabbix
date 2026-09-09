@@ -113,7 +113,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 	zbx_vector_ptr_create(&hosts);
 
 	domain_found = (0 == strcmp(zbx_mock_get_parameter_string("in.domain_found"), "yes")) ? 1 : 0;

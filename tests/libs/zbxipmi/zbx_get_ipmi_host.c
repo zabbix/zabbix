@@ -53,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	/* two hosts are registered so a lookup can be shown to return the correctly matching struct */
 	/* (not garbage read past an undersized hashset entry, and not a neighbouring host's data)   */

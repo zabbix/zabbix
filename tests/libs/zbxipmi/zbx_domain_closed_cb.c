@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_domain_closed_cb() is static and shares the RETURN_IF_CB_DATA_INVALID(cb_data) guard used by every */
-/* OpenIPMI callback in this file; it is picked here as the representative one, being the only such       */
+/* zbx_domain_closed_cb() is static and shares the RETURN_IF_CB_DATA_INVALID(cb_data, h) guard used by    */
+/* every OpenIPMI callback in this file; it is picked here as the representative one, being the only such */
 /* callback that takes no OpenIPMI-typed arguments besides cb_data. The source file is included directly  */
 /* to reach it and the static 'hostset' it validates cb_data against (ZBX-25759 regression coverage).     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
@@ -32,12 +32,12 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	if (0 != strcmp(scenario, "null"))
 	{
 		h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
-		cb_data = h;
+		cb_data = ZBX_IPMI_HOST_CB_DATA(h);
 
 		/* "unregistered" simulates OpenIPMI delivering a callback for a host that has already been */
 		/* removed from 'hostset' (e.g. by zbx_delete_inactive_ipmi_hosts()) - the exact ZBX-25759   */

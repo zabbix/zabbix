@@ -13,7 +13,7 @@
 **/
 
 /* zbx_got_control_reading_cb() and zbx_got_control_setting_cb() are OpenIPMI callbacks; checks_ipmi.c is */
-/* included directly to reach them, alongside the 'hostset' RETURN_IF_CB_DATA_INVALID(cb_data) needs.     */
+/* included directly to reach them, alongside the 'hostset' RETURN_IF_CB_DATA_INVALID(cb_data, h) needs.  */
 /*                                                                                                          */
 /* Only branches that never touch the 'control' argument for anything but pointer-identity matching are    */
 /* covered here, so a fabricated address stands in for a real ipmi_control_t*. Deliberately out of scope:  */
@@ -60,7 +60,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
@@ -78,9 +78,9 @@ void	zbx_mock_test_entry(void **state)
 	h->ret = SUCCEED;
 
 	if (0 == strcmp(cb, "reading"))
-		zbx_got_control_reading_cb((ipmi_control_t *)&dummy_control, err, val, h);
+		zbx_got_control_reading_cb((ipmi_control_t *)&dummy_control, err, val, ZBX_IPMI_HOST_CB_DATA(h));
 	else if (0 == strcmp(cb, "setting"))
-		zbx_got_control_setting_cb((ipmi_control_t *)&dummy_control, err, h);
+		zbx_got_control_setting_cb((ipmi_control_t *)&dummy_control, err, ZBX_IPMI_HOST_CB_DATA(h));
 	else
 		fail_msg("unknown 'in.cb' value: %s", cb);
 
