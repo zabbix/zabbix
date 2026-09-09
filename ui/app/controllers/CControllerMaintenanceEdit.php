@@ -232,13 +232,11 @@ class CControllerMaintenanceEdit extends CController {
 		$data['timeperiods'][] = $timeperiod
 			+ ['formatted_schedule' => CMaintenanceHelper::getTimePeriodSchedule($timeperiod)];
 
-		$triggerids = array_column($events, 'objectid');
-
 		$db_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description'],
 			'selectHosts' => ['hostid', 'name'],
 			'selectHostGroups' => ['groupid'],
-			'triggerids' => $triggerids,
+			'triggerids' => array_column($events, 'objectid'),
 			'editable' => true
 		]);
 
