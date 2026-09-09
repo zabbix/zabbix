@@ -182,8 +182,9 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
 static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
 		zbx_timespec_t *ts, int config_timeout)
 {
-	char	*info = NULL, *ext = NULL;
-	int	ret;
+	char				*info = NULL, *ext = NULL;
+	int				ret;
+	zbx_host_authenticated_t	authenticated = ZBX_HOST_AUTHENTICATED_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -194,7 +195,7 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		info = zbx_strdup(info, "data collection is paused");
 		ret = FAIL;
 	}
-	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info)))
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info, &authenticated)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -210,15 +211,11 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		info = NULL;
 		ret = FAIL;
 	}
-	else if (AGENT_ERROR != ret)
+	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
-	if (SUCCEED == ret)
+	if (ZBX_HOST_AUTHENTICATED_SUCCESS == authenticated)
 		zbx_process_command_results(jp);
-
-	/* set response as succeed so agent will not retry with the same non-existing host */
-	if (CONFIG_ERROR == ret || NETWORK_ERROR == ret)
-		ret = SUCCEED;
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
