@@ -129,9 +129,17 @@ class ApmDb {
 			$config['password'] = $credentials['password'];
 		}
 
-		if ($config['ssl_verify_peer'] && $config['ssl_ca_file'] === '' && $config['ssl_ca_location'] === '') {
+		if ($config['ssl_verify_peer'] === true && $config['ssl_ca_file'] === '' && $config['ssl_ca_location'] === '') {
 			$config['ssl_ca_file'] = $APM_CA_FILE;
 			$config['ssl_ca_location'] = $APM_CA_LOCATION;
+		}
+
+		if (!is_bool($config['ssl_verify_peer'])) {
+			$config['ssl_verify_peer'] = $config['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
+		}
+
+		if (!is_bool($config['ssl_verify_host'])) {
+			$config['ssl_verify_host'] = $config['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED;
 		}
 
 		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
