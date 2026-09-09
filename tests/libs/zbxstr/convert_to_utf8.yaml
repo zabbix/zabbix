@@ -184,7 +184,7 @@ test case: utf32 LE bom is removed incorrect guess conversion to utf16
 # 11
 #
 # However, if encoding is not specified, we can confuse it with utf-16 LE
-# which also has \xFF\xFE at the beginning, so the the result is different:
+# which also has \xFF\xFE at the beginning, so the result is different:
 # 00 11 00
 #
 # which then reads as an empty string

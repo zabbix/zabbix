@@ -1033,7 +1033,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == value_int)
 		return FAIL;
 
-	if (0 != *value && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
+	if (0 != value_int && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
 		return FAIL;
 
 	if (*value != value_int)
@@ -6467,8 +6467,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
- *             delay - [IN] the delay in seconds                              *
+ * Parameters: seed  - [IN]                                                   *
+ *             delay - [IN] delay in seconds                                  *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *

@@ -904,7 +904,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->fill($data['filter_options']);
 		$form->submit();
-		$table = $this->getTable();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Trigger create button disabled and breadcrumbs not exist.

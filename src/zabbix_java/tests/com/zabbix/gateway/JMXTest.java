@@ -75,6 +75,7 @@ public class JMXTest {
 		{
 			ProcessBuilder pb = new ProcessBuilder(
 					"java",
+					"-Djava.rmi.server.hostname=" + HOST,
 					"-Dcom.sun.management.jmxremote=true",
 					"-Dcom.sun.management.jmxremote.port=" + PORT,
 					"-Djavax.net.ssl.keyStore=" + (useTrustStoreWithoutTargetKey ?

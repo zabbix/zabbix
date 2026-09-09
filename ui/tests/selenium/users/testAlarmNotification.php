@@ -698,7 +698,8 @@ class testAlarmNotification extends CWebTest {
 		// Get alarm color codes.
 		$alarm_colors = [];
 		foreach ($notification_color_class as $color_class) {
-			$bg_color = $alarm_dialog->query('class', $color_class)->one()->getCSSValue('background-color');
+			$bg_color = $alarm_dialog->query('class', $color_class)->waitUntilPresent()->one()
+					->getCSSValue('background-color');
 			$alarm_colors[] = $bg_color;
 		}
 

@@ -472,12 +472,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
-				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
+				error[MAX_STRING_LEN], host_metadata[MAX_BUFFER_LEN], *interface = NULL,
+				*buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, version, num = 0;
 	zbx_uint64_t		hostid, revision, agent_config_revision;
-	size_t			host_metadata_alloc = 1,	/* for at least NUL-terminated string */
-				interface_alloc = 1,		/* for at least NUL-terminated string */
+	size_t			interface_alloc = 1,		/* for at least NUL-terminated string */
 				buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
@@ -497,12 +497,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		goto error;
 	}
 
-	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
-
-	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
-			&host_metadata, &host_metadata_alloc, NULL))
+	if (NULL == zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA))
 	{
 		*host_metadata = '\0';
+	}
+	else if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA, host_metadata,
+			sizeof(host_metadata), NULL))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host metadata is too long");
+		goto error;
 	}
 
 	interface = (char *)zbx_malloc(interface, interface_alloc);
@@ -793,7 +796,6 @@ out:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_expression_destroy(&regexps);
 
-	zbx_free(host_metadata);
 	zbx_free(interface);
 	zbx_free(buffer);
 

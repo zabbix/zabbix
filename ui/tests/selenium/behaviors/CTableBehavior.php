@@ -63,7 +63,7 @@ class CTableBehavior extends CBehavior {
 			$selector = 'class:list-table';
 		}
 
-		$table = $this->test->query($selector)->asTable()->one();
+		$table = $this->test->query($selector)->waitUntilPresent()->asTable()->one();
 		if ($this->column_names !== null) {
 			$table->setColumnNames($this->column_names);
 		}

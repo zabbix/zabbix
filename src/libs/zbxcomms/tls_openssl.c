@@ -1819,14 +1819,14 @@ out1:
  *                                                                            *
  * Parameters:                                                                *
  *     s          - [IN] socket with opened connection                        *
- *     error      - [OUT] dynamically allocated memory with error message     *
- *     tls_accept - [IN] type of connection to accept. Can be be either       *
+ *     tls_accept - [IN] type of connection to accept. Can be either          *
  *                       ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or      *
  *                       a bitwise 'OR' of both.                              *
+ *     error      - [OUT] dynamically allocated memory with error message     *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
- *     FAIL - an error occurred                                               *
+ *     SUCCEED    - successful TLS handshake with a valid certificate or PSK  *
+ *     FAIL       - an error occurred                                         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)

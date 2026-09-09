@@ -44,6 +44,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$VEEAM.API.URL}|<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p>|`https://localhost:9419`|
 |{$VEEAM.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.</p>|`full`|
 |{$VEEAM.PASSWORD}|<p>The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
 |{$VEEAM.USER}|<p>The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
 |{$VEEAM.DATA.TIMEOUT}|<p>A response timeout for the API.</p>|`10`|

@@ -462,14 +462,6 @@ class testFormMaintenance extends CWebTest {
 				if ($mode === 'Create') {
 					$this->page->removeFocus();
 
-					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
-					$dialog_footer = $dialog->getFooter();
-					foreach (['Add', 'Cancel'] as $button) {
-						$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-							[$dialog_footer->query('button', $button)->one()]
-						);
-					}
-
 					if ($period_type === 'One time only') {
 						$this->assertScreenshotExcept($dialog, [$dialog->query('id:start_date')->one()], $period_type);
 					}
@@ -670,7 +662,7 @@ class testFormMaintenance extends CWebTest {
 
 			$period_form = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$period_form->asForm()->fill(['Period type' => 'Daily']);
-			$period_form->query('button:Cancel')->one()->click();
+			$period_form->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 			$period_form->waitUntilNotVisible();
 			$this->assertEquals($initial_count, $periods_table->getRows()->count());
@@ -684,7 +676,7 @@ class testFormMaintenance extends CWebTest {
 				$row->query('button:Edit')->one()->click();
 				$period_form = COverlayDialogElement::find(1)->waitUntilReady()->one();
 				$period_form->asForm()->fill(['Period type' => 'Monthly']);
-				$period_form->query('button:Cancel')->one()->click();
+				$period_form->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 				$period_form->waitUntilNotVisible();
 				$this->assertEquals($old_text, $periods_table->getRow(0)->getText());

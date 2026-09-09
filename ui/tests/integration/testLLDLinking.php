@@ -185,7 +185,7 @@ class testLldLinking extends CIntegrationTest {
 		}
 	}
 
-	private function setupAutoregToLinkTemplates($templateNumber, $LLDParametrs) {
+	private function setupAutoregToLinkTemplates($templateNumber, $lldparameters) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -222,7 +222,7 @@ class testLldLinking extends CIntegrationTest {
 
 		for ($i = 0; $i < $templateNumber; $i++) {
 			$params = array_merge(
-				$LLDParametrs,
+				$lldparameters,
 				['hostid' => self::$templateids[$i]]
 			);
 			$response = $this->call('discoveryrule.create', $params);

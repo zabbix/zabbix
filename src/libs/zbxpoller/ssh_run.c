@@ -20,6 +20,9 @@
 #include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxfile.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxdbhigh.h"
 
 #if !defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
 		!defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && !defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && \
@@ -54,8 +57,8 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 static int	ssh_parse_options(ssh_session session, const char *options, char **err_msg)
 {
 	int	ret = SUCCEED;
-	char	opt_copy[1024] = {0};
 	char	*line, *saveptr;
+	char	opt_copy[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = {0};
 
 	zbx_strscpy(opt_copy, options);
 
