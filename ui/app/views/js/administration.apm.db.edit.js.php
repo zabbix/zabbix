@@ -78,7 +78,10 @@ const view = new class {
 			this.#url_changed = true;
 
 			if (this.#password_input !== null) {
-				this.#password_cleared = this.#password_input.value.length > 0;
+				if (this.#password_input.value.length > 0) {
+					this.#password_cleared = true;
+				}
+
 				this.#password_input.value = '';
 			}
 
@@ -94,6 +97,12 @@ const view = new class {
 			this.#updateDisabledState([this.#password_input], false);
 
 			e.target.hidden = true;
+		});
+
+		this.#password_input?.addEventListener('input', () => {
+			this.#password_cleared = false;
+
+			this.#updateForm({initial_values});
 		});
 
 		for (const name of ['status', 'authentication_type', 'ssl_verify_peer']) {
@@ -164,8 +173,6 @@ const view = new class {
 
 		this.#updateDisplayState([this.#password_input], !show_change_password_btn);
 		this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
-
-		this.#password_cleared = false;
 	}
 
 	#getFormField(name) {
