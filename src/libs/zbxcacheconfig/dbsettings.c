@@ -575,7 +575,7 @@ static void	update_hk_history_overrides(const char *history_status)
 
 static void	store_apm_global_db_option_str(zbx_json_parse_t *jp, const char *name, const char **target,
 		const char *default_value, char *buf, size_t buf_size, int found, int status, zbx_uint64_t revision,
-		const char *log_name)
+		const char *log_name, int masked)
 {
 	const char	*value_str;
 
@@ -593,7 +593,16 @@ static void	store_apm_global_db_option_str(zbx_json_parse_t *jp, const char *nam
 
 	if (NULL == *target || 0 != strcmp(*target, value_str))
 	{
-		UPDATE_REVISION(revision, log_name, "%s", ZBX_NULL2STR(*target), value_str);
+		const char	*log_target = ZBX_NULL2STR(*target);
+		const char	*log_source = value_str;
+
+		if (SUCCEED == masked)
+		{
+			log_target = ZBX_STRMASK(log_target);
+			log_source = ZBX_STRMASK(log_source);
+		}
+
+		UPDATE_REVISION(revision, log_name, "%s", log_target, log_source);
 		dc_strpool_replace(found, target, value_str);
 	}
 }
@@ -650,21 +659,21 @@ static void	update_apm_global_db(const char *value_str, int found, zbx_uint64_t 
 		apm_global_db->status = status;
 	}
 
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_URL, &apm_global_db->url, "",
-			buf, sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_URL);
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_URL, &apm_global_db->url, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_URL, FAIL);
 
 	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_AUTHENTICATION_TYPE,
 			&apm_global_db->authentication_type, ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_USR_PWD, buf,
 			sizeof(buf), status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_AUTHENTICATION_TYPE);
 
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_USERNAME, &apm_global_db->username, "",
-			buf, sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_USERNAME);
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_USERNAME, &apm_global_db->username, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_USERNAME, SUCCEED);
 
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_PASSWORD, &apm_global_db->password, "",
-			buf, sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_PASSWORD);
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_PASSWORD, &apm_global_db->password, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_PASSWORD, SUCCEED);
 
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_DB, &apm_global_db->db, "",
-			buf, sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_DB);
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_DB, &apm_global_db->db, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_DB, FAIL);
 
 	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_PEER,
 			&apm_global_db->ssl_verify_peer, ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_DISABLED, buf,
