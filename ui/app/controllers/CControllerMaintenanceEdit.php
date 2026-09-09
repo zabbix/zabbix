@@ -151,7 +151,8 @@ class CControllerMaintenanceEdit extends CController {
 			]);
 
 			foreach ($db_triggers as &$trigger) {
-				$trigger['description'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
+				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
+				unset($trigger['hosts']);
 			}
 			unset($trigger);
 
@@ -164,7 +165,7 @@ class CControllerMaintenanceEdit extends CController {
 
 			CArrayHelper::sort($data['hosts_ms'], ['name']);
 			CArrayHelper::sort($data['groups_ms'], ['name']);
-			CArrayHelper::sort($data['triggers_ms'], ['name']);
+			CArrayHelper::sort($data['triggers_ms'], ['prefix', 'name']);
 		}
 		else {
 			$data += [
@@ -301,11 +302,12 @@ class CControllerMaintenanceEdit extends CController {
 				foreach ($db_triggers as $trigger) {
 					$data['triggers_ms'][$trigger['triggerid']] = [
 						'id' => $trigger['triggerid'],
-						'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
+						'prefix' => $trigger['hosts'][0]['name'].NAME_DELIMITER,
+						'name' => $trigger['description']
 					];
 				}
 
-				CArrayHelper::sort($data['triggers_ms'], ['name']);
+				CArrayHelper::sort($data['triggers_ms'], ['prefix', 'name']);
 				break;
 
 			case 'event_name':
