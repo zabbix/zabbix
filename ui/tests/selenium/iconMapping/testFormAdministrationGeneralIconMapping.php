@@ -743,11 +743,11 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		// Activate inline validation error.
-		$this->query('id:iconmap')->one()->asForm()->getField('Default icon')->click();
+		$form = $this->query('id:iconmap')->asForm()->one();
+		$form->submit();
 
 		// Check the results in frontend.
-		$this->assertInlineError($this->query('id:iconmap')->asForm()->one(), $data['error']);
+		$this->assertInlineError($form, $data['error']);
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 

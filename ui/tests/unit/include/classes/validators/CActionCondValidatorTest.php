@@ -51,6 +51,10 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => ['1']
 			]],
 			[[], [
+				'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+				'value' => ['1']
+			]],
+			[[], [
 				'conditiontype' => ZBX_CONDITION_TYPE_DOBJECT,
 				'value' => EVENT_OBJECT_DHOST
 			]],
@@ -201,6 +205,13 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
+					'value' => ''
+				],
+				'Incorrect value for field "value": cannot be empty.'
+			],
+			[[],
+				[
+					'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'

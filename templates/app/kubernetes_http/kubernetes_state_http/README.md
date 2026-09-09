@@ -118,6 +118,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
 |{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Kubernetes cluster state", e.g. {$HTTP.TLS.VERIFY:"Kubernetes cluster state"}.</p>|`full`|
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Endpoint name for kube-state-metrics service (check with `kubectl get ep -n monitoring -owide`).</p>|`zabbix-kube-state-metrics`|
 |{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|

@@ -188,7 +188,8 @@ class testServiceRoles extends CIntegrationTest {
 			"type" => USER_TYPE_ZABBIX_USER,
 			"rules" => [
 				'services.read.mode' => 0,
-				'services.write.mode' => 0
+				'services.write.mode' => 0,
+				'api.access' => ZBX_ROLE_RULE_ENABLED
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $response['result']);

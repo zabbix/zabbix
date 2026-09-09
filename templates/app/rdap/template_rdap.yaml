@@ -28,7 +28,7 @@ zabbix_export:
         * Accepts seconds or time unit with suffix (e.g., 30s, 1m, 2h, 1d) and, optionally, one or more custom intervals, all separated by semicolons.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -40,6 +40,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             var RDAP = {
             	params: {},
@@ -47,6 +72,7 @@ zabbix_export:
             	services: [],
             
             	setParams: function (params) {
+            		RDAP.tls = new CTlsConfig(params.tls_verify);
             		RDAP.params['proxy'] = params.proxy;
             		RDAP.getServiceUrls();
             		['domains', 'enable_additional_info'].forEach(function (field) {
@@ -78,7 +104,7 @@ zabbix_export:
             	},
             
             	getServiceUrls: function () {
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(RDAP.tls.options);
             
             		if (typeof RDAP.params.proxy !== 'undefined' && RDAP.params.proxy !== '') {
             			request.setProxy(RDAP.params.proxy);
@@ -176,6 +202,8 @@ zabbix_export:
               value: '{$RDAP.DOMAINS}'
             - name: enable_additional_info
               value: '{$RDAP.LLD.ADDITIONAL.INFO.ENABLED}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Domain RDAP"}'
           tags:
             - tag: component
               value: raw
@@ -796,11 +824,27 @@ zabbix_export:
         - tag: target
           value: rdap
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Domain RDAP", e.g. {$HTTP.TLS.VERIFY:"Domain RDAP"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$RDAP.DOMAINS}'
           description: 'List of domains separated by commas.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: Domains
             description: 'List of domains to monitor, separated by commas.'
             required: 'YES'
@@ -809,7 +853,7 @@ zabbix_export:
           description: 'Number of days before expiration to trigger a warning.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'Expiration warning days'
             description: 'Number of days before a domain''s expiration date to trigger a warning.'
             regex: ^\d+$
@@ -818,7 +862,7 @@ zabbix_export:
           description: 'Interval for checking domain registration data.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'Check interval for domain registration data'
             description: |
               Interval for checking domain registration data using RDAP.
@@ -830,7 +874,7 @@ zabbix_export:
           description: 'Interval for checking TLD registration data.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'Check interval for TLD registration data'
             description: |
               Interval for checking TLD registration data using RDAP.
@@ -842,7 +886,7 @@ zabbix_export:
           description: 'Enable discovery additional information in LLD (1 - enabled, 0 - disabled).'
           config:
             type: CHECKBOX
-            priority: '2'
+            priority: '3'
             label: 'Enable additional info discovery'
             description: 'Enable discovery of additional information such as notices and entities in low-level discovery (LLD).'
             options:
@@ -853,7 +897,7 @@ zabbix_export:
           description: 'Number of days after last update to trigger a warning.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Not updated warning days'
             description: 'Number of days after the last update of RDAP data to trigger a warning.'
             regex: ^\d+$

@@ -77,19 +77,17 @@ $form_list
 				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
-			->addClass(ZBX_STYLE_HOR_LIST)
+			->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Suppress'),
 			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
 		], 'suppress_problem'),
 		(new CList([
-			(new CListItem(
-				(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
-					->addClass('js-operation-checkbox')
-					->setChecked($data['suppress_problem'])
-					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addClass(ZBX_STYLE_ALIGN_TOP),
+			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
+				->addClass('js-operation-checkbox')
+				->setChecked($data['suppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed']),
 			(new CListItem(
 				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
 					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
@@ -102,7 +100,7 @@ $form_list
 				->setPlaceholder(_($data['suppress_until_problem']))
 				->setAriaRequired()
 				->setEnabled(false)
-		]))->addClass(ZBX_STYLE_HOR_LIST)
+		]))->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))], 'unsuppress_problem'),

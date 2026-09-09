@@ -33,7 +33,7 @@ zabbix_export:
         tested_on: Claude API
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -73,6 +73,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -88,6 +113,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -116,7 +144,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -178,6 +206,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -217,6 +247,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -232,6 +287,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -260,7 +318,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -318,6 +376,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -357,6 +417,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -372,6 +457,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -400,7 +488,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -458,6 +546,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -497,6 +587,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -512,6 +627,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -540,7 +658,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -687,6 +805,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -726,6 +846,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -741,6 +886,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -769,7 +917,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -828,6 +976,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -867,6 +1017,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -882,6 +1057,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -910,7 +1088,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -1002,6 +1180,8 @@ zabbix_export:
               value: '{$CLAUDE.API.MSG.USAGE.BUCKET}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -1121,6 +1301,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -1136,6 +1341,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -1164,7 +1372,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -1222,6 +1430,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -1320,6 +1530,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ClaudeAPI = {
             	params: {},
             
@@ -1335,6 +1570,9 @@ zabbix_export:
             		if (typeof ClaudeAPI.params.api_url === 'string' && !ClaudeAPI.params.api_url.endsWith('/')) {
             			ClaudeAPI.params.api_url += '/';
             		}
+            
+            		ClaudeAPI.tls = new CTlsConfig(params.tls_verify);
+            		ClaudeAPI.tls.checkURL(ClaudeAPI.params.api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -1363,7 +1601,7 @@ zabbix_export:
             
             	apiRequest: function (endpoint, params) {
             		var response = [],
-            			request = new HttpRequest(),
+            			request = new HttpRequest(ClaudeAPI.tls.options),
             			has_more = true,
             			next_page = '',
             			separator = params ? '&' : '?',
@@ -1426,6 +1664,8 @@ zabbix_export:
               value: '{$CLAUDE.API.URL}'
             - name: http_proxy
               value: '{$CLAUDE.API.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Claude API"}'
           tags:
             - tag: component
               value: raw
@@ -2739,7 +2979,7 @@ zabbix_export:
           description: 'Warning threshold for estimated Claude Code usage cost.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Code usage costs warning'
             description: 'Code usage costs warning threshold. No less than 0.'
@@ -2766,7 +3006,7 @@ zabbix_export:
           description: 'Number of hours before invite expiration.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Invite expiration alert'
             description: 'Number of hours before invite expiration.'
@@ -2776,7 +3016,7 @@ zabbix_export:
           description: 'Filter to include invites by regex.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filter
             label: 'Invites to include'
             description: 'Filter to include invites by regex.'
@@ -2785,7 +3025,7 @@ zabbix_export:
           description: 'Filter to exclude invites by regex.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filter
             label: 'Invites to exclude'
             description: 'Filter to exclude invites by regex.'
@@ -2794,7 +3034,7 @@ zabbix_export:
           description: 'Filter to include API keys by regex.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filter
             label: 'API keys to include'
             description: 'Filter to include API keys by regex.'
@@ -2803,7 +3043,7 @@ zabbix_export:
           description: 'Filter to exclude API keys by regex.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filter
             label: 'API keys to exclude'
             description: 'Filter to exclude API keys by regex.'
@@ -2812,7 +3052,7 @@ zabbix_export:
           description: 'Warning threshold for previous day expenses. Supports macro context for per-workspace threshold tuning.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Model expenses warning'
             description: 'Model expenses warning threshold. No less than 0.'
@@ -2822,7 +3062,7 @@ zabbix_export:
           description: 'Filter to include model by regex.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filter
             label: 'Models to include'
             description: 'Filter to include model by regex.'
@@ -2831,7 +3071,7 @@ zabbix_export:
           description: 'Filter to exclude model by regex.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filter
             label: 'Models to exclude'
             description: 'Filter to exclude model by regex.'
@@ -2840,7 +3080,7 @@ zabbix_export:
           description: 'Time period and gathering interval for Claude API message usage report data.'
           config:
             type: LIST
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'Usage report time period and gathering interval'
             description: 'Time period and gathering interval for Claude API message usage report data.'
@@ -2880,7 +3120,7 @@ zabbix_export:
           description: 'Warning threshold for previous day expenses. Supports macro context for per-workspace threshold tuning.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Workspace expenses warning'
             description: 'Workspace expenses warning threshold. No less than 0.'
@@ -2890,7 +3130,7 @@ zabbix_export:
           description: 'Filter to include workspaces by regex.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filter
             label: 'Workspaces to include'
             description: 'Filter to include workspaces by regex.'
@@ -2899,10 +3139,26 @@ zabbix_export:
           description: 'Filter to exclude workspaces by regex.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filter
             label: 'Workspaces to exclude'
             description: 'Filter to exclude workspaces by regex.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Claude API", e.g. {$HTTP.TLS.VERIFY:"Claude API"}.'
+          config:
+            type: LIST
+            priority: '6'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: b83547edc74043b6a76c8379b89cb50a
           name: 'Claude API dashboard'

@@ -65,7 +65,7 @@ zabbix_export:
         You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the field `Replica Mismatch Evaluation Period`, which supports context and regular expressions.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -716,6 +716,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   var nodes = JSON.parse(value),
                   	Kube = {
                   	params: {
@@ -723,6 +748,8 @@ zabbix_export:
                   		api_token: '{$KUBE.API.TOKEN}',
                   		api_url: '{$KUBE.API.URL}'
                   	},
+                  
+                  	tls: new CTlsConfig('{{$HTTP.TLS.VERIFY:"Kubernetes Cluster"}.regsub("^(none|peer|full)$", "\1")}'),
                   
                   	setParams: function (params) {
                   		['api_url', 'api_token'].forEach(function (field) {
@@ -735,6 +762,8 @@ zabbix_export:
                   		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
                   			Kube.params.api_url += '/';
                   		}
+                  
+                  		Kube.tls.checkURL(Kube.params.api_url);
                   	},
                   
                   	clearData: function (value) {
@@ -770,7 +799,7 @@ zabbix_export:
                   
                   	getCadvisorMetrics: function () {
                   		var result = '',
-                  			request = new HttpRequest(),
+                  			request = new HttpRequest(Kube.tls.options),
                   			response;
                   		request.addHeader('Content-Type: application/json');
                   		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
@@ -859,6 +888,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Kube = {
             	params: {},
             
@@ -874,10 +928,13 @@ zabbix_export:
             		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
             			Kube.params.api_url += '/';
             		}
+            
+            		Kube.tls = new CTlsConfig(params.tls_verify);
+            		Kube.tls.checkURL(Kube.params.api_url);
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(Kube.tls.options),
             			response,
             			url = encodeURI(Kube.params.api_url + query);
             
@@ -981,7 +1038,7 @@ zabbix_export:
             	getStateMetrics: function () {
             		var metrics_endpoint = Kube.getMetricsEndpoint(),
             			IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
-            			request = new HttpRequest(),
+            			request = new HttpRequest(Kube.tls.options),
             			response;
             
             		request.addHeader('Content-Type: application/json');
@@ -1030,6 +1087,8 @@ zabbix_export:
               value: '{$KUBE.API.URL}'
             - name: http_proxy
               value: '{$KUBE.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Kubernetes Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -2340,6 +2399,22 @@ zabbix_export:
         - tag: target
           value: kubernetes
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Kubernetes Cluster", e.g. {$HTTP.TLS.VERIFY:"Kubernetes Cluster"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$KUBE.API.TOKEN}'
           type: SECRET_TEXT
           description: 'Service account bearer token.'
@@ -2363,7 +2438,7 @@ zabbix_export:
           description: 'The threshold of CPU usage in percent.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'Critical CPU usage threshold'
             description: 'Set the CPU usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -2373,7 +2448,7 @@ zabbix_export:
           description: 'The threshold of CPU usage in percent.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Warning CPU usage threshold'
             description: 'Set the CPU usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -2383,7 +2458,7 @@ zabbix_export:
           description: 'The threshold of memory usage in percent.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'Critical memory usage threshold'
             description: 'Set the memory usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -2393,7 +2468,7 @@ zabbix_export:
           description: 'The threshold of memory usage in percent.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
             description: 'Set the memory usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -2403,7 +2478,7 @@ zabbix_export:
           description: 'The number of failed pods used in triggers.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Other
             label: 'Number of failed pods'
             description: 'The number of failed pods used in triggers.'
@@ -2413,7 +2488,7 @@ zabbix_export:
           description: 'The number of pending pods used in triggers.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Other
             label: 'Number of pending pods'
             description: 'The number of pending pods used in triggers.'
@@ -2431,7 +2506,7 @@ zabbix_export:
           description: 'Filter of discoverable metrics by namespace.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Namespace matches filter'
             description: 'A regex to filter discoverable metrics by namespace.'
@@ -2440,7 +2515,7 @@ zabbix_export:
           description: 'Filter to exclude discovered metrics by namespace.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Namespace exclude filter'
             description: 'A regex to exclude discovered metrics by namespace.'
@@ -2449,7 +2524,7 @@ zabbix_export:
           description: 'Filter of discoverable nodes by nodename.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Node matches filter'
             description: 'A regex to filter discoverable nodes by nodename.'
@@ -2458,7 +2533,7 @@ zabbix_export:
           description: 'Filter to exclude discovered nodes by nodename.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Node exclude filter'
             description: 'A regex to exclude discovered nodes by nodename.'
@@ -2467,7 +2542,7 @@ zabbix_export:
           description: 'Filter of discoverable persistent volumes by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Persistent volume matches filter'
             description: 'A regex to filter discoverable persistent volumes by name.'
@@ -2476,7 +2551,7 @@ zabbix_export:
           description: 'Filter to exclude discovered persistent volumes by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Persistent volume exclude filter'
             description: 'A regex to exclude discovered persistent volumes by name.'
@@ -2485,7 +2560,7 @@ zabbix_export:
           description: 'The number of pending pods used in triggers.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Other
             label: 'Number of pending pods in namespace'
             description: 'The number of pending pods used in triggers.'
@@ -2495,7 +2570,7 @@ zabbix_export:
           description: 'Kubernetes prometheus-node-exporter metrics endpoint port.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Prometheus Node Exporter port'
             description: 'Default port for Kubernetes prometheus-node-exporter metrics endpoint (9100). Change if your node-exporter runs on a different port. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -2504,7 +2579,7 @@ zabbix_export:
           description: 'The number of nodes in the cluster used in triggers.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Other
             label: 'Number of nodes'
             description: 'The number of nodes in the cluster used in triggers.'
@@ -2514,7 +2589,7 @@ zabbix_export:
           description: 'The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Other
             label: 'Replica mismatch evaluation period'
             description: 'The evaluation period range for trigger prototype calculations.'

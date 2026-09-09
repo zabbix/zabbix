@@ -44,6 +44,9 @@ Install Zabbix agent on the AIX OS according to Zabbix documentation.
 |{$VFS.FS.INODE.PFREE.MIN.WARN}|<p>The warning threshold of the filesystem metadata utilization.</p>|`20`|
 |{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
 |{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
+|{$AIX.VFS.DEV.NAME.MATCHES}|<p>Block devices to include in discovery.</p>|`^hdisk[0-9]+$`|
+|{$AIX.VFS.DEV.NAME.NOT_MATCHES}|<p>Block devices to exclude from discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$AIX.VFS.DEV.IO.WARN}|<p>Warning threshold for disk I/O time in seconds.</p>|`0.9`|
 
 ### Items
 
@@ -72,6 +75,7 @@ Install Zabbix agent on the AIX OS according to Zabbix documentation.
 |Kernel thread context switches||Zabbix agent|system.stat[faults,cs]|
 |Device interrupts||Zabbix agent|system.stat[faults,in]|
 |System calls||Zabbix agent|system.stat[faults,sy]|
+|Block devices: Get data|<p>Retrieves block device configuration and I/O statistics for discovery and dependent items.</p>|Zabbix agent|vfs.dev.get[disk_stats,.*]|
 |Length of the swap queue||Zabbix agent|system.stat[kthr,b]|
 |Length of the run queue||Zabbix agent|system.stat[kthr,r]|
 |Active virtual pages||Zabbix agent|system.stat[memory,avm]|
@@ -150,6 +154,29 @@ Install Zabbix agent on the AIX OS according to Zabbix documentation.
 |AIX: FS [{#FSNAME}]: Running out of free inodes|<p>Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.</p>|`min(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}`|Warning|**Depends on**:<br><ul><li>AIX: FS [{#FSNAME}]: Running out of free inodes</li></ul>|
 |AIX: FS [{#FSNAME}]: Space is critically low|<p>The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%` limit.<br>The trigger expression is based on the current used and maximum available spaces.<br>Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.</p>|`min(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`|Average|**Manual close**: Yes|
 |AIX: FS [{#FSNAME}]: Space is low|<p>The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%` limit.<br>The trigger expression is based on the current used and maximum available spaces.<br>Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.</p>|`min(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>AIX: FS [{#FSNAME}]: Space is critically low</li></ul>|
+
+### LLD rule Block devices discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Block devices discovery|<p>Discovers AIX block devices from vfs.dev.get.</p>|Dependent item|vfs.dev.dependent.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.config`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Block devices discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Disk [{#DEVNAME}]: Block device size|<p>Total size of the block device.</p>|Dependent item|vfs.dev.disk.size[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.config[?(@.name == '{#DEVNAME}')].size_bytes.first()`</p></li></ul>|
+|Disk [{#DEVNAME}]: Read rate|<p>Read operations completed per second.</p>|Dependent item|vfs.dev.disk.read[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Disk [{#DEVNAME}]: Write rate|<p>Write operations completed per second.</p>|Dependent item|vfs.dev.disk.write[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Disk [{#DEVNAME}]: Read bytes rate|<p>Number of bytes read per second.</p>|Dependent item|vfs.dev.disk.read.rate[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.values[?(@.name == '{#DEVNAME}')].stats.bytes_read.first()`</p></li><li>Change per second</li></ul>|
+|Disk [{#DEVNAME}]: Write bytes rate|<p>Number of bytes written per second.</p>|Dependent item|vfs.dev.disk.write.rate[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Disk [{#DEVNAME}]: I/O time|<p>Time spent doing I/O.</p>|Dependent item|vfs.dev.disk.io.time[{#DEVNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.values[?(@.name == '{#DEVNAME}')].stats.io_time_ms.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li><li>Change per second</li></ul>|
+
+### Trigger prototypes for Block devices discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AIX: Disk [{#DEVNAME}]: High I/O time|<p>Disk I/O time has been above {$AIX.VFS.DEV.IO.WARN} for 5 minutes.</p>|`min(/AIX by Zabbix agent/vfs.dev.disk.io.time[{#DEVNAME}],5m)>{$AIX.VFS.DEV.IO.WARN}`|Warning||
 
 ## Feedback
 

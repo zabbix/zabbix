@@ -14,6 +14,7 @@
 package resultcache
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -659,18 +660,18 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 		return
 	}
 
-	rows, err := c.database.Query(fmt.Sprintf("SELECT "+
-		"id FROM registry WHERE address = '%s' AND hostname = '%s'", c.uploader.Addr(), c.uploader.Hostname()))
-
-	if err == nil {
-		defer rows.Close()
-
-		for rows.Next() {
-			if err = rows.Scan(&c.serverID); err != nil {
-				c.Errf("cannot retrieve diskcache server ID ")
-				c.serverID = 0
-			}
+	err = c.database.QueryRowContext(
+		context.Background(),
+		"SELECT id FROM registry WHERE address = ? AND hostname = ?",
+		c.uploader.Addr(),
+		c.uploader.Hostname(),
+	).Scan(&c.serverID)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			c.Errf("cannot retrieve disk cache server ID: %s", err)
 		}
+
+		c.serverID = 0
 	}
 
 	/* log history is removed before disk cache is initialized, so only data history needs to be checked */

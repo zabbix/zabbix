@@ -1082,7 +1082,7 @@ function makeInformationList($info_icons) {
  * @param string     $description  Description of the maintenance.
  */
 function makeMaintenanceIcon($type, string $name, string $description): CButtonIcon {
-	$hint = $name.' ['.($type
+	$hint = $name.' ['.($type == MAINTENANCE_TYPE_NODATA
 		? _('Maintenance without data collection')
 		: _('Maintenance with data collection')).']';
 
