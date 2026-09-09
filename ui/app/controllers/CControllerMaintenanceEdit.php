@@ -244,7 +244,7 @@ class CControllerMaintenanceEdit extends CController {
 		foreach ($db_triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
 				if (!in_array($host['hostid'], $hostids)) {
-					$hostids[] = $host['hostid'];
+					$hostids[$host['hostid']] = true;
 				}
 			}
 		}
@@ -252,7 +252,7 @@ class CControllerMaintenanceEdit extends CController {
 		$db_hosts = $hostids
 			? API::Host()->get([
 				'output' => ['hostid', 'name'],
-				'hostids' => $hostids,
+				'hostids' => array_keys($hostids),
 				'editable' => true,
 			])
 			: [];
@@ -260,7 +260,7 @@ class CControllerMaintenanceEdit extends CController {
 		$groups = $hostids
 			? API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'hostids' => $hostids,
+				'hostids' => array_keys($hostids),
 				'preservekeys' => true
 			])
 			: [];
