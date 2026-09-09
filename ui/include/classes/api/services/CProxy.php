@@ -498,7 +498,7 @@ class CProxy extends CApiService {
 					$proxy['apm'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 				);
 
-				if ($upd_apm !== false && strlen($upd_apm) > DB::getFieldLength('proxy', 'apm')) {
+				if (strlen($upd_apm) > DB::getFieldLength('proxy', 'apm')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/apm', _('value is too long')
 					));
