@@ -99,21 +99,25 @@
 				.setColumns([
 					new CDataTableColumn('metric_name', <?= json_encode(_('Metric name')); ?>)
 						.setFields(['metric_name'])
+						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type'])
+						.setRenderer('type')
 						.setWidth('auto'),
-					new CDataTableColumn('unit', <?= json_encode(_('Unit')); ?>)
-						.setFields(['unit'])
+					new CDataTableColumn('metric_unit', <?= json_encode(_('Unit')); ?>)
+						.setFields(['metric_unit'])
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name'])
 						.setWidth('auto'),
-					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
-						.setFields(['start_time'])
+					new CDataTableColumn('start_time_unix', <?= json_encode(_('Start time')); ?>)
+						.setFields(['start_time_unix'])
+						.setSortable(true)
+						.setRenderer('start_time_unix')
 						.setWidth('auto'),
-					new CDataTableColumn('sum_value', <?= json_encode(_('Sum/Value')); ?>)
-						.setFields(['sum_value'])
+					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
+						.setFields(['value'])
 						.setWidth('auto'),
 					new CDataTableColumn('count', <?= json_encode(_('Count')); ?>)
 						.setFields(['count'])
@@ -125,7 +129,35 @@
 				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
+				.setStickyHeader(true)
+				.setStickyFooter(true)
 				.setStorageIdx(storage_idx)
+				.setCellRenderer('start_time_unix', ({cell, cell_data}) => {
+					const [start_time_unix] = cell_data;
+
+					/** @type {HTMLDivElement} */
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
+					wordbreak.style.setProperty('--line-clamp', '2');
+					wordbreak.textContent = start_time_unix;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('type', ({cell, cell_data}) => {
+					const [type] = cell_data;
+
+					const types = <?= json_encode(CApmMetricHelper::getTypes()) ?>;
+
+					const content = types[type].label;
+
+					/** @type {HTMLDivElement} */
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
+					wordbreak.style.setProperty('--line-clamp', '2');
+					wordbreak.textContent = content;
+
+					cell.appendChild(wordbreak);
+				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
 

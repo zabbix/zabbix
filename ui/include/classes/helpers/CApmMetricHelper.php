@@ -32,7 +32,7 @@ class CApmMetricHelper {
 		$types = [];
 
 		foreach (range($min, $max) as $type) {
-			$types[] = [
+			$types[$type] = [
 				'label' => self::getName($type),
 				'value' => $type
 			];

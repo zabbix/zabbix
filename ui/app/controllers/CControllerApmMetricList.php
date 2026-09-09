@@ -34,7 +34,7 @@ class CControllerApmMetricList extends CController {
 			'filter_attributes' =>		'array',
 			'from' =>					'range_time',
 			'to' =>						'range_time',
-			'sort' =>					'in metric_name',
+			'sort' =>					'in metric_name,start_time_unix', // TODO: start_time_unix should be supported for sorting in API
 			'sortorder' =>				'in '.ZBX_SORT_UP,
 			'page' =>					'ge 1',
 			'filter_name' =>			'string',

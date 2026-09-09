@@ -16,16 +16,50 @@
 
 class CControllerApmMetricListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['metric_name', 'type', 'unit', 'service_name', 'start_time', 'sum_value',
-		'count'];
+	protected array $allowed_data_fields = ['metric_name', 'type', 'metric_unit', 'service_name', 'start_time_unix',
+		'value', 'count'
+	];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_APM_METRICS);
 	}
 
-	protected function getData(): array
-	{
+	protected function getData(): array {
+		$page = $this->getInput('page', 1);
+		$filter = $this->getInput('filter', []);
+
+		$sort_field = $this->getInput('sort_field', 'metric_name');
+		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
+
+		CProfile::update('web.apm.metric.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.metric.sortorder', $sort_order, PROFILE_TYPE_STR);
+
+		$timeline = getTimeSelectorPeriod([
+			'profileIdx' => 'web.apm.metric.filter',
+			'profileIdx2' => 0,
+			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+		]);
+
+		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
+		$metrics = API::ApmMetric()->get([
+			'output' => $this->getDataFields(),
+			'types' => array_key_exists('types', $filter) && $filter['types'] ? $filter['types'] : null,
+			'time_from' => $timeline['from_ts'],
+			'time_till' => $timeline['to_ts'],
+			'sortfield' => $this->getInput('sort_field', 'metric_name'),
+			'sortorder' => $sort_order,
+			'limit' => $limit
+		]);
+
 		$rows = [];
+
+		if ($metrics) {
+			$this->paging = $this->paginate($metrics, $page, $sort_order);
+
+			$rows = array_values(array_map(static fn (array $metric) => [['renderer' => 'trace'], $metric], $metrics));
+		}
 
 		$output = [
 			'data_fields' => $this->getDataFields(),
