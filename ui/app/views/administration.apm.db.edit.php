@@ -29,7 +29,7 @@ $apm_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel([
 			_('Enable global data source'),
-			makeHelpIcon(_('The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overriden in the respective configuration files.'))
+			makeHelpIcon(_('The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overridden in the respective configuration files.'))
 		], 'status')),
 		new CFormField(
 			(new CCheckBox('status'))
