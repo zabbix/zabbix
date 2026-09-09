@@ -22,6 +22,8 @@
 #define PIPE_BUFFER_SIZE	4096
 
 #ifdef _WINDOWS
+/* the size of Windows pipe used to read command output */
+#define ZBX_EXEC_PIPE_SIZE	(64 * ZBX_KIBIBYTE)
 
 /******************************************************************************
  *                                                                            *
@@ -55,15 +57,18 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  *             buf_size      - [IN] buffer size                               *
  *             offset        - [IN/OUT] current position in the buffer        *
  *             timeout_ms    - [IN] timeout in milliseconds                   *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset,
+			int timeout_ms, char *error, size_t max_error_len)
 {
-	DWORD		in_buf_size, read_bytes;
+	DWORD		in_buf_size = 0, read_bytes = 0;
 	struct _timeb	start_time, current_time;
-	char 		tmp_buf[PIPE_BUFFER_SIZE];
+	char 		tmp_buf[ZBX_EXEC_PIPE_SIZE];
 
 	_ftime(&start_time);
 
@@ -75,25 +80,28 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
+			zbx_snprintf(error, max_error_len, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			*error = (char)toupper((unsigned char)*error);
+
 			return FAIL;
 		}
 
 		if (0 != in_buf_size)
 		{
-			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
+			DWORD	to_read = MIN(in_buf_size, (DWORD)sizeof(tmp_buf));
+
+			if (0 == ReadFile(hRead, tmp_buf, to_read, &read_bytes, NULL))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
+				zbx_snprintf(error, max_error_len, "cannot read command output: %s",
 						zbx_strerror_from_system(GetLastError()));
+				zabbix_log(LOG_LEVEL_ERR, "%s", error);
 				return FAIL;
 			}
 
 			if (NULL != buf)
-			{
-				tmp_buf[read_bytes] = '\0';
-				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
-			}
+				zbx_str_memcpy_alloc(buf, buf_size, offset, tmp_buf, read_bytes);
 
 			in_buf_size = 0;
 			continue;
@@ -341,7 +349,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	sa.lpSecurityDescriptor = NULL;
 
 	/* create a pipe for the child process's STDOUT */
-	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
+	if (0 == CreatePipe(&hRead, &hWrite, &sa, ZBX_EXEC_PIPE_SIZE))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create a pipe: %s",
 				zbx_strerror_from_system(GetLastError()));
@@ -407,9 +415,9 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout);
+	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout, error, max_error_len);
 
-	if (TIMEOUT_ERROR != ret)
+	if (SUCCEED == ret)
 	{
 		_ftime(&current_time);
 		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
@@ -515,8 +523,10 @@ close:
 		}
 		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
+			zbx_snprintf(error, max_error_len, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			*error = (char)toupper((unsigned char)*error);
 		}
 		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{

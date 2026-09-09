@@ -811,11 +811,13 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [[
-						'id' => $item['valuemap']['valuemapid'],
-						'prefix' => $item['valuemap']['prefix'] ?? '',
-						'name' => $item['valuemap']['name']
-					]]
+					? [
+						[
+							'id' => $item['valuemap']['valuemapid'],
+							'prefix' => $item['valuemap']['prefix'] ?? '',
+							'name' => $item['valuemap']['name']
+						] + (array_key_exists('inaccessible', $item['valuemap']) ? ['inaccessible' => true] : [])
+					]
 					: [],
 				'popup' => [
 					'parameters' => [

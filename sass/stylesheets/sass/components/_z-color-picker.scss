@@ -256,7 +256,7 @@ z-color-picker {
 
 // Modifications by themes.
 
-@if $theme-name == 'blue' or $theme-name == 'dark' {
+@if $theme-name == 'blue' or $theme-name == 'dark' or $theme-name == 'dark-blue' {
 	z-color-picker {
 		&[readonly] {
 			.color-picker-box {
