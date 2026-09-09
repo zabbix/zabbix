@@ -494,7 +494,9 @@ class CProxy extends CApiService {
 			$proxy['apm'] = array_merge(self::APM_SCHEMA, $proxy['apm']);
 
 			if ($db_proxy === null || $proxy['apm'] != $db_proxy['apm']) {
-				$upd_apm = json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE);
+				$upd_apm = json_encode(
+					$proxy['apm'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+				);
 
 				if ($upd_apm !== false && strlen($upd_apm) > DB::getFieldLength('proxy', 'apm')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
