@@ -12,11 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* Same rationale as zbx_ipmi_sensor_lookup.c, for the zbx_ipmi_control_t side: zbx_get_ipmi_control(),    */
-/* zbx_get_ipmi_control_by_name(), zbx_get_ipmi_control_by_full_name() and zbx_delete_ipmi_control() only  */
-/* ever scan h->controls[] by ID identity (ipmi_cmp_control_id(), a plain value comparison) or string      */
-/* comparison. ipmi_control_convert_to_id() is wrapped to echo the fabricated pointer back into the ID,    */
-/* preserving pointer-identity semantics without dereferencing it - see zbx_ipmi_sensor_lookup.c.          */
+/* Same rationale as zbx_ipmi_sensor_lookup.c, for the zbx_ipmi_control_t side:                             */
+/* zbx_get_ipmi_control_within_cb_only(), zbx_get_ipmi_control_by_name(),                                   */
+/* zbx_get_ipmi_control_by_full_name() and zbx_delete_ipmi_control_within_cb_only() only ever scan          */
+/* h->controls[] by ID identity (ipmi_cmp_control_id(), a plain value comparison) or string comparison.     */
+/* ipmi_control_convert_to_id() is wrapped to echo the fabricated pointer back into the ID, preserving      */
+/* pointer-identity semantics without dereferencing it - see zbx_ipmi_sensor_lookup.c.                      */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -93,11 +94,18 @@ void	zbx_mock_test_entry(void **state)
 	add_control(&h, (ipmi_control_t *)&dummy_b, "ctrl-b", "Control B");
 
 	if (0 == strcmp(func, "by_pointer"))
-		c = zbx_get_ipmi_control(&h, control_by_name(zbx_mock_get_parameter_string("in.lookup")));
+	{
+		c = zbx_get_ipmi_control_within_cb_only(&h,
+				control_by_name(zbx_mock_get_parameter_string("in.lookup")));
+	}
 	else if (0 == strcmp(func, "by_name"))
+	{
 		c = zbx_get_ipmi_control_by_name(&h, zbx_mock_get_parameter_string("in.lookup"));
+	}
 	else if (0 == strcmp(func, "by_full_name"))
+	{
 		c = zbx_get_ipmi_control_by_full_name(&h, zbx_mock_get_parameter_string("in.lookup"));
+	}
 	else if (0 == strcmp(func, "delete"))
 	{
 		int	exp_count = zbx_mock_get_parameter_int("out.control_count");
@@ -107,7 +115,7 @@ void	zbx_mock_test_entry(void **state)
 		if (0 == strcmp(zbx_mock_get_parameter_string("in.three_controls"), "yes"))
 			add_control(&h, (ipmi_control_t *)&dummy_d, "ctrl-d", "Control D");
 
-		zbx_delete_ipmi_control(&h, control_by_name(zbx_mock_get_parameter_string("in.lookup")));
+		zbx_delete_ipmi_control_within_cb_only(&h, control_by_name(zbx_mock_get_parameter_string("in.lookup")));
 		zbx_mock_assert_int_eq("control_count after delete", exp_count, h.control_count);
 
 		if (0 < h.control_count)

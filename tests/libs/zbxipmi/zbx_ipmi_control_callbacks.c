@@ -24,9 +24,10 @@
 /*   ipmi_control_get_entity(), unconditionally - needs a real control object or a wrapped getter, neither  */
 /*   of which this file uses.                                                                                */
 /*                                                                                                          */
-/* Both callbacks call zbx_get_ipmi_control() internally, which converts the incoming (fabricated)          */
-/* 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to echo the pointer back into */
-/* the ID instead of dereferencing it, matching the pre-registered zbx_ipmi_control_t.control_id below.     */
+/* Both callbacks call zbx_get_ipmi_control_within_cb_only() internally, which converts the incoming        */
+/* (fabricated) 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to echo the      */
+/* pointer back into the ID instead of dereferencing it, matching the pre-registered                        */
+/* zbx_ipmi_control_t.control_id below.                                                                     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"

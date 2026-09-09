@@ -20,20 +20,21 @@
 /* ipmi_set_*()/ipmi_is_*() accessors are plain, connection-independent utility functions operating on a   */
 /* caller-owned buffer, so a real, valid states object is used throughout, never a fabricated one.         */
 /*                                                                                                          */
-/* The sensor argument, by contrast, is never dereferenced in any branch covered here - only compared by   */
-/* identity via zbx_get_ipmi_sensor(), or (for zbx_got_discrete_states_cb()'s err!=0 branch) not used at    */
-/* all once the sensor has been identified, since the error message is built purely from the already-owned */
-/* s->sdr_id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a real          */
-/* ipmi_sensor_*() getter on it (zbx_got_thresh_reading_cb()'s IPMI_BOTH_VALUES_PRESENT success path,       */
+/* The sensor argument, by contrast, is never dereferenced in any branch covered here - only compared by    */
+/* identity via zbx_get_ipmi_sensor_within_cb_only(), or (for zbx_got_discrete_states_cb()'s err!=0 branch) */
+/* not used at all once the sensor has been identified, since the error message is built purely from the    */
+/* already-owned s->sdr_id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a */
+/* real ipmi_sensor_*() getter on it (zbx_got_thresh_reading_cb()'s IPMI_BOTH_VALUES_PRESENT success path,  */
 /* zbx_got_thresholds_cb()'s "found" path, zbx_got_discrete_states_cb()'s state-processing loop) are out of */
 /* scope here. Also deliberately out of scope: every "sensor not found" branch, since all three call        */
 /* THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see zbxmocktest.c) - triggering it  */
 /* would kill the test process rather than fail one case, and bypasses atexit() so it wouldn't even earn    */
-/* coverage credit.                                                                                          */
+/* coverage credit.                                                                                         */
 /*                                                                                                          */
-/* All three callbacks call zbx_get_ipmi_sensor() internally, which converts the incoming (fabricated)      */
-/* 'sensor' pointer to an ID via ipmi_sensor_convert_to_id() - wrapped here to echo the pointer back into   */
-/* the ID instead of dereferencing it, matching the pre-registered zbx_ipmi_sensor_t.sensor_id below.       */
+/* All three callbacks call zbx_get_ipmi_sensor_within_cb_only() internally, which converts the incoming    */
+/* (fabricated) 'sensor' pointer to an ID via ipmi_sensor_convert_to_id() - wrapped here to echo the        */
+/* pointer back into the ID instead of dereferencing it, matching the pre-registered                        */
+/* zbx_ipmi_sensor_t.sensor_id below.                                                                       */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"

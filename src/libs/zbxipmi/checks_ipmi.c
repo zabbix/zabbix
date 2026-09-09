@@ -94,11 +94,11 @@ typedef struct
 								/* current, fan, chassis intrusion, etc. */
 	char				*full_name;
 	int				state;
-	/* Static properties of the sensor, captured once in zbx_allocate_ipmi_sensor() while 'sensor' is    */
-	/* still guaranteed valid, instead of being re-fetched from OpenIPMI (which would require the same   */
-	/* pointer-revalidation dance as 'sensor_id' above) every time they are displayed - see IPMI.pdf,    */
-	/* section 2.2.4: "it is recommended that you collect all the static information that you need from  */
-	/* an object when it is reported to you". */
+	/* Static properties of the sensor, captured once in zbx_allocate_ipmi_sensor_within_cb_only() while       */
+	/* 'sensor' is still guaranteed valid, instead of being re-fetched from OpenIPMI (which would require the  */
+	/* same pointer-revalidation dance as 'sensor_id' above) every time they are displayed - see IPMI.pdf,     */
+	/* section 2.2.4: "it is recommended that you collect all the static information that you need from an     */
+	/* object when it is reported to you".                                                                     */
 	char				*sensor_type_str;
 	char				*event_reading_type_str;
 	int				threshold_access;	/* threshold sensors only */
@@ -118,8 +118,8 @@ typedef struct
 	int			num_values;
 	int			*val;
 	char			*full_name;
-	/* static properties, captured once in zbx_allocate_ipmi_control() - see the comment on the matching */
-	/* fields in zbx_ipmi_sensor_t */
+	/* static properties, captured once in zbx_allocate_ipmi_control_within_cb_only() - see the comment on the */
+	/* matching fields in zbx_ipmi_sensor_t                                                                    */
 	int			is_readable;
 	int			is_settable;
 }
@@ -314,7 +314,7 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
  * Return value: pointer to sensor data or NULL if not found                  *
  *                                                                            *
  *****************************************************************************/
-static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(const zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_within_cb_only(const zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
 {
 	zbx_ipmi_sensor_t	*s = NULL;
 	ipmi_sensor_id_t	sensor_id = ipmi_sensor_convert_to_id(raw_sensor);
@@ -429,19 +429,19 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
  *                                                                            *
  * Purpose: converts sensor id to printable string and returns id_type        *
  *                                                                            *
- * Parameters: sensor    - [IN]                                               *
- *             id        - [OUT] sensor id                                    *
- *             sz        - [IN] sensor id buffer length                       *
- *             id_sz     - [OUT] sensor id length                             *
- *             id_type   - [OUT] type of sensor id                            *
- *             id_str    - [OUT] sensor id string                             *
- *             id_str_sz - [IN] sensor id string buffer length                *
+ * Parameters: raw_sensor - [IN]                                              *
+ *             id         - [OUT] sensor id                                   *
+ *             sz         - [IN] sensor id buffer length                      *
+ *             id_sz      - [OUT] sensor id length                            *
+ *             id_type    - [OUT] type of sensor id                           *
+ *             id_str     - [OUT] sensor id string                            *
+ *             id_str_sz  - [IN] sensor id string buffer length               *
  *                                                                            *
  * Return value: pointer to sensor id string                                  *
  *                                                                            *
- ******************************************************************************/
-static char *zbx_get_sensor_id(ipmi_sensor_t *raw_sensor, char *id, int sz, int *id_sz, enum ipmi_str_type_e *id_type,
-		char *id_str, int id_str_sz)
+ *****************************************************************************/
+static char *zbx_get_sensor_id_within_cb_only(ipmi_sensor_t *raw_sensor, char *id, int sz, int *id_sz,
+		enum ipmi_str_type_e *id_type, char *id_str, int id_str_sz)
 {
 	*id_sz = ipmi_sensor_get_id_length(raw_sensor);
 	memset(id, 0, (size_t)sz);
@@ -451,7 +451,7 @@ static char *zbx_get_sensor_id(ipmi_sensor_t *raw_sensor, char *id, int sz, int 
 	return zbx_sensor_id_to_str(id_str, (size_t)id_str_sz, id, *id_type, *id_sz);
 }
 
-static char	*zbx_get_ipmi_units(ipmi_sensor_t *raw_sensor);
+static char	*zbx_get_ipmi_units_within_cb_only(ipmi_sensor_t *raw_sensor);
 
 /******************************************************************************
  *                                                                            *
@@ -465,7 +465,7 @@ static char	*zbx_get_ipmi_units(ipmi_sensor_t *raw_sensor);
  * Return value: pointer to new sensor data                                   *
  *                                                                            *
  *****************************************************************************/
-static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
+static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor_within_cb_only(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
 {
 	char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_sensor_t	*s;
@@ -477,7 +477,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	char			ip_port[MAX_STRING_LEN];
 	int 			i;
 
-	zbx_get_sensor_id(raw_sensor, id, sizeof(id), &id_sz, &id_type, id_str, sizeof(id_str));
+	zbx_get_sensor_id_within_cb_only(raw_sensor, id, sizeof(id), &id_sz, &id_type, id_str, sizeof(id_str));
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __func__, id_str, h->ip, h->port);
 
 	h->sensor_count++;
@@ -513,7 +513,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->event_reading_type)
 	{
 		s->threshold_access = ipmi_sensor_get_threshold_access(raw_sensor);
-		s->units = zbx_get_ipmi_units(raw_sensor);
+		s->units = zbx_get_ipmi_units_within_cb_only(raw_sensor);
 	}
 	else
 	{
@@ -541,18 +541,9 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes sensor from host sensor list, if present, freeing its     *
- *          allocated fields                                                  *
- *                                                                            *
- * Parameters: h          - [IN/OUT] host whose sensor list is updated        *
- *             raw_sensor - [IN] sensor pointer, valid only within calling    *
- *                               callback                                     *
- *                                                                            *
- *****************************************************************************/
-/******************************************************************************
- *                                                                            *
  * Purpose: frees sensor dynamically allocated fields, not the sensor itself; *
- *          shared by zbx_delete_ipmi_sensor() and zbx_free_ipmi_host()       *
+ *          shared by zbx_delete_ipmi_sensor_within_cb_only() and             *
+ *          zbx_free_ipmi_host()                                              *
  *                                                                            *
  * Parameters: s - [IN] sensor whose allocated fields are freed               *
  *                                                                            *
@@ -567,7 +558,17 @@ static void	zbx_free_ipmi_sensor_data(zbx_ipmi_sensor_t *s)
 		zbx_free(s->reading_names[j]);
 }
 
-static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: removes sensor from host sensor list, if present, freeing its     *
+ *          allocated fields                                                  *
+ *                                                                            *
+ * Parameters: h          - [IN/OUT] host whose sensor list is updated        *
+ *             raw_sensor - [IN] sensor pointer, valid only within calling    *
+ *                               callback                                     *
+ *                                                                            *
+ *****************************************************************************/
+static void	zbx_delete_ipmi_sensor_within_cb_only(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor)
 {
 	ipmi_sensor_id_t	sensor_id = ipmi_sensor_convert_to_id(raw_sensor);
 
@@ -613,7 +614,8 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor
  * Return value: pointer to control data or NULL if not found                 *
  *                                                                            *
  *****************************************************************************/
-static zbx_ipmi_control_t	*zbx_get_ipmi_control(const zbx_ipmi_host_t *h, ipmi_control_t *raw_control)
+static zbx_ipmi_control_t	*zbx_get_ipmi_control_within_cb_only(const zbx_ipmi_host_t *h,
+		ipmi_control_t *raw_control)
 {
 	zbx_ipmi_control_t	*c = NULL;
 	ipmi_control_id_t	control_id = ipmi_control_convert_to_id(raw_control);
@@ -707,7 +709,8 @@ static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_full_name(const zbx_ipmi_host
  * Return value: pointer to new control data                                  *
  *                                                                            *
  *****************************************************************************/
-static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *raw_control)
+static zbx_ipmi_control_t	*zbx_allocate_ipmi_control_within_cb_only(zbx_ipmi_host_t *h,
+		ipmi_control_t *raw_control)
 {
 	size_t			sz, dm_sz;
 	zbx_ipmi_control_t	*c;
@@ -758,18 +761,8 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes control from host control list, if present, freeing its   *
- *          allocated fields                                                  *
- *                                                                            *
- * Parameters: h           - [IN/OUT] host whose control list is updated      *
- *             raw_control - [IN] control pointer, valid only within calling  *
- *                                callback                                    *
- *                                                                            *
- *****************************************************************************/
-/******************************************************************************
- *                                                                            *
  * Purpose: frees control dynamically allocated fields, not the control       *
- *          itself; shared by zbx_delete_ipmi_control() and                   *
+ *          itself; shared by zbx_delete_ipmi_control_within_cb_only() and    *
  *          zbx_free_ipmi_host()                                              *
  *                                                                            *
  * Parameters: c - [IN] control whose allocated fields are freed              *
@@ -782,7 +775,17 @@ static void	zbx_free_ipmi_control_data(zbx_ipmi_control_t *c)
 	zbx_free(c->full_name);
 }
 
-static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *raw_control)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: removes control from host control list, if present, freeing its   *
+ *          allocated fields                                                  *
+ *                                                                            *
+ * Parameters: h           - [IN/OUT] host whose control list is updated      *
+ *             raw_control - [IN] control pointer, valid only within calling  *
+ *                                callback                                    *
+ *                                                                            *
+ *****************************************************************************/
+static void	zbx_delete_ipmi_control_within_cb_only(zbx_ipmi_host_t *h, ipmi_control_t *raw_control)
 {
 	ipmi_control_id_t	control_id = ipmi_control_convert_to_id(raw_control);
 
@@ -842,7 +845,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *raw_sensor, int err, ipmi_thres
 		goto out;
 	}
 
-	if (NULL == (s = zbx_get_ipmi_sensor(h, raw_sensor)))
+	if (NULL == (s = zbx_get_ipmi_sensor_within_cb_only(h, raw_sensor)))
 	{
 		char			id[ZBX_IPMI_SENSOR_ID_SZ];
 		char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
@@ -851,7 +854,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *raw_sensor, int err, ipmi_thres
 
 		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "fatal error: host:'[%s]:%d' sensor %s", h->ip, h->port,
-				zbx_get_sensor_id(raw_sensor, id, sizeof(id), &id_sz, &id_type,  id_str,
+				zbx_get_sensor_id_within_cb_only(raw_sensor, id, sizeof(id), &id_sz, &id_type,  id_str,
 				sizeof(id_str)));
 
 		h->ret = NOTSUPPORTED;
@@ -895,7 +898,7 @@ out:
  * Return value: dynamically allocated unit string, must be freed by caller   *
  *                                                                            *
  *****************************************************************************/
-static char	*zbx_get_ipmi_units(ipmi_sensor_t *raw_sensor)
+static char	*zbx_get_ipmi_units_within_cb_only(ipmi_sensor_t *raw_sensor)
 {
 	const char	*base, *mod_use = "", *modifier = "", *rate;
 
@@ -970,7 +973,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *raw_sensor, int err, enum i
 		goto out;
 	}
 
-	s = zbx_get_ipmi_sensor(h, raw_sensor);
+	s = zbx_get_ipmi_sensor_within_cb_only(h, raw_sensor);
 
 	if (NULL == s)
 	{
@@ -999,7 +1002,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *raw_sensor, int err, enum i
 				s_type_string = ipmi_sensor_get_sensor_type_string(raw_sensor);
 				s_reading_type_string = ipmi_sensor_get_event_reading_type_string(raw_sensor);
 
-				units = zbx_get_ipmi_units(raw_sensor);
+				units = zbx_get_ipmi_units_within_cb_only(raw_sensor);
 
 				zabbix_log(LOG_LEVEL_DEBUG, "Value [%s | %s | %s | %s | " ZBX_FS_DBL " %s]",
 						zbx_sensor_id_to_str(id_str, sizeof(id_str), s->sdr_id, s->sdr_id_type,
@@ -1066,7 +1069,7 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *raw_sensor, int err, ipmi_
 		goto out;
 	}
 
-	s = zbx_get_ipmi_sensor(h, raw_sensor);
+	s = zbx_get_ipmi_sensor_within_cb_only(h, raw_sensor);
 
 	if (NULL == s)
 	{
@@ -1360,7 +1363,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *raw_control, int err, int
 		goto out;
 	}
 
-	c = zbx_get_ipmi_control(h, raw_control);
+	c = zbx_get_ipmi_control_within_cb_only(h, raw_control);
 
 	if (NULL == c)
 	{
@@ -1425,7 +1428,7 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *raw_control, int err, voi
 		return;
 	}
 
-	c = zbx_get_ipmi_control(h, raw_control);
+	c = zbx_get_ipmi_control_within_cb_only(h, raw_control);
 
 	if (NULL == c)
 	{
@@ -1575,11 +1578,11 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *raw_ent, 
 		switch (op)
 		{
 			case IPMI_ADDED:
-				if (NULL == zbx_get_ipmi_sensor(h, raw_sensor))
-					zbx_allocate_ipmi_sensor(h, raw_sensor);
+				if (NULL == zbx_get_ipmi_sensor_within_cb_only(h, raw_sensor))
+					zbx_allocate_ipmi_sensor_within_cb_only(h, raw_sensor);
 				break;
 			case IPMI_DELETED:
-				zbx_delete_ipmi_sensor(h, raw_sensor);
+				zbx_delete_ipmi_sensor_within_cb_only(h, raw_sensor);
 				break;
 			case IPMI_CHANGED:
 				break;
@@ -1619,11 +1622,11 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *raw_ent,
 	switch (op)
 	{
 		case IPMI_ADDED:
-			if (NULL == zbx_get_ipmi_control(h, raw_control))
-				zbx_allocate_ipmi_control(h, raw_control);
+			if (NULL == zbx_get_ipmi_control_within_cb_only(h, raw_control))
+				zbx_allocate_ipmi_control_within_cb_only(h, raw_control);
 			break;
 		case IPMI_DELETED:
-			zbx_delete_ipmi_control(h, raw_control);
+			zbx_delete_ipmi_control_within_cb_only(h, raw_control);
 			break;
 		case IPMI_CHANGED:
 			break;

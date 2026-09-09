@@ -17,13 +17,13 @@
 /* Regression coverage for the OpenIPMI pointer-lifetime rule documented in <OpenIPMI/ipmiif.h> and in     */
 /* IPMI.pdf section 2.2.4: "The pointer is only valid inside a callback... the id is good outside          */
 /* callbacks." zbx_ipmi_sensor_t caches a raw ipmi_sensor_t* (needed only for identity matching inside     */
-/* real OpenIPMI callbacks) alongside an ipmi_sensor_id_t, and zbx_read_ipmi_sensor() must only ever       */
-/* issue a *new* read through the latter - via ipmi_sensor_id_get_reading()/get_states(), which            */
-/* internally revalidate the id through ipmi_sensor_pointer_cb() - never via the former from outside a     */
-/* callback. The sensor's static properties (reading_type_str and friends) are a separate matter: per the  */
-/* same section of IPMI.pdf ("collect all the static information that you need from an object when it is   */
-/* reported to you"), those are captured once in zbx_allocate_ipmi_sensor() and simply read back here, no  */
-/* revalidation needed - case 3 below exercises that a cached string is used as-is.                        */
+/* real OpenIPMI callbacks) alongside an ipmi_sensor_id_t, and zbx_read_ipmi_sensor() must only ever issue */
+/* a *new* read through the latter - via ipmi_sensor_id_get_reading()/get_states(), which internally       */
+/* revalidate the id through ipmi_sensor_pointer_cb() - never via the former from outside a callback. The  */
+/* sensor's static properties (reading_type_str and friends) are a separate matter: per the same section   */
+/* of IPMI.pdf ("collect all the static information that you need from an object when it is reported to    */
+/* you"), those are captured once in zbx_allocate_ipmi_sensor_within_cb_only() and simply read back here,  */
+/* no revalidation needed - case 3 below exercises that a cached string is used as-is.                     */
 /*                                                                                                         */
 /* Case 1 and 2 simulate a sensor OpenIPMI has since destroyed (e.g. entity/sensor removed, or its domain  */
 /* closed) via IPMI_SENSOR_ID_INVALID, the same way the ZBX-25759 cb_data scenario is simulated in         */

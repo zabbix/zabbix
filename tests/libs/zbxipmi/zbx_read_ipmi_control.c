@@ -15,10 +15,10 @@
 /* zbx_read_ipmi_control() and zbx_set_ipmi_control() are static, so the source file is included directly   */
 /* to reach them. See zbx_read_ipmi_sensor.c for the full rationale - this is the same regression, on the   */
 /* zbx_ipmi_control_t side: only zbx_ipmi_control_t.control_id may be used to issue a new read/write from   */
-/* outside a callback, via ipmi_control_id_get_val()/ipmi_control_id_set_val() (which internally            */
-/* revalidate the id). is_readable/is_settable are a separate, static property captured once in             */
-/* zbx_allocate_ipmi_control() - simulated here as already-cached (both true), so the test actually         */
-/* reaches the id-based call being verified, rather than short-circuiting on the capability check.          */
+/* outside a callback, via ipmi_control_id_get_val()/ipmi_control_id_set_val() (which internally revalidate */
+/* the id). is_readable/is_settable are a separate, static property captured once in                        */
+/* zbx_allocate_ipmi_control_within_cb_only() - simulated here as already-cached (both true), so the test   */
+/* actually reaches the id-based call being verified, rather than short-circuiting on the capability check. */
 /*                                                                                                          */
 /* An IPMI_CONTROL_ID_INVALID control_id stands in for a control OpenIPMI has since destroyed. Real         */
 /* OpenIPMI (not mocked) is exercised throughout. 'out.err_contains' pins down the exact wording each       */
