@@ -313,8 +313,6 @@ class CControllerMaintenanceEdit extends CController {
 					$data['groups_ms'][$group['id']] = $group;
 				}
 
-				CArrayHelper::sort($data['groups_ms'], ['name']);
-
 				$data['event_names'] = [];
 
 				foreach ($events as $event) {
@@ -329,8 +327,6 @@ class CControllerMaintenanceEdit extends CController {
 				foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
 					$data['groups_ms'][$group['id']] = $group;
 				}
-
-				CArrayHelper::sort($data['groups_ms'], ['name']);
 
 				$data['tags'] = [];
 
