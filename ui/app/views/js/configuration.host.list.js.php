@@ -286,8 +286,7 @@
 						.setRenderer('status')
 						.setSortable(true),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
-						.setFields(['availability', 'active_available'])
-						.setRenderer('availability'),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumn('encryption', <?= json_encode(_('Agent encryption')); ?>)
 						.setFields(['tls_accept', 'tls_connect'])
 						.setRenderer('encryption'),
@@ -410,9 +409,10 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
-								? <?= json_encode(_('Maintenance without data collection')); ?>
-								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
+							let hint = `${escapeHtml(maintenance.name)} [${
+								maintenance.type == MAINTENANCE_TYPE_NODATA
+									? <?= json_encode(_('Maintenance without data collection')); ?>
+									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + escapeHtml(maintenance.description);
@@ -582,7 +582,7 @@
 
 					const overflow_ellipsis = document.createElement('span');
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.innerHTML = host_port;
+					overflow_ellipsis.textContent = host_port;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
@@ -644,11 +644,6 @@
 						cell.innerHTML += ' ';
 						cell.appendChild(description_icon);
 					}
-				})
-				.setCellRenderer('availability', ({cell_data, cell}) => {
-					const [availability] = cell_data;
-
-					cell.innerHTML = availability;
 				})
 				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
 					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
