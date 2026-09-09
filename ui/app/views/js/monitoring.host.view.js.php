@@ -19,6 +19,7 @@
  */
 
 ?>
+
 <script>
 	const view = new class {
 		#layout_mode = null;
