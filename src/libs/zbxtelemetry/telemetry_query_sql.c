@@ -16,7 +16,6 @@
 
 #include "telemetry.h"
 
-#include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxeval.h"
