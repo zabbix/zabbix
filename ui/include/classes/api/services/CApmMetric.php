@@ -175,7 +175,7 @@ class CApmMetric extends CApmGeneral {
 			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>					['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'time_unix']), 'uniq' => true, 'default' => []],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'start_time_unix', 'time_unix']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
 			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
