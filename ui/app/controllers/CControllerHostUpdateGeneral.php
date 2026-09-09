@@ -74,7 +74,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	protected function checkInputInterfaces(): bool {
 		$ret = true;
 
-		foreach ($this->getInput('interfaces') as $key => $interface) {
+		foreach ($this->getInput('interfaces', []) as $key => $interface) {
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				$interface_validation_rules = [];
 
