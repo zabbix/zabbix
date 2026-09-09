@@ -330,8 +330,11 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 
 	if (ZBX_MAX_JSON_DEPTH < depth)
 	{
-		char *err_str = zbx_dsprintf(NULL, "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
-		zbx_int64_t ret = json_error(err_str, ptr, error);
+		char		*err_str;
+		zbx_int64_t	ret;
+
+		err_str = zbx_dsprintf(NULL, "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
+		ret = json_error(err_str, ptr, error);
 		zbx_free(err_str);
 
 		return ret;

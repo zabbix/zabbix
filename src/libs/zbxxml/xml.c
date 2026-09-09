@@ -992,10 +992,6 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 
 	xmlDocDumpMemory(doc, &xmem, &size);
 
-	zbx_free(text);
-	zbx_free(attr_val);
-	zbx_free(attr);
-
 	if (FAIL == zbx_check_xml_memory((char *)xmem, -1, errmsg))
 		goto clean;
 
@@ -1004,6 +1000,9 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	xmlFree(xmem);
 	ret = SUCCEED;
 clean:
+	zbx_free(text);
+	zbx_free(attr_val);
+	zbx_free(attr);
 	xmlFreeDoc(doc);
 exit:
 	return ret;
