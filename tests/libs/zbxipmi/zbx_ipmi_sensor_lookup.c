@@ -27,6 +27,8 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor);
+
 ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
 {
 	ipmi_sensor_id_t	id;

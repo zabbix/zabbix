@@ -47,6 +47,13 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control);
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor);
+int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *raw_sensor);
+int	__wrap_ipmi_domain_close(ipmi_domain_t *raw_domain, ipmi_domain_close_done_cb close_done, void *cb_data);
+int	__wrap_ipmi_domain_add_entity_update_handler(ipmi_domain_t *raw_domain, ipmi_domain_entity_cb handler,
+		void *cb_data);
+
 ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
 {
 	ipmi_control_id_t	id;

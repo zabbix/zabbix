@@ -30,6 +30,12 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+void	__wrap_ipmi_domain_iterate_domains(ipmi_domain_ptr_cb handler, void *cb_data);
+int	__wrap_ipmi_domain_get_name(ipmi_domain_t *domain, char *name, int length);
+ipmi_domain_id_t	__wrap_ipmi_domain_convert_to_id(ipmi_domain_t *domain);
+int	__wrap_ipmi_domain_pointer_cb(ipmi_domain_id_t id, ipmi_domain_ptr_cb handler, void *cb_data);
+int	__wrap_ipmi_domain_close(ipmi_domain_t *domain, ipmi_domain_close_done_cb close_done, void *cb_data);
+
 static void	*wrap_iterate_cb_data;
 static int	domain_found;
 static int	domain_pointer_cb_calls;

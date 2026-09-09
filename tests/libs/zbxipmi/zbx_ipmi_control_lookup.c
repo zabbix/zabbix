@@ -25,6 +25,8 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control);
+
 ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
 {
 	ipmi_control_id_t	id;

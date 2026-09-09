@@ -36,6 +36,7 @@ static int	get_thresholds_calls;
 
 extern int	__real_ipmi_sensor_id_get_thresholds(ipmi_sensor_id_t id, ipmi_sensor_thresholds_cb done,
 		void *cb_data);
+int	__wrap_ipmi_sensor_id_get_thresholds(ipmi_sensor_id_t id, ipmi_sensor_thresholds_cb done, void *cb_data);
 
 int	__wrap_ipmi_sensor_id_get_thresholds(ipmi_sensor_id_t id, ipmi_sensor_thresholds_cb done, void *cb_data)
 {
