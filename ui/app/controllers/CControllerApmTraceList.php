@@ -34,6 +34,7 @@ class CControllerApmTraceList extends CController {
 			'filter_scope_name' => ['string'],
 			'filter_min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class,]],
+			'filter_statuses' => ['array', 'field' => ['integer']],
 			'filter_evaltype' => ['integer', 'in' => [APM_ATTR_EVAL_TYPE_AND_OR, APM_ATTR_EVAL_TYPE_OR]],
 			'filter_attributes' => ['array'],
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],

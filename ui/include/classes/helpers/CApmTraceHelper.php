@@ -18,14 +18,27 @@ class CApmTraceHelper {
 
 	public static function getName(int $type): string {
 		return match ($type) {
+			APM_TRACE_STATUS_UNSET => _('Unset'),
 			APM_TRACE_STATUS_OK => _('Ok'),
 			APM_TRACE_STATUS_ERROR => _('Error'),
-			APM_TRACE_STATUS_UNSET => _('Unset'),
 			default => _('Unknown')
 		};
 	}
 
-	public static function getStatuses(int $min = APM_TRACE_STATUS_OK, int $max = APM_TRACE_STATUS_UNSET): array {
+	public static function getStatusCode(int $status): ?string {
+		return match ($status) {
+			APM_TRACE_STATUS_UNSET => 'STATUS_CODE_UNSET',
+			APM_TRACE_STATUS_OK => 'STATUS_CODE_OK',
+			APM_TRACE_STATUS_ERROR => 'STATUS_CODE_ERROR',
+			default => null
+		};
+	}
+
+	public static function getStatusCodes(array $statuses): array {
+		return array_filter(array_map(static fn (int $status) => self::getStatusCode($status), $statuses));
+	}
+
+	public static function getStatuses(int $min = APM_TRACE_STATUS_UNSET, int $max = APM_TRACE_STATUS_ERROR): array {
 		$types = [];
 
 		foreach (range($min, $max) as $type) {

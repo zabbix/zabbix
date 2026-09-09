@@ -26,6 +26,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 	protected function getData(): array
 	{
 		$page = $this->getInput('page', 1);
+		$filter = $this->getInput('filter', []);
 
 		$sort_field = $this->getInput('sort_field', 'timestamp');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
@@ -40,10 +41,38 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		]);
 
+		$min_duration = $filter['min_duration']
+			? (int) round(timeUnitToSeconds($filter['min_duration']) / SEC_PER_NANOSEC)
+			: null;
+		$max_duration = $filter['max_duration']
+			? (int) round(timeUnitToSeconds($filter['max_duration']) / SEC_PER_NANOSEC)
+			: null;
+		$statuses = array_key_exists('statuses', $filter) && $filter['statuses']
+			? $filter['statuses']
+			: [];
+		$span_attributes = array_key_exists('attributes', $filter) && $filter['attributes']
+			? $filter['attributes']
+			: null;
+		$span_attributes_evaltype = array_key_exists('evaltype', $filter) && $filter['evaltype']
+			? $filter['evaltype']
+			: CONDITION_EVAL_TYPE_AND_OR;
+
+		$trace_filter = array_filter(array_intersect_key($filter, array_flip(['traceid', 'spanid', 'span_name',
+			'service_name', 'scope_name'])));
+
+		if ($statuses) {
+			$trace_filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
+		}
+
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
+			'min_duration' => $min_duration,
+			'max_duration' => $max_duration,
+			'filter' => $trace_filter ?: null,
+			'span_attributes' => $span_attributes,
+			'span_attributes_evaltype' => $span_attributes_evaltype,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
 			'limit' => $limit
