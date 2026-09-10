@@ -247,7 +247,7 @@ void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exp
 
 int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 {
-	int	ret = SUCCEED;
+	int	ret = APM_COMMIT_OK;
 
 	switch (exporter->cfg.type)
 	{

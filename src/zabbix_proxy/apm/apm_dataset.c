@@ -15,6 +15,7 @@
 #include "apm_dataset.h"
 #include "zbxcommon.h"
 #include "zbxstr.h"
+#include <stdatomic.h>
 
 ZBX_VECTOR_LITE_IMPL(apm_row, zbx_apm_row_t)
 
@@ -348,10 +349,28 @@ void	apm_dataset_dump(zbx_apm_dataset_t *ds)
 	apm_rowset_dump("traces", &ds->traces);
 }
 
+void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
+{
+	if (0 != ds->logs.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->logs.rows.values_num);
 
+	if (0 != ds->traces.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->traces.rows.values_num);
 
+	if (0 != ds->metrics_exponential_histogram.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_exponential_histogram.rows.values_num);
 
+	if (0 != ds->metrics_histogram.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_histogram.rows.values_num);
 
+	if (0 != ds->metrics_gauge.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_gauge.rows.values_num);
 
+	if (0 != ds->metrics_sum.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_sum.rows.values_num);
+
+	if (0 != ds->metrics_summary.rows.values_num)
+		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_summary.rows.values_num);
+}
 
 

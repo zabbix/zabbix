@@ -22,12 +22,13 @@
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
 
-zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters)
+zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters, zbx_apm_commit_stats_t *commit_stats)
 {
 	zbx_apm_worker_t	*worker;
 
 	worker = (zbx_apm_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_worker_t));
 	worker->exporters = exporters;
+	worker->commit_stats = commit_stats;
 
 	return worker;
 }
@@ -36,6 +37,7 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 {
 	zbx_apm_dataset_t	ds;
 	zbx_vector_tag_t	*attrs;
+	int			ret;
 
 	apm_dataset_init(&ds);
 
@@ -63,10 +65,14 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	exporter = apm_exporter_acquire(worker->exporters);
 
-	while (0 != (apm_exporter_commit(exporter, &ds) & APM_COMMIT_RETRY) &&
-			SUCCEED == zbx_mw_worker_is_running(&worker->base))
+	do
 	{
+		ret = apm_exporter_commit(exporter, &ds);
 	}
+	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
+
+	if (APM_COMMIT_OK == ret)
+		apm_dataset_flush_stats(&ds, worker->commit_stats);
 
 	apm_exporter_release(worker->exporters, exporter);
 

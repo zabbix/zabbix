@@ -91,6 +91,18 @@ void	apm_dataset_dump(zbx_apm_dataset_t *ds);
 void	apm_rowset_clear(zbx_apm_rowset_t *rs);
 zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs);
 
+typedef struct
+{
+	zbx_atomic_uint64_t	metrics_gauge;
+	zbx_atomic_uint64_t	metrics_sum;
+	zbx_atomic_uint64_t	metrics_histogram;
+	zbx_atomic_uint64_t	metrics_exponential_histogram;
+	zbx_atomic_uint64_t	metrics_summary;
+	zbx_atomic_uint64_t	logs;
+	zbx_atomic_uint64_t	traces;
+}
+zbx_apm_commit_stats_t;
 
+void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats);
 
 #endif

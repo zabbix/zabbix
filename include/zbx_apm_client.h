@@ -15,7 +15,28 @@
 #ifndef ZABBIX_ZBX_APM_CLIENT_H
 #define ZABBIX_ZBX_APM_CLIENT_H
 
+#include "zbxtypes.h"
+#include "zbx_rtc_constants.h"
+
 #define ZBX_IPC_SERVICE_APM	"apm"
+
+#define ZBX_APM_GET_STATS	(ZBX_IPC_RTC_MAX + 1)
+
+typedef struct
+{
+	zbx_uint64_t	written_logs;
+	zbx_uint64_t	written_traces;
+	zbx_uint64_t	written_metrics_gauge;
+	zbx_uint64_t	written_metrics_sum;
+	zbx_uint64_t	written_metrics_histogram;
+	zbx_uint64_t	written_metrics_exponential_histogram;
+	zbx_uint64_t	written_metrics_summary;
+}
+zbx_apm_stats_t;
+
+int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error);
+zbx_uint32_t	zbx_apm_serialize_stats(zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint64_t len);
+
 
 #endif
 

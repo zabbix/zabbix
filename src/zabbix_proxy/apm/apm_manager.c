@@ -18,6 +18,7 @@
 #include "apm_exporter.h"
 #include "apm_queue.h"
 #include "apm_task.h"
+#include "apm_dataset.h"
 #include "zbx_apm.h"
 #include "zbx_apm_client.h"
 #include "zbxalgo.h"
@@ -44,6 +45,8 @@ typedef struct
 
 	int				commit_limit;
 	int				commit_task_num;
+
+	zbx_apm_commit_stats_t		commit_stats;
 
 	zbx_apm_exporter_pool_t	*exporters;
 }
@@ -99,7 +102,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 		goto out;
 
 	for (int i = 0; i < APM_WORKERS_MAX; i++)
-		workers[i] = apm_worker_create(manager->exporters);
+		workers[i] = apm_worker_create(manager->exporters, &manager->commit_stats);
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_APM, ZBX_PROCESS_TYPE_APM_WORKER,
 			(zbx_mw_worker_t **)workers, APM_WORKERS_MAX, workers_num, apm_worker_entry,
@@ -207,6 +210,24 @@ static zbx_apm_config_tls_t	*apm_manager_validate_tls(zbx_apm_config_tls_t *tls)
 	return tls;
 }
 
+static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t *client)
+{
+	unsigned char	buf[sizeof(zbx_apm_stats_t)];
+	zbx_uint32_t	len;
+	zbx_apm_stats_t	stats;
+
+	stats.written_logs = atomic_load(&manager->commit_stats.logs);
+	stats.written_traces = atomic_load(&manager->commit_stats.traces);
+	stats.written_metrics_gauge = atomic_load(&manager->commit_stats.metrics_gauge);
+	stats.written_metrics_sum = atomic_load(&manager->commit_stats.metrics_sum);
+	stats.written_metrics_histogram = atomic_load(&manager->commit_stats.metrics_histogram);
+	stats.written_metrics_exponential_histogram = atomic_load(&manager->commit_stats.metrics_exponential_histogram);
+	stats.written_metrics_summary = atomic_load(&manager->commit_stats.metrics_summary);
+
+	if (0 != (len = zbx_apm_serialize_stats(&stats, buf, (zbx_uint32_t)sizeof(buf))))
+		zbx_ipc_client_send(client, ZBX_APM_GET_STATS, buf, len);
+}
+
 void	*zbx_apm_manager_thread(void *args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -269,8 +290,6 @@ void	*zbx_apm_manager_thread(void *args)
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 
 	zbx_supervisor_set_process_running(server_num);
-
-	time_flush = zbx_time();
 
 	while (1)
 	{
@@ -351,6 +370,9 @@ void	*zbx_apm_manager_thread(void *args)
 		{
 			switch (message->code)
 			{
+				case ZBX_APM_GET_STATS:
+					apm_manager_send_stats(manager, client);
+					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
 					shutdown = 1;

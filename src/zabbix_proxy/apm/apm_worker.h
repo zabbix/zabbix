@@ -22,10 +22,11 @@ typedef struct
 {
 	zbx_mw_worker_t		base;
 	zbx_apm_exporter_pool_t	*exporters;
+	zbx_apm_commit_stats_t	*commit_stats;
 }
 zbx_apm_worker_t;
 
-zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters);
+zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters, zbx_apm_commit_stats_t *commit_stats);
 
 void	*apm_worker_entry(void *args);
 

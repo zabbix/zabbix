@@ -153,6 +153,7 @@ endif
 if HAVE_APM
 zabbix_proxy_LDADD += \
 	apm/libzbxapm.a \
+	$(top_builddir)/src/libs/zbxapm_client/libzbxapm_client.a \
 	$(APM_LIBS)
 endif
 
