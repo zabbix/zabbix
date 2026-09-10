@@ -137,7 +137,8 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 	char		error[MAX_STRING_LEN];
 	int		j, err = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jmx_endpoint:'%s' num:%d", __func__, items[0].jmx_endpoint, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jmx_endpoint:'%s' num:%d", __func__,
+			ZBX_JAVA_GATEWAY_REQUEST_INTERNAL == request ?  "N/A" : items[0].jmx_endpoint, num);
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
