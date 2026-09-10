@@ -293,13 +293,20 @@ class CControllerMaintenanceEdit extends CController {
 					foreach ($event['tags'] as $tag) {
 						$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
 
-						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+						$unique_tags[$tag['tag']][$tag['value']] = $tag;
 					}
 				}
 
-				CArrayHelper::sort($unique_tags, ['tag', 'value']);
+				$data['tags'] = [];
+				foreach ($unique_tags as $tag) {
+					foreach ($tag as $value) {
+						$data['tags'][] = $value;
+					}
+				}
 
-				$data['tags'] = array_values($unique_tags);
+				CArrayHelper::sort($data['tags'], ['tag', 'value']);
+
+				$data['tags'] = array_values($data['tags']);
 				break;
 		}
 	}
