@@ -25,6 +25,14 @@ class CControllerApmMetricListData extends CControllerDataTable {
 	}
 
 	protected function getData(): array {
+		$settings = API::Settings()->get(['output' => ['apm_global_db']]);
+		if ($settings['apm_global_db']['status'] === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
+			return [
+				'no_data_icon' => ZBX_ICON_APM_NOT_CONFIGURED_LARGE,
+				'no_data_message' => _('No data source')
+			];
+		}
+
 		$page = $this->getInput('page', 1);
 		$filter = $this->getInput('filter', []);
 
