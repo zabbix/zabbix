@@ -292,19 +292,19 @@ class CControllerMaintenanceEdit extends CController {
 
 			case 'event_tags':
 				$data['groups_ms'] = $this->getHostGroupsMultiselect($hostids);
-				$data['tags'] = [];
+				$unique_tags = [];
 
 				foreach ($events as $event) {
-					if ($event['tags']) {
-						CArrayHelper::sort($event['tags'], ['tag', 'value']);
+					foreach ($event['tags'] as $tag) {
+						$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
 
-						foreach ($event['tags'] as $tag) {
-							$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
-
-							$data['tags'][] = $tag;
-						}
+						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 					}
 				}
+
+				CArrayHelper::sort($unique_tags, ['tag', 'value']);
+
+				$data['tags'] = array_values($unique_tags);
 				break;
 		}
 	}
