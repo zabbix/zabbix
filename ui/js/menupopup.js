@@ -691,7 +691,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  *        {bool}   options['allowed_edit_maintenance']    Whether user has permission to edit Maintenance.
  *        {bool}   options['backurl']                     URL from where the menu popup was called.
  *        {bool}   options['show_events']                 Show Problems item enabled. Default: false.
- *        {bool}   options['isWritable']                 Whether user has edit permission to related trigger.
+ *        {bool}   options['isWritable']                  Whether user has edit permission to related trigger.
  *        {string} options['eventid']                     (optional) Required for "Update problem" section and event
  *                                                        rank change.
  *        {array}  options['eventids']                    (optional)
