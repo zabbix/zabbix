@@ -1,0 +1,507 @@
+---
+test case: proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail (covers log entries with metadata but no value, and preprocessing discarding the value)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 09:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: [ZBX_DC_FLAG_NOVALUE]
+  tail_ts_offset: 0  # fresh, well inside the lookback window
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxied nodata(5m) no longer sticks forever on a stale real-value tail from before the window
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 09:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 301  # 1s older than the 300s (5m) lookback window start
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=no_tail offset=0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=no_tail history=boundary_exact (stale history value as late as possible, exactly period seconds before "time")
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2020-06-15 11:55:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=unsupported_fresh offset=0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NOTSUPPORTED
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=unsupported_stale offset=400
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NOTSUPPORTED
+  tail_flags: []
+  tail_ts_offset: 400
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=novalue_fresh offset=0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: [ZBX_DC_FLAG_NOVALUE]
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=novalue_boundary offset=300
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: [ZBX_DC_FLAG_NOVALUE]
+  tail_ts_offset: 300
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=novalue_stale offset=400
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: [ZBX_DC_FLAG_NOVALUE]
+  tail_ts_offset: 400
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_fresh offset=0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'historical data transfer from proxy is still in progress'
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_exact offset=300
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 300
+out:
+  return: FAIL
+  error: 'historical data transfer from proxy is still in progress'
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_in1 offset=299
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 299
+out:
+  return: FAIL
+  error: 'historical data transfer from proxy is still in progress'
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_out1 offset=301
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 301
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_far_stale offset=3000
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 3000
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=realvalue_future offset=-60
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: -60
+out:
+  return: FAIL
+  error: 'historical data transfer from proxy is still in progress'
+---
+test case: lastaccess_ext period=5m age=60 flags=0 boundary=exact offset=360
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 60
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 360
+out:
+  return: FAIL
+  error: 'historical data transfer from proxy is still in progress'
+---
+test case: lastaccess_ext period=5m age=60 flags=0 boundary=just_outside offset=361
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 60
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 361
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: param validation params='0'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '0'
+  proxyid: 0
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'invalid second parameter'
+---
+test case: param validation params='abc'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: 'abc'
+  proxyid: 0
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'invalid second parameter'
+---
+test case: param validation params='30,"aaa"'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '30,"aaa"'
+  proxyid: 0
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'invalid third parameter'
+---
+test case: param validation params='5m,"strict","extra"'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m,"strict","extra"'
+  proxyid: 0
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'invalid number of parameters'
+---
+test case: strict mode bypasses proxy lazy suppression (would FAIL as lazy on the same tail, see tail=realvalue_fresh offset=0)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m,"strict"'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: early-exit - recent value in window short-circuits suppression
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+    - value: 2
+      ts: 2020-06-15 12:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: [ZBX_PROXY_SUPPRESS_ACTIVE]
+  proxy_lastaccess_age: 0
+  tail_exists: 1
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: early-exit - not enough data since item creation
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2000-01-01 00:00:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '601'
+  proxyid: 0
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: FAIL
+  error: 'item does not have enough data after server start or item creation'
+...
