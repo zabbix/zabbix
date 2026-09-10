@@ -221,12 +221,12 @@ void	*zbx_apm_manager_thread(void *args)
 	const zbx_thread_apm_manager_args_t	*apm_args;
 	zbx_apm_manager_t			*manager;
 	char					*error = NULL;
-	double					time_stat, time_flush, time_idle = 0, time_config = 0;
+	double					time_stat, time_idle = 0, time_config = 0;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
 	int					shutdown = 0, workers_num, apm_status = APM_STATUS_DISABLED;
 	zbx_vector_mw_task_ptr_t		tasks;
-	zbx_uint64_t				cfg_revision = 0, quota;
+	zbx_uint64_t				cfg_revision = 0, quota, processed_num = 0;
 	char					*proxy_apm_config = NULL;
 	zbx_apm_config_t			apm_config = {0};
 	zbx_apm_config_tls_t			apm_config_tls, *tls;
@@ -278,12 +278,18 @@ void	*zbx_apm_manager_thread(void *args)
 
 		if (STAT_INTERVAL < time_start - time_stat)
 		{
-			zbx_supervisor_update_activity("%s #%d [processing something, idle %.1fs, during %.1fs]",
+			zbx_uint64_t	processed;
+
+			apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &processed);
+
+			zbx_supervisor_update_activity("%s #%d [processing " ZBX_FS_UI64 " requests,"
+					" idle %.1fs, during %.1fs]",
 					get_process_type_string(process_type), process_num,
-					time_idle, time_start - time_stat);
+					processed - processed_num, time_idle, time_start - time_stat);
 
 			time_stat = time_start;
 			time_idle = 0;
+			processed_num = 0;
 		}
 
 		if (CONFIG_INTERVAL < time_start - time_config)
