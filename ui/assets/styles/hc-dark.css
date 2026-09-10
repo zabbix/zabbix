@@ -2976,7 +2976,7 @@ button {
   font-weight: 700;
   height: 16px;
   justify-content: center;
-  width: 16px; }
+  padding: 0 3px; }
 #datatable-traces .duration {
   display: flex;
   height: 100%;
