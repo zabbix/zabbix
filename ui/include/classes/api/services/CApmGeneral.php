@@ -20,10 +20,6 @@
 class CApmGeneral extends CApiService {
 
 	protected static function fixOptionsForClickHouse(array $options, array $output_fields): array {
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_keys($output_fields);
-		}
-
 		$output = [];
 
 		foreach ($options['output'] as $field) {
