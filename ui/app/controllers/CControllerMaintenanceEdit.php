@@ -249,36 +249,6 @@ class CControllerMaintenanceEdit extends CController {
 			}
 		}
 
-		$groups = $hostids
-			? API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'hostids' => array_keys($hostids),
-				'preservekeys' => true
-			])
-			: [];
-
-		$groups_rw = ($groups && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-			? API::HostGroup()->get([
-				'output' => [],
-				'groupids' => array_keys($groups),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
-
-		$host_groups = [];
-		foreach ($groups as $groupid => $group) {
-			$is_editable = array_key_exists($groupid, $groups_rw);
-
-			if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable) {
-				continue;
-			}
-
-			$host_groups[$groupid] = $group;
-		}
-
-		CArrayHelper::sort($host_groups, ['name']);
-
 		switch ($this->getInput('context')) {
 			case 'host':
 				$db_hosts = $hostids
@@ -309,10 +279,7 @@ class CControllerMaintenanceEdit extends CController {
 				break;
 
 			case 'event_name':
-				foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
-					$data['groups_ms'][$group['id']] = $group;
-				}
-
+				$data['groups_ms'] = $this->getHostGroupsMultiselect($hostids);
 				$data['event_names'] = [];
 
 				foreach ($events as $event) {
@@ -324,10 +291,7 @@ class CControllerMaintenanceEdit extends CController {
 				break;
 
 			case 'event_tags':
-				foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
-					$data['groups_ms'][$group['id']] = $group;
-				}
-
+				$data['groups_ms'] = $this->getHostGroupsMultiselect($hostids);
 				$data['tags'] = [];
 
 				foreach ($events as $event) {
@@ -343,5 +307,24 @@ class CControllerMaintenanceEdit extends CController {
 				}
 				break;
 		}
+	}
+
+	protected function getHostGroupsMultiselect(array $hostids): array {
+		$db_groups = $hostids
+			? API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'hostids' => array_keys($hostids),
+				'editable' => true,
+				'sortfield' => 'name',
+				'preservekeys' => true
+			])
+			: [];
+
+		$groups_ms = [];
+		foreach (CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']) as $group) {
+			$groups_ms[$group['id']] = $group;
+		}
+
+		return $groups_ms;
 	}
 }
