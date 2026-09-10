@@ -52,6 +52,9 @@ const view = new class {
 	/** @type {HTMLButtonElement|null} */
 	#change_password_btn = null;
 
+	/** @type {boolean} */
+	#tls_automatically_checked = false;
+
 	init({rules}) {
 		this.#rules = rules;
 
@@ -157,12 +160,27 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-peer')
 		], show_ssl_fields, true);
 
-		this.#updateDisplayState([
-			...document.querySelectorAll('.js-ssl-verify-host')
-		], show_ssl_verify_peer_fields, true);
+		const ssl_verify_host_fields = document.querySelectorAll('.js-ssl-verify-host');
+
+		this.#updateDisplayState([...ssl_verify_host_fields], show_ssl_verify_peer_fields, true);
 
 		const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
 			&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
+
+		if (initial_values.status === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED && this.#url_changed && show_ssl_fields) {
+			const ssl_verify_peer = this.#form.findFieldByName('ssl_verify_peer')?.getField();
+
+			if (!this.#tls_automatically_checked && ssl_verify_peer !== null) {
+				this.#updateDisplayState([...ssl_verify_host_fields], true, true);
+
+				const ssl_verify_host = this.#form.findFieldByName('ssl_verify_host')?.getField();
+				if (ssl_verify_host !== null) {
+					ssl_verify_host.checked = true;
+				}
+
+				this.#tls_automatically_checked = true;
+			}
+		}
 
 		const show_change_password_btn = configured_authtype_password && !this.#url_changed && !this.#password_changed;
 
