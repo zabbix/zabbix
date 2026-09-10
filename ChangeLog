@@ -32,6 +32,16 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27956] fixed row-adding event duplication for hosts/templates mass update value mapping tab (scernisenko)
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
+.......PS. [ZBX-27437] fixed incorrect housekeeping option validation (ademidovs)
+........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
+........S. [ZBX-28016] fixed memory leak in item query when expanding user macros (vso)
+.........T [ZBX-25576] fixed bad URL issue in Topdesk webhook (kflorowski)
+.........T [ZBX-23983] fixed typo in the trigger event name for the 'Generic Java JMX' template (smansurovs)
+.........T [ZBX-28087] fixed README.md files for cloud templates (smansurovs)
+.........T [ZBX-26475] fixed error handling in configserver items in MongoDB template (kflorowski)
 .........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
 ..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
 .........T [ZBX-26954] adjusted mongo template to newer version (kflorowski)
@@ -501,6 +511,17 @@ Changes for 7.4.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27956] fixed row-adding event duplication for hosts/templates mass update value mapping tab (scernisenko)
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
+.......PS. [ZBX-27437] fixed incorrect housekeeping option validation (ademidovs)
+........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
+..F....... [ZBX-26912] fixed redirection of the trigger configuration form on submit (averza)
+........S. [ZBX-28016] fixed memory leak in item query when expanding user macros (vso)
+.........T [ZBX-25576] fixed bad URL issue in Topdesk webhook (kflorowski)
+.........T [ZBX-23983] fixed typo in the trigger event name for the 'Generic Java JMX' template (smansurovs)
+.........T [ZBX-28087] fixed README.md files for cloud templates (smansurovs)
+.........T [ZBX-26475] fixed error handling in configserver items in MongoDB template (kflorowski)
 .........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
 ..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
 ..F....... [ZBX-27204] fixed width of the edit tree element popup in the Map navigation tree widget (gklavins)
@@ -2073,6 +2094,13 @@ Changes for 7.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
+.......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
+........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
+.........T [ZBX-25576] fixed bad URL issue in Topdesk webhook (kflorowski)
+.........T [ZBX-23983] fixed typo in the trigger event name for the 'Generic Java JMX' template (smansurovs)
+.........T [ZBX-28087] fixed README.md files for cloud templates (smansurovs)
+.........T [ZBX-26475] fixed error handling in configserver items in MongoDB template (kflorowski)
 .........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
 ..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
 

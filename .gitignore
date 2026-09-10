@@ -260,6 +260,7 @@ tests/libs/zbxexpr/zbx_substitute_snmp_oid_params
 tests/libs/zbxcalc/zbx_evaluate
 tests/libs/zbxcalc/zbx_evaluate_unknown
 tests/libs/zbxcalc/zbx_evaluate_function
+tests/libs/zbxcalc/evaluate_nodata_proxied
 tests/libs/zbxcalc/zbx_format_value
 tests/libs/zbxcalc/zbx_get_percentage_of_deviations_in_stl_remainder
 tests/libs/zbxcalc/zbx_STL
