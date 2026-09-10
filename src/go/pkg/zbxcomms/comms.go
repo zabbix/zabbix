@@ -203,7 +203,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 
 	expectedSize := binary.LittleEndian.Uint32(s[5:9])
 
-	if c.maxRecvSize > 0 && expectedSize > c.maxRecvSize {
+	if c.maxRecvSize != 0 && expectedSize > c.maxRecvSize {
 		return nil, errs.Errorf(
 			"message size %d exceeds the maximum size %d bytes",
 			expectedSize,
