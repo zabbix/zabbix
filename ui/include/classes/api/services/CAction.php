@@ -197,6 +197,17 @@ class CAction extends CApiService {
 					')'.
 			')';
 
+			// Check permissions for proxy group used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN proxy_group pg ON '.zbx_dbcast_2bigint('c.value').'=pg.proxy_groupid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY_GROUP.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg').
+					')'.
+			')';
+
 			// Check permissions for discovery rules used in filter conditions.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL FROM conditions c'.
