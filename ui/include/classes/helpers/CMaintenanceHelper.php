@@ -121,14 +121,14 @@ class CMaintenanceHelper {
 	}
 
 	public static function getNextIndexedName(string $base_name): string {
-		$base_name = mb_substr($base_name, 0, DB::getFieldLength('maintenances', 'name'));
+		$reserved_length = 5;
+		$base_name = trim(mb_substr($base_name, 0, DB::getFieldLength('maintenances', 'name') - $reserved_length));
 
 		$maintenances = API::Maintenance()->get([
 			'output' => ['name'],
 			'search' => [
 				'name' => $base_name
 			],
-			'searchByAny' => false,
 			'startSearch' => true
 		]);
 
