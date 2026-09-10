@@ -149,8 +149,8 @@ class CApmTrace extends CApmGeneral {
 				|| $options['resource_attributes'] !== null || $options['span_attributes'] !== null) {
 			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema, [
 				'output' => ['TraceId'],
-				...array_intersect_key($options, array_flip(['filter', 'search', 'searchByAny', 'startSearch',
-					'excludeSearch', 'searchWildcardsEnabled', 'limit'
+				...array_intersect_key($options, array_flip([
+					'filter', 'search', 'searchByAny', 'startSearch', 'excludeSearch', 'searchWildcardsEnabled'
 				]))
 			]))
 				->linkQuery($inner_query)
@@ -170,14 +170,16 @@ class CApmTrace extends CApmGeneral {
 			}
 		}
 		else {
-			$inner_query->limit($options['limit']);
-
 			$outer_query = $inner_query;
 		}
 
-		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema,
-			array_intersect_key($options, array_flip(['countOutput', 'limit']))
-		))
+		if (!$options['countOutput']) {
+			$outer_query->limit($options['limit']);
+		}
+
+		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, [
+			'countOutput' => $options['countOutput']
+		]))
 			->linkQuery($outer_query)
 			->where('t.TraceId IN ('.$outer_query->getSql().')');
 

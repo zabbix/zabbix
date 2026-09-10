@@ -32,9 +32,7 @@ final class CClickHouseHelper {
 			'limit' => null,
 		], $options);
 
-		$query = (new CClickHouseQuery())
-			->from($table, $table_alias)
-			->limit($options['limit']);
+		$query = (new CClickHouseQuery())->from($table, $table_alias);
 
 		if ($options['filter']) {
 			self::addQueryFilterOptions($query, $options, $db_schema, $table, $table_alias);
@@ -55,6 +53,8 @@ final class CClickHouseHelper {
 		if ($options['output']) {
 			self::addQueryOutputOptions($query, $options, $db_schema, $table, $table_alias);
 		}
+
+		$query->limit($options['limit']);
 
 		return $query;
 	}

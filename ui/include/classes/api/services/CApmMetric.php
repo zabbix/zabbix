@@ -211,7 +211,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
 			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
-				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder']))
+				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit']))
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
 					'time_from' => $options['time_from']
@@ -310,9 +310,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return $options['limit'] !== null
-					? (string) min($options['limit'], $row['rowscount'])
-					: (string) $row['rowscount'];
+				return (string) $row['rowscount'];
 			}
 
 			$db_metrics[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
