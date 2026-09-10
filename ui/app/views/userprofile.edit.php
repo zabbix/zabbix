@@ -249,7 +249,7 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 }
 
 $form_list
-	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period')),
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
 		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
 			DB::getFieldLength('users', 'default_maintenance_period'))
 		)
