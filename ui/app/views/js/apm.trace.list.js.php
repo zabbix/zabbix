@@ -358,9 +358,11 @@
 		#openSideDrawer(container, traceid) {
 			const url = zabbixUrl({action: 'apm.trace.list.split.view'});
 
-			this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
-			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
-			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e))
+			if (this.#side_drawer === null) {
+				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
+				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
+				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
+			}
 
 			this.#side_drawer
 				.open(url, {
@@ -384,7 +386,10 @@
 			const element = this.#side_drawer.getElement();
 			element.innerHTML = trace_view;
 
+			this.#trace_view_page?.destroy();
 			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
+
+			this.#unscheduleRefresh();
 		}
 
 		#onSideDrawerClose = () => {

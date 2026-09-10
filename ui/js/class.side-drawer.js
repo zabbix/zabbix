@@ -83,6 +83,8 @@ class CSideDrawer {
 		return fetch(url, {...options, signal: this.#abort_controller.signal})
 			.then(response => response.json())
 			.then(response => {
+				this.#bindEvents();
+
 				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
 			})
 			.finally(() => {
@@ -98,6 +100,7 @@ class CSideDrawer {
 		this.#abort_controller = null;
 
 		return Promise.resolve().then(() => {
+			this.#unbindEvents();
 			this.#unmount();
 
 			this.dispatchEvent(CSideDrawer.EVENT_CLOSE);
@@ -140,11 +143,21 @@ class CSideDrawer {
 		this.#split_view_element.replaceWith(this.#original_container_element);
 
 		this.#target_container_element = this.#original_container_element;
-		this.#original_container_element = null;
 	}
 
 	#bindEvents() {
-		const close_btn = this.#drawer_element.querySelector('.js-close-button');
-		close_btn?.addEventListener('click', () => this.close(), {once: true});
+		document.addEventListener('keyup', this.#onKeyUp);
+	}
+
+	#unbindEvents() {
+		document.removeEventListener('keyup', this.#onKeyUp);
+	}
+
+	#onKeyUp = e => {
+		if (e.key !== 'Escape') {
+			return;
+		}
+
+		this.close();
 	}
 }
