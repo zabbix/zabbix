@@ -66,6 +66,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
+require_once dirname(__FILE__).'/testServerRestartHang.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -128,6 +129,10 @@ class IntegrationTests {
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testTelnetChecks');
+		// currently expected to FAIL against an unpatched server - that failure is the
+		// reproduction of the "shutdown hangs indefinitely" bug (see the test's own docblock);
+		// it should pass once the missing-timeout fix in zbx_threads_kill_and_wait() lands
+		$suite->addTestSuite('testServerRestartHang');
 		return $suite;
 	}
 }
