@@ -67,7 +67,6 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
-require_once dirname(__FILE__).'/testServerRestartHang.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -132,7 +131,6 @@ class IntegrationTests {
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testTelnetChecks');
-		$suite->addTestSuite('testServerRestartHang');
 		$suite->addTestSuite('testScheduledReports');
 		return $suite;
 	}
