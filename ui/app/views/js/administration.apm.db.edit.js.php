@@ -77,10 +77,11 @@ const view = new class {
 		this.#url_input?.addEventListener('input', () => {
 			this.#url_changed = true;
 
-			if (this.#password_input !== null) {
-				if (this.#password_input.value.length > 0) {
-					this.#password_cleared = true;
-				}
+			if (this.#password_input !== null && !this.#password_changed) {
+				const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
+					&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
+
+				this.#password_cleared = this.#password_input.value.length > 0 || configured_authtype_password;
 
 				this.#password_input.value = '';
 			}
@@ -160,10 +161,10 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields, true);
 
-		const show_change_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
-			&& values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD
-			&& !this.#url_changed
-			&& !this.#password_changed;
+		const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
+			&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
+
+		const show_change_password_btn = configured_authtype_password && !this.#url_changed && !this.#password_changed;
 
 		this.#updateDisabledState([this.#password_input], show_change_password_btn);
 
