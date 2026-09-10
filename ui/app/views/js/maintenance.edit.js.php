@@ -184,10 +184,25 @@ window.maintenance_edit = new class {
 				const timeperiod = Object.values(fields.timeperiods)[0];
 
 				if (timeperiod.timeperiod_type === '<?= TIMEPERIOD_TYPE_ONETIME ?>') {
-					const formatDate = (date) => date.toLocaleString('sv-SE', {
-						hour12: false,
+					const dateFormatter = new Intl.DateTimeFormat('en', {
+						year: 'numeric',
+						month: '2-digit',
+						day: '2-digit',
+						hour: '2-digit',
+						minute: '2-digit',
+						hourCycle: 'h23',
 						timeZone: <?= json_encode(date_default_timezone_get()) ?>
-					}).slice(0, -3);
+					});
+
+					const formatDate = (date) => {
+						const parts = Object.fromEntries(
+							dateFormatter.formatToParts(date)
+								.filter(({type}) => type !== 'literal')
+								.map(({type, value}) => [type, value])
+						);
+
+						return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
+					}
 
 					const start_date = new Date(timeperiod.start_date * 1000);
 					const active_since = formatDate(start_date);
