@@ -995,21 +995,26 @@ static void	get_current_event_value(const char *macro, const zbx_db_event *event
 	}
 }
 
-static int	expr_get_proxy_name_description(zbx_uint64_t itemid, int request, char **replace_to)
+static int	expr_get_proxy_name_description(zbx_uint64_t itemid, int request, char **replace_to,
+		const zbx_uint64_t *userid)
 {
 	int		errcode, ret = FAIL;
+	zbx_user_t	user = {.userid = *userid};
 	zbx_dc_host_t	dc_host;
 
 	zbx_dc_config_get_hosts_by_itemids(&dc_host, &itemid, &errcode, 1);
 
 	if (SUCCEED == errcode)
 	{
+		if (0 != dc_host.proxyid)
+			user.type = zbx_get_user_info(user.userid, &user.roleid, NULL);
+
 		if (0 == dc_host.proxyid)
 		{
 			*replace_to = zbx_strdup(*replace_to, "");
 			ret = SUCCEED;
 		}
-		else
+		else if (SUCCEED == zbx_db_proxy_allowed_for_monitoring(&user, dc_host.proxyid))
 		{
 			ret = zbx_db_get_proxy_value(dc_host.proxyid, replace_to,
 					ZBX_DB_REQUEST_PROXY_NAME == request ? "name" : "description");
@@ -1766,7 +1771,8 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 
 			if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger, p->index, &itemid)))
 			{
-				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_NAME, replace_to);
+				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_NAME, replace_to,
+						userid);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_DESCRIPTION))
@@ -1776,7 +1782,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger, p->index, &itemid)))
 			{
 				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_DESCRIPTION,
-						replace_to);
+						replace_to, userid);
 			}
 		}
 		else if (0 == p->indexed && 0 == strcmp(p->macro, MVAR_TIME))
@@ -2058,7 +2064,8 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 
 			if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger, p->index, &itemid)))
 			{
-				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_NAME, replace_to);
+				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_NAME, replace_to,
+						userid);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_DESCRIPTION))
@@ -2068,7 +2075,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger, p->index, &itemid)))
 			{
 				ret = expr_get_proxy_name_description(itemid, ZBX_DB_REQUEST_PROXY_DESCRIPTION,
-						replace_to);
+						replace_to, userid);
 			}
 		}
 		else if (0 == p->indexed && 0 == strcmp(p->macro, MVAR_TIME))
@@ -2539,12 +2546,13 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_NAME))
 		{
-			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_NAME, replace_to);
+			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_NAME, replace_to,
+					userid);
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_DESCRIPTION))
 		{
 			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_DESCRIPTION,
-					replace_to);
+					replace_to, userid);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TIME))
 		{
@@ -2687,12 +2695,13 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_NAME))
 		{
-			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_NAME, replace_to);
+			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_NAME, replace_to,
+					userid);
 		}
 		else if (0 == strcmp(p->macro, MVAR_PROXY_DESCRIPTION))
 		{
 			ret = expr_get_proxy_name_description(c_event->objectid, ZBX_DB_REQUEST_PROXY_DESCRIPTION,
-					replace_to);
+					replace_to, userid);
 		}
 		else if (0 == strcmp(p->macro, MVAR_TIME))
 		{
