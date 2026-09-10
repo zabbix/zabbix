@@ -112,6 +112,7 @@ class CApmTrace extends CApmGeneral {
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
 			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -174,7 +175,9 @@ class CApmTrace extends CApmGeneral {
 		}
 
 		if (!$options['countOutput']) {
-			$outer_query->limit($options['limit']);
+			$outer_query
+				->limit($options['limit'])
+				->offset($options['offset']);
 		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, [

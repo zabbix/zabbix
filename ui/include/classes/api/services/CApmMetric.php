@@ -177,7 +177,8 @@ class CApmMetric extends CApmGeneral {
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'start_time_unix', 'time_unix']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
-			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -211,7 +212,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
 			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
-				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit']))
+				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
 					'time_from' => $options['time_from']
@@ -301,7 +302,9 @@ class CApmMetric extends CApmGeneral {
 				$query->order('u.'.$field, $sort_order);
 			}
 
-			$query->limit($options['limit']);
+			$query
+				->limit($options['limit'])
+				->offset($options['offset']);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());

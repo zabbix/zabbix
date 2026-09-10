@@ -30,6 +30,7 @@ final class CClickHouseHelper {
 			'sortfield' => null,
 			'sortorder' => null,
 			'limit' => null,
+			'offset' => null
 		], $options);
 
 		$query = (new CClickHouseQuery())->from($table, $table_alias);
@@ -54,7 +55,9 @@ final class CClickHouseHelper {
 			self::addQueryOutputOptions($query, $options, $db_schema, $table, $table_alias);
 		}
 
-		$query->limit($options['limit']);
+		$query
+			->limit($options['limit'])
+			->offset($options['offset']);
 
 		return $query;
 	}
