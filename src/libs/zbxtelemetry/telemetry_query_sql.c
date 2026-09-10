@@ -298,19 +298,19 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(zbx_tq_query_t *query, const 
 		switch (aggr_col->function)
 		{
 			case ZBX_TQ_FUNCTION_COUNT:
-				zbx_strcpy_alloc(&str, &alloc, &offset, "COUNT(*)");
+				zbx_strcpy_alloc(&str, &alloc, &offset, "count(*)");
 				break;
 			case ZBX_TQ_FUNCTION_MIN:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "MIN(%s)", operand);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "min(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_MAX:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "MAX(%s)", operand);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "max(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_AVG:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "AVG(%s)", operand);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "avg(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_SUM:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "SUM(%s)", operand);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "sum(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_PERCENTILE:
 			{
@@ -400,7 +400,7 @@ static char	*tq_sql_dyn_get_condition_contains(const char *atom, const char *val
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", atom, value_esc);
+		str = zbx_dsprintf(NULL, "%s like '%%%s%%'", atom, value_esc);
 	}
 	else
 	{
@@ -449,7 +449,7 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_
 			char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
 
 			/* ensure that "not equal" results in false if attribute key is missing */
-			str = zbx_dsprintf(NULL, "(%s AND %s%s%s)", exists_check, operand, operator_str, value_esc);
+			str = zbx_dsprintf(NULL, "(%s and %s%s%s)", exists_check, operand, operator_str, value_esc);
 
 			zbx_free(exists_check);
 		}
@@ -468,7 +468,7 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_
 		char	*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
 		char	*str = tq_sql_dyn_get_condition_contains(operand, value, ctx);
 
-		str = zbx_dsprintf(str, "(%s%s)", (ZBX_TQ_OPERATOR_CONTAINS == operator ? "" : "NOT "), str);
+		str = zbx_dsprintf(str, "(%s%s)", (ZBX_TQ_OPERATOR_CONTAINS == operator ? "" : "not "), str);
 
 		zbx_free(operand);
 
@@ -540,7 +540,7 @@ static char	*tq_sql_dyn_get_conditions_simple(zbx_tq_query_t *query, const tq_sq
 		if (query->conditions.values_num - 1 != i)
 		{
 			zbx_strcpy_alloc(&str, &alloc, &offset,
-					(query->evaltype == ZBX_TQ_EVAL_TYPE_AND ? " AND " : " OR "));
+					(query->evaltype == ZBX_TQ_EVAL_TYPE_AND ? " and " : " or "));
 		}
 
 		zbx_free(cond_str);
@@ -587,11 +587,11 @@ static char	*tq_sql_dyn_get_conditions_and_or(zbx_tq_query_t *query, const tq_sq
 		else if (0 != tq_condition_ptr_compare_by_column_and_key((void *)&cond,
 				(void *)&conditions_sorted.values[i + 1]))
 		{
-			zbx_strcpy_alloc(&str, &alloc, &offset, ")AND(");
+			zbx_strcpy_alloc(&str, &alloc, &offset, ")and(");
 		}
 		else
 		{
-			zbx_strcpy_alloc(&str, &alloc, &offset, " OR ");
+			zbx_strcpy_alloc(&str, &alloc, &offset, " or ");
 		}
 
 		zbx_free(cond_str);
@@ -709,9 +709,9 @@ void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int l
 			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
 	/* select */
-	zbx_strcpy_alloc(sql, &alloc, &offset, "SELECT ");
+	zbx_strcpy_alloc(sql, &alloc, &offset, "select ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"intDiv((toUnixTimestamp(\"%s\")-" ZBX_FS_TIME_T "), %d)*%d+" ZBX_FS_TIME_T " AS rounded_time,",
+			"intDiv((toUnixTimestamp(\"%s\")-" ZBX_FS_TIME_T "), %d)*%d+" ZBX_FS_TIME_T " as rounded_time,",
 			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, granularity, granularity,
 			(zbx_fs_time_t)timestamp_filter_lower_bound);
 
@@ -721,29 +721,29 @@ void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int l
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
 
 	/* from */
-	zbx_snprintf_alloc(sql, &alloc, &offset, "FROM %s ", table_to_select_from);
+	zbx_snprintf_alloc(sql, &alloc, &offset, "from %s ", table_to_select_from);
 
 	/* where */
-	zbx_strcpy_alloc(sql, &alloc, &offset, "WHERE ");
+	zbx_strcpy_alloc(sql, &alloc, &offset, "where ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
 			"\"%s\">=toDateTime(" ZBX_FS_TIME_T ") "
-			"AND \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
+			"and \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
 			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, ts_col,
 			(zbx_fs_time_t)timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
-		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
+		zbx_snprintf_alloc(sql, &alloc, &offset, "and (%s) ", conditions);
 
 	/* group by */
-	zbx_snprintf_alloc(sql, &alloc, &offset, "GROUP BY rounded_time%s%s ",
+	zbx_snprintf_alloc(sql, &alloc, &offset, "group by rounded_time%s%s ",
 			(SUCCEED == query_has_columns ? "," : ""), columns_to_select);
 
 	/* order by */
-	zbx_snprintf_alloc(sql, &alloc, &offset, "ORDER BY rounded_time%s%s ",
+	zbx_snprintf_alloc(sql, &alloc, &offset, "order by rounded_time%s%s ",
 			(SUCCEED == query_has_columns ? "," : ""), columns_to_select);
 
-	zbx_snprintf_alloc(sql, &alloc, &offset, "LIMIT %d ", ZBX_TQ_MAX_RESULT_ROWS + 1);
-	zbx_strcpy_alloc(sql, &alloc, &offset, "FORMAT JSONCompactEachRow ");
-	zbx_snprintf_alloc(sql, &alloc, &offset, "SETTINGS "
+	zbx_snprintf_alloc(sql, &alloc, &offset, "limit %d ", ZBX_TQ_MAX_RESULT_ROWS + 1);
+	zbx_strcpy_alloc(sql, &alloc, &offset, "format JSONCompactEachRow ");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "settings "
 			"output_format_json_quote_64bit_floats=0,"
 			"output_format_json_quote_64bit_integers=0,"
 			"output_format_json_quote_decimals=0,"
