@@ -792,6 +792,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'zabbix.php?action=timeouts.edit',
 					'return_button' => false
 				]
+			],
+			// #70 Timeout options update.
+			[
+				[
+					'db' => 'SELECT * FROM settings',
+					'link' => 'zabbix.php?action=apm.db.edit',
+					'return_button' => false
+				]
 			]
 		];
 	}
