@@ -115,7 +115,7 @@ $event_names_template = (new CTemplateTag('event-names-row-tmpl'))
 			(new CCol())
 				->setId('event_names_#{rowNum}_error_container')
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setColSpan(4)
+				->setColSpan(3)
 		]))->addClass('form_row')
 	);
 
