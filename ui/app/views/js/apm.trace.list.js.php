@@ -38,6 +38,8 @@
 		#refresh_message_box = null;
 		/** @type {CSideDrawer|null} */
 		#side_drawer = null;
+		/** @type {TraceViewPage|null} */
+		#trace_view_page = null;
 		/** @type {string|null} */
 		#selected_traceid = null;
 
@@ -367,12 +369,12 @@
 
 		#onSideDrawerOpen = e => {
 			const {response} = e.detail;
-			const { trace_view, trace_view_data } = response;
+			const {trace_view, trace_view_data} = response;
 
 			const element = this.#side_drawer.getElement();
 			element.innerHTML = trace_view;
 
-			new TraceViewPage(element, trace_view_data);
+			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
 		}
 
 		#onSideDrawerClose = () => {
@@ -380,6 +382,9 @@
 
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			this.#trace_view_page?.destroy();
+			this.#trace_view_page = null;
 
 			this.#selected_traceid = null;
 		}
