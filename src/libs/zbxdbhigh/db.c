@@ -14,6 +14,7 @@
 
 #include "zbxdbhigh.h"
 
+#include "zbxnix.h"
 #include "zbxthreads.h"
 #include "zbxcfg.h"
 #include "zbxcrypto.h"
@@ -282,6 +283,9 @@ int	zbx_db_connect(int flag)
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
 			exit(EXIT_FAILURE);
 		}
+
+		if (0 == ZBX_IS_RUNNING())
+			break;
 #if defined(HAVE_POSTGRESQL)
 		if (ZBX_DB_RONLY == err)
 		{
@@ -346,6 +350,9 @@ static void	DBtxn_operation(int (*txn_operation)(void))
 
 	while (ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+			break;
+
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -447,6 +454,9 @@ void	zbx_db_statement_prepare(const char *sql)
 
 	while (ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+			break;
+
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -478,6 +488,9 @@ int	zbx_db_execute(const char *fmt, ...)
 
 	while (ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+			break;
+
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -578,6 +591,9 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+			break;
+
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -609,6 +625,9 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+			break;
+
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
