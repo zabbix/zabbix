@@ -432,7 +432,7 @@ class CCepRule extends CApiService {
 			'window' =>			['type' => API_ANY],
 			'operations' =>		['type' => API_ANY],
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::EXECUTION_CONTINUE, CCepRuleHelper::EXECUTION_STOP])],
-			'sortorder' =>		['type' => API_INT32, 'flags' => $api_required],
+			'sortorder' =>		['type' => API_INT32, 'flags' => $api_required, 'in' => '0:'.ZBX_MAX_INT32],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_rule', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED])]
 		]];
@@ -637,7 +637,7 @@ class CCepRule extends CApiService {
 
 			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 				'operations' =>	['type' => API_OBJECTS, 'flags' => $api_required | $api_not_empty | API_ALLOW_UNEXPECTED, 'uniq' => [['sortorder']], 'fields' => [
-					'sortorder' =>		['type' => API_INT32, 'flags' => API_REQUIRED],
+					'sortorder' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32],
 					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED]
 				]]
 			]];
