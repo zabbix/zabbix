@@ -327,7 +327,13 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', () => {
+						row.addEventListener('click', e => {
+							/** @type {HTMLElement} */
+							const target = e.target;
+							if (target.hasAttribute('data-hintbox')) {
+								return;
+							}
+
 							const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 							row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
