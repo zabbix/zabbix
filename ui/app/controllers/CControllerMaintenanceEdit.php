@@ -249,17 +249,14 @@ class CControllerMaintenanceEdit extends CController {
 
 		switch ($this->getInput('context')) {
 			case 'host':
-				$db_hosts = $hostids
-					? API::Host()->get([
+				$data['hosts_ms'] = $hostids
+					? CArrayHelper::renameObjectsKeys(API::Host()->get([
 						'output' => ['hostid', 'name'],
 						'hostids' => array_keys($hostids),
 						'editable' => true,
-					])
+						'preservekeys' => true
+					]), ['hostid' => 'id'])
 					: [];
-
-				foreach (CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']) as $host) {
-					$data['hosts_ms'][$host['id']] = $host;
-				}
 
 				CArrayHelper::sort($data['hosts_ms'], ['name']);
 				break;
@@ -309,20 +306,16 @@ class CControllerMaintenanceEdit extends CController {
 
 	protected function getHostGroupsMultiselect(array $hostids): array {
 		$db_groups = $hostids
-			? API::HostGroup()->get([
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'hostids' => array_keys($hostids),
 				'editable' => true,
-				'sortfield' => 'name',
 				'preservekeys' => true
-			])
+			]), ['groupid' => 'id'])
 			: [];
 
-		$groups_ms = [];
-		foreach (CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']) as $group) {
-			$groups_ms[$group['id']] = $group;
-		}
+		CArrayHelper::sort($db_groups, ['name']);
 
-		return $groups_ms;
+		return $db_groups;
 	}
 }
