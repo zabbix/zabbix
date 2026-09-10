@@ -20,7 +20,7 @@
 class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationFields()) & $this->checkInputInterfaces();
+		$ret = $this->validateInput(self::getValidationFields()) & $this->validateInterfaces();
 
 		if (!$ret) {
 			$this->setResponse(
