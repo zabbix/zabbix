@@ -688,10 +688,10 @@ function getMenuPopupDashboard(options, trigger_element) {
  *        {bool}   options['allowed_ui_conf_hosts']       Whether user has access to Configuration > Hosts.
  *        {bool}   options['allowed_ui_latest_data']      Whether user has access to Monitoring > Latest data.
  *        {bool}   options['allowed_ui_problems']         Whether user has access to Monitoring > Problems.
- *        {bool}   options['allowed_edit_maintenance']    Whether user has permission to edit Maintenance for the
- *                                                        related trigger.
+ *        {bool}   options['allowed_edit_maintenance']    Whether user has permission to edit Maintenance.
  *        {bool}   options['backurl']                     URL from where the menu popup was called.
  *        {bool}   options['show_events']                 Show Problems item enabled. Default: false.
+ *        {bool}   options['isWritable']                 Whether user has edit permission to related trigger.
  *        {string} options['eventid']                     (optional) Required for "Update problem" section and event
  *                                                        rank change.
  *        {array}  options['eventids']                    (optional)
@@ -961,7 +961,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 					popup: 'maintenance.edit',
 					context: item.context,
 					eventids: [options.eventid]
-				})
+				}),
+				disabled: !options.isWritable
 			});
 		}
 		sections.push({
