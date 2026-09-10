@@ -507,7 +507,11 @@ class CSettings extends CApiService {
 			if ($settings['apm_global_db']['status'] !== $db_settings['apm_global_db']['status']) {
 				CApiSettingsHelper::updateParameters(
 					['apm_global_db' =>  CSettingsSchema::getDefault('apm_global_db')],
-					['apm_global_db' => json_encode($db_settings['apm_global_db'], JSON_UNESCAPED_UNICODE)]
+					[
+						'apm_global_db' => json_encode($db_settings['apm_global_db'],
+							JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+						)
+					]
 				);
 
 				$settings['apm_global_db'] += $apm_global_db_defaults;
@@ -535,12 +539,15 @@ class CSettings extends CApiService {
 			$settings['apm_global_db'] += ['ssl_verify_host' => $apm_global_db_defaults['ssl_verify_host']];
 		}
 
-		$apm_global_db =
-			json_encode(array_merge($db_settings['apm_global_db'], $settings['apm_global_db']), JSON_UNESCAPED_UNICODE);
+		$apm_global_db = json_encode(array_merge($db_settings['apm_global_db'], $settings['apm_global_db']),
+			JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+		);
 
 		$db_apm_global_db = $db_settings['apm_global_db']['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED
 			? CSettingsSchema::getDefault('apm_global_db')
-			: json_encode($db_settings['apm_global_db'], JSON_UNESCAPED_UNICODE);
+			: json_encode($db_settings['apm_global_db'],
+				JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+			);
 
 		CApiSettingsHelper::updateParameters(['apm_global_db' => $apm_global_db],
 			['apm_global_db' => $db_apm_global_db]
