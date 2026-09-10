@@ -145,7 +145,7 @@ class ApmDbClickHouse {
 			CURLOPT_URL => $this->config['url'],
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_SHARE => $this->curl_share,
-			CURLOPT_SSL_VERIFYPEER => (bool) $this->config['ssl_verify_peer'],
+			CURLOPT_SSL_VERIFYPEER => $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
 			CURLOPT_HTTPHEADER => $http_headers
 		];
