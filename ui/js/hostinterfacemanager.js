@@ -228,10 +228,9 @@ class HostInterfaceManager {
 
 			if (changed_field_names.length > 0) {
 				input_community.dispatchEvent(new CustomEvent('field.change',
-					{detail: {source_fields: changed_field_names} }
+					{detail: {source_fields: changed_field_names}}
 				));
 			}
-
 		}).trigger('change');
 	}
 
