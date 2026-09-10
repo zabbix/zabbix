@@ -121,28 +121,26 @@ class CMaintenanceHelper {
 	}
 
 	public static function getNextIndexedName(string $base_name): string {
-		$reserved_length = 5;
-		$base_name = trim(mb_substr($base_name, 0, DB::getFieldLength('maintenances', 'name') - $reserved_length));
+		$max_length = DB::getFieldLength('maintenances', 'name');
+		$reserved_length = 3;
 
-		$maintenances = API::Maintenance()->get([
+		$db_names = array_column(API::Maintenance()->get([
 			'output' => ['name'],
 			'search' => [
-				'name' => $base_name
+				'name' => mb_substr($base_name, 0, $max_length - $reserved_length)
 			],
 			'startSearch' => true
-		]);
+		]), 'name', 'name');
 
-		$max_index = 0;
+		for ($i = 0; $i < pow(10, $reserved_length - 1); $i++) {
+			$suffix = $i == 0 ? '' : ' '.$i;
+			$name = mb_substr($base_name, 0, $max_length - strlen($suffix)).$suffix;
 
-		foreach ($maintenances as $maintenance) {
-			if (!preg_match('/^'.preg_quote($base_name, '/').'(?: (\d+))?$/u', $maintenance['name'], $matches)) {
-				continue;
+			if (!array_key_exists($name, $db_names)) {
+				return $name;
 			}
-
-			$index = (int) ($matches[1] ?? '1');
-			$max_index = max($max_index, $index);
 		}
 
-		return $max_index == 0 ? $base_name : $base_name.' '.($max_index + 1);
+		return mb_substr($base_name, 0, $max_length);
 	}
 }
