@@ -14,12 +14,12 @@
 
 #include "zbxdbhigh.h"
 
-#include "zbxnix.h"
 #include "zbxthreads.h"
 #include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
+#include "zbxnix.h"
 
 #ifdef HAVE_POSTGRESQL
 #	include "zbx_dbversion_constants.h"
@@ -3287,6 +3287,12 @@ retry_oracle:
 
 	if (ZBX_DB_DOWN == rc)
 	{
+		if (0 == ZBX_IS_RUNNING())
+		{
+			ret = FAIL;
+			goto out;
+		}
+
 		if (0 < tries++)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);

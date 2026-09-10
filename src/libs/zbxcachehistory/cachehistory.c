@@ -14,6 +14,7 @@
 
 #include "zbxcachehistory.h"
 
+#include "zbxnix.h"
 #include "zbxmutexs.h"
 #include "module.h"
 #include "zbxexport.h"
@@ -3176,6 +3177,15 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			{
 				UNLOCK_CACHE;
 
+				if (0 == ZBX_IS_RUNNING())
+				{
+					/* shutdown was requested while waiting for cache space - drop this  */
+					/* value rather than wait indefinitely for syncers that may          */
+					/* themselves be exiting; already queued values are unaffected       */
+					LOCK_CACHE;
+					goto next_value;
+				}
+
 				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
 				sleep(1);
 
@@ -3197,6 +3207,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item->head = data;
 		}
 		item->values_num++;
+next_value:;
 	}
 }
 

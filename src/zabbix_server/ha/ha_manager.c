@@ -14,7 +14,6 @@
 
 #include "ha.h"
 
-#include "zbxnix.h"
 #include "../rtc/rtc_server.h"
 #include "../audit/audit_server.h"
 
@@ -37,6 +36,7 @@
 #include "zbxalgo.h"
 #include "zbxlog.h"
 #include "zbxself.h"
+#include "zbxnix.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
