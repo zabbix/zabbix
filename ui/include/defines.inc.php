@@ -2387,6 +2387,7 @@ define('ZBX_ICON_ALERT', 'zi-alert');
 define('ZBX_ICON_ALERTS', 'zi-alerts');
 define('ZBX_ICON_ALERT_WITH_CONTENT', 'zi-alert-with-content');
 define('ZBX_ICON_ALERT_MORE', 'zi-alert-more');
+define('ZBX_ICON_APM_NOT_CONFIGURED_LARGE', 'zi-widget-empty-references-large');
 define('ZBX_ICON_ARROW_BACK', 'zi-arrow-back');
 define('ZBX_ICON_ARROW_DOWN', 'zi-arrow-down');
 define('ZBX_ICON_ARROW_DOWN_SMALL', 'zi-arrow-down-small');
