@@ -1768,7 +1768,7 @@ class CSvgGraph extends CSvg {
 	function truncateTextByMaxWidth(int $font_size, string $text, int $max_width, int $ellipsis_width): string {
 		$text_width = imageTextSize($font_size, 0, $text)['width'];
 
-		if ($text_width <= $max_width) {
+		if ($text_width <= $max_width || $max_width < $ellipsis_width) {
 			return $text;
 		}
 
