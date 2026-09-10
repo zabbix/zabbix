@@ -2708,9 +2708,20 @@ button {
     overflow-y: hidden;
     background-color: #ffffff;
     border-top: 1px solid #dfe4e7;
-    box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: #c2c2c2 #ffffff; }
+    box-sizing: border-box; }
+    @supports not selector(::-webkit-scrollbar) {
+      .datatable .datatable-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #c2c2c2 #ffffff; } }
+    .datatable .datatable-scrollbar::-webkit-scrollbar {
+      height: calc(var(--datatable-scrollbar-height) - 2px); }
+    .datatable .datatable-scrollbar::-webkit-scrollbar-track {
+      background-color: #ffffff; }
+    .datatable .datatable-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #c2c2c2;
+      background-clip: content-box;
+      border: 3px solid transparent;
+      border-radius: calc(var(--button-border-radius) + 3px); }
     .datatable .datatable-scrollbar .datatable-scrollbar-inner {
       height: 0; }
       .datatable .datatable-scrollbar .datatable-scrollbar-inner::after {

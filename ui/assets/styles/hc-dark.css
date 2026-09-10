@@ -2645,9 +2645,20 @@ button {
     overflow-y: hidden;
     background-color: #000000;
     border-top: 1px solid #444444;
-    box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: #c2c2c2 #000000; }
+    box-sizing: border-box; }
+    @supports not selector(::-webkit-scrollbar) {
+      .datatable .datatable-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #c2c2c2 #000000; } }
+    .datatable .datatable-scrollbar::-webkit-scrollbar {
+      height: calc(var(--datatable-scrollbar-height) - 2px); }
+    .datatable .datatable-scrollbar::-webkit-scrollbar-track {
+      background-color: #000000; }
+    .datatable .datatable-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #c2c2c2;
+      background-clip: content-box;
+      border: 3px solid transparent;
+      border-radius: calc(var(--button-border-radius) + 3px); }
     .datatable .datatable-scrollbar .datatable-scrollbar-inner {
       height: 0; }
       .datatable .datatable-scrollbar .datatable-scrollbar-inner::after {
