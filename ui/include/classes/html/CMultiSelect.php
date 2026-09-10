@@ -253,7 +253,7 @@ class CMultiSelect extends CTag {
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
 					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned',
-					'has_devices_access', 'templated', 'userid'
+					'has_devices_access', 'userid'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -353,11 +353,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('editable', $parameters) && $parameters['editable']) {
 					$popup_parameters['writeonly'] = '1';
 					$autocomplete_parameters['editable'] = true;
-				}
-
-				if (array_key_exists('templated', $parameters)) {
-					$popup_parameters['templated'] = $parameters['templated'];
-					$autocomplete_parameters['templated'] = $parameters['templated'];
 				}
 
 				if (array_key_exists('monitored_hosts', $parameters) && $parameters['monitored_hosts']) {
