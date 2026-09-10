@@ -448,6 +448,9 @@ class CSettings extends CApiService {
 
 		$url_scheme = parse_url($apm_global_db['url'], PHP_URL_SCHEME);
 
+		$is_url_scheme_https = is_string($url_scheme)
+			&& strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'username' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 										? ['type' => API_STRING_UTF8, 'flags' => $username_api_required | API_NOT_EMPTY, 'length' => self::APM_GLOBAL_DB_SCHEMA['username']['length']]
@@ -455,7 +458,7 @@ class CSettings extends CApiService {
 			'password' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 										? ['type' => API_STRING_UTF8, 'flags' => $password_api_required, 'length' => self::APM_GLOBAL_DB_SCHEMA['password']['length']]
 										: ['type' => API_STRING_UTF8, 'in' => self::APM_GLOBAL_DB_SCHEMA['password']['default']],
-			'ssl_verify_peer' =>	$url_scheme === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS
+			'ssl_verify_peer' =>	$is_url_scheme_https
 										? ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_PEER_DISABLED, APM_GLOBAL_DB_VERIFY_PEER_ENABLED])]
 										: ['type' => API_INT32, 'in' => self::APM_GLOBAL_DB_SCHEMA['ssl_verify_peer']['default']]
 		]];
@@ -466,7 +469,7 @@ class CSettings extends CApiService {
 
 		$apm_global_db_default = array_map(static fn(array $field) => $field['default'], self::APM_GLOBAL_DB_SCHEMA);
 
-		$apm_global_db += $url_scheme === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS
+		$apm_global_db += $is_url_scheme_https
 			? ['ssl_verify_peer' => $db_apm_global_db['ssl_verify_peer']]
 			: ['ssl_verify_peer' => $apm_global_db_default['ssl_verify_peer']];
 
