@@ -161,7 +161,6 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot post telemetry data: %s", curl_easy_strerror(err));
-		ret |= APM_COMMIT_RETRY;
 		goto out;
 	}
 
@@ -169,6 +168,7 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 	if (CURLE_OK != (err = curl_easy_perform(conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot post telemetry data to ClickHouse: %s", curl_easy_strerror(err));
+		ret |= APM_COMMIT_RETRY;
 		goto out;
 	}
 
@@ -188,7 +188,7 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 
 	ret = APM_COMMIT_OK;
 out:
-	if (0 != (ret & APM_COMMIT_RETRY))
+	if (0 == (ret & APM_COMMIT_RETRY))
 		apm_rowset_clear(rs);
 
 	zbx_free(data);
