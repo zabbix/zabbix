@@ -110,7 +110,6 @@ static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t las
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 
-
 	parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
 
 	if (FAIL == parse_ret)
