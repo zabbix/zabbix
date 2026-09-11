@@ -15,6 +15,7 @@ zabbix_export:
         Setup:
           1. Create a user to monitor the service or use an existing read-only account.
           See (https://helpcenter.veeam.com/references/vbr/13/rest/1.3-rev1/tag/Login#operation/CreateToken) for more details.
+          NOTE: License, Authorization Events, and Security Analyzer Data require the "Backup Administrator" role; without it, these items are not supported.
           2. Link the template to a host.
           3. Configure the following macros: {$VEEAM.API.URL}, {$VEEAM.API.VERSION}, {$VEEAM.USER}, and {$VEEAM.PASSWORD}.
         
@@ -50,11 +51,12 @@ zabbix_export:
         
         1. Create a user to monitor the service or use an existing read-only account.
         > See [Veeam Help Center](https://helpcenter.veeam.com/references/vbr/13/rest/1.3-rev1/tag/SectionOverview#section/Authorization-and-Security) for more details.
+        ***NOTE:*** License, Authorization Events, and Security Analyzer Data require the "Backup Administrator" role; without it, these items are not supported.
         2. Link the template to a host.
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -238,18 +240,28 @@ zabbix_export:
             			endpoints = {
             				proxies: 'api/v1/backupInfrastructure/proxies',
             				proxies_states: 'api/v1/backupInfrastructure/proxies/states',
-            				license: 'api/v1/license',
             				managedServers: 'api/v1/backupInfrastructure/managedServers',
             				repositories_states: 'api/v1/backupInfrastructure/repositories/states',
             				jobs_states: 'api/v1/jobs/states',
             				malware_events: 'api/v1/malwareDetection/events',
-            				authorization_events: 'api/v1/authorization/events',
             				sessions: 'api/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
+            			},
+            			restricted_endpoints = {
+            				license: 'api/v1/license',
+            				authorization_events: 'api/v1/authorization/events'
             			};
             
             		Veeam.login();
             		Object.keys(endpoints).forEach(function (key) {
             			data[key] = Veeam.getRequest(Veeam.params.api_endpoint + endpoints[key]);
+            		});
+            		Object.keys(restricted_endpoints).forEach(function (key) {
+            			try {
+            				data[key] = Veeam.getRequest(Veeam.params.api_endpoint + restricted_endpoints[key]);
+            			}
+            			catch (error) {
+            				Zabbix.log(3, '[ Veeam Backup and Replication ] Require the "Backup Administrator" role for endpoint "' + key + '": ' + error);
+            			}
             		});
             		Veeam.logout();
             
@@ -297,6 +309,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.expirationDate
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: JAVASCRIPT
               parameters:
                 - 'return Math.floor(Date.parse(value) / 1000);'
@@ -329,6 +343,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.instanceLicenseSummary.licensedInstancesNumber
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -349,6 +365,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.status
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -393,6 +411,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.instanceLicenseSummary.usedInstancesNumber
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -402,7 +422,7 @@ zabbix_export:
             - tag: component
               value: license
         - uuid: bd9e21c825094553ad711a594d049a5b
-          name: 'Get Security Analyzer results'
+          name: 'Get security analyzer results'
           type: HTTP_AGENT
           key: veeam.security.analyzer.get
           delay: '{$VEEAM.SECURITY.DATA.FREQUENCY}'
@@ -466,6 +486,10 @@ zabbix_export:
                   
                   Zabbix.log(4, '[ Veeam Backup and Replication ] Sending request: ' + url);
                   response = request.get(url);
+                  
+                  if (request.getStatus() === 403) {
+                  	throw 'Request failed with status code 403: "Backup Administrator" role is required.';
+                  }
                   
                   if (request.getStatus() !== 200 || response === null) {
                   	throw 'Request failed with status code ' + request.getStatus() + ': ' + response + '.';
@@ -591,6 +615,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.authorization_events.data
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h

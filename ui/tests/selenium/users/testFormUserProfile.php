@@ -72,9 +72,9 @@ class testFormUserProfile extends CLegacyWebTest {
 		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
 
 		// Check theme fields options.
-		$this->assertEquals(
-			['System default', 'Blue', 'Blue (classic)', 'Dark', 'Dark (classic)', 'High-contrast light', 'High-contrast dark'],
-			$this->query('name:theme')->asDropdown()->waitUntilVisible()->one()->getOptions()->asText()
+		$this->assertEquals(['System default', 'Blue', 'Blue (classic)', 'Dark', 'Dark blue', 'Dark (classic)',
+				'High-contrast light', 'High-contrast dark'], $this->query('name:theme')->asDropdown()->waitUntilVisible()
+				->one()->getOptions()->asText()
 		);
 
 		$form->fill(['Theme' => 'Blue'])->submit();
