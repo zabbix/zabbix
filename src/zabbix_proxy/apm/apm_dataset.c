@@ -235,8 +235,6 @@ void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 
 		zbx_free(rs->rows.values[i].cols);
 	}
-
-	zbx_vector_apm_row_destroy(&rs->rows);
 }
 
 zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs)
@@ -264,15 +262,28 @@ void	apm_dataset_init(zbx_apm_dataset_t *ds)
 #undef APM_ROWSET_INIT
 }
 
-void	apm_dataset_clear(zbx_apm_dataset_t *ds)
+void	apm_dataset_destroy(zbx_apm_dataset_t *ds)
 {
 	apm_rowset_clear(&ds->metrics_gauge);
+	zbx_vector_apm_row_destroy(&ds->metrics_gauge.rows);
+
 	apm_rowset_clear(&ds->metrics_sum);
+	zbx_vector_apm_row_destroy(&ds->metrics_sum.rows);
+
 	apm_rowset_clear(&ds->metrics_histogram);
+	zbx_vector_apm_row_destroy(&ds->metrics_histogram.rows);
+
 	apm_rowset_clear(&ds->metrics_exponential_histogram);
+	zbx_vector_apm_row_destroy(&ds->metrics_exponential_histogram.rows);
+
 	apm_rowset_clear(&ds->metrics_summary);
+	zbx_vector_apm_row_destroy(&ds->metrics_summary.rows);
+
 	apm_rowset_clear(&ds->logs);
+	zbx_vector_apm_row_destroy(&ds->logs.rows);
+
 	apm_rowset_clear(&ds->traces);
+	zbx_vector_apm_row_destroy(&ds->traces.rows);
 }
 
 static void	apm_value_snprintf_alloc(char **str, size_t *str_alloc, size_t *str_offset,

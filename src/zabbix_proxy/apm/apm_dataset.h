@@ -85,7 +85,7 @@ typedef struct
 zbx_apm_dataset_t;
 
 void	apm_dataset_init(zbx_apm_dataset_t *ds);
-void	apm_dataset_clear(zbx_apm_dataset_t *ds);
+void	apm_dataset_destroy(zbx_apm_dataset_t *ds);
 void	apm_dataset_dump(zbx_apm_dataset_t *ds);
 
 void	apm_rowset_clear(zbx_apm_rowset_t *rs);

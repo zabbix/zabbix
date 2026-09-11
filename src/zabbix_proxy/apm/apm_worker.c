@@ -79,7 +79,7 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	apm_exporter_release(worker->exporters, exporter);
 
-	apm_dataset_clear(&ds);
+	apm_dataset_destroy(&ds);
 }
 
 void	*apm_worker_entry(void *args)
