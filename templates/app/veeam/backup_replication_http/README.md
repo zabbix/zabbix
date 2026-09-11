@@ -31,7 +31,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Veeam Backup and Replication, version 13.0
+- Veeam Backup and Replication, version 13.1.1.18
 
 ## Configuration
 
@@ -50,7 +50,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$VEEAM.API.URL}|<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p>|`https://localhost:9419`|
-|{$VEEAM.API.VERSION}|<p>The REST API revision.</p>|`1.3-rev1`|
+|{$VEEAM.API.VERSION}|<p>The REST API revision.</p>|`1.3-rev2`|
 |{$VEEAM.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.</p>|`full`|
 |{$VEEAM.PASSWORD}|<p>The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
@@ -102,7 +102,7 @@ This template has been tested on:
 |Get security analyzer results|<p>Authenticates with the Veeam API and retrieves security analyzer best practices data.</p>|HTTP agent|veeam.security.analyzer.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |License: Status|<p>The status of the license.</p>|Dependent item|veeam.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.status`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.expirationDate`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `return Math.floor(Date.parse(value) / 1000);`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |License: Licensed instances|<p>The number of licensed instances.</p>|Dependent item|veeam.license.licensed.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.licensedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |License: Used instances|<p>The number of used instances.</p>|Dependent item|veeam.license.used.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.usedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
