@@ -856,10 +856,7 @@ class CMaintenance extends CApiService {
 			else {
 				$db_triggerids = array_column($db_maintenances[$maintenance['maintenanceid']]['triggers'], 'triggerid');
 
-				$ins_triggerids = array_flip(array_diff($triggerids, $db_triggerids));
-				$del_triggerids = array_flip(array_diff($db_triggerids, $triggerids));
-
-				$edit_triggerids += $ins_triggerids + $del_triggerids;
+				$edit_triggerids += array_flip(array_diff($triggerids, $db_triggerids));
 			}
 		}
 
