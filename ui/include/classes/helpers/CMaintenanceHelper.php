@@ -127,14 +127,14 @@ class CMaintenanceHelper {
 		$db_names = array_column(API::Maintenance()->get([
 			'output' => ['name'],
 			'search' => [
-				'name' => mb_substr($base_name, 0, $max_length - $reserved_length)
+				'name' => rtrim(mb_substr($base_name, 0, $max_length - $reserved_length))
 			],
 			'startSearch' => true
 		]), 'name', 'name');
 
 		for ($i = 0; $i < pow(10, $reserved_length - 1); $i++) {
 			$suffix = $i == 0 ? '' : ' '.$i;
-			$name = mb_substr($base_name, 0, $max_length - strlen($suffix)).$suffix;
+			$name = rtrim(mb_substr($base_name, 0, $max_length - strlen($suffix))).$suffix;
 
 			if (!array_key_exists($name, $db_names)) {
 				return $name;
