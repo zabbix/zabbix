@@ -688,6 +688,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  *        {bool}   options['allowed_ui_conf_hosts']       Whether user has access to Configuration > Hosts.
  *        {bool}   options['allowed_ui_latest_data']      Whether user has access to Monitoring > Latest data.
  *        {bool}   options['allowed_ui_problems']         Whether user has access to Monitoring > Problems.
+ *        {bool}   options['allowed_ui_conf_maintenance'] Whether user has access to Configuration > Maintenance.
  *        {bool}   options['allowed_edit_maintenance']    Whether user has permission to edit Maintenance.
  *        {bool}   options['backurl']                     URL from where the menu popup was called.
  *        {bool}   options['show_events']                 Show Problems item enabled. Default: false.
@@ -943,7 +944,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	const has_eventid = options.eventid !== undefined && Number(options.eventid) > 0;
 
-	if (options.allowed_edit_maintenance && has_eventid) {
+	if (options.allowed_ui_conf_maintenance && options.allowed_edit_maintenance && has_eventid) {
 		const item_urls = [];
 
 		const maintenance = [

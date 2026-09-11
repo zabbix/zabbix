@@ -162,7 +162,7 @@ $form_list
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	);
 
-if ($data['allowed_edit_maintenance']) {
+if ($data['allowed_ui_conf_maintenance'] && $data['allowed_edit_maintenance']) {
 	if ($data['editable_triggers_count'] > 0) {
 		$maintenance_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'popup')
