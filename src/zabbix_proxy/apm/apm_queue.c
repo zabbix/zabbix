@@ -33,7 +33,7 @@ zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota)
 	zbx_apm_queue_t	*queue;
 
 	queue = (zbx_apm_queue_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_queue_t));
-	queue->quota = quota;
+	queue->quota = quota * SEC_PER_MIN;
 	queue->window_start = time_monotonic();
 
 	return queue;
