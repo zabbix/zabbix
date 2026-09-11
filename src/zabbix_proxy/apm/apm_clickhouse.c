@@ -20,11 +20,21 @@
 #include "zbxcurl.h"
 #include "zbxhttp.h"
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxstr.h"
 
 #if defined(HAVE_LIBCURL)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize ClickHouse connection                                  *
+ *                                                                            *
+ * Parameters: conn  - [OUT] ClickHouse exporter connection                   *
+ *             cfg   - [IN] ClickHouse provider configuration                 *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ *****************************************************************************/
 int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg, char **error)
 {
 	CURLoption	opt;
@@ -66,6 +76,13 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by ClickHouse exporter connection        *
+ *                                                                            *
+ * Parameters: conn - [IN] ClickHouse connection                              *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 {
 	if (NULL != conn->handle)
@@ -74,6 +91,18 @@ void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 	zbx_free(conn->resp.page.data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: append column value to the row being serialized                   *
+ *                                                                            *
+ * Parameters: json  - [IN/OUT] row array being serialized                    *
+ *             col   - [IN] column definition                                 *
+ *             value - [IN] value to append                                   *
+ *                                                                            *
+ * Comments: Map and array columns are serialized into JSON by decoder and    *
+ *           are appended as raw values.                                      *
+ *                                                                            *
+ *****************************************************************************/
 static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_t *col,
 		const zbx_apm_value_t *value)
 {
@@ -113,6 +142,24 @@ static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: insert rowset contents into the specified ClickHouse table        *
+ *                                                                            *
+ * Parameters: conn  - [IN] ClickHouse exporter connection                    *
+ *             cfg   - [IN] ClickHouse provider configuration                 *
+ *             table - [IN] target table name                                 *
+ *             rs    - [IN/OUT] rowset to insert                              *
+ *                                                                            *
+ * Return value: APM_COMMIT_OK    - rows were inserted                        *
+ *               APM_COMMIT_ERR   - insertion failed                          *
+ *               APM_COMMIT_RETRY - insertion must be retried                 *
+ *                                                                            *
+ * Comments: Empty rowset is treated as successfully inserted. The rowset is  *
+ *           cleared unless the insertion has to be retried, leaving only the *
+ *           rows that still have to be inserted.                             *
+ *                                                                            *
+ *****************************************************************************/
 static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 		const char *table, zbx_apm_rowset_t *rs)
 {
@@ -198,6 +245,20 @@ out:
 #undef ZBX_CLICKHOUSE_ASYNC_INSERT
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: insert dataset contents into ClickHouse telemetry tables          *
+ *                                                                            *
+ * Parameters: conn - [IN] ClickHouse exporter connection                     *
+ *             cfg  - [IN] ClickHouse provider configuration                  *
+ *             ds   - [IN/OUT] dataset to insert                              *
+ *                                                                            *
+ * Return value: combined flags of the individual rowset insertions:          *
+ *               APM_COMMIT_OK    - all rows were inserted                    *
+ *               APM_COMMIT_ERR   - at least one insertion failed             *
+ *               APM_COMMIT_RETRY - at least one insertion must be retried    *
+ *                                                                            *
+ *****************************************************************************/
 int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 		zbx_apm_dataset_t *ds)
 {
