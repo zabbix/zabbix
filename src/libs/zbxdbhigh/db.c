@@ -269,10 +269,6 @@ int	zbx_db_connect(int flag)
 
 	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
-		/* each failed attempt leaves behind a connection object (and its socket) that is never */
-		/* reused by the next zbx_db_connect_basic() call - it must be released here or it leaks */
-		zbx_db_close();
-
 		if (ZBX_DB_CONNECT_ONCE == flag)
 		{
 #if defined(HAVE_POSTGRESQL)
