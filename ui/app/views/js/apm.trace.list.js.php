@@ -402,6 +402,8 @@
 			this.#trace_view_page = null;
 
 			this.#selected_traceid = null;
+
+			this.#scheduleRefresh();
 		}
 
 		#validateFormChanges() {
