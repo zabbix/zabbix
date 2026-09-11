@@ -566,7 +566,7 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "Invalid parameter \"/1/interfaces/1/max_repetitions\": an integer is expected."
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/details/max_repetitions\": an integer is expected."
 			],
 			'snmp interface with invalid retries value' => [
 				'request' => [
@@ -592,7 +592,7 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "Invalid parameter \"/1/interfaces/1/retries\": an integer is expected."
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/details/retries\": an integer is expected."
 			],
 			'non-snmp interface with filled details' => [
 				'request' => [
