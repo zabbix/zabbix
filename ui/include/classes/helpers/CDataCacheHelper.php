@@ -105,7 +105,17 @@ class CDataCacheHelper {
 			self::deleteCacheFile();
 		}
 		else {
-			file_put_contents(self::getDataCacheFileName(), json_encode(self::$data));
+			$file_name = self::getDataCacheFileName();
+			$tmp_file_name = tempnam(dirname($file_name), basename($file_name).'.tmp');
+
+			if ($tmp_file_name === false) {
+				return;
+			}
+
+			if (file_put_contents($tmp_file_name, json_encode(self::$data)) === false
+					|| !rename($tmp_file_name, $file_name)) {
+				unlink($tmp_file_name);
+			}
 		}
 	}
 

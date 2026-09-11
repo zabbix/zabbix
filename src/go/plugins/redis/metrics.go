@@ -90,6 +90,12 @@ var (
 		string(comms.TLSKeyFile),
 		"TLS key file path.").
 		WithDefault("")
+
+	//nolint:gochecknoglobals // just a runtime constant
+	paramConnTimeout = metric.NewSessionOnlyParam(
+		"ConnectionTimeout",
+		"Time for connection to timeout.",
+	)
 )
 
 //nolint:gochecknoglobals // just a runtime constant
@@ -99,23 +105,23 @@ var metrics = metric.MetricSet{
 			paramURI, paramPassword,
 			metric.NewParam("Pattern", "Glob-style pattern to filter configuration parameters.").
 				WithDefault("*"),
-			paramUser, paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			paramUser, paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 		}, false),
 
 	keyInfo: metric.NewUnordered("Returns output of INFO command.",
 		[]*metric.Param{
 			paramURI, paramPassword,
 			metric.NewParam("Section", "Section of information to return.").WithDefault("default"),
-			paramUser, paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			paramUser, paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 		}, false),
 
 	keyPing: metric.New("Test if connection is alive or not.",
 		[]*metric.Param{paramURI, paramPassword, paramUser,
-			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout}, false),
 
 	keySlowlog: metric.New("Returns the number of slow log entries since Redis has been started.",
 		[]*metric.Param{paramURI, paramPassword, paramUser,
-			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout}, false),
 }
 
 // handlerFunc defines an interface must be implemented by handlers.

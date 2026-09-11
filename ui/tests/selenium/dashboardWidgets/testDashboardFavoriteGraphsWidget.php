@@ -58,7 +58,7 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 		$this->page->assertHeader('Latest data');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('id:latest')->asDatatable()->one();
+		$table = $this->query('id:datatable-latest')->asDatatable()->one();
 
 		foreach ([$this->graph_cpu, $this->graph_memory] as $graph) {
 			$table_headers = $table->getHeaders();
@@ -71,9 +71,9 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 			// Add graph to favorite.
 			$this->page->waitUntilReady();
 			$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
-			$this->assertEquals('Add to favorites', $button->getAttribute('title'));
+			$this->assertEquals('Add graph to Favorite graphs widget', $button->getAttribute('aria-label'));
 			$button->waitUntilClickable()->click();
-			$button->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+			$button->waitUntilAttributesPresent(['aria-label' => 'Remove graph from the Favorite graphs widget']);
 			$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
 			$this->query('button:Reset')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();

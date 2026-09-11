@@ -210,7 +210,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			$dashboard->pasteWidget();
 		}
 
-		/* On the dashboard the widget has a unique name, except when copied/pasted within the same dashboard.
+		/*
+		 * On the dashboard the widget has a unique name, except when copied/pasted within the same dashboard.
 		 * $new_dashboard contains widget with name 'Test copy Map navigation tree' so name index should be 2 for this case.
 		 */
 		if ($new_page || $new_dashboard) {
@@ -220,15 +221,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$name_index = '[2]';
 		}
 
-		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the content block without the loading appear first,
-		 * and only after that the loading appears.
-		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
-		 */
 		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
 				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
-				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')->waitUntilPresent()->asWidget()->one();
-		sleep(1);
+				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')
+				->waitUntilPresent()->asWidget()->one();
 		$copied_widget->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
@@ -241,6 +237,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
+		// The widget can briefly re-render with an empty header after copy; wait for the name before asserting.
+		$copied_widget->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4'
+		)->waitUntilTextPresent($widget_name);
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields()->filter(CElementFilter::VISIBLE);
 
@@ -792,6 +792,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 				// Check that no inaccessible widgets are present on the pasted page.
 				$dashboard->selectPage($page_name, 2);
+				$dashboard->waitUntilReady();
 				$this->assertFalse($dashboard->query($inaccessible_xpath)->one(false)->isValid());
 				break;
 		}

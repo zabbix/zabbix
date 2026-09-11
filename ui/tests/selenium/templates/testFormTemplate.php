@@ -113,7 +113,10 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates');
+		$table = $this->query('id:datatable-templates')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);

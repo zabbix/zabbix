@@ -378,6 +378,7 @@ class ZBase {
 			'blue-theme' => _('Blue'),
 			'blue-classic-theme' => _('Blue (classic)'),
 			'dark-theme' => _('Dark'),
+			'dark-blue-theme' => _('Dark blue'),
 			'dark-classic-theme' => _('Dark (classic)'),
 			'hc-light' => _('High-contrast light'),
 			'hc-dark' => _('High-contrast dark')
@@ -386,7 +387,7 @@ class ZBase {
 
 	public static function getColorScheme(string $theme): string {
 		return match ($theme) {
-			'dark-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
+			'dark-theme', 'dark-blue-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
 			default => ZBX_COLOR_SCHEME_LIGHT
 		};
 	}
@@ -451,7 +452,8 @@ class ZBase {
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
 					$this->config['DB']['VAULT_PREFIX'], $this->config['DB']['VAULT_DB_PATH'],
-					$this->config['DB']['VAULT_TOKEN']
+					$this->config['DB']['VAULT_TOKEN'], $this->config['DB']['VAULT_APP_ROLE_ID'],
+					$this->config['DB']['VAULT_APP_SECRET_ID']
 				);
 				break;
 		}

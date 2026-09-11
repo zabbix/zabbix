@@ -100,7 +100,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func (p *Plugin) refreshObjects() (err error) {
 	if time.Now().After(p.nextObjectRefresh) {
-		_, err = win32.PdhEnumObject()
+		_, err = win32.PdhEnumObject(true)
 		p.nextObjectRefresh = time.Now().Add(time.Minute)
 	}
 

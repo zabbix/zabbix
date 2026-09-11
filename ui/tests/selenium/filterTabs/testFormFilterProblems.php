@@ -47,7 +47,7 @@ class testFormFilterProblems extends testFormFilter {
 	protected static $time;
 
 	public $url = 'zabbix.php?action=problem.view&show_timeline=0';
-	public $table_selector = 'id:problems';
+	public $table_selector = 'id:datatable-problems';
 
 	public function prepareProblemsData() {
 		// Create hostgroup for hosts with items triggers.

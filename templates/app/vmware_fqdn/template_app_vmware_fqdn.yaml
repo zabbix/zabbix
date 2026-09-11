@@ -47,7 +47,7 @@ zabbix_export:
         - How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters).
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -126,6 +126,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Vcenter = {
             	 params: {},
             	 vmware_api_session_id: '',
@@ -145,6 +170,8 @@ zabbix_export:
             		  params['url'] = params['url'].replace('/sdk','');
             
             		  Vcenter.params = params;
+            		  Vcenter.tls = new CTlsConfig(params.tls_verify);
+            		  Vcenter.tls.checkURL(Vcenter.params.url);
             	 },
             
             	 isGtOrEqVersion: function (first_version, second_version) {
@@ -180,7 +207,7 @@ zabbix_export:
             	  },
             
             	 login: function () {
-            		  var response, request = new HttpRequest();
+            		  var response, request = new HttpRequest(Vcenter.tls.options);
             		  request.setHttpAuth(HTTPAUTH_BASIC, Vcenter.params.username, Vcenter.params.password);
             		  request.addHeader('Accept: application/json');
             		  request.addHeader('Content-Type: application/json');
@@ -248,7 +275,7 @@ zabbix_export:
             	 },
             
             	 request: function (url, method) {
-            		  var response, request = new HttpRequest();
+            		  var response, request = new HttpRequest(Vcenter.tls.options);
             
             		  if (typeof Vcenter.params.proxy !== 'undefined' && Vcenter.params.proxy !== '') {
             			   request.setProxy(Vcenter.params.proxy);
@@ -318,6 +345,8 @@ zabbix_export:
               value: '{$VMWARE.PASSWORD}'
             - name: proxy
               value: '{$VMWARE.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"VMware FQDN"}'
             - name: url
               value: '{$VMWARE.URL}'
             - name: username
@@ -388,7 +417,7 @@ zabbix_export:
           description: 'Discovery of alarms.'
           item_prototypes:
             - uuid: 8e08a252b7344e10850bd177045e9a55
-              name: '{#VMWARE.ALARMS.NAME}'
+              name: '{#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}'
               type: DEPENDENT
               key: 'vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]'
               value_type: CHAR
@@ -410,8 +439,12 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 156400a8c7c04b25b99c540824168a36
                   expression: 'last(/VMware FQDN/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1'
-                  name: 'VMware FQDN: {#VMWARE.ALARMS.NAME}'
-                  description: '{#VMWARE.ALARMS.DESC}'
+                  name: 'VMware FQDN: {#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}'
+                  description: |
+                    '{#VMWARE.ALARMS.DESC}'
+                    Type: {#VMWARE.ALARMS.ENTITY.TYPE} 
+                    UUID: {#VMWARE.ALARMS.ENTITY.UUID}
+                    ID: {#VMWARE.ALARMS.ENTITY.ID}
                   tags:
                     - tag: scope
                       value: notice
@@ -420,6 +453,14 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#VMWARE.ALARMS.DESC}'
               path: $.description
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.ID}'
+              path: $.entity.id
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.NAME}'
+              path: $.entity.name
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.TYPE}'
+              path: $.entity.type
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.UUID}'
+              path: $.entity.uuid
             - lld_macro: '{#VMWARE.ALARMS.KEY}'
               path: $.key
             - lld_macro: '{#VMWARE.ALARMS.NAME}'
@@ -724,12 +765,28 @@ zabbix_export:
         - tag: target
           value: vmware-fqdn
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware FQDN", e.g. {$HTTP.TLS.VERIFY:"VMware FQDN"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VMWARE.DATASTORE.SPACE.CRIT}'
           value: '10'
           description: 'The critical threshold of the datastore free space.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Critical datastore free space threshold'
             description: 'Critical threshold of the datastore free space. In the range from 0 to 100 inclusive.'
@@ -739,7 +796,7 @@ zabbix_export:
           description: 'The warning threshold of the datastore free space.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Warning datastore free space threshold'
             description: 'Warning threshold of the datastore free space. In the range from 0 to 100 inclusive.'
@@ -749,7 +806,7 @@ zabbix_export:
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
           config:
             type: CHECKBOX
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Monitoring of hardware sensors'
             description: 'Whether it is necessary to monitor of hardware sensors.'
@@ -761,7 +818,7 @@ zabbix_export:
           description: 'Sets the regex string of hardware sensor names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Include hardware sensors filter'
             description: 'Regex string to include hardware sensors by sensors name.'
@@ -770,7 +827,7 @@ zabbix_export:
           description: 'Sets the regex string of hardware sensor names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Exclude hardware sensors filter'
             description: 'Regex string to exclude hardware sensors by sensors name.'
@@ -810,7 +867,7 @@ zabbix_export:
           description: 'Possibility to filter out VMs by power state.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'VMs power state filter'
             description: 'Regex string with desired power state of VMs for discovering.'
@@ -1113,7 +1170,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1146,6 +1203,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Consolidation'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1154,9 +1214,6 @@ zabbix_export:
                   	'false'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 2;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
           tags:
             - tag: component
               value: storage
@@ -1490,12 +1547,12 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: 'System boot time.'
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - 'return Math.floor(Date.parse(value)/1000);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+            - type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor(Date.parse(value)/1000);'
           tags:
             - tag: component
               value: system
@@ -1568,6 +1625,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Virtual Machine state'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1580,9 +1640,6 @@ zabbix_export:
                   	'unknown'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 5;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: health
@@ -1648,6 +1705,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Tools status'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1657,9 +1717,6 @@ zabbix_export:
                   	'guestToolsRunning'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: system
@@ -3689,7 +3746,7 @@ zabbix_export:
         Note: To enable discovery of hardware sensors of VMware hypervisors, set the host wizard configuration field `Monitoring of hardware sensors` to the selected state.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -3752,6 +3809,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Connection state'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -3761,9 +3821,6 @@ zabbix_export:
                   	'notResponding'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 3;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: availability
@@ -4354,6 +4411,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -4364,9 +4424,6 @@ zabbix_export:
                       	'red'
                       ].indexOf(value.toLowerCase());
                       return idx !== -1 ? idx : 0;
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
               master_item:
                 key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
               tags:
@@ -4411,12 +4468,12 @@ zabbix_export:
                 - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]'
               error_handler: CUSTOM_VALUE
               error_handler_params: '[]'
-            - type: JAVASCRIPT
-              parameters:
-                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
         - uuid: cabe1fbdd4e04ef396afaa5dfd1a3423
           name: 'Network interface discovery'
           type: SIMPLE
@@ -4476,6 +4533,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$..HostNumericSensorInfo[?(@.name=="{#NAME}")].healthState.label.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -4486,9 +4546,6 @@ zabbix_export:
                       	'red'
                       ].indexOf(value.toLowerCase());
                       return idx !== -1 ? idx : 0;
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
               master_item:
                 key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
               tags:
@@ -4580,6 +4637,9 @@ zabbix_export:
           master_item:
             key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -4630,9 +4690,6 @@ zabbix_export:
                   	Zabbix.log(3, '[ VMware Serial Number Discovery ] ERROR: ' + error);
                   	throw 'Failed to process data:' + error;
                   }
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
       tags:
         - tag: class
           value: software

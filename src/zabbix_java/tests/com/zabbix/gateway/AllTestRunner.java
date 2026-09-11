@@ -22,7 +22,8 @@ public class AllTestRunner
 		{
 			"IntegerValidatorTest",
 			"ZabbixItemTest",
-			"JMXTest"
+			"JMXTest",
+			"AllowedPeersTest"
 		};
 
 		for (int i = 0; i < testClasses.length; i++)

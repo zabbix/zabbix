@@ -91,9 +91,10 @@ $html_page = (new CHtmlPage())
 									->addClass(ZBX_STYLE_BTN_ACTION)
 									->addClass(ZBX_ICON_MENU)
 									->setId('dashboard-actions')
-									->setTitle(_('Actions'))
+									->setHint(_('Actions'), '', false)
 									->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
 									->setAttribute('aria-haspopup', true)
+									->setAttribute('aria-label', _('Dashboard actions'))
 									->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 										$data['dashboard']['editable'], $data['has_related_reports'],
 										$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
@@ -110,7 +111,8 @@ $html_page = (new CHtmlPage())
 					(new CTag('nav', true, new CList([
 						(new CButton('dashboard-config'))
 							->addClass(ZBX_STYLE_BTN_ICON)
-							->addClass(ZBX_ICON_COG_FILLED),
+							->addClass(ZBX_ICON_COG_FILLED)
+							->setAttribute('aria-label', _('Dashboard properties')),
 						(new CList())
 							->addClass(ZBX_STYLE_BTN_SPLIT)
 							->addItem(
@@ -146,17 +148,10 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton())
-						->addClass(ZBX_ICON_PAUSE)
+						->addClass($data['start_slideshow'] ? ZBX_ICON_PAUSE : ZBX_ICON_PLAY)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
-						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-							? _s('Stop slideshow')
-							: _s('Start slideshow')
-						)
-						->addClass(
-							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-								? 'slideshow-state-started'
-								: 'slideshow-state-stopped'
-						)
+						->setTitle($data['start_slideshow'] ? _s('Stop slideshow') : _s('Start slideshow'))
+						->addClass($data['start_slideshow'] ? 'slideshow-state-started' : 'slideshow-state-stopped')
 				)
 				->addItem(
 					(new CSimpleButton())
@@ -223,9 +218,7 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 							->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 							->addClass(ZBX_STYLE_BTN_ALT)
 							->addClass(
-								($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-									? 'slideshow-state-started'
-									: 'slideshow-state-stopped'
+								$data['start_slideshow'] ? 'slideshow-state-started' : 'slideshow-state-stopped'
 							)
 					])
 			)
@@ -244,6 +237,7 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'configuration_hash' => $data['configuration_hash'],
+		'start_slideshow' => $data['start_slideshow'],
 		'dashboard_host' => $data['dashboard_host'],
 		'dashboard_time_period' => $data['dashboard_time_period'],
 		'web_layout_mode' => $web_layout_mode,

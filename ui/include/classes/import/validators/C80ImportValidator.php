@@ -407,7 +407,8 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL,
 		CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
 		CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS,
-		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
+		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK,
+		CXmlConstantValue::MEDIA_TYPE_PUSH => CXmlConstantName::PUSH
 	];
 
 	private $MEDIA_PROVIDER = [
@@ -581,6 +582,14 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE,
 		CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE,
 		CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE
+	];
+
+	protected array $REGEX_TYPES = [
+		CXmlConstantValue::REGEX_TYPE_CONTAINS_STRING => CXmlConstantName::REGEX_TYPE_CONTAINS_STRING,
+		CXmlConstantValue::REGEX_TYPE_CONTAINS_ANY_SUBSTRING => CXmlConstantName::REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
+		CXmlConstantValue::REGEX_TYPE_NOT_CONTAINS_STRING => CXmlConstantName::REGEX_TYPE_NOT_CONTAINS_STRING,
+		CXmlConstantValue::REGEX_TYPE_MATCHES_REGEX => CXmlConstantName::REGEX_TYPE_MATCHES_REGEX,
+		CXmlConstantValue::REGEX_TYPE_NOT_MATCHES_REGEX => CXmlConstantName::REGEX_TYPE_NOT_MATCHES_REGEX
 	];
 
 	/**
@@ -3051,7 +3060,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
 								'page' =>						['type' => XML_ARRAY, 'rules' => [
 									'name' =>						['type' => XML_STRING, 'default' => ''],
@@ -3396,7 +3405,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 				'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
 						'page' =>						['type' => XML_ARRAY, 'rules' => [
 							'name' =>						['type' => XML_STRING, 'default' => ''],
@@ -3419,6 +3428,20 @@ class C80ImportValidator extends CImportValidatorGeneral {
 									]]
 								]]
 							]]
+						]]
+					]]
+				]]
+			]],
+			'global_regexes' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'global_regex', 'rules' => [
+				'global_regex' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'description' =>				['type' => XML_STRING, 'default' => ''],
+					'expressions' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'expression', 'rules' => [
+						'expression' =>						['type' => XML_ARRAY, 'rules' => [
+							'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->REGEX_TYPES],
+							'expression' =>					['type' => XML_STRING | XML_REQUIRED],
+							'exp_delimiter' =>				['type' => XML_STRING, 'default' => ''],
+							'case_sensitive' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]]
 				]]

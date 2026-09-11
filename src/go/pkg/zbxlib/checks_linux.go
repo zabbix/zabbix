@@ -19,57 +19,11 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../src/libs
 
-#include "zbxsysinfo.h"
-#include "module.h"
+#include "zbxsysinfo/sysinfo.h"
 
-// vfs_dir_get, system_localtime, system_users_num
-#include "zbxsysinfo/common/zbxsysinfo_common.c"
-#include "zbxsysinfo/common/system.c"
+// vfs_dir_get
 #include "zbxsysinfo/common/vfs_file.c"
 #include "zbxsysinfo/common/dir.c"
-int	net_dns(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-int	net_dns_record(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-int	net_dns_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-
-int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
 

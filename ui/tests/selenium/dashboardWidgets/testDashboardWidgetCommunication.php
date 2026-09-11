@@ -2981,7 +2981,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'No data':
 				case 'No permissions to referred object or it does not exist!':
 					$class = ($outcome === 'No data') ? 'svg-honeycomb-content' : 'no-data-message';
-					$no_data_message = $listener->query('class', $class)->one();
+					$no_data_message = $listener->query('class', $class)->waitUntilVisible()->one();
 					$this->assertTrue($no_data_message->isDisplayed(), 'No data message is missing.');
 					$this->assertEquals($outcome, $no_data_message->getText());
 					break;

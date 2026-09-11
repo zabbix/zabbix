@@ -54,12 +54,16 @@ typedef struct
 	const char				*config_webdriver_url;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
+	const char				*config_bridge_adapter_url;
+	const char				*config_bridge_adapter_connect_to;
 }
 zbx_thread_trapper_args;
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args);
 
 int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
+int	zbx_get_user_from_json_for_device_offboard(const struct zbx_json_parse *jp, const char *device_uuid,
+		zbx_user_t *user);
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,

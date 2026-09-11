@@ -36,7 +36,6 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
 				)
 			]),
 		(new CFormGrid())
@@ -269,9 +268,15 @@ $form->addItem([
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				(new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy')
-			)
+			(new CList())
+				->addItem(
+					(new CLink(_('Create proxy in Cloud'), ZBX_CLOUD_URL . '/create-proxy'))
+						->addClass(ZBX_STYLE_BTN)
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(ZBX_STYLE_LINK_EXTERNAL)
+						->setTarget('_blank')
+				)
+				->addItem((new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)

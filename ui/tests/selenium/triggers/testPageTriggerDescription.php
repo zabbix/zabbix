@@ -111,7 +111,7 @@ class testPageTriggerDescription extends CWebTest {
 		}
 
 		// Check trigger description in event details of the corresponding problem.
-		$row->getColumn('Time')->query('xpath:./div/div/a')->one()->scrollIntoView(50)->click();
+		$row->getColumn('Time')->query('xpath:./div/a')->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 
 		// Check the URL of the opened page to make sure that correct event is opened.

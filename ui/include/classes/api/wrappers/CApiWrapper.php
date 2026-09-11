@@ -98,6 +98,6 @@ class CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	protected function callClientMethod($method, array $params) {
-		return $this->client->callMethod($this->api, $method, $params, $this->auth);
+		return $this->client->callMethod($this->api, $method, $params, $this->auth['type']);
 	}
 }

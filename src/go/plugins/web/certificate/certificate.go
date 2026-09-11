@@ -39,8 +39,6 @@ const (
 	emptyParameters    = 0
 )
 
-var impl Plugin
-
 type Output struct {
 	X509              Cert             `json:"x509"`
 	Result            ValidationResult `json:"result"`
@@ -72,10 +70,26 @@ type ValidationResult struct {
 
 type Plugin struct {
 	plugin.Base
+
+	supportedCipherSuites []uint16
+}
+
+// New creates Plugin structure with preset default values.
+func New() *Plugin {
+	return &Plugin{
+		supportedCipherSuites: allCipherSuiteIDs(),
+	}
 }
 
 func init() {
-	err := plugin.RegisterMetrics(&impl, "WebCertificate", "web.certificate.get", "Get TLS/SSL website certificate.")
+	webCertificatePlugin := New()
+
+	err := plugin.RegisterMetrics(
+		webCertificatePlugin,
+		"WebCertificate",
+		"web.certificate.get",
+		"Get TLS/SSL website certificate.",
+	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
@@ -95,7 +109,7 @@ func (p *Plugin) webCertificateGet(params []string, timeout int) (interface{}, e
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, timeout)
+	certs, err := p.getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, timeout)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -134,6 +148,34 @@ func (p *Plugin) webCertificateGet(params []string, timeout int) (interface{}, e
 	}
 
 	return string(b), nil
+}
+
+func (p *Plugin) getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificate, error) {
+	netDialer := &net.Dialer{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	tlsDialer := &tls.Dialer{
+		NetDialer: netDialer,
+		Config: &tls.Config{
+			InsecureSkipVerify: true, //nolint:gosec // unsafe by design and only checks certs
+			ServerName:         domain,
+			CipherSuites:       p.supportedCipherSuites,
+		},
+	}
+
+	rawConn, err := tlsDialer.Dial("tcp", address)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to dial TLS certificate")
+	}
+	defer rawConn.Close() //nolint:errcheck // defer close
+
+	conn, ok := rawConn.(*tls.Conn)
+	if !ok {
+		return nil, errs.New(fmt.Sprintf("expected TLS connection, got %T", rawConn))
+	}
+
+	return conn.ConnectionState().PeerCertificates, nil
 }
 
 func createVerificationOptions(domain string, certs []*x509.Certificate) x509.VerifyOptions {
@@ -276,15 +318,19 @@ func getHostAndPort(uri *uri.URI, port string) (string, string, error) {
 	return uri.Host(), uri.Port(), nil
 }
 
-func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificate, error) {
-	var dialer net.Dialer
-	dialer.Timeout = time.Duration(timeout) * time.Second
+func allCipherSuiteIDs() []uint16 {
+	secure := tls.CipherSuites()
+	insecure := tls.InsecureCipherSuites()
 
-	conn, err := tls.DialWithDialer(&dialer, "tcp", address, &tls.Config{InsecureSkipVerify: true, ServerName: domain})
-	if err != nil {
-		return nil, err
+	ids := make([]uint16, 0, len(secure)+len(insecure))
+
+	for _, cipher := range secure {
+		ids = append(ids, cipher.ID)
 	}
-	defer conn.Close()
 
-	return conn.ConnectionState().PeerCertificates, nil
+	for _, cipher := range insecure {
+		ids = append(ids, cipher.ID)
+	}
+
+	return ids
 }

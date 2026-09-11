@@ -137,6 +137,12 @@ window.proxy_group_edit_popup = new class {
 	}
 
 	#delete() {
+		if (!window.confirm(<?= json_encode(_('Delete selected proxy group?')) ?>)) {
+			this.#overlay.unsetLoading();
+
+			return;
+		}
+
 		this.#removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
