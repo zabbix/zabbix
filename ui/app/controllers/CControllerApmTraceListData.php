@@ -92,12 +92,14 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		if ($traces) {
 			$this->paging = $this->paginate($traces, $page, $sort_order);
 
+			$trace_max_duration = max(...array_column($traces, 'duration'));
+
 			foreach ($traces as &$trace) {
 				$trace['service_name'] = $trace['service_name'] ?: '['._('No root span found').']';
 				$trace['span_name'] = $trace['span_name'] ?: '['._('No root span found').']';
 
 				$trace['duration_time_units'] = convertSecondsToTimeUnits($trace['duration'] * SEC_PER_NANOSEC);
-				$trace['duration_percentage'] = round(bcdiv($trace['duration'], 86_400_000_000) * 100);
+				$trace['duration_percentage'] = round($trace['duration'] / $trace_max_duration * 100);
 			}
 			unset($trace);
 
