@@ -91,7 +91,7 @@ class CTriggerManager {
 	 */
 	private static function checkMaintenances(array $triggerids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT DISTINCT mt.maintenanceid,m.name'.
+			'SELECT mt.maintenanceid,m.name'.
 			' FROM maintenance_trigger mt'.
 			' JOIN maintenances m ON mt.maintenanceid=m.maintenanceid'.
 			' WHERE '.dbConditionId('mt.triggerid', $triggerids).
@@ -110,9 +110,8 @@ class CTriggerManager {
 					'SELECT NULL'.
 					' FROM maintenances_groups mg'.
 					' WHERE mt.maintenanceid=mg.maintenanceid'.
-				')',
-			1
-		));
+				')'
+		, 1));
 
 		if ($maintenance) {
 			$maintenance_triggers = DBfetchColumn(DBselect(
@@ -120,7 +119,6 @@ class CTriggerManager {
 				' FROM maintenance_trigger mt'.
 				' JOIN triggers t ON mt.triggerid=t.triggerid'.
 				' WHERE mt.maintenanceid='.zbx_dbstr($maintenance['maintenanceid']).
-					' AND '.dbConditionId('mt.triggerid', $triggerids).
 				' ORDER BY t.triggerid'
 			), 'description');
 
