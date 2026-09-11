@@ -546,7 +546,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						ITEM_STATE_NOTSUPPORTED, results[i].msg);
 			}
 
-			/* cached data is only used on SUCCESS */
+			/* cached data is only used on SUCCEED */
 			zbx_async_manager_requeue(poller_config->manager, itemid, errcodes[i],
 					timespec.sec, NULL);
 		}
