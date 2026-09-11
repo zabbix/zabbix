@@ -673,7 +673,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			jQuery('<button>')
 				.addClass('btn-overlay-close')
 				.attr('type', 'button')
-				.attr('title', t('Close'))
+				.attr('aria-label', t('Close notification'))
 				.click(function() {
 					jQuery(this)
 						.closest(`.${classes[type]}`)

@@ -73,6 +73,8 @@ zabbix_export:
           value: '{ITEM.NAME4}'
         - name: ITEM.NAME5
           value: '{ITEM.NAME5}'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"iLert"}'
         - name: TRIGGER.DESCRIPTION
           value: '{TRIGGER.DESCRIPTION}'
         - name: TRIGGER.ID
@@ -93,66 +95,92 @@ zabbix_export:
           value: '{$ZABBIX.URL}'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         try {
-            var result = { tags: {} },
-                params = JSON.parse(value),
-                req = new HttpRequest(),
-                resp = '';
+        	var result = { tags: {} },
+        		params = JSON.parse(value),
+        		tls = new CTlsConfig(params.tls_verify),
+        		req = new HttpRequest(tls.options),
+        		resp = '';
         
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.setProxy(params.HTTPProxy);
-            }
-            var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];
-            if (!alertSourceKey || (typeof alertSourceKey === 'string' && alertSourceKey.trim() === '')) {
-                throw 'incorrect value for variable "ILERT.ALERT.SOURCE.KEY". The value must be a non-empty string.';
-            }
-            delete params['.ILERT.ALERT.SOURCE.KEY'];
-            
-            var ilertApiBaseURL = "https://api.ilert.com";
-            var reqURL = encodeURI(ilertApiBaseURL + "/api/v1/events/zabbix-mt/" + alertSourceKey)
+        	if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+        		req.setProxy(params.HTTPProxy);
+        	}
+        	var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];
+        	if (!alertSourceKey || (typeof alertSourceKey === 'string' && alertSourceKey.trim() === '')) {
+        		throw 'incorrect value for variable "ILERT.ALERT.SOURCE.KEY". The value must be a non-empty string.';
+        	}
+        	delete params['.ILERT.ALERT.SOURCE.KEY'];
+        	
+        	var ilertApiBaseURL = "https://api.ilert.com";
+        	var reqURL = encodeURI(ilertApiBaseURL + "/api/v1/events/zabbix-mt/" + alertSourceKey)
         
-            var incidentKey = "zabbix-" + params['EVENT.ID'];
-            var incidentViewURL = ilertApiBaseURL + "/api/v1/incidents/resolve-ik/" + alertSourceKey + "/" + incidentKey;
+        	var incidentKey = "zabbix-" + params['EVENT.ID'];
+        	var incidentViewURL = ilertApiBaseURL + "/api/v1/incidents/resolve-ik/" + alertSourceKey + "/" + incidentKey;
         
-            req.addHeader('Accept: application/json');
-            req.addHeader('Content-Type: application/json');
+        	req.addHeader('Accept: application/json');
+        	req.addHeader('Content-Type: application/json');
         
-            Zabbix.log(4, '[iLert Webhook] Sending request:' + JSON.stringify(params));
-            resp = req.post(reqURL, JSON.stringify(params));
-            Zabbix.log(4, '[iLert Webhook] Receiving response:' + resp);
+        	Zabbix.log(4, '[iLert Webhook] Sending request:' + JSON.stringify(params));
+        	resp = req.post(tls.checkURL(reqURL), JSON.stringify(params));
+        	Zabbix.log(4, '[iLert Webhook] Receiving response:' + resp);
         
-            try {
-                resp = JSON.parse(resp);
-            }
-            catch (error) {
-                throw 'incorrect response. iLert returned a non-JSON object.';
-            }
+        	try {
+        		resp = JSON.parse(resp);
+        	}
+        	catch (error) {
+        		throw 'incorrect response. iLert returned a non-JSON object.';
+        	}
         
-            if (req.getStatus() == 200) {
-                result.tags.__ilert_incident_url = incidentViewURL;
-                return JSON.stringify(result);
-            }
+        	if (req.getStatus() == 200) {
+        		result.tags.__ilert_incident_url = incidentViewURL;
+        		return JSON.stringify(result);
+        	}
         
-            if (req.getStatus() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
-                if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {
-                  return JSON.stringify(result);
-                }
-                if (resp.code === 'INCIDENT_ALREADY_ACCEPTED') {
-                  result.tags.__ilert_incident_url = incidentViewURL;
-                  return JSON.stringify(result);
-                }
-            }
+        	if (req.getStatus() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
+        		if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {
+        		  return JSON.stringify(result);
+        		}
+        		if (resp.code === 'INCIDENT_ALREADY_ACCEPTED') {
+        		  result.tags.__ilert_incident_url = incidentViewURL;
+        		  return JSON.stringify(result);
+        		}
+        	}
         
-            if (typeof resp === 'object' && typeof resp.message === 'string') {
-                throw resp.message;
-            }
-            else {
-                throw 'Unknown error.';
-            }
+        	if (typeof resp === 'object' && typeof resp.message === 'string') {
+        		throw resp.message;
+        	}
+        	else {
+        		throw 'Unknown error.';
+        	}
         }
         catch (error) {
-            Zabbix.log(3, '[iLert Webhook] Notification failed : ' + error);
-            throw 'iLert notification failed : ' + error;
+        	Zabbix.log(3, '[iLert Webhook] Notification failed : ' + error);
+        	throw 'iLert notification failed : ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
@@ -160,7 +188,7 @@ zabbix_export:
       event_menu_name: 'iLert incident'
       description: |
         Please refer to https://docs.ilert.com/integrations/zabbix/native 
-          
+        
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "iLert". You can also rewrite the incident summary via ".ILERT.INCIDENT.SUMMARY" parameter or leave it empty to use the standard pattern.
       message_templates:
@@ -179,9 +207,8 @@ zabbix_export:
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
-            Problem duration: {EVENT.DURATION}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
@@ -194,3 +221,72 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        - event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        - event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

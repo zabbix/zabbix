@@ -1711,17 +1711,17 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 	if ($data['original_severity'] > $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))
 			->addClass(ZBX_STYLE_COLOR_POSITIVE)
-			->setAttribute('aria-label', _x('Severity decreased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity decreased', 'screen reader'));
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))
 			->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			->setAttribute('aria-label', _x('Severity increased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity increased', 'screen reader'));
 	}
 	else {
 		$button = (new CButtonIcon(ZBX_ICON_ARROWS_TOP_BOTTOM))
 			->addClass(ZBX_STYLE_COLOR_ICON)
-			->setAttribute('aria-label', _x('Severity changed', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity changed', 'screen reader'));
 	}
 
 	return $button->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
@@ -1808,7 +1808,7 @@ function makeEventActionsIcon(array $data, $eventid): ?CButtonIcon {
 	return $button
 		->setAttribute('data-content', $data['count'])
 		->setAttribute('aria-label',
-			_xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+			_xn('%1$s action have been taken', '%1$s actions have been taken', $data['count'], 'screen reader', $data['count'])
 		)
 		->setAjaxHint([
 			'type' => 'eventactions',

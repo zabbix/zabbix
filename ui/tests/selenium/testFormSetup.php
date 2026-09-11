@@ -21,6 +21,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
  * @backup sessions
  *
  * @backupConfig
+ *
+ * @onAfter waitUntilConfigRestored
  */
 class testFormSetup extends CWebTest {
 
@@ -84,7 +86,6 @@ class testFormSetup extends CWebTest {
 			'PHP databases support',
 			'PHP bcmath',
 			'PHP mbstring',
-			'PHP option "mbstring.func_overload"',
 			'PHP sockets',
 			'PHP gd',
 			'PHP gd PNG support',
@@ -302,9 +303,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complete the setup and check in DB that the default timezone was applied.
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Finish')->waitUntilVisible()->one()->click();
 		$db_values = CDBHelper::getRow('SELECT default_theme, default_timezone FROM config');
 		$this->assertEquals(['dark-theme', 'Europe/Riga'], array_values($db_values));
 	}
@@ -1030,5 +1031,14 @@ class testFormSetup extends CWebTest {
 		// Uncheck the Database TLS encryption and verify that Verify database certificate field is hidden.
 		$tls_encryption->uncheck();
 		$this->assertFalse($verify_certificate->isDisplayed());
+	}
+
+	/**
+	 * Wait for frontend to get the restored config from zabbix.conf.php file. Otherwise the next tests are
+	 * executed with the configuration file written by the setup form, where Zabbix server name and Zabbix
+	 * server address are empty.
+	 */
+	public static function waitUntilConfigRestored() {
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 	}
 }

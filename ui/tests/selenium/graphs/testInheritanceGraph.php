@@ -106,7 +106,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph&context=template&hostid='.$this->templateid);
+		$this->zbxTestLogin('graphs.php?form=create&context=template&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));

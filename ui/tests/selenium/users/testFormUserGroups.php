@@ -158,7 +158,7 @@ class testFormUserGroups extends CWebTest {
 				$mfa_field->fill('Default');
 				$warning_icon = $form->query('id:mfa-warning')->waitUntilVisible()->one();
 				$warning_icon->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()
 						->waitUntilReady()->one();
 				$this->assertEquals('Multi-factor authentication is disabled system-wide.', $hint->getText());
 				$hint->close();

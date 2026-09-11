@@ -79,9 +79,9 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
-		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->submit();
 		$table->waitUntilReloaded();
@@ -239,11 +239,13 @@ class testPageHosts extends CLegacyWebTest {
 	 */
 	public function testPageHosts_FilterByStatus($data) {
 		$this->page->login()->open('zabbix.php?action=host.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
 		// Apply filtering parameters.
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
@@ -345,10 +347,10 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->submit();
 		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
@@ -357,10 +359,10 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByTemplates() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$table = $this->getTable();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill(['Templates' => ['values' =>'Template for web scenario testing', 'context' => 'Templates']]);
+		$table = $this->getTable();
 		$filter->submit();
 		$table->waitUntilReloaded();
 		$this->zbxTestWaitForPageToLoad();
@@ -423,13 +425,13 @@ class testPageHosts extends CLegacyWebTest {
 	 */
 	public function testPageHosts_FilterMonitoredBy($data) {
 		$this->page->login()->open(self::HOST_LIST_PAGE)->waitUntilReady();
-		$table = $this->getTable();
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill($data['filter']);
+		$table = $this->getTable();
 		$filter->submit();
-		$table ->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableStats(count($data['expected']));
@@ -443,10 +445,9 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
 		$filter->submit();
 		$table->waitUntilReloaded();
@@ -461,13 +462,13 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->getField('IP')->fill($this->HostIp);
 		$filter->getField('Port')->fill($this->HostPort);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->submit();
 		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
@@ -885,7 +886,8 @@ class testPageHosts extends CLegacyWebTest {
 	 * Test the Enable and Disable link in the Host list.
 	 */
 	public function testPageHosts_EnableDisableLink() {
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		// Reset the filter (filter_rst=1) so a filter left over from a previous test does not hide the host.
+		$this->page->login()->open('zabbix.php?action=host.list&filter_rst=1')->waitUntilReady();
 		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Enabled status');
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
@@ -903,10 +905,10 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_Delete() {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 
-		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Host for t');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->submit();
 		$table->waitUntilReloaded();
 
