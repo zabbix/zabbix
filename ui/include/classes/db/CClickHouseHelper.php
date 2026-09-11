@@ -211,6 +211,10 @@ final class CClickHouseHelper {
 		$list_grouped = [];
 
 		foreach ($list as $attribute) {
+			if ($attribute['operator'] == CONDITION_OPERATOR_LIKE && $attribute['value'] === '') {
+				$attribute['operator'] = CONDITION_OPERATOR_EXISTS;
+			}
+
 			$list_grouped[$attribute['key']][$attribute['operator']][] = $attribute['value'];
 		}
 
