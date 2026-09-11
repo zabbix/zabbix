@@ -23,7 +23,7 @@
 <script>
 	const view = new class {
 		#layout_mode = null;
-		#refresh_interval = null;
+		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#global_timerange = null;
 		/** @type {CDataTable|null} */

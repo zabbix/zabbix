@@ -22,7 +22,7 @@
 <script>
 	const view = new class {
 		#layout_mode = null;
-		#refresh_interval = null;
+		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#filter_defaults = {};
 		#filter = null;
@@ -542,7 +542,7 @@
 		}
 
 		#refreshCounters(response) {
-			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.#layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 				return;
 			}
 
@@ -588,7 +588,7 @@
 		}
 
 		#scheduleRefresh() {
-			if (this.#refresh_interval == 0) {
+			if (this.#refresh_interval === 0) {
 				return;
 			}
 
