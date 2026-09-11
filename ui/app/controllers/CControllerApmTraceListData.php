@@ -63,8 +63,9 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			? $filter['evaltype']
 			: CONDITION_EVAL_TYPE_AND_OR;
 
-		$trace_filter = array_filter(array_intersect_key($filter, array_flip(['traceid', 'spanid', 'span_name',
-			'service_name', 'scope_name'])));
+		$trace_filter = array_filter(array_intersect_key($filter, array_flip(['traceid', 'spanid'])));
+		$trace_search = array_filter(array_intersect_key($filter, array_flip(['span_name', 'service_name',
+			'scope_name'])));
 
 		if ($statuses) {
 			$trace_filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
@@ -79,6 +80,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'min_duration' => $min_duration,
 			'max_duration' => $max_duration,
 			'filter' => $trace_filter ?: null,
+			'search' => $trace_search ?: null,
 			'span_attributes' => $span_attributes,
 			'span_attributes_evaltype' => $span_attributes_evaltype,
 			'sortfield' => $sort_field,
