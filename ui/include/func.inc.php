@@ -502,80 +502,72 @@ function convertUnitsS($value, array $options = []) {
  * The following units will be used: weeks, days, hours, minutes and seconds.
  * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
  *
- * @param float $value  Time period in seconds.
+ * @param float $value    Time period in seconds.
+ * @param array $options
+ *        bool  $options['combine_last_subsecond_parts']  (optional) Whether to combine last subsecond parts together.
+ *                                                        e.g. 1ms 400μs -> 1.4ms,, 1μs 400ns -> 1.4μs, etc.
  *
  * @return string
  */
-function convertSecondsToTimeUnits(float $value): string {
+function convertSecondsToTimeUnits(float $value, array $options = []): string {
 	if ($value <= 0) {
 		return '0';
 	}
 
-	if ($value < 1) {
-		if ($value >= SEC_PER_MILLISEC) {
-			return round($value / SEC_PER_MILLISEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ms', 'millisecond short');
-		}
-		elseif ($value >= SEC_PER_MICROSEC) {
-			return round($value / SEC_PER_MICROSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('μs', 'microsecond short');
-		}
-
-		return round($value / SEC_PER_NANOSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ns', 'nanosecond short');
-	}
-
-	$parts = [];
-	$start = null;
-
-	if (($v = floor($value / SEC_PER_WEEK)) > 0) {
-		$parts['weeks'] = $v;
-		$value -= $v * SEC_PER_WEEK;
-		$start = 0;
-	}
-
-	$level = 1;
-
-	foreach ([
-		'days' => SEC_PER_DAY,
-		'hours' => SEC_PER_HOUR,
-		'minutes' => SEC_PER_MIN
-	] as $part => $sec_per_part) {
-		$v = floor($value / $sec_per_part);
-
-		if ($v > 0) {
-			$parts[$part] = $v;
-			$value -= $v * $sec_per_part;
-			$start = $start === null ? $level : $start;
-		}
-
-		if ($start !== null && $level - $start >= 2) {
-			break;
-		}
-
-		$level++;
-	}
-
-	if ($start === null || $start >= 2) {
-		$v = $value + round(fmod($value, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
-
-		if ($v > 0) {
-			$parts['seconds'] = $v;
-		}
-	}
-
-	$units = [
-		'weeks' => _x('w', 'week short'),
-		'days' => _x('d', 'day short'),
-		'hours' => _x('h', 'hour short'),
-		'minutes' => _x('m', 'minute short'),
-		'seconds' => _x('s', 'second short')
+	$options += [
+		'combine_last_subsecond_parts' => false
 	];
 
-	$result = [];
+	$time_units = [
+		'weeks'        => SEC_PER_WEEK,
+		'days'         => SEC_PER_DAY,
+		'hours'        => SEC_PER_HOUR,
+		'minutes'      => SEC_PER_MIN,
+		'seconds'      => 1,
+		'milliseconds' => SEC_PER_MILLISEC,
+		'microseconds' => SEC_PER_MICROSEC,
+		'nanoseconds'  => SEC_PER_NANOSEC
+	];
 
-	foreach ($parts as $part_unit => $part_value) {
-		$result[] = $part_value.$units[$part_unit];
+	$unit_labels = [
+		'weeks'        => _x('w', 'week short'),
+		'days'         => _x('d', 'day short'),
+		'hours'        => _x('h', 'hour short'),
+		'minutes'      => _x('m', 'minute short'),
+		'seconds'      => _x('s', 'second short'),
+		'milliseconds' => _x('ms', 'millisecond short'),
+		'microseconds' => _x('μs', 'microsecond short'),
+		'nanoseconds'  => _x('ns', 'nanosecond short')
+	];
+
+	$parts = [];
+
+	foreach ($time_units as $unit => $sec_per_unit) {
+		$value = round($value, 9);
+
+		if ($value < $sec_per_unit && empty($parts)) {
+			continue;
+		}
+
+		if ($options['combine_last_subsecond_parts'] && $sec_per_unit < SEC_PER_MILLISEC && $value > 0) {
+			if ($value >= $sec_per_unit || $unit === 'nanoseconds') {
+				$v = round($value / $sec_per_unit, ZBX_UNITS_ROUNDOFF_SUFFIXED);
+				if ($v > 0) {
+					$parts[] = $v . $unit_labels[$unit];
+				}
+				break;
+			}
+			continue;
+		}
+
+		$v = floor(round($value / $sec_per_unit, 9));
+		if ($v > 0) {
+			$parts[] = $v . $unit_labels[$unit];
+			$value -= $v * $sec_per_unit;
+		}
 	}
 
-	return $result ? implode(' ', $result) : '0';
+	return $parts ? implode(' ', $parts) : '0';
 }
 
 /**
