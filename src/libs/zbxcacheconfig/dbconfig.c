@@ -12181,7 +12181,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
-	if (1 == local_apm_db_config->status)
+	if (0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
 		return;
