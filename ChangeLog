@@ -3,6 +3,13 @@ Changes for 7.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
+........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
+........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
+........S. [ZBX-28002] fixed nodata() trigger from flapping into unknown state when 1) log history with only metadata is received 2) preprocessing discards history 3) only old entries outside nodata() period are received (arimdjonoks)
+.........T [ZBX-26929] fixed duplicate item names in GCP template (kflorowski)
+.......PS. [ZBX-27437] fixed incorrect housekeeping option validation (ademidovs)
+..F....... [ZBX-27513] fixed runtime errors on PHP 8.5 (Ivo)
 ..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
 .......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
 ........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)
