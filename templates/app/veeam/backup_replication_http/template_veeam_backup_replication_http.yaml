@@ -54,7 +54,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 7.4-5
       groups:
         - name: Templates/Applications
       items:
@@ -296,10 +296,16 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.license.expirationDate
+                - $.license
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: JAVASCRIPT
               parameters:
-                - 'return Math.floor(Date.parse(value) / 1000);'
+                - |
+                  var license = JSON.parse(value),
+                  	expiration_date = ('{$VEEAM.API.VERSION}' > '1.3-rev1') ? license.instanceLicenseSummary.expirationDate : license.expirationDate;
+                  
+                  return Math.floor(Date.parse(expiration_date) / 1000);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -1946,7 +1952,7 @@ zabbix_export:
             description: 'The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
             required: 'YES'
         - macro: '{$VEEAM.API.VERSION}'
-          value: 1.3-rev1
+          value: 1.3-rev2
           description: 'The REST API revision.'
           config:
             type: TEXT
