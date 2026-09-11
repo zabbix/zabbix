@@ -241,7 +241,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
-	 * - "alias" value cannot start or end with whitespace character
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path for validation message.
@@ -271,14 +270,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 					return false;
 				}
-			}
-
-			if (trim($column['alias'], ' ') !== $column['alias']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
-					_('value cannot start or end with whitespace')
-				);
-
-				return false;
 			}
 		}
 
@@ -314,17 +305,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/filter/conditions/'.(reset($formulaids) + 1).'/formulaid',
 					_('an identifier is not defined in the formula')
-				);
-
-				return false;
-			}
-		}
-
-		foreach ($item['query']['filter']['conditions'] as $i => $condition) {
-			if (trim($condition['attribute_key'], ' ') !== $condition['attribute_key']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/filter/conditions/'.($i + 1).'/attribute_key',
-					_('value cannot start or end with whitespace')
 				);
 
 				return false;
