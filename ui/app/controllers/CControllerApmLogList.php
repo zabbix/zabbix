@@ -32,7 +32,7 @@ class CControllerApmLogList extends CController {
 			'filter_service_name' =>	'string',
 			'filter_scope_name' =>		'string',
 			'filter_severities' =>		'array',
-			'filter_evaltype' =>		'in '.APM_ATTR_EVAL_TYPE_AND_OR.','.APM_ATTR_EVAL_TYPE_OR,
+			'filter_evaltype' =>		'in '.CONDITION_EVAL_TYPE_AND_OR.','.CONDITION_EVAL_TYPE_OR,
 			'filter_attributes' =>		'array',
 			'from' =>					'range_time',
 			'to' =>						'range_time',
@@ -93,7 +93,7 @@ class CControllerApmLogList extends CController {
 			'service_name' => CProfile::get('web.apm.log.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.log.filter_scope_name', ''),
 			'severities' =>	CProfile::getArray('web.apm.log.filter_severities', []),
-			'evaltype' => CProfile::get('web.apm.log.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+			'evaltype' => CProfile::get('web.apm.log.filter_evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			'attributes' => $filter_attributes
 		];
 
@@ -139,7 +139,7 @@ class CControllerApmLogList extends CController {
 		CProfile::update('web.apm.log.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.log.filter_severities', $this->getInput('filter_severities', []),
 			PROFILE_TYPE_INT);
-		CProfile::update('web.apm.log.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+		CProfile::update('web.apm.log.filter_evaltype', $this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT);
 		CProfile::updateArray('web.apm.log.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR);

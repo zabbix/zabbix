@@ -39,7 +39,7 @@ class CApmAttrFilterItem extends CBaseComponent {
 			 */
 			changeOperation: (ev) => {
 				const operator = parseInt(ev.target.value);
-				const show_value = ![APM_ATTR_OPERATOR_EXISTS, APM_ATTR_OPERATOR_NOT_EXISTS].includes(operator);
+				const show_value = ![CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS].includes(operator);
 
 				if (this._value.hasClass('display-none') !== show_value) {
 					return;

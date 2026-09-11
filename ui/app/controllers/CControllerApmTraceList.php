@@ -35,7 +35,7 @@ class CControllerApmTraceList extends CController {
 			'filter_min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class,]],
 			'filter_statuses' => ['array', 'field' => ['integer']],
-			'filter_evaltype' => ['integer', 'in' => [APM_ATTR_EVAL_TYPE_AND_OR, APM_ATTR_EVAL_TYPE_OR]],
+			'filter_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
 			'filter_attributes' => ['array'],
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
@@ -104,7 +104,7 @@ class CControllerApmTraceList extends CController {
 			'min_duration' => CProfile::get('web.apm.trace.filter_min_duration', ''),
 			'max_duration' => CProfile::get('web.apm.trace.filter_max_duration', ''),
 			'statuses' => CProfile::getArray('web.apm.trace.filter_statuses', []),
-			'evaltype' => CProfile::get('web.apm.trace.filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
+			'evaltype' => CProfile::get('web.apm.trace.filter_evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			'attributes' => $filter_attributes
 		];
 
@@ -156,8 +156,8 @@ class CControllerApmTraceList extends CController {
 			PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.trace.filter_statuses', $this->getInput('filter_statuses', []),
 			PROFILE_TYPE_INT);
-		CProfile::update('web.apm.trace.filter_evaltype', $this->getInput('filter_evaltype', APM_ATTR_EVAL_TYPE_AND_OR),
-			PROFILE_TYPE_INT);
+		CProfile::update('web.apm.trace.filter_evaltype',
+			$this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
 		CProfile::updateArray('web.apm.trace.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.trace.filter_attributes.value', array_column($filter_attributes, 'value'),
