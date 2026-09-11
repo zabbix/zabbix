@@ -516,10 +516,12 @@
 				return;
 			}
 
-			const loading_fadein = true;
-
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
+
+			this.#refresh_interval_id = setInterval(
+				() => this.#refresh({loading_fadein: true}),
+				this.#refresh_interval
+			);
 		}
 
 		#unscheduleRefresh() {
