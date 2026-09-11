@@ -648,8 +648,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 #endif
 
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
-			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
-			connect_callback, sendval_args->json, &data, NULL);
+			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, ZBX_TCP_PROTOCOL,
+			sendval_args->json->buffer, connect_callback, sendval_args->json, &data, NULL);
 
 
 	if (SUCCEED == ret)
