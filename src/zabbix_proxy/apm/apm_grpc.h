@@ -29,8 +29,6 @@ zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_apm_
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
 void	zbx_grpc_shutdown(void);
 
-int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,
-		char **error);
 void	zbx_apm_request_free(zbx_apm_request_t request, zbx_apm_request_type_t type);
 
 #ifdef __cplusplus

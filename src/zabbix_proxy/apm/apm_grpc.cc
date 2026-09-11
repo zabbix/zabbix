@@ -272,53 +272,6 @@ extern "C"
 			google::protobuf::ShutdownProtobufLibrary();
 	}
 
-	int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,
-			char **error)
-	{
-
-		try
-		{
-			std::string debug_string;
-
-			switch (type)
-			{
-				case APM_TRACES:
-				{
-					auto *req = static_cast<otlp_trace::ExportTraceServiceRequest *>(request);
-					debug_string = req->DebugString();
-					break;
-				}
-				case APM_METRICS:
-				{
-					auto *req = static_cast<otlp_metrics::ExportMetricsServiceRequest *>(request);
-					debug_string = req->DebugString();
-					break;
-				}
-				case APM_LOGS:
-				{
-					auto *req = static_cast<otlp_logs::ExportLogsServiceRequest *>(request);
-					debug_string = req->DebugString();
-					break;
-				}
-				default:
-					set_error(error, "unknown APM request type: " +
-							std::to_string(static_cast<int>(type)));
-					return FAIL;
-			}
-
-			size_t len = debug_string.length() + 1;
-			*output = static_cast<char *>(zbx_malloc(NULL, len));
-			memcpy(*output, debug_string.c_str(), len);
-
-			return SUCCEED;
-		}
-		catch (const std::exception &e)
-		{
-			set_error(error, std::string("error decoding APM request: ") + e.what());
-			return FAIL;
-		}
-	}
-
 	void	zbx_apm_request_free(zbx_apm_request_t request, zbx_apm_request_type_t type)
 	{
 		switch (type)
