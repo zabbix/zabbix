@@ -223,7 +223,7 @@ static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t 
 	stats.written_metrics_histogram = atomic_load(&manager->commit_stats.metrics_histogram);
 	stats.written_metrics_exponential_histogram = atomic_load(&manager->commit_stats.metrics_exponential_histogram);
 	stats.written_metrics_summary = atomic_load(&manager->commit_stats.metrics_summary);
-	apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &stats.processed_requests);
+	apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &stats.accepted_requests, &stats.dropped_requests);
 
 	if (0 != (len = zbx_apm_serialize_stats(&stats, buf, (zbx_uint32_t)sizeof(buf))))
 		zbx_ipc_client_send(client, ZBX_APM_GET_STATS, buf, len);
@@ -248,7 +248,7 @@ void	*zbx_apm_manager_thread(void *args)
 	zbx_ipc_message_t			*message;
 	int					shutdown = 0, workers_num, apm_status = APM_STATUS_DISABLED;
 	zbx_vector_mw_task_ptr_t		tasks;
-	zbx_uint64_t				cfg_revision = 0, quota, processed_num = 0;
+	zbx_uint64_t				cfg_revision = 0, quota, accepted_num = 0, dropped_num = 0;
 	char					*proxy_apm_config = NULL;
 	zbx_apm_config_t			apm_config = {0};
 	zbx_apm_config_tls_t			apm_config_tls, *tls;
@@ -298,18 +298,20 @@ void	*zbx_apm_manager_thread(void *args)
 
 		if (STAT_INTERVAL < time_start - time_stat)
 		{
-			zbx_uint64_t	processed;
+			zbx_uint64_t	accepted, dropped;
 
-			apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &processed);
+			apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &accepted, &dropped);
 
-			zbx_supervisor_update_activity("%s #%d [processing " ZBX_FS_UI64 " requests,"
-					" idle %.1fs, during %.1fs]",
+			zbx_supervisor_update_activity("%s #%d [accepted " ZBX_FS_UI64 ", dropped " ZBX_FS_UI64
+					" requests, idle %.1fs, during %.1fs]",
 					get_process_type_string(process_type), process_num,
-					processed - processed_num, time_idle, time_start - time_stat);
+					accepted - accepted_num, dropped - dropped_num, time_idle,
+					time_start - time_stat);
 
 			time_stat = time_start;
 			time_idle = 0;
-			processed_num = 0;
+			accepted_num = accepted;
+			dropped_num = dropped;
 		}
 
 		if (CONFIG_INTERVAL < time_start - time_config)

@@ -31,7 +31,8 @@ typedef struct
 	zbx_uint64_t	written_metrics_histogram;
 	zbx_uint64_t	written_metrics_exponential_histogram;
 	zbx_uint64_t	written_metrics_summary;
-	zbx_uint64_t	processed_requests;
+	zbx_uint64_t	accepted_requests;
+	zbx_uint64_t	dropped_requests;
 }
 zbx_apm_stats_t;
 

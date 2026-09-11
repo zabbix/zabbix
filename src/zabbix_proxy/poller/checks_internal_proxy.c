@@ -34,7 +34,7 @@ static int	get_apm_export_stats(AGENT_RESULT *result)
 
 	zbx_json_init(&j, 1024);
 
-	zbx_json_addobject(&j, "written");
+	zbx_json_addobject(&j, "rows");
 	zbx_json_adduint64(&j, "logs", stats.written_logs);
 	zbx_json_adduint64(&j, "traces", stats.written_traces);
 	zbx_json_adduint64(&j, "metrics_gauge", stats.written_metrics_gauge);
@@ -43,8 +43,9 @@ static int	get_apm_export_stats(AGENT_RESULT *result)
 	zbx_json_adduint64(&j, "metrics_exponential_histogram", stats.written_metrics_exponential_histogram);
 	zbx_json_adduint64(&j, "metrics_summary", stats.written_metrics_summary);
 	zbx_json_close(&j);
-	zbx_json_addobject(&j, "processed");
-	zbx_json_adduint64(&j, "requests", stats.processed_requests);
+	zbx_json_addobject(&j, "requests");
+	zbx_json_adduint64(&j, "accepted", stats.accepted_requests);
+	zbx_json_adduint64(&j, "dropped", stats.dropped_requests);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
 

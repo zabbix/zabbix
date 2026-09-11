@@ -77,17 +77,20 @@ int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zb
 	if (SUCCEED == ret)
 	{
 		zbx_mw_queue_push_completed_direct(&queue->base, apm_task_request_create(request, type));
-		queue->requests_num++;
+		queue->accepted_num++;
 	}
+	else
+		queue->dropped_num++;
 
 	zbx_mw_queue_unlock(&queue->base);
 
 	return ret;
 }
 
-void	apm_queue_get_stats(zbx_apm_queue_t *queue, zbx_uint64_t *requests_num)
+void	apm_queue_get_stats(zbx_apm_queue_t *queue, zbx_uint64_t *accepted_num, zbx_uint64_t *dropped_num)
 {
 	zbx_mw_queue_lock(&queue->base);
-	*requests_num = queue->requests_num;
+	*accepted_num = queue->accepted_num;
+	*dropped_num = queue->dropped_num;
 	zbx_mw_queue_unlock(&queue->base);
 }

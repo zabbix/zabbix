@@ -32,7 +32,8 @@ typedef struct
 	zbx_mw_queue_t	base;
 	zbx_uint64_t	usage;
 	zbx_uint64_t	quota;
-	zbx_uint64_t	requests_num;
+	zbx_uint64_t	accepted_num;
+	zbx_uint64_t	dropped_num;
 	time_t		window_start;
 }
 zbx_apm_queue_t;
@@ -41,6 +42,6 @@ zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota);
 void	apm_queue_set_quota(zbx_apm_queue_t *queue, zbx_uint64_t quota);
 
 int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zbx_apm_request_type_t type);
-void	apm_queue_get_stats(zbx_apm_queue_t *queue, zbx_uint64_t *requests_num);
+void	apm_queue_get_stats(zbx_apm_queue_t *queue, zbx_uint64_t *accepted_num, zbx_uint64_t *dropped_num);
 
 #endif
