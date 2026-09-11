@@ -250,7 +250,8 @@
 						const more_attributes = document.createElement('button');
 						more_attributes.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
 						more_attributes.setAttribute('data-hintbox-html', more_attributes_hintbox.innerHTML);
-						more_attributes.setAttribute('data-hintbox-class', `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
+						more_attributes.setAttribute('data-hintbox-class',
+							`${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
 						more_attributes.setAttribute('data-hintbox', '1');
 						more_attributes.setAttribute('data-hintbox-static', '1');
 						more_attributes.setAttribute('aria-expanded', 'false');
@@ -334,7 +335,8 @@
 								return;
 							}
 
-							const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+							const row_selected = datatable_element
+								.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 							row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
