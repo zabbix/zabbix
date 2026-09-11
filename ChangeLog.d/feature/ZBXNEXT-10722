@@ -1,1 +1,1 @@
-A.F.I...S. [ZBXNEXT-10722] added user macro usage for 'Max repetition count' SNMP interface field. Added 'Retries' SNMP interface field to configure native bulk requests. (gberzina, jburlakovs, scernisenko)
+A.F.I...S. [ZBXNEXT-10111,ZBXNEXT-10722] added user macro usage for 'Max repetition count' SNMP interface field. Added 'Retries' SNMP interface field to configure native bulk requests. (gberzina, jburlakovs, scernisenko)
