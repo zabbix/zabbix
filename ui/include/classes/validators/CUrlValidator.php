@@ -144,6 +144,8 @@ class CUrlValidator extends CValidator {
 		}
 
 		if ($this->options['required_scheme'] && !array_key_exists('scheme', $url_parts)) {
+			$this->setError(_('URL scheme is required'));
+
 			return false;
 		}
 
