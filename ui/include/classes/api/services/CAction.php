@@ -3421,15 +3421,29 @@ class CAction extends CApiService {
 
 		$proxy_groupids = array_keys($proxy_groupids);
 
-		$count = API::ProxyGroup()->get([
-			'countOutput' => true,
-			'proxy_groupids' => $proxy_groupids
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => [],
+			'proxy_groupids' => $proxy_groupids,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($proxy_groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Incorrect action condition proxy group. Proxy group does not exist or you have no access to it.')
-			);
+		foreach ($actions as $i1 => $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $i2 => $condition) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_PROXY_GROUP) {
+					continue;
+				}
+
+				if (!array_key_exists($condition['value'], $proxy_groups)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value',
+						_('object does not exist, or you have no permissions to it')
+					));
+				}
+			}
 		}
 	}
 
