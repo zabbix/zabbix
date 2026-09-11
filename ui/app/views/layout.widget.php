@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 header('Cache-Control: no-cache, must-revalidate');

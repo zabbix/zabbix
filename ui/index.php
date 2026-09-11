@@ -56,7 +56,7 @@ if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 $autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
 $request = getRequest('request', '');
 
-if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
+if ($request !== '' && !(new CFrontendActionValidator())->validate($request)) {
 	$request = '';
 }
 
@@ -95,12 +95,37 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		redirect($mfa_url->toString());
 	}
 
-	$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
-	redirect(reset($redirect));
+	CMessageHelper::clear();
+
+	$redirect = CWebUser::getRedirectUrl();
+
+	if ($redirect['error']) {
+		CMessageHelper::addError(_('Invalid redirect URL.'));
+	}
+
+	$redirect = array_filter([$request, $redirect['url'], CMenuHelper::getFirstUrl()]);
+
+	$response = new CControllerResponseRedirect(
+		new CUrl(reset($redirect))
+	);
+
+	$response->redirect();
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
-	redirect(CWebUser::$data['url'] ? : CMenuHelper::getFirstUrl());
+	CMessageHelper::clear();
+
+	$redirect = CWebUser::getRedirectUrl();
+
+	if ($redirect['error']) {
+		CMessageHelper::addError(_('Invalid redirect URL.'));
+	}
+
+	$response = new CControllerResponseRedirect(
+		new CUrl($redirect['url'] ? : CMenuHelper::getFirstUrl())
+	);
+
+	$response->redirect();
 }
 
 $messages = get_and_clear_messages();

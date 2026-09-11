@@ -177,7 +177,9 @@ class CControllerAuditLogList extends CController {
 		$response->setTitle(_('Audit log'));
 
 		if ($this->getAction() === 'auditlog.csv') {
-			$response->setFileName('zbx_auditlog_export.csv');
+			$response
+				->setFileName('zbx_auditlog_export.csv')
+				->setFileMimeType('text/csv');
 		}
 
 		$this->setResponse($response);

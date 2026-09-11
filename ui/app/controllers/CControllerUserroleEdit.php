@@ -190,6 +190,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		return [
 			'ui' => array_fill_keys(CRoleHelper::getUiElementsByUserType($user_type), true),
 			'ui.default_access' => true,
+			'profile.redirect.enforce' => false,
+			'profile.redirect.url' => '',
 			'service_read_access' => CRoleHelper::SERVICES_ACCESS_ALL,
 			'service_read_list' => [],
 			'service_read_tag' => ['tag' => '', 'value' => ''],
@@ -215,10 +217,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	private function getRulesByRoleid(string $roleid): array {
 		global $ZBX_FEATURE_FLAGS;
 
-		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
-			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
-			'services.write.mode', 'services.write.list', 'services.write.tag', 'devices.access', 'devices.actions',
-			'devices.actions.default_access'
+		$select_rules = ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url', 'api',
+			'api.access', 'api.mode', 'actions', 'actions.default_access', 'services.read.mode', 'services.read.list',
+			'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'devices.access',
+			'devices.actions', 'devices.actions.default_access'
 		];
 
 		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
@@ -261,7 +263,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'api.mode' => $input['api.mode'],
 			'actions.default_access' => $input['actions.default_access'],
 			'devices.access' => $input['devices.access'],
-			'devices.actions.default_access' => $input['devices.actions.default_access']
+			'devices.actions.default_access' => $input['devices.actions.default_access'],
+			'profile.redirect.enforce' => $input['profile.redirect.enforce'],
+			'profile.redirect.url' => $input['profile.redirect.url']
 		];
 
 		foreach ($input['ui'] as $rule) {
