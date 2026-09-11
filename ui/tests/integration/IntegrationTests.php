@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
+require_once dirname(__FILE__).'/testEncryptionDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
@@ -39,6 +40,7 @@ require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
+require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 /* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
@@ -47,6 +49,7 @@ require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
@@ -62,6 +65,9 @@ require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
+require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
+require_once dirname(__FILE__).'/testTelnetChecks.php';
+require_once dirname(__FILE__).'/testScheduledReports.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -78,6 +84,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
@@ -99,12 +106,14 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
 		$suite->addTestSuite('testActiveAvailability');
+		$suite->addTestSuite('testActiveCheckHeartbeat');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
@@ -120,6 +129,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		$suite->addTestSuite('testHousekeepingConfSync');
+		$suite->addTestSuite('testTelnetChecks');
+		$suite->addTestSuite('testScheduledReports');
 		return $suite;
 	}
 }

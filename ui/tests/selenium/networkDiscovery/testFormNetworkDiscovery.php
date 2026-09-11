@@ -246,7 +246,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			}
 		}
 
-		$checks_dialog->query('xpath:.//button[@title="Close"]')->one()->waitUntilClickable()->click();
+		$checks_dialog->query('xpath:.//button[@aria-label="Close modal window"]')->one()->waitUntilClickable()->click();
 		$dialog->close();
 	}
 

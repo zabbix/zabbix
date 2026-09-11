@@ -836,7 +836,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
-			))->one()->click();
+			))->waitUntilClickable()->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
 		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
