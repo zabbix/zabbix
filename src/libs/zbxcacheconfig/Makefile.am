@@ -21,7 +21,8 @@ libzbxcacheconfig_a_SOURCES = \
 	vps_monitor.h \
 	proxy_group.c \
 	proxy_group.h \
-	dbconfig_atomic.c
+	dbconfig_atomic.c \
+	macrotags.c
 
 libzbxcacheconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
