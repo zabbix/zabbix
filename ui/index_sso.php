@@ -240,11 +240,11 @@ try {
 
 	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
 		CWebUser::logout();
-		$auth->processSLO();
+		$url = $auth->processSLO(true, null, false, null, true);
 
 		header('Pragma: no-cache');
 		header('Cache-Control: no-cache, must-revalidate');
-		redirect('index.php');
+		redirect($url ?: $redirect_to->getUrl());
 	}
 
 	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
