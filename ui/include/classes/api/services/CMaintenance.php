@@ -97,7 +97,7 @@ class CMaintenance extends CApiService {
 			}
 
 			$permission_condition = $options['editable']
-				? ' AND (p.hgsetid IS NULL OR p.permission < '.PERM_READ_WRITE.')'
+				? ' AND (p.hgsetid IS NULL OR p.permission<'.PERM_READ_WRITE.')'
 				: ' AND p.hgsetid IS NULL';
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
@@ -110,7 +110,9 @@ class CMaintenance extends CApiService {
 					$permission_condition.
 			')';
 
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+			$permission_condition = $options['editable']
+				? ' OR MAX(p.permission)<'.PERM_READ_WRITE
+				: '';
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -122,12 +124,12 @@ class CMaintenance extends CApiService {
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE m.maintenanceid=mt.maintenanceid'.
 				' GROUP by mt.triggerid'.
-				' HAVING COUNT(p.permission) < COUNT(*)'.
-					' OR MIN(p.permission)='.PERM_DENY.
-					' OR MAX(p.permission)<'.zbx_dbstr($permission).
+				' HAVING COUNT(p.permission)<COUNT(*)'.
+					$permission_condition.
 			')';
 
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
