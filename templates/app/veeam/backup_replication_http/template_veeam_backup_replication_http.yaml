@@ -15,6 +15,7 @@ zabbix_export:
         Setup:
           1. Create a user to monitor the service or use an existing read-only account.
           See (https://helpcenter.veeam.com/references/vbr/13/rest/1.3-rev1/tag/Login#operation/CreateToken) for more details.
+          NOTE: License, Authorization Events, and Security Analyzer Data require the "Backup Administrator" role; without it, these items are not supported.
           2. Link the template to a host.
           3. Configure the following macros: {$VEEAM.API.URL}, {$VEEAM.API.VERSION}, {$VEEAM.USER}, and {$VEEAM.PASSWORD}.
         
@@ -50,6 +51,7 @@ zabbix_export:
         
         1. Create a user to monitor the service or use an existing read-only account.
         > See [Veeam Help Center](https://helpcenter.veeam.com/references/vbr/13/rest/1.3-rev1/tag/SectionOverview#section/Authorization-and-Security) for more details.
+        ***NOTE:*** License, Authorization Events, and Security Analyzer Data require the "Backup Administrator" role; without it, these items are not supported.
         2. Link the template to a host.
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
@@ -238,18 +240,28 @@ zabbix_export:
             			endpoints = {
             				proxies: 'api/v1/backupInfrastructure/proxies',
             				proxies_states: 'api/v1/backupInfrastructure/proxies/states',
-            				license: 'api/v1/license',
             				managedServers: 'api/v1/backupInfrastructure/managedServers',
             				repositories_states: 'api/v1/backupInfrastructure/repositories/states',
             				jobs_states: 'api/v1/jobs/states',
             				malware_events: 'api/v1/malwareDetection/events',
-            				authorization_events: 'api/v1/authorization/events',
             				sessions: 'api/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
+            			},
+            			restricted_endpoints = {
+            				license: 'api/v1/license',
+            				authorization_events: 'api/v1/authorization/events'
             			};
             
             		Veeam.login();
             		Object.keys(endpoints).forEach(function (key) {
             			data[key] = Veeam.getRequest(Veeam.params.api_endpoint + endpoints[key]);
+            		});
+            		Object.keys(restricted_endpoints).forEach(function (key) {
+            			try {
+            				data[key] = Veeam.getRequest(Veeam.params.api_endpoint + restricted_endpoints[key]);
+            			}
+            			catch (error) {
+            				Zabbix.log(3, '[ Veeam Backup and Replication ] Require the "Backup Administrator" role for endpoint "' + key + '": ' + error);
+            			}
             		});
             		Veeam.logout();
             
@@ -335,6 +347,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.instanceLicenseSummary.licensedInstancesNumber
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -355,6 +369,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.status
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -399,6 +415,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.license.instanceLicenseSummary.usedInstancesNumber
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -408,7 +426,7 @@ zabbix_export:
             - tag: component
               value: license
         - uuid: bd9e21c825094553ad711a594d049a5b
-          name: 'Get Security Analyzer results'
+          name: 'Get security analyzer results'
           type: HTTP_AGENT
           key: veeam.security.analyzer.get
           delay: '{$VEEAM.SECURITY.DATA.FREQUENCY}'
@@ -472,6 +490,10 @@ zabbix_export:
                   
                   Zabbix.log(4, '[ Veeam Backup and Replication ] Sending request: ' + url);
                   response = request.get(url);
+                  
+                  if (request.getStatus() === 403) {
+                  	throw 'Request failed with status code 403: "Backup Administrator" role is required.';
+                  }
                   
                   if (request.getStatus() !== 200 || response === null) {
                   	throw 'Request failed with status code ' + request.getStatus() + ': ' + response + '.';
@@ -597,6 +619,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.authorization_events.data
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Require the "Backup Administrator" role'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -1418,11 +1442,6 @@ zabbix_export:
               - macro: '{#NAME}'
                 value: '{$SESSION.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-              - macro: '{#RESULT}'
-                value: '{$SESSION.RESULT.MATCHES}'
-              - macro: '{#RESULT}'
-                value: '{$SESSION.RESULT.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: '{$SESSION.TYPE.MATCHES}'
               - macro: '{#TYPE}'
@@ -1433,7 +1452,7 @@ zabbix_export:
             - uuid: 7224f41e5c614268bf6997ad8a49710b
               name: 'Session [{#NAME}] [{#TYPE}]: Message'
               type: DEPENDENT
-              key: 'veeam.sessions.message[{#ID}]'
+              key: 'veeam.sessions.message[{#NAME}/{#TYPE}]'
               value_type: TEXT
               description: 'A message that explains the session result.'
               preprocessing:
@@ -1441,7 +1460,7 @@ zabbix_export:
                   parameters:
                     - $.result.message
               master_item:
-                key: 'veeam.sessions.raw[{#ID}]'
+                key: 'veeam.sessions.raw[{#NAME}/{#TYPE}]'
               tags:
                 - tag: component
                   value: sessions
@@ -1452,7 +1471,7 @@ zabbix_export:
             - uuid: 3f449f47943b4877a32e89774712510f
               name: 'Session [{#NAME}] [{#TYPE}]: Progress percent'
               type: DEPENDENT
-              key: 'veeam.sessions.progress.percent[{#ID}]'
+              key: 'veeam.sessions.progress.percent[{#NAME}/{#TYPE}]'
               value_type: FLOAT
               units: '%'
               description: 'The progress of the session expressed as percentage.'
@@ -1461,7 +1480,7 @@ zabbix_export:
                   parameters:
                     - $.progressPercent
               master_item:
-                key: 'veeam.sessions.raw[{#ID}]'
+                key: 'veeam.sessions.raw[{#NAME}/{#TYPE}]'
               tags:
                 - tag: component
                   value: sessions
@@ -1472,15 +1491,31 @@ zabbix_export:
             - uuid: f82984e1180946c6b4bff1f46987555d
               name: 'Session [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
-              key: 'veeam.sessions.raw[{#ID}]'
+              key: 'veeam.sessions.raw[{#NAME}/{#TYPE}]'
               history: '0'
               value_type: TEXT
               description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.sessions.data.[?(@.id==''{#ID}'')].first()'
-                  error_handler: DISCARD_VALUE
+                    - '$.sessions.data.[?(@.name==''{#NAME}'' && @.sessionType==''{#TYPE}'')]'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var sessions = JSON.parse(value),
+                      	latest = null;
+                      
+                      sessions.forEach(function (session) {
+                        if (latest === null || Date.parse(session.creationTime) > Date.parse(latest.creationTime)) {
+                      	latest = session;
+                        }
+                      });
+                      
+                      if (latest === null) {
+                        throw 'No session data found for name "{#NAME}" and type "{#TYPE}".';
+                      }
+                      
+                      return JSON.stringify(latest);
               master_item:
                 key: veeam.get.metrics
               tags:
@@ -1491,7 +1526,7 @@ zabbix_export:
             - uuid: 5fb9dcb62bfe4d1dae94beefa329691d
               name: 'Session [{#NAME}] [{#TYPE}]: Result'
               type: DEPENDENT
-              key: 'veeam.sessions.result[{#ID}]'
+              key: 'veeam.sessions.result[{#NAME}/{#TYPE}]'
               trends: '0'
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               valuemap:
@@ -1512,7 +1547,7 @@ zabbix_export:
                       
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: 'veeam.sessions.raw[{#ID}]'
+                key: 'veeam.sessions.raw[{#NAME}/{#TYPE}]'
               tags:
                 - tag: component
                   value: sessions
@@ -1522,9 +1557,11 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: eeb93a10f3d04eee819587c6fa4ce8f8
-                  expression: 'last(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}])=4'
+                  expression: 'last(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#NAME}/{#TYPE}])=4'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#NAME}/{#TYPE}])=2'
                   name: 'Veeam Backup: Last result session failed'
-                  event_name: 'Veeam Backup: Failed session [{#NAME}]'
+                  event_name: 'Veeam Backup: Failed session [{#NAME}] [{#TYPE}]'
                   priority: AVERAGE
                   description: 'The last result of the session `[{#NAME}]` is failed.'
                   manual_close: 'YES'
@@ -1534,7 +1571,7 @@ zabbix_export:
             - uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
               name: 'Session [{#NAME}] [{#TYPE}]: State'
               type: DEPENDENT
-              key: 'veeam.sessions.state[{#ID}]'
+              key: 'veeam.sessions.state[{#NAME}/{#TYPE}]'
               trends: '0'
               description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'
               valuemap:
@@ -1562,7 +1599,7 @@ zabbix_export:
                       
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: 'veeam.sessions.raw[{#ID}]'
+                key: 'veeam.sessions.raw[{#NAME}/{#TYPE}]'
               tags:
                 - tag: component
                   value: sessions
@@ -1577,8 +1614,6 @@ zabbix_export:
               path: $.creationTime
             - lld_macro: '{#END.TIME}'
               path: $.endTime
-            - lld_macro: '{#ID}'
-              path: $.id
             - lld_macro: '{#NAME}'
               path: $.name
             - lld_macro: '{#RESULT}'
@@ -1594,11 +1629,24 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var obj = JSON.parse(value, function (key, value) {
-                  	if (key == 'creationTime') return new Date(value).toDateString();
-                  	return value;
-                  });
-                  return JSON.stringify(obj);
+                  var sessions = {},
+                  	sessions_by_recency = JSON.parse(value).sort(function (a, b) {
+                  		return Date.parse(b.creationTime) - Date.parse(a.creationTime);
+                  	}),
+                  	latest_sessions = sessions_by_recency.filter(function (session) {
+                  		var dedupe_key = session.name + '|' + session.sessionType;
+                  
+                  		if (sessions[dedupe_key]) {
+                  			return false;
+                  		}
+                  
+                  		sessions[dedupe_key] = true;
+                  		session.creationTime = new Date(session.creationTime).toDateString();
+                  
+                  		return true;
+                  	});
+                  
+                  return JSON.stringify(latest_sessions);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -1615,7 +1663,7 @@ zabbix_export:
           description: 'Filter of discoverable authorization events by name.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '40'
             section_name: Filters
             label: 'Authorization event name filter (include)'
             description: 'A regex pattern to include authorization events by name.'
@@ -1624,7 +1672,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable authorization events by name.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '41'
             section_name: Filters
             label: 'Authorization event name filter (exclude)'
             description: 'A regex pattern to exclude authorization events by name.'
@@ -1633,7 +1681,7 @@ zabbix_export:
           description: 'Filter of discoverable authorization events by state.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '42'
             section_name: Filters
             label: 'Authorization event state filter (include)'
             description: 'A regex pattern to include authorization events by state.'
@@ -1642,7 +1690,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable authorization events by state.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '43'
             section_name: Filters
             label: 'Authorization event state filter (exclude)'
             description: 'A regex pattern to exclude authorization events by state.'
@@ -1677,7 +1725,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by name.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '23'
             section_name: Filters
             label: 'Job name filter (include)'
             description: 'A regex pattern to include jobs by name.'
@@ -1686,7 +1734,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by name.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '24'
             section_name: Filters
             label: 'Job name filter (exclude)'
             description: 'A regex pattern to exclude jobs by name.'
@@ -1695,7 +1743,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by status.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '27'
             section_name: Filters
             label: 'Job status filter (include)'
             description: 'A regex pattern to include jobs by status.'
@@ -1704,7 +1752,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by status.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '28'
             section_name: Filters
             label: 'Job status filter (exclude)'
             description: 'A regex pattern to exclude jobs by status.'
@@ -1713,7 +1761,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by type.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '25'
             section_name: Filters
             label: 'Job type filter (include)'
             description: 'A regex pattern to include jobs by type.'
@@ -1722,7 +1770,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable jobs by type.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '26'
             section_name: Filters
             label: 'Job type filter (exclude)'
             description: 'A regex pattern to exclude jobs by type.'
@@ -1731,7 +1779,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by severity.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '32'
             section_name: Filters
             label: 'Malware event severity filter (include)'
             description: 'A regex pattern to include malware events by severity.'
@@ -1740,7 +1788,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by severity.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '33'
             section_name: Filters
             label: 'Malware event severity filter (exclude)'
             description: 'A regex pattern to exclude malware events by severity.'
@@ -1749,7 +1797,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by state.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '34'
             section_name: Filters
             label: 'Malware event state filter (include)'
             description: 'A regex pattern to include malware events by state.'
@@ -1758,7 +1806,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by state.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '35'
             section_name: Filters
             label: 'Malware event state filter (exclude)'
             description: 'A regex pattern to exclude malware events by state.'
@@ -1767,7 +1815,7 @@ zabbix_export:
           description: 'Filter of discoverable malware events by type.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '30'
             section_name: Filters
             label: 'Malware event type filter (include)'
             description: 'A regex pattern to include malware events by type.'
@@ -1776,7 +1824,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable malware events by type.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '31'
             section_name: Filters
             label: 'Malware event type filter (exclude)'
             description: 'A regex pattern to exclude malware events by type.'
@@ -1785,7 +1833,7 @@ zabbix_export:
           description: 'Filter of discoverable proxies by name.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '15'
             section_name: Filters
             label: 'Proxies name filter (include)'
             description: 'A regex pattern to include proxies by name.'
@@ -1794,7 +1842,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable proxies by name.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '16'
             section_name: Filters
             label: 'Proxies name filter (exclude)'
             description: 'A regex pattern to exclude proxies by name.'
@@ -1803,7 +1851,7 @@ zabbix_export:
           description: 'Filter of discoverable proxies by type.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '17'
             section_name: Filters
             label: 'Proxies type filter (include)'
             description: 'A regex pattern to include proxies by type.'
@@ -1812,7 +1860,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable proxies by type.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '18'
             section_name: Filters
             label: 'Proxies type filter (exclude)'
             description: 'A regex pattern to exclude proxies by type.'
@@ -1821,7 +1869,7 @@ zabbix_export:
           description: 'Filter of discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '19'
             section_name: Filters
             label: 'Repositories name filter (include)'
             description: 'A regex pattern to include repositories by name.'
@@ -1830,7 +1878,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable repositories by name.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '20'
             section_name: Filters
             label: 'Repositories name filter (exclude)'
             description: 'A regex pattern to exclude repositories by name.'
@@ -1839,7 +1887,7 @@ zabbix_export:
           description: 'Filter of discoverable repositories by type.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '21'
             section_name: Filters
             label: 'Repositories type filter (include)'
             description: 'A regex pattern to include repositories by type.'
@@ -1848,7 +1896,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable repositories by type.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '22'
             section_name: Filters
             label: 'Repositories type filter (exclude)'
             description: 'A regex pattern to exclude repositories by type.'
@@ -1857,7 +1905,7 @@ zabbix_export:
           description: 'Filter of discoverable security best practices by name.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '38'
             section_name: Filters
             label: 'Security best practice name filter (include)'
             description: 'A regex pattern to include security best practices by name.'
@@ -1866,7 +1914,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable security best practices by name.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '39'
             section_name: Filters
             label: 'Security best practice name filter (exclude)'
             description: 'A regex pattern to exclude security best practices by name.'
@@ -1875,7 +1923,7 @@ zabbix_export:
           description: 'Filter of discoverable security best practices by status.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '36'
             section_name: Filters
             label: 'Security best practice status filter (include)'
             description: 'A regex pattern to include security best practices by status.'
@@ -1884,7 +1932,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable security best practices by status.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '37'
             section_name: Filters
             label: 'Security best practice status filter (exclude)'
             description: 'A regex pattern to exclude security best practices by status.'
@@ -1906,24 +1954,6 @@ zabbix_export:
             section_name: Filters
             label: 'Session name filter (exclude)'
             description: 'A regex pattern to exclude sessions by name.'
-        - macro: '{$SESSION.RESULT.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable sessions by result.'
-          config:
-            type: TEXT
-            priority: '15'
-            section_name: Filters
-            label: 'Session result filter (include)'
-            description: 'A regex pattern to include sessions by result.'
-        - macro: '{$SESSION.RESULT.NOT_MATCHES}'
-          value: Success
-          description: 'Filter to exclude discoverable sessions by result.'
-          config:
-            type: TEXT
-            priority: '16'
-            section_name: Filters
-            label: 'Session result filter (exclude)'
-            description: 'A regex pattern to exclude sessions by result.'
         - macro: '{$SESSION.TYPE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable sessions by type.'
@@ -1992,7 +2022,7 @@ zabbix_export:
           description: 'Number of days until the license expires.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '29'
             section_name: Other
             label: 'License expiry warning (days)'
             description: 'Number of days until the license expires.'
@@ -2011,7 +2041,7 @@ zabbix_export:
           description: 'Repository space warning threshold, expressed in %.'
           config:
             type: TEXT
-            priority: '46'
+            priority: '44'
             section_name: Thresholds
             label: 'Repository space warning threshold'
             description: 'Repository space warning threshold, expressed in %. In the range from 0 to 100 inclusive.'

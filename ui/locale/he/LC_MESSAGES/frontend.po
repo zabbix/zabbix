@@ -11312,6 +11312,10 @@ msgstr "משתמש בלתי נגיש"
 msgid "Inaccessible user group"
 msgstr "קבוצת משתמשים בלתי נגישה"
 
+#: include/classes/helpers/CItemGeneralHelper.php:283
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "וידג׳ט בלתי נגיש"
