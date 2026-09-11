@@ -188,6 +188,8 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 	zbx_vector_apm_exporter_ptr_destroy(&pool->exporters);
 	apm_exporter_cfg_clear(&pool->cfg);
 
+	pthread_mutex_destroy(&pool->lock);
+
 	zbx_free(pool);
 }
 
@@ -297,7 +299,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
 		goto out;
 
-	if (0 == strncmp(options, APM_PROVIDER_CLICKHOUSE, ZBX_CONST_STRLEN(APM_PROVIDER_CLICKHOUSE)))
+	if (len == ZBX_CONST_STRLEN(APM_PROVIDER_CLICKHOUSE) && 0 == memcmp(options, APM_PROVIDER_CLICKHOUSE, len))
 	{
 		cfg->type = APM_EXPORTER_CLICKHOUSE;
 		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
@@ -317,7 +319,7 @@ out:
 	if (FAIL == ret)
 		apm_exporter_cfg_clear(cfg);
 
-#undef APM_EXPORTER_PROVIDER
+#undef APM_PROVIDER_CLICKHOUSE
 
 	return ret;
 }

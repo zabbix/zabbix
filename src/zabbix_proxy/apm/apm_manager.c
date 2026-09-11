@@ -94,7 +94,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 	zbx_apm_exporter_cfg_t	cfg;
 
 	manager = (zbx_apm_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_manager_t));
-	workers = (zbx_apm_worker_t **)zbx_calloc(NULL, (size_t)APM_WORKERS_MAX, sizeof(zbx_apm_worker_t));
+	workers = (zbx_apm_worker_t **)zbx_calloc(NULL, (size_t)APM_WORKERS_MAX, sizeof(zbx_apm_worker_t *));
 	queue = apm_queue_create(quota);
 
 	if (SUCCEED != apm_exporter_cfg_init(&cfg, options, error))

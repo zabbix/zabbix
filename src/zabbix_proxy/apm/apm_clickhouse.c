@@ -126,7 +126,7 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 	long		http_ret;
 
 	if (0 == rs->rows.values_num)
-		return SUCCEED;
+		return APM_COMMIT_OK;
 
 	zbx_snprintf(url, sizeof(url), "%s?database=%s"
 			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20JSONCompactEachRow"
@@ -227,7 +227,7 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 	*error = zbx_strdup(NULL, "ClickHouse APM provider requires curl library."
 			" This Zabbix server binary was compiled without curl");
 
-	return FAIL;
+	return APM_COMMIT_ERR;
 }
 
 void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
