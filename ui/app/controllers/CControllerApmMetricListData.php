@@ -16,8 +16,8 @@
 
 class CControllerApmMetricListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['metric_name', 'type', 'metric_unit', 'service_name', 'start_time_unix',
-		'value', 'count'
+	protected array $allowed_data_fields = ['metric_name', 'type', 'scope_name', 'metric_unit', 'service_name',
+		'start_time_unix', 'value', 'count'
 	];
 
 	protected function checkPermissions(): bool {
@@ -34,6 +34,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 		$page = $this->getInput('page', 1);
 		$filter = $this->getInput('filter', []);
+		$search = array_intersect_key($filter, array_flip(['metric_name', 'service_name', 'scope_name']));
 
 		$sort_field = $this->getInput('sort_field', 'metric_name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
@@ -55,6 +56,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'types' => array_key_exists('types', $filter) && $filter['types'] ? $filter['types'] : null,
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
+			'search' => array_filter($search) ?: null,
 			'sortfield' => $this->getInput('sort_field', 'metric_name'),
 			'sortorder' => $sort_order,
 			'limit' => $limit

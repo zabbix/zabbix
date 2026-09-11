@@ -99,6 +99,7 @@
 				.setColumns([
 					new CDataTableColumn('metric_name', <?= json_encode(_('Metric name')); ?>)
 						.setFields(['metric_name'])
+						.setRenderer(['name'])
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
@@ -110,6 +111,12 @@
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name'])
+						.setRenderer(['name'])
+						.setWidth('auto'),
+					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
+						.setFields(['scope_name'])
+						.setRenderer(['name'])
+						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time_unix', <?= json_encode(_('Start time')); ?>)
 						.setFields(['start_time_unix'])
@@ -132,6 +139,19 @@
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setStorageIdx(storage_idx)
+				.setCellRenderer('name', ({cell, cell_data}) => {
+					const column_name = cell_data;
+
+					const name = document.createElement('div');
+					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name.textContent = column_name;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(name);
+
+					cell.appendChild(flex_wrapper);
+				})
 				.setCellRenderer('start_time_unix', ({cell, cell_data}) => {
 					const [start_time_unix] = cell_data;
 

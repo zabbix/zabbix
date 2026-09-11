@@ -64,7 +64,7 @@ class CControllerApmMetricList extends CController {
 		$sort_field = $this->getInput('sort', 'metric_name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
 
-		$storage_idx = 'web.apm.trace.datatable';
+		$storage_idx = 'web.apm.metric.datatable';
 
 		$timeselector_options = [
 			'profileIdx' => 'web.apm.metric.filter',
