@@ -190,7 +190,7 @@ class CHostInterface extends CApiService {
 		if ($this->outputIsRequested('details', $options['output'])) {
 			foreach ($result as &$value) {
 				$snmp_fields = ['version', 'bulk', 'community', 'securityname', 'securitylevel', 'authpassphrase',
-					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
+					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions', 'retries'
 				];
 
 				$interface_type = $value['type'];
@@ -384,6 +384,8 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpMaxRepetitions($interface);
 
+			$this->checkSnmpRetries($interface);
+
 			$this->checkSnmpBulk($interface);
 
 			$this->checkSnmpSecurityLevel($interface);
@@ -404,6 +406,7 @@ class CHostInterface extends CApiService {
 	protected function sanitizeSnmpFields(array $interfaces): array {
 		$default_fields = [
 			'community' => '',
+			'retries' => DB::getDefault('interface_snmp', 'retries'),
 			'max_repetitions' =>  DB::getDefault('interface_snmp', 'max_repetitions'),
 			'securityname' => '',
 			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
@@ -1065,11 +1068,33 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpMaxRepetitions(array $interface) {
 		if (($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3)
-				&& (array_key_exists('max_repetitions', $interface['details'])
-					&& (!is_numeric($interface['details']['max_repetitions'])
-						|| $interface['details']['max_repetitions'] < 1
-						|| $interface['details']['max_repetitions'] > ZBX_MAX_INT32))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				&& array_key_exists('max_repetitions', $interface['details'])) {
+			$rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'max_repetitions' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'length' => DB::getFieldLength('interface_snmp', 'max_repetitions')]
+			]];
+
+			if (!CApiInputValidator::validate($rules, $interface['details'], '', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+		}
+	}
+
+	/**
+	 * Check SNMP retries.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "retries" value is incorrect.
+	 */
+	protected function checkSnmpRetries(array $interface) {
+		if (array_key_exists('retries', $interface['details'])) {
+			$rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'retries' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [0, 100]), 'length' => DB::getFieldLength('interface_snmp', 'retries')]
+			]];
+
+			if (!CApiInputValidator::validate($rules, $interface['details'], '', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
 		}
 	}
 
@@ -1152,6 +1177,7 @@ class CHostInterface extends CApiService {
 
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.version', SNMP_V2C, 'version'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', SNMP_BULK_ENABLED, 'bulk'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.retries', '5', 'retries'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.community', '', 'community'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.max_repetitions', '10', 'max_repetitions'),
 				$sqlParts

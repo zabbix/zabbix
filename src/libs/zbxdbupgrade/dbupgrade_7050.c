@@ -2109,6 +2109,13 @@ static int	DBpatch_7050185(void)
 	return DBmodify_field_type("interface_snmp", &field, NULL);
 }
 
+static int	DBpatch_7050094(void)
+{
+	const zbx_db_field_t	field = {"retries", "5", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)

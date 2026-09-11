@@ -647,6 +647,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 							'details' =>				['type' => XML_MULTIPLE, 'rules' => [
 								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
 									'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
+									'retries' => 				['type' => XML_STRING, 'default' => '5'],
 									'community' =>				['type' => XML_STRING, 'default' => ''],
 									'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 									'contextname' =>			['type' => XML_STRING, 'default' => ''],
@@ -1458,6 +1459,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 													['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
 														'version' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 														'bulk' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+														'retries' => 			['type' => XML_STRING, 'default' => '5'],
 														'community' =>			['type' => XML_MULTIPLE, 'rules' => [
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
 																					['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2723,6 +2725,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 													['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
 														'version' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 														'bulk' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+														'retries' => 			['type' => XML_STRING, 'default' => '5'],
 														'community' =>			['type' => XML_MULTIPLE, 'rules' => [
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
 																					['else' => true, 'type' => XML_IGNORE_TAG]
