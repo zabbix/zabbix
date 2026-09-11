@@ -13,6 +13,7 @@
 **/
 
 #include "zbxcommon.h"
+#include "zbxnix.h"
 
 #ifdef HAVE_IPCSERVICE
 
@@ -1129,7 +1130,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 
 	while (0 != connect(csocket->fd, (struct sockaddr*)&addr, sizeof(addr)))
 	{
-		if (0 == timeout || time(NULL) - start > timeout)
+		if (0 == timeout || time(NULL) - start > timeout || 0 == ZBX_IS_RUNNING())
 		{
 			*error = zbx_dsprintf(*error, "Cannot connect to service \"%s\": %s.", service_name,
 					zbx_strerror(errno));
