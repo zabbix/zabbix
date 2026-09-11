@@ -840,7 +840,7 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 			zbx_db_insert_execute(&db_problem);
 			zbx_db_insert_clean(&db_problem);
 		}
-		while (ZBX_DB_DOWN == (ret = zbx_db_commit()));
+		while (ZBX_DB_DOWN == (ret = zbx_db_commit()) && 0 != ZBX_IS_RUNNING());
 
 		if (ZBX_DB_OK == ret)
 			am_service_add_event_tags(&update_events_tags);

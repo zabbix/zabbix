@@ -470,7 +470,7 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 				pgm_db_flush_host_proxy_revision(cache->hostmap_revision);
 
 		}
-		while (ZBX_DB_DOWN == (ret = zbx_db_commit()));
+		while (ZBX_DB_DOWN == (ret = zbx_db_commit()) && 0 != ZBX_IS_RUNNING());
 
 		zbx_free(sql);
 

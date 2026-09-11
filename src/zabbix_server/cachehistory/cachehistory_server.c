@@ -1421,7 +1421,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
-				while (ZBX_DB_DOWN == txn_error);
+				while (ZBX_DB_DOWN == txn_error && 0 != ZBX_IS_RUNNING());
 
 				do
 				{
@@ -1444,7 +1444,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 							events_cbs->reset_event_recovery_cb();
 					}
 				}
-				while (ZBX_DB_DOWN == txn_error);
+				while (ZBX_DB_DOWN == txn_error && 0 != ZBX_IS_RUNNING());
 			}
 
 			zbx_dc_close_user_macros(um_handle);
@@ -1520,7 +1520,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 							zbx_escalation_new_ptr_free);
 					zbx_vector_escalation_new_ptr_destroy(&escalations);
 				}
-				while (ZBX_DB_DOWN == txn_error);
+				while (ZBX_DB_DOWN == txn_error && 0 != ZBX_IS_RUNNING());
 
 				if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
 					events_cbs->events_update_itservices_cb();

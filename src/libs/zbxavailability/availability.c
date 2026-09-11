@@ -16,6 +16,7 @@
 #include "zbx_availability_constants.h"
 
 #include "zbxipcservice.h"
+#include "zbxnix.h"
 
 int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
 {
@@ -293,7 +294,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 
 		txn_error = zbx_db_commit();
 	}
-	while (ZBX_DB_DOWN == txn_error);
+	while (ZBX_DB_DOWN == txn_error && 0 != ZBX_IS_RUNNING());
 
 	zbx_free(sql);
 }

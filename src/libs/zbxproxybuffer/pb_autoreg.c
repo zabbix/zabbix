@@ -19,6 +19,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
+#include "zbxnix.h"
 #include "zbxproxybuffer.h"
 #include "zbxshmem.h"
 #include "zbxdbschema.h"
@@ -433,7 +434,7 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 
 		pb_autoreg_write_host_db(id, host, ip, dns, port, connection_type, host_metadata, flags, clock);
 	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
+	while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
 
 	pb_lock();
 

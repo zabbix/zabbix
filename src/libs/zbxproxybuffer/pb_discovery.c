@@ -18,6 +18,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
+#include "zbxnix.h"
 #include "zbxproxybuffer.h"
 #include "zbxshmem.h"
 #include "zbxdbschema.h"
@@ -575,7 +576,7 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 			zbx_db_begin();
 			pb_discovery_add_rows_db(&data->rows, next, &lastid);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit());
+		while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
 	}
 	else
 	{
@@ -586,7 +587,7 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 			zbx_db_begin();
 			(void)zbx_db_insert_execute(&data->db_insert);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit());
+		while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
 
 		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}

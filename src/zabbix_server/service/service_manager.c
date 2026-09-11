@@ -2749,7 +2749,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 		if (0 != manager->actions.num_data)
 			db_manage_service_events(manager, &service_updates);
 	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
+	while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
 
 	zbx_vector_uint64_destroy(&service_problemids);
 	zbx_vector_service_problem_ptr_destroy(&service_problems_new);
@@ -3195,7 +3195,7 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 		if (16 < sql_offset)
 			zbx_db_execute("%s", sql);
 	}
-	while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
+	while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()) && 0 != ZBX_IS_RUNNING());
 
 	zbx_free(sql);
 
@@ -3664,7 +3664,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 						ZBX_IPC_SERVICE_SERVICE);
 				}
 			}
-			while (ZBX_DB_DOWN == zbx_db_commit());
+			while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
 
 			if (0 != updated)
 				recalculate_services(&service_manager);
