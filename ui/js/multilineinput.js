@@ -18,10 +18,7 @@
 
 	function updateProperties(obj, $elm) {
 		obj.$hidden.prop('disabled', obj.options.disabled ? true : null);
-		obj.$input
-			.prop('disabled', obj.options.disabled ? true : null)
-			.prop('readonly', obj.options.disabled ? null : true)
-			.prop('title', obj.options.disabled ? '' : obj.options.hint);
+		obj.$input.attr('title', obj.options.disabled ? '' : obj.options.hint);
 		obj.$button
 			.prop('disabled', obj.options.disabled ? true : null)
 			.prop('title', obj.options.disabled ? '' : obj.options.hint);
@@ -228,14 +225,13 @@
 					name: $this.data('name')
 				});
 
-				obj.$input = $('<input>', {
-					type: 'text',
-					placeholder: obj.options.placeholder,
-					title: obj.options.hint,
-					tabindex: -1
+				obj.$input = $('<span>', {
+					class: 'multilineinput-preview',
+					title: obj.options.hint
 				})
+					.attr('tabindex', -1)
+					.attr('data-placeholder', obj.options.placeholder)
 					.toggleClass('monospace-font', obj.options.monospace_font)
-					.prop('readonly', obj.options.disabled ? null : true)
 					.on('mousedown', obj, openModal);
 
 				obj.$button = $('<button>', {
@@ -271,10 +267,13 @@
 						value_lines = $.trim(value).split("\n");
 
 					obj.$hidden.val(value);
-					obj.$input.val(value_lines.length > 1
+
+					var preview = value_lines.length > 1
 						? value_lines[0] + String.fromCharCode(8230) // U+2026 Horizontal ellipsis character.
-						: value_lines[0]
-					);
+						: value_lines[0];
+					obj.$input
+						.text(preview)
+						.toggleClass('multilineinput-preview-placeholder', preview === '');
 					$this.trigger('change');
 				});
 			}

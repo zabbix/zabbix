@@ -2015,23 +2015,38 @@ select {
 	display: flex;
 	width: 100%;
 
-	input[type=text] {
+	.multilineinput-preview {
+		border: 1px solid $form-border-color;
+		border-right-width: 0;
+		box-sizing: border-box;
+		flex: 1;
 		overflow: hidden;
-		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		border-right: 0;
-		width: 100%;
-
-		&[readonly] {
-			background: $form-bg-color !important;
-			border-color: $form-border-color;
-			color: $form-font-color;
-		}
+		cursor: pointer;
+		height: 24px;
+		line-height: 22px;
+		padding: 0 5px;
 
 		&.monospace-font {
 			padding-top: 1px;
 		}
+
+		&.multilineinput-preview-placeholder::before {
+			content: attr(data-placeholder);
+			color: $input-placeholder-color !important;
+		}
+	}
+
+	&.multilineinput-readonly .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+	}
+
+	&.multilineinput-disabled .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+		border-color: $form-disabled-border-color;
+		color: $form-border-color;
+		cursor: default;
 	}
 
 	&.editable {
@@ -2063,10 +2078,6 @@ select {
 	}
 
 	&.multilineinput-disabled {
-		input[type=text] {
-			cursor: default;
-		}
-
 		button::after {
 			opacity: .5;
 		}
