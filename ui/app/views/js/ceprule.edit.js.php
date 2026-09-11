@@ -95,7 +95,7 @@ window.ceprule_edit_popup = new class {
 		}
 
 		for (const operation of Object.values(ceprule.operations)) {
-			this.#addOperationRow(operation, false);
+			this.#addOperationRow(operation);
 		}
 
 		jQuery(window['ceprule-script']).multilineInput({
@@ -605,7 +605,7 @@ window.ceprule_edit_popup = new class {
 								overlayDialogueDestroy(overlay.dialogueid);
 
 								if (is_new) {
-									this.#addOperationRow(fields, true);
+									this.#addOperationRow(fields);
 								}
 								else {
 									fields.row_index = row_index;
