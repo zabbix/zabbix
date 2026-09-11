@@ -42,7 +42,8 @@ class CUrlValidator extends CValidator {
 		'user_macro' => false,
 		'event_tags_macro' => false,
 		'manualinput_macro' => false,
-		'schemes' => null
+		'schemes' => null,
+		'required_scheme' => false
 	];
 
 	/**
@@ -139,6 +140,10 @@ class CUrlValidator extends CValidator {
 		if (!$url_parts) {
 			$this->setError(_('unacceptable URL'));
 
+			return false;
+		}
+
+		if ($this->options['required_scheme'] && !array_key_exists('scheme', $url_parts)) {
 			return false;
 		}
 

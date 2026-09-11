@@ -778,8 +778,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'ssl_ca_file' => ''
 		];
 
-		$url_validator = new CUrlValidator(['schemes' => ['http', 'https']]);
-		$https_url_validator = new CUrlValidator(['schemes' => ['https']]);
+		$url_validator = new CUrlValidator(['schemes' => ['http', 'https'], 'required_scheme' => true]);
+		$https_url_validator = new CUrlValidator(['schemes' => ['https'], 'required_scheme' => true]);
 
 		$results = [];
 
