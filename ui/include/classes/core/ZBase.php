@@ -377,6 +377,7 @@ class ZBase {
 			'blue-theme' => _('Blue'),
 			'blue-classic-theme' => _('Blue (classic)'),
 			'dark-theme' => _('Dark'),
+			'dark-blue-theme' => _('Dark blue'),
 			'dark-classic-theme' => _('Dark (classic)'),
 			'hc-light' => _('High-contrast light'),
 			'hc-dark' => _('High-contrast dark')
@@ -385,7 +386,7 @@ class ZBase {
 
 	public static function getColorScheme(string $theme): string {
 		return match ($theme) {
-			'dark-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
+			'dark-theme', 'dark-blue-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
 			default => ZBX_COLOR_SCHEME_LIGHT
 		};
 	}
