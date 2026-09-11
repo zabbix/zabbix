@@ -32,9 +32,9 @@ class CUrlValidator extends CValidator {
 	 *   'event_tags_macro'   If true, treat the URL as valid whenever it includes an {EVENT.TAGS.<ref>} macro.
 	 *   'manualinput_macro'  If true, treat the URL as valid whenever it includes a {MANUALINPUT} macro.
 	 *   'schemes'            If not null, the URL scheme will be validated against the provided list.
-	 *   'required_scheme'    If true, the URL must contain scheme.
 	 *                        The list is expected to contain schemes in lower case.
 	 *                        Scheme validation won't take place if the URL does not contain a scheme component.
+	 *    'required_scheme'   If true, the URL must contain scheme.
 	 *
 	 * @var array
 	 */
