@@ -125,10 +125,6 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url);
 
-			if ('attributes' in filter) {
-				filter.attributes = filter.attributes.filter(({ key }) => key !== '');
-			}
-
 			this.#datatable = new CDataTable(document.getElementById('datatable-traces'), data_provider)
 				.setColumns([
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)

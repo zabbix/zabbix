@@ -57,7 +57,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			? $filter['statuses']
 			: [];
 		$span_attributes = array_key_exists('attributes', $filter) && $filter['attributes']
-			? $filter['attributes']
+			? array_filter($filter['attributes'], static fn (array $attribute) => ($attribute['key'] ?? '') !== '')
 			: null;
 		$span_attributes_evaltype = array_key_exists('evaltype', $filter) && $filter['evaltype']
 			? $filter['evaltype']
