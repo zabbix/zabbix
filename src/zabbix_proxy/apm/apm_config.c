@@ -134,7 +134,7 @@ zbx_apm_config_attrs_t	*apm_config_attrs_acquire(zbx_apm_config_attrs_t *attrs)
 void	apm_config_init(zbx_apm_config_t *cfg)
 {
 	cfg->attrs = apm_config_attrs_create(NULL);
-	cfg->status = 1;
+	cfg->status = APM_STATUS_DISABLED;
 	cfg->quota = 0;
 }
 
@@ -160,7 +160,7 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 	if (NULL == apm_config)
 		return FAIL;
 
-	if (0 == cfg->revision)
+	if (0 == cfg->revision && NULL == cfg->attrs)
 		apm_config_init(cfg);
 
 	if (SUCCEED != zbx_json_open(apm_config, &jp))

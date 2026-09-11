@@ -295,7 +295,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 		;
 
 	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
-		return FAIL;
+		goto out;
 
 	if (0 == strncmp(options, APM_PROVIDER_CLICKHOUSE, ZBX_CONST_STRLEN(APM_PROVIDER_CLICKHOUSE)))
 	{
