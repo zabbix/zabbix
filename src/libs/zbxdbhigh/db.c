@@ -269,6 +269,10 @@ int	zbx_db_connect(int flag)
 
 	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
+		/* each failed attempt leaves behind a connection object (and its socket) that is never */
+		/* reused by the next zbx_db_connect_basic() call - it must be released here or it leaks */
+		zbx_db_close();
+
 		if (ZBX_DB_CONNECT_ONCE == flag)
 		{
 #if defined(HAVE_POSTGRESQL)
@@ -284,8 +288,33 @@ int	zbx_db_connect(int flag)
 			exit(EXIT_FAILURE);
 		}
 
-		if (0 == ZBX_IS_RUNNING())
-			break;
+		{
+			/* zbx_db_connect() can be called from within a zbx_block_signals()-protected region */
+			/* (e.g. the history syncer main loop). SIGUSR2, sent by the parent on shutdown, would */
+			/* then stay pending and ZBX_IS_RUNNING() could never see it change - briefly unblock  */
+			/* the signals here so a pending shutdown signal gets delivered and processed before we */
+			/* decide whether to keep retrying; the actual connect/sleep below stays fully protected */
+			sigset_t	signal_mask, orig_mask;
+			int		running;
+
+			sigemptyset(&signal_mask);
+			sigaddset(&signal_mask, SIGUSR1);
+			sigaddset(&signal_mask, SIGUSR2);
+			sigaddset(&signal_mask, SIGTERM);
+			sigaddset(&signal_mask, SIGINT);
+			sigaddset(&signal_mask, SIGQUIT);
+
+			if (0 > zbx_sigmask(SIG_UNBLOCK, &signal_mask, &orig_mask))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot unblock signals in %s()", __func__);
+
+			running = ZBX_IS_RUNNING();
+
+			if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask in %s()", __func__);
+
+			if (0 == running)
+				break;
+		}
 #if defined(HAVE_POSTGRESQL)
 		if (ZBX_DB_RONLY == err)
 		{
@@ -386,6 +415,18 @@ void	zbx_db_begin(void)
  ******************************************************************************/
 int	zbx_db_commit(void)
 {
+	/* zbx_db_begin() (via DBtxn_operation()) can give up without ever starting a transaction if a  */
+	/* shutdown is requested while it is retrying a lost DB connection - in that case there is       */
+	/* nothing to commit, and calling zbx_db_commit_basic() would hit its "commit without            */
+	/* transaction" assertion and crash the process instead of letting it exit. Keep the assertion   */
+	/* as a genuine bug detector for any other (non-shutdown) mismatched begin/commit case. */
+	if (0 == zbx_db_txn_level() && 0 == ZBX_IS_RUNNING())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): no open transaction to commit, shutdown in progress - skipping",
+				__func__);
+		return ZBX_DB_OK;
+	}
+
 	if (ZBX_DB_OK > zbx_db_commit_basic())
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
@@ -404,6 +445,15 @@ int	zbx_db_commit(void)
  ******************************************************************************/
 void	zbx_db_rollback(void)
 {
+	/* same rationale as the equivalent guard in zbx_db_commit() above - a transaction that was never */
+	/* actually started because a shutdown was requested mid-retry has nothing to roll back */
+	if (0 == zbx_db_txn_level() && 0 == ZBX_IS_RUNNING())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): no open transaction to roll back, shutdown in progress - "
+				"skipping", __func__);
+		return;
+	}
+
 	if (ZBX_DB_OK > zbx_db_rollback_basic())
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
@@ -489,7 +539,12 @@ int	zbx_db_execute(const char *fmt, ...)
 	while (ZBX_DB_DOWN == rc)
 	{
 		if (0 == ZBX_IS_RUNNING())
+		{
+			/* ZBX_DB_FAIL is already a value zbx_db_vexecute() itself returns for a          */
+			/* non-recoverable error - callers already handle it, unlike the raw DOWN sentinel */
+			rc = ZBX_DB_FAIL;
 			break;
+		}
 
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -592,7 +647,13 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		if (0 == ZBX_IS_RUNNING())
+		{
+			/* callers already treat NULL as "query failed" (zbx_db_vselect() itself returns  */
+			/* NULL for a non-recoverable error) - returning the raw DOWN sentinel here instead */
+			/* would hand callers a value they have never had to expect and cannot safely check */
+			rc = NULL;
 			break;
+		}
 
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -626,7 +687,11 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		if (0 == ZBX_IS_RUNNING())
+		{
+			/* see zbx_db_select() - callers already handle NULL, never the raw DOWN sentinel */
+			rc = NULL;
 			break;
+		}
 
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
