@@ -1401,7 +1401,7 @@ class CUser extends CApiService {
 			if (array_key_exists('roleid', $user)) {
 				$roleid = $user['roleid'];
 			}
-			elseif ($db_users !== null && array_key_exists('roleid', $db_users[$user['userid']])) {
+			elseif ($db_users !== null) {
 				$roleid = $db_users[$user['userid']]['roleid'];
 			}
 
