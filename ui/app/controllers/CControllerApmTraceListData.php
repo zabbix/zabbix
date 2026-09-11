@@ -25,8 +25,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 
 	protected function getData(): array
 	{
-		$settings = API::Settings()->get(['output' => ['apm_global_db']]);
-		if ($settings['apm_global_db']['status'] === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
+		if (!$this->isDataSourceConfigured()) {
 			return [
 				'no_data_icon' => ZBX_ICON_APM_NOT_CONFIGURED_LARGE,
 				'no_data_message' => _('No data source')
@@ -118,5 +117,15 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		}
 
 		return $output;
+	}
+
+	protected function isDataSourceConfigured(): bool {
+		try {
+			ApmDb::getInstance()->getConfig();
+		} catch (DBException) {
+			return false;
+		}
+
+		return true;
 	}
 }
