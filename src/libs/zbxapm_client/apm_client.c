@@ -28,20 +28,20 @@ int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_APM, SEC_PER_MIN, &errmsg))
 	{
-		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		*error = zbx_dsprintf(NULL, "cannot connect to APM service: %s", errmsg);
 		zbx_free(errmsg);
 		return ret;
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_APM_GET_STATS, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "cannot send get stats message to CEP service");
+		*error = zbx_strdup(NULL, "cannot send get stats message to APM service");
 		goto out;
 	}
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "read stats response from APM service");
 		goto out;
 	}
 
@@ -65,7 +65,7 @@ out:
 	return ret;
 }
 
-zbx_uint32_t	zbx_apm_serialize_stats(zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint64_t len)
+zbx_uint32_t	zbx_apm_serialize_stats(const zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint32_t len)
 {
 	zbx_uint32_t	data_len = 0;
 

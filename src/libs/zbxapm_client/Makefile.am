@@ -2,9 +2,6 @@
 
 noinst_LIBRARIES = libzbxapm_client.a
 
-libzbxapm_client_a_CFLAGS = \
-	$(TLS_CFLAGS)
-
 libzbxapm_client_a_SOURCES = \
 	apm_client.c
 

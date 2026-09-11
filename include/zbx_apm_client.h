@@ -37,7 +37,7 @@ typedef struct
 zbx_apm_stats_t;
 
 int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error);
-zbx_uint32_t	zbx_apm_serialize_stats(zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint64_t len);
+zbx_uint32_t	zbx_apm_serialize_stats(const zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint32_t len);
 
 
 #endif
