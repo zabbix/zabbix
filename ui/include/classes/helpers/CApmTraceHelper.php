@@ -27,9 +27,9 @@ class CApmTraceHelper {
 
 	public static function getStatusCode(int $status): ?string {
 		return match ($status) {
-			APM_TRACE_STATUS_UNSET => 'STATUS_CODE_UNSET',
-			APM_TRACE_STATUS_OK => 'STATUS_CODE_OK',
-			APM_TRACE_STATUS_ERROR => 'STATUS_CODE_ERROR',
+			APM_TRACE_STATUS_UNSET => 'Unset',
+			APM_TRACE_STATUS_OK => 'Ok',
+			APM_TRACE_STATUS_ERROR => 'Error',
 			default => null
 		};
 	}
