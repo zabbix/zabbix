@@ -42,6 +42,8 @@ namespace otlp_logs = opentelemetry::proto::collector::logs::v1;
 
 struct GrpcServerHandle;
 
+static int grpc_initialized = 0;
+
 class TraceServiceImpl final : public otlp_trace::TraceService::CallbackService
 {
 public:
@@ -128,7 +130,6 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 	else
 		reactor->Finish(Status::OK);
 
-	reactor->Finish(Status::OK);
 	return reactor;
 }
 
@@ -149,7 +150,6 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 	else
 		reactor->Finish(Status::OK);
 
-	reactor->Finish(Status::OK);
 	return reactor;
 }
 
@@ -229,9 +229,12 @@ extern "C"
 			handle->server = builder.BuildAndStart();
 			if (!handle->server)
 			{
+				set_error(error, std::string("cannot start collector"));
 				delete handle;
 				return nullptr;
 			}
+
+			grpc_initialized = 1;
 
 			zabbix_log(LOG_LEVEL_WARNING, "Open Telemetry collector listening on %s",
 					listen_address.c_str());
@@ -245,7 +248,7 @@ extern "C"
 		}
 	}
 
-	void zbx_grpc_stop(zbx_grpc_handle_t handle)
+	void	zbx_grpc_stop(zbx_grpc_handle_t handle)
 	{
 		if (handle == nullptr)
 			return;
@@ -260,9 +263,13 @@ extern "C"
 
 		delete server_handle;
 
-		google::protobuf::ShutdownProtobufLibrary();
-
 		zabbix_log(LOG_LEVEL_WARNING, "Open Telemetry collector stopped");
+	}
+
+	void	zbx_grpc_shutdown(void)
+	{
+		if (1 == grpc_initialized)
+			google::protobuf::ShutdownProtobufLibrary();
 	}
 
 	int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,

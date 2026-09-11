@@ -27,6 +27,7 @@ typedef void * zbx_grpc_handle_t;
 zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
 		const zbx_apm_config_tls_t *tls, char **error);
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
+void	zbx_grpc_shutdown(void);
 
 int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,
 		char **error);

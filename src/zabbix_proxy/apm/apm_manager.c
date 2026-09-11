@@ -52,14 +52,16 @@ typedef struct
 }
 zbx_apm_manager_t;
 
+static void	apm_manager_deactivate(zbx_apm_manager_t *manager);
+
 static void	apm_manager_free(zbx_apm_manager_t *manager)
 {
 	for (int i = 0; i < manager->commits.values_num; i++)
 		apm_task_free(manager->commits.values[i]);
 	zbx_vector_mw_task_ptr_destroy(&manager->commits);
 
-	if (NULL != manager->grpc)
-		zbx_grpc_stop(manager->grpc);
+	apm_manager_deactivate(manager);
+	zbx_grpc_shutdown();
 
 	zbx_mw_manager_clear(&manager->base);
 
