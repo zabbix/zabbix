@@ -140,11 +140,11 @@
 				.setStickyFooter(true)
 				.setStorageIdx(storage_idx)
 				.setCellRenderer('name', ({cell, cell_data}) => {
-					const column_name = cell_data;
+					const [data] = cell_data;
 
 					const name = document.createElement('div');
 					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					name.textContent = column_name;
+					name.textContent = data;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
