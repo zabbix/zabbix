@@ -1,1 +1,1 @@
-A.F....... [ZBXNEXT-9962] added support for enforcing the 'URL (after login)' page for users through user roles; refactored request helper into Frontend Action Validator; refactored MVC response classes (aluchko, dpankins)
+A.F....... [ZBXNEXT-9962] added support for enforcing the 'URL (after login)' page for users through user roles; refactored request helper into Frontend Action Validator; refactored MVC response classes (aluchko, dfofanovs, dpankins)
