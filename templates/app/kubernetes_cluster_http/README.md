@@ -86,6 +86,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port>.</p>|`https://kubernetes.default.svc`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Kubernetes Cluster", e.g. {$HTTP.TLS.VERIFY:"Kubernetes Cluster"}.</p>|`full`|
 |{$KUBE.NODE.EXPORTER.PORT}|<p>Kubernetes prometheus-node-exporter metrics endpoint port.</p>|`9100`|
 |{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}|<p>Filter of discoverable metrics by namespace.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered metrics by namespace.</p>|`CHANGE_IF_NEEDED`|

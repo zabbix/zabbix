@@ -42,7 +42,7 @@ $html_page = (new CHtmlPage())
 
 			(new CFormGrid())
 				->addItem([
-					new CLabel(_('Users'), 'filter_users__ms'),
+					new CLabel(_('Users'), 'filter_userids__ms'),
 					new CFormField(
 						(new CMultiSelect([
 							'name' => 'filter_userids[]',
@@ -61,7 +61,7 @@ $html_page = (new CHtmlPage())
 					)
 				])
 				->addItem([
-					new CLabel(_('User roles'), 'filter_roles__ms'),
+					new CLabel(_('User roles'), 'filter_roleids__ms'),
 					new CFormField(
 						(new CMultiSelect([
 							'name' => 'filter_roleids[]',

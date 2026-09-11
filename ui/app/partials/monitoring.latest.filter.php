@@ -369,7 +369,7 @@ if (array_key_exists('render_html', $data)) {
 		this.resetUnsavedState();
 	}
 
-	function expand(data, container) {
+	function expand(data) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
 		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
@@ -384,7 +384,7 @@ if (array_key_exists('render_html', $data)) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
-		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+		expand.call(ev.detail, ev.detail._data);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function (ev) {
 		select.call(ev.detail, ev.detail._data, ev.detail._content_container);

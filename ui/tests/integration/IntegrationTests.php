@@ -17,6 +17,7 @@ require_once dirname(__FILE__).'/testInitialConfSync.php';
 require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
+require_once dirname(__FILE__).'/testEncryptionDataCollection.php';
 require_once dirname(__FILE__).'/testBinaryAndJSONValueTypesDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
@@ -48,10 +49,12 @@ require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryGet.php';
+require_once dirname(__FILE__).'/testAutoregistrationProxyGroup.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
@@ -73,7 +76,9 @@ require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
+require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
+require_once dirname(__FILE__).'/testScheduledReports.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -89,7 +94,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
+		$suite->addTestSuite('testAutoregistrationProxyGroup');
 		$suite->addTestSuite('testDataCollection');
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
@@ -122,6 +129,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
@@ -144,7 +152,9 @@ class IntegrationTests {
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
+		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
+		$suite->addTestSuite('testScheduledReports');
 		return $suite;
 	}
 }

@@ -481,7 +481,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with matching event tags (17)
+test case: Match tags with matching event tags (19)
 in:
   eval_type: and/or
   match_tags:
@@ -511,7 +511,8 @@ in:
     - tag: b
       value: 1
 out:
-  return: SUCCEED---
+  return: SUCCEED
+---
 test case: Match tags with not matching event tags (1)
 in:
   eval_type: or
@@ -662,7 +663,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with matching event tags (8)
+test case: Match tags with matching event tags (20)
 in:
   eval_type: and/or
   match_tags:

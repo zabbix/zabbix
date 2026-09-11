@@ -248,7 +248,6 @@ out:
  *             config_ssl_ca_location    - [IN]                               *
  *             config_ssl_cert_location  - [IN]                               *
  *             config_ssl_key_location   - [IN]                               *
- *             config_denyitemtypes_mask - [IN]                               *
  *             vault_ret                 - [OUT]                              *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
@@ -261,7 +260,7 @@ out:
 static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location,
-		zbx_uint32_t config_denyitemtypes_mask, int *vault_ret)
+		int *vault_ret)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
@@ -298,7 +297,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 
 	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-			config_denyitemtypes_mask, vault_ret, &error)))
+			vault_ret, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->name, error);
@@ -564,7 +563,7 @@ static int	process_proxy(zbx_ipc_async_socket_t *rtc, const zbx_config_vault_t *
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location,
 		const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency, int proxydata_frequency,
-		zbx_uint32_t config_denyitemtypes_mask, int *vault_ret)
+		int *vault_ret)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
 	int			num, i;
@@ -620,8 +619,7 @@ static int	process_proxy(zbx_ipc_async_socket_t *rtc, const zbx_config_vault_t *
 			{
 				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault,
 						config_trapper_timeout, config_source_ip, config_ssl_ca_location,
-						config_ssl_cert_location, config_ssl_key_location,
-						config_denyitemtypes_mask, vault_ret)))
+						config_ssl_cert_location, config_ssl_key_location, vault_ret)))
 				{
 					goto error;
 				}
@@ -752,7 +750,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				proxy_poller_args_in->config_ssl_key_location,
 				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
 				proxy_poller_args_in->proxydata_frequency,
-				proxy_poller_args_in->config_denyitemtypes_mask, &vault_ret);
+				&vault_ret);
 
 		if (SUCCEED != vault_ret && NULL != proxy_poller_args_in->config_vault->token)
 		{
