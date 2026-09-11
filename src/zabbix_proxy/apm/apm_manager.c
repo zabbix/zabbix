@@ -223,6 +223,7 @@ static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t 
 	stats.written_metrics_histogram = atomic_load(&manager->commit_stats.metrics_histogram);
 	stats.written_metrics_exponential_histogram = atomic_load(&manager->commit_stats.metrics_exponential_histogram);
 	stats.written_metrics_summary = atomic_load(&manager->commit_stats.metrics_summary);
+	apm_queue_get_stats((zbx_apm_queue_t *)manager->base.queue, &stats.processed_requests);
 
 	if (0 != (len = zbx_apm_serialize_stats(&stats, buf, (zbx_uint32_t)sizeof(buf))))
 		zbx_ipc_client_send(client, ZBX_APM_GET_STATS, buf, len);

@@ -104,5 +104,6 @@ typedef struct
 zbx_apm_commit_stats_t;
 
 void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats);
+void	apm_dataset_undo_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats);
 
 #endif

@@ -355,22 +355,50 @@ void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t
 		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->logs.rows.values_num);
 
 	if (0 != ds->traces.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->traces.rows.values_num);
+		atomic_fetch_add(&stats->traces, (zbx_uint64_t)ds->traces.rows.values_num);
 
 	if (0 != ds->metrics_exponential_histogram.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_exponential_histogram.rows.values_num);
+	{
+		atomic_fetch_add(&stats->metrics_exponential_histogram,
+				(zbx_uint64_t)ds->metrics_exponential_histogram.rows.values_num);
+	}
 
 	if (0 != ds->metrics_histogram.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_histogram.rows.values_num);
+		atomic_fetch_add(&stats->metrics_histogram, (zbx_uint64_t)ds->metrics_histogram.rows.values_num);
 
 	if (0 != ds->metrics_gauge.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_gauge.rows.values_num);
+		atomic_fetch_add(&stats->metrics_gauge, (zbx_uint64_t)ds->metrics_gauge.rows.values_num);
 
 	if (0 != ds->metrics_sum.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_sum.rows.values_num);
+		atomic_fetch_add(&stats->metrics_sum, (zbx_uint64_t)ds->metrics_sum.rows.values_num);
 
 	if (0 != ds->metrics_summary.rows.values_num)
-		atomic_fetch_add(&stats->logs, (zbx_uint64_t)ds->metrics_summary.rows.values_num);
+		atomic_fetch_add(&stats->metrics_summary, (zbx_uint64_t)ds->metrics_summary.rows.values_num);
 }
 
+void	apm_dataset_undo_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
+{
+	if (0 != ds->logs.rows.values_num)
+		atomic_fetch_sub(&stats->logs, (zbx_uint64_t)ds->logs.rows.values_num);
 
+	if (0 != ds->traces.rows.values_num)
+		atomic_fetch_sub(&stats->traces, (zbx_uint64_t)ds->traces.rows.values_num);
+
+	if (0 != ds->metrics_exponential_histogram.rows.values_num)
+	{
+		atomic_fetch_sub(&stats->metrics_exponential_histogram,
+				(zbx_uint64_t)ds->metrics_exponential_histogram.rows.values_num);
+	}
+
+	if (0 != ds->metrics_histogram.rows.values_num)
+		atomic_fetch_sub(&stats->metrics_histogram, (zbx_uint64_t)ds->metrics_histogram.rows.values_num);
+
+	if (0 != ds->metrics_gauge.rows.values_num)
+		atomic_fetch_sub(&stats->metrics_gauge, (zbx_uint64_t)ds->metrics_gauge.rows.values_num);
+
+	if (0 != ds->metrics_sum.rows.values_num)
+		atomic_fetch_sub(&stats->metrics_sum, (zbx_uint64_t)ds->metrics_sum.rows.values_num);
+
+	if (0 != ds->metrics_summary.rows.values_num)
+		atomic_fetch_sub(&stats->metrics_summary, (zbx_uint64_t)ds->metrics_summary.rows.values_num);
+}

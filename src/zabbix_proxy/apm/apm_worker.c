@@ -65,14 +65,17 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	exporter = apm_exporter_acquire(worker->exporters);
 
+	apm_dataset_flush_stats(&ds, worker->commit_stats);
+
 	do
 	{
 		ret = apm_exporter_commit(exporter, &ds);
 	}
 	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
 
-	if (APM_COMMIT_OK == ret)
-		apm_dataset_flush_stats(&ds, worker->commit_stats);
+	/* uncommited rows are left in dataset, undo commit stats for them */
+	if (APM_COMMIT_OK != ret)
+		apm_dataset_undo_stats(&ds, worker->commit_stats);
 
 	apm_exporter_release(worker->exporters, exporter);
 

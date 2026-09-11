@@ -42,6 +42,9 @@ static int	get_apm_export_stats(AGENT_RESULT *result)
 	zbx_json_adduint64(&j, "metrics_histogram", stats.written_metrics_histogram);
 	zbx_json_adduint64(&j, "metrics_exponential_histogram", stats.written_metrics_exponential_histogram);
 	zbx_json_adduint64(&j, "metrics_summary", stats.written_metrics_summary);
+	zbx_json_close(&j);
+	zbx_json_addobject(&j, "processed");
+	zbx_json_adduint64(&j, "requests", stats.processed_requests);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
 
@@ -178,14 +181,14 @@ int	zbx_get_value_internal_ext_proxy(const zbx_dc_item_t *item, const char *para
 		}
 
 		param2 = get_rparam(request, 1);
-		if (0 != strcmp(param2, "export"))
+		if (0 == strcmp(param2, "export"))
 		{
 			return get_apm_export_stats(result);
 		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			return SUCCEED;
+			return NOTSUPPORTED;
 		}
 	}
 	else

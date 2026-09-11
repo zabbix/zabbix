@@ -186,8 +186,6 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 		goto out;
 	}
 
-	apm_rowset_clear(rs);
-
 	ret = APM_COMMIT_OK;
 out:
 	if (0 != (ret & APM_COMMIT_RETRY))

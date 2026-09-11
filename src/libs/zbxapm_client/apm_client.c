@@ -52,7 +52,8 @@ int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
 	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_sum);
 	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_histogram);
 	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_exponential_histogram);
-	(void)zbx_deserialize_value(ptr, &stats->written_metrics_summary);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_summary);
+	(void)zbx_deserialize_value(ptr, &stats->processed_requests);
 
 	zbx_ipc_message_clean(&response);
 
@@ -74,6 +75,7 @@ zbx_uint32_t	zbx_apm_serialize_stats(zbx_apm_stats_t *stats, unsigned char *buf,
 	zbx_serialize_prepare_value(data_len, stats->written_metrics_histogram);
 	zbx_serialize_prepare_value(data_len, stats->written_metrics_exponential_histogram);
 	zbx_serialize_prepare_value(data_len, stats->written_metrics_summary);
+	zbx_serialize_prepare_value(data_len, stats->processed_requests);
 
 	if (data_len > len)
 	{
@@ -87,7 +89,8 @@ zbx_uint32_t	zbx_apm_serialize_stats(zbx_apm_stats_t *stats, unsigned char *buf,
 	buf += zbx_serialize_value(buf, stats->written_metrics_sum);
 	buf += zbx_serialize_value(buf, stats->written_metrics_histogram);
 	buf += zbx_serialize_value(buf, stats->written_metrics_exponential_histogram);
-	(void)zbx_serialize_value(buf, stats->written_metrics_summary);
+	buf += zbx_serialize_value(buf, stats->written_metrics_summary);
+	(void)zbx_serialize_value(buf, stats->processed_requests);
 
 	return data_len;
 }
