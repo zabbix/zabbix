@@ -542,6 +542,58 @@ class testHostPrototype extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			'snmp interface with invalid max_repetitions value' => [
+				'request' => [
+					[
+						'ruleid' => 400660,
+						'groupLinks' => [[
+							'groupid' => 50014
+						]],
+						'host' => 'new {#HOST} snmp3',
+						'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+						'interfaces' => [
+							[
+								'type' => INTERFACE_TYPE_SNMP,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.0',
+								'port' => '1234',
+								'main' => 1,
+								'details' => [
+									'version' => SNMP_V3,
+									'max_repetitions' => '{MACRO}'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/max_repetitions\": an integer is expected."
+			],
+			'snmp interface with invalid retries value' => [
+				'request' => [
+					[
+						'ruleid' => 400660,
+						'groupLinks' => [[
+							'groupid' => 50014
+						]],
+						'host' => 'new {#HOST} snmp3',
+						'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+						'interfaces' => [
+							[
+								'type' => INTERFACE_TYPE_SNMP,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.0',
+								'port' => '1234',
+								'main' => 1,
+								'details' => [
+									'version' => SNMP_V3,
+									'retries' => '{MACRO}'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/retries\": an integer is expected."
+			],
 			'non-snmp interface with filled details' => [
 				'request' => [
 					[
@@ -1139,6 +1191,120 @@ class testHostPrototype extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			'SNMP interface with user macros for max_repetitions and retries' => [
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+								'max_repetitions' => '{$MACRO}',
+								'retries' => '{$MACRO}'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'max_repetitions' => '{$MACRO2}',
+								'retries' => '{$MACRO2}'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'SNMP interface with LLD macros for max_repetitions and retries' => [
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+								'max_repetitions' => '{#MACRO}',
+								'retries' => '{#MACRO}'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'max_repetitions' => '{#MACRO2}',
+								'retries' => '{#MACRO2}'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'SNMP interface with numeric value for max_repetitions and retries' => [
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+								'max_repetitions' => '1',
+								'retries' => '0'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V3,
+								'max_repetitions' => '3',
+								'retries' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -1171,7 +1337,7 @@ class testHostPrototype extends CAPITest {
 
 		if ($details_interfaceids) {
 			$options = [
-				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
+				'output' => ['interfaceid', 'version', 'bulk', 'retries', 'community', 'securityname', 'securitylevel',
 					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
 				],
 				'interfaceids' => $details_interfaceids
