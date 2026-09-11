@@ -97,7 +97,9 @@ class CControllerApmTraceListData extends CControllerDataTable {
 				$trace['service_name'] = $trace['service_name'] ?: '['._('No root span found').']';
 				$trace['span_name'] = $trace['span_name'] ?: '['._('No root span found').']';
 
-				$trace['duration_time_units'] = convertSecondsToTimeUnits($trace['duration'] * SEC_PER_NANOSEC);
+				$trace['duration_time_units'] = $trace['duration']
+					? convertSecondsToTimeUnits($trace['duration'] * SEC_PER_NANOSEC)
+					: '0'._x('ns', 'nanosecond short');
 				$trace['duration_percentage'] = round($trace['duration'] / $trace_max_duration * 100);
 			}
 			unset($trace);
