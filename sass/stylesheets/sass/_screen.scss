@@ -1206,25 +1206,40 @@ select {
 	display: flex;
 	width: 100%;
 
-	input[type=text] {
+	.multilineinput-preview {
+		border: 1px solid $form-border-color;
+		border-right-width: 0;
+		border-radius: 4px 0 0 4px;
+		box-sizing: border-box;
+		flex: 1;
 		overflow: hidden;
-		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		border-right: 0;
-		border-top-right-radius: 0;
-		border-bottom-right-radius: 0;
-		width: 100%;
-
-		&[readonly] {
-			background: $form-bg-color !important;
-			border-color: $form-border-color;
-			color: $form-font-color;
-		}
+		cursor: pointer;
+		height: 24px;
+		line-height: 22px;
+		padding: 0 5px;
 
 		&.monospace-font {
 			padding-top: 1px;
 		}
+
+		&.multilineinput-preview-placeholder::before {
+			content: attr(data-placeholder);
+			color: $input-placeholder-color !important;
+		}
+	}
+
+	&.multilineinput-readonly .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+		line-height: 24px;
+	}
+
+	&.multilineinput-disabled .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+		border-color: $form-disabled-border-color;
+		color: $form-border-color;
+		cursor: default;
 	}
 
 	&.editable {
@@ -1256,10 +1271,6 @@ select {
 	}
 
 	&.multilineinput-disabled {
-		input[type=text] {
-			cursor: default;
-		}
-
 		button::after {
 			opacity: .5;
 		}

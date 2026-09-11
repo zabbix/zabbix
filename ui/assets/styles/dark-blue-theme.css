@@ -8547,21 +8547,32 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
 .multilineinput-control {
   display: flex;
   width: 100%; }
-  .multilineinput-control input[type=text] {
+  .multilineinput-control .multilineinput-preview {
+    border: 1px solid #0066d9;
+    border-right-width: 0;
+    border-radius: 4px 0 0 4px;
+    box-sizing: border-box;
+    flex: 1;
     overflow: hidden;
-    cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    width: 100%; }
-    .multilineinput-control input[type=text][readonly] {
-      background: #001f42 !important;
-      border-color: #0066d9;
-      color: #e5f1ff; }
-    .multilineinput-control input[type=text].monospace-font {
+    cursor: pointer;
+    height: 24px;
+    line-height: 22px;
+    padding: 0 5px; }
+    .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #939ca4 !important; }
+  .multilineinput-control.multilineinput-readonly .multilineinput-preview {
+    background-color: #002956;
+    line-height: 24px; }
+  .multilineinput-control.multilineinput-disabled .multilineinput-preview {
+    background-color: #002956;
+    border-color: #003a7a;
+    color: #0066d9;
+    cursor: default; }
   .multilineinput-control.editable {
     background-color: #001f42 !important;
     border-color: #626c75; }
@@ -8578,8 +8589,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
         background-color: rgba(0, 58, 122, 0.35); }
   .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
     background-color: #002956 !important; }
-  .multilineinput-control.multilineinput-disabled input[type=text] {
-    cursor: default; }
   .multilineinput-control.multilineinput-disabled button::after {
     opacity: .5; }
   .multilineinput-control button.zi-pencil::before {
