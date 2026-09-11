@@ -23,8 +23,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
 	}
 
-	protected function getData(): array
-	{
+	protected function getData(): array {
 		if (!$this->isDataSourceConfigured()) {
 			return [
 				'no_data_icon' => ZBX_ICON_APM_NOT_CONFIGURED_LARGE,
