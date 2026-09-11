@@ -7473,19 +7473,30 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .multilineinput-control {
   display: flex;
   width: 100%; }
-  .multilineinput-control input[type=text] {
+  .multilineinput-control .multilineinput-preview {
+    border: 1px solid #888888;
+    border-right-width: 0;
+    box-sizing: border-box;
+    flex: 1;
     overflow: hidden;
-    cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-right: 0;
-    width: 100%; }
-    .multilineinput-control input[type=text][readonly] {
-      background: #ffffff !important;
-      border-color: #888888;
-      color: #000000; }
-    .multilineinput-control input[type=text].monospace-font {
+    cursor: pointer;
+    height: 24px;
+    line-height: 22px;
+    padding: 0 5px; }
+    .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #777777 !important; }
+  .multilineinput-control.multilineinput-readonly .multilineinput-preview {
+    background-color: #f0f0f0; }
+  .multilineinput-control.multilineinput-disabled .multilineinput-preview {
+    background-color: #f0f0f0;
+    border-color: #9f9f9f;
+    color: #888888;
+    cursor: default; }
   .multilineinput-control.editable {
     background-color: #ffffff !important;
     border-color: #9f9f9f; }
@@ -7502,8 +7513,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
         background-color: #f4f4f4; }
   .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
     background-color: #f0f0f0 !important; }
-  .multilineinput-control.multilineinput-disabled input[type=text] {
-    cursor: default; }
   .multilineinput-control.multilineinput-disabled button::after {
     opacity: .5; }
   .multilineinput-control button.zi-pencil::before {
