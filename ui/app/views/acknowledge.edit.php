@@ -162,19 +162,26 @@ $form_list
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	);
 
-if ($data['allowed_edit_maintenance'] && $data['editable_triggers_count'] > 0) {
-	$maintenance_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'maintenance.edit')
-		->setArgument('context', 'trigger');
+if ($data['allowed_edit_maintenance']) {
+	if ($data['editable_triggers_count'] > 0) {
+		$maintenance_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'maintenance.edit')
+			->setArgument('context', 'trigger');
 
-	foreach ($data['eventids'] as $key => $eventid) {
-		$maintenance_url->setArgument("eventids[{$key}]", $eventid);
+		foreach ($data['eventids'] as $key => $eventid) {
+			$maintenance_url->setArgument("eventids[{$key}]", $eventid);
+		}
+
+		$form_list->addRow('',
+			(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['editable_triggers_count']), $maintenance_url))
+		);
 	}
-
-	$form_list->addRow('',
-		(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['editable_triggers_count']), $maintenance_url))
-	);
+	else {
+		$form_list->addRow('',
+			(new CSpan(_n('Suppress trigger', 'Suppress triggers', $selected_events)))->addClass(ZBX_STYLE_DISABLED)
+		);
+	}
 }
 
 $form_list
