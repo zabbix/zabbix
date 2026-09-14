@@ -313,6 +313,7 @@ class CImportDataAdapterTest extends TestCase {
 						'interface_ref' => 'if2',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '2',
 							'community' => '{$SNMP_COMMUNITY}',
 							'max_repetitions' => '10',
@@ -2595,6 +2596,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '161',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '1',
 							'community' => 'public',
 							'max_repetitions' => '10',
@@ -2617,6 +2619,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '162',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '1',
 							'community' => 'public',
 							'max_repetitions' => '10',
@@ -2639,6 +2642,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '161',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '2',
 							'community' => 'public',
 							'max_repetitions' => '10',
@@ -2661,6 +2665,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '163',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '2',
 							'community' => 'public',
 							'max_repetitions' => '10',
@@ -2683,6 +2688,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '161',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '3',
 							'contextname' => 'test',
 							'securityname' => 'test',
@@ -2705,6 +2711,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '164',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '3',
 							'contextname' => 'test',
 							'securityname' => 'test',
@@ -2727,6 +2734,7 @@ class CImportDataAdapterTest extends TestCase {
 						'port' => '161',
 						'details' => [
 							'bulk' => '1',
+							'retries' => '5',
 							'version' => '3',
 							'contextname' => 'test',
 							'securityname' => 'test',

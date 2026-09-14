@@ -689,6 +689,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 				'details' => [
 					'version' => 3,
 					'bulk' => 1,
+					'retries' => 5,
 					'max_repetitions' => 10,
 					'securityname' => 'zabbix',
 					'securitylevel' => 0,
@@ -708,6 +709,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 				'details' => [
 					'version' => 3,
 					'bulk' => 1,
+					'retries' => 5,
 					'max_repetitions' => 10,
 					'securityname' => 'zabbix',
 					'securitylevel' => 0,
