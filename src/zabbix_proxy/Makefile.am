@@ -141,6 +141,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
+	$(top_builddir)/src/libs/zbxapm_client/libzbxapm_client.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
@@ -153,7 +154,6 @@ endif
 if HAVE_APM
 zabbix_proxy_LDADD += \
 	apm/libzbxapm.a \
-	$(top_builddir)/src/libs/zbxapm_client/libzbxapm_client.a \
 	$(APM_LIBS)
 endif
 

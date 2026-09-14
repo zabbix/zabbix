@@ -101,6 +101,7 @@ DIST_SUBDIRS = \
 if SERVER
 SERVER_SUBDIRS = \
 	zbxalerter \
+	zbxapm_client \
 	zbxasynchttppoller \
 	zbxasyncpoller \
 	zbxaudit \
