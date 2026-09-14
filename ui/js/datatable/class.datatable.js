@@ -1367,10 +1367,6 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
-				if (error.name === 'TypeError') {
-					return;
-				}
-
 				CMessageHelper.error(this.#element, [error.message], error.name);
 
 				onError(error);
