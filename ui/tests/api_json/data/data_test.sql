@@ -74,8 +74,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52
 -- role and role_rule
 INSERT INTO role (roleid, name, type) VALUES (5, 'User role with API access', 1);
 INSERT INTO role (roleid, name, type) VALUES (6, 'Admin role with API access', 2);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (36, 5, 0, 'api.access', 1);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (37, 6, 0, 'api.access', 1);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (44, 5, 0, 'api.access', 1);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (45, 6, 0, 'api.access', 1);
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');

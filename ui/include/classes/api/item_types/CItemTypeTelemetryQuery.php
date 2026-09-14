@@ -214,34 +214,10 @@ class CItemTypeTelemetryQuery extends CItemType {
 		return true;
 	}
 
-
-	/**
-	 * Validate "query.columns":
-	 * - "attribute_key" value cannot start or end with whitespace character
-	 *
-	 * @param array       $item   Telemetry item to validate.
-	 * @param string      $path   Path for validation message.
-	 * @param string|null $error  Error message when validation fails, set by reference.
-	 */
-	public static function validateColumns(array $item, string $path, ?string &$error = null): bool {
-		foreach ($item['query']['columns'] as $i => $column) {
-			if (trim($column['attribute_key'], ' ') !== $column['attribute_key']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/columns/'.($i + 1).'/attribute_key',
-					_('value cannot start or end with whitespace')
-				);
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	/**
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
-	 * - "alias" value cannot start or end with whitespace character
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path for validation message.
@@ -271,14 +247,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 					return false;
 				}
-			}
-
-			if (trim($column['alias'], ' ') !== $column['alias']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
-					_('value cannot start or end with whitespace')
-				);
-
-				return false;
 			}
 		}
 
@@ -314,17 +282,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/filter/conditions/'.(reset($formulaids) + 1).'/formulaid',
 					_('an identifier is not defined in the formula')
-				);
-
-				return false;
-			}
-		}
-
-		foreach ($item['query']['filter']['conditions'] as $i => $condition) {
-			if (trim($condition['attribute_key'], ' ') !== $condition['attribute_key']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/filter/conditions/'.($i + 1).'/attribute_key',
-					_('value cannot start or end with whitespace')
 				);
 
 				return false;
@@ -455,11 +412,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @return array
 	 */
 	public static function convertFilterFormulaToExpression(array $query): array {
-		if ($query['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			return $query;
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
 		}
-
-		CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
 
 		foreach ($query['filter']['conditions'] as &$condition) {
 			unset($condition['formulaid']);

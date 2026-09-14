@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 /*
  * 8.0 development database patches
@@ -1276,33 +1277,87 @@ static int	DBpatch_7050092(void)
 
 static int	DBpatch_7050093(void)
 {
-	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("items", &field);
+	return DBmodify_field_type("role_rule", &field, NULL);
 }
 
 static int	DBpatch_7050094(void)
 {
-	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
 
-	return DBadd_field("items", &field);
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" where rr.name='api.mode' and rr.value_int=1"
+				" and not exists ("
+					"select null"
+					" from role_rule rr2"
+					" where rr2.roleid=rr.roleid"
+						" and rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
+	{
+#define ZBX_ROLE_RULE_TYPE_STR	1
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
+				"*");
+#undef ZBX_ROLE_RULE_TYPE_STR
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
 }
 
 static int	DBpatch_7050095(void)
 {
-	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_7050096(void)
 {
-	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_7050097(void)
+{
+	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050098(void)
+{
+	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050099(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
@@ -1313,14 +1368,14 @@ static int	DBpatch_7050097(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050100(void)
 {
 	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050101(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update proxy set timeout_telemetry_query='3s' where custom_timeouts=1"))
 		return FAIL;
@@ -1328,14 +1383,14 @@ static int	DBpatch_7050099(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050102(void)
 {
 	const zbx_db_field_t	field = {"storage_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050103(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('apm_global_db', %d, '{}')", ZBX_SETTING_TYPE_STR))
@@ -1454,5 +1509,7 @@ DBPATCH_ADD(7050098, 0, 1)
 DBPATCH_ADD(7050099, 0, 1)
 DBPATCH_ADD(7050100, 0, 1)
 DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
 
 DBPATCH_END()

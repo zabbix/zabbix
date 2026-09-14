@@ -654,20 +654,6 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query/filter/conditions/1/attribute_key": value is too long.'
 		];
 
-		yield '"query.aggregated_columns[].alias" value start and end with whitespace fail' => [
-			[
-				'query' => [
-					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
-					'columns' => [],
-					'aggregated_columns' => [
-						['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => ' a ']
-					],
-					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
-				]
-			],
-			'Invalid parameter "/1/query/aggregated_columns/1/alias": value cannot start or end with whitespace.'
-		];
-
 		yield '"query.aggregated_columns[].alias" value too long fail' => [
 			[
 				'query' => [

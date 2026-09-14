@@ -5430,6 +5430,11 @@ section {
         padding-bottom: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+    .table-forms .table-forms-td-right .form-fields-hint {
+      font-size: 11px;
+      line-height: 16px;
+      white-space: nowrap;
+      color: #5e7988; }
   .table-forms .table-subforms {
     margin-top: -5px;
     margin-bottom: -5px; }
@@ -9695,6 +9700,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   align-items: center; }
   .multiselect-description-container > .multiselect-control {
     margin-right: 5px; }
+
+.rules-status-title {
+  margin-bottom: 3px;
+  color: #768d99; }
 
 .rules-status-container .status-green,
 .rules-status-container .status-grey {

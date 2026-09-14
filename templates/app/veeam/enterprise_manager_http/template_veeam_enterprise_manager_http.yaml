@@ -64,7 +64,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -76,7 +76,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.failedJobRuns
+                - $.JobStatistics.FailedJobRuns
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -221,7 +221,7 @@ zabbix_export:
             			throw 'Request failed with status code ' + Veeam.request.getStatus() + ': ' + response;
             		}
             
-            		Veeam.session_id = Veeam.getField(JSON.parse(response), 'sessionId');
+            		Veeam.session_id = Veeam.getField(JSON.parse(response), 'SessionId');
             	},
             
             	logout: function () {
@@ -264,21 +264,21 @@ zabbix_export:
             	getMetricsData: function () {
             		var data = {},
             			endpoints = {
-            				backupFiles: 'api/backupFiles'
+            				backup_files: 'api/backupFiles'
             			};
             
             		Veeam.getSessionId();
             
-            		var links = (Veeam.getField(Veeam.getRequest(Veeam.params.api_endpoint + 'api/reports/summary', Veeam.session_id), 'links'));
+            		var links = (Veeam.getField(Veeam.getRequest(Veeam.params.api_endpoint + 'api/reports/summary', Veeam.session_id), 'Links'));
             
             		links.forEach(function (field) {
-            			data[field.name] = Veeam.getRequest(field.href, Veeam.session_id);
+            			data[field.Name] = Veeam.getRequest(field.Href, Veeam.session_id);
             		});
             
             		Object.keys(endpoints).forEach(function (key) {
-            			data[key] = Veeam.getField(Veeam.getRequest(Veeam.params.api_endpoint + endpoints[key], Veeam.session_id), 'refs');
+            			data[key] = Veeam.getField(Veeam.getRequest(Veeam.params.api_endpoint + endpoints[key], Veeam.session_id), 'Refs');
             			data[key] = data[key].map(function (item) {
-            				return Veeam.getRequest(item.href + '?format=Entity', Veeam.session_id);
+            				return Veeam.getRequest(item.Href + '?format=Entity', Veeam.session_id);
             			});
             		});
             		Veeam.logout();
@@ -320,7 +320,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.backupServers
+                - $.Overview.BackupServers
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -338,7 +338,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.failedVmLastestStates
+                - $.Overview.FailedVmLastestStates
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -356,7 +356,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.proxyServers
+                - $.Overview.ProxyServers
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -374,7 +374,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.repositoryServers
+                - $.Overview.RepositoryServers
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -392,7 +392,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.successfulVmLastestStates
+                - $.Overview.SuccessfulVmLastestStates
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -410,7 +410,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Overview.warningVmLastestStates
+                - $.Overview.WarningVmLastestStates
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -428,7 +428,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.runningJobs
+                - $.JobStatistics.RunningJobs
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -446,7 +446,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.scheduledBackupJobs
+                - $.JobStatistics.ScheduledBackupJobs
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -464,7 +464,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.scheduledJobs
+                - $.JobStatistics.ScheduledJobs
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -482,7 +482,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.scheduledReplicaJobs
+                - $.JobStatistics.ScheduledReplicaJobs
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -500,7 +500,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.totalJobRuns
+                - $.JobStatistics.TotalJobRuns
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -518,7 +518,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.backedUpVms
+                - $.VmsOverview.BackedUpVms
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -538,7 +538,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.fullBackupPointsSize
+                - $.VmsOverview.FullBackupPointsSize
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -558,7 +558,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.incrementalBackupPointsSize
+                - $.VmsOverview.IncrementalBackupPointsSize
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -576,7 +576,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.protectedVms
+                - $.VmsOverview.ProtectedVms
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -596,7 +596,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.replicaRestorePointsSize
+                - $.VmsOverview.ReplicaRestorePointsSize
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -614,7 +614,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.replicatedVms
+                - $.VmsOverview.ReplicatedVms
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -632,7 +632,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.restorePoints
+                - $.VmsOverview.RestorePoints
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -652,7 +652,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.sourceVmsSize
+                - $.VmsOverview.SourceVmsSize
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -672,7 +672,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.VmsOverview.successBackupPercents
+                - $.VmsOverview.SuccessBackupPercents
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -690,7 +690,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.JobStatistics.warningsJobRuns
+                - $.JobStatistics.WarningsJobRuns
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -739,7 +739,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.backupFiles[?(@.name == "{#NAME}")].compressRatio.first()'
+                    - '$.backup_files[?(@.Name == "{#NAME}")].CompressRatio.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -762,7 +762,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.backupFiles[?(@.name == "{#NAME}")].dataSize.first()'
+                    - '$.backup_files[?(@.Name == "{#NAME}")].DataSize.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -784,7 +784,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.backupFiles[?(@.name == "{#NAME}")].deduplicationRatio.first()'
+                    - '$.backup_files[?(@.Name == "{#NAME}")].DeduplicationRatio.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -807,7 +807,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.backupFiles[?(@.name == "{#NAME}")].backupSize.first()'
+                    - '$.backup_files[?(@.Name == "{#NAME}")].BackupSize.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -824,17 +824,17 @@ zabbix_export:
             key: veeam.manager.get.metrics
           lld_macro_paths:
             - lld_macro: '{#FILE.TYPE}'
-              path: $.fileType
+              path: $.FileType
             - lld_macro: '{#NAME}'
-              path: $.name
+              path: $.Name
             - lld_macro: '{#TYPE}'
-              path: $.type
+              path: $.Type
             - lld_macro: '{#UID}'
-              path: $.uid
+              path: $.UID
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.backupFiles
+                - $.backup_files
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -862,7 +862,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Repositories.periods[?(@.name == "{#NAME}")].backupSize.first()'
+                    - '$.Repositories.Periods[?(@.Name == "{#NAME}")].BackupSize.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -883,7 +883,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Repositories.periods[?(@.name == "{#NAME}")].capacity.first()'
+                    - '$.Repositories.Periods[?(@.Name == "{#NAME}")].Capacity.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -904,7 +904,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Repositories.periods[?(@.name == "{#NAME}")].freeSpace.first()'
+                    - '$.Repositories.Periods[?(@.Name == "{#NAME}")].FreeSpace.first()'
               master_item:
                 key: veeam.manager.get.metrics
               tags:
@@ -936,11 +936,11 @@ zabbix_export:
             key: veeam.manager.get.metrics
           lld_macro_paths:
             - lld_macro: '{#NAME}'
-              path: $.name
+              path: $.Name
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.Repositories.periods
+                - $.Repositories.Periods
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h

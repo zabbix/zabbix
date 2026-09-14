@@ -31,7 +31,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Veeam Backup and Replication, version 13.0
+- Veeam Backup and Replication, version 13.1.1.18
 
 ## Configuration
 
@@ -50,7 +50,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$VEEAM.API.URL}|<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p>|`https://localhost:9419`|
-|{$VEEAM.API.VERSION}|<p>The REST API revision.</p>|`1.3-rev1`|
+|{$VEEAM.API.VERSION}|<p>The REST API revision.</p>|`1.3-rev2`|
 |{$VEEAM.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.</p>|`full`|
 |{$VEEAM.PASSWORD}|<p>The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
@@ -63,8 +63,6 @@ This template has been tested on:
 |{$SESSION.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable sessions by name.</p>|`CHANGE_IF_NEEDED`|
 |{$SESSION.TYPE.MATCHES}|<p>Filter of discoverable sessions by type.</p>|`.*`|
 |{$SESSION.TYPE.NOT_MATCHES}|<p>Filter to exclude discoverable sessions by type.</p>|`CHANGE_IF_NEEDED`|
-|{$SESSION.RESULT.MATCHES}|<p>Filter of discoverable sessions by result.</p>|`.*`|
-|{$SESSION.RESULT.NOT_MATCHES}|<p>Filter to exclude discoverable sessions by result.</p>|`Success`|
 |{$PROXIES.NAME.MATCHES}|<p>Filter of discoverable proxies by name.</p>|`.*`|
 |{$PROXIES.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable proxies by name.</p>|`CHANGE_IF_NEEDED`|
 |{$PROXIES.TYPE.MATCHES}|<p>Filter of discoverable proxies by type.</p>|`.*`|
@@ -104,7 +102,7 @@ This template has been tested on:
 |Get security analyzer results|<p>Authenticates with the Veeam API and retrieves security analyzer best practices data.</p>|HTTP agent|veeam.security.analyzer.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |License: Status|<p>The status of the license.</p>|Dependent item|veeam.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.status`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.expirationDate`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `return Math.floor(Date.parse(value) / 1000);`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|License: Expiration date|<p>The expiration date of the license.</p>|Dependent item|veeam.license.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |License: Licensed instances|<p>The number of licensed instances.</p>|Dependent item|veeam.license.licensed.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.licensedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |License: Used instances|<p>The number of used instances.</p>|Dependent item|veeam.license.used.instances<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.license.instanceLicenseSummary.usedInstancesNumber`</p><p>⛔️Custom on fail: Set error to: `Require the "Backup Administrator" role`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
@@ -177,17 +175,17 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Session [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.sessions.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.result`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
-|Session [{#NAME}] [{#TYPE}]: Progress percent|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.progressPercent`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.sessions.raw[{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.result`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Progress percent|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.progressPercent`</p></li></ul>|
 
 ### Trigger prototypes for Sessions discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Veeam Backup: Last result session failed|<p>The last result of the session `[{#NAME}]` is failed.</p>|`last(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}])=4`|Average|**Manual close**: Yes|
+|Veeam Backup: Last result session failed|<p>The last result of the session `[{#NAME}]` is failed.</p>|`last(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#NAME}/{#TYPE}])=4`|Average|**Manual close**: Yes|
 
 ### LLD rule Jobs states discovery
 
