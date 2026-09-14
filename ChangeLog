@@ -1,9 +1,11 @@
 Changes for 7.4.15rc1
 
 New features:
+...G...... [ZBXNEXT-10451] added Zabbix agent 2 pprof profiler (opucka)
 .........T [ZBXNEXT-10778] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates for version 13.1 (egordymov)
 
 Bug fixes:
+..F....... [ZBX-28110] fixed simple trigger hintbox closure in SVG graph (dfofanovs)
 .........T [ZBX-28099] fixed LLD Sessions discovery in Veeam Backup and Replication by HTTP template (egordymov)
 ..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
 .........T [ZBX-28056] fixed script for endpoints requiring the Backup Administrator role in Veeam Backup and Replication by HTTP template (egordymov)
@@ -1593,8 +1595,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.31rc1
 
 New features:
+...G...... [ZBXNEXT-10451] added Zabbix agent 2 pprof profiler (opucka)
 
 Bug fixes:
+..F....... [ZBX-28110] fixed simple trigger hintbox closure in SVG graph (dfofanovs)
+..F....... [ZBX-27793] fixed incorrect screen reader announcements for modal dialog windows (aluchko)
 ..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
 ........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
 ........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
