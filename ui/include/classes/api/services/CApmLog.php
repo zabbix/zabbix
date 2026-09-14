@@ -105,7 +105,7 @@ class CApmLog extends CApmGeneral {
 			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>					['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
 			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
