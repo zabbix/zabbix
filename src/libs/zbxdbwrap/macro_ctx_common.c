@@ -999,22 +999,22 @@ static int	expr_get_proxy_name_description(zbx_uint64_t itemid, int request, cha
 		const zbx_uint64_t *userid)
 {
 	int		errcode, ret = FAIL;
-	zbx_user_t	user = {.userid = *userid};
+	zbx_user_t	user;
 	zbx_dc_host_t	dc_host;
 
 	zbx_dc_config_get_hosts_by_itemids(&dc_host, &itemid, &errcode, 1);
 
 	if (SUCCEED == errcode)
 	{
-		if (0 != dc_host.proxyid)
-			user.type = zbx_get_user_info(user.userid, &user.roleid, NULL);
+		if (0 != dc_host.proxyid && NULL != userid)
+			user.type = zbx_get_user_info(user.userid = *userid, &user.roleid, NULL);
 
 		if (0 == dc_host.proxyid)
 		{
 			*replace_to = zbx_strdup(*replace_to, "");
 			ret = SUCCEED;
 		}
-		else if (SUCCEED == zbx_db_proxy_allowed_for_monitoring(&user, dc_host.proxyid))
+		else if (NULL == userid || SUCCEED == zbx_db_proxy_allowed_for_monitoring(&user, dc_host.proxyid))
 		{
 			ret = zbx_db_get_proxy_value(dc_host.proxyid, replace_to,
 					ZBX_DB_REQUEST_PROXY_NAME == request ? "name" : "description");
