@@ -21,6 +21,9 @@
 #include "zbxshmem.h"
 #include "zbxipcservice.h"
 
+/* the maximum number of characters for history cache values (except binary and JSON) */
+#define ZBX_HISTORY_VALUE_LEN_MAX	(64 * ZBX_KIBIBYTE)
+
 #define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
 #define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
 
@@ -195,7 +198,7 @@ void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
-int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid);
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items);
 int	zbx_hc_check_high_usage_timer(void);

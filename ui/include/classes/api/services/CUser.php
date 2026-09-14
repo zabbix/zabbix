@@ -433,7 +433,7 @@ class CUser extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
+			'url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
@@ -481,6 +481,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users);
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
+		self::checkRedirectUrlEnforce($users);
 
 		self::checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
@@ -548,7 +549,7 @@ class CUser extends CApiService {
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
 			'current_passwd' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
+			'url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
@@ -703,6 +704,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users, $db_users);
 		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
+		self::checkRedirectUrlEnforce($users, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
 
@@ -1382,6 +1384,33 @@ class CUser extends CApiService {
 			}
 		}
 		unset($user);
+	}
+
+	/**
+	 * @param array      $users
+	 * @param array|null $db_users
+	 */
+	private static function checkRedirectUrlEnforce(array $users, ?array $db_users = null): void {
+		foreach ($users as $i => $user) {
+			if (!array_key_exists('url', $user)) {
+				continue;
+			}
+
+			$roleid = null;
+
+			if (array_key_exists('roleid', $user)) {
+				$roleid = $user['roleid'];
+			}
+			elseif ($db_users !== null) {
+				$roleid = $db_users[$user['userid']]['roleid'];
+			}
+
+			if ($roleid !== null && CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $roleid)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/url',
+					_s('you do not have permission to update the parameter while redirect url is enforced by role rule')
+				));
+			}
+		}
 	}
 
 	/**
