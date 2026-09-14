@@ -17,7 +17,6 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -624,6 +623,8 @@ func Test_ValidateOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			tt.args.options.ProfilerDir = "profiles"
+
 			err := ValidateOptions(tt.args.options)
 
 			if (err != nil) != tt.wantErr {
@@ -661,8 +662,12 @@ func TestProfilerDirConfiguration(t *testing.T) {
 		var options AgentOptions
 
 		err := conf.UnmarshalStrict([]byte("ProfilerDir="), &options)
-		if err == nil || !strings.Contains(err.Error(), "invalid parameter ProfilerDir") ||
-			!strings.Contains(err.Error(), conf.ErrValueCannotBeEmpty.Error()) {
+		if err != nil {
+			t.Fatalf("cannot parse configuration: %v", err)
+		}
+
+		err = ValidateOptions(&options)
+		if err == nil || err.Error() != "ProfilerDir cannot be empty" {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
