@@ -1,8 +1,11 @@
 Changes for 7.0.31rc1
 
 New features:
+...G...... [ZBXNEXT-10451] added Zabbix agent 2 pprof profiler (opucka)
 
 Bug fixes:
+..F....... [ZBX-28110] fixed simple trigger hintbox closure in SVG graph (dfofanovs)
+..F....... [ZBX-27793] fixed incorrect screen reader announcements for modal dialog windows (aluchko)
 ..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
 ........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
 ........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
