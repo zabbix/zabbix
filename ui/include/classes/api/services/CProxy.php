@@ -135,7 +135,7 @@ class CProxy extends CApiService {
 		/*
 		 * Cleaning the output from write-only properties.
 		 */
-		if ($options['output'] === API_OUTPUT_EXTEND) {
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
 				['tls_psk_identity', 'tls_psk', 'name_upper']
 			);

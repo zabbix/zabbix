@@ -127,6 +127,16 @@ class testProxy extends CAPITest {
 		return $rows;
 	}
 
+	public function testProxy_GetOutputBooleanTrue() {
+		$result = $this->call('proxy.get', [
+			'output' => true,
+			'proxyids' => [self::$data['proxy']['test.example.com']]
+		]);
+
+		$this->assertArrayNotHasKey('tls_psk_identity', $result['result'][0]);
+		$this->assertArrayNotHasKey('tls_psk', $result['result'][0]);
+	}
+
 	public static function proxy_delete() {
 		return [
 			// Check proxy id validation.

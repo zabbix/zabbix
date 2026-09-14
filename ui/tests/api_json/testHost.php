@@ -505,6 +505,20 @@ class testHost extends CAPITest {
 					'name' => 'Host OS - Windows',
 					'name_upper' => null
 				]
+			],
+			'Check if {"output": true} excludes write-only properties' => [
+				'request' => [
+					'output' => true,
+					'hostids' => ['99013']
+				],
+				'expected_result' => [
+					'hostid' => '99013',
+
+					// Write-only properties.
+					'tls_psk_identity' => null,
+					'tls_psk' => null,
+					'name_upper' => null
+				]
 			]
 		];
 	}
