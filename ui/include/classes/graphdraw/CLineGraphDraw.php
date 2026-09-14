@@ -18,6 +18,10 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
+	const MAX_YAXIS_WIDTH = 150;
+	const MIN_YAXIS_WIDTH = 85;
+	const NO_YAXIS_WIDTH = 30;
+	const Y_AXIS_LABEL_GAP = 9;
 
 	private $cell_height_min;
 	private $cell_width;
@@ -29,6 +33,7 @@ class CLineGraphDraw extends CGraphDraw {
 	private $oxy;
 	private $percentile;
 	private $power;
+	private $scale_values;
 	private $show_triggers;
 	private $show_work_period;
 	private $triggers;
@@ -84,6 +89,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->intervals = [];
 		$this->power = [];
+		$this->scale_values = [];
 
 		$this->drawItemsLegend = false; // draw items legend
 		$this->drawExLegend = false; // draw percentile and triggers legend
@@ -1243,21 +1249,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 	private function drawVerticalScale() {
 		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
-			$units = null;
 			$units_long = '';
 
 			foreach ($this->items as $item) {
-				if ($item['yaxisside'] == $side) {
-					if ($units === null) {
-						$units = $item['units'];
-					}
-					elseif ($item['units'] !== $units) {
-						$units = '';
-					}
-
-					if ($item['units_long'] !== '') {
-						$units_long = $item['units_long'];
-					}
+				if ($item['yaxisside'] == $side && $item['units_long'] !== '') {
+					$units_long = $item['units_long'];
 				}
 			}
 
@@ -1282,16 +1278,13 @@ class CLineGraphDraw extends CGraphDraw {
 				);
 			}
 
-			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
-				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->power[$side], 10
-			);
+			$scale_values = $this->scale_values[$side];
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
 
 			foreach ($scale_values as ['relative_pos' => $relative_pos, 'value' => $value]) {
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)
-					? $this->shiftXleft - imageTextSize(8, 0, $value)['width'] - 9
+					? $this->shiftXleft - imageTextSize(8, 0, $value)['width'] - self::Y_AXIS_LABEL_GAP
 					: $this->sizeX + $this->shiftXleft + 12;
 
 				$pos_Y = $this->shiftY + $this->sizeY * (1 - $relative_pos);
@@ -1994,6 +1987,19 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
+			$display_units = null;
+
+			foreach ($this->items as $item) {
+				if ($item['yaxisside'] == $side) {
+					if ($display_units === null) {
+						$display_units = $item['units'];
+					}
+					elseif ($item['units'] !== $display_units) {
+						$display_units = '';
+					}
+				}
+			}
+
 			$calc_power = $units === '' || $units[0] !== '!';
 
 			$result = calculateGraphScaleExtremes($min, $max, $units, $calc_power, $calc_min, $calc_max, $rows_min,
@@ -2012,15 +2018,37 @@ class CLineGraphDraw extends CGraphDraw {
 				'power' => $this->power[$side]
 			] = $result;
 
+			$this->scale_values[$side] = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
+				$calc_min, $calc_max, $this->intervals[$side], (string) $display_units, $this->power[$side], 10
+			);
+
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];
 			}
 		}
 	}
 
+	private function calcYAxisWidth($side) {
+		if (!$this->yaxis[$side]) {
+			return self::NO_YAXIS_WIDTH;
+		}
+
+		if (!array_key_exists($side, $this->scale_values)) {
+			return self::MIN_YAXIS_WIDTH;
+		}
+
+		$width = 0;
+
+		foreach ($this->scale_values[$side] as ['value' => $value]) {
+			$width = max($width, imageTextSize(8,0, $value)['width']);
+		}
+
+		return (int) min(self::MAX_YAXIS_WIDTH, max(self::MIN_YAXIS_WIDTH, $width + self::Y_AXIS_LABEL_GAP * 2));
+	}
+
 	private function calcDimensions() {
-		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
-		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+		$this->shiftXleft = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_LEFT);
+		$this->shiftXright = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_RIGHT);
 
 		// Calculate graph summary padding for both axes.
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
@@ -2088,6 +2116,21 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	private function recalcHorizontalDimensions()
+	{
+		$shiftXleft = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_LEFT);
+		$shiftXright = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_RIGHT);
+
+		if ($shiftXleft == $this->shiftXleft && $shiftXright == $this->shiftXright) {
+			return;
+		}
+
+		$this->shiftXleft = $shiftXleft;
+		$this->shiftXright = $shiftXright;
+
+		$this->sizeX = $this->fullSizeX - $this->shiftXleft - $this->shiftXright - 1;
+	}
+
 	public function getMinDimensions() {
 		$min_dimensions = [
 			'width' => self::GRAPH_WIDTH_MIN,
@@ -2142,6 +2185,7 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		$this->calcVerticalScale();
+		$this->recalcHorizontalDimensions();
 		$this->calcPercentile();
 		$this->calcZero();
 
