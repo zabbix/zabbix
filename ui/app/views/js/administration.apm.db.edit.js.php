@@ -74,14 +74,20 @@ const view = new class {
 		this.#url_input?.addEventListener('input', () => {
 			this.#url_changed = true;
 
+			if (this.#password_input !== null) {
+				this.#password_input.value = '';
+			}
+
 			this.#updateForm({initial_values});
 		});
 
 		this.#change_password_btn?.addEventListener('click', e => {
-			this.#password_changed = this.#password_input?.value !== '';
+			this.#password_changed = true;
+
+			this.#password_input?.focus();
 
 			this.#updateDisplayState([this.#password_input], true);
-			this.#password_input?.focus();
+			this.#updateDisabledState([this.#password_input], false);
 
 			e.target.hidden = true;
 		});
@@ -117,7 +123,7 @@ const view = new class {
 
 		const show_fields = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
 		const show_user_fields = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
-		const show_ssl_fields = show_fields && values.url.substring(0, 8) === 'https://';
+		const show_ssl_fields = show_fields && values.url.substring(0, 8).toLowerCase() === 'https://';
 		const show_ssl_verify_peer_fields = show_ssl_fields
 			&& values.ssl_verify_peer === APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
 
@@ -146,12 +152,12 @@ const view = new class {
 			&& !this.#url_changed
 			&& !this.#password_changed;
 
+		this.#updateDisabledState([this.#password_input], show_change_password_btn);
+
 		this.#password_warning?.setAttribute('hidden', '');
 
 		if (this.#password_input !== null) {
-			if (this.#url_changed && this.#password_input.value !== '') {
-				this.#password_input.value = '';
-
+			if (this.#url_changed) {
 				this.#password_warning?.removeAttribute('hidden');
 			}
 

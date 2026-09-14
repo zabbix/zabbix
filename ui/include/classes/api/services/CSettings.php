@@ -125,7 +125,10 @@ class CSettings extends CApiService {
 		self::prepareApmGlobalDbForApi($db_settings);
 
 		if (array_key_exists('apm_global_db', $db_settings)) {
-			unset($db_settings['apm_global_db']['password']);
+			foreach ($db_settings['apm_global_db'] as $key => &$db_value) {
+				$db_value = self::APM_GLOBAL_DB_SCHEMA[$key]['type'] == API_INT32 ? (string) $db_value : $db_value;
+			}
+			unset($db_value, $db_settings['apm_global_db']['password']);
 		}
 
 		return $db_settings;
@@ -418,10 +421,12 @@ class CSettings extends CApiService {
 			return;
 		}
 
+		$url_api_required = $apm_global_db['status'] != $db_apm_global_db['status'] ? API_REQUIRED : 0;
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'url' =>					['type' => API_URL, 'flags' => API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => self::APM_GLOBAL_DB_SCHEMA['url']['length']],
+			'url' =>					['type' => API_URL, 'flags' => $url_api_required | API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => self::APM_GLOBAL_DB_SCHEMA['url']['length']],
 			'authentication_type' =>	['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_NONE])],
-			'db' =>						['type' => API_STRING_UTF8, 'length' => self::APM_GLOBAL_DB_SCHEMA['db']['length']],
+			'db' =>						['type' => API_STRING_UTF8, 'length' => self::APM_GLOBAL_DB_SCHEMA['db']['length']]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $apm_global_db, '/apm_global_db', $error)) {
@@ -446,6 +451,9 @@ class CSettings extends CApiService {
 
 		$url_scheme = parse_url($apm_global_db['url'], PHP_URL_SCHEME);
 
+		$is_url_scheme_https = is_string($url_scheme)
+			&& strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'username' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 										? ['type' => API_STRING_UTF8, 'flags' => $username_api_required | API_NOT_EMPTY, 'length' => self::APM_GLOBAL_DB_SCHEMA['username']['length']]
@@ -453,7 +461,7 @@ class CSettings extends CApiService {
 			'password' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 										? ['type' => API_STRING_UTF8, 'flags' => $password_api_required, 'length' => self::APM_GLOBAL_DB_SCHEMA['password']['length']]
 										: ['type' => API_STRING_UTF8, 'in' => self::APM_GLOBAL_DB_SCHEMA['password']['default']],
-			'ssl_verify_peer' =>	$url_scheme === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS
+			'ssl_verify_peer' =>	$is_url_scheme_https
 										? ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_PEER_DISABLED, APM_GLOBAL_DB_VERIFY_PEER_ENABLED])]
 										: ['type' => API_INT32, 'in' => self::APM_GLOBAL_DB_SCHEMA['ssl_verify_peer']['default']]
 		]];
@@ -464,7 +472,7 @@ class CSettings extends CApiService {
 
 		$apm_global_db_default = array_map(static fn(array $field) => $field['default'], self::APM_GLOBAL_DB_SCHEMA);
 
-		$apm_global_db += $url_scheme === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS
+		$apm_global_db += $is_url_scheme_https
 			? ['ssl_verify_peer' => $db_apm_global_db['ssl_verify_peer']]
 			: ['ssl_verify_peer' => $apm_global_db_default['ssl_verify_peer']];
 
@@ -507,7 +515,11 @@ class CSettings extends CApiService {
 			if ($settings['apm_global_db']['status'] !== $db_settings['apm_global_db']['status']) {
 				CApiSettingsHelper::updateParameters(
 					['apm_global_db' =>  CSettingsSchema::getDefault('apm_global_db')],
-					['apm_global_db' => json_encode($db_settings['apm_global_db'], JSON_UNESCAPED_UNICODE)]
+					[
+						'apm_global_db' => json_encode($db_settings['apm_global_db'],
+							JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+						)
+					]
 				);
 
 				$settings['apm_global_db'] += $apm_global_db_defaults;
@@ -535,12 +547,15 @@ class CSettings extends CApiService {
 			$settings['apm_global_db'] += ['ssl_verify_host' => $apm_global_db_defaults['ssl_verify_host']];
 		}
 
-		$apm_global_db =
-			json_encode(array_merge($db_settings['apm_global_db'], $settings['apm_global_db']), JSON_UNESCAPED_UNICODE);
+		$apm_global_db = json_encode(array_merge($db_settings['apm_global_db'], $settings['apm_global_db']),
+			JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+		);
 
 		$db_apm_global_db = $db_settings['apm_global_db']['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED
 			? CSettingsSchema::getDefault('apm_global_db')
-			: json_encode($db_settings['apm_global_db'], JSON_UNESCAPED_UNICODE);
+			: json_encode($db_settings['apm_global_db'],
+				JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+			);
 
 		CApiSettingsHelper::updateParameters(['apm_global_db' => $apm_global_db],
 			['apm_global_db' => $db_apm_global_db]
