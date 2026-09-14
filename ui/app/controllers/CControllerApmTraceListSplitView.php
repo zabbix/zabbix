@@ -16,6 +16,8 @@
 
 class CControllerApmTraceListSplitView extends CController {
 
+	protected array $colors = ['#4c5de5', '#22935f', '#f17c0e', '#9b4cad', '#e93b3b', '#2588d8'];
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
@@ -75,7 +77,7 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
 
 		$trace_view_spans = [];
-		foreach ($spans as $span) {
+		foreach ($spans as $i => $span) {
 			$span_timestamp = explode('.', $span['timestamp']);
 
 			$span_start = ((int) $span_timestamp[1] - $trace_start) * SEC_PER_NANOSEC;
@@ -98,7 +100,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'operation' => $span['operation_name'],
 				'start' => $span_start,
 				'end' => $span_end,
-				'color' => null,
+				'color' => $this->colors[$i % count($this->colors)],
 				'events' => $span_events
 			];
 		}
