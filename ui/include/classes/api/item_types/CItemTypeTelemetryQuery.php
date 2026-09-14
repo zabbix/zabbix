@@ -412,11 +412,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @return array
 	 */
 	public static function convertFilterFormulaToExpression(array $query): array {
-		if ($query['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			return $query;
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
 		}
-
-		CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
 
 		foreach ($query['filter']['conditions'] as &$condition) {
 			unset($condition['formulaid']);
