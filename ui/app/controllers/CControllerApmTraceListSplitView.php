@@ -16,8 +16,6 @@
 
 class CControllerApmTraceListSplitView extends CController {
 
-	protected array $colors = ['#4c5de5', '#22935f', '#f17c0e', '#9b4cad', '#e93b3b', '#2588d8'];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
@@ -100,7 +98,6 @@ class CControllerApmTraceListSplitView extends CController {
 				'operation' => $span['operation_name'],
 				'start' => $span_start,
 				'end' => $span_end,
-				'color' => $this->colors[$i % count($this->colors)],
 				'events' => $span_events
 			];
 		}
