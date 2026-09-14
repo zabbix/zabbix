@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-07-27 18:55+0000\n"
+"PO-Revision-Date: 2026-08-23 11:28+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -8187,8 +8187,8 @@ msgstr "Type d'événement"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:273
 msgid "Event updated"
 msgid_plural "Events updated"
-msgstr[0] "Mettre à jour l'événement"
-msgstr[1] "Mettre à jour les événements"
+msgstr[0] "Evénement mis à jour"
+msgstr[1] "Evénements mis à jour"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:100
 msgid "Events"
@@ -10547,6 +10547,10 @@ msgstr "Utilisateur inaccessible"
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
 msgstr "Groupe d'utilisateurs inaccessible"
+
+#: include/classes/helpers/CItemGeneralHelper.php:276
+msgid "Inaccessible value mapping"
+msgstr ""
 
 #: jsLoader.php:153
 msgid "Inaccessible widget"
@@ -13354,6 +13358,10 @@ msgstr "Nombre maximal de répétitions"
 #: app/partials/configuration.host.interface.row.php:121
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Le nombre maximal de répétitions s'applique uniquement à la découverte et à walk."
+
+#: app/partials/configuration.host.interface.row.php:116
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
