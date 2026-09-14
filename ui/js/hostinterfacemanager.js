@@ -210,27 +210,6 @@ class HostInterfaceManager {
 					}
 				);
 			}
-
-			const changed_field_names = [];
-			const input_max_rep = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
-
-			if (input_max_rep.value.trim() === '' || input_max_rep.value.trim() === '0') {
-				input_max_rep.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
-				changed_field_names.push(input_max_rep.name);
-			}
-
-			const input_community = document.getElementById(`interfaces_${iface.interfaceid}_details_community`);
-
-			if (input_community.value.trim() === '') {
-				input_community.value = HostInterfaceManager.SNMP_COMMUNITY;
-				changed_field_names.push(input_community.name);
-			}
-
-			if (changed_field_names.length > 0) {
-				input_community.dispatchEvent(new CustomEvent('field.change',
-					{detail: {source_fields: changed_field_names}}
-				));
-			}
 		}).trigger('change');
 	}
 
@@ -293,6 +272,17 @@ class HostInterfaceManager {
 		const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 		iface.type_name = this.INTERFACE_NAMES[iface.type];
+
+		if (iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP) {
+			iface.details.community = typeof iface.details.community === 'undefined'
+				? HostInterfaceManager.SNMP_COMMUNITY
+				: iface.details.community;
+
+			iface.details.max_repetitions = typeof iface.details.max_repetitions === 'undefined'
+				? HostInterfaceManager.SNMP_MAX_REPETITIONS
+				: iface.details.max_repetitions;
+		}
+
 		const template = iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP ? this.TEMPLATE_SNMP : this.TEMPLATE;
 
 		/*
