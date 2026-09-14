@@ -557,7 +557,7 @@ unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned c
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
 		case ITEM_TYPE_TELEMETRY_QUERY:
-			if (0 == get_config_forks_cb(*proc_type = ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_TELEMETRY_QUERY;
