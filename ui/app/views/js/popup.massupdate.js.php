@@ -412,7 +412,7 @@ function submitPopup(overlay) {
 	}
 
 	if (warning_message !== '') {
-		let warning_overlay = overlayDialogue({
+		const warning_overlay = overlayDialogue({
 			title: <?= json_encode(_('Warning')) ?>,
 			content: $('<span>').text(warning_message),
 			buttons: [

@@ -291,7 +291,7 @@
 			delete cached_values.interface_details;
 		}
 
-		let overlay = PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+		const overlay = PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,
