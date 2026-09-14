@@ -93,6 +93,22 @@ struct GrpcServerHandle
 	zbx_apm_queue_t * const queue;
 };
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle an OTLP trace export gRPC call                             *
+ *                                                                            *
+ * Parameters: context  - [IN] gRPC call context                              *
+ *             request  - [IN] trace data to queue for processing; its        *
+ *                              payload is moved into a heap copy owned       *
+ *                              by the queued task                            *
+ *             response - [OUT] gRPC response message (unused)                *
+ *                                                                            *
+ * Return value: reactor used to finish the gRPC call                         *
+ *                                                                            *
+ * Comments: If the APM queue is over quota, the call is finished with        *
+ *           RESOURCE_EXHAUSTED and the request is discarded.                 *
+ *                                                                            *
+ ******************************************************************************/
 ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
 		const otlp_trace::ExportTraceServiceRequest *request,
 		otlp_trace::ExportTraceServiceResponse *response)
@@ -113,6 +129,22 @@ ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
 	return reactor;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle an OTLP metrics export gRPC call                           *
+ *                                                                            *
+ * Parameters: context  - [IN] gRPC call context                              *
+ *             request  - [IN] metrics data to queue for processing; its      *
+ *                              payload is moved into a heap copy owned       *
+ *                              by the queued task                            *
+ *             response - [OUT] gRPC response message (unused)                *
+ *                                                                            *
+ * Return value: reactor used to finish the gRPC call                         *
+ *                                                                            *
+ * Comments: If the APM queue is over quota, the call is finished with        *
+ *           RESOURCE_EXHAUSTED and the request is discarded.                 *
+ *                                                                            *
+ ******************************************************************************/
 ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 		const otlp_metrics::ExportMetricsServiceRequest *request,
 		otlp_metrics::ExportMetricsServiceResponse *response)
@@ -133,6 +165,22 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 	return reactor;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle an OTLP logs export gRPC call                              *
+ *                                                                            *
+ * Parameters: context  - [IN] gRPC call context                              *
+ *             request  - [IN] log data to queue for processing; its          *
+ *                              payload is moved into a heap copy owned       *
+ *                              by the queued task                            *
+ *             response - [OUT] gRPC response message (unused)                *
+ *                                                                            *
+ * Return value: reactor used to finish the gRPC call                         *
+ *                                                                            *
+ * Comments: If the APM queue is over quota, the call is finished with        *
+ *           RESOURCE_EXHAUSTED and the request is discarded.                 *
+ *                                                                            *
+ ******************************************************************************/
 ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 		const otlp_logs::ExportLogsServiceRequest *request,
 		otlp_logs::ExportLogsServiceResponse *response)
@@ -157,6 +205,19 @@ namespace
 {
 	constexpr const char *DEFAULT_APM_PORT = "4317";
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: build a "host:port" listen address string, applying               *
+	 *          defaults for missing values                                       *
+	 *                                                                            *
+	 * Parameters: address - [IN] address to listen on, or NULL/empty for         *
+	 *                             all interfaces                                 *
+	 *             port    - [IN] port to listen on, or NULL/empty for the        *
+	 *                             default APM port                               *
+	 *                                                                            *
+	 * Return value: listen address in "host:port" format                         *
+	 *                                                                            *
+	 ******************************************************************************/
 	std::string build_listen_address(const char *address, const char *port)
 	{
 		std::string addr = (address != nullptr && address[0] != '\0') ? address : "0.0.0.0";
@@ -164,12 +225,33 @@ namespace
 		return addr + ":" + prt;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: allocate and populate an error message buffer from a C++          *
+	 *          string                                                            *
+	 *                                                                            *
+	 * Parameters: error - [OUT] newly allocated error message                    *
+	 *             msg   - [IN] error message text                                *
+	 *                                                                            *
+	 ******************************************************************************/
 	void set_error(char **error, const std::string &msg)
 	{
 		*error = static_cast<char *>(zbx_malloc(NULL, msg.length() + 1));
 		memcpy(*error, msg.c_str(), msg.length() + 1);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: read a PEM-encoded file into memory                               *
+	 *                                                                            *
+	 * Parameters: path - [IN] path to the PEM file                               *
+	 *                                                                            *
+	 * Return value: file contents                                                *
+	 *                                                                            *
+	 * Comments: Throws std::runtime_error if the file cannot be opened or        *
+	 *           read.                                                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	static std::string read_pem(const char *path)
 	{
 		std::ifstream	f(path, std::ios::binary);
@@ -186,6 +268,20 @@ namespace
 		return ss.str();
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: build gRPC server credentials from the specified TLS              *
+	 *          configuration                                                     *
+	 *                                                                            *
+	 * Parameters: tls - [IN] TLS configuration, or NULL for insecure             *
+	 *                        (no TLS) credentials                                *
+	 *                                                                            *
+	 * Return value: gRPC server credentials                                      *
+	 *                                                                            *
+	 * Comments: A CA file requires and verifies a client certificate;            *
+	 *           without one, only server-side TLS is used.                       *
+	 *                                                                            *
+	 ******************************************************************************/
 	static std::shared_ptr<grpc::ServerCredentials>	build_credentials(const zbx_apm_config_tls_t *tls)
 	{
 		if (NULL == tls)
@@ -207,6 +303,22 @@ namespace
 
 extern "C"
 {
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: create and start the APM gRPC collector server                    *
+	 *                                                                            *
+	 * Parameters: address - [IN] address to listen on, or NULL/empty for         *
+	 *                             all interfaces                                 *
+	 *             port    - [IN] port to listen on, or NULL/empty for the        *
+	 *                             default APM port                               *
+	 *             queue   - [IN] queue to push received requests to              *
+	 *             tls     - [IN] TLS configuration, or NULL for an               *
+	 *                             insecure listener                              *
+	 *             error   - [OUT] error message if the operation fails           *
+	 *                                                                            *
+	 * Return value: handle to the started server, or NULL on error               *
+	 *                                                                            *
+	 ******************************************************************************/
 	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
 			const zbx_apm_config_tls_t *tls, char **error)
 	{
@@ -248,8 +360,18 @@ extern "C"
 		}
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: stop and free the APM gRPC collector server                       *
+	 *                                                                            *
+	 * Parameters: handle - [IN] server handle returned by zbx_grpc_start(),      *
+	 *                            or NULL                                         *
+	 *                                                                            *
+	 ******************************************************************************/
 	void	zbx_grpc_stop(zbx_grpc_handle_t handle)
 	{
+	#define GRPC_SHUTDOWN_TIMEOUT	5
+
 		if (handle == nullptr)
 			return;
 
@@ -257,21 +379,39 @@ extern "C"
 
 		if (server_handle->server)
 		{
-			auto deadline = std::chrono::system_clock::now() + std::chrono::seconds(5);
+			auto deadline = std::chrono::system_clock::now() + std::chrono::seconds(GRPC_SHUTDOWN_TIMEOUT);
 			server_handle->server->Shutdown(deadline);
 		}
 
 		delete server_handle;
 
 		zabbix_log(LOG_LEVEL_WARNING, "Open Telemetry collector stopped");
+
+	#undef GRPC_SHUTDOWN_TIMEOUT
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: release library-wide resources held by the protobuf runtime       *
+	 *                                                                            *
+	 * Comments: Must be called at most once, after the last gRPC server has      *
+	 *           been stopped and no further APM requests will be decoded.        *
+	 *                                                                            *
+	 ******************************************************************************/
 	void	zbx_grpc_shutdown(void)
 	{
 		if (1 == grpc_initialized)
 			google::protobuf::ShutdownProtobufLibrary();
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: free an OTLP export request queued for processing                 *
+	 *                                                                            *
+	 * Parameters: request - [IN] request to free                                 *
+	 *             type    - [IN] request signal type                             *
+	 *                                                                            *
+	 ******************************************************************************/
 	void	zbx_apm_request_free(zbx_apm_request_t request, zbx_apm_request_type_t type)
 	{
 		switch (type)

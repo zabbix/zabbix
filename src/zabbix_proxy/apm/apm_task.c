@@ -19,6 +19,17 @@
 static void	apm_task_request_free(void *task);
 static void	apm_task_commit_free(void *task);
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a task wrapping a single decoded OTLP request              *
+ *                                                                            *
+ * Parameters: request - [IN] request to wrap; ownership is transferred       *
+ *                              to the task                                   *
+ *             type    - [IN] request signal type                             *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
 zbx_mw_task_t	*apm_task_request_create(zbx_apm_request_t request, zbx_apm_request_type_t type)
 {
 	zbx_apm_task_request_t	*task;
@@ -33,6 +44,11 @@ zbx_mw_task_t	*apm_task_request_create(zbx_apm_request_t request, zbx_apm_reques
 	return (zbx_mw_task_t *)task;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free a request task                                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_task_request_free(void *task)
 {
 	zbx_apm_task_request_t	*apm_task = (zbx_apm_task_request_t *)task;
@@ -42,6 +58,20 @@ static void	apm_task_request_free(void *task)
 	zbx_free(apm_task);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a task that commits the accumulated request tasks          *
+ *                                                                            *
+ * Parameters: tasks - [IN/OUT] request tasks to commit; the vector is        *
+ *                               cleared, ownership of its elements is        *
+ *                               transferred to the created task              *
+ *             attrs - [IN] resource attributes to apply on commit;           *
+ *                           ownership is transferred to the created          *
+ *                           task                                             *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
 zbx_mw_task_t	*apm_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, zbx_apm_config_attrs_t *attrs)
 {
 	zbx_apm_task_commit_t	*task;
@@ -58,6 +88,11 @@ zbx_mw_task_t	*apm_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, zbx_apm_c
 	return (zbx_mw_task_t *)task;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free a commit task                                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_task_commit_free(void *task)
 {
 	zbx_apm_task_commit_t	*apm_task = (zbx_apm_task_commit_t *)task;

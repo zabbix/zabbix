@@ -34,7 +34,7 @@
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg, char **error)
 {
 	CURLoption	opt;
@@ -82,7 +82,7 @@ out:
  *                                                                            *
  * Parameters: conn - [IN] ClickHouse connection                              *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 {
 	if (NULL != conn->handle)
@@ -102,7 +102,7 @@ void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
  * Comments: Map and array columns are serialized into JSON by decoder and    *
  *           are appended as raw values.                                      *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_t *col,
 		const zbx_apm_value_t *value)
 {
@@ -159,7 +159,7 @@ static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_
  *           cleared unless the insertion has to be retried, leaving only the *
  *           rows that still have to be inserted.                             *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 		const char *table, zbx_apm_rowset_t *rs)
 {
@@ -258,7 +258,7 @@ out:
  *               APM_COMMIT_ERR   - at least one insertion failed             *
  *               APM_COMMIT_RETRY - at least one insertion must be retried    *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 		zbx_apm_dataset_t *ds)
 {

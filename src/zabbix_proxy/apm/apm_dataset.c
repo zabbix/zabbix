@@ -206,7 +206,7 @@ static const zbx_apm_col_t	apm_col_traces[] = {
  * Parameters: value - [IN] value to free                                     *
  *             col   - [IN] column definition describing the value type       *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_value_free(zbx_apm_value_t *value, const zbx_apm_col_t *col)
 {
 	switch (col->type)
@@ -234,7 +234,7 @@ static void	apm_value_free(zbx_apm_value_t *value, const zbx_apm_col_t *col)
  *             cols     - [IN] column definitions                             *
  *             cols_num - [IN] number of columns                              *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_rowset_init(zbx_apm_rowset_t *rs, const zbx_apm_col_t *cols, int cols_num)
 {
 	zbx_vector_apm_row_create(&rs->rows);
@@ -250,7 +250,7 @@ static void	apm_rowset_init(zbx_apm_rowset_t *rs, const zbx_apm_col_t *cols, int
  *                                                                            *
  * Comments: The rowset is cleared, but not destroyed.                        *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 {
 	for (int i = 0; i < rs->rows.values_num; i++)
@@ -270,7 +270,7 @@ void	apm_rowset_clear(zbx_apm_rowset_t *rs)
  *                                                                            *
  * Return value: the appended row                                             *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs)
 {
 	zbx_apm_row_t	row;
@@ -285,7 +285,7 @@ zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs)
  *                                                                            *
  * Purpose: initialize dataset rowsets for all supported signal types         *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_dataset_init(zbx_apm_dataset_t *ds)
 {
 #define APM_ROWSET_INIT(rs, cols)	apm_rowset_init(rs, cols, (int)ARRSIZE(cols))
@@ -305,7 +305,7 @@ void	apm_dataset_init(zbx_apm_dataset_t *ds)
  *                                                                            *
  * Purpose: free all resources allocated by dataset rowsets                   *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_dataset_destroy(zbx_apm_dataset_t *ds)
 {
 	apm_rowset_clear(&ds->metrics_gauge);
@@ -341,7 +341,7 @@ void	apm_dataset_destroy(zbx_apm_dataset_t *ds)
  *             value      - [IN] value to format                              *
  *             col        - [IN] column definition describing the value type  *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_value_snprintf_alloc(char **str, size_t *str_alloc, size_t *str_offset,
 		const zbx_apm_value_t *value, const zbx_apm_col_t *col)
 {
@@ -386,7 +386,7 @@ static void	apm_value_snprintf_alloc(char **str, size_t *str_alloc, size_t *str_
  * Parameters: name - [IN] rowset name used in the trace log                  *
  *             rs   - [IN] rowset to dump                                     *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_rowset_dump(const char *name, zbx_apm_rowset_t *rs)
 {
 	char	*row = NULL;
@@ -417,7 +417,7 @@ static void	apm_rowset_dump(const char *name, zbx_apm_rowset_t *rs)
  *                                                                            *
  * Purpose: write dataset rowsets to the trace log                            *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_dataset_dump(zbx_apm_dataset_t *ds)
 {
 	apm_rowset_dump("metrics_gauge", &ds->metrics_gauge);
@@ -436,7 +436,7 @@ void	apm_dataset_dump(zbx_apm_dataset_t *ds)
  * Parameters: ds    - [IN] dataset with rows to account for                  *
  *             stats - [IN/OUT] commit statistics to update                   *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
 {
 	if (0 != ds->logs.rows.values_num)
@@ -474,7 +474,7 @@ void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t
  * Comments: Used to revert counts added by apm_dataset_flush_stats() for     *
  *           rows that failed to commit.                                      *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_dataset_undo_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
 {
 	if (0 != ds->logs.rows.values_num)

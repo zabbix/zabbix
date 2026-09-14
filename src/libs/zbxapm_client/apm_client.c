@@ -27,7 +27,7 @@
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
 {
 	zbx_ipc_socket_t	socket;
@@ -85,7 +85,7 @@ out:
  *                                                                            *
  * Return value: size of the serialized data or 0 if the buffer was too small *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 zbx_uint32_t	zbx_apm_serialize_stats(const zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint32_t len)
 {
 	zbx_uint32_t	data_len = 0;

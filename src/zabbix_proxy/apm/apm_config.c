@@ -21,7 +21,7 @@
  *                                                                            *
  * Parameters: attrs - [IN] attributes to free                                *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static void	apm_config_attrs_free(zbx_apm_config_attrs_t *attrs)
 {
 	for (int i = 0; i < attrs->metrics.values_num; i++)
@@ -58,7 +58,7 @@ static void	apm_config_attrs_free(zbx_apm_config_attrs_t *attrs)
  *                                                                            *
  * Return value: created attributes, or NULL if the JSON array is invalid     *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 static zbx_apm_config_attrs_t	*apm_config_attrs_create(const struct zbx_json_parse *jp)
 {
 #define APM_ATTR_SIGNAL	"signal_type"
@@ -142,7 +142,7 @@ fail:
  *                                                                            *
  * Parameters: attrs - [IN] attributes to release                             *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_config_attrs_release(zbx_apm_config_attrs_t *attrs)
 {
 	if (1 != atomic_fetch_sub(&attrs->refcount, 1))
@@ -159,7 +159,7 @@ void	apm_config_attrs_release(zbx_apm_config_attrs_t *attrs)
  *                                                                            *
  * Return value: the acquired attributes                                      *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 zbx_apm_config_attrs_t	*apm_config_attrs_acquire(zbx_apm_config_attrs_t *attrs)
 {
 	atomic_fetch_add(&attrs->refcount, 1);
@@ -172,7 +172,7 @@ zbx_apm_config_attrs_t	*apm_config_attrs_acquire(zbx_apm_config_attrs_t *attrs)
  *                                                                            *
  * Parameters: cfg - [OUT] APM configuration                                  *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_config_init(zbx_apm_config_t *cfg)
 {
 	cfg->attrs = apm_config_attrs_create(NULL);
@@ -188,7 +188,7 @@ void	apm_config_init(zbx_apm_config_t *cfg)
  *                                                                            *
  * Comments: Releases the previously held attributes reference.               *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_config_reset(zbx_apm_config_t *cfg)
 {
 	apm_config_attrs_release(cfg->attrs);
@@ -209,7 +209,7 @@ void	apm_config_reset(zbx_apm_config_t *cfg)
  * Comments: If revision matches the currently held configuration revision,   *
  *           the function returns immediately without changes.                *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revision)
 {
 #define APM_STATUS		"data_collection_status"
@@ -265,7 +265,7 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
  *                                                                            *
  * Purpose: free resources allocated by APM configuration                     *
  *                                                                            *
- *****************************************************************************/
+ ******************************************************************************/
 void	apm_config_clear(zbx_apm_config_t *cfg)
 {
 	if (0 != cfg->revision)

@@ -24,6 +24,19 @@
 
 ZBX_PTR_VECTOR_LITE_IMPL(apm_exporter_ptr, zbx_apm_exporter_t *)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get option value, duplicated into a new buffer                    *
+ *                                                                            *
+ * Parameters: options     - [IN] provider options                            *
+ *             options_num - [IN] number of options                           *
+ *             key         - [IN] option name to look up                      *
+ *             error       - [OUT] error message if the option is missing     *
+ *                                                                            *
+ * Return value: newly allocated option value, or NULL if the option is       *
+ *               missing                                                      *
+ *                                                                            *
+ ******************************************************************************/
 static char	*apm_option_dup(const zbx_config_option_t *options, int options_num, const char *key, char **error)
 {
 	const char	*value;
@@ -38,6 +51,20 @@ static char	*apm_option_dup(const zbx_config_option_t *options, int options_num,
 
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize ClickHouse exporter configuration from provider        *
+ *          options                                                           *
+ *                                                                            *
+ * Parameters: cfg         - [OUT] ClickHouse exporter configuration          *
+ *             options     - [IN] provider options                            *
+ *             options_num - [IN] number of options                           *
+ *             error       - [OUT] error message if a mandatory option is     *
+ *                                  missing or curl support is unavailable    *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
 		int options_num, char **error)
 {
@@ -67,6 +94,11 @@ static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_conf
 #endif
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by ClickHouse exporter configuration     *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 {
 	zbx_free(cfg->url);
@@ -75,6 +107,14 @@ static void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 	zbx_free(cfg->password);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy ClickHouse exporter configuration                            *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination configuration                          *
+ *             src - [IN] source configuration                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src)
 {
 	dst->url = zbx_strdup(NULL, src->url);
@@ -83,6 +123,13 @@ static void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm
 	dst->password = zbx_strdup(NULL, src->password);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by exporter configuration                *
+ *                                                                            *
+ * Parameters: cfg - [IN] exporter configuration                              *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 {
 	switch (cfg->type)
@@ -99,6 +146,14 @@ static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 	zbx_vector_config_option_destroy(&cfg->options);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy exporter configuration                                       *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination configuration                          *
+ *             src - [IN] source configuration                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_exporter_cfg_copy(zbx_apm_exporter_cfg_t *dst, const zbx_apm_exporter_cfg_t *src)
 {
 	dst->type = src->type;
@@ -115,6 +170,18 @@ static void	apm_exporter_cfg_copy(zbx_apm_exporter_cfg_t *dst, const zbx_apm_exp
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create an exporter pool with the specified configuration          *
+ *                                                                            *
+ * Parameters: cfg   - [IN] exporter configuration; ownership is              *
+ *                          transferred to the pool on success, freed on      *
+ *                          failure                                           *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: created exporter pool, or NULL on error                      *
+ *                                                                            *
+ ******************************************************************************/
 zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, char **error)
 {
 	zbx_apm_exporter_pool_t	*pool;
@@ -137,6 +204,17 @@ zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, c
 	return pool;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a new exporter connection using the specified              *
+ *          configuration                                                     *
+ *                                                                            *
+ * Parameters: cfg   - [IN] exporter configuration to use                     *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: created exporter, or NULL on error                           *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_apm_exporter_t *apm_exporter_create(zbx_apm_exporter_cfg_t *cfg, char **error)
 {
 	zbx_apm_exporter_t	*exporter;
@@ -164,6 +242,13 @@ static zbx_apm_exporter_t *apm_exporter_create(zbx_apm_exporter_cfg_t *cfg, char
 	return exporter;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by an exporter connection                *
+ *                                                                            *
+ * Parameters: exporter - [IN] exporter to destroy                            *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
 {
 	switch (exporter->cfg.type)
@@ -180,6 +265,13 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
 	zbx_free(exporter);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by an exporter pool                      *
+ *                                                                            *
+ * Parameters: pool - [IN] exporter pool to destroy                           *
+ *                                                                            *
+ ******************************************************************************/
 void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 {
 	for (int i = 0; i < pool->exporters.values_num; i++)
@@ -193,6 +285,15 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 	zbx_free(pool);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether a pooled exporter connection can still be used      *
+ *                                                                            *
+ * Parameters: exporter - [IN] exporter to validate                           *
+ *                                                                            *
+ * Return value: SUCCEED if the exporter can be reused, FAIL otherwise        *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_exporter_validate(const zbx_apm_exporter_t *exporter)
 {
 	if (APM_EXPORTER_GLOBAL != exporter->cfg.type)
@@ -203,6 +304,19 @@ static int	apm_exporter_validate(const zbx_apm_exporter_t *exporter)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire an exporter connection from the pool, creating one        *
+ *          if none is available                                              *
+ *                                                                            *
+ * Parameters: pool - [IN/OUT] exporter pool to acquire from                  *
+ *                                                                            *
+ * Return value: acquired exporter connection                                 *
+ *                                                                            *
+ * Comments: Terminates the process if a new exporter connection cannot       *
+ *           be created.                                                      *
+ *                                                                            *
+ ******************************************************************************/
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 {
 	zbx_apm_exporter_t	*exporter;
@@ -240,6 +354,14 @@ zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 	return exporter;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return an exporter connection back to the pool                    *
+ *                                                                            *
+ * Parameters: pool     - [IN/OUT] exporter pool                              *
+ *             exporter - [IN] exporter connection to return                  *
+ *                                                                            *
+ ******************************************************************************/
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter)
 {
 	pthread_mutex_lock(&pool->lock);
@@ -247,6 +369,17 @@ void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exp
 	pthread_mutex_unlock(&pool->lock);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: commit dataset contents using the specified exporter              *
+ *          connection                                                        *
+ *                                                                            *
+ * Parameters: exporter - [IN] exporter connection to commit through          *
+ *             ds       - [IN/OUT] dataset to commit                          *
+ *                                                                            *
+ * Return value: combined APM_COMMIT_* flags returned by the exporter         *
+ *                                                                            *
+ ******************************************************************************/
 int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 {
 	int	ret = APM_COMMIT_OK;
@@ -264,6 +397,19 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse TelemetryProvider configuration into exporter               *
+ *          configuration                                                     *
+ *                                                                            *
+ * Parameters: cfg     - [OUT] exporter configuration                         *
+ *             options - [IN] TelemetryProvider option string, or NULL        *
+ *                             to use the global exporter configuration       *
+ *             error   - [OUT] error message if the operation fails           *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
 int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char **error)
 {
 #define	APM_PROVIDER_CLICKHOUSE		"clickhouse"

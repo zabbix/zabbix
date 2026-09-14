@@ -18,6 +18,14 @@
 
 #define APM_THROTTLE_WINDOW	SEC_PER_MIN
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get current monotonic time in seconds                             *
+ *                                                                            *
+ * Return value: current monotonic time, or wall clock time if the            *
+ *               monotonic clock is unavailable                               *
+ *                                                                            *
+ ******************************************************************************/
 static time_t	time_monotonic(void)
 {
 	struct timespec	ts;
@@ -28,6 +36,15 @@ static time_t	time_monotonic(void)
 	return time(NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create APM request queue with the specified ingestion quota       *
+ *                                                                            *
+ * Parameters: quota - [IN] ingestion quota, messages per second              *
+ *                                                                            *
+ * Return value: created queue                                                *
+ *                                                                            *
+ ******************************************************************************/
 zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota)
 {
 	zbx_apm_queue_t	*queue;
@@ -39,11 +56,36 @@ zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota)
 	return queue;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change the ingestion quota of an APM request queue                *
+ *                                                                            *
+ * Parameters: queue - [IN/OUT] queue to update                               *
+ *             quota - [IN] new ingestion quota, messages per second          *
+ *                                                                            *
+ ******************************************************************************/
 void	apm_queue_set_quota(zbx_apm_queue_t *queue, zbx_uint64_t quota)
 {
 	queue->quota = quota * SEC_PER_MIN;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push a new request onto the queue, subject to the ingestion       *
+ *          quota                                                             *
+ *                                                                            *
+ * Parameters: queue   - [IN/OUT] queue to push the request onto              *
+ *             request - [IN] request to push; ownership transfers to         *
+ *                             the queue only on success                      *
+ *             type    - [IN] request signal type                             *
+ *                                                                            *
+ * Return value: SUCCEED if the request was accepted, FAIL if the quota       *
+ *               was exceeded                                                 *
+ *                                                                            *
+ * Comments: Throttling uses a sliding window of APM_THROTTLE_WINDOW          *
+ *           seconds; a quota of 0 disables throttling.                       *
+ *                                                                            *
+ ******************************************************************************/
 int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zbx_apm_request_type_t type)
 {
 	int	ret = SUCCEED;
@@ -87,6 +129,15 @@ int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zb
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get accepted and dropped request counters                         *
+ *                                                                            *
+ * Parameters: queue        - [IN] queue to get statistics from               *
+ *             accepted_num - [OUT] number of accepted requests               *
+ *             dropped_num  - [OUT] number of dropped requests                *
+ *                                                                            *
+ ******************************************************************************/
 void	apm_queue_get_stats(zbx_apm_queue_t *queue, zbx_uint64_t *accepted_num, zbx_uint64_t *dropped_num)
 {
 	zbx_mw_queue_lock(&queue->base);

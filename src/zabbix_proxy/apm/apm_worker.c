@@ -16,12 +16,21 @@
 #include "apm_dataset.h"
 #include "apm_decode.h"
 #include "apm_task.h"
-#include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create an APM worker                                              *
+ *                                                                            *
+ * Parameters: exporters    - [IN] exporter pool shared by all workers        *
+ *             commit_stats - [IN] commit statistics shared by all            *
+ *                                 workers                                    *
+ *                                                                            *
+ * Return value: created worker                                               *
+ *                                                                            *
+ ******************************************************************************/
 zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters, zbx_apm_commit_stats_t *commit_stats)
 {
 	zbx_apm_worker_t	*worker;
@@ -33,6 +42,15 @@ zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters, zbx_apm_
 	return worker;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode and commit the request tasks accumulated in a commit       *
+ *          task                                                              *
+ *                                                                            *
+ * Parameters: worker - [IN] worker processing the task                       *
+ *             task   - [IN] commit task to process                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_commit_t *task)
 {
 	zbx_apm_dataset_t	ds;
@@ -82,6 +100,11 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 	apm_dataset_destroy(&ds);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: entry point of an APM worker thread                               *
+ *                                                                            *
+ ******************************************************************************/
 void	*apm_worker_entry(void *args)
 {
 #define CEP_RTC_OPEN_TIMEOUT	10

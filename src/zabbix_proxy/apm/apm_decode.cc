@@ -27,6 +27,16 @@ namespace otlpmc = opentelemetry::proto::collector::metrics::v1;
 namespace otlplc = opentelemetry::proto::collector::logs::v1;
 namespace otlpt = opentelemetry::proto::trace::v1;
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert a raw byte string into its lowercase hexadecimal          *
+ *          representation                                                    *
+ *                                                                            *
+ * Parameters: b - [IN] bytes to convert                                      *
+ *                                                                            *
+ * Return value: hexadecimal string representation of b                       *
+ *                                                                            *
+ ******************************************************************************/
 static std::string	bytes_to_hex(const std::string &b)
 {
 	static const char	*hex = "0123456789abcdef";
@@ -41,6 +51,17 @@ static std::string	bytes_to_hex(const std::string &b)
 	return out;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: recursively add an OTLP AnyValue to a JSON object or array        *
+ *          being built                                                       *
+ *                                                                            *
+ * Parameters: j   - [IN/OUT] JSON being built                                *
+ *             key - [IN] key to add the value under, or NULL to append       *
+ *                         the value to an array                              *
+ *             v   - [IN] value to add                                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	any_value_add_to_json(struct zbx_json *j, const char *key,
 		const opentelemetry::proto::common::v1::AnyValue &v)
 {
@@ -81,6 +102,16 @@ static void	any_value_add_to_json(struct zbx_json *j, const char *key,
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert an OTLP AnyValue to its string representation             *
+ *                                                                            *
+ * Parameters: v - [IN] value to convert                                      *
+ *                                                                            *
+ * Return value: string representation of v; scalar values are converted      *
+ *               directly, kvlist/array values are serialized as JSON         *
+ *                                                                            *
+ ******************************************************************************/
 static std::string	any_value_to_string(const opentelemetry::proto::common::v1::AnyValue &v)
 {
 	using AV = opentelemetry::proto::common::v1::AnyValue;
@@ -126,6 +157,17 @@ static std::string	any_value_to_string(const opentelemetry::proto::common::v1::A
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether an attribute with the specified key is present      *
+ *          in the attribute list                                             *
+ *                                                                            *
+ * Parameters: attrs - [IN] attributes to search                              *
+ *             key   - [IN] attribute key to look for                         *
+ *                                                                            *
+ * Return value: SUCCEED if found, FAIL otherwise                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	attributes_contain(
 		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs,
 		const char *key)
@@ -139,6 +181,19 @@ static int	attributes_contain(
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize OTLP attributes into a JSON object, optionally          *
+ *          adding resource attributes not already present                    *
+ *                                                                            *
+ * Parameters: attrs          - [IN] attributes to serialize                  *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                   if not already present in attrs, or      *
+ *                                   NULL                                     *
+ *                                                                            *
+ * Return value: newly allocated JSON string, must be freed by the caller     *
+ *                                                                            *
+ ******************************************************************************/
 static char 	*attrs_to_json_ex(
 		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs,
 		const zbx_vector_tag_t *resource_attrs)
@@ -171,12 +226,30 @@ static char 	*attrs_to_json_ex(
 	return out;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize OTLP attributes into a JSON object                      *
+ *                                                                            *
+ * Parameters: attrs - [IN] attributes to serialize                           *
+ *                                                                            *
+ * Return value: newly allocated JSON string, must be freed by the caller     *
+ *                                                                            *
+ ******************************************************************************/
 static char 	*attrs_to_json(
 	const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs)
 {
 	return attrs_to_json_ex(attrs, NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize a numeric array into a JSON array                       *
+ *                                                                            *
+ * Parameters: arr - [IN] numeric values to serialize                         *
+ *                                                                            *
+ * Return value: newly allocated JSON string, must be freed by the caller     *
+ *                                                                            *
+ ******************************************************************************/
 template <typename Repeated>
 static char	*num_array_to_json(const Repeated &arr)
 {
@@ -195,11 +268,30 @@ static char	*num_array_to_json(const Repeated &arr)
 
 	return out;
 }
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert a unix nanosecond timestamp to whole seconds              *
+ *                                                                            *
+ * Parameters: nano - [IN] timestamp in unix nanoseconds                      *
+ *                                                                            *
+ * Return value: timestamp in unix seconds                                    *
+ *                                                                            *
+ ******************************************************************************/
 static inline zbx_uint64_t	unixnano_to_secs(uint64_t nano)
 {
 	return (zbx_uint64_t)(nano / 1000000000ULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: column value setter helpers used when filling dataset rows        *
+ *                                                                            *
+ * Comments: row - row being filled, idx - column index to set. SETS          *
+ *           copies the string, SETC takes ownership of an already            *
+ *           allocated string, SETU/SETD/SETI store a uint64/double/int32     *
+ *           value respectively.                                              *
+ *                                                                            *
+ ******************************************************************************/
 static inline void	SETS(zbx_apm_row_t &row, int idx, const std::string &s)
 {
 	row.cols[idx].str = zbx_strdup(NULL, s.c_str());
@@ -225,6 +317,15 @@ static inline void	SETI(zbx_apm_row_t &row, int idx, int i32)
 	row.cols[idx].i32 = i32;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find the "service.name" resource attribute value                  *
+ *                                                                            *
+ * Parameters: res - [IN] resource to search                                  *
+ *                                                                            *
+ * Return value: service name, or an empty string if not present              *
+ *                                                                            *
+ ******************************************************************************/
 static std::string	service_name_of(
 		const opentelemetry::proto::resource::v1::Resource &res)
 {
@@ -247,13 +348,9 @@ static std::string	service_name_of(
  *             dp_attrs    - [IN] data point attributes                       *
  *             start_nano  - [IN] start time in unix nanoseconds              *
  *             time_nano   - [IN] collection time in unix nanoseconds         *
- *             resource_atrrs - [IN] optional resource attributes to add      *
+ *             resource_attrs - [IN] optional resource attributes to add      *
  *                                                                            *
  * Return value: index of the first column after the common columns           *
- *                                                                            *
- * Comments: Column layout is fixed and shared by all five metric types, so   *
- *           type-specific fill functions must continue writing at the        *
- *           returned index.                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	metrics_fill_common(zbx_apm_row_t &row,
@@ -281,6 +378,18 @@ static int	metrics_fill_common(zbx_apm_row_t &row,
 	return 14;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fill the 5 Exemplars parallel-array columns starting at           *
+ *          index i                                                           *
+ *                                                                            *
+ * Parameters: row - [OUT] row to populate                                    *
+ *             i   - [IN] starting column index                               *
+ *             exs - [IN] exemplars to serialize                              *
+ *                                                                            *
+ * Return value: number of columns filled (always 5)                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	metrics_fill_exemplars(zbx_apm_row_t &row, int i,
 		const google::protobuf::RepeatedPtrField<opentelemetry::proto::metrics::v1::Exemplar> &exs)
 {
@@ -327,12 +436,32 @@ static int	metrics_fill_exemplars(zbx_apm_row_t &row, int i,
 	return 5;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the numeric value of a NumberDataPoint as double              *
+ *                                                                            *
+ * Parameters: dp - [IN] data point                                           *
+ *                                                                            *
+ * Return value: value as double, converting from int64 if necessary          *
+ *                                                                            *
+ ******************************************************************************/
 static double	np_value(const opentelemetry::proto::metrics::v1::NumberDataPoint &dp)
 {
 	using NDP = opentelemetry::proto::metrics::v1::NumberDataPoint;
 	return dp.value_case() == NDP::kAsDouble ? dp.as_double() : (double)dp.as_int();
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode gauge metric data points into dataset rows                 *
+ *                                                                            *
+ * Parameters: rm             - [IN] resource metrics containing the metric   *
+ *             sm             - [IN] scope metrics containing the metric      *
+ *             metric         - [IN] gauge metric to decode                   *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_decode_gauge(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
 		const otlpm::Metric &metric, zbx_apm_dataset_t *ds, const zbx_vector_tag_t *resource_attrs)
 {
@@ -348,6 +477,17 @@ static void	apm_decode_gauge(const otlpm::ResourceMetrics &rm, const otlpm::Scop
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode sum metric data points into dataset rows                   *
+ *                                                                            *
+ * Parameters: rm             - [IN] resource metrics containing the metric   *
+ *             sm             - [IN] scope metrics containing the metric      *
+ *             metric         - [IN] sum metric to decode                     *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_decode_sum(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
 		const otlpm::Metric &metric, zbx_apm_dataset_t *ds, const zbx_vector_tag_t *resource_attrs)
 {
@@ -365,6 +505,17 @@ static void	apm_decode_sum(const otlpm::ResourceMetrics &rm, const otlpm::ScopeM
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode histogram metric data points into dataset rows             *
+ *                                                                            *
+ * Parameters: rm             - [IN] resource metrics containing the metric   *
+ *             sm             - [IN] scope metrics containing the metric      *
+ *             metric         - [IN] histogram metric to decode               *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_decode_histogram(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
 		const otlpm::Metric &metric, zbx_apm_dataset_t *ds, const zbx_vector_tag_t *resource_attrs)
 {
@@ -386,6 +537,17 @@ static void	apm_decode_histogram(const otlpm::ResourceMetrics &rm, const otlpm::
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode exponential histogram metric data points into dataset rows *
+ *                                                                            *
+ * Parameters: rm             - [IN] resource metrics containing the metric   *
+ *             sm             - [IN] scope metrics containing the metric      *
+ *             metric         - [IN] exponential histogram metric to decode   *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_decode_exponential_histogram(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
 		const otlpm::Metric &metric, zbx_apm_dataset_t *ds, const zbx_vector_tag_t *resource_attrs)
 {
@@ -411,6 +573,17 @@ static void	apm_decode_exponential_histogram(const otlpm::ResourceMetrics &rm, c
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode summary metric data points into dataset rows               *
+ *                                                                            *
+ * Parameters: rm             - [IN] resource metrics containing the metric   *
+ *             sm             - [IN] scope metrics containing the metric      *
+ *             metric         - [IN] summary metric to decode                 *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_decode_summary(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
 		const otlpm::Metric &metric, zbx_apm_dataset_t *ds, const zbx_vector_tag_t *resource_attrs)
 {
@@ -445,6 +618,15 @@ static void	apm_decode_summary(const otlpm::ResourceMetrics &rm, const otlpm::Sc
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode an OTLP metrics export request into dataset rows           *
+ *                                                                            *
+ * Parameters: request        - [IN] ExportMetricsServiceRequest to decode    *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_request_decode_metrics(zbx_apm_request_t request, zbx_apm_dataset_t *ds,
 		const zbx_vector_tag_t *resource_attrs)
 {
@@ -483,7 +665,7 @@ static void	apm_request_decode_metrics(zbx_apm_request_t request, zbx_apm_datase
 					case otlpm::Metric::kSummary:
 						apm_decode_summary(rm, sm, metric, ds, resource_attrs);
 						break;
-					default:	/* DATA_NOT_SET */
+					default:
 						break;
 				}
 			}
@@ -491,6 +673,15 @@ static void	apm_request_decode_metrics(zbx_apm_request_t request, zbx_apm_datase
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode an OTLP logs export request into dataset rows              *
+ *                                                                            *
+ * Parameters: request        - [IN] ExportLogsServiceRequest to decode       *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_request_decode_logs(zbx_apm_request_t request, zbx_apm_dataset_t *ds,
 		const zbx_vector_tag_t *resource_attrs)
 {
@@ -539,7 +730,17 @@ static void	apm_request_decode_logs(zbx_apm_request_t request, zbx_apm_dataset_t
 	}
 }
 
-/* fills the 3 Events parallel-array cells at [idx..idx+2]; returns number of filled cells */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fill the 3 Events parallel-array columns starting at idx          *
+ *                                                                            *
+ * Parameters: row    - [OUT] row to populate                                 *
+ *             idx    - [IN] starting column index                            *
+ *             events - [IN] span events to serialize                         *
+ *                                                                            *
+ * Return value: number of columns filled (always 3)                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_traces_fill_events(zbx_apm_row_t &row, int idx,
 		const google::protobuf::RepeatedPtrField<otlpt::Span_Event> &events)
 {
@@ -575,7 +776,17 @@ static int	apm_traces_fill_events(zbx_apm_row_t &row, int idx,
 	return 3;
 }
 
-/* fills the 4 Links parallel-array cells at [idx..idx+3]; returns number of filled cells */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fill the 4 Links parallel-array columns starting at idx           *
+ *                                                                            *
+ * Parameters: row   - [OUT] row to populate                                  *
+ *             idx   - [IN] starting column index                             *
+ *             links - [IN] span links to serialize                           *
+ *                                                                            *
+ * Return value: number of columns filled (always 4)                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_traces_fill_links(zbx_apm_row_t &row, int idx,
 		const google::protobuf::RepeatedPtrField<otlpt::Span_Link> &links)
 {
@@ -614,6 +825,15 @@ static int	apm_traces_fill_links(zbx_apm_row_t &row, int idx,
 	return 4;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert an OTLP span kind enum to its string representation       *
+ *                                                                            *
+ * Parameters: kind - [IN] span kind                                          *
+ *                                                                            *
+ * Return value: span kind name                                               *
+ *                                                                            *
+ ******************************************************************************/
 static const char	*span_kind_str(otlpt::Span_SpanKind kind)
 {
 	switch (kind)
@@ -627,6 +847,15 @@ static const char	*span_kind_str(otlpt::Span_SpanKind kind)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert an OTLP status code enum to its string representation     *
+ *                                                                            *
+ * Parameters: code - [IN] status code                                        *
+ *                                                                            *
+ * Return value: status code name                                             *
+ *                                                                            *
+ ******************************************************************************/
 static const char	*status_code_str(otlpt::Status_StatusCode code)
 {
 	switch (code)
@@ -637,6 +866,15 @@ static const char	*status_code_str(otlpt::Status_StatusCode code)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode an OTLP trace export request into dataset rows             *
+ *                                                                            *
+ * Parameters: request        - [IN] ExportTraceServiceRequest to decode      *
+ *             ds             - [OUT] dataset to append rows to               *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_request_decode_traces(zbx_apm_request_t request, zbx_apm_dataset_t *ds,
 		const zbx_vector_tag_t *resource_attrs)
 {
@@ -688,6 +926,18 @@ static void	apm_request_decode_traces(zbx_apm_request_t request, zbx_apm_dataset
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decode an OTLP export request of the specified signal type        *
+ *          into dataset rows                                                 *
+ *                                                                            *
+ * Parameters: request        - [IN] OTLP export request to decode            *
+ *             type           - [IN] request signal type                      *
+ *             ds             - [OUT] dataset to append decoded rows to       *
+ *             resource_attrs - [IN] optional resource attributes to add      *
+ *                                   to every row's *Attributes column        *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_apm_request_decode(zbx_apm_request_t request, zbx_apm_request_type_t type, zbx_apm_dataset_t *ds,
 		const zbx_vector_tag_t *resource_attrs)
 {

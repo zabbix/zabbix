@@ -54,6 +54,16 @@ zbx_apm_manager_t;
 
 static void	apm_manager_deactivate(zbx_apm_manager_t *manager);
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by APM manager                           *
+ *                                                                            *
+ * Parameters: manager - [IN] manager to free                                 *
+ *                                                                            *
+ * Comments: Deactivates the gRPC listener and releases protobuf runtime      *
+ *           resources before freeing manager-owned memory.                   *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_manager_free(zbx_apm_manager_t *manager)
 {
 	for (int i = 0; i < manager->commits.values_num; i++)
@@ -84,9 +94,24 @@ static void	apm_manager_free(zbx_apm_manager_t *manager)
 	zbx_free(manager);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create and initialize APM manager                                 *
+ *                                                                            *
+ * Parameters: info        - [IN] process info                                *
+ *             workers_num - [IN] number of active worker threads             *
+ *             quota       - [IN] initial ingestion quota, messages per       *
+ *                                 second                                     *
+ *             options     - [IN] TelemetryProvider configuration options     *
+ *             error       - [OUT] error message if the operation fails       *
+ *                                                                            *
+ * Return value: created manager, or NULL on error                            *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int workers_num, zbx_uint64_t quota,
 		const char *options, char **error)
 {
+#define APM_COMMIT_LIMIT	10
 	zbx_apm_manager_t	*manager;
 	zbx_apm_worker_t	**workers;
 	zbx_apm_queue_t	*queue = NULL;
@@ -113,8 +138,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 		goto out;
 	}
 
-	/* TODO: make configurable */
-	manager->commit_limit = 10;
+	manager->commit_limit = APM_COMMIT_LIMIT;
 	manager->commit_task_num = 0;
 
 	zbx_vector_mw_task_ptr_create(&manager->commits);
@@ -139,8 +163,21 @@ out:
 	}
 
 	return manager;
+#undef APM_COMMIT_LIMIT
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process finished worker tasks                                     *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] manager                                     *
+ *             tasks   - [IN/OUT] finished tasks to process                   *
+ *                                                                            *
+ * Comments: Finished request tasks are queued for the next commit            *
+ *           batch, finished commit tasks are freed. The task vector is       *
+ *           cleared on return.                                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_manager_process_finished(zbx_apm_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
 	for (int i = 0; i < tasks->values_num; i++)
@@ -160,6 +197,20 @@ static void	apm_manager_process_finished(zbx_apm_manager_t *manager, zbx_vector_
 	zbx_vector_mw_task_ptr_clear(tasks);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: start the APM gRPC listener                                       *
+ *                                                                            *
+ * Parameters: manager  - [IN/OUT] manager                                    *
+ *             sourceip - [IN] address to listen on                           *
+ *             port     - [IN] port to listen on                              *
+ *             tls      - [IN] TLS configuration, or NULL for an              *
+ *                              insecure listener                             *
+ *             error    - [OUT] error message if the operation fails          *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, const char *port,
 		const zbx_apm_config_tls_t *tls, char **error)
 {
@@ -172,12 +223,29 @@ static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: stop the APM gRPC listener                                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_manager_deactivate(zbx_apm_manager_t *manager)
 {
 	zbx_grpc_stop(manager->grpc);
 	manager->grpc = NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue a commit task for the finished request tasks                *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] manager                                     *
+ *             attrs   - [IN] resource attributes to apply to the             *
+ *                             commit; the reference is transferred to        *
+ *                             the created task                               *
+ *                                                                            *
+ * Comments: The manager's list of finished request tasks is cleared.         *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_manager_commit_tasks(zbx_apm_manager_t *manager, zbx_apm_config_attrs_t *attrs)
 {
 	zbx_mw_task_t	*t = apm_task_commit_create(&manager->commits, attrs);
@@ -189,6 +257,17 @@ static void	apm_manager_commit_tasks(zbx_apm_manager_t *manager, zbx_apm_config_
 	manager->commit_task_num++;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether the exporter uses the global telemetry              *
+ *          provider configuration                                            *
+ *                                                                            *
+ * Parameters: manager - [IN] manager                                         *
+ *                                                                            *
+ * Return value: SUCCEED if the global configuration is active, FAIL          *
+ *               otherwise                                                    *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_manager_global_config_active(zbx_apm_manager_t *manager)
 {
 	if (NULL == manager->exporters || APM_EXPORTER_GLOBAL != manager->exporters->cfg.type)
@@ -198,6 +277,16 @@ static int	apm_manager_global_config_active(zbx_apm_manager_t *manager)
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that all TLS files required for a listener are           *
+ *          configured                                                        *
+ *                                                                            *
+ * Parameters: tls - [IN] TLS configuration to validate                       *
+ *                                                                            *
+ * Return value: tls if fully configured, NULL otherwise                      *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_apm_config_tls_t	*apm_manager_validate_tls(zbx_apm_config_tls_t *tls)
 {
 	if (NULL == tls->ca_file || '\0' == *tls->ca_file)
@@ -212,6 +301,14 @@ static zbx_apm_config_tls_t	*apm_manager_validate_tls(zbx_apm_config_tls_t *tls)
 	return tls;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize and send APM statistics to the requesting client        *
+ *                                                                            *
+ * Parameters: manager - [IN] manager                                         *
+ *             client  - [IN] IPC client to send the statistics to            *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t *client)
 {
 	unsigned char	buf[sizeof(zbx_apm_stats_t)];
@@ -231,6 +328,11 @@ static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t 
 		zbx_ipc_client_send(client, ZBX_APM_GET_STATS, buf, len);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: entry point of APM manager process                                *
+ *                                                                            *
+ ******************************************************************************/
 void	*zbx_apm_manager_thread(void *args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
