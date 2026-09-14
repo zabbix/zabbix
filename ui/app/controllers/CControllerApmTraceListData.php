@@ -120,7 +120,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['duration']);
+		$data_fields = $this->getDataFields(['traceid', 'duration']);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
