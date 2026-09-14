@@ -757,7 +757,7 @@ class CMaintenance extends CApiService {
 	 * @throws APIException if groups are not valid.
 	 */
 	private static function checkGroups(array $maintenances, ?array $db_maintenances = null): void {
-		$edit_groupids = [];
+		$ins_groupids = [];
 
 		foreach ($maintenances as $maintenance) {
 			if (!array_key_exists('groups', $maintenance)) {
@@ -767,29 +767,26 @@ class CMaintenance extends CApiService {
 			$groupids = array_column($maintenance['groups'], 'groupid');
 
 			if ($db_maintenances === null) {
-				$edit_groupids += array_flip($groupids);
+				$ins_groupids += array_flip($groupids);
 			}
 			else {
 				$db_groupids = array_column($db_maintenances[$maintenance['maintenanceid']]['groups'], 'groupid');
 
-				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
-				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
-
-				$edit_groupids += $ins_groupids + $del_groupids;
+				$ins_groupids += array_flip(array_diff($groupids, $db_groupids));
 			}
 		}
 
-		if (!$edit_groupids) {
+		if (!$ins_groupids) {
 			return;
 		}
 
 		$count = API::HostGroup()->get([
 			'countOutput' => true,
-			'groupids' => array_keys($edit_groupids),
+			'groupids' => array_keys($ins_groupids),
 			'editable' => true
 		]);
 
-		if ($count != count($edit_groupids)) {
+		if ($count != count($ins_groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
@@ -803,7 +800,7 @@ class CMaintenance extends CApiService {
 	 * @throws APIException if hosts are not valid.
 	 */
 	private static function checkHosts(array $maintenances, ?array $db_maintenances = null): void {
-		$edit_hostids = [];
+		$ins_hostids = [];
 
 		foreach ($maintenances as $maintenance) {
 			if (!array_key_exists('hosts', $maintenance)) {
@@ -813,35 +810,32 @@ class CMaintenance extends CApiService {
 			$hostids = array_column($maintenance['hosts'], 'hostid');
 
 			if ($db_maintenances === null) {
-				$edit_hostids += array_flip($hostids);
+				$ins_hostids += array_flip($hostids);
 			}
 			else {
 				$db_hostids = array_column($db_maintenances[$maintenance['maintenanceid']]['hosts'], 'hostid');
 
-				$ins_hostids = array_flip(array_diff($hostids, $db_hostids));
-				$del_hostids = array_flip(array_diff($db_hostids, $hostids));
-
-				$edit_hostids += $ins_hostids + $del_hostids;
+				$ins_hosts += array_flip(array_diff($hostids, $db_hostids));
 			}
 		}
 
-		if (!$edit_hostids) {
+		if (!$ins_hostids) {
 			return;
 		}
 
 		$count = API::Host()->get([
 			'countOutput' => true,
-			'hostids' => array_keys($edit_hostids),
+			'hostids' => array_keys($ins_hostids),
 			'editable' => true
 		]);
 
-		if ($count != count($edit_hostids)) {
+		if ($count != count($ins_hostids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	private static function checkTriggers(array $maintenances, ?array $db_maintenances = null): void {
-		$edit_triggerids = [];
+		$ins_triggerids = [];
 
 		foreach ($maintenances as $maintenance) {
 			if (!array_key_exists('triggers', $maintenance)) {
@@ -851,27 +845,27 @@ class CMaintenance extends CApiService {
 			$triggerids = array_column($maintenance['triggers'], 'triggerid');
 
 			if ($db_maintenances === null) {
-				$edit_triggerids += array_flip($triggerids);
+				$ins_triggerids += array_flip($triggerids);
 			}
 			else {
 				$db_triggerids = array_column($db_maintenances[$maintenance['maintenanceid']]['triggers'], 'triggerid');
 
-				$edit_triggerids += array_flip(array_diff($triggerids, $db_triggerids));
+				$ins_triggerids += array_flip(array_diff($triggerids, $db_triggerids));
 			}
 		}
 
-		if (!$edit_triggerids) {
+		if (!$ins_triggerids) {
 			return;
 		}
 
 		$count = API::Trigger()->get([
 			'countOutput' => true,
-			'triggerids' => array_keys($edit_triggerids),
+			'triggerids' => array_keys($ins_triggerids),
 			'templated' => false,
 			'editable' => true
 		]);
 
-		if ($count != count($edit_triggerids)) {
+		if ($count != count($ins_triggerids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
