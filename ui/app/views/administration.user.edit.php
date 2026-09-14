@@ -292,6 +292,16 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
+$is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
+
+$default_url_label = array_key_exists('profile_redirect_url', $data) && $data['profile_redirect_url'] !== ''
+	? (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	: null;
+
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
@@ -304,9 +314,14 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextAreaFlexible('url', $data['url']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('users', 'url'))
+		[
+			(new CTextAreaFlexible('url', $data['url']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('users', 'url'))
+				->setEnabled(!$is_disabled)
+				->setSingleline($is_disabled),
+			$default_url_label
+		]
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -431,6 +446,20 @@ if ($data['roleid']) {
 			);
 		}
 	}
+
+	// User settings section.
+
+	$permissions_form_list
+		->addRow((new CTag('h4', true, _('User profile settings')))->addClass('input-section-header'))
+		->addRow(
+			(new CDiv(
+				(new CSpan(_('Redirect URL after login')))->addClass(
+					$data['profile_redirect_enforce'] ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
 
 	// Services section.
 

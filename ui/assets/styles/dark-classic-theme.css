@@ -5430,6 +5430,11 @@ section {
         padding-bottom: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
+    .table-forms .table-forms-td-right .form-fields-hint {
+      font-size: 11px;
+      line-height: 16px;
+      white-space: nowrap;
+      color: #737373; }
   .table-forms .table-subforms {
     margin-top: -5px;
     margin-bottom: -5px; }

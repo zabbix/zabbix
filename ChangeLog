@@ -1,6 +1,9 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F....... [ZBXNEXT-9962] added support for enforcing the 'URL (after login)' page for users through user roles; refactored request helper into Frontend Action Validator; refactored MVC response classes (aluchko, dfofanovs, dpankins)
+.........T [ZBXNEXT-10778] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates for version 13.1 (egordymov)
+..F....... [ZBXNEXT-10657] added dark blue theme (kastafjevs)
 .........T [ZBXNEXT-10556] added trend function cache monitoring to Zabbix health templates (kbruvers)
 A.F....... [ZBXNEXT-10469] turned off API access for all user roles by default (jfreibergs, vskalbins)
 .......PS. [ZBXNEXT-10578] removed legacy protocols from trapper (sboidenko)
@@ -32,6 +35,18 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-28099] fixed LLD Sessions discovery in Veeam Backup and Replication by HTTP template (egordymov)
+..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
+..F....... [ZBX-27647] fixed empty space between Y-axis and graph data for graph widget (kastafjevs)
+.........T [ZBX-28056] fixed script for endpoints requiring the Backup Administrator role in Veeam Backup and Replication by HTTP template (egordymov)
+........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
+..F....... [ZBX-28101] fixed proper context passing for the templated host editing in template Discovery rules (scernisenko)
+........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
+........S. [ZBX-28002] fixed nodata() trigger from flapping into unknown state when 1) log history with only metadata is received 2) preprocessing discards history 3) only old entries outside nodata() period are received (arimdjonoks)
+...G...PS. [ZBX-27227] fixed missing error message when external checks and system.run output exceeds 16 MB (rtrizna)
+.........T [ZBX-26929] fixed duplicate item names in GCP template (kflorowski)
+..F....... [ZBX-27513] fixed runtime errors on PHP 8.5 (Ivo)
+..F....... [ZBX-28062] fixed maintenance type check to properly output maintenance hint text (scernisenko)
 ..F....... [ZBX-27956] fixed row-adding event duplication for hosts/templates mass update value mapping tab (scernisenko)
 ..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
 .......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
@@ -509,8 +524,17 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.15rc1
 
 New features:
+.........T [ZBXNEXT-10778] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates for version 13.1 (egordymov)
 
 Bug fixes:
+.........T [ZBX-28099] fixed LLD Sessions discovery in Veeam Backup and Replication by HTTP template (egordymov)
+..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
+.........T [ZBX-28056] fixed script for endpoints requiring the Backup Administrator role in Veeam Backup and Replication by HTTP template (egordymov)
+........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
+........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
+........S. [ZBX-28002] fixed nodata() trigger from flapping into unknown state when 1) log history with only metadata is received 2) preprocessing discards history 3) only old entries outside nodata() period are received (arimdjonoks)
+.........T [ZBX-26929] fixed duplicate item names in GCP template (kflorowski)
+..F....... [ZBX-27513] fixed runtime errors on PHP 8.5 (Ivo)
 ..F....... [ZBX-27956] fixed row-adding event duplication for hosts/templates mass update value mapping tab (scernisenko)
 ..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
 .......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
@@ -2094,6 +2118,13 @@ Changes for 7.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
+........S. [ZBX-26411] fixed report manager failing to send scheduled reports when media types had been renamed (rtrizna)
+........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
+........S. [ZBX-28002] fixed nodata() trigger from flapping into unknown state when 1) log history with only metadata is received 2) preprocessing discards history 3) only old entries outside nodata() period are received (arimdjonoks)
+.........T [ZBX-26929] fixed duplicate item names in GCP template (kflorowski)
+.......PS. [ZBX-27437] fixed incorrect housekeeping option validation (ademidovs)
+..F....... [ZBX-27513] fixed runtime errors on PHP 8.5 (Ivo)
 ..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)
 .......PS. [ZBX-27976] fixed Database monitor db.odbc.get and db.odbc.discovery failing when the first statement in SQL query is not a SELECT (mkorotkov)
 ........S. [ZBX-27860] fixed agent redirect loop in proxy groups when server goes offline (wiper)

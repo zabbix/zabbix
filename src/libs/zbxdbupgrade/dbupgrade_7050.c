@@ -1277,6 +1277,15 @@ static int	DBpatch_7050092(void)
 
 static int	DBpatch_7050093(void)
 {
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("role_rule", &field, NULL);
+}
+
+#endif
+
+static int	DBpatch_7050094(void)
+{
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	ids;
 	zbx_db_insert_t		db_insert;
@@ -1422,5 +1431,6 @@ DBPATCH_ADD(7050090, 0, 1)
 DBPATCH_ADD(7050091, 0, 1)
 DBPATCH_ADD(7050092, 0, 1)
 DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
 
 DBPATCH_END()
