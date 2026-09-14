@@ -77,6 +77,7 @@ class CApmLog extends CApmGeneral {
 			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'with_flags_on' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'severity_numbers' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '1:24', 'uniq' => true, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
@@ -144,6 +145,12 @@ class CApmLog extends CApmGeneral {
 		if ($options['with_flags_off'] !== null) {
 			$query->where('bitAnd(l.TraceFlags, {flags_off:Int32})=0', [
 				'flags_off' => $options['with_flags_off']
+			]);
+		}
+
+		if ($options['severity_numbers'] !== null) {
+			$query->where('l.SeverityNumber IN {severity_numbers:Array(Int32)}', [
+				'severity_numbers' => $options['severity_numbers']
 			]);
 		}
 
