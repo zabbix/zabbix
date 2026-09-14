@@ -145,7 +145,8 @@
 							number_of_attributes: 3
 						})
 						.setFields(['span_attributes'])
-						.setRenderer('attributes'),
+						.setRenderer('attributes')
+						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
