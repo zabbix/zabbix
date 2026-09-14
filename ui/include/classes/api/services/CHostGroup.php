@@ -790,6 +790,7 @@ class CHostGroup extends CApiService {
 				' WHERE mg.groupid=g.groupid'.
 					' AND '.dbConditionId('mg.maintenanceid', [$maintenance['maintenanceid']])
 			), 'name');
+			natsort($maintenance_groups);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
 				'Cannot delete host group %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',

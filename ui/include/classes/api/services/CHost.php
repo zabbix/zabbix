@@ -1346,6 +1346,7 @@ class CHost extends CHostGeneral {
 				' WHERE mh.hostid=h.hostid'.
 				' 	AND '.dbConditionId('mh.maintenanceid', [$maintenance['maintenanceid']])
 			), 'host');
+			natsort($maintenance_hosts);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
 				'Cannot delete host %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',

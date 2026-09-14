@@ -116,11 +116,11 @@ class CTriggerManager {
 		if ($maintenance) {
 			$maintenance_triggers = DBfetchColumn(DBselect(
 				'SELECT t.description'.
-				' FROM maintenance_trigger mt'.
-				' JOIN triggers t ON mt.triggerid=t.triggerid'.
-				' WHERE mt.maintenanceid='.zbx_dbstr($maintenance['maintenanceid']).
-				' ORDER BY t.triggerid'
+				' FROM maintenance_trigger mt,triggers t'.
+				' WHERE mt.triggerid=t.triggerid'.
+					' AND '.dbConditionId('mt.maintenanceid', [$maintenance['maintenanceid']])
 			), 'description');
+			natsort($maintenance_triggers);
 
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _n(
 				'Cannot delete trigger %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
