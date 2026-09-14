@@ -16,13 +16,16 @@
 #define ZABBIX_ZBX_CEP_H
 
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
 #include "zbxtypes_ext.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
-	int	workers_num;
-	int	config_timeout;
-	int	commit_limit;
+	int		workers_num;
+	int		config_timeout;
+	const char	*config_source_ip;
+	int		commit_limit;
 }
 zbx_thread_cep_manager_args_t;
 
@@ -37,6 +40,9 @@ typedef struct
 }
 zbx_cep_origin_t;
 
+#define ZBX_EVENT_NORMAL	0
+#define ZBX_EVENT_COPIED	1
+
 typedef struct zbx_cep_event zbx_cep_event_t;
 
 ZBX_VECTOR_LITE_DECL(lite_tag, zbx_tag_t)
@@ -49,15 +55,17 @@ struct zbx_cep_event
 	int				ns;
 	int				value;
 	int				severity;
+	unsigned char			flags;
 	time_t				suppress_mtime;
 	char				*name;
 
+	zbx_uint64_t			cause_eventid;
 	zbx_cep_event_t			*r_event;
 
 	zbx_cep_origin_t		origin;
 
 	zbx_vector_lite_tag_t		tags;
-	zbx_vector_lite_uint64_t	maintenanceids;
+	zbx_vector_db_event_suppress_t	suppress;
 
 	zbx_atomic_uint32_t		refcount;
 
@@ -80,7 +88,8 @@ typedef enum
 	CEP_EVENT_UNSUPPRESS,
 	CEP_EVENT_ADD_TAG,
 	CEP_EVENT_UPDATE_SEVERITY,
-	CEP_EVENT_DELETE
+	CEP_EVENT_DELETE,
+	CEP_EVENT_UPDATE_TAGS
 }
 zbx_cep_event_op_t;
 
@@ -106,6 +115,9 @@ void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *han
 
 void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, int handles_num,
 		zbx_vector_uint64_t *eventids);
+zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h);
 
+int	zbx_cep_event_handle_compare(const void *a1, const void *a2);
+void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent);
 
 #endif

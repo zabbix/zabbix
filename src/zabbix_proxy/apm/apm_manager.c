@@ -34,6 +34,7 @@
 #include "zbxsupervisor_client.h"
 #include "zbxtypes_ext.h"
 
+#define APM_WORKERS_MIN		1
 #define APM_WORKERS_MAX		100
 #define APM_WORKERS_DEFAULT	10
 typedef struct
@@ -132,7 +133,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 		workers[i] = apm_worker_create(manager->exporters, &manager->commit_stats);
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_APM, ZBX_PROCESS_TYPE_APM_WORKER,
-			(zbx_mw_worker_t **)workers, APM_WORKERS_MAX, workers_num, apm_worker_entry,
+			(zbx_mw_worker_t **)workers, APM_WORKERS_MIN, APM_WORKERS_MAX, workers_num, apm_worker_entry,
 			(zbx_mw_queue_t *)queue, error))
 	{
 		goto out;

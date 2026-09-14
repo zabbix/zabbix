@@ -29,7 +29,7 @@ typedef struct zbx_mw_task
 }
 zbx_mw_task_t;
 
-ZBX_PTR_VECTOR_DECL(mw_task_ptr, zbx_mw_task_t *)
+ZBX_PTR_VECTOR_LITE_DECL(mw_task_ptr, zbx_mw_task_t *)
 
 typedef struct
 {
@@ -99,6 +99,7 @@ typedef struct
 	/* number of workers being started/stopped depending on pool_state */
 	int			workers_diff;
 
+	int			workers_min;
 	int			workers_max;
 
 	unsigned char		worker_process_type;
@@ -123,7 +124,7 @@ void	zbx_mw_queue_notify_all(zbx_mw_queue_t *queue);
 int	zbx_mw_queue_wait(zbx_mw_queue_t *queue, char **error);
 
 void	zbx_mw_queue_push_priority(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
-void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *tasks);
+void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
 
 void	zbx_mw_queue_lock(zbx_mw_queue_t *queue);
 void	zbx_mw_queue_unlock(zbx_mw_queue_t *queue);
@@ -136,8 +137,8 @@ int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t
 void	zbx_mw_queue_get_stats(zbx_mw_queue_t *queue, int *priority_num, int *normal_num, int *completed_num);
 
 int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info, const char *service,
-		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,
-		void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error);
+		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_min, int workers_max,
+		int workers_num, void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error);
 void	zbx_mw_manager_clear(zbx_mw_manager_t *manager);
 
 double	zbx_mw_manager_recv(zbx_mw_manager_t *manager, zbx_ipc_client_t **client, zbx_ipc_message_t **message);

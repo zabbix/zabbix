@@ -17,6 +17,7 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxtime.h"
+#include "zbxresolver.h"
 
 #ifdef HAVE_LIBEVENT
 #include "zbxip.h"

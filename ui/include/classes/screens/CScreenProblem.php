@@ -153,7 +153,7 @@ class CScreenProblem extends CScreenBase {
 			? $filter['triggerids']
 			: null;
 		$show_opdata = array_key_exists('show_opdata', $column_options)
-			&& $column_options['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY;
+			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
@@ -280,7 +280,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 
-			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
+			$problems = $filter['show'] == TRIGGERS_OPTION_ALL
 				? self::getDataEvents($options)
 				: self::getDataProblems($options);
 
@@ -304,19 +304,19 @@ class CScreenProblem extends CScreenBase {
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
-						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
+						'skipDependent' => $filter['show'] == TRIGGERS_OPTION_ALL ? null : true,
 						'preservekeys' => true
 					];
 
-					$details = (array_key_exists('details', $column_options)
-						&& $column_options['details'] == 1);
+					$details = array_key_exists('details', $column_options) && $column_options['details'] == 1;
+					$custom_text = array_key_exists('custom_text', $column_options);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
 						$options['selectFunctions'] = ['itemid'];
 					}
 
-					if ($resolve_comments || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details || $custom_text) {
 						$options['output'][] = 'expression';
 					}
 
@@ -376,6 +376,7 @@ class CScreenProblem extends CScreenBase {
 	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
 		$userids = [];
+		$cepruleids = [];
 
 		foreach ($problems as $problem) {
 			foreach ($problem['suppression_data'] as $data) {
@@ -384,6 +385,9 @@ class CScreenProblem extends CScreenBase {
 				}
 				elseif ($data['userid'] != 0) {
 					$userids[] = $data['userid'];
+				}
+				elseif ($data['cep_ruleid'] != 0) {
+					$cepruleids[] = $data['cep_ruleid'];
 				}
 			}
 		}
@@ -404,6 +408,14 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
+		if ($cepruleids) {
+			$ceprules = API::CEPRule()->get([
+				'output' => ['name'],
+				'cep_ruleids' => $cepruleids,
+				'preservekeys' => true
+			]);
+		}
+
 		foreach ($problems as &$problem) {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
@@ -416,6 +428,12 @@ class CScreenProblem extends CScreenBase {
 					$data['username'] = array_key_exists($data['userid'], $users)
 						? getUserFullname($users[$data['userid']])
 						: _('Inaccessible user');
+				}
+
+				if ($data['cep_ruleid'] != 0) {
+					$data['ceprule_name'] = array_key_exists($data['cep_ruleid'], $ceprules)
+						? $ceprules[$data['cep_ruleid']]['name']
+						: _('Inaccessible complex event processing rule');
 				}
 			}
 			unset($data);
@@ -503,7 +521,7 @@ class CScreenProblem extends CScreenBase {
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -562,7 +580,7 @@ class CScreenProblem extends CScreenBase {
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -606,11 +624,10 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		$show_opdata = array_key_exists('show_opdata', $column_options)
-			? $column_options['show_opdata'] == 1
-			: OPERATIONAL_DATA_SHOW_SEPARATELY;
+			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		// resolve macros
-		if ($column_options['details'] == 1 || $show_opdata) {
+		if ((array_key_exists('details', $column_options) && $column_options['details'] == 1) || $show_opdata) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -631,25 +648,30 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_comments) {
-			foreach ($data['problems'] as &$problem) {
+			$events = [];
+
+			foreach ($data['problems'] as $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
-				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
-					[
-						'triggerid' => $problem['objectid'],
-						'expression' => $trigger['expression'],
-						'comments' => $trigger['comments'],
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					],
-					['events' => true]
-				);
+
+				$events[$problem['eventid']] = [
+					'triggerid' => $problem['objectid'],
+					'expression' => $trigger['expression'],
+					'comments' => $trigger['comments'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				];
 			}
-			unset($problem);
+			$events = CMacrosResolverHelper::resolveEventDescriptions($events);
 
 			foreach ($data['triggers'] as &$trigger) {
 				unset($trigger['comments']);
 			}
 			unset($trigger);
+
+			foreach ($data['problems'] as &$problem) {
+				$problem['comments'] = $events[$problem['eventid']]['comments'];
+			}
+			unset($problem);
 		}
 
 		// get additional data
@@ -840,7 +862,7 @@ class CScreenProblem extends CScreenBase {
 					(new CDiv(
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					))->addClass(ZBX_STYLE_TABLE_STATS)
-				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_PAGER_CONTAINER)
 			))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 			if ($data['show_timeline']) {

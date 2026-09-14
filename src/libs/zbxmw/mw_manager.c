@@ -25,6 +25,9 @@
 #include "zbxself.h"
 #include "zbxserialize.h"
 #include "zbxtimekeeper.h"
+#include "zbxalgo.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 #define MANAGER_SERVICE_TIMEOUT		SEC_PER_MIN
 
@@ -32,7 +35,7 @@
  *                                                                            *
  * Purpose: start specified number of workers                                 *
  *                                                                            *
- * Parameters: manager     - [IN/OUT] manager                                 *
+ * Parameters: manager     - [IN/OUT]                                         *
  *             workers_num - [IN] number of workers to start                  *
  *             error       - [OUT] error message                              *
  *                                                                            *
@@ -56,6 +59,8 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "starting %d workers", workers_num);
 
+	manager->workers_diff = 0;
+
 	for (int i = manager->workers_num; i < manager->workers_num + workers_num; i++)
 	{
 		if (SUCCEED != mw_worker_start(manager->workers[i], manager->worker_process_type,
@@ -63,10 +68,10 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
 		{
 			return FAIL;
 		}
-	}
 
-	manager->workers_diff = workers_num;
-	manager->worker_pool_state = MW_WORKER_POOL_GROWING;
+		manager->workers_diff++;
+		manager->worker_pool_state = MW_WORKER_POOL_GROWING;
+	}
 
 	return SUCCEED;
 }
@@ -75,7 +80,7 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
  *                                                                            *
  * Purpose: stop specified number of workers                                  *
  *                                                                            *
- * Parameters: manager     - [IN/OUT] manager                                 *
+ * Parameters: manager     - [IN/OUT]                                         *
  *             workers_num - [IN] number of workers to stop                   *
  *                                                                            *
  * Comments: At least one worker is always kept running. If the requested     *
@@ -104,7 +109,11 @@ static void	mw_manager_stop_workers(zbx_mw_manager_t *manager, int workers_num)
 	manager->worker_pool_state = MW_WORKER_POOL_SHRINKING;
 
 	if (NULL != manager->queue)
+	{
+		zbx_mw_queue_lock(manager->queue);
 		zbx_mw_queue_notify_all(manager->queue);
+		zbx_mw_queue_unlock(manager->queue);
+	}
 }
 
 /******************************************************************************
@@ -148,7 +157,7 @@ static int	mw_manager_scale_workers(zbx_mw_manager_t *manager)
 
 			if (SUCCEED != (ret = mw_manager_start_workers(manager, num, &error)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot start %: %s",
+				zabbix_log(LOG_LEVEL_ERR, "cannot start %s: %s",
 						get_process_type_string(manager->worker_process_type), error);
 				zbx_free(error);
 
@@ -158,7 +167,7 @@ static int	mw_manager_scale_workers(zbx_mw_manager_t *manager)
 		else if (CEP_LOW_LOAD_SHRINK <= manager->low_load_ticks)
 		{
 			manager->low_load_ticks = 0;
-			if (1 != manager->workers_num)
+			if (manager->workers_num > manager->workers_min)
 			{
 				double	projected_usage = usage * manager->workers_num / (manager->workers_num - 1);
 
@@ -180,7 +189,7 @@ out:
  *                                                                            *
  * Purpose: check worker pool scaling status and initiate scaling if needed   *
  *                                                                            *
- * Parameters: manager - [IN/OUT] manager                                     *
+ * Parameters: manager - [IN/OUT]                                             *
  *             now     - [IN] current timestamp                               *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
@@ -269,7 +278,10 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
 	}
 
 	if (NULL != manager->timekeeper)
+	{
 		zbx_timekeeper_free(manager->timekeeper);
+		manager->timekeeper = NULL;
+	}
 }
 
 /******************************************************************************
@@ -281,6 +293,7 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
  *             process_type        - [IN] manager process type                *
  *             worker_process_type - [IN] worker process type                 *
  *             workers             - [IN] pre-allocated worker array          *
+ *             workers_min         - [IN] minimum number of workers           *
  *             workers_max         - [IN] maximum number of workers           *
  *             workers_num         - [IN] number of workers to start          *
  *             worker_entry        - [IN] worker thread entry point           *
@@ -291,8 +304,8 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsigned char process_type,
-		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,
-		void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
+		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_min, int workers_max,
+		int workers_num, void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
 {
 	char	*errmsg = NULL;
 
@@ -320,8 +333,17 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
 				MANAGER_SERVICE_TIMEOUT, service);
 	}
 
+	if (workers_min > workers_max)
+		workers_min = workers_max;
+
+	if (workers_num < workers_min)
+		workers_num = workers_min;
+	else if (workers_num > workers_max)
+		workers_num = workers_max;
+
 	manager->timekeeper = zbx_timekeeper_create(workers_max, NULL);
 	manager->worker_entry = worker_entry;
+	manager->workers_min = workers_min;
 	manager->workers_max = workers_max;
 
 	if (FAIL == mw_queue_init(queue, &errmsg))
@@ -358,6 +380,7 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
  *             service             - [IN] IPC service name (optional)         *
  *             worker_process_type - [IN] worker process type                 *
  *             workers             - [IN] pre-allocated worker array          *
+ *             workers_min         - [IN] minimum number of workers           *
  *             workers_max         - [IN] maximum number of workers           *
  *             workers_num         - [IN] number of workers to start          *
  *             worker_entry        - [IN] worker thread entry point           *
@@ -368,7 +391,7 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
  *                                                                            *
  ******************************************************************************/
 int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info, const char *service,
-	unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,
+	unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_min, int workers_max, int workers_num,
 	void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
 {
 	int	ret = FAIL;
@@ -378,7 +401,7 @@ int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info
 	memset(manager, 0, sizeof(zbx_mw_manager_t));
 
 	if (SUCCEED != (ret = mw_manager_init(manager, service, info->process_type, worker_process_type, workers,
-			workers_max, workers_num, worker_entry, queue, error)))
+			workers_min, workers_max, workers_num, worker_entry, queue, error)))
 	{
 		zbx_mw_manager_clear(manager);
 	}
@@ -396,7 +419,7 @@ int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info
  *                                                                            *
  * Purpose: change log level for specified workers                            *
  *                                                                            *
- * Parameters: manager   - [IN/OUT] manager                                   *
+ * Parameters: manager   - [IN/OUT]                                           *
  *             direction - [IN] log level change direction                    *
  *             data      - [IN] RTC command target data                       *
  *                                                                            *
@@ -444,7 +467,7 @@ static void	mw_manager_change_loglevel(zbx_mw_manager_t *manager, int direction,
  *                                                                            *
  * Purpose: send current worker count to IPC client                           *
  *                                                                            *
- * Parameters: manager - [IN] manager                                         *
+ * Parameters: manager - [IN]                                                 *
  *             client  - [IN] IPC client to send response to                  *
  *                                                                            *
  ******************************************************************************/
@@ -461,7 +484,7 @@ static void	mw_manager_reply_worker_count(zbx_mw_manager_t *manager, zbx_ipc_cli
  *                                                                            *
  * Purpose: send worker load statistics to IPC client                         *
  *                                                                            *
- * Parameters: manager - [IN] manager                                         *
+ * Parameters: manager - [IN]                                                 *
  *             client  - [IN] IPC client to send response to                  *
  *                                                                            *
  ******************************************************************************/
@@ -493,7 +516,7 @@ static void	mw_manager_reply_worker_load(zbx_mw_manager_t *manager, zbx_ipc_clie
  *                                                                            *
  * Purpose: receive and dispatch IPC messages                                 *
  *                                                                            *
- * Parameters: manager - [IN/OUT] manager                                     *
+ * Parameters: manager - [IN/OUT]                                             *
  *             client  - [OUT] IPC client that sent the message               *
  *             message - [OUT] received message, NULL if none or handled      *
  *                                                                            *

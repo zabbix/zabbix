@@ -25,10 +25,10 @@
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
-#include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtypes_ext.h"
+#include "zbxtime.h"
 
 /*
  * Event cache
@@ -67,13 +67,17 @@ typedef enum
 }
 zbx_cep_event_state_t;
 
+#define CEP_EVENT_STATE_NEW		0x00
+#define CEP_EVENT_STATE_COMMITTED	0x01
+#define CEP_EVENT_STATE_DELETED		0x02
+
 /* event handle implementation */
 struct zbx_cep_event_ptr
 {
 	zbx_uint64_t		eventid;
 	zbx_cep_event_t		*event;
 	zbx_atomic_uint32_t	refcount;
-	zbx_cep_event_state_t	state;
+	zbx_atomic_uint32_t	state;
 };
 
 ZBX_VECTOR_IMPL(cep_event_handle, zbx_cep_event_handle_t)
@@ -99,12 +103,22 @@ typedef struct
 }
 zbx_cep_object_t;
 
+typedef struct
+{
+	zbx_uint64_t	ruleid;
+	char		*error;
+	time_t		window_start;
+}
+zbx_cep_rule_rtdata_t;
+
 struct zbx_cep
 {
 	zbx_hashset_t			events;
 
 	/* object -> events index */
 	zbx_hashset_t			objects;
+
+	zbx_hashset_t			rules;
 
 	zbx_uint64_t			eventid_next;
 	zbx_uint64_t			eventid_max;
@@ -116,11 +130,18 @@ struct zbx_cep
 	zbx_atomic_uint64_t		events_discarded_num;
 };
 
+static void	cep_rule_error_clear(void *a)
+{
+	zbx_cep_rule_rtdata_t	*rule_error = (zbx_cep_rule_rtdata_t *)a;
+
+	zbx_free(rule_error->error);
+}
+
 static zbx_hash_t	cep_event_ptr_hash(const void *a)
 {
 	const zbx_cep_event_ptr_t	*ref = (const zbx_cep_event_ptr_t *)a;
 
-	return ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->eventid);
+	return ZBX_DEFAULT_ID_HASH_FUNC(&ref->eventid);
 }
 
 static int	cep_event_ptr_compare(const void *a1, const void *a2)
@@ -166,16 +187,26 @@ static int	cep_release_event_handle(zbx_cep_t *cep, zbx_cep_event_handle_t h)
 	return SUCCEED;
 }
 
-static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event)
+static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event, zbx_uint32_t state)
 {
 	zbx_cep_event_ptr_t	handle_local = {
 			.eventid = event->eventid,
 			.event = event,
-			.state = CEP_EVENT_STATE_ACTIVE,
+			.state = state,
 			.refcount = 1
 		};
 
 	return (zbx_cep_event_handle_t)zbx_hashset_insert(&cep->events, &handle_local, sizeof(handle_local));
+}
+
+int	cep_event_handle_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_handle_t *h1 = (const zbx_cep_event_handle_t *)a1;
+	const zbx_cep_event_handle_t *h2 = (const zbx_cep_event_handle_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(*h1, *h2);
+
+	return 0;
 }
 
 zbx_hash_t	cep_origin_hash(const zbx_cep_origin_t *origin)
@@ -183,8 +214,8 @@ zbx_hash_t	cep_origin_hash(const zbx_cep_origin_t *origin)
 	zbx_hash_t	hash;
 	unsigned char	stream[] = {origin->source, origin->object};
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&origin->objectid);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(stream, sizeof(stream), hash);
+	hash = ZBX_DEFAULT_ID_HASH_FUNC(&origin->objectid);
+	hash = ZBX_DEFAULT_HASH_ALGO(stream, sizeof(stream), hash);
 
 	return hash;
 }
@@ -207,15 +238,15 @@ static void	cep_object_clear(void *a)
 
 static zbx_hash_t	cep_object_hash(const void *a)
 {
-	zbx_cep_object_t	*object = (zbx_cep_object_t *)a;
+	const zbx_cep_object_t	*object = (const zbx_cep_object_t *)a;
 
 	return cep_origin_hash(&object->origin);
 }
 
 static int	cep_object_compare(const void *a1, const void *a2)
 {
-	zbx_cep_object_t	*o1 = (zbx_cep_object_t *)a1;
-	zbx_cep_object_t	*o2 = (zbx_cep_object_t *)a2;
+	const zbx_cep_object_t	*o1 = (const zbx_cep_object_t *)a1;
+	const zbx_cep_object_t	*o2 = (const zbx_cep_object_t *)a2;
 
 	return cep_origin_compare(&o1->origin, &o2->origin);
 }
@@ -234,11 +265,17 @@ zbx_cep_t	*cep_create(void)
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	zbx_hashset_create_ext(&cep->rules, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			cep_rule_error_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	return cep;
 }
 
-void	cep_destroy(zbx_cep_t *cep)
+void	cep_destroy(void *a)
 {
+	zbx_cep_t	*cep = (zbx_cep_t *)a;
+
 	zbx_hashset_destroy(&cep->objects);
 
 	zbx_hashset_iter_t	iter;
@@ -249,8 +286,9 @@ void	cep_destroy(zbx_cep_t *cep)
 	{
 		zbx_cep_event_release(h->event);
 	}
-
 	zbx_hashset_destroy(&cep->events);
+
+	zbx_hashset_destroy(&cep->rules);
 
 	zbx_free(cep);
 }
@@ -292,7 +330,7 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 
 static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
 {
-	if (CEP_EVENT_STATE_ACTIVE != h->state)
+	if (0 != (atomic_load(&h->state) & CEP_EVENT_STATE_DELETED))
 		return NULL;
 
 	if (0 == atomic_fetch_add(&h->refcount, 1))
@@ -309,13 +347,13 @@ static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
  *                                                                            *
  * Purpose: acquire (with incremented refcoutn) event handle by event ID      *
  *                                                                            *
- * Parameters: cache   - [IN] cache context                                   *
+ * Parameters: cep     - [IN] cep cache                                       *
  *             eventid - [IN] event ID                                        *
  *                                                                            *
  * Return value: event handle or NULL if not found or being released          *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_uint64_t eventid)
+zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_uint64_t eventid)
 {
 	zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
 
@@ -329,7 +367,7 @@ static zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep
  *                                                                            *
  * Purpose: get object by origin                                              *
  *                                                                            *
- * Parameters: cache  - [IN] cache context                                    *
+ * Parameters: cep    - [IN] cep cache                                        *
  *             origin - [IN] object origin                                    *
  *                                                                            *
  * Return value: object or NULL if not found                                  *
@@ -344,8 +382,8 @@ static zbx_cep_object_t	*cep_get_object(zbx_cep_t *cep, const zbx_cep_origin_t *
  *                                                                            *
  * Purpose: get object by origin or create it if not found                    *
  *                                                                            *
- * Parameters: cache  - [IN]     cache context                                *
- *             origin - [IN]     object origin                                *
+ * Parameters: cep    - [IN] cep cache                                        *
+ *             origin - [IN] object origin                                    *
  *                                                                            *
  * Return value: existing or newly created object                             *
  *                                                                            *
@@ -404,13 +442,35 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load open problems from database into cache                       *
+ * Purpose: decrement pending event count for cep object and remove it if    *
+ *          empty                                                            *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
- *             db    - [IN]     database connection                           *
+ * Parameters: cep    - [IN] cep service                                     *
+ *             origin - [IN] cep object origin                               *
  *                                                                            *
  ******************************************************************************/
-static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
+void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin)
+{
+	zbx_cep_object_t	*obj;
+
+	if (NULL == (obj = cep_get_object(cep, origin)))
+		return;
+
+	obj->pending_events_num--;
+	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
+		zbx_hashset_remove_direct(&cep->objects, obj);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load open problems from database into cache                       *
+ *                                                                            *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
+ *             db    - [IN]     database connection                           *
+ *             stats - [OUT] initialization statistics                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
 {
 #define CEP_PROBLEM_BATCH	5000
 
@@ -421,9 +481,12 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	zbx_uint64_t		eventid = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	int			events_num;
+	int			events_num, tags_num = 0;
+	double			events_time, tags_time;
 
 	zbx_vector_uint64_create(&eventids);
+
+	events_time = zbx_time();
 
 	do
 	{
@@ -432,7 +495,8 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 		events_num = 0;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
+				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name,"
+					"p.cause_eventid,p.flags"
 				" from problem p"
 				" where eventid>" ZBX_FS_UI64
 					" and r_eventid is null"
@@ -444,20 +508,29 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
+			unsigned char	flags;
+			zbx_uint64_t	cause_eventid;
+
 			ZBX_STR2UINT64(eventid, row[0]);
 			ZBX_STR2UCHAR(origin.source, row[4]);
 			ZBX_STR2UCHAR(origin.object, row[5]);
 			ZBX_STR2UINT64(origin.objectid, row[6]);
+			ZBX_DBROW2UINT64(cause_eventid, row[8]);
+			ZBX_STR2UCHAR(flags, row[9]);
 
 			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],
-					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
+					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), flags,
+					cause_eventid, NULL, NULL);
 
 			zbx_cep_object_t	*obj;
 
 			event->value = cep_origin_problem(&origin);
 
 			obj = cep_get_object_or_create(cep, &event->origin);
-			zbx_vector_cep_event_handle_append(&obj->events, cep_create_event_handle(cep, event));
+
+			zbx_cep_event_handle_t	h = cep_create_event_handle(cep, event, CEP_EVENT_STATE_COMMITTED);
+
+			zbx_vector_cep_event_handle_append(&obj->events, h);
 
 			zbx_vector_uint64_append(&eventids, eventid);
 			events_num++;
@@ -465,6 +538,10 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 		zbx_db_free_result(result);
 	}
 	while (CEP_PROBLEM_BATCH == events_num);
+
+	tags_time = zbx_time();
+	stats->events_time = tags_time - events_time;
+	stats->events_num = eventids.values_num;
 
 	if (0 != eventids.values_num)
 	{
@@ -495,9 +572,14 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			tag.tag = zbx_strdup(NULL, row[1]);
 			tag.value = zbx_strdup(NULL, row[2]);
 			zbx_vector_lite_tag_append(&event->tags, tag);
+
+			tags_num++;
 		}
 		zbx_db_large_query_clear(&query);
 	}
+
+	stats->tags_time = zbx_time() - tags_time;
+	stats->tags_num = tags_num;
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&eventids);
@@ -509,36 +591,75 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
  *                                                                            *
  * Purpose: load maintenance data from database into cache                    *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             db    - [IN]     database connection                           *
+ *             stats - [OUT] initialization statistics                        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
+static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_cep_event_handle_t	h = NULL;
+	double			suppress_time;
+	int			suppress_num = 0;
 
-	result = zbx_dbconn_select(db, "select eventid,maintenanceid from event_suppress order by eventid");
+	suppress_time = zbx_time();
+
+	result = zbx_dbconn_select(db, "select eventid,maintenanceid,cep_ruleid,suppress_until"
+			" from event_suppress order by eventid");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t		eventid;
-		zbx_uint64_t		maintenanceid;
+		zbx_db_event_suppress_t	suppress_local;
 
 		ZBX_STR2UINT64(eventid, row[0]);
-		ZBX_DBROW2UINT64(maintenanceid, row[1]);
 
 		if (NULL == h || h->eventid != eventid)
 		{
 			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventid)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
-			}
+
+			cep_release_event_handle(cep, h);
 		}
-		zbx_vector_lite_uint64_append(&h->event->maintenanceids, maintenanceid);
-		cep_release_event_handle(cep, h);
+
+		ZBX_DBROW2UINT64(suppress_local.maintenanceid, row[1]);
+		ZBX_DBROW2UINT64(suppress_local.cep_ruleid, row[2]);
+		suppress_local.until = atoi(row[3]);
+
+		zbx_vector_db_event_suppress_append(&h->event->suppress, suppress_local);
+
+		suppress_num++;
+	}
+
+	stats->suppress_time = zbx_time() - suppress_time;
+	stats->suppress_num = suppress_num;
+
+	zbx_db_free_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load CEP rule errors from database into cache                     *
+ *                                                                            *
+ * Parameters: cep - [IN/OUT] cep cache                                       *
+ *             db  - [IN]     database connection                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_load_rule_errors(zbx_cep_t *cep, zbx_dbconn_t *db)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	result = zbx_dbconn_select(db, "select cep_ruleid,error from cep_rule_rtdata where error<>''");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	ruleid;
+
+		ZBX_STR2UINT64(ruleid, row[0]);
+		cep_rule_set_error(cep, ruleid, row[1]);
 	}
 
 	zbx_db_free_result(result);
@@ -548,7 +669,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
  *                                                                            *
  * Purpose: create item diff record marking an item as not supported          *
  *                                                                            *
- * Parameters: itemid - [IN] item ID                                          *
+ * Parameters: itemid - [IN]                                                  *
  *             error  - [IN] error message                                    *
  *                                                                            *
  * Return value: allocated item diff record                                   *
@@ -802,10 +923,11 @@ void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db)
  * Purpose: initialize cache                                                  *
  *                                                                            *
  * Parameters: cep   - [IN/OUT] cep cache                                     *
- *             dbpool - [IN]     database connection pool                     *
+ *             dbpool - [IN] database connection pool                         *
+ *             stats  - [OUT] initialization statistics                       *
  *                                                                            *
  ******************************************************************************/
-void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
+void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *stats)
 {
 	zbx_dbconn_t	*db;
 
@@ -813,8 +935,12 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
-	cep_load_problems(cep, db);
-	cep_load_maintenances(cep, db);
+	/* warmup event ids cache */
+	(void)zbx_dbconn_get_maxid_num(db, "events", 1);
+
+	cep_load_problems(cep, db, stats);
+	cep_load_maintenances(cep, db, stats);
+	cep_load_rule_errors(cep, db);
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }
@@ -823,7 +949,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
  *                                                                            *
  * Purpose: add event to cache and link it to its object                      *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             event - [IN]     event to add                                  *
  *                                                                            *
  * Return value: event handle, must be released after use                     *
@@ -835,7 +961,7 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
 	zbx_cep_object_t	*obj;
 
 	obj = cep_get_object_or_create(cep, &event->origin);
-	h = cep_create_event_handle(cep, event);
+	h = cep_create_event_handle(cep, event, CEP_EVENT_STATE_NEW);
 	zbx_vector_cep_event_handle_append(&obj->events, h);
 
 	obj->pending_events_num--;
@@ -866,10 +992,10 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
  *           scheduled in the current batch.                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_result_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_hashset_t *triggerids,
+static zbx_cep_assessment_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_hashset_t *triggerids,
 		const zbx_vector_uint64_t *dep_triggerids)
 {
-	zbx_cep_result_t	ret = CEP_EVENT_ALLOW;
+	zbx_cep_assessment_t	ret = CEP_EVENT_ALLOW;
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 
 	for (int i = 0; i < dep_triggerids->values_num; i++)
@@ -903,6 +1029,7 @@ static zbx_cep_result_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_h
  *                                                                            *
  * Parameters: cep     - [IN/OUT] cep cache                                   *
  *             queries - [IN]     trigger assessment queries                  *
+ *             triggerids   - [IN] trigger IDs processed in current batch     *
  *             results - [OUT]    assessment results                          *
  *                                                                            *
  * Comments: Uses cache state and trigger dependencies to decide whether      *
@@ -911,30 +1038,23 @@ static zbx_cep_result_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_h
  *                                                                            *
  ******************************************************************************/
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
-		unsigned char *results)
+		const zbx_hashset_t *triggerids, unsigned char *results)
 {
 	int			dropped_num = 0;
-	zbx_hashset_t		triggerids;
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queries:%d", __func__, queries->values_num);
 
-	zbx_hashset_create(&triggerids, (size_t)queries->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	for (int i = 0; i < queries->values_num; i++)
-		zbx_hashset_insert(&triggerids, &queries->values[i].triggerid, sizeof(queries->values[i].triggerid));
-
 	for (int i = 0; i < queries->values_num; i++)
 	{
 		zbx_cep_assessment_query_t	*query = &queries->values[i];
-		zbx_cep_object_t	*obj;
-		int			result = CEP_EVENT_ALLOW;
+		zbx_cep_object_t		*obj;
+		zbx_cep_assessment_t		result = CEP_EVENT_ALLOW;
 
 		origin.objectid = query->triggerid;
 
 		if (0 != (query->flags & CEP_QUERY_FLAG_DEPS) &&
-				CEP_EVENT_ALLOW != (result = cep_check_trigger_dependency(cep, &triggerids,
+				CEP_EVENT_ALLOW != (result = cep_check_trigger_dependency(cep, triggerids,
 						&query->dep_triggerids)))
 		{
 			if (CEP_EVENT_DEPENDENCY_DENY == result)
@@ -963,7 +1083,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 			/* if there are open problems or pending events - */
 			/* OK event might close something, request it     */
 			if (0 != obj->pending_events_num)
-				results[i] = CEP_EVENT_DEFER;
+				result = CEP_EVENT_DEFER;
 		}
 		else
 		{
@@ -988,10 +1108,16 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		}
 
 		results[i] = result;
-		obj->pending_events_num++;
-	}
 
-	zbx_hashset_destroy(&triggerids);
+		/* unknown and none trigger events will not be sent to CEP */
+		if (TRIGGER_VALUE_UNKNOWN <= (query->flags & CEP_QUERY_MASK_VALUE))
+		{
+			if (0 == obj->pending_events_num && 0 == obj->events.values_num)
+				zbx_hashset_remove_direct(&cep->objects, obj);
+		}
+		else
+			obj->pending_events_num++;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() dropped:%d", __func__, dropped_num);
 }
@@ -1007,7 +1133,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
  *               CEP_EVENT_ALLOW otherwise                                    *
  *                                                                            *
  ******************************************************************************/
-zbx_cep_result_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids)
+zbx_cep_assessment_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids)
 {
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 
@@ -1061,9 +1187,25 @@ static int	cep_event_match_tag(const zbx_cep_event_t *event, const char *tag, co
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: decrease pending event count for a CEP object and remove it if    *
+ *          it holds no events                                                *
+ *                                                                            *
+ * Parameters: cep - [IN] cep instance                                        *
+ *             obj - [IN] cep object to update                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_object_pending_event_done(zbx_cep_t *cep, zbx_cep_object_t *obj)
+{
+	obj->pending_events_num--;
+	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
+		zbx_hashset_remove_direct(&cep->objects, obj);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: open problem event for trigger                                    *
  *                                                                            *
- * Parameters: cache          - [IN/OUT] cache context                        *
+ * Parameters: cep            - [IN/OUT] cep cache                            *
  *             triggerid      - [IN]     trigger ID                           *
  *             trigger_type   - [IN]     trigger type                         *
  *             dep_triggerids - [IN]     dependency trigger IDs               *
@@ -1082,6 +1224,7 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 					.objectid = triggerid
 					};
 	zbx_cep_object_t	*obj;
+	zbx_uint64_t		eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
@@ -1090,17 +1233,22 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 	}
 
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
-		return 0;
+		goto out;
 
 	if (0 != obj->events.values_num)
 	{
 		if (TRIGGER_TYPE_MULTIPLE_TRUE != trigger_type)
-			return 0;
+			goto out;
 	}
 	else
 		*obj_value = TRIGGER_VALUE_PROBLEM;
 
-	return cep_eventid_next(cep);
+	eventid = cep_eventid_next(cep);
+out:
+	if (0 == eventid)
+		cep_object_pending_event_done(cep, obj);
+
+	return eventid;
 }
 
 /******************************************************************************
@@ -1128,6 +1276,12 @@ static zbx_cep_event_t	*cep_event_handle_mutable(zbx_cep_event_handle_t h)
 	h->event = event;
 
 	return event;
+}
+
+void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event)
+{
+	zbx_cep_event_release(h->event);
+	h->event = cep_event_addref(event);
 }
 
 /******************************************************************************
@@ -1162,7 +1316,7 @@ void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_ve
  *                                                                            *
  * Purpose: close matching trigger events                                     *
  *                                                                            *
- * Parameters: cache            - [IN/OUT] cache context                      *
+ * Parameters: cep              - [IN/OUT] cep cache                          *
  *             triggerid        - [IN]     trigger ID                         *
  *             dep_triggerids   - [IN]     dependency trigger IDs             *
  *             correlation_mode - [IN]     correlation mode                   *
@@ -1184,6 +1338,7 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 					.objectid = triggerid
 					};
 	zbx_cep_object_t	*obj;
+	zbx_uint64_t		r_eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
@@ -1191,10 +1346,8 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 		return 0;
 	}
 
-	obj->pending_events_num--;
-
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
-		return 0;
+		goto out;
 
 	for (int i = obj->events.values_num - 1; i >= 0 && 0 != obj->events.values_num; i--)
 	{
@@ -1212,24 +1365,23 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 
 	/* no events to recover */
 	if (0 == events->values_num)
-		return 0;
+		goto out;
 
 	if (0 == obj->events.values_num)
-	{
 		*obj_value = TRIGGER_VALUE_OK;
 
-		if (0 == obj->pending_events_num)
-			zbx_hashset_remove_direct(&cep->objects, obj);
-	}
+	r_eventid = cep_eventid_next(cep);
+out:
+	cep_object_pending_event_done(cep, obj);
 
-	return cep_eventid_next(cep);
+	return r_eventid;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: close specified trigger event                                     *
  *                                                                            *
- * Parameters: cache     - [IN/OUT] cache context                             *
+ * Parameters: cache     - [IN/OUT] cep cache                                 *
  *             triggerid - [IN]  trigger ID                                   *
  *             eventid   - [IN]  event ID                                     *
  *             handles   - [OUT] handle of event to close                     *
@@ -1247,14 +1399,13 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 			.object = EVENT_OBJECT_TRIGGER,
 			.objectid = triggerid
 	};
+	zbx_uint64_t	r_eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("detected incoming trigger event without creation check");
 		return 0;
 	}
-
-	obj->pending_events_num--;
 
 	for (int i = 0; i < obj->events.values_num; i++)
 	{
@@ -1268,24 +1419,23 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 
 	/* no events to recover */
 	if (0 == handles->values_num)
-		return 0;
+		goto out;
 
 	if (0 == obj->events.values_num)
-	{
 		*obj_value = TRIGGER_VALUE_OK;
 
-		if (0 == obj->pending_events_num)
-			zbx_hashset_remove_direct(&cep->objects, obj);
-	}
+	r_eventid = cep_eventid_next(cep);
+out:
+	cep_object_pending_event_done(cep, obj);
 
-	return cep_eventid_next(cep);
+	return r_eventid;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: open internal event                                               *
  *                                                                            *
- * Parameters: cache   - [IN/OUT] cache context                               *
+ * Parameters: cep     - [IN/OUT] cep cache                                   *
  *             object  - [IN]     object type                                 *
  *             objectid- [IN]     object ID                                   *
  *                                                                            *
@@ -1306,6 +1456,8 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
 	if (0 != obj->events.values_num)
 		return 0;
 
+	obj->pending_events_num++;
+
 	return cep_eventid_next(cep);
 }
 
@@ -1313,7 +1465,7 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
  *                                                                            *
  * Purpose: close internal event                                              *
  *                                                                            *
- * Parameters: cache    - [IN/OUT] cache context                              *
+ * Parameters: cep      - [IN/OUT] cep cache                                  *
  *             object   - [IN]     object type                                *
  *             objectid - [IN]     object ID                                  *
  *             eventids - [OUT]    closed event ID                            *
@@ -1334,7 +1486,11 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 		return 0;
 
-	obj->pending_events_num--;
+	if (0 == obj->events.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("found internal event object without events in cache");
+		return 0;
+	}
 
 	/* internal event objects in cache as exactly one event */
 	zbx_cep_event_handle_t	h = obj->events.values[0];
@@ -1371,100 +1527,23 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add maintenance IDs to event and update suppression time          *
- *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN/OUT] maintenance IDs to add                *
- *                                                                            *
- ******************************************************************************/
-static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids)
-{
-	for (int i = 0; i < h->event->maintenanceids.values_num; i++)
-	{
-		int	index;
-
-		if (FAIL != (index = zbx_vector_uint64_search(maintenanceids, h->event->maintenanceids.values[i],
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			zbx_vector_uint64_remove_noorder(maintenanceids, index);
-		}
-	}
-
-	if (0 == maintenanceids->values_num)
-		return;
-
-	zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-	if (0 == event->maintenanceids.values_num)
-		event->suppress_mtime = time(NULL);
-
-	zbx_vector_lite_uint64_append_array(&event->maintenanceids, maintenanceids->values, maintenanceids->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: remove maintenance IDs from event and update suppression time     *
- *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN]     maintenance IDs to remove             *
- *                                                                            *
- ******************************************************************************/
-static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids)
-{
-	zbx_vector_uint64_t	ids;
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_append_array(&ids, h->event->maintenanceids.values, h->event->maintenanceids.values_num);
-
-	for (int i = 0; i < ids.values_num;)
-	{
-		if (FAIL != zbx_vector_uint64_search(maintenanceids, ids.values[i], ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			zbx_vector_uint64_remove_noorder(&ids, i);
-		else
-			i++;
-	}
-
-	if (ids.values_num != h->event->maintenanceids.values_num)
-	{
-		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-		if (0 != ids.values_num)
-		{
-			zbx_vector_lite_uint64_clear(&event->maintenanceids);
-			zbx_vector_lite_uint64_append_array(&event->maintenanceids, ids.values, ids.values_num);
-		}
-		else
-		{
-			zbx_vector_lite_uint64_reset(&event->maintenanceids);
-		}
-
-		if (0 == event->maintenanceids.values_num)
-			event->suppress_mtime = time(NULL);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
-}
-
-
-/******************************************************************************
- *                                                                            *
  * Purpose: update event maintenances                                         *
  *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN/OUT] maintenance IDs                       *
- *             action        - [IN]     maintenance operation                 *
+ * Parameters: h        - [IN/OUT] event handle                               *
+ *             suppress - [IN/OUT] suppress data                             *
+ *             action   - [IN]     maintenance operation                      *
  *                                                                            *
  * Comments: Suppresses or unsuppresses event by adding or removing           *
  *           maintenances depending on action.                                *
  *                                                                            *
  ******************************************************************************/
-static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids,
+static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_db_event_suppress_t *suppress,
 	zbx_cep_event_op_t action)
 {
 	if (CEP_EVENT_SUPPRESS == action)
-		cep_event_add_maintenaces(h, maintenanceids);
+		cep_event_add_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 	else
-		cep_event_remove_maintenaces(h, maintenanceids);
+		cep_event_remove_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 }
 
 /******************************************************************************
@@ -1480,17 +1559,23 @@ static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_
 void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_maintenance_t *events,
 		zbx_cep_event_op_t action, zbx_vector_cep_event_handle_t *handles)
 {
-	zbx_cep_event_handle_t	h = NULL;
-	zbx_vector_uint64_t	maintenanceids;
+	zbx_cep_event_handle_t		h = NULL;
+	zbx_vector_db_event_suppress_t	suppress;
 
-	zbx_vector_uint64_create(&maintenanceids);
+	zbx_vector_db_event_suppress_create(&suppress);
 
 	for (int i = 0; i < events->values_num; i++)
 	{
+		zbx_db_event_suppress_t	suppress_local = {.maintenanceid = events->values[i].maintenanceid,
+				.cep_ruleid = events->values[i].cep_ruleid};
+
 		if (NULL == h || h->eventid != events->values[i].eventid)
 		{
 			if (NULL != h)
-				cep_event_update_maintenances(h, &maintenanceids, action);
+			{
+				cep_event_update_maintenances(h, &suppress, action);
+				zbx_vector_db_event_suppress_clear(&suppress);
+			}
 
 			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 				continue;
@@ -1498,13 +1583,13 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 			zbx_vector_cep_event_handle_append(handles, h);
 		}
 
-		zbx_vector_uint64_append(&maintenanceids, events->values[i].maintenanceid);
+		zbx_vector_db_event_suppress_append(&suppress, suppress_local);
 	}
 
 	if (NULL != h)
-		cep_event_update_maintenances(h, &maintenanceids, action);
+		cep_event_update_maintenances(h, &suppress, action);
 
-	zbx_vector_uint64_destroy(&maintenanceids);
+	zbx_vector_db_event_suppress_destroy(&suppress);
 }
 
 /******************************************************************************
@@ -1631,7 +1716,7 @@ void	cep_add_event_tags(zbx_cep_t *cep, zbx_vector_event_tags_t *events, zbx_vec
 		{
 			(void)cep_release_event_handle(cep, h);
 			zbx_vector_tag_destroy(&events->values[i].tags);
-			zbx_vector_event_tags_remove_noorder(events, i);
+			zbx_vector_event_tags_remove(events, i);
 		}
 	}
 }
@@ -1655,7 +1740,7 @@ void	cep_get_events_by_handles(zbx_cep_t *cep, zbx_cep_event_handle_t *handles, 
 
 	for (int i = 0; i < handles_num; i++)
 	{
-		if (CEP_EVENT_STATE_ACTIVE == handles[i]->state)
+		if (0 == (atomic_load(&handles[i]->state) & CEP_EVENT_STATE_DELETED))
 			events[i] = cep_event_addref(handles[i]->event);
 		else
 			events[i] = NULL;
@@ -1681,7 +1766,7 @@ void	cep_get_events_by_updates(zbx_cep_t *cep, zbx_cep_event_update_t *updates, 
 
 	for (int i = 0; i < updates_num; i++)
 	{
-		if (CEP_EVENT_STATE_ACTIVE == updates[i].handle->state)
+		if (0 == (atomic_load(&updates[i].handle->state) & CEP_EVENT_STATE_DELETED))
 			events[i] = cep_event_addref(updates[i].handle->event);
 		else
 			events[i] = NULL;
@@ -1710,11 +1795,16 @@ void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, in
 		zbx_vector_uint64_append(eventids, handles[i]->eventid);
 }
 
+zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h)
+{
+	return h->eventid;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get all active event handles                                      *
  *                                                                            *
- * Parameters: cep     - [IN]  cache context                                  *
+ * Parameters: cep     - [IN]  cep cache                                      *
  *             handles - [OUT] active event handles                           *
  *                                                                            *
  ******************************************************************************/
@@ -1732,6 +1822,12 @@ void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_h
 
 		if (NULL == (h = cep_event_handle_acquire(h)))
 			continue;
+
+		if (0 == (atomic_load(&h->state) & CEP_EVENT_STATE_COMMITTED))
+		{
+			zbx_cep_event_handle_release(h);
+			continue;
+		}
 
 		zbx_vector_cep_event_handle_append(handles, h);
 	}
@@ -1775,25 +1871,9 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 			}
 		}
 
-		h->state = CEP_EVENT_STATE_DELETED;
+		atomic_fetch_or(&h->state, CEP_EVENT_STATE_DELETED);
 		zbx_vector_cep_event_handle_append(handles, h);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: increment pending event count for a CEP object                    *
- *                                                                            *
- * Parameters: cep    - [IN/OUT] CEP instance                                 *
- *             origin - [IN] event origin identifying the CEP object          *
- *                                                                            *
- ******************************************************************************/
-void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
-{
-	zbx_cep_object_t	*obj;
-
-	obj = cep_get_object_or_create(cep, origin);
-	obj->pending_events_num++;
 }
 
 /******************************************************************************
@@ -1807,8 +1887,8 @@ void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
 static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64 " name:%s", indent, event->eventid, event->name);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d refs:%u tags:",
-			indent, event->clock, event->ns, event->severity, event->refcount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d cause:" ZBX_FS_UI64 " refs:%u tags:",
+			indent, event->clock, event->ns, event->severity, event->cause_eventid, event->refcount);
 
 	for (int i = 0; i < event->tags.values_num; i++)
 	{
@@ -1816,19 +1896,23 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 				event->tags.values[i].value);
 	}
 
-	if (0 != event->maintenanceids.values_num)
+	if (0 != event->suppress.values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s  maintenances:", indent);
-		for (int i = 0; i < event->maintenanceids.values_num; i++)
-			zabbix_log(LOG_LEVEL_DEBUG, "%s    " ZBX_FS_UI64, indent, event->maintenanceids.values[i]);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s  suppress:", indent);
+		for (int i = 0; i < event->suppress.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s    maintenanceid:" ZBX_FS_UI64 " cep_ruleid:" ZBX_FS_UI64 ,
+					indent, event->suppress.values[i].maintenanceid,
+					event->suppress.values[i].cep_ruleid);
+		}
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: dump event cache contents for debugging                           *
+ * Purpose: dump cep cache contents for debugging                             *
  *                                                                            *
- * Parameters: cep - [IN]  cache                                              *
+ * Parameters: cep - [IN]  cep cache                                          *
  *             msg - [IN]  description of the cache change                    *
  *                                                                            *
  ******************************************************************************/
@@ -1837,7 +1921,7 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 	zbx_hashset_iter_t	iter;
 	zbx_cep_object_t	*obj;
 
-	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "CEP cache, changed by %s", msg);
@@ -1878,5 +1962,165 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 
 	stats->events_num = cep->events.num_data;
+	stats->objects_num = cep->objects.num_data;
+}
+
+int	zbx_cep_event_handle_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_handle_t	*h1 = (const zbx_cep_event_handle_t *)a1;
+	const zbx_cep_event_handle_t	*h2 = (const zbx_cep_event_handle_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(*h1, *h2);
+
+	return 0;
+}
+
+void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
+{
+	zbx_cep_event_handle_t	h = cep_acquire_event_handle_by_eventid(cep, eventid);
+
+	if (NULL != h)
+	{
+		zbx_cep_event_t	*e = cep_event_handle_mutable(h);
+
+		e->cause_eventid = cause_eventid;
+		cep_release_event_handle(cep, h);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment pending event count for a CEP object                    *
+ *                                                                            *
+ * Parameters: cep    - [IN/OUT] CEP instance                                 *
+ *             origin - [IN] event origin identifying the CEP object          *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
+{
+	zbx_cep_object_t	*obj;
+
+	obj = cep_get_object_or_create(cep, origin);
+	obj->pending_events_num++;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate if the rule error matches the specified error string     *
+ *                                                                            *
+ * Parameters: cep    - [IN] CEP instance                                     *
+ *             ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string to match or NULL if no error        *
+ *                                                                            *
+ * Return value: SUCCEED if rule has a matching error, FAIL otherwise         *
+ *                                                                            *
+ ******************************************************************************/
+int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
+{
+	zbx_cep_rule_rtdata_t	*rt;
+
+	if (NULL == (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)))
+		return (NULL == error ? SUCCEED : FAIL);
+
+	if (NULL == error)
+		return (NULL == rt->error ? SUCCEED : FAIL);
+
+	if (NULL == rt->error || 0 != strcmp(rt->error, error))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update rule error in cache                                        *
+ *                                                                            *
+ * Parameters: cep    - [IN] CEP instance                                     *
+ *             ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string, NULL  clears the error             *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error)
+{
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
+
+	if (NULL == error)
+	{
+		if (NULL != (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)))
+		{
+			if (0 == rt->window_start)
+				zbx_hashset_remove_direct(&cep->rules, rt);
+			else
+				zbx_free(rt->error);
+		}
+		return;
+	}
+
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	rt->error = zbx_strdup(rt->error, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the current window start time for a rule                      *
+ *                                                                            *
+ * Parameters: cep      - [IN] CEP instance                                   *
+ *             ruleid   - [IN] rule identifier                                *
+ *             duration - [IN] window duration in seconds                     *
+ *                                                                            *
+ * Return value: window start timestamp                                       *
+ *                                                                            *
+ * Comments: If no window start has been registered, it is set to the         *
+ *           current time. If the window has expired, the start time is       *
+ *           advanced by duration steps until it covers the current time.     *
+ *                                                                            *
+ ******************************************************************************/
+time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int duration)
+{
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
+	time_t			now = time(NULL);
+
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	if (0 == rt->window_start)
+	{
+		rt->window_start = now;
+	}
+	else
+	{
+		while (rt->window_start + duration <= now)
+			rt->window_start += duration;
+	}
+
+	return rt->window_start;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize rule window start time, aligned to duration boundary   *
+ *                                                                            *
+ * Parameters: cep          - [IN] cep service                                *
+ *             ruleid       - [IN] rule identifier                            *
+ *             time_created - [IN] time the window was created                *
+ *             duration     - [IN] window duration in seconds                 *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_rule_set_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, time_t time_created, int duration)
+{
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
+	time_t			now = time(NULL);
+
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	if (0 == rt->window_start)
+	{
+		rt->window_start = time_created;
+
+		while (rt->window_start + duration < now)
+			rt->window_start += duration;
+	}
+}
+
+void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent)
+{
+	atomic_fetch_or(&hevent->state, CEP_EVENT_STATE_COMMITTED);
 }
 

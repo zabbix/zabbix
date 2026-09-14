@@ -34,13 +34,18 @@ else {
 		[
 			'title' => _('Update'),
 			'class' => 'js-submit',
-			'withChevron' => 'js-submit-force',
 			'keepOpen' => true,
 			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
+			'keepOpen' => true,
+			'isSubmit' => false
+		],
+		[
+			'title' => _('Reset time windows'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-reset-time-windows']),
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
@@ -57,12 +62,13 @@ $form = (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('cepruleid', $data['ceprule']['cepruleid'])
-	->addStyle('display: none;')
+	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['ceprule']['name']))
+				(new CTextAreaFlexible('name', $data['ceprule']['name']))
+					->setMaxlength(DB::getFieldLength('cep_rule', 'name'))
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
@@ -83,7 +89,102 @@ $form = (new CForm())
 		->addItem((new CTemplateTag('ceprule-operation-modal-template'))->addItem(
 			new CPartial('ceprule.modal.operation')
 		))
-		->addItem((new CLabel('Operations'))->setAsteriskMark()->setId('ceprule-operations-label'))
+		->addItem((new CTemplateTag('ceprule-condition-row-template'))->addItem(
+			(new CRow(['#{formulaid}',
+				(new CCol('#{*description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
+					(new CVar('filter[conditions][#{row_index}][type]', '#{type}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][operator]', '#{operator}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][severity]', '#{severity}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][event_name]', '#{event_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag]', '#{tag}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host_name]', '#{host_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host_group_name]', '#{host_group_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][time_period]', '#{time_period}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}')
+		))
+		->addItem((new CTemplateTag('ceprule-operation-row-template'))->addItem(
+			(new CRow([
+				(new CCol([
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
+				(new CCol([
+					_('Execute when'),
+					' #{execute_when_str} : #{label_str}',
+					new CTag('em', true, ' #{arguments_str}')
+				]))->addClass(ZBX_STYLE_WORDBREAK),
+				'#{*condition_description_html}',
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
+					'#{*conditions_input_html}',
+					(new CVar('operations[#{row_index}][row_index]', '#{row_index}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][sortorder]', '#{sortorder}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][execute_when]', '#{execute_when}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][type]', '#{type}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][filter][evaltype]', '#{filter.evaltype}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][filter][formula]', '#{filter.formula}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][event_name]', '#{event_name}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag]', '#{tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][old_tag]', '#{old_tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][new_tag]', '#{new_tag}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag_name]', '#{tag_name}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][tag_value]', '#{tag_value}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][severity]', '#{severity}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][suppress_time_option]', '#{suppress_time_option}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][suppress_duration]', '#{suppress_duration}'))
+						->setAttribute('data-changed', '')
+						->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}')
+		))
+		->addItem((new CLabel(_('Operations'), 'ceprule-operations-table'))
+			->setAsteriskMark()->setId('ceprule-operations-label')
+			->addItem(makeHelpIcon([
+				_('Operation execution order:').PHP_EOL,
+				_('1) "Event occurred"').PHP_EOL,
+				_('2) "Event added to window"').PHP_EOL,
+				_('3) "Event evicted"').PHP_EOL,
+				''.PHP_EOL,
+				_('Note: "Window closed" and "Pattern matched" operate independently and are not affected by this execution order.')
+			]))
+		)
 		->addItem((new CFormField())
 			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')
@@ -93,11 +194,38 @@ $form = (new CForm())
 				->addItem((new CTable())
 					->setId('ceprule-operations-table')
 					->addClass('list-numbered')
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 					->setColumns([
-						(new CTableColumn(new CColHeader(''))),
-						(new CTableColumn(new CColHeader(_('Details'))))
-							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-						(new CTableColumn(new CColHeader('')))
+						new CTableColumn(
+							(new CColHeader(
+								(new CDiv())
+									->addItem(makeWarningIcon(
+										_s('Execute when %1$s: There is no "%2$s" operation defined.',
+											CCepRuleHelper::getOperationExecuteWhenString([
+												'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED
+											]),
+											CCepRuleHelper::getOperationLabelString([
+												'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+											])
+										)
+									))
+									->addClass('js-operations-info')
+									->addClass(ZBX_STYLE_DISPLAY_NONE)
+							))
+								->setWidth('12')
+						),
+						(new CTableColumn(
+							(new CColHeader())->setWidth('17')
+						)),
+						(new CTableColumn(
+							(new CColHeader(_('Details')))->setWidth('50%')
+						)),
+						(new CTableColumn(
+							(new CColHeader(_('Conditions')))->setWidth('50%')
+						)),
+						(new CTableColumn(
+							(new CColHeader('Actions'))->setWidth('75')
+						))
 					])
 					->addItem((new CTag('tfoot', true))
 						->addItem((new CCol(
@@ -109,8 +237,8 @@ $form = (new CForm())
 			->addItem((new CDiv())->setId('ceprule-operations-error-container'))
 		)
 		->addItem([
-			new CLabel(_('Stop processing'), 'stop'),
-			new CFormField((new CCheckBox('stop'))
+			new CLabel(_('Stop after this rule'), 'stop'),
+			new CFormField((new CCheckBox('stop', CCepRuleHelper::EXECUTION_STOP))
 				->setChecked($data['ceprule']['stop'] == CCepRuleHelper::EXECUTION_STOP)
 				->setUncheckedValue(CCepRuleHelper::EXECUTION_CONTINUE)
 			)
@@ -144,6 +272,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('ceprule.condition.edit.js.php')
+		.$this->readJsFile('ceprule.operation.condition.edit.js.php')
 		.$this->readJsFile('ceprule.operation.edit.js.php')
 		.$this->readJsFile('ceprule.edit.js.php')
 		.'ceprule_edit_popup.init('.json_encode([
@@ -151,6 +280,9 @@ $output = [
 			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'condition_rules' => $data['condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],
+			'operation_conditon_rules' => $data['operation_condition_js_validation_rules'],
+			'operation_types_by_execute_when' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN,
+			'execute_when_by_window_type' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE,
 			'ceprule' => $data['ceprule']
 		]).');',
 	'dialogue_class' => 'modal-popup-large'

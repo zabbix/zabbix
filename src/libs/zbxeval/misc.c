@@ -1081,7 +1081,7 @@ void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **valu
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-				if (index == (int)token->opt + 1)
+				if (index == (int)token->opt)
 				{
 					zbx_free(*value);
 					if (ZBX_VARIANT_NONE != token->value.type)

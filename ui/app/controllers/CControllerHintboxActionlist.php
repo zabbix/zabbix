@@ -69,8 +69,8 @@ class CControllerHintboxActionlist extends CController {
 
 	protected function doAction(): void {
 		$actions = getEventDetailsActions($this->event);
-		$ceprule_actions = array_filter($actions['actions'],
-			fn (array $action) => $action['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE
+		$ceprule_actions = array_filter($actions['actions'], fn (array $action) =>
+			array_key_exists('action_type', $action) && $action['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE
 		);
 
 		$ceprules = $ceprule_actions ? API::CepRule()->get([

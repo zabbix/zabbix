@@ -87,6 +87,17 @@ if (array_key_exists('templates', $data['filter'])) {
 	$script_inline .= $template_ms->getPostJS(). 'popup_generic.initTemplatesFilter();';
 }
 
+// Add users multiselect.
+if (array_key_exists('users', $data['filter'])) {
+	$multiselect_options = $data['filter']['users'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$user_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Username'), 'popup_user_ms'), $user_ms);
+
+	$script_inline .= $user_ms->getPostJS(). 'popup_generic.initUsersFilter();';
+}
+
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
 	switch ($options['itemtype']) {
@@ -367,12 +378,20 @@ switch ($data['popup_type']) {
 				array_pop($description);
 			}
 
+			if ($data['popup_type'] === 'trigger_prototypes') {
+				$indicator = triggerIndicator($trigger['status']);
+				$indicator_style = triggerIndicatorStyle($trigger['status']);
+			}
+			else {
+				$indicator = triggerIndicator($trigger['status'], $trigger['state']);
+				$indicator_style = triggerIndicatorStyle($trigger['status'], $trigger['state']);
+			}
+
 			$table->addRow([
 				$check_box,
 				$description,
 				CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
-				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
-					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+				(new CSpan($indicator))->addClass($indicator_style)
 			]);
 
 			$trigger = [
@@ -432,8 +451,8 @@ switch ($data['popup_type']) {
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP)
-				->setTitle(_('Help'))
-				->setTarget('_blank');
+				->setTarget('_blank')
+				->setAttribute('aria-label', _('Open Zabbix documentation in a new tab'));
 
 			$table->addRow([$name, $description, $documentation_link]);
 		}
@@ -710,8 +729,10 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
 				: null;
 
-			$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
-			$name[] = NAME_DELIMITER;
+			if (array_key_exists('hostname', $valuemap)) {
+				$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
+				$name[] = NAME_DELIMITER;
+			}
 
 			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
 				if ($data['multiselect']) {
@@ -874,6 +895,26 @@ switch ($data['popup_type']) {
 			$media_type = $entry;
 		}
 		unset($media_type);
+		break;
+
+	case 'devices':
+		foreach ($data['table_records'] as $device) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$device['id'].']', $device['id'])
+				: null;
+
+			$name = (new CLink($device['name']))
+				->setId('spanid'.$device['id'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-deviceuuid', $device['id'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.deviceuuid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+		}
 		break;
 }
 

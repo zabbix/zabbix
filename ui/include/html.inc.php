@@ -163,13 +163,19 @@ function get_icon($type, $params = []): ?CSimpleButton {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR_FILLED)
-					->setTitle(_('Remove from favorites'))
+					->setHint(_('Remove from favorites'), '', false)
+					->setAttribute('aria-label', $params['fav'] === 'web.favorite.sysmapids'
+						? _('Remove map from the Favorite maps widget')
+						: _('Remove graph from the Favorite graphs widget'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR)
-					->setTitle(_('Add to favorites'))
+					->setHint(_('Add to favorites'), '', false)
+					->setAttribute('aria-label', $params['fav'] === 'web.favorite.sysmapids'
+						? _('Add map to Favorite maps widget')
+						: _('Add graph to Favorite graphs widget'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setId('addrm_fav');
@@ -182,7 +188,8 @@ function get_icon($type, $params = []): ?CSimpleButton {
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_MINIMIZE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
-					->setTitle(_('Normal view'))
+					->setHint(_('Normal view'), '', false)
+					->setAttribute('aria-label', _('Exit full screen mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL);
 			}
 			else {
@@ -190,7 +197,8 @@ function get_icon($type, $params = []): ?CSimpleButton {
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_FULLSCREEN)
 					->addClass(ZBX_STYLE_BTN_KIOSK)
-					->setTitle(_('Kiosk mode'))
+					->setHint(_('Kiosk mode'), '', false)
+					->setAttribute('aria-label', _('Enter full screen mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE);
 			}
 
@@ -499,7 +507,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		// discovery rules
 		$lld_rules = new CSpan([
-			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
+			new CLink(_('Discovery rules'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'lldrule.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
@@ -531,13 +540,15 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			new CLink(
 				$db_discovery_rule['name'],
 				$db_lld_prototype_parents
-					? (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					? (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
 						->setArgument('context', $context)
-					: (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
+					: (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('context', $context)
 			)
@@ -549,7 +560,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			$parents_breadcrumbs_data = [];
 
 			foreach ($db_lld_prototype_parents as $parent) {
-				$parent_url = (new CUrl('host_discovery_prototypes.php'))
+				$parent_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent['itemid'])
 					->setArgument('context', $context)
 					->getUrl();
@@ -570,7 +582,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		$list->addItem(new CBreadcrumbs([
 			(new CSpan())->addItem(new CLink(_('Discovery list'),
-				(new CUrl('host_discovery.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -644,7 +657,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// Discovery prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Discovery prototypes'),
-				(new CUrl('host_discovery_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -1114,6 +1128,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 	$maintenance_names = [];
 	$username = '';
+	$ceprule_names = [];
 
 	foreach ($icon_data as $suppression) {
 		if (array_key_exists('maintenance_name', $suppression)) {
@@ -1122,9 +1137,13 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
+		elseif (array_key_exists('ceprule_name', $suppression)) {
+			$ceprule_names[] = $suppression['ceprule_name'];
+		}
 	}
 
 	$maintenances = implode(', ', $maintenance_names);
+	$ceprules = implode(', ', array_unique($ceprule_names));
 	$is_suppressed_by_maintenance = $maintenances !== '' && $username === '';
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
@@ -1132,10 +1151,11 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		->addClass($blink ? 'js-blink' : null)
 		->setAttribute('aria-label', $is_suppressed_by_maintenance
 			? _('Suppressed by maintenance')
-			: _('Manually suppressed')
+			: ($ceprules === '' ? _('Manually suppressed') : _('Suppressed by complex event processing'))
 		)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
+			($ceprules !== '' ? "\n"._s('Complex event processing: %1$s', $ceprules) : '').
 			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').
 			($maintenances !== '' ? "\n"._s('Maintenance: %1$s', $maintenances) : '')
 		);
@@ -1158,6 +1178,7 @@ function makeHelpIcon($help_text): CSimpleButton {
 function makeDescriptionIcon(string $description): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
 		->setAttribute('data-content', '?')
+		->setAttribute('aria-label', 'Show hint')
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 

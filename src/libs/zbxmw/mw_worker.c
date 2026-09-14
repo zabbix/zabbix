@@ -21,18 +21,19 @@
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 
-ZBX_PTR_VECTOR_IMPL(mw_task_ptr, zbx_mw_task_t *)
+ZBX_PTR_VECTOR_LITE_IMPL(mw_task_ptr, zbx_mw_task_t *)
 
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize worker                                                 *
  *                                                                            *
- * Parameters: worker     - [OUT] worker to initialize                        *
+ * Parameters: worker     - [OUT]                                             *
  *             id         - [IN] worker id                                    *
  *             service    - [IN] IPC service                                  *
  *             queue      - [IN] task queue                                   *
- *             timekeeper - [IN] timekeeper                                   *
+ *             timekeeper - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 void	mw_worker_init(zbx_mw_worker_t *worker, int id,  zbx_ipc_service_t *service, zbx_mw_queue_t *queue,
@@ -79,6 +80,8 @@ static void	*mw_worker_entry(void *a)
 	void *(*worker_entry)(void *) = args->worker_entry;
 	void			*ret;
 
+	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
+
 	zbx_init_thread_signal_handler(&jmp_ret);
 	if (0 != sigsetjmp(jmp_ret, 1))
 	{
@@ -104,7 +107,7 @@ static void	*mw_worker_entry(void *a)
  *                                                                            *
  * Purpose: start worker thread                                               *
  *                                                                            *
- * Parameters: worker       - [IN/OUT] worker to start                        *
+ * Parameters: worker       - [IN/OUT]                                        *
  *             process_type - [IN] worker process type                        *
  *             worker_entry - [IN] worker thread entry point                  *
  *             error        - [OUT] error message                             *
@@ -119,8 +122,6 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 	pthread_attr_t		attr;
 	zbx_mw_worker_args_t	*args;
 
-	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
-
 	zbx_pthread_init_attr(&attr);
 
 	args = (zbx_mw_worker_args_t *)zbx_malloc(NULL, sizeof(zbx_mw_worker_args_t));
@@ -128,9 +129,12 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 	args->process_type = process_type;
 	args->worker_entry = worker_entry;
 
+	zbx_timekeeper_reset(worker->timekeeper, worker->id - 1);
+
 	if (0 != (err = pthread_create(&worker->thread, &attr, mw_worker_entry, (void *)args)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
+		zbx_free(args);
 		goto out;
 	}
 
@@ -182,7 +186,7 @@ int	zbx_mw_worker_is_running(zbx_mw_worker_t *worker)
  *                                                                            *
  * Purpose: report worker busy state to timekeeper                            *
  *                                                                            *
- * Parameters: worker - [IN] worker                                           *
+ * Parameters: worker - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_worker_report_busy(zbx_mw_worker_t *worker)
@@ -194,7 +198,7 @@ void	zbx_mw_worker_report_busy(zbx_mw_worker_t *worker)
  *                                                                            *
  * Purpose: report worker idle state to timekeeper                            *
  *                                                                            *
- * Parameters: worker - [IN] worker                                           *
+ * Parameters: worker - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_worker_report_idle(zbx_mw_worker_t *worker)

@@ -15,12 +15,10 @@
 #ifndef ZABBIX_CEP_WORKER_H
 #define ZABBIX_CEP_WORKER_H
 
-#include "cep_queue.h"
-
+#include "zbxmw.h"
 #include "zbxexport.h"
 #include "zbxipcservice.h"
 #include "zbxtypes.h"
-#include "zbxtimekeeper.h"
 
 typedef struct
 {

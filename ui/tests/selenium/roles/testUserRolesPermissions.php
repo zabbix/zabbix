@@ -294,7 +294,7 @@ class testUserRolesPermissions extends CWebTest {
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
 					'action' => 'Create and edit maps',
-					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
+					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=create']
 				]
 			],
 			// Dashboard creation/edit.
@@ -373,6 +373,7 @@ class testUserRolesPermissions extends CWebTest {
 			if (in_array('Cancel', $data['form_button'])) {
 				$this->query('button:Cancel')->one()->click();
 				COverlayDialogElement::ensureNotPresent();
+				$this->page->waitUntilReady();
 			}
 
 			if ($action_status) {
@@ -481,7 +482,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+			$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 			$row = $table->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -605,7 +606,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$problem_row = $this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
+			$problem_row = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
 			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
 					->one()->isAttributePresent('href'));
 
@@ -635,7 +636,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'link' => 'zabbix.php?action=problem.view',
-					'selector' => 'xpath:(//a[@class="link-action wordbreak" and text()="ЗАББИКС Сервер"])[1]'
+					'selector' => 'xpath:(//a[@class="link-action overflow-ellipsis" and text()="ЗАББИКС Сервер"])[1]'
 				]
 			],
 			// Dashboard problem widget.
@@ -906,7 +907,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=templategroup.list']
@@ -921,7 +922,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=hostgroup.list']
@@ -936,7 +937,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=template.list']
@@ -951,7 +952,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Templates',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=host.list']
@@ -966,7 +967,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Templates',
 						'Hosts',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=maintenance.list']
@@ -975,7 +976,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Data collection',
-					'page' => 'Event correlation',
+					'page' => 'Event processing',
 					'displayed_ui' => [
 						'Template groups',
 						'Host groups',
@@ -984,7 +985,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Maintenance',
 						'Discovery'
 					],
-					'link' => ['zabbix.php?action=correlation.list']
+					'link' => ['zabbix.php?action=ceprule.list']
 				]
 			],
 			[
@@ -997,7 +998,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation'
+						'Event processing'
 					],
 					'link' => ['zabbix.php?action=discovery.list']
 				]
@@ -1695,11 +1696,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->page->waituntilReady();
 
 		$this->assertTableDataColumn($column_content, 'Name');
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {
@@ -1806,7 +1808,7 @@ class testUserRolesPermissions extends CWebTest {
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-latest')->asDatatable()->one()->waitUntilReady();
 
 		$selected_count = $this->query('class:selected-item-count')->one()->waitUntilVisible();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();

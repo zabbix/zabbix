@@ -25,7 +25,7 @@ class CControllerMaintenanceList extends CController {
 			'filter_set'	=> 'in 1',
 			'filter_rst'	=> 'in 1',
 			'filter_name'	=> 'string',
-			'filter_status'	=> 'in '.implode(',', [-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_APPROACH, MAINTENANCE_STATUS_EXPIRED]),
+			'filter_status'	=> 'in '.implode(',', [-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_UPCOMING, MAINTENANCE_STATUS_EXPIRED]),
 			'filter_groups'	=> 'array_db hosts_groups.groupid',
 			'sort'			=> 'in '.implode(',', ['name', 'maintenance_type', 'active_since', 'active_till']),
 			'sortorder'		=> 'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
@@ -112,7 +112,7 @@ class CControllerMaintenanceList extends CController {
 				$maintenance['status'] = MAINTENANCE_STATUS_EXPIRED;
 			}
 			elseif ($maintenance['active_since'] > time()) {
-				$maintenance['status'] = MAINTENANCE_STATUS_APPROACH;
+				$maintenance['status'] = MAINTENANCE_STATUS_UPCOMING;
 			}
 			else {
 				$maintenance['status'] = MAINTENANCE_STATUS_ACTIVE;

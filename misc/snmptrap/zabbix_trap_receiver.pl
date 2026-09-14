@@ -70,6 +70,17 @@ sub get_header_regex
 	return "$regex ZBXTRAP";
 }
 
+sub sanitize_trap_header
+{
+	my $value = shift;
+
+	return $value unless defined $value;
+
+	$value =~ s/\bZBXTRAP\b/'ZBXTRAP'/g;
+
+	return $value;
+}
+
 sub zabbix_receiver
 {
 	my (%pdu_info) = %{$_[0]};
@@ -117,14 +128,14 @@ sub zabbix_receiver
 			$pdu_info{$key} = "0x$OctetAsHex";		# apply 0x prefix for consistency
 		}
 
-		printf OUTPUT_FILE "  %-30s %s\n", $key, $pdu_info{$key};
+		printf OUTPUT_FILE "  %-30s %s\n", $key, sanitize_trap_header($pdu_info{$key});
 	}
 
 	# print the variable bindings:
 	print OUTPUT_FILE "VARBINDS:\n";
 	foreach my $x (@varbinds)
 	{
-		printf OUTPUT_FILE "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1];
+		printf OUTPUT_FILE "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], sanitize_trap_header($x->[1]);
 	}
 
 	close (OUTPUT_FILE);

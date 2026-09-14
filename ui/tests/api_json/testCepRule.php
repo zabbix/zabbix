@@ -21,6 +21,7 @@ require_once __DIR__.'/../../include/classes/helpers/CCepRuleHelper.php';
 /**
  * @onBefore	prepareData
  * @onAfter		clearData
+ * @backup cep_rule
  */
 class testCepRule extends CAPITest {
 	static array $ruleids = [];
@@ -30,20 +31,55 @@ class testCepRule extends CAPITest {
 			'ceprules' => [
 				[
 					'name' => 'update.success',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
+					]
+				],
+				[
+					'name' => 'window_type=simple',
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'sortorder' => 2,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'event'
+						]
+					]
+				],
+				[
+					'name' => 'window_type=pattern_match',
+					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
+					'window' => [
+						'script' => 'return 0;'
+					],
+					'sortorder' => 3,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_PATTERN_MATCHED,
+							'type' => CCepRuleHelper::OP_SET_SEVERITY,
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						]
 					]
 				],
 				[
 					'name' => 'update.fail',
+					'sortorder' => 4,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					]
 				]
 			]
@@ -58,7 +94,267 @@ class testCepRule extends CAPITest {
 		CTestDataHelper::cleanUp();
 	}
 
-	public function cepRuleCreateValidationData(): array {
+	public static function dataProviderCreateOperationFilter() {
+		yield 'Operation filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "formula" is missing.'
+		];
+
+		yield 'Operation filter formula must contain identifier' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'abc'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": incorrect syntax near "abc".'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_AND_OR' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions cannot define non existing formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'A'
+								],
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield 'Operation filter cannot reference non existing condition for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": missing filter condition "A".'
+		];
+
+		yield 'Operation filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1": the parameter "formulaid" is missing.'
+		];
+
+		yield 'Operation filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								'formulaid' => 123
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": a character string is expected.'
+		];
+
+		yield 'Operation filter conditions formulaid cannot be empty' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => ''
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": cannot be empty.'
+		];
+
+		yield 'Operation filter conditions formulaid must be uppercase' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => 'b'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": uppercase identifier expected.'
+		];
+
+		yield 'Operation filter conditions can be empty unless CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create.valid',
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => []
+						]
+					]
+				]
+			],
+			null
+		];
+	}
+
+	public static function cepRuleCreateValidationData(): array {
 		return [
 			'Non-empty object is required' => [
 				'request' => [],
@@ -72,31 +368,42 @@ class testCepRule extends CAPITest {
 			],
 			'Name is required' => [
 				'request' => [
+					'sortorder' => 1,
 					'operations' => []
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
 			'Name must be string' => [
 				'request' => [
-					'name' => []
+					'name' => [],
+					'sortorder' => 1
 				],
 				'expected_error' => 'Invalid parameter "/1/name": a character string is expected.'
 			],
 			'Name must be not empty' => [
 				'request' => [
-					'name' => ''
+					'name' => '',
+					'sortorder' => 1
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
+			'Sortorder is required' => [
+				'request' => [
+					'name' => 'ceprule',
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "sortorder" is missing.'
+			],
 			'Operations are required unless WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
-					'name' => 'ceprule'
+					'name' => 'ceprule',
+					'sortorder' => 1
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "operations" is missing.'
 			],
 			'Operations must be array' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => 123
 				],
 				'expected_error' => 'Invalid parameter "/1/operations": an array is expected.'
@@ -104,6 +411,7 @@ class testCepRule extends CAPITest {
 			'Operations must be non-empty' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/operations": cannot be empty.'
@@ -111,8 +419,12 @@ class testCepRule extends CAPITest {
 			'Operation must contain execute_when' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'type' => CCepRuleHelper::OP_SET_NAME
+						[
+							'sortorder' => 1,
+							'type' => CCepRuleHelper::OP_SET_NAME
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
@@ -120,8 +432,12 @@ class testCepRule extends CAPITest {
 			'Operation execute_when must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'execute_when' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": an integer is expected.'
@@ -129,8 +445,12 @@ class testCepRule extends CAPITest {
 			'Operation execute_when without window must be WHEN_EVENT_OCCURRED(0)' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'execute_when' => -1
+						[
+							'sortorder' => 1,
+							'execute_when' => -1
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
@@ -138,8 +458,12 @@ class testCepRule extends CAPITest {
 			'Cannot have execute_when=WHEN_EVENT_EVICTED(1) without window' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
@@ -147,8 +471,11 @@ class testCepRule extends CAPITest {
 			'Operation must contain sortorder' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						[
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "sortorder" is missing.'
@@ -156,8 +483,11 @@ class testCepRule extends CAPITest {
 			'Both sortorder and execute_when are required' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 'abc'
+						[
+							'sortorder' => 1
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
@@ -165,9 +495,12 @@ class testCepRule extends CAPITest {
 			'Operation sortorder must be int' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 'abc',
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						[
+							'sortorder' => 'abc',
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/sortorder": an integer is expected.'
@@ -175,9 +508,12 @@ class testCepRule extends CAPITest {
 			'Operation must contain type' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "type" is missing.'
@@ -185,10 +521,13 @@ class testCepRule extends CAPITest {
 			'Operation type must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": an integer is expected.'
@@ -196,20 +535,24 @@ class testCepRule extends CAPITest {
 			'Operation type must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => -1
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => -1
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::OP_SET_NAME,
-					CCepRuleHelper::OP_CLOSE,
+					CCepRuleHelper::OP_CLOSE_EVENT,
 					CCepRuleHelper::OP_DISCARD,
 					CCepRuleHelper::OP_SET_SEVERITY,
 					CCepRuleHelper::OP_INCREASE_SEVERITY,
 					CCepRuleHelper::OP_DECREASE_SEVERITY,
 					CCepRuleHelper::OP_SUPPRESS,
+					CCepRuleHelper::OP_UNSUPPRESS,
 					CCepRuleHelper::OP_ADD_TAG,
 					CCepRuleHelper::OP_SET_TAG,
 					CCepRuleHelper::OP_SET_TAG_VALUE,
@@ -222,20 +565,24 @@ class testCepRule extends CAPITest {
 			'Operation type must be suited for WHEN_EVENT_OCCURRED' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_COPY_LAST
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_CLONE_LAST
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::OP_SET_NAME,
-					CCepRuleHelper::OP_CLOSE,
+					CCepRuleHelper::OP_CLOSE_EVENT,
 					CCepRuleHelper::OP_DISCARD,
 					CCepRuleHelper::OP_SET_SEVERITY,
 					CCepRuleHelper::OP_INCREASE_SEVERITY,
 					CCepRuleHelper::OP_DECREASE_SEVERITY,
 					CCepRuleHelper::OP_SUPPRESS,
+					CCepRuleHelper::OP_UNSUPPRESS,
 					CCepRuleHelper::OP_ADD_TAG,
 					CCepRuleHelper::OP_SET_TAG,
 					CCepRuleHelper::OP_SET_TAG_VALUE,
@@ -245,13 +592,47 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_REMOVE_TAG
 				]).'.'
 			],
+			'Operation suppress_duration is required' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SUPPRESS
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "suppress_duration" is missing.'
+			],
+			'Operation suppress_duration is in range' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SUPPRESS,
+							'suppress_duration' => -1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/suppress_duration": value must be one of 0-157680000.'
+			],
 			'Need event_name for WHEN_EVENT_OCCURRED' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "event_name" is missing.'
@@ -259,11 +640,14 @@ class testCepRule extends CAPITest {
 			'Event name parameter must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 123
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 123
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/event_name": a character string is expected.'
@@ -271,11 +655,14 @@ class testCepRule extends CAPITest {
 			'Minimal ceprule without window succeeds' => [
 				'request' => [
 					'name' => 'ceprule.minimal',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					]
 				],
 				'expected_error' => null
@@ -283,179 +670,62 @@ class testCepRule extends CAPITest {
 			'Can pass tags for operation' => [
 				'request' => [
 					'name' => 'ceprule.operation.tags',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => []
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'conditions' => []
+							]
+						]
 					]
 				],
 				'expected_error' => null
 			],
-			'Operation tags must be array' => [
+			'Operation tag must be set for operation type OP_SET_TAG' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => 'abc'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags": an array is expected.'
-			],
-			'Operation tags cannot have unexpected fields' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'unexpected' => true
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_TAG
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1": unexpected parameter "unexpected".'
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "tag" is missing.'
 			],
-			'Operation tags must have tag name' => [
+			'Operation tag cannot be empty' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'value' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1": the parameter "tag" is missing.'
-			],
-			'Operation tags name must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/tag": a character string is expected.'
-			],
-			'Operation tags name cannot be empty' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_TAG,
 							'tag' => ''
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/tag": cannot be empty.'
-			],
-			'Operation tags operator must be integer' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'sortorder' => 1,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'operator' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/operator": an integer is expected.'
-			],
-			'Operation tags operator must be of known range' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'operator' => 99
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/operator": value must be one of '.
-					implode(', ', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]).'.'
-			],
-			'Operation tags value must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'value' => 123
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/value": a character string is expected.'
-			],
-			'Multiple operation tags accepted' => [
-				'request' => [
-					'name' => 'ceprule.operation.tags.multiple',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							['tag' => 'tag1'],
-							['tag' => 'tag2']
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			'Operation tags must be unique' => [
-				'request' => [
-					'name' => 'ceprule.operation.tags.multiple.unique',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							['tag' => 'tag1', 'value' => ''],
-							['tag' => 'tag1', 'value' => '']
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/2": value (tag, value)=(tag1, ) already exists.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/tag": cannot be empty.'
 			],
 			'Operation tag must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tag' => 123
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_TAG,
+							'tag' => 123
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/tag": a character string is expected.'
@@ -463,52 +733,68 @@ class testCepRule extends CAPITest {
 			'Cannot specify non-default tag for OP_SET_NAME' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tag' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'tag' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/tag": value must be empty.'
 			],
-			'Operation evaltype must be integer' => [
+			'Operation  filter.evaltype must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'evaltype' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'filter' => [
+								'evaltype' => 'abc'
+							]
+						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/evaltype": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/filter/evaltype": an integer is expected.'
 			],
 			'Operation evaltype must be of known range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'evaltype' => -1
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'filter' => [
+								'evaltype' => -1
+							]
+						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/evaltype": value must be one of '.
-					implode(', ', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND]).'.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/filter/evaltype": value must be one of '.
+					implode(', ', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]).'.'
 			],
 			'Operation new_tag must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'new_tag' => 123
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'new_tag' => 123
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/new_tag": a character string is expected.'
@@ -516,12 +802,15 @@ class testCepRule extends CAPITest {
 			'Cannot have non-default operation new_tag for OP_SET_NAME' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'new_tag' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'new_tag' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/new_tag": value must be empty.'
@@ -529,12 +818,15 @@ class testCepRule extends CAPITest {
 			'Operation tag_value must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tag_value' => 123
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'tag_value' => 123
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/tag_value": a character string is expected.'
@@ -542,12 +834,15 @@ class testCepRule extends CAPITest {
 			'Cannot have non-default operation tag_value for OP_SET_NAME' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tag_value' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'tag_value' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/tag_value": value must be empty.'
@@ -555,12 +850,15 @@ class testCepRule extends CAPITest {
 			'Operation severity must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'severity' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'severity' => 'abc'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/severity": an integer is expected.'
@@ -568,12 +866,15 @@ class testCepRule extends CAPITest {
 			'Cannot have non-default operation severity for OP_SET_NAME' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'severity' => 123
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name',
+							'severity' => 123
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/severity": value must be 0.'
@@ -581,11 +882,14 @@ class testCepRule extends CAPITest {
 			'Filter must be object' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => 123
 				],
@@ -594,24 +898,33 @@ class testCepRule extends CAPITest {
 			'Filter can be reset' => [
 				'request' => [
 					'name' => 'ceprule.no.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
-					'filter' => []
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => []
+					]
 				],
 				'expected_error' => null
 			],
 			'Non-empty filter requires evaltype' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'conditions' => []
@@ -622,11 +935,14 @@ class testCepRule extends CAPITest {
 			'Filter evaltype must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => 'abc'
@@ -637,11 +953,14 @@ class testCepRule extends CAPITest {
 			'Filter evaltype must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => -1
@@ -657,11 +976,14 @@ class testCepRule extends CAPITest {
 			'Filter formula must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -673,11 +995,14 @@ class testCepRule extends CAPITest {
 			'Filter formula must be empty unless CONDITION_EVAL_TYPE_AND_OR' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -689,11 +1014,14 @@ class testCepRule extends CAPITest {
 			'Filter conditions must be array' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -705,11 +1033,14 @@ class testCepRule extends CAPITest {
 			'Filter conditions can be empty unless CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter.conditions.empty',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -721,11 +1052,14 @@ class testCepRule extends CAPITest {
 			'Filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
@@ -736,11 +1070,14 @@ class testCepRule extends CAPITest {
 			'Filter formula must contain identifier' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -752,11 +1089,14 @@ class testCepRule extends CAPITest {
 			'Filter conditions must be present for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -765,14 +1105,17 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter": the parameter "conditions" is missing.'
 			],
-			'Filter conditions cannot be empty for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter cannot reference non existing condition for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -780,22 +1123,27 @@ class testCepRule extends CAPITest {
 						'conditions' => []
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/formula": missing filter condition "A".'
 			],
 			'Filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+							]
 						]
 					]
 				],
@@ -804,11 +1152,14 @@ class testCepRule extends CAPITest {
 			'Filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -823,17 +1174,22 @@ class testCepRule extends CAPITest {
 			'Filter conditions formulaid cannot be empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'formulaid' => ''
+							[
+								'formulaid' => ''
+							]
 						]
 					]
 				],
@@ -842,17 +1198,22 @@ class testCepRule extends CAPITest {
 			'Filter conditions formulaid must be uppercase' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'formulaid' => 'b'
+							[
+								'formulaid' => 'b'
+							]
 						]
 					]
 				],
@@ -861,18 +1222,24 @@ class testCepRule extends CAPITest {
 			'Filter conditions event_name must be specified' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'formulaid' => 'A'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'formulaid' => 'A',
+								'operator' => CONDITION_OPERATOR_EQUAL
+							]
 						]
 					]
 				],
@@ -881,19 +1248,25 @@ class testCepRule extends CAPITest {
 			'Filter conditions event_name must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'formulaid' => 'A',
-							'event_name' => 123
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'formulaid' => 'A',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'event_name' => 123
+							]
 						]
 					]
 				],
@@ -902,19 +1275,25 @@ class testCepRule extends CAPITest {
 			'Filter conditions event_name must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'formulaid' => 'A',
-							'event_name' => ''
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'formulaid' => 'A',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'event_name' => ''
+							]
 						]
 					]
 				],
@@ -923,20 +1302,26 @@ class testCepRule extends CAPITest {
 			'Filter conditions event_name can be empty if not CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter.event_name.empty',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST,
-							'formulaid' => 'A',
-							'event_name' => '',
-							'host' => 'host name'
+							[
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+								'formulaid' => 'A',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'event_name' => '',
+								'host_name' => 'host name'
+							]
 						]
 					]
 				],
@@ -945,19 +1330,25 @@ class testCepRule extends CAPITest {
 			'Filter conditions formulaid must match expression' => [
 				'request' => [
 					'name' => 'ceprule.filter.formulaid',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A',
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'formulaid' => 'B',
-							'event_name' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'formulaid' => 'B',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'event_name' => 'abc'
+							]
 						]
 					]
 				],
@@ -966,16 +1357,21 @@ class testCepRule extends CAPITest {
 			'Filter conditions type must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => 'abc'
+							[
+								'type' => 'abc'
+							]
 						]
 					]
 				],
@@ -984,42 +1380,53 @@ class testCepRule extends CAPITest {
 			'Filter conditions type must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => -1
+							[
+								'type' => -1
+							]
 						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::CONDITION_EVENT_NAME,
 					CCepRuleHelper::CONDITION_TAG,
+					CCepRuleHelper::CONDITION_TAG_VALUE,
 					CCepRuleHelper::CONDITION_SEVERITY,
-					CCepRuleHelper::CONDITION_HOST,
-					CCepRuleHelper::CONDITION_HOST_GROUP,
+					CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+					CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
 					CCepRuleHelper::CONDITION_TIME_PERIOD
 				]).'.'
 			],
 			'Filter conditions operator must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'operator' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'operator' => 'abc'
+							]
 						]
 					]
 				],
@@ -1028,17 +1435,22 @@ class testCepRule extends CAPITest {
 			'Filter conditions operator must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'operator' => -1
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'operator' => -1
+							]
 						]
 					]
 				],
@@ -1052,17 +1464,23 @@ class testCepRule extends CAPITest {
 			'Filter conditions tag must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG,
-							'tag' => 123
+							[
+								'type' => CCepRuleHelper::CONDITION_TAG,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'tag' => 123
+							]
 						]
 					]
 				],
@@ -1071,17 +1489,23 @@ class testCepRule extends CAPITest {
 			'Filter conditions tag must be non-empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG,
-							'tag' => ''
+							[
+								'type' => CCepRuleHelper::CONDITION_TAG,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'tag' => ''
+							]
 						]
 					]
 				],
@@ -1090,18 +1514,24 @@ class testCepRule extends CAPITest {
 			'Filter conditions tag must be empty when type!=CONDITION_TAG_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'event_name' => 'abc',
-							'tag' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'event_name' => 'abc',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'tag' => 'abc'
+							]
 						]
 					]
 				],
@@ -1110,17 +1540,23 @@ class testCepRule extends CAPITest {
 			'Filter conditions severity must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_SEVERITY,
-							'severity' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_SEVERITY,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'severity' => 'abc'
+							]
 						]
 					]
 				],
@@ -1129,18 +1565,24 @@ class testCepRule extends CAPITest {
 			'Filter conditions severity must be empty when type=CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'event_name' => 'abc',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'event_name' => 'abc',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'severity' => TRIGGER_SEVERITY_INFORMATION
+							]
 						]
 					]
 				],
@@ -1149,134 +1591,176 @@ class testCepRule extends CAPITest {
 			'Filter conditions host must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST,
-							'host' => 123
+							[
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'host_name' => 123
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": a character string is expected.'
 			],
 			'Filter conditions host must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST,
-							'host' => ''
+							[
+								'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'host_name' => ''
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": cannot be empty.'
 			],
 			'Filter conditions host must be empty when type!=CONDITION_HOST' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'event_name' => 'abc',
-							'host' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'event_name' => 'abc',
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'host_name' => 'abc'
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_name": value must be empty.'
 			],
 			'Filter conditions host_group must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
-							'host_group' => 123
+							[
+								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'host_group_name' => 123
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": a character string is expected.'
 			],
 			'Filter conditions host_group must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST_GROUP,
-							'host_group' => ''
+							[
+								'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'host_group_name' => ''
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": cannot be empty.'
 			],
 			'Filter conditions host_group must be empty when type=CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'event_name' => 'abc',
-							'host_group' => 'abc'
+							[
+								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'event_name' => 'abc',
+								'host_group_name' => 'abc'
+							]
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group_name": value must be empty.'
 			],
 			'Filter conditions time_period must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
-							'event_name' => '',
-							'time_period' => 123
+							[
+								'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
+								'operator' => CONDITION_OPERATOR_IN,
+								'event_name' => '',
+								'time_period' => 123
+							]
 						]
 					]
 				],
@@ -1285,6 +1769,7 @@ class testCepRule extends CAPITest {
 			'Filter conditions time_period must be empty when type!=CONDITION_TIME_PERIOD' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1295,6 +1780,7 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
+							'operator' => CONDITION_OPERATOR_EQUAL,
 							'event_name' => 'abc',
 							'time_period' => 'abc'
 						]
@@ -1305,6 +1791,7 @@ class testCepRule extends CAPITest {
 			'Filter conditions requires tag when type=CONDITION_TAG_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1314,7 +1801,8 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG
+							'type' => CCepRuleHelper::CONDITION_TAG,
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					]
 				],
@@ -1323,24 +1811,7 @@ class testCepRule extends CAPITest {
 			'Filter conditions requires severity when type=CONDITION_SEVERITY' => [
 				'request' => [
 					'name' => 'ceprule.filter',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_SEVERITY
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "severity" is missing.'
-			],
-			'Filter conditions requires severity must be in range when type=CONDITION_SEVERITY' => [
-				'request' => [
-					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1351,6 +1822,27 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							'type' => CCepRuleHelper::CONDITION_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "severity" is missing.'
+			],
+			'Filter conditions requires severity must be in range when type=CONDITION_SEVERITY' => [
+				'request' => [
+					'name' => 'ceprule.filter',
+					'sortorder' => 1,
+					'operations' => [
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name'
+					],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							'type' => CCepRuleHelper::CONDITION_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
 							'severity' => -1
 						]
 					]
@@ -1361,6 +1853,7 @@ class testCepRule extends CAPITest {
 			'Filter conditions requires host when type=CONDITION_HOST' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1370,15 +1863,17 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST
+							'type' => CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME,
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host" is missing.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_name" is missing.'
 			],
 			'Filter conditions requires host_group when type=CONDITION_HOST_GROUP' => [
 				'request' => [
 					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1388,33 +1883,17 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_HOST_GROUP
+							'type' => CCepRuleHelper::CONDITION_HOST_GROUP_NAME,
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_group" is missing.'
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_group_name" is missing.'
 			],
 			'Filter conditions requires time_period when type=CONDITION_TIME_PERIOD' => [
 				'request' => [
 					'name' => 'ceprule.filter',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TIME_PERIOD
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "time_period" is missing.'
-			],
-			'Filter time_period invalid format check' => [
-				'request' => [
-					'name' => 'ceprule.filter',
+					'sortorder' => 1,
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -1425,6 +1904,29 @@ class testCepRule extends CAPITest {
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_IN
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "time_period" is missing.'
+			],
+			'Filter time_period invalid format check' => [
+				'request' => [
+					'name' => 'ceprule.filter',
+					'sortorder' => 1,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
+					],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_IN,
 							'time_period' => '2h'
 						]
 					]
@@ -1434,16 +1936,20 @@ class testCepRule extends CAPITest {
 			'Filter time_period check' => [
 				'request' => [
 					'name' => 'ceprule.filter.time_period',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'Event name'
+						]
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_IN,
 							'time_period' => '3-4,10:00-14:00'
 						]
 					]
@@ -1453,11 +1959,14 @@ class testCepRule extends CAPITest {
 			'Rule stop must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'stop' => 'abc'
 				],
@@ -1466,11 +1975,14 @@ class testCepRule extends CAPITest {
 			'Rule stop must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'stop' => -1
 				],
@@ -1481,10 +1993,12 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'sortorder' => 'abc'
 				],
@@ -1493,11 +2007,14 @@ class testCepRule extends CAPITest {
 			'Rule description must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'description' => -1
 				],
@@ -1506,11 +2023,14 @@ class testCepRule extends CAPITest {
 			'Rule status must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'status' => 'abc'
 				],
@@ -1519,11 +2039,14 @@ class testCepRule extends CAPITest {
 			'Rule status must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'status' => -1
 				],
@@ -1533,11 +2056,14 @@ class testCepRule extends CAPITest {
 			'Rule window_type must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => 'abc'
 				],
@@ -1546,11 +2072,14 @@ class testCepRule extends CAPITest {
 			'Rule window_type must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => -1
 				],
@@ -1562,53 +2091,33 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::WINDOW_PATTERN_MATCH
 				]).'.'
 			],
-			'Rule window required for window_type=WINDOW_SIMPLE' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
-			],
 			'Rule window required for window_type=WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
-			],
-			'Rule window required for window_type=WINDOW_TAG_MATCH' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
 			'Rule window required for window_type=WINDOW_PATTERN_MATCH' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH
 				],
@@ -1617,11 +2126,14 @@ class testCepRule extends CAPITest {
 			'Rule window must be object' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => 'abc'
@@ -1631,11 +2143,14 @@ class testCepRule extends CAPITest {
 			'Unexpected fields for window are rejected' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1644,28 +2159,17 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
 			],
-			'Duration is required for window!=WINDOW_NONE' => [
-				'request' => [
-					'name' => 'ceprule.window.simple',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/window": the parameter "duration" is missing.'
-			],
 			'Window duration must be time unit' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1674,14 +2178,17 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/duration": a time unit is expected.'
 			],
-			'Window duration must be not empty' => [
+			'Window duration must be greater than zero' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1693,11 +2200,14 @@ class testCepRule extends CAPITest {
 			'Window duration must be not more than 365d' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1709,11 +2219,14 @@ class testCepRule extends CAPITest {
 			'Window duration accepts time unit' => [
 				'request' => [
 					'name' => 'ceprule.window.duration',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1725,11 +2238,14 @@ class testCepRule extends CAPITest {
 			'Window duration does not accept "y"' => [
 				'request' => [
 					'name' => 'ceprule.window.duration.as.year',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1741,11 +2257,14 @@ class testCepRule extends CAPITest {
 			'Window duration accepts macro' => [
 				'request' => [
 					'name' => 'ceprule.window.duration.as.macro',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1757,11 +2276,14 @@ class testCepRule extends CAPITest {
 			'Window duration rejects malformed macro' => [
 				'request' => [
 					'name' => 'ceprule.window.duration.as.macro.malformed',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1773,15 +2295,18 @@ class testCepRule extends CAPITest {
 			'Window duration rejects too long macro' => [
 				'request' => [
 					'name' => 'ceprule.window.duration.as.macro.long',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
-						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'duration')).'}'
+						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'duration')).'}'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/duration": value is too long.'
@@ -1789,11 +2314,14 @@ class testCepRule extends CAPITest {
 			'Window capacity must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1806,11 +2334,14 @@ class testCepRule extends CAPITest {
 			'Window capacity must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1818,16 +2349,19 @@ class testCepRule extends CAPITest {
 						'capacity' => -1
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/capacity": value must be one of 0-'.ZBX_MAX_INT64.'.'
+				'expected_error' => 'Invalid parameter "/1/window/capacity": value must be one of 0-'.ZBX_MAX_INT32.'.'
 			],
 			'Window capacity accepts macro' => [
 				'request' => [
 					'name' => 'ceprule.window.capacity.as.macro',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1840,11 +2374,14 @@ class testCepRule extends CAPITest {
 			'Window capacity rejects malformed macro' => [
 				'request' => [
 					'name' => 'ceprule.window.capacity.as.macro.malformed',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1857,16 +2394,19 @@ class testCepRule extends CAPITest {
 			'Window capacity rejects too long macro' => [
 				'request' => [
 					'name' => 'ceprule.window.capacity.as.macro.long',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '{$DURATION}',
-						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'capacity')).'}'
+						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'capacity')).'}'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/capacity": value is too long.'
@@ -1874,11 +2414,14 @@ class testCepRule extends CAPITest {
 			'Window script must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1891,11 +2434,14 @@ class testCepRule extends CAPITest {
 			'Window script must be empty for WINDOW_SIMPLE' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1908,11 +2454,14 @@ class testCepRule extends CAPITest {
 			'Window script must be empty for WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
@@ -1925,11 +2474,14 @@ class testCepRule extends CAPITest {
 			'Window script must be empty for WINDOW_TAG_MATCH' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
 					'window' => [
@@ -1942,11 +2494,14 @@ class testCepRule extends CAPITest {
 			'Window script must not be empty for WINDOW_PATTERN_MATCH' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
 					'window' => [
@@ -1959,11 +2514,14 @@ class testCepRule extends CAPITest {
 			'Window group_by_host_group must be int boolean' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1976,11 +2534,14 @@ class testCepRule extends CAPITest {
 			'Window group_by_host must be int boolean' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -1993,11 +2554,14 @@ class testCepRule extends CAPITest {
 			'Window group_by_tags must be int boolean' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -2010,11 +2574,14 @@ class testCepRule extends CAPITest {
 			'Window tag required if group_by_tags=true' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -2022,126 +2589,82 @@ class testCepRule extends CAPITest {
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
+				'expected_error' => 'Invalid parameter "/1/window": the parameter "tags" is missing.'
 			],
-			'Window tag must be string' => [
+			'Window tags must be array of strings' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => 123
+						'tags' => 123
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/tag": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": an array is expected.'
 			],
-			'Window tag must be not empty' => [
+			'Window tags must be not empty' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => ''
+						'tags' => []
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/tag": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": cannot be empty.'
 			],
-			'Window tag not accepted if group_by_tags=no' => [
+			'Window tags does not accept non-default value if group_by_tags=no' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
-						'tag' => 'abc'
+						'tags' => 'abc'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/tag": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": an array is expected.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM' => [
+			'Properties group_by* are optional' => [
 				'request' => [
-					'name' => 'ceprule.window.symptom',
+					'name' => 'ceprule.window.symptom.group_by',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled.'
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_host_group',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_host',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'group_by_host' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_tags' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_tags',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => 'abc'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					]
 				],
 				'expected_error' => null
@@ -2150,10 +2673,11 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.symptom.no.operations',
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+					'sortorder' => 1,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => 'abc'
+						'tags' => ['abc']
 					]
 				],
 				'expected_error' => null
@@ -2161,11 +2685,14 @@ class testCepRule extends CAPITest {
 			'Window event_count_tag must be string' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -2178,11 +2705,14 @@ class testCepRule extends CAPITest {
 			'Window event_count_tag must can be empty' => [
 				'request' => [
 					'name' => 'ceprule.window.event_count_tag',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
@@ -2192,14 +2722,17 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Window should be empty for WINDOW_NONE' => [
+			'Window should be set to database default for WINDOW_NONE' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_NONE,
 					'window' => [
@@ -2207,278 +2740,21 @@ class testCepRule extends CAPITest {
 						'event_count_tag' => 'abc'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/window/duration": value must be "10m".'
 			],
 			'Non-empty window filter prohibited for WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter": should be empty.'
-			],
-			'Empty window filter allowed for WINDOW_CAUSE_SYMPTOM' => [
-				'request' => [
-					'name' => 'ceprule.symptom.filter.empty',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [],
-						'group_by_host' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'Non-empty window filter prohibited for WINDOW_PATTERN_MATCH' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter": should be empty.'
-			],
-			'Empty window filter allowed for WINDOW_PATTERN_MATCH' => [
-				'request' => [
-					'name' => 'ceprule.pattern.filter.empty',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [],
-						'script' => 'abc'
-					]
-				],
-				'expected_error' => null
-			],
-			'Window filter prohibits unexpected fields' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'unexpected' => true
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter": unexpected parameter "unexpected".'
-			],
-			'Window filter evaltype must be integer' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/evaltype": an integer is expected.'
-			],
-			'Window filter evaltype must be in range' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/evaltype": value must be one of '.implode(', ', [
-					CONDITION_EVAL_TYPE_AND_OR,
-					CONDITION_EVAL_TYPE_AND,
-					CONDITION_EVAL_TYPE_OR,
-					CONDITION_EVAL_TYPE_EXPRESSION
-				]).'.'
-			],
-			'Window filter formula must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'formula' => 123
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/formula": a character string is expected.'
-			],
-			'Window filter formula must be empty unless evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'formula' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/formula": value must be empty.'
-			],
-			'Window filter formula must be non-empty if evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/formula": cannot be empty.'
-			],
-			'Window filter formula required if evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/formula": incorrect syntax near "abc".'
-			],
-			'Window filter conditions prohibit unexpected fields' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'unexpected' => true
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1": unexpected parameter "unexpected".'
-			],
-			'Window filter conditions required if evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter": the parameter "conditions" is missing.'
-			],
-			'Window filter conditions cannot be empty if evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
 					'window' => [
 						'duration' => '1h',
 						'filter' => [
@@ -2488,589 +2764,35 @@ class testCepRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "filter".'
 			],
-			'Window filter conditions formulaid required for evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Window tags accepts default value if group_by_tags=no' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1": the parameter "formulaid" is missing.'
-			],
-			'Window filter conditions formulaid must be string for evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'formulaid' => 123,
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/formulaid": a character string is expected.'
-			],
-			'Window filter conditions formulaid must be non-empty for evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'formulaid' => '',
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/formulaid": cannot be empty.'
-			],
-			'Window filter conditions formulaid must be identifier for evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'formulaid' => 'a',
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/formulaid": uppercase identifier expected.'
-			],
-			'Window filter conditions formulaid must match identifier for evaltype=CONDITION_EVAL_TYPE_EXPRESSION' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'formulaid' => 'B',
-								'past_tag' => 'abc',
-								'tag_value' => 'abc'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/formula": missing filter condition "A".'
-			],
-			'Window filter conditions type must be integer' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-							'formula' => 'A',
-							'conditions' => [
-								'formulaid' => 'A',
-								'type' => 'abc'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/type": an integer is expected.'
-			],
-			'Window filter conditions type must be in range' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => -1
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/type": value must be one of '.implode(', ', [
-					CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-					CCepRuleHelper::WINDOW_CONDITION_OLD_TAG,
-					CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE
-				]).'.'
-			],
-			'Window filter conditions requires past_tag' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1": the parameter "past_tag" is missing.'
-			],
-			'Window filter conditions past_tag must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 123
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/past_tag": a character string is expected.'
-			],
-			'Window filter conditions past_tag cannot be empty' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => ''
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/past_tag": cannot be empty.'
-			],
-			'Window filter conditions operator must be integer' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 'abc',
-								'operator' => 'abc'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/operator": an integer is expected.'
-			],
-			'Window filter conditions operator range for WINDOW_CONDITION_TAG_PAIR' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 'abc',
-								'operator' => -1
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/operator": value must be '.
-					implode(', ', [CONDITION_OPERATOR_EQUAL]).'.'
-			],
-			'Window filter conditions operator range for WINDOW_CONDITION_OLD_TAG' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG,
-								'past_tag' => 'abc',
-								'operator' => -1
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/operator": value must be '.
-					implode(', ', [CONDITION_OPERATOR_EQUAL]).'.'
-			],
-			'Window filter conditions operator range for WINDOW_CONDITION_OLD_TAG_VALUE' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'past_tag' => 'abc',
-								'operator' => -1
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/operator": value must be one of '.
-					implode(', ', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]).'.'
-			],
-			'Window filter conditions tag required for WINDOW_CONDITION_TAG_PAIR' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 'abc'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1": the parameter "tag" is missing.'
-			],
-			'Window filter conditions tag must be string for WINDOW_CONDITION_TAG_PAIR' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 'abc',
-								'tag' => 123
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/tag": a character string is expected.'
-			],
-			'Window filter conditions tag can be empty for WINDOW_CONDITION_TAG_PAIR' => [
-				'request' => [
-					'name' => 'ceprule.window.filter.conditions.tag.empty',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
-								'past_tag' => 'abc',
-								'tag' => ''
-							]
-						]
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
+						'tags' => []
 					]
 				],
 				'expected_error' => null
-			],
-			'Window filter conditions tag_value required for WINDOW_CONDITION_OLD_TAG_VALUE' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'past_tag' => 'abc'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1": the parameter "tag_value" is missing.'
-			],
-			'Window filter conditions tag_value must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'past_tag' => 'abc',
-								'tag_value' => 123
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/window/filter/conditions/1/tag_value": a character string is expected.'
-			],
-			'Window filter conditions tag_value can be empty' => [
-				'request' => [
-					'name' => 'ceprule.filter.conditions.tag_value.empty',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'past_tag' => 'abc',
-								'tag_value' => ''
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			'Window filter conditions event_name cannot be empty with CONDITION_OPERATOR_LIKE' => [
-				'request' => [
-					'name' => 'ceprule.filter.conditions.like',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => [
-						'duration' => '1h'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'operator' => CONDITION_OPERATOR_LIKE,
-							'event_name' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/event_name": cannot be empty.'
-			],
-			'Window filter conditions event_name cannot be empty with CONDITION_OPERATOR_NOT_LIKE' => [
-				'request' => [
-					'name' => 'ceprule.filter.conditions.like',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => [
-						'duration' => '1h'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
-							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-							'event_name' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/event_name": cannot be empty.'
-			],
-			'Window filter conditions tag cannot be empty with CONDITION_OPERATOR_LIKE' => [
-				'request' => [
-					'name' => 'ceprule.filter.conditions.like',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => [
-						'duration' => '1h'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG,
-							'operator' => CONDITION_OPERATOR_LIKE,
-							'tag' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": cannot be empty.'
-			],
-			'Window filter conditions tag cannot be empty with CONDITION_OPERATOR_NOT_LIKE' => [
-				'request' => [
-					'name' => 'ceprule.filter.conditions.like',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => [
-						'duration' => '1h'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG,
-							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-							'tag' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": cannot be empty.'
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider cepRuleCreateValidationData
+	 * @dataProvider dataProviderCreateOperationFilter
 	 */
 	public function testCepRule_CreateValidation(array $request, ?string $expected_error = null) {
 		$result = $this->call('ceprule.create', $request, $expected_error);
@@ -3080,7 +2802,229 @@ class testCepRule extends CAPITest {
 		}
 	}
 
-	public function cepRuleUpdateValidation(): array {
+	public static function dataProviderUpdateOperationFilter() {
+		yield 'Operation filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "formula" is missing.'
+		];
+
+		yield 'Operation filter formula must contain identifier' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'abc'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": incorrect syntax near "abc".'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_AND_OR' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions cannot define non existing formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'A'
+								],
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield 'Operation filter cannot reference non existing condition for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": missing filter condition "A".'
+		];
+
+		yield 'Operation filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1": the parameter "formulaid" is missing.'
+		];
+
+		yield 'Operation filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								'formulaid' => 123
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": a character string is expected.'
+		];
+
+		yield 'Operation filter conditions formulaid cannot be empty' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => ''
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": cannot be empty.'
+		];
+
+		yield 'Operation filter conditions formulaid must be uppercase' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => 'b'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": uppercase identifier expected.'
+		];
+	}
+
+	public static function cepRuleUpdateValidation(): array {
 		return [
 			'Ruleid(s) required' => [
 				'request' => [],
@@ -3123,7 +3067,10 @@ class testCepRule extends CAPITest {
 			'Can reset filter' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
-					'filter' => []
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => []
+					]
 				],
 				'expected_error' => null
 			],
@@ -3152,13 +3099,6 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Window required on window type switch' => [
-				'request' => [
-					'cep_ruleid' => ':ceprule:update.fail',
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE
-				],
-				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
-			],
 			'Unexpected fields in window are rejected' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
@@ -3169,61 +3109,31 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM' => [
+			'Cannot change window_type from WINDOW_SIMPLE to WINDOW_NONE when operations[].execute_when is not supported' => [
 				'request' => [
-					'cep_ruleid' => ':ceprule:update.fail',
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => []
+					'cep_ruleid' => ':ceprule:window_type=simple',
+					'window_type' => CCepRuleHelper::WINDOW_NONE
 				],
-				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled.'
+				'Invalid parameter "/1/operations/1/execute_when": value must be 0.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
+			'Cannot change window_type from WINDOW_PATTERN_MATCH to WINDOW_NONE when operations[].execute_when is not supported' => [
 				'request' => [
-					'cep_ruleid' => ':ceprule:update.success',
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_YES
-					]
+					'cep_ruleid' => ':ceprule:window_type=pattern_match',
+					'window_type' => CCepRuleHelper::WINDOW_NONE
 				],
-				'expected_error' => null
+				'Invalid parameter "/1/operations/1/execute_when": value must be 0.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_host' => [
-				'request' => [
-					'cep_ruleid' => ':ceprule:update.success',
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_host' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags requires tag' => [
+			'Switch to group_by_tags requires tags' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": cannot be empty.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags' => [
-				'request' => [
-					'cep_ruleid' => ':ceprule:update.success',
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => 'abc'
-					]
-				],
-				'expected_error' => null
-			],
-			'Can switch to WINDOW_TAG_MATCH' => [
+			'Script is required for WINDOW_TAG_MATCH' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'name' => 'pattern',
@@ -3232,9 +3142,21 @@ class testCepRule extends CAPITest {
 						'duration' => '1h'
 					]
 				],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1/window/script": cannot be empty.'
 			],
-			'Cannot pass non-empty window for switch to WINDOW_NONE' => [
+			'Can switch to WINDOW_TAG_MATCH' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'name' => 'pattern',
+					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
+					'window' => [
+						'duration' => '1h',
+						'script' => 'return false;'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations": at least one operation must execute when pattern matched.'
+			],
+			'Cannot pass non database default duration for switch to WINDOW_NONE' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'name' => 'pattern',
@@ -3243,28 +3165,7 @@ class testCepRule extends CAPITest {
 						'duration' => '1h'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": should be empty.'
-			],
-
-			'Can provide filter for switch to WINDOW_TAG_MATCH' => [
-				'request' => [
-					'cep_ruleid' => ':ceprule:update.success',
-					'name' => 'pattern',
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-					'window' => [
-						'duration' => '1h',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
-								'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-								'past_tag' => 'abc',
-								'tag_value' => ''
-							]
-						]
-					]
-				],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1/window/duration": value must be "10m".'
 			],
 			'Can reset window' => [
 				'request' => [
@@ -3277,7 +3178,9 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'operations' => [
-						'unexpected' => 'unexpected'
+						[
+							'sortorder' => 1
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
@@ -3286,8 +3189,11 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'unexpected' => 'unexpected'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'unexpected' => 'unexpected'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": unexpected parameter "unexpected".'
@@ -3296,10 +3202,12 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'update.operation'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'update.operation'
+						]
 					]
 				],
 				'expected_error' => null
@@ -3356,6 +3264,7 @@ class testCepRule extends CAPITest {
 
 	/**
 	 * @dataProvider cepRuleUpdateValidation
+	 * @dataProvider dataProviderUpdateOperationFilter
 	 */
 	public function testCepRule_UpdateValidation(array $request, ?string $expected_error = null) {
 		if (!is_numeric(key($request))) {

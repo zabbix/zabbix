@@ -103,11 +103,24 @@ static int	get_cep_stats(AGENT_RESULT *result)
 	zbx_json_adduint64(&json, "processed", stats.events_processed);
 	zbx_json_adduint64(&json, "discarded", stats.events_discarded);
 	zbx_json_close(&json);
+
 	zbx_json_addobject(&json, "tasks");
 	zbx_json_addint64(&json, "remote", stats.task_remote_num);
 	zbx_json_addint64(&json, "internal", stats.task_internal_num);
 	zbx_json_addint64(&json, "completed", stats.task_completed_num);
-	zbx_json_addint64(&json, "cached_events", stats.events_num);
+	zbx_json_close(&json);
+
+	zbx_json_addobject(&json, "cache");
+	zbx_json_addint64(&json, "events", stats.events_num);
+	zbx_json_addint64(&json, "objects", stats.objects_num);
+	zbx_json_close(&json);
+
+	zbx_json_addobject(&json, "windows");
+	zbx_json_addint64(&json, "total", stats.windows_num);
+	zbx_json_addint64(&json, "scheduled", stats.window_alarms_num);
+	zbx_json_addint64(&json, "polled", stats.window_ticks_num);
+	zbx_json_close(&json);
+
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
 
@@ -151,7 +164,7 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		SET_UI64_RESULT(result, zbx_dc_get_trigger_count());
 	}
-	if (0 == strcmp(param1, "cep"))			/* zabbix["triggers"] */
+	else if (0 == strcmp(param1, "cep"))			/* zabbix["triggers"] */
 	{
 		if (1 != nparams)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));

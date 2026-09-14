@@ -51,10 +51,11 @@ static void	DCdump_config(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  %s", config->config->severity_name[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "housekeeping:");
-	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%d period:[trigger:%d internal:%d autoreg:%d discovery:%d]",
+	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%d period:[trigger:%d internal:%d autoreg:%d"
+			" discovery:%d service:%d]",
 			config->config->hk.events_mode, config->config->hk.events_trigger,
 			config->config->hk.events_internal, config->config->hk.events_autoreg,
-			config->config->hk.events_discovery);
+			config->config->hk.events_discovery, config->config->hk.events_service);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  audit, mode:%d period:%d", config->config->hk.audit_mode,
 			config->config->hk.audit);
@@ -80,6 +81,7 @@ static void	DCdump_config(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_enabled: %d", config->config->auditlog_enabled);
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_mode: %d", config->config->auditlog_mode);
+	zabbix_log(LOG_LEVEL_TRACE, "  enable_mobile_devices: %d", config->config->enable_mobile_devices);
 
 	zabbix_log(LOG_LEVEL_TRACE, "item timeouts:");
 	zabbix_log(LOG_LEVEL_TRACE, "  agent:%s", config->config->item_timeouts.agent);
@@ -157,12 +159,20 @@ static void	DCdump_hosts(void)
 
 		zabbix_log(LOG_LEVEL_TRACE, "  items:");
 
-		zbx_hashset_iter_t	item_iter;
-		ZBX_DC_ITEM_REF		*ref;
+		ZBX_DC_ITEM_REF	*ref;
 
-		zbx_hashset_iter_reset(&host->items, &item_iter);
-		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&item_iter)))
+		zbx_hashset_iter_reset(&host->items, &iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, ref->item->itemid);
+
+
+		zabbix_log(LOG_LEVEL_TRACE, "  groupids:");
+
+		zbx_uint64_t	*groupid;
+
+		zbx_hashset_iter_reset(&host->groupids, &iter);
+		while (NULL != (groupid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+			zabbix_log(LOG_LEVEL_TRACE, "    groupid:" ZBX_FS_UI64, *groupid);
 	}
 
 	zbx_vector_ptr_destroy(&index);

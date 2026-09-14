@@ -293,6 +293,13 @@ Additional information about the metrics and used API methods:
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable backup vaults by region.</p>|`.*`|
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by region.</p>|`CHANGE_IF_NEEDED`|
 
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get EC2 instances|<p>Get EC2 instances.</p>|Script|aws.ec2.get|
+|EC2 instances count|<p>Get the total count of EC2 instances.</p>|Dependent item|aws.ec2.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+
 ### LLD rule S3 buckets discovery
 
 |Name|Description|Type|Key and additional info|
@@ -303,7 +310,7 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|EC2 instances discovery|<p>Get EC2 instances.</p>|Script|aws.ec2.discovery|
+|EC2 instances discovery|<p>Discover EC2 instances.</p>|Dependent item|aws.ec2.discovery|
 
 ### LLD rule RDS instances discovery
 
@@ -3014,7 +3021,7 @@ Also, see the Macros section for a list of macros used in LLD filters.
 
 Additional information about metrics and used API methods:
 
-* [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
+* [Describe AWS Cost Explorer API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
 
 
 ### Macros used
@@ -3026,43 +3033,231 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.BUDGET.MONTH}|<p>Threshold for AWS monthly budget limit.</p>|`10000`|
+|{$AWS.BILLING.MONTH.HIGH}|<p>Threshold for high AWS monthly billing.</p>|`15000`|
+|{$AWS.BILLING.MONTH.WARN}|<p>Warning threshold for AWS monthly billing.</p>|`10000`|
+|{$AWS.SERVICE.COST.TOP.HIGH}|<p>Threshold for high AWS top service cost.</p>|`400`|
+|{$AWS.SERVICE.COST.TOP.WARN}|<p>Warning threshold for AWS top service cost.</p>|`200`|
+|{$AWS.ACCOUNT.COST.DAILY.HIGH}|<p>Threshold for high AWS account daily cost.</p>|`400`|
+|{$AWS.ACCOUNT.COST.DAILY.WARN}|<p>Warning threshold for AWS account daily cost.</p>|`200`|
+|{$AWS.REGION.COST.DAILY.HIGH}|<p>Threshold for high AWS region daily cost.</p>|`400`|
+|{$AWS.REGION.COST.DAILY.WARN}|<p>Warning threshold for AWS region daily cost.</p>|`200`|
+|{$AWS.SERVICE.COST.DAILY.HIGH}|<p>Threshold for high AWS service daily cost.</p>|`400`|
+|{$AWS.SERVICE.COST.DAILY.WARN}|<p>Warning threshold for AWS service daily cost.</p>|`200`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
-|{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
-|{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
+|{$AWS.BILLING.MONTH}|<p>Number of months of historical cost data to get from AWS Cost Explorer API (maximum 12 months).</p>|`11`|
+|{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter to include discoverable billing services by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get yearly service cost data|<p>Collects AWS service yearly data.</p>|Dependent item|aws.yearly.service.data.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get daily service cost data|<p>Collects AWS service daily data.</p>|Dependent item|aws.daily.service.data.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="SERVICE")].data.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region and account yearly costs|<p>Get region and account yearly costs.</p>|Dependent item|aws.region.account.yearly.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region yearly costs|<p>Collects yearly region costs.</p>|Dependent item|aws.region.yearly.costs.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get account monthly costs|<p>Collects monthly account costs.</p>|Dependent item|aws.account.monthly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li></ul>|
+|AWS monthly budget delta|<p>Calculates AWS current monthly budget delta compared to previous month.</p>|Calculated|aws.monthly.budget.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS monthly delta, in percent|<p>Calculates AWS current monthly delta, in percent, compared to previous month.</p>|Calculated|aws.monthly.delta.percent<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS monthly delta|<p>Calculates AWS current monthly delta compared to previous month.</p>|Calculated|aws.monthly.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get current month|<p>Collects AWS current month data.</p>|Dependent item|aws.current.month.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.monthly_comparison`</p></li></ul>|
+|Get region and account daily costs|<p>Collects region and account daily cost data.</p>|Dependent item|aws.region.account.daily.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type == "REGION_ACCOUNT")].data[0].Groups`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get region daily costs|<p>Collects AWS daily cost by region (BlendedCost).</p>|Dependent item|aws.region.daily.costs.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get account total daily cost|<p>Collects total daily AWS cost per linked account (BlendedCost).</p>|Dependent item|aws.account.total.daily.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get monthly costs|<p>Get raw data on the monthly costs by service.</p>|Script|aws.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get daily costs|<p>Get raw data on the daily costs by service.</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS cost total|<p>Total cost across all AWS billing months.</p>|Calculated|aws.cost.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get AWS month total cost|<p>Collects AWS billing data with monthly comparison and quarterly cost aggregation.</p>|Dependent item|aws.month.total.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Q1 cost|<p>First quarter total cost.</p>|Dependent item|aws.first.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q1`</p></li></ul>|
+|AWS Q2 cost|<p>Second quarter total cost.</p>|Dependent item|aws.second.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q2`</p></li></ul>|
+|AWS Q3 cost|<p>Third quarter total cost.</p>|Dependent item|aws.third.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q3`</p></li></ul>|
+|AWS Q4 cost|<p>Fourth quarter total cost.</p>|Dependent item|aws.fourth.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q4`</p></li></ul>|
+|AWS Q1 delta|<p>Difference in cost between `Q2` and `Q1`.</p>|Calculated|aws.q1.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS Q2 delta|<p>Difference in cost between `Q3` and `Q2`.</p>|Calculated|aws.q2.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS Q3 delta|<p>Difference in cost between `Q4` and `Q3`.</p>|Calculated|aws.q3.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS quarterly trend cost|<p>Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.</p>|Calculated|aws.quarterly.trend.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get AWS monthly service type|<p>Collects monthly AWS service data and groups services into predefined categories:</p><p>  compute - compute and server execution services for running applications and workloads</p><p>  storage - data storage and backup services</p><p>  networking - networking, traffic routing, and content delivery services</p><p>  security - security, identity, encryption, and compliance services</p><p>  containers - container orchestration and registry services</p><p>  database - managed database and caching services</p><p>  analytics - data processing, analytics, and search services</p><p>  integration - messaging, event-driven, and workflow integration services</p><p>  business - business communication and productivity services</p><p>  ml_ai - machine learning and artificial intelligence services</p><p>  developer_tools - CI/CD, development, and monitoring tools for developers</p><p>  management - monitoring, governance, and infrastructure management services</p><p>  migration - data migration and transfer services</p><p>  media - media processing, streaming, and delivery services</p><p>  iot - Internet of Things device and data services</p><p>  frontend - application frontend, mobile, and API interface services</p><p>  financial - billing, cost management, and financial optimization services</p>|Dependent item|aws.monthly.service.type.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.category_totals`</p></li></ul>|
+|Get AWS daily service type|<p>Collects daily AWS service data and groups services into predefined categories:</p><p>  compute - compute and server execution services for running applications and workloads</p><p>  storage - data storage and backup services</p><p>  networking - networking, traffic routing, and content delivery services</p><p>  security - security, identity, encryption, and compliance services</p><p>  containers - container orchestration and registry services</p><p>  database - managed database and caching services</p><p>  analytics - data processing, analytics, and search services</p><p>  integration - messaging, event-driven, and workflow integration services</p><p>  business - business communication and productivity services</p><p>  ml_ai - machine learning and artificial intelligence services</p><p>  developer_tools - CI/CD, development, and monitoring tools for developers</p><p>  management - monitoring, governance, and infrastructure management services</p><p>  migration - data migration and transfer services</p><p>  media - media processing, streaming, and delivery services</p><p>  iot - Internet of Things device and data services</p><p>  frontend - application frontend, mobile, and API interface services</p><p>  financial - billing, cost management, and financial optimization services</p>|Dependent item|aws.daily.service.type.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.categories`</p></li></ul>|
+|AWS daily service count|<p>Total AWS service daily count.</p>|Dependent item|aws.daily.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_service_count`</p></li></ul>|
+|Get services yearly stats|<p>Collects total yearly cost for AWS services.</p>|Dependent item|aws.services.yearly.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_totals`</p></li></ul>|
+|Get top daily service|<p>Collects AWS daily top cost services (BlendedCost).</p>|Dependent item|aws.top.daily.service.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.top_services`</p></li></ul>|
+|AWS monthly average cost|<p>AWS service monthly average cost.</p>|Calculated|aws.monthly.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS daily average cost|<p>AWS service daily average cost.</p>|Calculated|aws.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS daily total service cost|<p>AWS daily service total cost.</p>|Calculated|aws.daily.service.total.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### LLD rule AWS daily costs by services discovery
+### LLD rule AWS service type yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS daily costs by services discovery|<p>Discovery of daily blended costs by services.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
+|AWS service type yearly cost discovery|<p>Discovers AWS service type total yearly value.</p>|Dependent item|aws.service.type.yearly.cost.discovery|
 
-### Item prototypes for AWS daily costs by services discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost|<p>The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-
-### LLD rule AWS monthly costs by services discovery
+### Item prototypes for AWS service type yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS monthly costs by services discovery|<p>Discovery of monthly costs by services.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Get yearly data|<p>Collects yearly preprocessed data for AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.yearly.processed.get["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.TYPE}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Yearly cost|<p>Collects yearly total cost for AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.yearly.total.cost["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Yearly count|<p>Collects yearly total count for AWS `{#AWS.SERVICE.TYPE}` service.</p>|Dependent item|aws.service.type.yearly.total.count["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
 
-### Item prototypes for AWS monthly costs by services discovery
+### LLD rule AWS account yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost|<p>The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.</p>|Dependent item|aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS account yearly cost discovery|<p>Discovers AWS account total yearly value.</p>|Dependent item|aws.account.yearly.cost.discovery|
+
+### Item prototypes for AWS account yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Account [{#AWS.LINKED.ACCOUNT}]: Get yearly data|<p>Collects yearly preprocessed data for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.yearly.processed.get["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.account_id=="{#AWS.LINKED.ACCOUNT}")].first()`</p></li></ul>|
+|Account [{#AWS.LINKED.ACCOUNT}]: Total yearly cost|<p>Collects yearly total cost for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.yearly.total.cost["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+
+### LLD rule AWS region yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS region yearly cost discovery|<p>Discovers AWS region total yearly value.</p>|Dependent item|aws.region.yearly.cost.discovery|
+
+### Item prototypes for AWS region yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region [{#AWS.REGION}]: Get yearly data|<p>Collects yearly preprocessed data for `{#AWS.REGION}` AWS region.</p>|Dependent item|aws.region.yearly.processed.get["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AWS.REGION}")].first()`</p></li></ul>|
+|Region [{#AWS.REGION}]: Total yearly cost|<p>Collects yearly total cost for `{#AWS.REGION}` AWS region.</p>|Dependent item|aws.region.yearly.cost["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule AWS month comparison discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS month comparison discovery|<p>Discovers current month data and previous month data.</p>|Dependent item|aws.month.comparison.discovery|
+
+### Item prototypes for AWS month comparison discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#AWS.MONTH}]: Type [{#AWS.MONTH.TYPE}]: Get data|<p>Collects the latest data of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.</p>|Dependent item|aws.month.comparison.current.get["{#AWS.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="{#AWS.MONTH.TYPE}")].first()`</p></li></ul>|
+|Month [{#AWS.MONTH}]: Type [{#AWS.MONTH.TYPE}]: Total cost|<p>Collects total cost of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.</p>|Dependent item|aws.month.comparison.current.cost["{#AWS.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.amount`</p></li></ul>|
+
+### LLD rule AWS daily service type discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS daily service type discovery|<p>Discovers total amount of each AWS service type.</p>|Dependent item|aws.daily.service.type.discovery|
+
+### Item prototypes for AWS daily service type discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service [{#AWS.SERVICE.TYPE}]: Get daily data|<p>Collects data of AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.preprocessed.daily.get["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.TYPE}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Daily count|<p>Collects AWS `{#AWS.SERVICE.TYPE}` service type total count.</p>|Dependent item|aws.service.type.count["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
+
+### LLD rule AWS top service daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS top service daily cost discovery|<p>Discovers top daily services and billing data.</p>|Dependent item|aws.top.service.daily.cost.discovery|
+
+### Item prototypes for AWS top service daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Top service [{#AWS.SERVICE.NAME}]: Get data|<p>Collects top daily data for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.preprocessed.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.NAME}")].first()`</p></li></ul>|
+|Top service [{#AWS.SERVICE.NAME}]: cost|<p>Collects top daily cost for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
+|Top service [{#AWS.SERVICE.NAME}]: cost, in percent|<p>Collects top daily percent for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.cost.percent["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.percent`</p></li></ul>|
+
+### Trigger prototypes for AWS top service daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS top daily service cost warning|<p>AWS `{#AWS.SERVICE.NAME}` top service cost is above warning threshold `{$AWS.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.TOP.WARN}`|Warning|**Depends on**:<br><ul><li>AWS top daily service cost high</li></ul>|
+|AWS top daily service cost high|<p>AWS `{#AWS.SERVICE.NAME}` top service cost has exceeded high threshold `{$AWS.SERVICE.COST.TOP.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.TOP.HIGH}`|High||
+
+### LLD rule AWS account daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS account daily cost discovery|<p>Discovers AWS account total daily cost and affected regions.</p>|Dependent item|aws.account.daily.cost.discovery|
+
+### Item prototypes for AWS account daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Account [{#AWS.LINKED.ACCOUNT}]: Get daily data|<p>Collects daily preprocessed data for `{#AWS.LINKED.ACCOUNT}` AWS accounts.</p>|Dependent item|aws.account.daily.cost.processed.get["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.linked_account=="{#AWS.LINKED.ACCOUNT}")].first()`</p></li></ul>|
+|Account [{#AWS.LINKED.ACCOUNT}]: Total daily cost|<p>Collects total daily cost for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total`</p></li></ul>|
+
+### Trigger prototypes for AWS account daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS account daily cost warning|<p>AWS `{#AWS.LINKED.ACCOUNT}` account daily cost is above warning threshold `{$AWS.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]) >= {$AWS.ACCOUNT.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS account daily cost high</li></ul>|
+|AWS account daily cost high|<p>AWS `{#AWS.LINKED.ACCOUNT}` account daily cost has exceeded high threshold `{$AWS.ACCOUNT.COST.DAILY.HIGH}`. Immediate investigation of account spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]) >= {$AWS.ACCOUNT.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS region daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS region daily cost discovery|<p>Discovers AWS daily region cost data.</p>|Dependent item|aws.region.daily.cost.discovery|
+
+### Item prototypes for AWS region daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region [{#AWS.REGION}]: Get daily data|<p>Collects AWS service daily cost from `{#AWS.REGION}` region.</p>|Dependent item|aws.region.daily.cost.processed.get["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AWS.REGION}")].first()`</p></li></ul>|
+|Region [{#AWS.REGION}]: Total daily cost|<p>Collects `{#AWS.REGION}` region daily cost.</p>|Dependent item|aws.region.daily.cost["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for AWS region daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS region daily cost warning|<p>AWS `{#AWS.REGION}` region daily cost is above warning threshold `{$AWS.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.region.daily.cost["{#AWS.REGION}"]) >= {$AWS.REGION.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS region daily cost high</li></ul>|
+|AWS region daily cost high|<p>AWS `{#AWS.REGION}` region daily cost has exceeded high threshold `{$AWS.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.region.daily.cost["{#AWS.REGION}"]) >= {$AWS.REGION.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS service yearly discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service yearly discovery|<p>Discovers AWS service yearly data.</p>|Dependent item|aws.service.yearly.discovery|
+
+### Item prototypes for AWS service yearly discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service [{#AWS.SERVICE.NAME}]: Get yearly data|<p>Collects AWS yearly data for AWS `{#AWS.SERVICE.NAME}` service.</p>|Dependent item|aws.service.yearly.preprocessed.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.NAME}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.NAME}]: Total yearly cost|<p>Collects AWS `{#AWS.SERVICE.NAME}` service yearly cost.</p>|Dependent item|aws.service.yearly.category.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+
+### LLD rule AWS daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS daily costs by service discovery|<p>Discovery of daily blended costs by service.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
+
+### Item prototypes for AWS daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost|<p>The daily blended cost of the `{#AWS.BILLING.SERVICE.NAME}` service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Trigger prototypes for AWS daily costs by service discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS service daily cost warning|<p>AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost is above warning threshold `{$AWS.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS service daily cost high</li></ul>|
+|AWS service daily cost high|<p>AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost has exceeded high threshold `{$AWS.SERVICE.COST.DAILY.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS monthly costs by service discovery|<p>Discovery of monthly costs by service.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p></li></ul>|
+
+### Item prototypes for AWS monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost|<p>The monthly cost by service `{#AWS.BILLING.SERVICE.NAME}`.</p>|Dependent item|aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule AWS monthly costs discovery
 
@@ -3074,7 +3269,16 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#AWS.BILLING.MONTH}]: Blended cost per month|<p>The blended cost by month {#AWS.BILLING.MONTH}.</p>|Dependent item|aws.monthly.cost["{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#AWS.BILLING.MONTH}]: Blended cost per month|<p>The blended cost by month `{#AWS.BILLING.MONTH}`.</p>|Dependent item|aws.monthly.cost["{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Trigger prototypes for AWS monthly costs discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS monthly billing warning|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost is above warning threshold `{$AWS.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BILLING.MONTH.WARN}`|Warning|**Depends on**:<br><ul><li>AWS monthly billing high</li></ul>|
+|AWS monthly billing high|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has exceeded high threshold `{$AWS.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BILLING.MONTH.HIGH}`|High||
+|AWS monthly billing budget warning 80%|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached 80% of the defined budget `{$AWS.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BUDGET.MONTH}*0.8`|Warning|**Depends on**:<br><ul><li>AWS monthly billing budget exceeded 100%</li></ul>|
+|AWS monthly billing budget exceeded 100%|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached or exceeded the full budget `{$AWS.BUDGET.MONTH}`. Immediate cost control actions are recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BUDGET.MONTH}`|High||
 
 ## Feedback
 

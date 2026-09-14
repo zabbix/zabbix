@@ -34,7 +34,7 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
 					"escalations", "autoreg_host", "event_suppress", "trigger_queue",
 					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy",
-					"lld_macro_export"
+					"lld_macro_export", "cep_window"
 };
 
 #define ZBX_IDS_SIZE	ARRSIZE(idcache_tables)
@@ -353,7 +353,7 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num)
 	if (0 != idcache->lastids[index])
 	{
 		nextid = idcache->lastids[index] + 1;
-		idcache->lastids[index] += num;
+		idcache->lastids[index] += (zbx_uint64_t)num;
 	}
 
 	zbx_mutex_unlock(idcache_mutex);
@@ -1305,9 +1305,9 @@ out:
  *                                                                            *
  * Purpose: locks a records in a table by field name using index hint         *
  *                                                                            *
- * Parameters: db        - [IN] database connection                           *
- *             table      - [IN] the target table                             *
- *             field_name - [IN] field name                                   *
+ * Parameters: db         - [IN] database connection                          *
+ *             table      - [IN] target table name                            *
+ *             field_name - [IN]                                              *
  *             index_hint - [IN] index hint for MYSQL, "" if not used         *
  *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
  *                                   OUT - resulting array of locked IDs      *

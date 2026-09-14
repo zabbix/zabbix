@@ -12,9 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxalgo.h"
-#include "zbxmw.h"
 #include "mw_queue.h"
+#include "zbxmw.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -33,7 +33,6 @@ int	mw_queue_init(zbx_mw_queue_t *queue, char **error)
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue mutex: %s", zbx_strerror(err));
-		zbx_free(queue);
 
 		return FAIL;
 	}
@@ -43,7 +42,6 @@ int	mw_queue_init(zbx_mw_queue_t *queue, char **error)
 		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue conditional variable: %s",
 			zbx_strerror(err));
 		pthread_mutex_destroy(&queue->lock);
-		zbx_free(queue);
 
 		return FAIL;
 	}
@@ -93,7 +91,7 @@ void	mw_queue_clear(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: notify one worker waiting on the queue                            *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_queue_notify(zbx_mw_queue_t *queue)
@@ -110,7 +108,7 @@ void	zbx_mw_queue_notify(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: notify all workers waiting on the queue                           *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_queue_notify_all(zbx_mw_queue_t *queue)
@@ -127,7 +125,7 @@ void	zbx_mw_queue_notify_all(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: wait for queue notification                                       *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
@@ -152,7 +150,7 @@ int	zbx_mw_queue_wait(zbx_mw_queue_t *queue, char **error)
  *                                                                            *
  * Purpose: push task to priority queue                                       *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             task  - [IN] task to push                                      *
  *                                                                            *
  ******************************************************************************/
@@ -167,13 +165,13 @@ void	zbx_mw_queue_push_priority(zbx_mw_queue_t *queue, zbx_mw_task_t *task)
  *                                                                            *
  * Purpose: push task to normal queue                                         *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             task  - [IN] task to push                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *tasks)
+void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *task)
 {
-	zbx_queue_ptr_push(&queue->normal, tasks);
+	zbx_queue_ptr_push(&queue->normal, task);
 	queue->pending_num++;
 	zbx_mw_queue_notify(queue);
 }
@@ -202,7 +200,7 @@ void	zbx_mw_queue_unlock(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: pop next task from queue                                          *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *                                                                            *
  * Return value: next task, or NULL if queue is empty                         *
  *                                                                            *
@@ -230,7 +228,7 @@ zbx_mw_task_t	*zbx_mw_queue_pop(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: push completed task to completed queue                            *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             task  - [IN] completed task                                    *
  *                                                                            *
  * Comments: Must be called with the queue lock held.                         *
@@ -246,7 +244,7 @@ void	zbx_mw_queue_push_completed(zbx_mw_queue_t *queue, zbx_mw_task_t *task)
  *                                                                            *
  * Purpose: push completed task to completed queue without updating counters  *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             task  - [IN] completed task                                    *
  *                                                                            *
  * Comments: Must be called with the queue lock held.                         *
@@ -263,7 +261,7 @@ void	zbx_mw_queue_push_completed_direct(zbx_mw_queue_t *queue, zbx_mw_task_t *ta
  *                                                                            *
  * Purpose: pop next task from completed queue                                *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *                                                                            *
  * Return value: next completed task, or NULL if queue is empty               *
  *                                                                            *
@@ -279,7 +277,7 @@ zbx_mw_task_t	*zbx_mw_queue_pop_completed(zbx_mw_queue_t *queue)
  *                                                                            *
  * Purpose: move all completed tasks to vector                                *
  *                                                                            *
- * Parameters: queue - [IN/OUT] queue                                         *
+ * Parameters: queue - [IN/OUT]                                               *
  *             tasks - [OUT] vector to append completed tasks to              *
  *                                                                            *
  * Return value: number of pending tasks                                      *

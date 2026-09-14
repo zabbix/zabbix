@@ -15,13 +15,17 @@
 
 
 require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
-require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareTestData
  * @onAfter  cleanTestData
  */
 class testAuditlogProxy extends testAuditlogCommon {
+
+	/**
+	 * Resource type Proxy
+	 */
+	const RESOURCE_TYPE = 26;
 
 	public static function prepareTestData(): void {
 		CTestDataHelper::createObjects([
@@ -77,7 +81,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.proxyid' => ['add', $proxyid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $expected_details, $proxyid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $expected_details, $proxyid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogProxy_Update() {
@@ -124,7 +128,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 
 		$this->call('proxy.update', $request);
 
-		$this->getAuditDetails('details', $this->update_actionid, $expected_details, $proxyid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $expected_details, $proxyid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -136,6 +140,6 @@ class testAuditlogProxy extends testAuditlogCommon {
 		$this->call('proxy.delete', [$proxyid]);
 		CTestDataHelper::unsetDeletedObjectIds([':proxy:proxy.for.create.audit']);
 
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'proxy.for.create.audit', $proxyid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'proxy.for.create.audit', $proxyid, self::RESOURCE_TYPE);
 	}
 }

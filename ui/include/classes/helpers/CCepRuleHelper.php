@@ -15,10 +15,11 @@
 
 
 class CCepRuleHelper {
-	public const WINDOW_NONE =0;
-	public const WINDOW_SIMPLE =1;
+
+	public const WINDOW_NONE = 0;
+	public const WINDOW_SIMPLE = 1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH =3;
+	public const WINDOW_TAG_MATCH = 3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
 	public const STATUS_ENABLED = 0;
@@ -31,38 +32,53 @@ class CCepRuleHelper {
 	public const CONDITION_TAG = ZBX_CONDITION_TYPE_EVENT_TAG;
 	public const CONDITION_TAG_VALUE = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
 	public const CONDITION_SEVERITY = ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
-	public const CONDITION_HOST = ZBX_CONDITION_TYPE_HOST;
-	public const CONDITION_HOST_GROUP = ZBX_CONDITION_TYPE_HOST_GROUP;
+	public const CONDITION_HOST_VISIBLE_NAME = ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME;
+	public const CONDITION_HOST_GROUP_NAME = ZBX_CONDITION_TYPE_HOST_GROUP_NAME;
 	public const CONDITION_TIME_PERIOD = ZBX_CONDITION_TYPE_TIME_PERIOD;
 
+	public const CONDITION_TYPES = [
+		ZBX_CONDITION_TYPE_EVENT_NAME,
+		ZBX_CONDITION_TYPE_EVENT_TAG,
+		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+		ZBX_CONDITION_TYPE_TRIGGER_SEVERITY,
+		ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME,
+		ZBX_CONDITION_TYPE_HOST_GROUP_NAME,
+		ZBX_CONDITION_TYPE_TIME_PERIOD
+	];
+
 	public const OP_SET_NAME = 1;
-	public const OP_CLOSE = 2;
+	public const OP_CLOSE_EVENT = 2;
 	public const OP_DISCARD = 3;
 	public const OP_SET_SEVERITY = 4;
 	public const OP_INCREASE_SEVERITY =  5;
 	public const OP_DECREASE_SEVERITY =  6;
 	public const OP_SUPPRESS = 7;
-	public const OP_COPY_FIRST = 8;
-	public const OP_COPY_LAST = 9;
-	public const OP_ADD_TAG = 10;
-	public const OP_SET_TAG = 11;
-	public const OP_SET_TAG_VALUE = 12;
-	public const OP_INCREASE_TAG_VALUE = 13;
-	public const OP_DECREASE_TAG_VALUE = 14;
-	public const OP_RENAME_TAG = 15;
-	public const OP_REMOVE_TAG = 16;
-	public const OP_CLOSE_WINDOW = 17;
-	public const OP_SET_CAUSE = 18;
+	public const OP_UNSUPPRESS = 8;
+	public const OP_CLONE_FIRST = 9;
+	public const OP_CLONE_LAST = 10;
+	public const OP_ADD_TAG = 11;
+	public const OP_SET_TAG = 12;
+	public const OP_SET_TAG_VALUE = 13;
+	public const OP_INCREASE_TAG_VALUE = 14;
+	public const OP_DECREASE_TAG_VALUE = 15;
+	public const OP_RENAME_TAG = 16;
+	public const OP_REMOVE_TAG = 17;
+	public const OP_CLOSE_WINDOW = 18;
+	public const OP_SET_CAUSE = 19;
 
 	public const WHEN_EVENT_OCCURRED = 0;
-	public const WHEN_EVENT_EVICTED = 1;
-	public const WHEN_WINDOW_CLOSED = 2;
-	public const WHEN_TAGS_CORRELATED = 3;
+	public const WHEN_EVENT_ADDED = 1;
+	public const WHEN_EVENT_EVICTED = 2;
+	public const WHEN_WINDOW_CLOSED = 3;
 	public const WHEN_PATTERN_MATCHED = 4;
 
-	public const WINDOW_CONDITION_TAG_PAIR = 0;
-	public const WINDOW_CONDITION_OLD_TAG = 1;
-	public const WINDOW_CONDITION_OLD_TAG_VALUE = 2;
+	public const EXECUTE_WHEN_ORDER = [
+		self::WHEN_EVENT_OCCURRED,
+		self::WHEN_EVENT_ADDED,
+		self::WHEN_EVENT_EVICTED,
+		self::WHEN_WINDOW_CLOSED,
+		self::WHEN_PATTERN_MATCHED
+	];
 
 	public const GROUP_BY_NO = 0;
 	public const GROUP_BY_YES = 1;
@@ -76,38 +92,120 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED
 		],
 		self::WINDOW_SIMPLE => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_CAUSE_SYMPTOM => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_TAG_MATCH => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_TAGS_CORRELATED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_PATTERN_MATCH => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_PATTERN_MATCHED,
-			self::WHEN_WINDOW_CLOSED
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_WINDOW_CLOSED,
+			self::WHEN_PATTERN_MATCHED
+		]
+	];
+
+	public const OPERATION_CONDITION_TYPES = [
+		ZBX_CONDITION_TYPE_EVENT_TAG,
+		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+		ZBX_CONDITION_TYPE_EVENT_OPEN,
+		ZBX_CONDITION_TYPE_EVENT_FIRST,
+		ZBX_CONDITION_TYPE_EVENT_LAST,
+		ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+		ZBX_CONDITION_TYPE_EVENT_COPIED,
+		ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+	];
+
+	public const OPERATION_CONDITION_TYPES_BY_EXECUTE_WHEN = [
+		self::WHEN_EVENT_OCCURRED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_EVENT_ADDED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_EVENT_EVICTED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_WINDOW_CLOSED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_PATTERN_MATCHED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 		]
 	];
 
 	public const OPERATION_TYPES_BY_EXECUTE_WHEN = [
 		self::WHEN_EVENT_OCCURRED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
+			self::OP_CLOSE_EVENT,
 			self::OP_DISCARD,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_ADD_TAG,
+			self::OP_SET_TAG,
+			self::OP_SET_TAG_VALUE,
+			self::OP_INCREASE_TAG_VALUE,
+			self::OP_DECREASE_TAG_VALUE,
+			self::OP_RENAME_TAG,
+			self::OP_REMOVE_TAG
+		],
+		self::WHEN_EVENT_ADDED => [
+			self::OP_SET_NAME,
+			self::OP_CLOSE_EVENT,
+			self::OP_SET_SEVERITY,
+			self::OP_INCREASE_SEVERITY,
+			self::OP_DECREASE_SEVERITY,
+			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -119,14 +217,14 @@ class CCepRuleHelper {
 		],
 		self::WHEN_EVENT_EVICTED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
-			self::OP_DISCARD,
+			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -138,12 +236,14 @@ class CCepRuleHelper {
 		],
 		self::WHEN_WINDOW_CLOSED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
-			self::OP_DISCARD,
+			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -152,13 +252,17 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
 		],
-		self::WHEN_TAGS_CORRELATED => [
+		self::WHEN_PATTERN_MATCHED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
+			self::OP_DISCARD,
+			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -167,21 +271,17 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG,
 			self::OP_CLOSE_WINDOW
-		],
-		self::WHEN_PATTERN_MATCHED => [
-			self::OP_DISCARD,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST
 		]
 	];
 
 	public static function getConditionLabels(): array {
 		return [
 			self::CONDITION_EVENT_NAME => _('Event name'),
-			self::CONDITION_TAG => _('Tag'),
+			self::CONDITION_TAG => _('Tag name'),
+			self::CONDITION_TAG_VALUE => _('Tag value'),
 			self::CONDITION_SEVERITY => _('Severity'),
-			self::CONDITION_HOST => _('Host'),
-			self::CONDITION_HOST_GROUP => _('Host group'),
+			self::CONDITION_HOST_VISIBLE_NAME => _('Host'),
+			self::CONDITION_HOST_GROUP_NAME => _('Host group'),
 			self::CONDITION_TIME_PERIOD => _('Time period')
 		];
 	}
@@ -196,16 +296,45 @@ class CCepRuleHelper {
 		return $labels[$type];
 	}
 
-	public static function getConditionTagOperators(): array {
+	public static function getOperationConditionLabels(): array {
 		return [
-			CONDITION_OPERATOR_EQUAL => _('Equals'),
-			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
-			CONDITION_OPERATOR_LIKE => _('Contains'),
-			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
-			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
-			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+			ZBX_CONDITION_TYPE_EVENT_TAG => _('Tag name'),
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value'),
+			ZBX_CONDITION_TYPE_EVENT_OPEN => _('Problem is opened'),
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM => _('Problem is symptom'),
+			ZBX_CONDITION_TYPE_EVENT_FIRST => _('First event in time window'),
+			ZBX_CONDITION_TYPE_EVENT_LAST => _('Last event in time window'),
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Problem is suppressed'),
+			ZBX_CONDITION_TYPE_EVENT_COPIED => _('Event is cloned')
+		];
+	}
+
+	public static function getOperationConditionDescriptions(): array {
+		return [
+			ZBX_CONDITION_TYPE_EVENT_OPEN => [
+				CONDITION_OPERATOR_YES => _('Problem is opened'),
+				CONDITION_OPERATOR_NO => _('Problem is not opened')
+			],
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM => [
+				CONDITION_OPERATOR_YES => _('Problem is symptom'),
+				CONDITION_OPERATOR_NO => _('Problem is not symptom')
+			],
+			ZBX_CONDITION_TYPE_EVENT_FIRST => [
+				CONDITION_OPERATOR_YES => _('First event in time window'),
+				CONDITION_OPERATOR_NO => _('Not first event in time window')
+			],
+			ZBX_CONDITION_TYPE_EVENT_LAST => [
+				CONDITION_OPERATOR_YES => _('Last event in time window'),
+				CONDITION_OPERATOR_NO => _('Not last event in time window')
+			],
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => [
+				CONDITION_OPERATOR_YES => _('Problem is suppressed'),
+				CONDITION_OPERATOR_NO => _('Problem is not suppressed')
+			],
+			ZBX_CONDITION_TYPE_EVENT_COPIED => [
+				CONDITION_OPERATOR_YES => _('Event is cloned'),
+				CONDITION_OPERATOR_NO => _('Event is not cloned')
+			]
 		];
 	}
 
@@ -219,8 +348,8 @@ class CCepRuleHelper {
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
 			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+			CONDITION_OPERATOR_YES => _('Yes'),
+			CONDITION_OPERATOR_NO => _('No')
 		];
 	}
 
@@ -235,41 +364,46 @@ class CCepRuleHelper {
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		[$arg1, $arg2] = match((int) $ceprule_condition['type']) {
-			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
-			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
-			self::CONDITION_HOST => [$ceprule_condition['host'], null],
-			self::CONDITION_HOST_GROUP => [$ceprule_condition['host_group'], null],
-			self::CONDITION_TIME_PERIOD => [$ceprule_condition['time_period'], null],
-			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
-				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => [$ceprule_condition['tag'], null],
-				default => [$ceprule_condition['tag'], $ceprule_condition['tag_value']]
-			}
-		};
+		$type_name = CCepRuleHelper::getConditionLabel($ceprule_condition['type']);
+		$operator_name = mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']));
 
-		$result = [
-			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
-			' ',
-			italic($arg1),
-			' ',
-			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
-		];
-
-		if ($arg2 !== null) {
-			$result[] = ' ';
-			$result[] = italic($arg2);
+		if (self::CONDITION_EVENT_NAME == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['event_name'])];
 		}
-
-		return $result;
+		elseif (self::CONDITION_SEVERITY == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ',
+				italic(CSeverityHelper::getName($ceprule_condition['severity']))
+			];
+		}
+		elseif (self::CONDITION_HOST_VISIBLE_NAME == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_name'])];
+		}
+		elseif (self::CONDITION_HOST_GROUP_NAME == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_group_name'])];
+		}
+		elseif (self::CONDITION_TIME_PERIOD == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['time_period'])];
+		}
+		elseif (self::CONDITION_TAG == $ceprule_condition['type']) {
+				return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['tag'])];
+		}
+		elseif (self::CONDITION_TAG_VALUE == $ceprule_condition['type']) {
+			return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name, ' ',
+				italic($ceprule_condition['tag_value'])
+			];
+		}
+		else {
+			throw new Exception('Unknown condition type');
+		}
 	}
 
 	public static function getOperationExecuteWhenStrings(): array {
 		return [
-			self::WHEN_EVENT_OCCURRED => _('Event occured'),
+			self::WHEN_EVENT_OCCURRED => _('Event occurred'),
+			self::WHEN_EVENT_ADDED => _('Event added to window'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
-			self::WHEN_TAGS_CORRELATED => _('Tags correlated'),
-			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
+			self::WHEN_PATTERN_MATCHED => _('Pattern matched')
 		];
 	}
 
@@ -279,43 +413,28 @@ class CCepRuleHelper {
 
 	public static function getOperationLabelStrings(): array {
 		return [
-			self::OP_SET_NAME => _('Set event name'),
-			self::OP_CLOSE => _('Close'),
+			self::OP_SET_NAME => _('Set name'),
+			self::OP_CLOSE_EVENT => _('Close'),
 			self::OP_DISCARD => _('Discard'),
 			self::OP_SET_SEVERITY => _('Set severity'),
 			self::OP_INCREASE_SEVERITY => _('Increase severity'),
 			self::OP_DECREASE_SEVERITY => _('Decrease severity'),
 			self::OP_SUPPRESS => _('Suppress'),
-			self::OP_COPY_FIRST => _('Copy first'),
-			self::OP_COPY_LAST => _('Copy last'),
-			self::OP_ADD_TAG => _('Add tag'),
-			self::OP_SET_TAG => _('Set tag'),
-			self::OP_SET_TAG_VALUE => _('Set tag value'),
-			self::OP_INCREASE_TAG_VALUE => _('Increase tag value'),
-			self::OP_DECREASE_TAG_VALUE => _('Decrease tag value'),
-			self::OP_RENAME_TAG => _('Rename tag'),
-			self::OP_REMOVE_TAG => _('Remove tag'),
-			self::OP_CLOSE_WINDOW => _('Close window')
-		];
-	}
-
-	public static function getOperationTypes(): array {
-		return [
-			self::OP_SET_NAME => _('Set name'),
-			self::OP_CLOSE => _('Close event'),
-			self::OP_DISCARD => _('Discard event'),
-			self::OP_SET_SEVERITY => _('Set severity'),
-			self::OP_INCREASE_SEVERITY => _('Increase severity'),
-			self::OP_DECREASE_SEVERITY => _('Decrease severity'),
-			self::OP_SUPPRESS => _('Suppress')
+			self::OP_UNSUPPRESS => _('Unsuppress'),
+			self::OP_CLONE_FIRST => _('Clone first'),
+			self::OP_CLONE_LAST => _('Clone last'),
+			self::OP_ADD_TAG => _('Add'),
+			self::OP_SET_TAG => _('Set'),
+			self::OP_SET_TAG_VALUE => _('Set value'),
+			self::OP_INCREASE_TAG_VALUE => _('Increase value'),
+			self::OP_DECREASE_TAG_VALUE => _('Decrease value'),
+			self::OP_RENAME_TAG => _('Rename'),
+			self::OP_REMOVE_TAG => _('Remove'),
+			self::OP_CLOSE_WINDOW => _('Close (window)')
 		];
 	}
 
 	public static function getOperationLabelString(array $ceprule_operation): string {
-		if ($ceprule_operation['type'] === self::OP_SET_CAUSE) {
-			return _('Set cause');
-		}
-
 		return self::getOperationLabelStrings()[$ceprule_operation['type']];
 	}
 
@@ -323,11 +442,16 @@ class CCepRuleHelper {
 		return match((int) $ceprule_operation['type']) {
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
-			self::OP_SUPPRESS,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLOSE_WINDOW,
+			self::OP_CLONE_LAST,
 			self::OP_DISCARD,
-			self::OP_CLOSE => '',
+			self::OP_CLOSE_EVENT => '',
+
+			self::OP_SUPPRESS => $ceprule_operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
+				? _('Indefinitely')
+				: _s('duration %1$s', $ceprule_operation['suppress_duration']),
 
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
@@ -363,7 +487,7 @@ class CCepRuleHelper {
 			self::WINDOW_SIMPLE => _('Simple'),
 			self::WINDOW_CAUSE_SYMPTOM => _('Cause and symptoms grouping'),
 			self::WINDOW_TAG_MATCH => _('Tag correlation'),
-			self::WINDOW_PATTERN_MATCH => _('Event pattern match')
+			self::WINDOW_PATTERN_MATCH => _('Pattern match')
 		];
 	}
 
@@ -391,6 +515,9 @@ class CCepRuleHelper {
 	private static function formatOperationDetails(array $ceprule_operation): string {
 		$operation = (int) $ceprule_operation['operation'];
 		$target = match($operation) {
+			self::OP_SUPPRESS
+				=> 'suppress',
+
 			self::OP_SET_NAME
 				=> 'name',
 
@@ -404,48 +531,68 @@ class CCepRuleHelper {
 			default => ''
 		};
 
-		$format_tag_pair = fn (array $value): string => sprintf('%s:%s', $value['tag'], $value['value']);
-		$format_value_added = fn (array $value): string => sprintf('> %s', $value['new']);
-		$format_value_changed = fn (array $value): string => array_key_exists('old', $value)
-			? sprintf('%s > %s', $value['old'], $value['new'])
-			: $format_value_added($value);
-
 		$target_details = $target ? $ceprule_operation[$target] : [];
-
 		$arguments = match($operation) {
 			self::OP_SET_NAME
-				=> $format_value_changed($target_details),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', $target_details['old'], $target_details['new'])
+					: sprintf('> %s', $target_details['new']),
 
 			self::OP_RENAME_TAG
-				=> $format_value_changed($target_details['tag']),
+				=> array_key_exists('old', $target_details['tag'])
+					? sprintf('%s > %s', $target_details['tag']['old'], $target_details['tag']['new'])
+					: sprintf('> %s', $target_details['tag']['new']),
 
 			self::OP_SET_SEVERITY, self::OP_DECREASE_SEVERITY, self::OP_INCREASE_SEVERITY
-				=> $format_value_changed([
-					'old' => CSeverityHelper::getName($target_details['old']),
-					'new' => CSeverityHelper::getName($target_details['new'])
-				]),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', CSeverityHelper::getName($target_details['old']),
+						CSeverityHelper::getName($target_details['new'])
+					)
+					: sprintf('> %s', CSeverityHelper::getName($target_details['new'])),
 
 			self::OP_ADD_TAG, self::OP_REMOVE_TAG
-				=> $format_tag_pair($target_details),
+				=> sprintf('%s:%s', $target_details['tag'], $target_details['value']),
 
 			self::OP_DECREASE_TAG_VALUE, self::OP_INCREASE_TAG_VALUE, self::OP_SET_TAG_VALUE
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'],
+					array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new'])
+					),
 
 			self::OP_SET_TAG
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => is_string($target_details['value'])
-						? $target_details['value']
-						: $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'], is_string($target_details['value'])
+					? $target_details['value']
+					: (array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new']))
+					),
 
 			default => ''
 		};
 
-		$label = CCepRuleHelper::getOperationLabelString(['type' => $operation]);
+		switch ($operation) {
+			case self::OP_SET_CAUSE:
+				$label = _('Set as symptom');
+				break;
+
+			case self::OP_SUPPRESS:
+				if ($target_details['until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+					$suppressed_till = _('Indefinitely');
+				}
+				else {
+					$suppressed_till = $target_details['until'] < strtotime('tomorrow')
+							&& $target_details['until'] > strtotime('today')
+						? zbx_date2str(TIME_FORMAT, $target_details['until'])
+						: zbx_date2str(DATE_TIME_FORMAT, $target_details['until']);
+				}
+
+				$label = _s('Suppressed till: %1$s', $suppressed_till);
+				break;
+
+			default:
+				$label = CCepRuleHelper::getOperationLabelString(['type' => $operation]);
+		}
 
 		return $arguments !== '' ? "$label: $arguments." : "$label.";
 	}

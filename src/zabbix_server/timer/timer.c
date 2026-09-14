@@ -161,7 +161,7 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 	zbx_vector_event_maintenance_create(&event_maintenance);
 
 	result = zbx_db_select(
-			"select eventid,maintenanceid"
+			"select eventid,maintenanceid,cep_ruleid"
 			" from event_suppress"
 			" where suppress_until<" ZBX_FS_TIME_T
 				" and suppress_until<>0",
@@ -173,6 +173,7 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 
 		ZBX_STR2UINT64(event.eventid, row[0]);
 		ZBX_DBROW2UINT64(event.maintenanceid, row[1]);
+		ZBX_DBROW2UINT64(event.cep_ruleid, row[2]);
 
 		zbx_vector_event_maintenance_append(&event_maintenance, event);
 	}
@@ -452,7 +453,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
 		zbx_vector_event_maintenance_t	del_event_maintenances, suppressed;
-		zbx_vector_uint64_t		maintenanceids;
+		zbx_vector_uint64_t		maintenanceids, eventids;
 
 		zbx_vector_uint64_create(&maintenanceids);
 		zbx_vector_event_maintenance_create(&del_event_maintenances);
@@ -460,7 +461,17 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 		zbx_dc_get_running_maintenanceids(&maintenanceids);
 
+		zbx_vector_uint64_create(&eventids);
+		zbx_vector_uint64_reserve(&eventids, (size_t)event_queries.values_num);
+
+		for (int i = 0; i < event_queries.values_num; i++)
+				zbx_vector_uint64_append(&eventids, event_queries.values[i]->eventid);
+
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		zbx_db_begin();
+
+		zbx_db_lock_ids("events", "eventid", &eventids);
 
 		if (0 != maintenanceids.values_num && SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
 			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
@@ -474,6 +485,13 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 		for (int i = 0; i < event_queries.values_num; i++)
 		{
 			query = event_queries.values[i];
+
+			if (FAIL == zbx_vector_uint64_bsearch(&eventids, query->eventid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
+
 			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			k = 0;
@@ -524,7 +542,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 							zbx_event_maintenance_t	event = {
 								.eventid = query->eventid,
-								.maintenanceid = data->maintenances.values[k].first
+								.maintenanceid = query->maintenances.values[k].first
 							};
 
 							zbx_vector_event_maintenance_append(&suppressed, event);
@@ -654,6 +672,7 @@ cleanup:
 		zbx_vector_uint64_destroy(&maintenanceids);
 
 		zbx_vector_event_maintenance_destroy(&suppressed);
+		zbx_vector_uint64_destroy(&eventids);
 	}
 
 	zbx_vector_event_suppress_data_ptr_clear_ext(&event_data, event_suppress_data_free);

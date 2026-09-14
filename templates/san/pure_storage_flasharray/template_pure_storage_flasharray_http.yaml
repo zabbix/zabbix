@@ -26,7 +26,7 @@ zabbix_export:
         4. Set your FlashArray (Purity//FA) graphical user interface URL as the `Web interface URL` host wizard configuration field value.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/SAN
       items:
@@ -3622,7 +3622,6 @@ zabbix_export:
       dashboards:
         - uuid: b92fba854dba4f01a0aae16baadd25ec
           name: 'Pure Storage FlashArray: General'
-          auto_start: 'NO'
           pages:
             - name: Array
               widgets:
@@ -4452,7 +4451,7 @@ zabbix_export:
         4. Set your FlashArray (Purity//FA) graphical user interface URL as the `Web interface URL` host wizard configuration field value.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/SAN
       items:
@@ -8319,7 +8318,6 @@ zabbix_export:
       dashboards:
         - uuid: 186b571696774e6ab4ba5a8a38dc9c8d
           name: 'Pure Storage FlashArray: General'
-          auto_start: 'NO'
           pages:
             - name: Array
               widgets:

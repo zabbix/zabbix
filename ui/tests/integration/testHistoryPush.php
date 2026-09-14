@@ -265,6 +265,11 @@ class testHistoryPush extends CIntegrationTest {
 				'user.delete did not return the expected userids');
 		}
 
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_DISABLED]
+		]);
+
 		self::$hostid_normal = null;
 		self::$hostid_non_monitored = null;
 		self::$hostid_maintained = null;
@@ -287,8 +292,6 @@ class testHistoryPush extends CIntegrationTest {
 
 	/**
 	 * Push value of every type.
-	 *
-	 * @backup history_uint,history_text,history,history_str,history_log
 	 */
 	public function testHistoryPush_pushSingleTrapperValue() {
 		$tcs = [
@@ -403,8 +406,6 @@ class testHistoryPush extends CIntegrationTest {
 
 	/**
 	 * Push multiple values of different types in single request.
-	 *
-	 * @backup history_uint, history_text
 	 */
 	public function testHistoryPush_pushMultipleValues() {
 		$values_sent_uint = [];
@@ -623,6 +624,11 @@ class testHistoryPush extends CIntegrationTest {
 	}
 
 	public function testHistoryPush_noPermission() {
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+		]);
+
 		$response = $this->call('user.create', [
 			'username' => 'John',
 			'passwd' => 'Doe123123',

@@ -1148,6 +1148,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 			*error = zbx_dsprintf(*error, "Cannot connect to service \"%s\": %s.", service_name,
 					zbx_strerror(errno));
 			close(csocket->fd);
+			csocket->fd = -1;
 			goto out;
 		}
 
@@ -1483,6 +1484,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service:%s", __func__, service_name);
 
+	service->fd = -1;
 	mode = umask(077);
 
 	if (NULL == (socket_path = ipc_make_path(service_name, error)))
@@ -1527,6 +1529,12 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 		goto out;
 	}
 
+	if (0 != pipe(service->alert_pipe))
+	{
+		*error = zbx_dsprintf(*error, "Cannot create alert pipe: %s.", zbx_strerror(errno));
+		goto out;
+	}
+
 	service->path = zbx_strdup(NULL, socket_path);
 	zbx_vector_ipc_client_ptr_create(&service->clients);
 	zbx_queue_ptr_create(&service->clients_recv);
@@ -1538,7 +1546,6 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
 
-	pipe(service->alert_pipe);
 	evutil_make_socket_nonblocking(service->alert_pipe[0]);
 	evutil_make_socket_nonblocking(service->alert_pipe[1]);
 
@@ -1551,6 +1558,12 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	ret = SUCCEED;
 out:
 	umask(mode);
+
+	if (SUCCEED != ret && -1 != service->fd)
+	{
+		close(service->fd);
+		service->fd = -1;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1570,8 +1583,15 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __func__, service->path);
 
+	if (-1 == service->fd)
+		goto out;
+
+	event_free(service->ev_listener);
+
 	if (0 != close(service->fd))
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot close path \"%s\": %s", service->path, zbx_strerror(errno));
+
+	service->fd = -1;
 
 	if (-1 == unlink(service->path))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove socket at %s: %s.", service->path, zbx_strerror(errno));
@@ -1593,12 +1613,11 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	event_free(service->ev_alert);
 	event_free(service->ev_timer);
-	event_free(service->ev_listener);
 	event_base_free(service->ev);
 
 	close(service->alert_pipe[0]);
 	close(service->alert_pipe[1]);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1690,8 +1709,20 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
 void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
 {
 	char	byte = 1;
+	ssize_t	n;
 
-	write(service->alert_pipe[1], &byte, 1);
+	while (1 != (n = write(service->alert_pipe[1], &byte, 1)))
+	{
+		if (EWOULDBLOCK == errno || EAGAIN == errno)
+			return;
+
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot alert IPC service \"%s\": %s", service->path,
+					zbx_strerror(errno));
+			return;
+		}
+	}
 }
 
 /******************************************************************************

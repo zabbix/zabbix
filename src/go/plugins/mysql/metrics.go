@@ -48,9 +48,9 @@ var (
 	// Common params: [URI|Session][,User][,Password].
 	//nolint:gochecknoglobals //readability
 	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
-		WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port). //nolint:gci,gofmt //readablility
-		WithSession().
-		WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).
+			WithSession().
+			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	//nolint:gochecknoglobals //readability
 	paramUsername = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
 	//nolint:gochecknoglobals //readability
@@ -66,57 +66,59 @@ var (
 	//nolint:gochecknoglobals //readability
 	paramTLSKeyFile = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 	//nolint:gochecknoglobals //readability
+	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
+	//nolint:gochecknoglobals //readability
 	metrics = metric.MetricSet{
 		keyCustomQuery: metric.New("Returns result of a custom query.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
 				metric.NewParam("QueryName", "Name of a custom query "+
 					"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, true),
 
 		keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyDatabaseSize: metric.New("Returns size of given database in bytes.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
 				metric.NewParam("Database", "Database name.").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyPing: metric.New("Tests if connection is alive or not.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyReplicationSlaveStatus: metric.New("Returns replication status.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
 				paramMasterHost,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyStatusVars: metric.New("Returns values of global status variables.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 
 		keyVersion: metric.New("Returns MySQL version.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, paramConnTimeout,
 			}, false),
 	}
 )

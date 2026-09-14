@@ -20,6 +20,10 @@ class CControllerCepRuleList extends CController {
 		$this->disableCsrfValidation();
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name,status,sortorder',
@@ -41,10 +45,6 @@ class CControllerCepRuleList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
-	}
-
 	protected function doAction(): void {
 		$sort_field = $this->getInput('sort', CProfile::get('web.ceprule.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.ceprule.list.sortorder', ZBX_SORT_UP));
@@ -53,8 +53,11 @@ class CControllerCepRuleList extends CController {
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.ceprule.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', CCepRuleHelper::FILTER_SHOW_ALL), PROFILE_TYPE_INT);
-			CProfile::update('web.ceprule.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_type',
+				$this->getInput('filter_type', CCepRuleHelper::FILTER_SHOW_ALL),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.ceprule.filter_name');
@@ -79,7 +82,15 @@ class CControllerCepRuleList extends CController {
 		$data['ceprules'] = self::fetchCepRules($filter);
 		$data['group_names'] = self::fetchGroupNames($data['ceprules']);
 
-		CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
+		if ($sort_field === 'sortorder') {
+			CArrayHelper::sort($data['ceprules'], [
+				['field' => 'sortorder', 'order' => $sort_order],
+				['field' => 'name', 'order' => $sort_order]
+			]);
+		}
+		else {
+			CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
+		}
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('ceprule.list', $page_num);
@@ -98,7 +109,8 @@ class CControllerCepRuleList extends CController {
 		$result_cep = [];
 		$result_legacy = [];
 
-		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_LEGACY) {
+		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL
+				|| $filter['type'] == CCepRuleHelper::FILTER_SHOW_LEGACY) {
 			$result_legacy = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['conditions'],
@@ -110,7 +122,7 @@ class CControllerCepRuleList extends CController {
 			]);
 
 			if ($result_legacy === false) {
-				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+				return [];
 			}
 		}
 
@@ -118,15 +130,16 @@ class CControllerCepRuleList extends CController {
 			$result_cep = API::CepRule()->get([
 				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status', 'error'],
 				'selectFilter' => ['conditions'],
-				'selectOperations' => ['execute_when', 'type', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'],
+				'selectOperations' => ['execute_when', 'type', 'event_name', 'severity', 'suppress_duration', 'tag',
+					'new_tag', 'tag_value'
+				],
 				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
 				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'limit' => $limit
 			]);
 
-
 			if ($result_cep === false) {
-				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+				return [];
 			}
 		}
 
@@ -139,18 +152,6 @@ class CControllerCepRuleList extends CController {
 				$record['filter'] += [
 					'conditions' => []
 				];
-
-				$record['filter']['conditions'] = array_map(function(array $condition) {
-					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
-						$condition['type'] = CCepRuleHelper::CONDITION_TAG;
-					}
-
-					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-						$condition['tag_operator'] = $condition['operator'];
-					}
-
-					return $condition;
-				}, $record['filter']['conditions']);
 			}
 
 			$record['cepruleid'] = array_key_exists('cep_ruleid', $record) ? $record['cep_ruleid'] : null;
@@ -166,15 +167,16 @@ class CControllerCepRuleList extends CController {
 			$is_legacy = array_key_exists('correlationid', $ceprule);
 
 			if ($is_legacy) {
-				$groupids += array_column($ceprule['filter']['conditions'], 'groupid', 'groupid');
+				$groupids = array_merge($groupids,
+					array_column($ceprule['filter']['conditions'], 'groupid', 'groupid')
+				);
 			}
 		}
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
+				'groupids' => array_unique($groupids)
 			]);
 
 			return array_column($groups, 'name', 'groupid');

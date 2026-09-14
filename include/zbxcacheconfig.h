@@ -590,6 +590,7 @@ typedef struct
 	int		auditlog_enabled;
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
+	int		enable_mobile_devices;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -614,6 +615,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
 #define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
+#define ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES		__UINT64_C(0x0000000000004000)
 
 typedef struct
 {
@@ -678,8 +680,8 @@ ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
 #define ZBX_CORR_OPERATION_CLOSE_NEW	1
 
 #define CORRELATION_OP_NONE		0
-#define CORRELATION_OP_CLOSE_NEW	0x01
-#define CORRELATION_OP_CLOSE_OLD	0x02
+#define CORRELATION_OP_CLOSE_NEW	0x01U
+#define CORRELATION_OP_CLOSE_OLD	0x02U
 
 typedef struct
 {
@@ -687,7 +689,7 @@ typedef struct
 	char				*name;
 	char				*formula;
 	unsigned char			evaltype;
-	unsigned char			operations;	/* bitmask of CORRELATION_OP_ defines */
+	zbx_uint32_t			operations;	/* bitmask of CORRELATION_OP_ defines */
 
 	zbx_atomic_uint32_t		refcount;
 
@@ -883,7 +885,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location);
+		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
@@ -1125,7 +1127,11 @@ void	zbx_dc_get_expressions_by_name(zbx_vector_expression_t *expressions, const 
 int	zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	zbx_dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+zbx_uint64_t	zbx_dc_get_hostid_by_functionid(zbx_uint64_t functionid);
 void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *names);
+void	zbx_dc_get_hostgroup_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *groups);
+zbx_uint64_t	zbx_dc_get_hostgroupid_by_functionid(zbx_uint64_t functionid);
 
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
@@ -1381,6 +1387,7 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
 zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid);
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
@@ -1422,6 +1429,8 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP pings with retry options */
 #define ZBX_SERVER_ICMPPINGRETRY_KEY	"icmppingretry"
 
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule);
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq);
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
@@ -1637,8 +1646,6 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_comms_redirect_t *redirect);
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_item_format(zbx_uint64_t itemid,  unsigned char *value_type, zbx_uint64_t *valuemapid,
 		char *units, size_t units_alloc);
 
@@ -1703,9 +1710,207 @@ void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
-/* open telemetry settings */
+/* APM */
 #define ZBX_SETTINGS_APM		"apm"
 
 char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 
+/* CEP */
+
+#define ZBX_CEP_WINDOW_SIMPLE		1
+#define ZBX_CEP_WINDOW_CAUSAL		2
+#define ZBX_CEP_WINDOW_CORRELATION	3
+#define ZBX_CEP_WINDOW_PATTERN		4
+
+#define ZBX_CEP_OP_SET_NAME		1
+#define ZBX_CEP_OP_CLOSE		2
+#define ZBX_CEP_OP_DISCARD		3
+#define ZBX_CEP_OP_SET_SEVERITY		4
+#define ZBX_CEP_OP_INCREASE_SEVERITY	5
+#define ZBX_CEP_OP_DECREASE_SEVERITY	6
+#define ZBX_CEP_OP_SUPPRESS		7
+#define ZBX_CEP_OP_UNSUPPRESS		8
+#define ZBX_CEP_OP_COPY_FIRST		9
+#define ZBX_CEP_OP_COPY_LAST		10
+#define ZBX_CEP_OP_ADD_TAG		11
+#define ZBX_CEP_OP_SET_TAG		12
+#define ZBX_CEP_OP_SET_TAG_VALUE	13
+#define ZBX_CEP_OP_INCREASE_TAG_VALUE	14
+#define ZBX_CEP_OP_DECREASE_TAG_VALUE	15
+#define ZBX_CEP_OP_RENAME_TAG		16
+#define ZBX_CEP_OP_REMOVE_TAG		17
+#define ZBX_CEP_OP_CLOSE_WINDOW		18
+#define ZBX_CEP_OP_SET_CAUSE		19
+
+#define ZBX_CEP_WHEN_EVENT_OCCURRED	0
+#define ZBX_CEP_WHEN_EVENT_ADDED	1
+#define ZBX_CEP_WHEN_EVENT_EVICTED	2
+#define ZBX_CEP_WHEN_WINDOW_CLOSED	3
+#define ZBX_CEP_WHEN_PATTERN_MATCH	4
+
+typedef struct
+{
+	char	*name;
+}
+zbx_cep_args_name_t;
+
+typedef struct
+{
+	char	*tag;
+}
+zbx_cep_args_tag_name_t;
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_cep_args_tag_value_t;
+
+typedef struct
+{
+	char	*old_tag;
+	char	*new_tag;
+}
+zbx_cep_args_tag_pair_t;
+
+typedef struct
+{
+	int	level;
+}
+zbx_cep_args_severity_t;
+
+typedef struct
+{
+	int	duration;
+}
+zbx_cep_args_suppress_t;
+
+typedef struct
+{
+	char	*period;
+}
+zbx_cep_args_time_period_t;
+
+typedef union
+{
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+}
+zbx_cep_op_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			cep_op_conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_op_condition_args_t	args;
+}
+zbx_cep_op_condition_t;
+
+ZBX_VECTOR_DECL(cep_op_condition, zbx_cep_op_condition_t)
+
+typedef union
+{
+	zbx_cep_args_name_t		set_name;
+	zbx_cep_args_severity_t		set_severity;
+	zbx_cep_args_tag_value_t	add_tag;
+	zbx_cep_args_tag_value_t	set_tag;
+	zbx_cep_args_tag_value_t	set_tag_value;
+	zbx_cep_args_tag_name_t		increase_tag_value;
+	zbx_cep_args_tag_name_t		decrease_tag_value;
+	zbx_cep_args_tag_name_t		remove_tag;
+	zbx_cep_args_tag_pair_t		rename_tag;
+	zbx_cep_args_suppress_t		suppress;
+}
+zbx_cep_op_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			operationid;
+	int				type;
+	int				execute_when;
+	int				evaltype;
+	int				sortorder;
+	zbx_cep_op_args_t		args;
+	zbx_vector_cep_op_condition_t	conditions;
+	char				*formula;
+}
+zbx_cep_operation_t;
+
+ZBX_VECTOR_DECL(cep_operation, zbx_cep_operation_t)
+
+/* keep union names in sync with CEP condition defines */
+typedef union
+{
+	zbx_cep_args_name_t		event_name;
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+	zbx_cep_args_severity_t		severity;
+	zbx_cep_args_name_t		host;
+	zbx_cep_args_name_t		host_group;
+	zbx_cep_args_time_period_t	time_period;
+}
+zbx_cep_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_condition_args_t	args;
+}
+zbx_cep_condition_t;
+
+ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
+
+typedef struct
+{
+	int		type;
+	zbx_uint32_t	group_by;
+	char		*duration;
+	char		*capacity;
+	char		*event_count_tag;
+	char		*script;
+	char		*group_tag;
+}
+zbx_cep_rule_window_t;
+
+typedef struct
+{
+	zbx_uint64_t		ruleid;
+	char			*name;
+	char			*formula;
+	int			evaltype;
+	int			status;
+	int			stop;
+	int			sortorder;
+
+	zbx_cep_rule_window_t	*window;
+
+	zbx_vector_cep_condition_t	conditions;
+	zbx_vector_cep_operation_t	operations;
+
+	zbx_uint64_t		revision;
+	zbx_atomic_uint32_t	refcount;
+}
+zbx_cep_rule_t;
+
+typedef struct zbx_cep_config_handle *zbx_cep_config_handle_t;
+
+ZBX_PTR_VECTOR_DECL(cep_rule_ptr, zbx_cep_rule_t *)
+
+zbx_cep_config_handle_t	zbx_cep_config_open(void);
+void	zbx_cep_config_close(zbx_cep_config_handle_t handle);
+const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle);
+zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid);
+void	zbx_cep_rule_release(zbx_cep_rule_t *rule);
+
+#define ZBX_CEP_GROUP_BY_NONE		0x00
+#define ZBX_CEP_GROUP_BY_HOSTGROUP	0x01
+#define ZBX_CEP_GROUP_BY_HOST		0x02
+#define ZBX_CEP_GROUP_BY_TAG		0x04
+
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
 #endif

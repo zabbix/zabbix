@@ -1121,6 +1121,31 @@ class CFormValidatorTest extends TestCase {
 				['type' => 'object', 'fields' => [
 					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string', 'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string', 'in' => ['agent', 'snmp', 'simple']]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string'],
+					'target_field' => ['string',
+						'when' => [
+							'item_type',
+							'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string']],
+					'target_field' => [['type' => 'string', 'when' => [
+						['item_type', 'in' => ['agent', 'snmp', 'simple']]
+					]]]
+				]]
 			]
 		];
 	}
@@ -3359,6 +3384,26 @@ class CFormValidatorTest extends TestCase {
 				CFormValidator::ERROR,
 				['/value' => [
 					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string'],
+					'object' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]],
+					'object2' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]]
+				]],
+				[
+					'value' => 'test',
+					'object' => []
+				],
+				[],
+				CFormValidator::ERROR,
+				['/object/value2' => [
+					['message' => 'Required field is missing.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			]
 		];

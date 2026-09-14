@@ -34,7 +34,10 @@
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
 #define ZBX_CEP_CHECK_TRIGGER_DEPS	(ZBX_IPC_RTC_MAX + 10)
 #define ZBX_CEP_GET_STATS		(ZBX_IPC_RTC_MAX + 11)
-#define ZBX_CEP_SYNC_OBJECT_STATE	(ZBX_IPC_RTC_MAX + 12)
+#define ZBX_CEP_GET_DIAGINFO		(ZBX_IPC_RTC_MAX + 12)
+#define ZBX_CEP_SYNC_OBJECT_STATE	(ZBX_IPC_RTC_MAX + 13)
+#define ZBX_CEP_SET_EVENT_CAUSE		(ZBX_IPC_RTC_MAX + 14)
+#define ZBX_CEP_RESET_RULE		(ZBX_IPC_RTC_MAX + 15)
 
 typedef enum
 {
@@ -44,7 +47,7 @@ typedef enum
 	CEP_EVENT_DENY,
 	CEP_EVENT_DEPENDENCY_DENY
 }
-zbx_cep_result_t;
+zbx_cep_assessment_t;
 
 #define CEP_QUERY_MASK_VALUE	0x0f
 #define CEP_QUERY_FLAG_MULTI	0x10
@@ -79,6 +82,7 @@ typedef struct
 {
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
 }
 zbx_event_maintenance_t;
 
@@ -120,12 +124,42 @@ typedef struct
 	int		task_completed_num;
 
 	int		events_num;
+	int		objects_num;
+
+	int		windows_num;
+	int		window_alarms_num;
+	int		window_ticks_num;
 }
 zbx_cep_stats_t;
 
 int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error);
 
+typedef struct
+{
+	int	events_num;
+	double	events_time;
+	int	tags_num;
+	double	tags_time;
+	int	suppress_num;
+	double	suppress_time;
+}
+zbx_cep_init_stats_t;
+
+typedef struct
+{
+	zbx_cep_init_stats_t	startup;
+	int			blocked_commit_num;
+	int			commits_num;
+	int			commit_task_num;
+	int			workers_num;
+}
+zbx_cep_diaginfo_t;
+
+int	zbx_cep_get_diaginfo(zbx_cep_diaginfo_t *stats, char **error);
+
 int	zbx_cep_sync_object_state(char **error);
+void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid);
+int	zbx_cep_reset_rule(zbx_uint64_t cep_ruleid, char **error);
 
 #endif
 

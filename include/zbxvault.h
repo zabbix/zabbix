@@ -17,6 +17,10 @@
 
 #include "zbxkvs.h"
 
+#define ZBX_VAULT_DEFAULT_URL		"https://127.0.0.1:8200"
+#define ZBX_VAULT_RENEW_TOKEN_NORMAL	0
+#define ZBX_VAULT_RENEW_TOKEN_FORCE	1
+
 typedef struct
 {
 	char	*name;
@@ -26,19 +30,29 @@ typedef struct
 	char	*tls_key_file;
 	char	*db_path;
 	char	*prefix;
+	char	*app_role_id;
+	char	*app_secret_id;
 }
 zbx_config_vault_t;
 
-int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error);
+int	zbx_vault_is_configured(const zbx_config_vault_t *conf);
+int	zbx_vault_validate_config(const zbx_config_vault_t *config_vault, const char *dbuser,
+		const char *dbpassword, char **error);
+
+void	zbx_vault_init(const char *vault_name);
+
 int	zbx_vault_get_kvs(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error);
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location,
+		int *vault_ret, char **error);
+
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
-void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
-		const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location);
+
+void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, int force, char **token);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
 

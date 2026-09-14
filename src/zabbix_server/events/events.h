@@ -17,7 +17,6 @@
 
 #include "zbxdbhigh.h"
 #include "zbxexport.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 

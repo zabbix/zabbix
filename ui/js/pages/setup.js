@@ -19,6 +19,9 @@ const ZBX_DB_POSTGRESQL	= 'POSTGRESQL';
 const DB_STORE_CREDS_VAULT_HASHICORP	= 1;
 const DB_STORE_CREDS_VAULT_CYBERARK		= 2;
 
+const DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN = 0;
+const DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE = 1;
+
 const STEP_WELCOME			= 1;
 const STEP_DB_CONNECTION	= 3;
 const STEP_SETTINGS			= 4;
@@ -37,14 +40,15 @@ const view = new class {
 
 			case STEP_DB_CONNECTION:
 				for (const id of ['type', 'server', 'tls_encryption', 'verify_certificate', 'creds_storage',
-						'vault_certificates_toggle', 'vault_url']) {
+						'vault_certificates_toggle', 'vault_url', 'vault_auth_type']) {
 					document.getElementById(id).addEventListener('change', () => this.#update());
 				}
 
 				form.addEventListener('submit', () => {
 					const input_ids = ['server', 'database', 'schema', 'vault_url', 'vault_prefix_hashicorp',
 						'vault_prefix_cyberark', 'vault_db_path', 'vault_query_string', 'vault_token',
-						'vault_cert_file', 'vault_key_file', 'ca_file', 'key_file', 'cert_file'
+						'vault_app_role_id', 'vault_app_secret_id', 'vault_cert_file', 'vault_key_file', 'ca_file',
+						'key_file', 'cert_file'
 					];
 
 					for (const id of input_ids) {
@@ -96,6 +100,12 @@ const view = new class {
 		const vault_enabled = [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK].includes(vault_selected);
 		const vault_certificates_enabled = document.getElementById('vault_certificates_toggle').checked;
 
+		let vault_auth_type = null;
+
+		if (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP) {
+			vault_auth_type = parseInt(document.querySelector('input[name="vault_auth_type"]:checked').value);
+		}
+
 		const rows = {
 			'db_schema_row': db_type === ZBX_DB_POSTGRESQL,
 			'db_encryption_row': encryption_supported,
@@ -108,7 +118,13 @@ const view = new class {
 			'vault_url_row': vault_enabled,
 			'vault_prefix_hashicorp_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
 			'vault_db_path_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
-			'vault_token_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
+			'vault_auth_type_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
+			'vault_token_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
+				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
+			'vault_app_role_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
+				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE,
+			'vault_app_secret_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
+				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE,
 			'db_user': !vault_enabled,
 			'db_password': !vault_enabled,
 			'vault_prefix_cyberark_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK,

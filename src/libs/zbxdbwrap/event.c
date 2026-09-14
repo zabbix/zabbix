@@ -411,7 +411,7 @@ void	zbx_db_get_event_data_triggers(zbx_db_event *event)
 			"t.recovery_expression,t.recovery_mode,rt.value,t.opdata,t.event_name"
 			" from triggers t"
 			" join trigger_rtdata rt on t.triggerid=rt.triggerid"
-			" where triggerid=" ZBX_FS_UI64, event->objectid);
+			" where t.triggerid=" ZBX_FS_UI64, event->objectid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{

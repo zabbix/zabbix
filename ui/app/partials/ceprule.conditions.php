@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-echo (new CObject())
+(new CObject())
 	->addItem(new CLabel(_('Type of calculation'), 'ceprule-filter-evaltype-select'))
 	->addItem(new CFormField([
 		(new CDiv(
@@ -27,40 +27,49 @@ echo (new CObject())
 				->setValue($data['filter']['evaltype'])
 				->setId('ceprule-filter-evaltype')
 				->setFocusableElementId('ceprule-filter-evaltype-select')
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression')))
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
 			(new CSpan())->setId('ceprule-filter-expression-preview'),
-			(new CTextBox('filter[formula]', $data['filter']['formula']))
+			(new CTextAreaFlexible('filter[formula]', $data['filter']['formula']))
+				->setMaxlength(DB::getFieldLength('cep_rule', 'formula'))
 				->setId('ceprule-filter-expression')
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('placeholder', 'A or (B and C) ...')
-		]))->addClass(ZBX_STYLE_CELL)
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	]))
-	->addItem(new CLabel(_('Conditions'), 'ceprule-filter-conditions-add'))
+	->addItem(new CLabel(_('Conditions'), 'ceprule-filter-conditions'))
 	->addItem((new CFormField())
 		->addItem((new CDiv())
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'filter[conditions]')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: 100%')
 			->addItem((new CTable())
 				->setColumns([
-					new CTableColumn(new CColHeader(_('Label'))),
-					(new CTableColumn(new CColHeader(_('Name'))))
-						->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-					new CTableColumn(new CColHeader(_('Actions')))
+					new CTableColumn(
+						(new CColHeader(_('Label')))->setWidth('40')
+					),
+					new CTableColumn(_('Name')),
+					new CTableColumn(
+						(new CColHeader(_('Actions')))->setWidth('75')
+					)
 				])
 				->setId('ceprule-filter-conditions')
 				->addItem((new CTag('tfoot', true))
 					->addItem((new CCol(
 						(new CButtonLink(_('Add')))->addClass('js-condition-add')
-							->setId('ceprule-filter-conditions-add')
 					))->setColSpan(4))
 				)
 			)
 		)
-	);
+	)
+	->show();

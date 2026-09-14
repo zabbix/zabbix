@@ -145,8 +145,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 
 	for (int i = 0; i < triggers->values_num; i++)
 	{
-		zbx_dc_trigger_t	*trigger = triggers->values[i];
-
+		zbx_dc_trigger_t		*trigger = triggers->values[i];
 		zbx_cep_assessment_query_t	query;
 
 		query.triggerid = trigger->triggerid;
@@ -216,7 +215,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 		if (ZBX_FLAGS_TRIGGER_DIFF_UNSET != flags)
 		{
 			zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority, flags,
-					trigger->new_value, new_state, trigger->timespec.sec, new_error);
+					trigger->new_value, (unsigned char)new_state, trigger->timespec.sec, new_error);
 
 			if (NULL != add_internal_event_cb)
 			{
@@ -1396,6 +1395,10 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *                                                                                     *
  * Parameters:                                                                         *
  *   events_cbs                       - [IN]                                           *
+ *   mode                             - [IN] history cache syncing mode,               *
+ *                                         ZBX_HISTORY_SYNC_DEFAULT - default          *
+ *                                         ZBX_HISTORY_SYNC_SKIP_TRIGGERS - skip       *
+ *                                         trigger and internal event processing       *
  *   stats                            - [OUT] flag indicating the cache emptiness:     *
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *
@@ -1511,7 +1514,10 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 		int			trends_num = 0, timers_num = 0, ret = SUCCEED;
 		ZBX_DC_TREND		*trends = NULL;
 
-		add_internal_event_cb = (0 == zbx_dc_get_internal_action_count() ? NULL : events_cbs->add_event_cb);
+		if (mode != ZBX_HISTORY_SYNC_SKIP_TRIGGERS && 0 != zbx_dc_get_internal_action_count())
+			add_internal_event_cb = events_cbs->add_event_cb;
+		else
+			add_internal_event_cb = NULL;
 
 		stats->more = ZBX_SYNC_DONE;
 

@@ -14,8 +14,9 @@
 
 #include "zbx_cep_client.h"
 
-#include "zbx_trigger_constants.h"
 #include "zbxcommon.h"
+#include "zbx_trigger_constants.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
@@ -39,16 +40,16 @@ ZBX_VECTOR_IMPL(event_severity, zbx_event_severity_t)
 zbx_uint32_t	zbx_cep_serialize_ids(const zbx_vector_uint64_t *ids, unsigned char **data)
 {
 	unsigned char	*ptr;
-	zbx_uint32_t	size;
+	size_t		size;
 
-	size = sizeof(ids->values_num) + ids->values_num * sizeof(zbx_uint64_t);
+	size = sizeof(ids->values_num) + (size_t)ids->values_num * sizeof(zbx_uint64_t);
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, ids->values_num);
 	for (int i = 0; i < ids->values_num; i++)
 		ptr += zbx_serialize_value(ptr, ids->values[i]);
 
-	return size;
+	return (zbx_uint32_t)size;
 }
 
 /******************************************************************************
@@ -65,7 +66,7 @@ void	zbx_cep_deserialize_event_queries(const unsigned char *data, zbx_vector_cep
 	const unsigned char	*ptr = data;
 
 	ptr += zbx_deserialize_value(ptr, &queries_num);
-	zbx_vector_cep_assessment_query_reserve(queries, queries_num);
+	zbx_vector_cep_assessment_query_reserve(queries, (size_t)queries_num);
 
 	for (int i = 0; i < queries_num; i++)
 	{
@@ -169,14 +170,14 @@ void	zbx_cep_assess_trigger_events(const zbx_cep_assessment_query_t *queries, in
 		unsigned char **results)
 {
 	unsigned char	*data, *ptr;
-	zbx_uint32_t	data_len = sizeof(queries_num) + queries_num * (sizeof(zbx_uint64_t) + 1);
+	size_t		data_len = sizeof(queries_num) + (size_t)queries_num * (sizeof(zbx_uint64_t) + 1);
 
 	for (int i = 0; i < queries_num; i++)
 	{
 		if (0 == queries[i].dep_triggerids.values_num)
 			continue;
 
-		data_len += sizeof(int) + queries[i].dep_triggerids.values_num * sizeof(zbx_uint64_t);
+		data_len += sizeof(int) + (size_t)queries[i].dep_triggerids.values_num * sizeof(zbx_uint64_t);
 	}
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
@@ -202,12 +203,12 @@ void	zbx_cep_assess_trigger_events(const zbx_cep_assessment_query_t *queries, in
 		}
 	}
 
-	int	ret = zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ASSESS_TRIGGER_EVENTS, data, data_len);
+	int	ret = zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ASSESS_TRIGGER_EVENTS, data,
+			(zbx_uint32_t)data_len);
 
 	zbx_free(data);
 	if (SUCCEED != ret)
 	{
-		zbx_free(data);
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to CEP service");
 		zbx_exit(EXIT_FAILURE);
 	}
@@ -264,8 +265,8 @@ static void	cep_buffer_reserve(unsigned char **data, zbx_uint32_t *data_alloc, z
 static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
 		const zbx_db_event *event)
 {
-	zbx_uint32_t		data_len = 0, name_len, tags_local_len[32], *tags_len, expr_len, r_expr_len,
-				corr_tag_len;
+	zbx_uint32_t		name_len, tags_local_len[32], *tags_len, expr_len, r_expr_len, corr_tag_len;
+	size_t			data_len = 0;
 	int			maintenances_num;
 	zbx_db_event_suppress_t	sup_local;
 
@@ -307,19 +308,20 @@ static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_
 			zbx_serialize_prepare_str_len(data_len, event->trigger.correlation_tag, corr_tag_len);
 
 		zbx_serialize_prepare_value(data_len, event->trigger.dep_triggerids.values_num);
-		data_len += sizeof(zbx_uint64_t) * event->trigger.dep_triggerids.values_num;
+		data_len += sizeof(zbx_uint64_t) * (size_t)event->trigger.dep_triggerids.values_num;
 
 		data_len += sizeof(int);
 		if (NULL != event->suppress)
 		{
 			maintenances_num = event->suppress->values_num;
-			data_len += (sizeof(sup_local.maintenanceid) + sizeof(sup_local.until)) * maintenances_num;
+			data_len += (sizeof(sup_local.maintenanceid) + sizeof(sup_local.until)) *
+					(size_t)maintenances_num;
 		}
 		else
 			maintenances_num = 0;
 	}
 
-	cep_buffer_reserve(data, data_alloc, *data_offset, data_len);
+	cep_buffer_reserve(data, data_alloc, *data_offset, (zbx_uint32_t)data_len);
 
 	unsigned char	*ptr = *data + *data_offset;
 
@@ -372,7 +374,7 @@ static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_
 	if (tags_len != tags_local_len)
 		zbx_free(tags_len);
 
-	*data_offset += data_len;
+	*data_offset += (zbx_uint32_t)data_len;
 }
 
 /******************************************************************************
@@ -464,7 +466,8 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 
 	if (EVENT_SOURCE_TRIGGERS == e->source)
 	{
-		int	deps_num, maintenances_num;
+		int			deps_num, maintenances_num;
+		zbx_db_event_suppress_t	suppress_local = {0};
 
 		e->trigger.triggerid = e->objectid;
 
@@ -500,16 +503,15 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 
 			for (int i = 0; i < maintenances_num; i++)
 			{
-				zbx_db_event_suppress_t	suppress_local;
-
 				ptr += zbx_deserialize_value(ptr, &suppress_local.maintenanceid);
 				ptr += zbx_deserialize_value(ptr, &suppress_local.until);
+				suppress_local.cep_ruleid = 0;
 				zbx_vector_db_event_suppress_append(e->suppress, suppress_local);
 			}
 		}
 	}
 
-	return ptr - data;
+	return (zbx_uint32_t)(ptr - data);
 }
 
 /******************************************************************************
@@ -525,7 +527,7 @@ void	zbx_cep_deserialize_events(const unsigned char *data, zbx_vector_db_event_t
 	int	events_num;
 
 	data += zbx_deserialize_value(data, &events_num);
-	zbx_vector_db_event_reserve(events, events_num);
+	zbx_vector_db_event_reserve(events, (size_t)events_num);
 
 	for (int i = 0; i < events_num; i++)
 	{
@@ -554,8 +556,8 @@ void	zbx_cep_close_problem_by_user(const zbx_db_event *event, zbx_uint64_t event
 
 	cep_buffer_serialize_event(&data, &data_alloc, &data_offset, event);
 	cep_buffer_reserve(&data, &data_alloc, data_offset, sizeof(zbx_uint64_t) * 2);
-	data_offset += zbx_serialize_value(data + data_offset, eventid);
-	data_offset += zbx_serialize_value(data + data_offset, userid);
+	data_offset += (zbx_uint32_t)zbx_serialize_value(data + data_offset, eventid);
+	data_offset += (zbx_uint32_t)zbx_serialize_value(data + data_offset, userid);
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ADD_USER_CLOSE_EVENT, data, data_offset))
 	{
@@ -604,6 +606,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 		zbx_event_maintenance_t	event_local;
 		data += zbx_deserialize_value(data, &event_local.eventid);
 		data += zbx_deserialize_value(data, &event_local.maintenanceid);
+		data += zbx_deserialize_value(data, &event_local.cep_ruleid);
 
 		zbx_vector_event_maintenance_append(events, event_local);
 	}
@@ -621,7 +624,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, int events_num, zbx_uint32_t code)
 {
 	unsigned char	*data = NULL, *ptr;
-	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
+	zbx_uint32_t	data_len = (zbx_uint32_t)(3 * sizeof(zbx_uint64_t) * (size_t)events_num + sizeof(int));
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -629,6 +632,7 @@ static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, in
 	{
 		ptr += zbx_serialize_value(ptr, events[i].eventid);
 		ptr += zbx_serialize_value(ptr, events[i].maintenanceid);
+		ptr += zbx_serialize_value(ptr, events[i].cep_ruleid);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), code, data, data_len))
@@ -681,7 +685,7 @@ void	zbx_cep_send_event_severities(const zbx_event_severity_t *events, int event
 	zbx_event_severity_t	es_local;
 
 	data_len = sizeof(events_num);
-	data_len += (zbx_uint32_t)(events_num * (sizeof(es_local.eventid) + sizeof(es_local.severity)));
+	data_len += (zbx_uint32_t)((size_t)events_num * (sizeof(es_local.eventid) + sizeof(es_local.severity)));
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -857,7 +861,7 @@ void	zbx_deserialize_event_tags(const unsigned char *data, zbx_vector_event_tags
  ******************************************************************************/
 void	zbx_cep_send_deleted_events(const zbx_uint64_t *eventids, int eventids_num)
 {
-	zbx_uint32_t	data_len = sizeof(eventids_num) + sizeof(zbx_uint64_t) * eventids_num;
+	zbx_uint32_t	data_len = (zbx_uint32_t)(sizeof(eventids_num) + sizeof(zbx_uint64_t) * (size_t)eventids_num);
 	unsigned char	*data, *ptr;
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
@@ -1000,7 +1004,7 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
 		goto out;
 	}
 
@@ -1011,7 +1015,11 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 	ptr += zbx_deserialize_value(ptr, &stats->task_remote_num);
 	ptr += zbx_deserialize_value(ptr, &stats->task_internal_num);
 	ptr += zbx_deserialize_value(ptr, &stats->task_completed_num);
-	(void)zbx_deserialize_value(ptr, &stats->events_num);
+	ptr += zbx_deserialize_value(ptr, &stats->events_num);
+	ptr += zbx_deserialize_value(ptr, &stats->objects_num);
+	ptr += zbx_deserialize_value(ptr, &stats->windows_num);
+	ptr += zbx_deserialize_value(ptr, &stats->window_alarms_num);
+	(void)zbx_deserialize_value(ptr, &stats->window_ticks_num);
 
 	zbx_ipc_message_clean(&response);
 
@@ -1053,7 +1061,7 @@ int	zbx_cep_sync_object_state(char **error)
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
 		goto out;
 	}
 
@@ -1066,4 +1074,110 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve startup statistics from the CEP service                  *
+ *                                                                            *
+ * Parameters: stats - [OUT] CEP cache loading statistics                     *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_diaginfo(zbx_cep_diaginfo_t *stats, char **error)
+{
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+	unsigned char		*ptr;
 
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_GET_DIAGINFO, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send get init stats message to CEP service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&socket, &response))
+	{
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
+		goto out;
+	}
+
+	ptr = response.data;
+	ptr += zbx_deserialize_value(ptr, &stats->startup.events_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.events_time);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.tags_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.tags_time);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.suppress_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.suppress_time);
+	ptr += zbx_deserialize_value(ptr, &stats->blocked_commit_num);
+	ptr += zbx_deserialize_value(ptr, &stats->commits_num);
+	ptr += zbx_deserialize_value(ptr, &stats->commit_task_num);
+	(void)zbx_deserialize_value(ptr, &stats->workers_num);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send event cause to CEP service                                   *
+ *                                                                            *
+ * Parameters: eventid       - [IN]                                           *
+ *             cause_eventid - [IN]                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
+{
+	unsigned char	buf[sizeof(eventid) + sizeof(cause_eventid)], *ptr = buf;
+	ptr += zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, cause_eventid);
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_SET_EVENT_CAUSE, buf, sizeof(buf)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send set event cause message to CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+}
+
+int	zbx_cep_reset_rule(zbx_uint64_t cep_ruleid, char **error)
+{
+	unsigned char		buf[sizeof(cep_ruleid)];
+	int			ret = FAIL;
+	char			*errmsg = NULL;
+	zbx_ipc_socket_t	socket;
+
+	(void)zbx_serialize_value(buf, cep_ruleid);
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_RESET_RULE, buf, sizeof(buf)))
+	{
+		*error = zbx_strdup(NULL, "cannot send reset rule message to CEP service");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}

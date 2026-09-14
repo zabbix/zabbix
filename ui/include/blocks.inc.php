@@ -136,7 +136,7 @@ function getSystemStatusData(array $filter) {
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		unset($options['suppressed']);
-		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid'];
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid'];
 	}
 
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {
@@ -637,6 +637,25 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		CScreenProblem::addSuppressionNames($problems);
 	}
 
+	if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+		$events = [];
+
+		foreach ($problems as $problem) {
+			$trigger = $triggers[$problem['objectid']];
+
+			if ($trigger['opdata'] !== '') {
+				$events[$problem['eventid']] = [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				];
+			}
+		}
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events, ['html' => true]);
+	}
+
 	foreach ($problems as $problem) {
 		$trigger = $triggers[$problem['objectid']];
 
@@ -716,19 +735,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 				}
 			}
 			else {
-				$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
-					[
-						'triggerid' => $trigger['triggerid'],
-						'expression' => $trigger['expression'],
-						'opdata' => $trigger['opdata'],
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					],
-					[
-						'events' => true,
-						'html' => true
-					]
-				);
+				$opdata = $events[$problem['eventid']]['opdata'];
 
 				if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
 					$opdata = (new CCol($opdata))

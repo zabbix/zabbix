@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_DBCONFIG_CEP_H
-#define ZABBIX_DBCONFIG_CEP_H
+#ifndef ZABBIX_DBCONFIG_CORRELATION_H
+#define ZABBIX_DBCONFIG_CORRELATION_H
 
 #include "dbconfig.h"
 #include "zbxcacheconfig.h"

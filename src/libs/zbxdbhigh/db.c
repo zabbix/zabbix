@@ -12,8 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbx_trigger_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbx_trigger_constants.h"
 
 #include "zbxcrypto.h"
 #include "zbxdbwrap.h"
@@ -21,7 +22,6 @@
 #include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
-#include "zbxdb.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -37,7 +37,7 @@ ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
-ZBX_VECTOR_IMPL(db_event_suppress, zbx_db_event_suppress_t)
+ZBX_VECTOR_LITE_IMPL(db_event_suppress, zbx_db_event_suppress_t)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -650,9 +650,10 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 				" and t.token='%s'"
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
+				" and t.auth_scheme=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t)))
 	{
 		goto out;
 	}
@@ -791,6 +792,65 @@ zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size)
 		zbx_vector_db_event_suppress_reserve(suppress, (size_t)size);
 
 	return suppress;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
+{
+	zbx_db_result_t	result;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+				"on the first try");
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		char	*uuid7 = zbx_gen_uuid7_hyphenated();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			/* INSERT may fail if a concurrent HA node has already inserted the   */
+			/* serverid row. Re-verify the row exists before treating this as     */
+			/* fatal.                                                             */
+			zbx_db_free_result(result);
+
+			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+						"after trying to insert");
+				zbx_free(uuid7);
+				ret = FAIL;
+				goto out;
+			}
+
+			if (NULL == zbx_db_fetch(result))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				ret = FAIL;
+			}
+		}
+
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
+
+	return ret;
 }
 
 /******************************************************************************

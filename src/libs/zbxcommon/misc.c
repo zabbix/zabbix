@@ -21,6 +21,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxstr.h"
@@ -64,15 +65,6 @@ void	zbx_exit_from_thread(int ret)
 		atomic_fetch_add(zbx_exit_num, 1);
 #endif
 	pthread_exit((void *)(zbx_int64_t)ret);
-}
-
-int	zbx_get_exit_num(void)
-{
-#if defined(HAVE_STDATOMIC_H)
-	if (NULL != zbx_exit_num)
-		return atomic_load(zbx_exit_num);
-#endif
-	return FAIL;
 }
 
 #endif

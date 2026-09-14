@@ -114,13 +114,12 @@ foreach ($data['ceprules'] as $ceprule) {
 		}
 	}
 
-	CArrayHelper::sort($ceprule['operations'], ['type']);
+	$is_legacy && CArrayHelper::sort($ceprule['operations'], ['type']);
 
 	foreach ($ceprule['operations'] as $operation) {
 		if ($is_legacy) {
 			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
 			$operations[] = BR();
-			continue;
 		}
 		else {
 			$operations[] = CCepRuleHelper::getOperationDescription($operation);
@@ -128,59 +127,61 @@ foreach ($data['ceprules'] as $ceprule) {
 		}
 	}
 
-	$make_stop_indicator = function (array $ceprule): CSpan {
-		if ($ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP) {
-			return (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
-		}
-
-		return (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);
-	};
-
-	$make_status_toggle_button = function (array $ceprule, bool $is_legacy): CLink {
-		$id = $is_legacy ? 'legacy-'.$ceprule['correlationid'] : $ceprule['cepruleid'];
-		$enable_action = $is_legacy ? 'correlation.enable' : 'ceprule.enable';
-		$disable_action = $is_legacy ? 'correlation.disable' : 'ceprule.disable';
-		$is_enabled = $is_legacy
-			? $ceprule['status'] == ZBX_CORRELATION_ENABLED
-			: $ceprule['status'] == CCepRuleHelper::STATUS_ENABLED;
-
-		return (new CLink($is_enabled ? _('Enabled') : _('Disabled')))
-			->addClass($is_enabled ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass('js-toggle-disabled')
-			->setAttribute('data-action', $is_enabled ? $disable_action : $enable_action)
-			->setAttribute('data-id', $id);
-	};
-
-	$make_row_checkbox = function (array $ceprule, bool $is_legacy): CCheckBox {
-		$id = $is_legacy ? 'legacy-'.$ceprule['correlationid'] : $ceprule['cepruleid'];
-
-		return new CCheckBox("cepruleids[$id]", $id);
-	};
-
-	$table->addRow([
-		$make_row_checkbox($ceprule, $is_legacy),
-		$is_legacy
-			? new CLink($ceprule['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'correlation.edit')
-				->setArgument('correlationid', $ceprule['correlationid'])
-				->getUrl()
-			)
-			: new CLink($ceprule['name'], (new CUrl('zabbix.php'))
+	if ($is_legacy) {
+		$table->addRow([
+			new CCheckBox('cepruleids[legacy-'.$ceprule['correlationid'].']', $ceprule['correlationid']),
+			new CLink($ceprule['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'correlation.edit')
+					->setArgument('correlationid', $ceprule['correlationid'])
+					->getUrl()
+				),
+			_('Event correlation'),
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			'',
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
+			'',
+			'',
+			(new CLink($ceprule['status'] == ZBX_CORRELATION_ENABLED ? _('Enabled') : _('Disabled')))
+				->addClass($ceprule['status'] == ZBX_CORRELATION_ENABLED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-toggle-disabled')
+				->setAttribute('data-action', $ceprule['status'] == ZBX_CORRELATION_ENABLED
+					? 'ceprule.disable'
+					: 'ceprule.enable'
+				)
+				->setAttribute('data-id', 'legacy-'.$ceprule['correlationid']),
+			$ceprule['error'] ? makeErrorIcon($ceprule['error']) : ''
+		]);
+	}
+	else {
+		$table->addRow([
+			new CCheckBox('cepruleids['.$ceprule['cepruleid'].']', $ceprule['cepruleid']),
+			new CLink($ceprule['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
 				->setArgument('popup', 'ceprule.edit')
 				->setArgument('cepruleid', $ceprule['cepruleid'])
 				->getUrl()),
-		$is_legacy ? _('Event correlation') : _('Complex event processing'),
-		$conditions,
-		$is_legacy ? '' : CCepRuleHelper::getWindowLabelString($ceprule),
-		$operations,
-		$is_legacy ? '' : $make_stop_indicator($ceprule),
-		$is_legacy ? '' : $ceprule['sortorder'],
-		$make_status_toggle_button($ceprule, $is_legacy),
-		$ceprule['error'] ? makeErrorIcon($ceprule['error']) : ''
-	]);
+			_('Complex event processing'),
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			CCepRuleHelper::getWindowLabelString($ceprule),
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
+			$ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP
+				? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+				: '',
+			$ceprule['sortorder'],
+			(new CLink($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? _('Enabled') : _('Disabled')))
+				->addClass($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-toggle-disabled')
+				->setAttribute('data-action', $ceprule['status'] == CCepRuleHelper::STATUS_ENABLED
+					? 'ceprule.disable'
+					: 'ceprule.enable'
+				)
+				->setAttribute('data-id', $ceprule['cepruleid']),
+			$ceprule['error'] ? makeErrorIcon($ceprule['error']) : ''
+		]);
+	}
 }
 
 $form->addItem([
@@ -190,19 +191,16 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massenable')
-				->addClass('no-chkbxrange')
 		],
 		[
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdisable')
-				->addClass('no-chkbxrange')
 		],
 		[
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdelete')
-				->addClass('no-chkbxrange')
 		]
 	], 'ceprules')
 ]);

@@ -466,14 +466,21 @@
 			const options = $.extend({}, defaults, JSON.parse(this.dataset.params));
 
 			options.required_str = $obj.attr('aria-required') === undefined ? 'false' : $obj.attr('aria-required');
-			options.custom_suggest_list = () => {
-				const name = $obj.data('multiSelect').values.search;
-				const list = new Map();
 
-				list.set(name, {name, id: name});
+			if (options.ms_list_of_string_mode) {
+				if (options.custom_suggest_list !== null) {
+					throw 'Unsupported options combination ms_list_of_string_mode and custom_suggest_list.';
+				}
 
-				return list;
-			};
+				options.custom_suggest_list = () => {
+					const name = $obj.data('multiSelect').values.search;
+					const list = new Map();
+
+					list.set(name, {name, id: name});
+
+					return list;
+				};
+			}
 
 			$obj.removeAttr('aria-required');
 			$obj.attr('data-field-type', 'multiselect');

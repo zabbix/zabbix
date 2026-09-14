@@ -66,7 +66,7 @@
 					.finally(() => this.#unsetLoadingActionButtons(e.target));
 			});
 
-			[...document.querySelectorAll('.js-toggle-disabled')]
+			document.querySelectorAll('.js-toggle-disabled')
 				.forEach(node => node.addEventListener('click', () => this.#toggleEnabled(node)));
 
 			this.#initPopupListeners();
@@ -74,12 +74,12 @@
 
 		#setLoadingActionButtons(target) {
 			target.classList.add('is-loading');
-			[...window['action_buttons'].querySelectorAll('button')].map(node => node.disabled = true);
+			window['action_buttons'].querySelectorAll('button').forEach(node => node.disabled = true);
 		}
 
 		#unsetLoadingActionButtons(target) {
 			target.classList.remove('is-loading');
-			[...window['action_buttons'].querySelectorAll('button')].map(node => node.disabled = false);
+			window['action_buttons'].querySelectorAll('button').forEach(node => node.disabled = false);
 		}
 
 		#branchLegacyIds(cepruleids_mixed) {

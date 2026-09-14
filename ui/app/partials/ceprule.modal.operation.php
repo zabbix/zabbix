@@ -19,129 +19,245 @@
  * @var array    $data
  */
 
-$execute_when = new CSelect('execute_when');
-foreach (CCepRuleHelper::getOperationExecuteWhenStrings() as $value => $name) {
-	$execute_when->addOption(new CSelectOption($value, $name));
-}
-
-$events_operations = new CSelectOptionGroup(_('Events'));
-$tags_operations = new CSelectOptionGroup(_('Tags'));
-$labels = CCepRuleHelper::getOperationLabelStrings();
-
-$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD,
+$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE_EVENT, CCepRuleHelper::OP_DISCARD,
 	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST, CCepRuleHelper::OP_COPY_FIRST
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_FIRST,
+	CCepRuleHelper::OP_CLONE_LAST
 ];
 
-foreach ($labels as $option => $label) {
-	$is_events_group = in_array($option, $events_group_opts);
-	$option = new CSelectOption($option, $label);
-	$option->setExtra('is_events_group', $is_events_group);
+$tag_group_opts = [CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
+	CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
+	CCepRuleHelper::OP_REMOVE_TAG
+];
 
-	if ($is_events_group) {
-		$events_operations->addOption($option);
-	}
-	else {
-		$tags_operations->addOption($option);
-	}
-}
+$labels = CCepRuleHelper::getOperationLabelStrings();
+$events_operations = (new CSelectOptionGroup(_('Event')))
+	->addOptions(CSelect::createOptionsFromArray(
+		array_intersect_key($labels, array_flip($events_group_opts))
+	));
+$tags_operations = (new CSelectOptionGroup(_('Tag')))
+	->addOptions(CSelect::createOptionsFromArray(
+		array_intersect_key($labels, array_flip($tag_group_opts))
+	));
+$window_operations = (new CSelectOptionGroup(_('Window')))
+	->addOptions(CSelect::createOptionsFromArray([
+		CCepRuleHelper::OP_CLOSE_WINDOW => $labels[CCepRuleHelper::OP_CLOSE_WINDOW]
+	]));
 
-echo (new CForm())
+(new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('sortorder', '0')
-	->addStyle('display: none;')
+	->addVar('window_type', '0')
+	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
-		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
-			->addItem((new CRow())
-				->setAttribute('data-row_index', '#{row_index}')
-				->addItem((new CCol())
-					->addItem((new CTextBox('tags[#{row_index}][tag]', '#{tag}'))
-						->setAttribute('is', 'z-cep-tagsuggest')
-						->setAttribute('placeholder', _('tag or $'))
-					)
-				)
-				->addItem((new CCol())
-					->addItem((new CSelect('tags[#{row_index}][operator]'))
-						->setValue('#{operator}')
-						->addOptions(CSelect::createOptionsFromArray([
-							TAG_OPERATOR_EXISTS => _('Exists'),
-							TAG_OPERATOR_EQUAL => _('Equals'),
-							TAG_OPERATOR_LIKE => _('Contains'),
-							TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
-							TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
-							TAG_OPERATOR_NOT_LIKE => _('Does not contain')
-						]))
-				)
-				->addItem((new CCol())
-					->addItem((new CTextBox('tags[#{row_index}][value]', '#{value}'))->setAttribute('placeholder', _('value')))
-				)
-				->addItem((new CCol())
-					->addItem((new CButtonLink(_('Remove')))->addClass('js-tag-remove'))
-				))
-			)
-		)
+		->addItem((new CTemplateTag('ceprule-operation-condition-row-template'))->addItem([
+			(new CRow(['#{formulaid}',
+				(new CCol('#{*description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][type]', '#{type}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Type'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][operator]', '#{operator}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Operator'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag]', '#{tag}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag value'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))
+						->setAttribute('data-changed', '')
+						->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}')
+		]))
+		->addItem((new CTemplateTag('ceprule-operation-condition-row-error-container-template'))->addItem([
+			(new CRow(
+				(new CCol())
+					->setColSpan(3)
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setId('operation-conditions-#{row_index}-error-container')
+			))
+		]))
+		->addItem((new CTemplateTag('ceprule-operation-condition-modal-template'))->addItem(
+			new CPartial('ceprule.modal.operation.condition')
+		))
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
 		->addItem(new CFormField(
-			$execute_when
+			(new CSelect('execute_when'))
+				->setId('ceprule-operation-execute-when')
 				->setAttribute('autofocus', '')
 				->setFocusableElementId('ceprule-operation-execute-when-label')
-				->setId('ceprule-operation-execute-when')
+				->addOptions(CSelect::createOptionsFromArray(
+					CCepRuleHelper::getOperationExecuteWhenStrings()
+				))
 		))
-		->addItem(new CLabel('Event tags'))
-		->addItem(new CFormField((new CRadioButtonList('evaltype', TAG_EVAL_TYPE_AND_OR))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-			->setModern(true)
-		))
-		->addItem(new CFormField(
-			(new CTable())
-				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
-				->setId('ceprule-operation-tags-table')
+		->addItem(new CLabel(_('Type of calculation'), 'ceprule-operation-filter-evaltype-select'))
+		->addItem(new CFormField([
+			(new CDiv(
+				(new CSelect('filter[evaltype]'))
+					->setId('ceprule-operation-filter-evaltype')
+					->setFocusableElementId('ceprule-operation-filter-evaltype-select')
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					]))
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+			))->addClass(ZBX_STYLE_CELL),
+			(new CDiv([
+				(new CSpan())->setId('ceprule-operation-filter-expression-preview'),
+				(new CTextAreaFlexible('filter[formula]'))
+					->setMaxlength(DB::getFieldLength('cep_rule', 'formula'))
+					->setId('ceprule-operation-filter-expression')
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setAttribute('placeholder', 'A or (B and C) ...')
+			]))
+				->addClass(ZBX_STYLE_CELL)
+				->addClass(ZBX_STYLE_CELL_EXPRESSION)
+		]))
+		->addItem(new CLabel(_('Conditions'), 'ceprule-operation-filter-conditions'))
+		->addItem((new CFormField())
+			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')
-				->setAttribute('data-field-name', 'tags')
-				->addItem((new CTag('tfoot', true))->addItem((new CCol(
-					(new CButtonLink(_('Add')))->addClass('js-tag-add')
-				))->setColSpan(4)))
-		))
-		->addItem(new CLabel('Operation', 'ceprule-operation-type-label'))
-		->addItem((new CFormField())
-			->addItem((new CSelect('type'))
-				->setFocusableElementId('ceprule-operation-type-label')
-				->setId('ceprule-operation-type')
-				->addOptionGroup($events_operations)
-				->addOptionGroup($tags_operations)
-			)
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('event_name'))
-				->setId('ceprule-operation-name-argument')
-				->setAttribute('placeholder', 'name')
-			)
-			->addItem((new CTextBox('tag'))
-				->setId('ceprule-operation-tag-argument')
-				->setAttribute('placeholder', 'tag')
-			)
-			->addItem((new CDateSelector('suppress_until'))
-				->setId('ceprule-operation-period-argument')
-				->setDateFormat(ZBX_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-				->setAriaRequired()
+				->setAttribute('data-field-name', 'filter[conditions]')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addItem((new CTable())
+					->setColumns([
+						new CTableColumn(
+							(new CColHeader(_('Label')))->setWidth('40')
+						),
+						(new CTableColumn(_('Name')))
+							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+						new CTableColumn(
+							(new CColHeader(_('Actions')))->setWidth('75')
+						)
+					])
+					->setId('ceprule-operation-filter-conditions')
+					->addItem((new CTag('tfoot', true))
+						->addItem((new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-condition-add')
+						))->setColSpan(4))
+					)
+				)
 			)
 		)
-		->addItem((new CFormField())
-			->setId('ceprule-operation-tag-rename-argument')
-			->addItem((new CTextBox('tag'))->setAttribute('placeholder', _('old name')))
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('new_tag'))->setAttribute('placeholder', _('new name')))
+		->addItem(
+			(new CLabel(_('Operation'), 'ceprule-operation-type-label'))
+				->addItem(
+					makeHelpIcon([
+						_('Problem event generation mode impacts cloning:'),
+						(new CList([
+							_('Multiple: Clones any problem.'),
+							_('Single: Clones closed problems only.')
+						]))->addClass(ZBX_STYLE_LIST_DASHED)
+					])
+						->setId('ceprule-operation-type-hint')
+				)
 		)
-		->addItem((new CFormField())
-			->setId('ceprule-operation-tag-pair-argument')
-			->addItem((new CTextBox('tag'))->setAttribute('placeholder', _('tag')))
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('tag_value'))->setAttribute('placeholder', _('value')))
+		->addItem(new CFormField([
+			new CHorList([
+				(new CListItem([
+					(new CSelect('type'))
+						->setFocusableElementId('ceprule-operation-type-label')
+						->setId('ceprule-operation-type')
+						->addOptionGroup($events_operations)
+						->addOptionGroup($tags_operations)
+						->addOptionGroup($window_operations)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('event_name'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
+						->setAttribute('placeholder', _('name'))
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('tag'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
+						->setAttribute('placeholder', _('tag'))
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
+						->addValue(_('Duration'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
+						->setModern(true)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('suppress_duration'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'suppress_duration'))
+				]))->addClass(ZBX_STYLE_ALIGN_TOP)
+			])
+		]))
+		->addItem(
+			(new CFormField([
+				new CHorList([
+					(new CTextAreaFlexible('old_tag'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
+						->setAttribute('placeholder', _('old name'))
+						->setErrorLabel(_('old name'))
+						->setErrorContainer('ceprule-operation-tag-rename-error-container'),
+					(new CTextAreaFlexible('new_tag'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'new_tag'))
+						->setAttribute('placeholder', _('new name'))
+						->setErrorLabel(_('new name'))
+						->setErrorContainer('ceprule-operation-tag-rename-error-container')
+				]),
+				(new CDiv())
+					->setId('ceprule-operation-tag-rename-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			]))
+				->setId('ceprule-operation-tag-rename-argument')
+		)
+		->addItem(
+			(new CFormField([
+				new CHorList([
+					(new CTextAreaFlexible('tag_name'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
+						->setAttribute('placeholder', _('tag'))
+						->setErrorContainer('ceprule-operation-tag-pair-error-container'),
+					(new CTextAreaFlexible('tag_value'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag_value'))
+						->setAttribute('placeholder', _('value'))
+						->setErrorContainer('ceprule-operation-tag-pair-error-container')
+				]),
+				(new CDiv())
+					->setId('ceprule-operation-tag-pair-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			]))
+				->setId('ceprule-operation-tag-pair-argument')
 		)
 		->addItem((new CFormField())
 			->setId('ceprule-operation-severity-argument')
 			->addItem(new CSeverity('severity', TRIGGER_SEVERITY_INFORMATION))
 		)
-	);
+	)
+	->show();

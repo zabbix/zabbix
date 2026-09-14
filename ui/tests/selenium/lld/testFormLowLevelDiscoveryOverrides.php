@@ -671,8 +671,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	private function overridesCreate($data) {
-		$this->page->login()->open('host_discovery.php?form=create&context=host&hostid='.self::HOST_ID);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.
+				'&context=host'
+		);
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$key = 'lld_override'.time();
 		$form->fill([
 			'Name' => 'LLD with overrides',
@@ -685,16 +690,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		// Add overrides from data to lld rule.
 		foreach($data['overrides'] as $i => $override){
 			$override_container->query('button:Add')->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+			$override_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+			$override_form = $override_dialog->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 			// Fill Override name and what to do if Filter matches.
 			if (array_key_exists('fields', $override)) {
-				$override_overlay->fill($override['fields']);
+				$override_form->fill($override['fields']);
 			}
 			$this->fillOverrideFilter($override);
 			$this->fillOverrideOperations($data, $override);
 
-			$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
+			$this->checkSubmittedOverlay($data['expected'], $override_form, CTestArrayHelper::get($override, 'error'));
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 				// Check that Override with correct name was added to Overrides table.
@@ -1618,7 +1624,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
-		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::UPDATED_ID);
+		$this->page->login()->open('zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::UPDATED_ID);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
@@ -1777,10 +1784,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					}
 					// Open Override overlay.
 					$override_container->query('link', $override['name'])->one()->click();
-					$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+					$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 					// Get Operations Table.
-					$operations_container = $override_overlay->getField('Operations')->asTable();
+					$operations_container = $override_form->getField('Operations')->asTable();
 
 					foreach (CTestArrayHelper::get($override, 'Operations', []) as $j => $operation) {
 						$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
@@ -1823,12 +1830,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				case USER_ACTION_UPDATE:
 					// Fill Override name and what to do if Filter matches.
 					if (array_key_exists('fields', $override)) {
-						$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
-						$override_overlay->fill($override['fields']);
+						$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+						$override_form->fill($override['fields']);
 					}
 					$this->fillOverrideFilter($override);
 					$this->fillOverrideOperations($data, $override, $sources, $id);
-					$this->checkSubmittedOverlay($data['expected'], $override_overlay,
+					$this->checkSubmittedOverlay($data['expected'], $override_form,
 							CTestArrayHelper::get($override, 'error'));
 
 					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
@@ -1868,25 +1875,25 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	/**
 	 * @param array         $override          override fields from data
 	 *
-	 * @return CFormElement $override_overlay  override or condition form in overlay
+	 * @return CFormElement $override_form  override or condition form in overlay
 	 */
 	private function fillOverrideFilter($override) {
-		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+		$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 		// Add Filters to override.
 		if (array_key_exists('Filters', $override)) {
-			$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+			$filters_table = $override_form->query('id:overrides_filters')->asMultifieldTable()->one();
 			$mapping = $this->setFiltersTableMapping($filters_table);
 			$filters_table->setFieldMapping($mapping)->fill($override['Filters']['filter_conditions']);
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
-				$override_overlay->query('name:overrides_evaltype')->waitUntilPresent()->one()
+				$override_form->query('name:overrides_evaltype')->waitUntilPresent()->one()
 						->asDropdown()->fill($override['Filters']['Type of calculation']);
 
 				// Add formula if Type of calculation is Custom.
 				if (array_key_exists('formula', $override['Filters'])) {
-					$override_overlay->query('id:overrides_formula')->waitUntilPresent()->one()
+					$override_form->query('id:overrides_formula')->waitUntilPresent()->one()
 							->fill($override['Filters']['formula']);
 				}
 			}
@@ -1897,11 +1904,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * @param array         $data              data provider
 	 * @param array         $override          override fields from data
 	 *
-	 * @return CFormElement $override_overlay  override or condition form in overlay
+	 * @return CFormElement $override_form  override or condition form in overlay
 	 */
 	private function fillOverrideOperations($data, $override, $sources = null, $id = null) {
-		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
-		$operation_container = $override_overlay->getField('Operations')->asTable();
+		$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+		$operation_container = $override_form->getField('Operations')->asTable();
 
 		// Add Operations to override.
 		foreach(CTestArrayHelper::get($override, 'Operations', []) as $i => $operation){
@@ -1990,7 +1997,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 		}
 		// Submit Override.
-		$override_overlay->submit();
+		$override_form->submit();
 	}
 
 	/**
@@ -2018,8 +2025,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 
 		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::$created_id);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$this->page->open('zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::$created_id);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();
 		// Get Overrides count.
@@ -2047,11 +2055,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Open each override dialog.
 			$row = $override_container->findRow('Name', $override['fields']['Name']);
 			$row->query('link', $override['fields']['Name'])->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
+			$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 			// Check that Override fields filled with correct data.
 			foreach ($override['fields'] as $field => $value) {
-				$override_overlay->getField($field)->checkValue($value);
+				$override_form->getField($field)->checkValue($value);
 			}
 
 			if (array_key_exists('Filters', $override)) {
@@ -2062,26 +2070,26 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				unset($condition);
 
 				// Check that Filters are filled correctly.
-				$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+				$filters_table = $override_form->query('id:overrides_filters')->asMultifieldTable()->one();
 				$mapping = $this->setFiltersTableMapping($filters_table);
 				$filters_table->setFieldMapping($mapping)->checkValue($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
-					$evaluation_type = $override_overlay->query('name:overrides_evaltype')->one()->asDropdown()->getValue();
+					$evaluation_type = $override_form->query('name:overrides_evaltype')->one()->asDropdown()->getValue();
 					$this->assertEquals($override['Filters']['Type of calculation'], $evaluation_type);
 
 					// Check that Formula is filled correctly.
 					if (array_key_exists('formula', $override['Filters'])) {
 						$formula = CTestArrayHelper::get($override['Filters'], 'Type of calculation') !== 'Custom expression'
-							? $override_overlay->query('id:overrides_expression')->one()->getText()
-							: $override_overlay->query('id:overrides_formula')->one()->getValue();
+							? $override_form->query('id:overrides_expression')->one()->getText()
+							: $override_form->query('id:overrides_formula')->one()->getValue();
 						$this->assertEquals($override['Filters']['formula'], $formula);
 					}
 				}
 			}
 
-			$operation_container = $override_overlay->getField('Operations')->asTable();
+			$operation_container = $override_form->getField('Operations')->asTable();
 			// Get Operations count.
 			$operation_count = $operation_container->getRows()->count();
 
@@ -2116,8 +2124,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 
 			// Close Override dialog.
-			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::find(1)->one()->close();
 		}
+
+		$dialog->close();
 	}
 
 	/**

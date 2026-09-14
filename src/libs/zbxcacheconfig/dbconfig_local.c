@@ -14,6 +14,7 @@
 
 #include "dbconfig_local.h"
 #include "dbconfig_correlation.h"
+#include "dbconfig_cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
@@ -32,6 +33,7 @@ void	zbx_dc_config_local_init(void)
 	zbx_hashset_create(&config_local->trigger_depends_links, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	config_local->cep_config = cep_config_create();
 	config_local->correlation_config = correlation_config_create();
 	config_local->apm_config = NULL;
 
@@ -67,6 +69,7 @@ void	zbx_dc_config_local_release(void)
 	correlation_config_destroy(config_local->correlation_config);
 	zbx_free(config_local->apm_config);
 
+	cep_config_destroy(config_local->cep_config);
 	zbx_free(config_local);
 }
 

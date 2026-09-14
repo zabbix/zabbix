@@ -17,8 +17,9 @@
 #include "cep.h"
 #include "zbx_cep.h"
 
-#include "zbxalgo.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxmw.h"
 
@@ -32,12 +33,11 @@ zbx_cep_task_group_t;
 
 struct zbx_cep_queue
 {
-	/* remote requests (IPC messages) will be queued as priority tasks */
 	zbx_mw_queue_t	base;
 
 	/* pending tasks grouped by event origin (source, object, objectid), each group enforcing */
-	zbx_hashset_t	groups;
 	/* a limit on parallel tasks with excess tasks stored as pending in the group             */
+	zbx_hashset_t	groups;
 
 	/* number of pending tasks in groups */
 	int		group_tasks_num;
@@ -64,15 +64,15 @@ static void	cep_task_group_clear(void *d)
 
 static zbx_hash_t	cep_task_group_hash(const void *d)
 {
-	zbx_cep_task_group_t	*group = (zbx_cep_task_group_t *)d;
+	const zbx_cep_task_group_t	*group = (const zbx_cep_task_group_t *)d;
 
 	return cep_origin_hash(&group->origin);
 }
 
 static int	cep_task_group_compare(const void *d1, const void *d2)
 {
-	zbx_cep_task_group_t	*g1 = (zbx_cep_task_group_t *)d1;
-	zbx_cep_task_group_t	*g2 = (zbx_cep_task_group_t *)d2;
+	const zbx_cep_task_group_t	*g1 = (const zbx_cep_task_group_t *)d1;
+	const zbx_cep_task_group_t	*g2 = (const zbx_cep_task_group_t *)d2;
 
 	return cep_origin_compare(&g1->origin, &g2->origin);
 }
@@ -146,8 +146,8 @@ static void	cep_queue_push_event(zbx_cep_queue_t *queue, zbx_mw_task_t *task, co
 {
 	zbx_cep_task_group_t	pending_local = {
 						.origin = {
-							.source = db_event->source,
-							.object = db_event->object,
+							.source = (unsigned char)db_event->source,
+							.object = (unsigned char)db_event->object,
 							.objectid = db_event->objectid
 						}
 					};
@@ -274,13 +274,13 @@ static void	cep_queue_push_next_event_task(zbx_cep_queue_t *queue, zbx_cep_task_
 {
 	zbx_cep_task_group_t	pending_local = {
 					.origin = {
-						.source = task->db_event->source,
-						.object = task->db_event->object,
+						.source = (unsigned char)task->db_event->source,
+						.object = (unsigned char)task->db_event->object,
 						.objectid = task->db_event->objectid
 					}
 	};
 	zbx_cep_task_group_t	*group;
-	int			pending_num;
+	int			pending_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64, __func__,
 			pending_local.origin.source, pending_local.origin.object, pending_local.origin.objectid);
@@ -342,11 +342,27 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 			zbx_queue_ptr_values_num(&queue->base.completed));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the number of pending commits in queue                     *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue)
 {
 	return queue->pending_commits_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether a queue is empty                                    *
+ *                                                                            *
+ * Parameters: queue - [IN] queue instance                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the queue is empty                                 *
+ *               FAIL - the queue has pending, processing, group, or          *
+ *                      completed tasks                                       *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_queue_is_empty(zbx_cep_queue_t *queue)
 {
 	if (0 != queue->base.pending_num || 0 != queue->base.processing_num)

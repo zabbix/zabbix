@@ -14,6 +14,7 @@
 
 #include "browser_alert.h"
 #include "duktape.h"
+#include "duk_config.h"
 
 #ifdef HAVE_LIBCURL
 

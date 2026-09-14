@@ -208,7 +208,7 @@ static double	get_selfmon_stats_threads(unsigned char aggr_func, int proc_num, u
 	switch (aggr_func)
 	{
 		case ZBX_SELFMON_AGGR_FUNC_AVG:
-			return get_selfmon_stat(total / usage->values_num, state);
+			return get_selfmon_stat(total / count, state);
 		case ZBX_SELFMON_AGGR_FUNC_MIN:
 			return get_selfmon_stat(min, state);
 		case ZBX_SELFMON_AGGR_FUNC_MAX:
@@ -1084,6 +1084,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			zbx_uint64_t	total = stats.items_num + stats.requests_num;
 
 			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / (double)total * 100));
+		}
+		else if (0 == strcmp(tmp, "paccessed"))
+		{
+			SET_DBL_RESULT(result, (0 == stats.slots_num ? 0 :
+					(double)stats.recent_entry_num / stats.slots_num * 100));
 		}
 		else
 		{

@@ -210,8 +210,8 @@ static void	correlation_remove_condition(zbx_correlation_t *correlation, zbx_cor
 	{
 		if (correlation->conditions.values[i] == condition)
 		{
-			zbx_vector_corr_condition_ptr_remove_noorder(&correlation->conditions, i);
 			corr_condition_release(condition);
+			zbx_vector_corr_condition_ptr_remove_noorder(&correlation->conditions, i);
 			return;
 		}
 	}
@@ -349,8 +349,8 @@ static zbx_corr_condition_t	*corr_condition_create(zbx_uint64_t conditionid, uns
 
 static int	correlation_compare_by_id(const void *a1, const void *a2)
 {
-	const zbx_correlation_t	*c1 = *(zbx_correlation_t **)a1;
-	const zbx_correlation_t	*c2 = *(zbx_correlation_t **)a2;
+	const zbx_correlation_t	*c1 = *(zbx_correlation_t * const *)a1;
+	const zbx_correlation_t	*c2 = *(zbx_correlation_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c1->correlationid, c2->correlationid);
 
@@ -402,8 +402,8 @@ static void	correlation_config_handle_release(zbx_correlation_config_handle_t ha
  ******************************************************************************/
 static int	compare_corr_conditions_by_type(const void *a1, const void *a2)
 {
-	zbx_corr_condition_t	*c1 = *(zbx_corr_condition_t **)a1;
-	zbx_corr_condition_t	*c2 = *(zbx_corr_condition_t **)a2;
+	const zbx_corr_condition_t	*c1 = *(const zbx_corr_condition_t * const *)a1;
+	const zbx_corr_condition_t	*c2 = *(const zbx_corr_condition_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c1->type, c2->type);
 
@@ -488,7 +488,6 @@ static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&corr_config->correlations, ref);
 	}
 
-	atomic_store(&corr_config->correlations_num, corr_config->correlations.num_data);
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -551,14 +550,14 @@ static void	correlation_config_sync_operations(zbx_dbsync_t *sync)
 		switch (op->type)
 		{
 			case ZBX_CORR_OPERATION_CLOSE_OLD:
-				ref->correlation->operations |= CORRELATION_OP_CLOSE_OLD;
+				correlation->operations |= CORRELATION_OP_CLOSE_OLD;
 				break;
 			case ZBX_CORR_OPERATION_CLOSE_NEW:
-				ref->correlation->operations |= CORRELATION_OP_CLOSE_NEW;
+				correlation->operations |= CORRELATION_OP_CLOSE_NEW;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
-				continue;
+				break;
 		}
 
 		correlation_ref_update(ref, correlation);
@@ -669,7 +668,10 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 		correlation = correlation_acquire(ref->correlation);
 
 		if (NULL != cond_ref->condition)
+		{
+			correlation_remove_condition(correlation, cond_ref->condition);
 			corr_condition_release(cond_ref->condition);
+		}
 		else
 			cond_ref->correlationid = correlationid;
 
@@ -677,7 +679,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 		cond_ref->condition = corr_condition_create(cond_ref->conditionid, type, row + 3);
 
 		/* sort the conditions later */
-		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 			zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 		zbx_vector_corr_condition_ptr_append(&correlation->conditions,
@@ -707,7 +709,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 			correlation_remove_condition(correlation, cond_ref->condition);
 
 			/* sort the conditions later */
-			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 				zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 			correlation_ref_update(ref, correlation);
@@ -766,6 +768,8 @@ void	correlation_config_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_
 		corr_config->handle = handle;
 
 		pthread_mutex_unlock(&corr_config->lock);
+
+		atomic_store(&corr_config->correlations_num, corr_config->correlations.num_data);
 	}
 }
 
@@ -801,8 +805,9 @@ static void	correlation_conditon_dump(const zbx_corr_condition_t *cond, const ch
 
 static void	correlation_dump(const zbx_correlation_t *correlation)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x refcount:%u",
-			correlation->correlationid, correlation->name, correlation->operations, correlation->refcount);
+	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x evaltype:%u formula:%s"
+			" refcount:%u", correlation->correlationid, correlation->name, correlation->operations,
+			correlation->evaltype, correlation->formula, correlation->refcount);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 

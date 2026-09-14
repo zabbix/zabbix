@@ -12,10 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxhistory.h"
-#include "zbxstr.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxhistory.h"
+#include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxcommon.h"
 #include "zbxrtc.h"
@@ -29,6 +29,7 @@
 #include "zbxnix.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 #include "zbxdb.h"
 #include "zbxprof.h"
 #ifdef HAVE_ARES_QUERY_CACHE
@@ -307,7 +308,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 
 		case ZBX_PROCESS_TYPE_CEP_MANAGER:
 			*owner = PROCESS_OWNER_SUPERVISOR;
-			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
+			*runlevel = ZBX_RUNLEVEL_CEP;
 			break;
 
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
@@ -726,11 +727,12 @@ static void	*supervisor_thread_entry(void *args)
  *                                                                            *
  * Purpose: start a unit thread with specified entry function and arguments   *
  *                                                                            *
- * Parameters: unit         - [IN] supervisor unit to start                   *
- *             thread_entry - [IN] thread entry function                      *
- *             args         - [IN] thread arguments structure                 *
- *             shared       - [IN] data shared between units                  *
- *              unit_exit_num - [IN] counter of exited (stopped/crashed) units*
+ * Parameters: unit          - [IN] supervisor unit to start                  *
+ *             thread_entry  - [IN] thread entry function                     *
+ *             args          - [IN] thread arguments structure                *
+ *             shared        - [IN] data shared between units                 *
+ *             unit_exit_num - [IN/OUT] counter of exited (stopped/crashed)   *
+ *                                  units                                     *
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),
@@ -769,6 +771,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
  *                                                                            *
  * Parameters: sv            - [IN] supervisor instance                       *
  *             args          - [IN] supervisor thread arguments               *
+ *             shared        - [IN] data shared between units                 *
  *             runlevel_last - [IN] previous runlevel                         *
  *                                                                            *
  ******************************************************************************/

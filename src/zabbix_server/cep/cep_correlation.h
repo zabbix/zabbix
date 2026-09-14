@@ -17,6 +17,7 @@
 
 #include "zbxmw.h"
 #include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 #define CORRELATION_RESULT_NONE		0x00
 #define CORRELATION_RESULT_CLOSE_NEW	0x01

@@ -33,6 +33,12 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#condition_rules;
 
+	/** @type {Object} */
+	#execute_when_by_window_type;
+
+	/** @type {Object} */
+	#operation_types_by_execute_when;
+
 	/** @type {Template} */
 	#condition_row_template;
 
@@ -43,10 +49,22 @@ window.ceprule_edit_popup = new class {
 	#condition_row_template_tag;
 
 	/** @type {Template} */
-	#condition_row_template_tag_exists;
+	#condition_row_template_tag_value;
+
+	/** @type {Template} */
+	#template_operation_table_condition_tag;
+
+	/** @type {Template} */
+	#template_operation_table_condition_tag_value;
+
+	/** @type {Template} */
+	#template_operation_table_condition_property;
 
 	/** @type {Number} */
 	#condition_row_index = 0;
+
+	/** @type {Number} */
+	#operation_row_index = 0;
 
 	/** @type {Template} */
 	#operation_row_template;
@@ -55,20 +73,25 @@ window.ceprule_edit_popup = new class {
 	#operation_rules;
 
 	/** @type {Object} */
+	#operation_conditon_rules;
+
+	/** @type {Object} */
 	#rules_for_clone;
 
-	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
+	init({rules, rules_for_clone, operation_rules, condition_rules, operation_conditon_rules,
+			operation_types_by_execute_when, execute_when_by_window_type, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
+		this.#operation_types_by_execute_when = operation_types_by_execute_when;
+		this.#execute_when_by_window_type = execute_when_by_window_type;
 		this.#operation_rules = operation_rules;
+		this.#operation_conditon_rules = operation_conditon_rules;
 		this.#overlay = overlays_stack.getById('ceprule.edit');
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 
 		for (const condition of Object.values(ceprule.filter.conditions)) {
-			const formulaid = this.#indexToFormulaId(this.#condition_row_index++);
-
-			this.#addConditionRow({...condition, formulaid});
+			this.#addConditionRow(condition);
 		}
 
 		for (const operation of Object.values(ceprule.operations)) {
@@ -82,83 +105,42 @@ window.ceprule_edit_popup = new class {
 
 		this.#initActions();
 		this.form = new CForm(this.form_element, rules);
+		this.form.findFieldByName('operations').setButtonOnBlur('js-operation-add', 'ceprule.operation.edit');
 
-		this.#handleFilterChanged();
+		this.#refreshExpressionPreview();
+		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
+		this.#handleWindowTypeChanged(Number(ceprule.window_type));
+
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
-		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
 
-		this.#handleWindowTypeChanged();
-		this.form_element.style.display = '';
-	}
-
-	/**
-	 * Formula ID from large number.
-	 */
-	#indexToFormulaId(index) {
-		let formulaid = '';
-
-		for (index++; index; index = Math.floor(index / 26)) {
-			formulaid = String.fromCharCode(65 + --index % 26) + formulaid
-		};
-
-		return formulaid;
+		window.requestAnimationFrame(() => {
+			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			Focuser.focus(this.form_element.querySelector('[autofocus]'));
+		});
 	}
 
 	#initTemplates() {
-		this.#condition_row_template_value = new Template(`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`);
-		this.#condition_row_template_tag = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`);
-		this.#condition_row_template_tag_exists = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`);
-		this.#condition_row_template = new Template(`
-			<tr data-formulaid="#{formulaid}">
-				<td>#{formulaid}</td>
-				<td>#{*description_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][type]" type="hidden" value="#{type}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][operator]" type="hidden" value="#{operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][severity]" type="hidden" value="#{severity}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][event_name]" type="hidden" value="#{event_name}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_operator]" type="hidden" value="#{tag_operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host]" type="hidden" value="#{host}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host_group]" type="hidden" value="#{host_group}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][time_period]" type="hidden" value="#{time_period}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][formulaid]" type="hidden" value="#{formulaid}"/>
-				</td>
-			</tr>
-		`);
+		this.#condition_row_template_value = new Template(
+			`#{name} #{operator} <em>#{value}</em>`
+		);
+		this.#condition_row_template_tag = new Template(
+			`#{name} #{operator} <em>#{tag}</em>`
+		);
+		this.#condition_row_template_tag_value = new Template(
+			`#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>`
+		);
 
-		this.#operation_row_template = new Template(`
-			<tr data-sortorder="#{sortorder}">
-				<td class="td-drag-icon">
-					<div class="drag-icon"></div>
-					<span class="list-numbered-item">:</span>
-				</td>
-				<td>
-					<div class="text"><?= _('Execute when') ?> #{execute_when_str} : #{label_str}<em> #{arguments_str}</em></div>
-				</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-remove"><?= _('Remove') ?></button>
+		this.#template_operation_table_condition_tag = new Template(
+			`#{name} #{operator} <em>#{tag}</em>`
+		);
+		this.#template_operation_table_condition_tag_value = new Template(
+			`#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>`
+		);
+		this.#template_operation_table_condition_property = new Template(`#{text}`);
 
-					#{*tags_input_html}
-
-					<input data-field-type="hidden" name="operations[#{sortorder}][sortorder]" type="hidden" value="#{sortorder}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][type]" type="hidden" value="#{type}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
-				</td>
-			</tr>
-		`);
+		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
+		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
 	}
 
 	#initActions() {
@@ -173,113 +155,109 @@ window.ceprule_edit_popup = new class {
 				this.#openConditionPopup(undefined, e.target);
 			}
 			else if (e.target.classList.contains('js-condition-edit')) {
-				const formulaid = e.target.closest('tr').dataset.formulaid;
+				const row_index = e.target.closest('tr').dataset.row_index;
 				const conditions = this.form.findFieldByName('filter[conditions]').getValue();
 
-				this.#openConditionPopup(conditions[formulaid], e.target);
+				this.#openConditionPopup(conditions[row_index], e.target, row_index);
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
+				this.#refreshExpressionPreview();
 
-				if (!window['ceprule-filter-conditions'].querySelector('[data-formulaid]')) {
+				if (!window['ceprule-filter-conditions'].querySelector('[data-row_index]')) {
 					this.#condition_row_index = 0;
 				}
-
-				this.form_element.dispatchEvent(new Event('filter.change'));
 			}
 			else if (e.target.classList.contains('js-operation-add')) {
 				this.#openOperationPopup(undefined, e.target);
 			}
 			else if (e.target.classList.contains('js-operation-edit')) {
-				const {
-					[e.target.closest('[data-sortorder]').getAttribute('data-sortorder')]: operation
-				} = this.form.findFieldByName('operations').getValue();
+				const row_index = Number(e.target.closest('tr').dataset.row_index);
+				const operation = this.form.findFieldByName('operations').getValue()[row_index];
+
 				this.#openOperationPopup(operation, e.target);
 			}
 			else if (e.target.classList.contains('js-operation-remove')) {
-				e.target.closest('tr').remove();
+				const row = e.target.closest('tr');
+				row.nextElementSibling.remove();
+				row.remove();
+
+				if (!document.getElementById('ceprule-operations-table').querySelector('[data-row_index]')) {
+					this.#operation_row_index = 0;
+				}
+
+				this.#renumberOperationRows();
 				this.form.discoverAllFields();
+				this.#toggleOperationsInformation();
 			}
 		});
 
-		// Add event proxies.
-		this.form_element.addEventListener('change', (e) => {
-			if (e.target.name === 'filter[evaltype]') {
-				this.form_element.dispatchEvent(new Event('filter.change'));
-			}
-		});
-
-		// Add proxied form event handlers.
-		this.form_element.addEventListener('filter.change', () => this.#handleFilterChanged());
-
+		window['ceprule-filter-evaltype'].addEventListener('change', () => this.#refreshExpressionPreview());
 		window['ceprule-window-counttag-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-counttag-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-counttag'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-counttag'].disabled = !enabled;
 		});
 
 		window['ceprule-window-capacity-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-capacity-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-capacity'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-capacity'].disabled = !enabled;
 		});
 
-		window['ceprule-window-groupby-opt-tag'].addEventListener('change', (e) => {
-			window['ceprule-window-groupby-tag'].style.display = e.target.checked ? '' : 'none';
+		window['ceprule-window-groupby-opt-tag']
+			.addEventListener('change', e => this.#handleOptgroupTagChange.call(e.target));
+
+		window['ceprule-window-groupby-opt-host'].addEventListener('change', e => {
+			this.form.findFieldByName('window[group_by_tags]').setChanged();
+		});
+		window['ceprule-window-groupby-opt-group'].addEventListener('change', e => {
+			this.form.findFieldByName('window[group_by_tags]').setChanged();
 		});
 
-		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
+		window['ceprule-window-type']
+			.addEventListener('change', e => this.#handleWindowTypeChanged(Number(e.target.value)));
 
-		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {selector_handle: 'div.drag-icon'});
+		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {
+			selector_span: ':not(.error-container-row)',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		}).on(CSortable.EVENT_SORT, () => {
+			this.#renumberOperationRows();
+		});
 
 		// Confirm / cancel dialog.
 		this.#overlay.$dialogue.$footer.get(0).addEventListener('click', (e) => {
 			const class_list = e.target.classList;
 
 			if (class_list.contains('js-submit')) {
-				if (class_list.contains('js-submit-force')) {
-					const $target = jQuery(e.target);
-					const item = {
-						label: <?= json_encode(_('Force update')) ?>,
-						clickCallback: () => this.#submit(true)
-					};
-					const options = {
-						position: {at: 'left bottom', my: 'left top', of: $target},
-						closeCallback: () => { $target.focus(); }
-					};
-
-					$target.menuPopup([{items: [item]}], jQuery(e), options);
-				}
-				else {
-					this.#submit(false);
-				}
+				this.#submit();
 			}
 			else if (class_list.contains('js-delete')) {
-				window.confirm(<?= json_encode('Delete complex event processing rule?') ?>) && this.#delete();
+				if (window.confirm(<?= json_encode(_('Delete complex event processing rule?')) ?>)) {
+					this.#delete();
+				}
+				else {
+					this.#overlay.unsetLoading();
+				}
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
 			}
+			else if (class_list.contains('js-reset-time-windows')) {
+				this.#resetTimeWindows();
+			}
 		});
 	}
 
-	#handleWindowTypeChanged() {
-		const input = [...window['ceprule-window-type'].querySelectorAll('[name="window_type"]')]
-			.find(node => node.checked);
-		const type = Number(input.value);
+	#handleOptgroupTagChange() {
+		window['ceprule-window-groupby-tag'].style.display = this.checked ? '' : 'none';
+		jQuery(window['ceprule-window-groupby-tag']).multiSelect(this.checked ? 'enable' : 'disable');
+	}
 
-
-		// TODO: why are these fields initially in changed state although no interaction yet?
-		if (this.form.findFieldByName('window[group_by_host]')._changed
-				|| this.form.findFieldByName('window[group_by_host_group]')._changed
-				|| this.form.findFieldByName('window[group_by_tags]')._changed) {
-			this.form.validateChanges(['window[group_by_tags]']);
-		}
-
+	#handleWindowTypeChanged(type) {
 		window['ceprule-operations-label']
 			.classList.toggle('form-label-asterisk', type != <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
-
-		window['ceprule-groupby-label']
-			.classList.toggle('form-label-asterisk', type == <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
 
 		{
 			const form_field = window['ceprule-script'].closest('.form-field');
@@ -287,6 +265,7 @@ window.ceprule_edit_popup = new class {
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
+			jQuery(window['ceprule-script']).multilineInput(display === '' ? 'enable' : 'disable');
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');
@@ -331,6 +310,16 @@ window.ceprule_edit_popup = new class {
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 		}
+
+		const group_field_names = ['window[group_by_host]', 'window[group_by_host_group]', 'window[group_by_tags]'];
+
+		if (group_field_names.find(name => this.form.findFieldByName(name).hasChanged())) {
+			group_field_names.forEach(name => this.form.findFieldByName(name).setChanged());
+			this.form.validateChanges(group_field_names);
+		}
+
+		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
+		this.#toggleOperationsInformation();
 	}
 
 	#delete() {
@@ -370,6 +359,37 @@ window.ceprule_edit_popup = new class {
 			});
 	}
 
+	#resetTimeWindows() {
+		this.#removePopupMessages();
+		fetch(zabbixUrl({action: 'ceprule.resettimewindows'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json; charset=UTF-8'},
+			body: JSON.stringify({
+				cepruleid: this.form.findFieldByName('cepruleid').getValue(),
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('success' in response) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
+
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				}
+				else {
+					throw new Error();
+				}
+			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
+	}
+
 	#clone() {
 		this.form.findFieldByName('cepruleid')._field.remove();
 		this.#removePopupMessages();
@@ -394,19 +414,9 @@ window.ceprule_edit_popup = new class {
 		this.form.reload(this.#rules_for_clone);
 	}
 
-	#submit(force_sumbit) {
+	#submit() {
 		const fields = this.form.getAllValues();
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
-		fields._cep_rule_reset = force_sumbit ? 1 : 0;
-
-		// Correct the sortorder.
-		const operations = {};
-		[...window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')]
-			.map((row, index) => {
-				operations[index + 1] = {...fields.operations[row.dataset.sortorder], sortorder: index + 1};
-			});
-
-		fields.operations = operations;
 
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)
@@ -454,89 +464,71 @@ window.ceprule_edit_popup = new class {
 			});
 	}
 
-	/**
-	 * Method ensures filter view is correct with data:
-	 *	- conditions formula preview string.
-	 *	- type of calculation row.
-	 */
-	#handleFilterChanged() {
-		const evaltype_select = window['ceprule-filter-evaltype'];
-		const evaltype_field = evaltype_select.closest('.form-field');
-
+	#listConditionIdentifiers() {
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
 
-		if (conditions.length < 2) {
-			evaltype_field.style.display = 'none';
-			evaltype_field.previousElementSibling.style.display = 'none';
-
-			return;
-		}
-
-		evaltype_field.style.display = '';
-		evaltype_field.previousElementSibling.style.display = '';
-
-		const evaltype = Number(evaltype_select.value);
-		const is_expression_evaltype = evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-
-		window['ceprule-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
-		window['ceprule-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
-
-		const identifiers = Object.values(conditions).map(condition => ({id: condition.formulaid}));
-
-		window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+		return conditions.map(condition => ({
+			id: condition.formulaid,
+			type: condition.type
+		}));
 	}
 
-	#openConditionPopup(condition, trigger_element) {
-		const is_new = condition === undefined;
+	#refreshExpressionPreview() {
+		const identifiers = this.#listConditionIdentifiers();
+		const evaltype = Number(window['ceprule-filter-evaltype'].value);
 
-		if (is_new) {
-			condition = {
-				formulaid: this.#indexToFormulaId(this.#condition_row_index),
-				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
-				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-				host_group: '',
-				host: '',
-				severity: '<?= TRIGGER_SEVERITY_INFORMATION ?>',
-				tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-				tag: '',
-				tag_value: '',
-				time_period: ''
-			};
+		if (evaltype == <?= CONDITION_EVAL_TYPE_AND_OR ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_AND ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_OR ?>) {
+			window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+			window['ceprule-filter-expression-preview'].style.display = ''
+			window['ceprule-filter-expression'].disabled = true;
+			window['ceprule-filter-expression'].style.display = 'none';
 		}
+		else {
+			window['ceprule-filter-expression'].disabled = identifiers.length < 2;
+			window['ceprule-filter-expression'].style.display = '';
+			window['ceprule-filter-expression-preview'].style.display = 'none';
+
+			if (identifiers.length < 2) {
+				window['ceprule-filter-evaltype'].value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+			}
+		}
+
+		const evaltype_field = window['ceprule-filter-evaltype'].closest('.form-field');
+
+		evaltype_field.style.display = identifiers.length < 2 ? 'none' : '';
+		evaltype_field.previousElementSibling.style.display = identifiers.length < 2 ? 'none' : '';
+	}
+
+	#openConditionPopup(condition, trigger_element, index) {
+		const is_new = condition === undefined;
 
 		const template = document.getElementById('ceprule-condition-modal-template');
 		const form_element = template.content.querySelector('form').cloneNode(true);
 
 		const overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: t('Condition details'),
+			title: <?= json_encode(_('Condition details')) ?>,
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Edit'),
+					title: is_new ? <?= json_encode(_('Add')) ?> : <?= json_encode(_('Update')) ?>,
 					isSubmit: true,
-					action: (overlay) => {
-						const form = ceprule_condition_edit_popup.form;
-						const fields = form.getAllValues();
-
-						form.validateSubmit(fields)
-							.then((result) => {
-								if (!result) {
-									overlay.unsetLoading();
-									return;
-								}
-
-								overlayDialogueDestroy(overlay.dialogueid);
-
-								is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
-								is_new && (this.#condition_row_index++);
-
-								this.form.discoverAllFields();
-								this.form_element.dispatchEvent(new Event('filter.change'));
-							});
-
-						return false;
-					}
+					action: overlay => ceprule_condition_edit_popup.submit()
+						.then(fields => {
+							if (is_new) {
+								this.#addConditionRow(fields);
+							}
+							else {
+								this.#editConditionRow(fields, index);
+							}
+							this.form.discoverAllFields();
+							this.#refreshExpressionPreview();
+						})
+						.then(() => overlayDialogueDestroy(overlay.dialogueid))
+						.catch(() => overlay.unsetLoading())
+						&& false
 				},
 				{
 					title: t('Cancel'),
@@ -555,20 +547,37 @@ window.ceprule_edit_popup = new class {
 
 	#openOperationPopup(operation, trigger_element) {
 		const is_new = operation === undefined;
+		const row_index = is_new ? null : operation.row_index;
 
 		if (is_new) {
 			operation = {
-				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
-				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
+				sortorder: this.#getNextSortorder(),
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
-				new_tag: '',
-				suppress_until: '',
+				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
+				suppress_time_option: '<?= ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE ?>',
+				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
+				old_tag: '',
+				new_tag: '',
+				tag_name: '',
 				tag_value: '',
-				tags: [{tag: '', operator: <?= TAG_OPERATOR_EQUAL ?>, value: ''}]
+				filter: {
+					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					formula: '',
+					conditions: [{
+						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
+						operator: <?= CONDITION_OPERATOR_YES ?>,
+						tag: '',
+						tag_name: '',
+						tag_value: ''
+					}]
+				}
 			};
+		}
+		else {
+			delete operation.row_index;
 		}
 
 		const template = document.getElementById('ceprule-operation-modal-template');
@@ -576,23 +585,15 @@ window.ceprule_edit_popup = new class {
 
 		const overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: t('Operation details'),
+			title: <?= json_encode(_('Operation details')) ?>,
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Edit'),
+					title: is_new ? <?= json_encode(_('Add')) ?> : <?= json_encode(_('Update')) ?>,
 					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
 						const fields = form.getAllValues();
-
-						for (const tag_index in fields.tags) {
-							const {tag, value} = fields.tags[tag_index];
-
-							if (tag === '' && value === '') {
-								delete fields.tags[tag_index];
-							}
-						}
 
 						form.validateSubmit(fields)
 							.then((result) => {
@@ -603,8 +604,16 @@ window.ceprule_edit_popup = new class {
 
 								overlayDialogueDestroy(overlay.dialogueid);
 
-								is_new && this.#addOperationRow(fields) || this.#editOperationRow(fields);
+								if (is_new) {
+									this.#addOperationRow(fields);
+								}
+								else {
+									fields.row_index = row_index;
+									this.#editOperationRow(fields);
+								}
+
 								this.form.discoverAllFields();
+								this.#toggleOperationsInformation();
 							});
 
 						return false;
@@ -623,7 +632,10 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_operation_edit_popup.init({rules: this.#operation_rules, operation, overlay,
-			window_type: this.form.findFieldByName('window_type').getValue()
+			window_type: this.form.findFieldByName('window_type').getValue(),
+			operation_types_by_execute_when: this.#operation_types_by_execute_when,
+			execute_when_by_window_type: this.#execute_when_by_window_type,
+			operation_conditon_rules: this.#operation_conditon_rules
 		});
 	}
 
@@ -647,24 +659,55 @@ window.ceprule_edit_popup = new class {
 		this.#overlay.unsetLoading();
 	}
 
+	#getNextSortorder() {
+		return document.getElementById('ceprule-operations-table').querySelectorAll('[data-row_index]').length;
+	}
+
 	#editOperationRow(operation) {
-		this.form_element.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`)
-			.replaceWith(this.#buildOperationRow(operation));
+		const row = this.form_element
+			.querySelector(`#ceprule-operations-table [data-row_index="${operation.row_index}"]`);
+
+		row.nextElementSibling.remove();
+		row.replaceWith(this.#buildOperationRow(operation));
 	}
 
 	#addOperationRow(operation) {
+		operation.row_index = this.#operation_row_index++;
+		operation.sortorder = this.#getNextSortorder();
+
 		this.form_element.querySelector('#ceprule-operations-table tbody')
-			.insertAdjacentElement('beforeend', this.#buildOperationRow(operation));
+			.append(this.#buildOperationRow(operation));
+	}
+
+	#toggleOperationsInformation() {
+		const operations = this.form.findFieldByName('operations').getValue();
+		const type = Number(this.form.findFieldByName('window_type').getValue());
+		let hide_warning = type == <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>;
+
+		if (!hide_warning) {
+			const [has_op_close, has_when_close] = Object.values(operations)
+				.reduce(([has_op_close, has_when_close], {type, execute_when}) => [
+						has_op_close || type == <?= CCepRuleHelper::OP_CLOSE_WINDOW ?>,
+						has_when_close || execute_when == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>
+					], [false, false]
+				);
+
+			hide_warning = !(has_when_close && !has_op_close);
+		}
+
+		window['ceprule-operations-table'].querySelector('.js-operations-info')
+			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', hide_warning);
 	}
 
 	#buildOperationRow(operation) {
+		const operation_type = Number(operation.type);
 		const execute_when_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationExecuteWhenStrings()
 		) ?>')[operation.execute_when];
 
 		const label_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationLabelStrings()
-		) ?>')[operation.type];
+		) ?>')[operation_type];
 
 		const severity_names_json = '<?= json_encode([
 			TRIGGER_SEVERITY_NOT_CLASSIFIED => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
@@ -680,68 +723,138 @@ window.ceprule_edit_popup = new class {
 		if ([
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
-			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
-			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_UNSUPPRESS ?>,
+			<?= CCepRuleHelper::OP_CLONE_FIRST ?>,
+			<?= CCepRuleHelper::OP_CLONE_LAST ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
-			<?= CCepRuleHelper::OP_CLOSE ?>
-		].includes(operation.type)) {
+			<?= CCepRuleHelper::OP_CLOSE_EVENT ?>
+		].includes(operation_type)) {
 			arguments_str = '';
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_SUPPRESS ?>
-		].includes(operation.type)) {
-			arguments_str = operation.suppress_until
-				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_until
-				: <?= json_encode(_('Indefinately')) ?>;
+		].includes(operation_type)) {
+			arguments_str = operation.suppress_duration
+					&& operation.suppress_duration !== '<?= DB::getDefault('cep_operation', 'suppress_duration') ?>'
+				? sprintf(<?= json_encode(_('duration %1$s')) ?>, operation.suppress_duration)
+				: <?= json_encode(_('Indefinitely')) ?>;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
-		].includes(operation.type)) {
+		].includes(operation_type)) {
 			arguments_str = operation.tag;
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_SET_NAME ?>) {
+		else if (operation_type == <?= CCepRuleHelper::OP_SET_NAME ?>) {
 			arguments_str = operation.event_name;
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_SET_SEVERITY ?>) {
+		else if (operation_type == <?= CCepRuleHelper::OP_SET_SEVERITY ?>) {
 			arguments_str = severity_names[operation.severity];
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
-			arguments_str = `${operation.tag}:${operation.new_tag}`;
+		else if (operation_type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
+			arguments_str = `${operation.old_tag}:${operation.new_tag}`;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_SET_TAG ?>,
 			<?= CCepRuleHelper::OP_ADD_TAG ?>
-		].includes(operation.type)) {
-			arguments_str = `${operation.tag}:${operation.tag_value}`;
+		].includes(operation_type)) {
+			arguments_str = `${operation.tag_name}:${operation.tag_value}`;
 		}
 
-		const tags_input_html = Object.values(operation.tags).map((tag, tag_index) => (new Template(`
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][tag]"
-				type="hidden" value="#{tag}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][operator]"
-				type="hidden" value="#{operator}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][value]"
-				type="hidden" value="#{value}"/>
-		`)).evaluate(tag)).join('');
+		const conditions_input_html = Object.values(operation.filter.conditions)
+			.map((condition, condition_index) => (new Template(`
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][type]"
+					type="hidden" value="#{type}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][operator]"
+					type="hidden" value="#{operator}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_name]"
+					type="hidden" value="#{tag_name}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_value]"
+					type="hidden" value="#{tag_value}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][formulaid]"
+					type="hidden" value="#{formulaid}" data-changed/>
+			`)).evaluate(condition)).join('');
 
-		return this.#operation_row_template
-			.evaluateToElement({execute_when_str, label_str, arguments_str, tags_input_html, ...operation});
+		const condition_label_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionLabels()
+		) ?>');
+
+		const condition_operator_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getConditionOperatorLabels()
+		) ?>');
+
+		const descriptions = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionDescriptions()
+		) ?>');
+
+		const condition_descriptions = [];
+
+		Object.values(operation.filter.conditions).forEach(condition => {
+			let description_template = null;
+			const description_view = {};
+
+			switch (Number(condition.type)) {
+				case <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
+					description_template = this.#template_operation_table_condition_property;
+					description_view.text = descriptions[condition.type][condition.operator];
+					break;
+
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>:
+					description_template = this.#template_operation_table_condition_tag;
+					description_view.name = condition_label_names[condition.type];
+					description_view.operator = condition_operator_names[condition.operator].toLocaleLowerCase();
+					description_view.tag = condition.tag;
+					break;
+
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>:
+					description_template = this.#template_operation_table_condition_tag_value;
+					description_view.name = condition_label_names[condition.type];
+					description_view.operator = condition_operator_names[condition.operator].toLocaleLowerCase();
+					description_view.tag_name = condition.tag_name;
+					description_view.tag_value = condition.tag_value;
+					break;
+			}
+
+			condition_descriptions.push(description_template.evaluate(description_view));
+		});
+
+		const condition_description_html = condition_descriptions.join('<br>');
+		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
+			condition_description_html, ...operation};
+		const row = this.#operation_row_template.evaluateToElement(template_args);
+
+		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;
+		const rows = new DocumentFragment();
+
+		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
+		rows.append(row);
+		rows.append((new Template(`
+			<tr class="error-container-row"><td colspan="5" id="${error_container_id}"></td></tr>
+		`)).evaluateToElement());
+
+		return rows;
 	}
 
-	#editConditionRow(condition) {
-		window['ceprule-filter-conditions'].querySelector(`[data-formulaid=${condition.formulaid}]`)
-			.replaceWith(this.#buildConditionRow(condition));
+	#editConditionRow(condition, index) {
+		window['ceprule-filter-conditions'].querySelector(`[data-row_index="${index}"]`)
+			.replaceWith(this.#buildConditionRow(condition, index));
 	}
 
 	#addConditionRow(condition) {
 		window['ceprule-filter-conditions'].querySelector('tbody')
-			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition));
+			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, this.#condition_row_index++));
 	}
 
-	#buildConditionRow(condition) {
+	#buildConditionRow(condition, index) {
 		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getConditionLabels()
 		) ?>');
@@ -757,10 +870,9 @@ window.ceprule_edit_popup = new class {
 		let description_template = this.#condition_row_template_value;
 		const description_view = {
 			name: label_names[condition.type],
-			operator: condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>
-				? operator_names[condition.tag_operator]
-				: operator_names[condition.operator],
+			operator: operator_names[condition.operator],
 			value: undefined,
+			tag: undefined,
 			tag_name: undefined,
 			tag_value: undefined
 		};
@@ -771,32 +883,40 @@ window.ceprule_edit_popup = new class {
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {
 			description_view.value = severity_names[condition.severity];
 		}
-		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST ?>) {
-			description_view.value = condition.host;
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME ?>) {
+			description_view.value = condition.host_name;
 		}
-		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>) {
-			description_view.value = condition.host_group;
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP_NAME ?>) {
+			description_view.value = condition.host_group_name;
 		}
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>) {
 			description_view.value = condition.time_period;
 		}
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>) {
-			description_view.tag_name = condition.tag;
-			description_template = this.#condition_row_template_tag_exists;
-
-			if (condition.tag_operator != <?= CONDITION_OPERATOR_EXISTS ?>
-					&& condition.tag_operator != <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
-				description_view.tag_value = condition.tag_value;
-				description_template = this.#condition_row_template_tag;
-			}
+			description_template = this.#condition_row_template_tag;
+			description_view.tag = condition.tag;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>) {
+			description_template = this.#condition_row_template_tag_value;
+			description_view.tag_name = condition.tag_name;
+			description_view.tag_value = condition.tag_value;
 		}
 
 		description_view.operator = description_view.operator.toLocaleLowerCase();
 
 		return this.#condition_row_template.evaluateToElement({
-			description_html: description_template.evaluate(description_view),
-			...condition
+			...condition,
+			row_index: index,
+			formulaid: num2letter(index),
+			description_html: description_template.evaluate(description_view)
 		});
+	}
+
+	#renumberOperationRows() {
+		document.getElementById('ceprule-operations-table').querySelectorAll('[data-row_index]')
+			.forEach(function(row, index) {
+				row.querySelector('[name$="[sortorder]"]').value = index;
+			});
 	}
 
 	#removePopupMessages() {

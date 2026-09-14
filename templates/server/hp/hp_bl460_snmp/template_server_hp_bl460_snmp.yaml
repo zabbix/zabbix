@@ -26,7 +26,7 @@ zabbix_export:
         This is a template for monitoring HPE ProLiant BL460 servers with HP iLO version 4 and later via Zabbix SNMP agent that works without any external scripts.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -296,10 +296,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: zabbix.host.available
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: health
@@ -1909,6 +1905,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '26'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$VDISK.STATUS.CRIT}'
           value: '3'
           description: 'The critical status of the virtual disk for trigger expression.'
@@ -2357,11 +2362,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: 9159ee66dbe4498cba29daca24ddcb5f
-      expression: '(last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
+      expression: |
+        (last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and change(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])<0 and last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime],#2)<42949672.96-(lastclock(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])-lastclock(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime],#2)))
+        or (last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and change(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime])<0 and last(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime],#2)<42949672.96-(lastclock(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime])-lastclock(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/HPE ProLiant BL460 by SNMP/hp.server.hw.uptime[hrSystemUptime])>{$SNMP.UPTIME.WARN}
+        or last(/HPE ProLiant BL460 by SNMP/hp.server.net.uptime[sysUpTime])>{$SNMP.UPTIME.WARN}
       name: 'HPE ProLiant BL460: Host has been restarted'
-      event_name: 'HPE ProLiant BL460: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'HPE ProLiant BL460: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       tags:
         - tag: scope

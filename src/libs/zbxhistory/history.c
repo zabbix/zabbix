@@ -491,7 +491,6 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		if (NULL == (provider = history_provider_open(registry->name, registry->options.values,
 				registry->options.values_num, error)))
 		{
-			history_manager_clear(manager);
 			goto out;
 		}
 
@@ -534,6 +533,9 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 	ret = SUCCEED;
 out:
+	if (FAIL == ret)
+		history_manager_clear(manager);
+
 	history_options_clear(options.values, options.values_num);
 	zbx_vector_history_option_destroy(&options);
 

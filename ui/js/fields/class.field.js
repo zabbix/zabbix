@@ -20,7 +20,7 @@ class CField {
 	_error_hint = null;
 	_prev_value = null;
 	_delayed_field_change = null;
-	_changed = false;
+	_changed;
 	_error_msg = null;
 	_error_level = -1;
 	_global_errors = Object.create(null);
@@ -37,6 +37,7 @@ class CField {
 
 		this._error_label = this._field.getAttribute('data-error-label');
 		this._allow_trim = !this._field.hasAttribute('data-notrim');
+		this._changed = this._field.hasAttribute('data-changed');
 	}
 
 	init() {
@@ -263,5 +264,27 @@ class CField {
 				errors_list.classList.remove('list-dashed');
 			}
 		}
+	}
+
+	lock() {
+		if (this._field.disabled) {
+			return false;
+		}
+
+		this._field.dataset.formDisabled = '';
+		this._field.disabled = true;
+
+		return true;
+	}
+
+	unlock() {
+		if ('formDisabled' in this._field.dataset) {
+			this._field.disabled = false;
+			delete this._field.dataset.formDisabled;
+
+			return true;
+		}
+
+		return false;
 	}
 }

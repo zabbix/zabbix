@@ -856,7 +856,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
 				123,
 				'/1/int',
-				123
+				'123'
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
@@ -868,7 +868,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
 				2147483647,
 				'/1/int',
-				2147483647
+				'2147483647'
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 4],
@@ -908,6 +908,72 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_USER_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 5],
+				'{#MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_LLD_MACRO, 'in' => '0,60:900', 'length' => 5],
 				null,
 				'/1/int',
 				null
@@ -4705,9 +4771,15 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_URL],
-				'javascript:alert()',
+				'//',
 				'/1/url',
 				'Invalid parameter "/1/url": unacceptable URL.'
+			],
+			[
+				['type' => API_URL],
+				'javascript:alert()',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			[
 				['type' => API_URL],
@@ -4728,6 +4800,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'javascript:{$URL}'
 			],
 			[
+				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
+				'javascript:{$URL}',
+				'/1/url',
+				'javascript:{$URL}'
+			],
+			[
 				['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO],
 				'text{EVENT.TAGS."JIRAID"}text',
 				'/1/url',
@@ -4738,6 +4816,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'text{MANUALINPUT}text',
 				'/1/url',
 				'text{MANUALINPUT}text'
+			],
+			[
+				['type' => API_URL],
+				'invalid://user@host:8080',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
+			],
+			[
+				['type' => API_URL],
+				'http://www.zabbix.com',
+				'/1/url',
+				'http://www.zabbix.com'
+			],
+			[
+				['type' => API_URL],
+				'zabbix.php',
+				'/1/url',
+				'zabbix.php'
 			],
 			[
 				['type' => API_IP],
@@ -5720,6 +5816,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'2fdcb2e2995080b2bba202067f730136',
 				'/uuid',
 				'Invalid parameter "/uuid": UUIDv4 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78'
+			],
+			[
+				['type' => API_UUID_V7],
+				null,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				true,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				1,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				[],
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": cannot be empty.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'23',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234567890123456789012345678901234567890',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'123456789012345678901234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234-1234-1234-1234-1234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'12345678-1234-1234-1234-123456789012',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-xf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-0c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-cf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
 			],
 			[
 				['type' => API_CUIDS],

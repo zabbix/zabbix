@@ -659,7 +659,7 @@ static int	table_data_get_field_index(const zbx_table_data_t *td, const char *fi
  * Purpose: delete rows that are not present in new configuration data        *
  *                                                                            *
  * Parameters: td          - [IN] table data object                           *
- *             db        - [IN] database connection                           *
+ *             db          - [IN] database connection                         *
  *             unhash_func - [IN] function to get identifier for hash value   *
  *             error       - [OUT]                                            *
  *                                                                            *
@@ -731,7 +731,7 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, zbx_dbconn_t *db,
  * Purpose: prepare existing rows for update/delete                           *
  *                                                                            *
  * Parameters: td          - [IN] table data object                           *
- *             db        - [IN] database connection                           *
+ *             db          - [IN] database connection                         *
  *             unhash_func - [IN] function to get identifier for hash value   *
  *             error       - [OUT]                                            *
  *                                                                            *
@@ -1020,7 +1020,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, zbx_dbconn_t *db, id_un
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
 				case ZBX_TYPE_LONGTEXT:
-					value_esc = zbx_db_dyn_escape_string_len(buf, field->length);
+					value_esc = zbx_dbconn_dyn_escape_string_len(db, buf, field->length);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", value_esc);
 					zbx_free(value_esc);
 					break;
@@ -1068,7 +1068,7 @@ out:
  * Purpose: insert new rows                                                   *
  *                                                                            *
  * Parameters: td    - [IN] the table data object                             *
- *             db        - [IN] database connection                           *
+ *             db    - [IN] database connection                               *
  *             error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - the rows were inserted successfully                *
@@ -1634,7 +1634,7 @@ out:
  *                                                                            *
  * Parameters: hostmacro       - [IN] the hostmacro table                     *
  *             hosts_templates - [IN] the hosts templates table               *
- *             db            - [IN] database connection                       *
+ *             db              - [IN] database connection                     *
  *             full_sync       - [IN] 1 if full sync must be done, 0 otherwise*
  *                                                                            *
  ******************************************************************************/
@@ -1707,7 +1707,7 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
  *                                                                            *
  * Parameters: hosts_templates - [IN]                                         *
  *             hostmacro       - [IN]                                         *
- *             db            - [IN] database connection                       *
+ *             db              - [IN] database connection                     *
  *             error           - [OUT]                                        *
  *                                                                            *
  * Return value: SUCCEED - templates were synced successfully                 *
@@ -2490,7 +2490,7 @@ out:
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *server)
+		const char *config_ssl_key_location, const char *server, int *vault_ret)
 {
 	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
 	int				ret, locked = 0;
@@ -2568,7 +2568,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			{
 				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault, config_source_ip,
 						config_ssl_ca_location, config_ssl_cert_location,
-						config_ssl_key_location);
+						config_ssl_key_location, vault_ret);
 			}
 		}
 		else

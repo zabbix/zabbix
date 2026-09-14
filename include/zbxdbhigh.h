@@ -117,7 +117,6 @@
 #define ZBX_HISTORY_JSON_VALUE_LEN		(ZBX_MEBIBYTE * 128)
 
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
-#define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 
 #define ZBX_GRAPH_NAME_LEN			128
 #define ZBX_GRAPH_ITEM_COLOR_LEN		6
@@ -125,6 +124,8 @@
 
 #define ZBX_DSERVICE_VALUE_LEN			255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
+
+#define ZBX_EVENT_NAME_LEN			2048
 
 typedef struct
 {
@@ -171,11 +172,12 @@ zbx_db_trigger;
 typedef struct
 {
 	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
 	int		until;
 }
 zbx_db_event_suppress_t;
 
-ZBX_VECTOR_DECL(db_event_suppress, zbx_db_event_suppress_t)
+ZBX_VECTOR_LITE_DECL(db_event_suppress, zbx_db_event_suppress_t)
 
 typedef struct
 {
@@ -206,8 +208,8 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
-
 zbx_db_event;
+
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 
 typedef struct
@@ -248,7 +250,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_WEBHOOK = 4
+	MEDIA_TYPE_WEBHOOK = 4,
+	MEDIA_TYPE_PUSH = 5
 }
 zbx_media_type_t;
 
@@ -549,15 +552,13 @@ int	zbx_db_get_database_type(void);
 
 typedef struct
 {
-	zbx_uint64_t		eventid;
-	int			clock;
-	int			ns;
-	int			value;
-	int			severity;
-	int			mtime;
-	zbx_vector_tags_ptr_t	tags;
-
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_uint64_t			eventid;
+	int				clock;
+	int				ns;
+	int				value;
+	int				severity;
+	int				mtime;
+	zbx_vector_tags_ptr_t		tags;
 }
 zbx_event_t;
 
@@ -630,6 +631,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 int	zbx_db_check_instanceid(void);
 int	zbx_db_update_software_update_checkid(void);
+int	zbx_db_check_serverid(void);
 
 /* tags */
 typedef struct
@@ -829,6 +831,15 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
+#define ZBX_CONDITION_TYPE_PROXY_GROUP			29
+#define ZBX_CONDITION_TYPE_EVENT_OPEN			30
+#define ZBX_CONDITION_TYPE_EVENT_FIRST			31
+#define ZBX_CONDITION_TYPE_EVENT_LAST			32
+#define ZBX_CONDITION_TYPE_EVENT_SYMPTOM		33
+#define ZBX_CONDITION_TYPE_EVENT_COPIED			34
+#define ZBX_CONDITION_TYPE_EVENT_SUPPRESSED		35
+#define ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME		36
+#define ZBX_CONDITION_TYPE_HOST_GROUP_NAME		37
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1

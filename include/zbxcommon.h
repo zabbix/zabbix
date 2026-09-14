@@ -671,6 +671,8 @@ int	MAIN_ZABBIX_ENTRY(int flags);
 #define ZBX_AUTH_TOKEN_ENABLED		0
 #define ZBX_AUTH_TOKEN_DISABLED		1
 #define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
+#define ZBX_AUTH_SCHEME_BEARER		0
+#define ZBX_AUTH_SCHEME_DPOP		1
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1
@@ -741,6 +743,9 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
 #define ZBX_SHA512_BINARY_LENGTH 64
+
+/* includes terminating '\0' */
+#define ZBX_UUID_LEN	37
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
@@ -851,7 +856,6 @@ void	zbx_set_exit(zbx_exit_cb_t exit_cb, zbx_atomic_uint32_t *exit_num);
 void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
 
 void	zbx_exit_from_thread(int ret) ZBX_NORETURN;
-int	zbx_get_exit_num(void);
 
 #else
 #	define zbx_exit(status)		exit(status)
