@@ -1005,7 +1005,6 @@ static int	expr_get_proxy_name_description(zbx_uint64_t itemid, int request, cha
 
 	if (SUCCEED == errcode)
 	{
-
 		if (0 == dc_host.proxyid)
 		{
 			*replace_to = zbx_strdup(*replace_to, "");
