@@ -248,7 +248,7 @@ static int	fill_test_item_host(zbx_dc_item_t *item, const struct zbx_json_parse 
 		{
 			if (FAIL == zbx_dc_get_host_by_hostid(&item->host, item->host.hostid))
 			{
-				*info = zbx_strdup(NULL, "Failed to verify host data.");
+				*info = zbx_strdup(NULL, "Can be tested only on host.");
 				goto out;
 			}
 		}
