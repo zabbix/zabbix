@@ -4892,7 +4892,7 @@ section {
 .status-warning-bg,
 .status-average-bg,
 .status-high-bg,
-.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red {
+.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal {
   box-sizing: border-box;
   display: inline-block;
   min-width: 16px;
@@ -4957,6 +4957,36 @@ section {
   color: #ffffff;
   background-color: #d64e4e;
   border-color: #d23d3d; }
+
+.status-amp-severity-trace {
+  color: #f2f2f2;
+  background-color: #97AAB3;
+  border-color: #7F9199; }
+
+.status-amp-severity-debug {
+  color: #f2f2f2;
+  background-color: #7499FF;
+  border-color: #6383D6; }
+
+.status-amp-severity-info {
+  color: #f2f2f2;
+  background-color: #FFC859;
+  border-color: #CBA34E; }
+
+.status-amp-severity-warn {
+  color: #f2f2f2;
+  background-color: #FFA059;
+  border-color: #D28951; }
+
+.status-amp-severity-error {
+  color: #f2f2f2;
+  background-color: #E97659;
+  border-color: #C06751; }
+
+.status-amp-severity-fatal {
+  color: #f2f2f2;
+  background-color: #E45959;
+  border-color: #BC5051; }
 
 .subfilter-option-grid {
   grid-template-columns: minmax(75px, max-content) auto;

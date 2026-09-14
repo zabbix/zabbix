@@ -71,8 +71,7 @@ abstract class CControllerDataTable extends CController {
 		return $ret;
 	}
 
-	protected function paginate(array &$rows, int $page, string $sort_order): array {
-		$num_rows = count($rows);
+	protected function paginateNumRows(int $num_rows, int $page, string $sort_order, &$offset, &$limit): array {
 		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
 
 		$offset_down = 0;
@@ -88,10 +87,10 @@ abstract class CControllerDataTable extends CController {
 
 		$start = ($page - 1) * $rows_per_page;
 		$end = min($num_rows, $start + $rows_per_page);
-		$offset = $sort_order == ZBX_SORT_DOWN ? $offset_down : 0;
+		$start_offset = $sort_order == ZBX_SORT_DOWN ? $offset_down : 0;
 
-		// Trim given rows for the current page.
-		$rows = array_slice($rows, $start + $offset, $end - $start, true);
+		$offset = $start + $start_offset;
+		$limit = $end - $start;
 
 		return [
 			'page' => $page,
@@ -100,6 +99,15 @@ abstract class CControllerDataTable extends CController {
 			'rows_per_page' => $rows_per_page,
 			'limit_exceeded' => $limit_exceeded
 		];
+	}
+
+	protected function paginate(array &$rows, int $page, string $sort_order): array {
+		$paging = $this->paginateNumRows(count($rows), $page, $sort_order, $offset, $limit);
+
+		// Trim given rows for the current page.
+		$rows = array_slice($rows, $offset, $limit, true);
+
+		return $paging;
 	}
 
 	protected function export(string $type): ?string {

@@ -30,10 +30,6 @@ $web_layout_mode = $this->getLayoutMode();
 $csrf_token = CCsrfTokenHelper::get('apm');
 $reset_url  = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
-if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attributes']) {
-	$data['filter']['attributes'] = [['key' => '', 'value' => '', 'operator' => 0]];
-}
-
 $filter = (new CFilter())
 	->setId('apm_log_filter')
 	->setResetUrl($reset_url)
@@ -98,12 +94,17 @@ $filter = (new CFilter())
 				)
 			])
 			->addItem([
-				(new CLabel(_('Attributes'), 'filter_attributes')),
+				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
-						'evaltype' => $data['filter']['evaltype'],
-						'attributes' => $data['filter']['attributes']
-					])
+						'evaltype' => $data['filter']['resource_attributes_evaltype'],
+						'attributes' => $data['filter']['resource_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						]
+					], [
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
+						'attribute_field_name' => 'filter_resource_attributes'
+					])->setId('filter-resource-attributes')
 				)
 			])
 	]);
@@ -130,12 +131,14 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-attributes-row-tmpl'))
+(new CTemplateTag('filter-resource-attributes-row-tmpl'))
 	->addItem(
 		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 			'key' => '#{key}',
 			'value' => '#{value}',
-			'operator' => 0
+			'operator' => CONDITION_OPERATOR_LIKE
+		], [
+			'attribute_field_name' => 'filter_resource_attributes'
 		])
 	)
 	->show();
@@ -147,6 +150,7 @@ $html_page->show();
 		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
+		'filter_validation_rules' => $data['filter_validation_rules'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],
