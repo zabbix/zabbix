@@ -2292,7 +2292,7 @@ class CDataTable {
 		this.#cancelRequestAnimationFrame();
 
 		if (!this.#has_data) {
-			this.#applyColumnWidths('0px');
+			this.#applyColumnWidths();
 
 			return;
 		}
