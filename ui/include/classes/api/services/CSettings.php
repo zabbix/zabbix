@@ -125,7 +125,10 @@ class CSettings extends CApiService {
 		self::prepareApmGlobalDbForApi($db_settings);
 
 		if (array_key_exists('apm_global_db', $db_settings)) {
-			unset($db_settings['apm_global_db']['password']);
+			foreach ($db_settings['apm_global_db'] as $key => &$db_value) {
+				$db_value = self::APM_GLOBAL_DB_SCHEMA[$key]['type'] == API_INT32 ? (string) $db_value : $db_value;
+			}
+			unset($db_value, $db_settings['apm_global_db']['password']);
 		}
 
 		return $db_settings;
