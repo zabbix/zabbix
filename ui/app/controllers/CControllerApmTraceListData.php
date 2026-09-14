@@ -48,7 +48,8 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'scope_name' => ['string'],
 			'min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'max_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
-			'statuses' => ['array', 'field' => ['integer']],
+			'statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
+				APM_TRACE_STATUS_ERROR]]],
 			'evaltype' => ['integer', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
 			'attributes' => ['array',
 				'field' => ['object', 'fields' => [
