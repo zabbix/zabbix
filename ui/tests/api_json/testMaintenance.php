@@ -70,22 +70,22 @@ class testMaintenance extends CAPITest {
 					'tags' => [
 						[
 							'tag' => 'tag1',
-							'operator' => 0, // CONDITION_OPERATOR_EQUAL
+							'operator' => 0, // MAINTENANCE_TAG_OPERATOR_EQUAL
 							'value' => 'value1'
 						],
 						[
 							'tag' => 'tag2',
-							'operator' => 1, // CONDITION_OPERATOR_NOT_EQUAL
+							'operator' => 1, // MAINTENANCE_TAG_OPERATOR_NOT_EQUAL
 							'value' => 'value2'
 						],
 						[
 							'tag' => 'tag3',
-							'operator' => 2, // CONDITION_OPERATOR_LIKE
+							'operator' => 2, // MAINTENANCE_TAG_OPERATOR_LIKE
 							'value' => 'value3'
 						],
 						[
 							'tag' => 'tag4',
-							'operator' => 3, // CONDITION_OPERATOR_NOT_LIKE
+							'operator' => 3, // MAINTENANCE_TAG_OPERATOR_NOT_LIKE
 							'value' => 'value4'
 						]
 					]
@@ -670,7 +670,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'event_names' => [
 						['value' => 'Database unavailable'],
-						['operator' => 3, 'value' => 'Test event']
+						['operator' => 3, 'value' => 'Test event']	// MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE
 					]
 				] + $def_options,
 				'expected_error' => null
