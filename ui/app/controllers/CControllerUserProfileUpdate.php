@@ -68,9 +68,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
-			'url' => ['db users.url',
-				'use' => [CUrlValidator::class, ['schemes' => CSettingsHelper::getAllowedUriSchemes()]]
-			]
+			'url' => ['db users.url', 'use' => [CFrontendActionValidator::class]]
 		]];
 	}
 
@@ -110,8 +108,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$user = [];
 
 		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'default_maintenance_period',
-			'refresh', 'rows_per_page',	'url'
-		]);
+			'refresh', 'rows_per_page']);
 
 		if ($this->getInput('autologout_visible') == 0) {
 			$user['autologout'] = 0;
@@ -130,6 +127,11 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		DBstart();
+
+		if ($this->hasInput('url') && !CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE)) {
+			$user['url'] = $this->getInput('url');
+		}
+
 		$result = (bool) API::User()->update($user);
 		$result = DBend($result);
 

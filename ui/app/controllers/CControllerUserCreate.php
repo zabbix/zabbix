@@ -94,9 +94,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
-			'url' => ['db users.url',
-				'use' => [CUrlValidator::class, ['schemes' => CSettingsHelper::getAllowedUriSchemes()]]
-			],
+			'url' => ['db users.url', 'use' => [CFrontendActionValidator::class]],
 			'roleid' => ['db users.roleid', 'required']
 		]];
 	}
@@ -133,7 +131,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['username', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
+		$this->getInputs($user, ['username', 'name', 'surname', 'autologin', 'autologout', 'theme', 'refresh',
 			'default_maintenance_period', 'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 
@@ -145,6 +143,11 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 		if ($this->getInput('password1', '') !== '' || !$this->allow_empty_password) {
 			$user['passwd'] = $this->getInput('password1');
+		}
+
+		if ($this->hasInput('url')
+				&& !CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $user['roleid'])) {
+			$user['url'] = $this->getInput('url');
 		}
 
 		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)) {

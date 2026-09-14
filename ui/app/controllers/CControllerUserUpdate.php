@@ -98,9 +98,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
-			'url' => ['db users.url',
-				'use' => [CUrlValidator::class, ['schemes' => CSettingsHelper::getAllowedUriSchemes()]]
-			],
+			'url' => ['db users.url', 'use' => [CFrontendActionValidator::class]],
 			'roleid' => ['db users.roleid', 'required']
 		]];
 	}
@@ -154,7 +152,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
-			'autologout', 'default_maintenance_period', 'refresh', 'rows_per_page', 'url', 'roleid'
+			'autologout', 'default_maintenance_period', 'refresh', 'rows_per_page', 'roleid'
 		]);
 
 		if ($this->hasInput('autologout_visible') && $this->getInput('autologout_visible') == 0) {
@@ -182,6 +180,11 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'output' => ['userdirectoryid'],
 			'userids' => [$user['userid']]
 		]);
+
+		if ($this->hasInput('url')
+				&& !CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $user['roleid'])) {
+			$user['url'] = $this->getInput('url');
+		}
 
 		if ($db_user['userdirectoryid']) {
 			$provisioned_fields = ['username', 'name', 'surname', 'roleid', 'passwd'];

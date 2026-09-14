@@ -911,7 +911,7 @@ switch ($data['method']) {
 		if ($db_result) {
 			$db_result = array_flip(array_column($db_result, 'name'));
 
-			if (array_key_exists($search, $db_result)) {
+			if ($search !== null && array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);
 			}
 

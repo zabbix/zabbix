@@ -65,6 +65,9 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
 
+	public const PROFILE_REDIRECT_ENFORCE = 'profile.redirect.enforce';
+	public const PROFILE_REDIRECT_URL = 'profile.redirect.url';
+
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
@@ -132,11 +135,11 @@ class CRoleHelper {
 	 * @param string $rule_name  Name of the rule to check access for.
 	 * @param string $roleid     ID of the role where check of access is necessary to perform.
 	 *
-	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
+	 * @return mixed  Returns value if role have access to specified rule, false - otherwise.
 	 *
 	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name, string $roleid): bool {
+	public static function checkAccess(string $rule_name, string $roleid): mixed {
 		self::loadRoleRules($roleid);
 
 		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
@@ -185,9 +188,9 @@ class CRoleHelper {
 
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api', 'actions', 'actions.default_access', 'devices.access', 'devices.actions',
-				'devices.actions.default_access'
+			'selectRules' => ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url', 'modules',
+				'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access',
+				'devices.access', 'devices.actions', 'devices.actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -200,6 +203,8 @@ class CRoleHelper {
 
 		$rules = [
 			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
+			'profile.redirect.enforce' => (bool) $role['rules']['profile.redirect.enforce'],
+			'profile.redirect.url' => $role['rules']['profile.redirect.url'],
 			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
 			'api.access' => (bool) $role['rules']['api.access'],
 			'api.mode' => (bool) $role['rules']['api.mode'],
