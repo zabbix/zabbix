@@ -815,7 +815,7 @@ class CMaintenance extends CApiService {
 			else {
 				$db_hostids = array_column($db_maintenances[$maintenance['maintenanceid']]['hosts'], 'hostid');
 
-				$ins_hosts += array_flip(array_diff($hostids, $db_hostids));
+				$ins_hostids += array_flip(array_diff($hostids, $db_hostids));
 			}
 		}
 
