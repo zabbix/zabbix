@@ -488,7 +488,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select f1.triggerid,i2.hostid"
 				" from items i1"
 				" join functions f1 on f1.itemid=i1.itemid"
@@ -531,7 +531,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			else
 			{
 				zbx_snprintf(error, max_error_len,
-						"Failed to retrieve trigger or host for the matching items");
+						"failed to retrieve trigger or host for the matching items");
 			}
 
 			ret = FAIL;
