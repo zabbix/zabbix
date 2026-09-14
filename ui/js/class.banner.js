@@ -51,16 +51,7 @@ class CBanner {
 	`);
 
 	constructor() {
-		this.#initEvents();
 		this.#getSavedData();
-	}
-
-	#initEvents() {
-		window.addEventListener('beforeunload', this.#onWindowBeforeUnload);
-	}
-
-	#onWindowBeforeUnload = () => {
-		window.unloading = true;
 	}
 
 	#getSavedData() {
@@ -105,13 +96,11 @@ class CBanner {
 				}
 			})
 			.catch(error => {
-				if (window.unloading || error instanceof TypeError) {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
 					return;
 				}
 
-				if (error.name !== 'AbortError') {
-					console.log('Could not get saved data.', error);
-				}
+				console.log('Could not get saved data.', error);
 			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
@@ -143,13 +132,11 @@ class CBanner {
 				this.#updateData(response.banners);
 			})
 			.catch(error => {
-				if (window.unloading || error instanceof TypeError) {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
 					return;
 				}
 
-				if (error.name !== 'AbortError') {
-					console.log('Could not get current banner data.', error);
-				}
+				console.log('Could not get current banner data.', error);
 
 				if (this.#number_of_attempts === CBanner.NUMBER_OF_ATTEMPTS) {
 					return;
@@ -364,13 +351,11 @@ class CBanner {
 				this.#displayActiveBanner();
 			})
 			.catch(error => {
-				if (window.unloading || error instanceof TypeError) {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
 					return;
 				}
 
-				if (error.name !== 'AbortError') {
-					console.log('Could not update banner data.', error);
-				}
+				console.log('Could not update banner data.', error);
 			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {

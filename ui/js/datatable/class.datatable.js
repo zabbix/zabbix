@@ -1367,13 +1367,11 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
-				if (window.unloading || error instanceof TypeError) {
+				if (error.name === 'TypeError') {
 					return;
 				}
 
-				if (error.name !== 'AbortError') {
-					CMessageHelper.error(this.#element, [error.message], error.name);
-				}
+				CMessageHelper.error(this.#element, [error.message], error.name);
 
 				onError(error);
 			})
@@ -2578,10 +2576,6 @@ class CDataTable {
 		this.#options_popup?.resize();
 	}
 
-	onWindowBeforeUnload = () => {
-		window.unloading = true;
-	}
-
 	onWrapperScroll = () => {
 		this.#options_popup?.position();
 		this.#options_popup?.resize();
@@ -2597,8 +2591,6 @@ class CDataTable {
 				.on(CPager.EVENT_SELECT, this.onPagerSelect)
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
-
-		window.addEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
@@ -2631,7 +2623,6 @@ class CDataTable {
 		}
 
 		window.removeEventListener('resize', this.onWindowResize);
-		window.removeEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.removeEventListener('scroll', this.onWrapperScroll);
 
@@ -2737,13 +2728,11 @@ class CDataTable {
 		/* global updateUserProfile */
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
 			.catch(error => {
-				if (window.unloading || error instanceof TypeError) {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
 					return;
 				}
 
-				if (error.name !== 'AbortError') {
-					CMessageHelper.error(this.#element, [error.message], error.name);
-				}
+				CMessageHelper.error(this.#element, [error.message], error.name);
 			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
