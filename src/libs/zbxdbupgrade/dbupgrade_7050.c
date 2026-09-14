@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 /*
  * 8.0 development database patches
@@ -1276,13 +1277,67 @@ static int	DBpatch_7050092(void)
 
 static int	DBpatch_7050093(void)
 {
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("role_rule", &field, NULL);
+}
+
+static int	DBpatch_7050094(void)
+{
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" where rr.name='api.mode' and rr.value_int=1"
+				" and not exists ("
+					"select null"
+					" from role_rule rr2"
+					" where rr2.roleid=rr.roleid"
+						" and rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
+	{
+#define ZBX_ROLE_RULE_TYPE_STR	1
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
+				"*");
+#undef ZBX_ROLE_RULE_TYPE_STR
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_7050095(void)
+{
 	/* 1 - PROXY_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050096(void)
 {
 	/* 1 - PROXY_GROUP_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_group_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -1290,7 +1345,7 @@ static int	DBpatch_7050094(void)
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050097(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy", "usrgrp_proxyid", 0,
@@ -1306,31 +1361,31 @@ static int	DBpatch_7050095(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050098(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050099(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050100(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 1, &field);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050101(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 2, &field);
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050102(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy_group", "usrgrp_proxy_groupid", 0,
@@ -1346,24 +1401,24 @@ static int	DBpatch_7050100(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050103(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050104(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
 }
 
-static int	DBpatch_7050103(void)
+static int	DBpatch_7050105(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy_group", 1, &field);
 }
 
-static int	DBpatch_7050104(void)
+static int	DBpatch_7050106(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1371,7 +1426,7 @@ static int	DBpatch_7050104(void)
 	return DBadd_foreign_key("usrgrp_proxy_group", 2, &field);
 }
 
-static int	DBpatch_7050105(void)
+static int	DBpatch_7050107(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1495,5 +1550,7 @@ DBPATCH_ADD(7050102, 0, 1)
 DBPATCH_ADD(7050103, 0, 1)
 DBPATCH_ADD(7050104, 0, 1)
 DBPATCH_ADD(7050105, 0, 1)
+DBPATCH_ADD(7050106, 0, 1)
+DBPATCH_ADD(7050107, 0, 1)
 
 DBPATCH_END()

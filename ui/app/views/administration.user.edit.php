@@ -292,6 +292,16 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
+$is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
+
+$default_url_label = array_key_exists('profile_redirect_url', $data) && $data['profile_redirect_url'] !== ''
+	? (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	: null;
+
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
@@ -304,9 +314,14 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextAreaFlexible('url', $data['url']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('users', 'url'))
+		[
+			(new CTextAreaFlexible('url', $data['url']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('users', 'url'))
+				->setEnabled(!$is_disabled)
+				->setSingleline($is_disabled),
+			$default_url_label
+		]
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -440,6 +455,20 @@ if ($data['roleid']) {
 		}
 	}
 
+	// User settings section.
+
+	$permissions_form_list
+		->addRow((new CTag('h4', true, _('User profile settings')))->addClass('input-section-header'))
+		->addRow(
+			(new CDiv(
+				(new CSpan(_('Redirect URL after login')))->addClass(
+					$data['profile_redirect_enforce'] ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
+
 	// Services section.
 
 	$permissions_form_list->addRow(
@@ -569,29 +598,39 @@ if ($data['roleid']) {
 
 	// API section.
 
-	$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
+	$is_api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 	$permissions_form_list
-		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('rules-status-container')
+		->addRow(
+			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
+		)
+		->addRow(
+			(new CDiv(
+				$is_api_access_enabled
+					? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_STATUS_GREEN)
+					: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_STATUS_GREY)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
 		);
 
-	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
-
-	if ($api_methods) {
-		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
+	if ($is_api_access_enabled) {
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+		$is_api_allow_list = CRoleHelper::getRoleApiListMode($data['roleid']) == ZBX_ROLE_RULE_API_MODE_ALLOW;
 		$elements = [];
 
-		foreach ($api_methods as $api_method) {
-			$elements[] = (new CSpan($api_method))->addClass(
-				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
+		if ($api_methods) {
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))
+					->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
+			}
+		}
+		else {
+			$elements[] = (new CSpan(_('None')))
+				->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN);
 		}
 
-		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+		$permissions_form_list->addRow(
+			$is_api_allow_list ? _('Allowed methods') : _('Denied methods'),
 			(new CDiv($elements))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
