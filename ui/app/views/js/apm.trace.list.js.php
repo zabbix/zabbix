@@ -25,7 +25,7 @@
 		#layout_mode = null;
 		#refresh_interval = 0;
 		#refresh_interval_id = null;
-		#global_timerange = null;
+		#time_selector = null;
 		/** @type {CDataTable|null} */
 		#datatable = null;
 		/** @type {HTMLFormElement|null} */
@@ -89,8 +89,8 @@
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				if (data.idx === filter_options.idx) {
-					this.#global_timerange.from = data.from;
-					this.#global_timerange.to = data.to;
+					this.#time_selector.from = data.from;
+					this.#time_selector.to = data.to;
 				}
 
 				this.#refresh();
@@ -98,7 +98,7 @@
 		}
 
 		#initFilter(filter_options) {
-			this.#global_timerange = {
+			this.#time_selector = {
 				from: filter_options.timeselector.from,
 				to: filter_options.timeselector.to
 			};
@@ -152,7 +152,7 @@
 						.setWidth('auto')
 				])
 				.setPage(page)
-				.setFilter(filter)
+				.setFilter({...filter, ...this.#time_selector})
 				.setDefaultSortField(default_sort_field)
 				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
@@ -467,12 +467,8 @@
 
 			const filter = this.#datatable.getFilter();
 
-			if (filter.filter_custom_time === 0) {
-				filter.from = this.#global_timerange.from;
-				filter.to = this.#global_timerange.to;
-			}
-
 			this.#datatable
+				.setFilter({...filter, ...this.#time_selector})
 				.updateUserConfig()
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,

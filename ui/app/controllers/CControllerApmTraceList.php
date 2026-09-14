@@ -37,14 +37,13 @@ class CControllerApmTraceList extends CController {
 			'filter_statuses' => ['array', 'field' => ['integer']],
 			'filter_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
 			'filter_attributes' => ['array'],
-			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
-			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'sort' => ['string', 'in' => ['timestamp']],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
-			'filter_custom_time' => ['integer', 'in' => [0, 1]],
 			'filter_set' => ['integer', 'in' => ['1']],
-			'filter_rst' => ['integer', 'in' => ['1']]
+			'filter_rst' => ['integer', 'in' => ['1']],
+			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
+			'to' => ['string', 'use' => [CRangeTimeValidator::class]]
 		]];
 	}
 

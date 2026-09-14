@@ -38,8 +38,8 @@ abstract class CControllerDataTable extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 
 		$this->setValidationRules([
-			'data_fields' =>		'required|array',
-			'options' =>			'required|array',
+			'data_fields' =>		'array|required',
+			'options' =>			'array|required',
 			'filter' =>				'array',
 			'filter_counters' =>	'in 1',
 			'page' =>				'int32',
