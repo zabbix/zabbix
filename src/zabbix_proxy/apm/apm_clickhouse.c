@@ -17,6 +17,7 @@
 #include "apm_exporter.h"
 #include "libs/zbxhistory/history_curl.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxcurl.h"
 #include "zbxhttp.h"
 #include "zbxjson.h"

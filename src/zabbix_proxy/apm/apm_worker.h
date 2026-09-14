@@ -16,6 +16,7 @@
 #define ZABBIX_APM_WORKER_H
 
 #include "apm_exporter.h"
+#include "apm_dataset.h"
 #include "zbxmw.h"
 
 typedef struct

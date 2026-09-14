@@ -15,6 +15,7 @@
 #include "zbx_apm_client.h"
 
 #include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 

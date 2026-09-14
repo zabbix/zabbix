@@ -13,6 +13,8 @@
 **/
 
 #include "apm_config.h"
+#include "zbxcommon.h"
+#include "zbxnum.h"
 #include "zbxjson.h"
 
 /******************************************************************************

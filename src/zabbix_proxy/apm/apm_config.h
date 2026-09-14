@@ -16,6 +16,7 @@
 #define ZABBIX_APM_CONFIG_H
 
 #include "zbxalgo.h"
+#include "zbxtypes.h"
 #include "zbxtypes_ext.h"
 
 #define APM_STATUS_ENABLED	1

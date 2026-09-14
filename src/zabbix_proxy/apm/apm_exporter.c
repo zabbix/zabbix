@@ -13,8 +13,12 @@
 **/
 
 #include "apm_exporter.h"
+#include "apm_clickhouse.h"
+#include "apm_dataset.h"
 #include "zbxcfg.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "config.h"
 
 #define APM_EXPORTER_PROVIDER_URL	"url"
 #define APM_EXPORTER_PROVIDER_USERNAME	"username"

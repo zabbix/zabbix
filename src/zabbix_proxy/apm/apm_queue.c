@@ -15,6 +15,7 @@
 #include "apm_queue.h"
 #include "apm_task.h"
 #include "zbxmw.h"
+#include "zbxcommon.h"
 
 #define APM_THROTTLE_WINDOW	SEC_PER_MIN
 

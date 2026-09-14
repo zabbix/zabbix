@@ -13,8 +13,10 @@
 **/
 
 #include "apm_task.h"
+#include "apm_queue.h"
 #include "apm_grpc.h"
 #include "apm_config.h"
+#include "zbxcommon.h"
 
 static void	apm_task_request_free(void *task);
 static void	apm_task_commit_free(void *task);

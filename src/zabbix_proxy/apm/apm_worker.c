@@ -15,8 +15,13 @@
 #include "apm_worker.h"
 #include "apm_dataset.h"
 #include "apm_decode.h"
+#include "apm_exporter.h"
+#include "apm_dataset.h"
 #include "apm_task.h"
 #include "zbxmw.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
 

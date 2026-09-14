@@ -17,7 +17,7 @@
 
 #include "apm_dataset.h"
 #include "libs/zbxhistory/history_curl.h"
-#include "zbxcommon.h"
+#include "config.h"
 
 typedef struct
 {

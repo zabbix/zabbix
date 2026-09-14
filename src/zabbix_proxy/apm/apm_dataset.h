@@ -15,6 +15,8 @@
 #ifndef ZABBIX_APM_DATASET_H
 #define ZABBIX_APM_DATASET_H
 
+#include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 #include "zbxalgo.h"
 
 typedef union

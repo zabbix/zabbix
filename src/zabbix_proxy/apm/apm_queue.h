@@ -16,6 +16,7 @@
 #define ZABBIX_APM_QUEUE_H
 
 #include "zbxmw.h"
+#include "zbxtypes.h"
 
 typedef enum
 {

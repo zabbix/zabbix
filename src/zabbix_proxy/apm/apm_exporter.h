@@ -18,7 +18,6 @@
 #include "apm_dataset.h"
 #include "apm_clickhouse.h"
 #include "zbxcfg.h"
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 typedef enum
