@@ -34,24 +34,30 @@ class CControllerApmTraceList extends CController {
 			'filter_scope_name' => ['string'],
 			'filter_min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class,]],
-			'filter_statuses' => ['array', 'field' => ['integer']],
+			'filter_statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
+				APM_TRACE_STATUS_ERROR]]],
 			'filter_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
-			'filter_attributes' => ['array'],
+			'filter_attributes' => ['array',
+				'field' => ['object', 'fields' => [
+					'key' => ['string', 'required'],
+					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
+						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
+						CONDITION_OPERATOR_NOT_LIKE]],
+					'value' => ['string', 'required']
+				]]
+			],
 			'sort' => ['string', 'in' => ['timestamp']],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
-			'filter_set' => ['integer', 'in' => ['1']],
-			'filter_rst' => ['integer', 'in' => ['1']],
+			'filter_set' => ['integer', 'in' => [1]],
+			'filter_rst' => ['integer', 'in' => [1]],
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]]
 		]];
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules())
-			&& $this->validateTimeSelectorPeriod()
-			&& $this->validateStatuses()
-			&& $this->validateAttributes();
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -137,6 +143,10 @@ class CControllerApmTraceList extends CController {
 		$filter_attributes = [];
 
 		foreach ($this->getInput('filter_attributes', []) as $filter_attribute) {
+			if (!array_key_exists('key', $filter_attribute) || !array_key_exists('value', $filter_attribute)) {
+				continue;
+			}
+
 			if ($filter_attribute['key'] !== '' || $filter_attribute['value'] !== '') {
 				$filter_attributes[] = $filter_attribute;
 			}
@@ -178,43 +188,5 @@ class CControllerApmTraceList extends CController {
 		CProfile::deleteIdx('web.apm.trace.filter_attributes.key');
 		CProfile::deleteIdx('web.apm.trace.filter_attributes.value');
 		CProfile::deleteIdx('web.apm.trace.filter_attributes.operator');
-	}
-
-	/**
-	 * Validate values of filter statuses.
-	 *
-	 * @return bool
-	 */
-	private function validateStatuses(): bool {
-		if (!$this->hasInput('filter_statuses')) {
-			return true;
-		}
-
-		return !array_diff($this->getInput('filter_statuses'), [APM_TRACE_STATUS_OK, APM_TRACE_STATUS_ERROR,
-			APM_TRACE_STATUS_UNSET]);
-	}
-
-	/**
-	 * Validate values of filter attributes.
-	 *
-	 * @return bool
-	 */
-	private function validateAttributes(): bool {
-		if (!$this->hasInput('filter_attributes')) {
-			return true;
-		}
-
-		$ret = true;
-		foreach ($this->getInput('filter_attributes') as $filter_attribute) {
-			if (count($filter_attribute) != 3
-					|| !array_key_exists('key', $filter_attribute) || !is_string($filter_attribute['key'])
-					|| !array_key_exists('value', $filter_attribute) || !is_string($filter_attribute['value'])
-					|| !array_key_exists('operator', $filter_attribute) || !is_string($filter_attribute['operator'])) {
-				$ret = false;
-				break;
-			}
-		}
-
-		return $ret;
 	}
 }
