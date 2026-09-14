@@ -39,7 +39,7 @@ static const zbx_apm_col_t	apm_col_metrics_gauge[] = {
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
 	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.SpanId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
 	{APM_COL_ARRAY_STRING}		/* Exemplars.TraceId */
 };
 
@@ -63,8 +63,8 @@ static const zbx_apm_col_t	apm_col_metrics_sum[] = {
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
 	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.SpanId */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.TraceId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
 	{APM_COL_INT32},		/* AggregationTemporality */
 	{APM_COL_BOOL}			/* IsMonotonic */
 };
@@ -86,17 +86,17 @@ static const zbx_apm_col_t	apm_col_metrics_histogram[] = {
 	{APM_COL_DATETIME},		/* TimeUnix */
 	{APM_COL_UINT64},		/* Count */
 	{APM_COL_FLOAT64},		/* Sum */
-	{APM_COL_ARRAY_UINT64},	/* BucketCounts */
+	{APM_COL_ARRAY_UINT64},		/* BucketCounts */
 	{APM_COL_ARRAY_FLOAT64},	/* ExplicitBounds */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
 	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.SpanId */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.TraceId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
 	{APM_COL_UINT32},		/* Flags */
 	{APM_COL_FLOAT64},		/* Min */
 	{APM_COL_FLOAT64},		/* Max */
-	{APM_COL_INT32}		/* AggregationTemporality */
+	{APM_COL_INT32}			/* AggregationTemporality */
 };
 
 static const zbx_apm_col_t	apm_col_metrics_exponential_histogram[] = {
@@ -119,18 +119,18 @@ static const zbx_apm_col_t	apm_col_metrics_exponential_histogram[] = {
 	{APM_COL_INT32},		/* Scale */
 	{APM_COL_UINT64},		/* ZeroCount */
 	{APM_COL_INT32},		/* PositiveOffset */
-	{APM_COL_ARRAY_UINT64},	/* PositiveBucketCounts */
+	{APM_COL_ARRAY_UINT64},		/* PositiveBucketCounts */
 	{APM_COL_INT32},		/* NegativeOffset */
-	{APM_COL_ARRAY_UINT64},	/* NegativeBucketCounts */
+	{APM_COL_ARRAY_UINT64},		/* NegativeBucketCounts */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
 	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.SpanId */
-	{APM_COL_ARRAY_STRING},	/* Exemplars.TraceId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
+	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
 	{APM_COL_UINT32},		/* Flags */
 	{APM_COL_FLOAT64},		/* Min */
 	{APM_COL_FLOAT64},		/* Max */
-	{APM_COL_INT32}		/* AggregationTemporality */
+	{APM_COL_INT32}			/* AggregationTemporality */
 };
 
 static const zbx_apm_col_t	apm_col_metrics_summary[] = {
@@ -191,14 +191,22 @@ static const zbx_apm_col_t	apm_col_traces[] = {
 	{APM_COL_STRING},		/* StatusCode */
 	{APM_COL_STRING},		/* StatusMessage */
 	{APM_COL_ARRAY_DATETIME64},	/* Events.Timestamp */
-	{APM_COL_ARRAY_STRING},	/* Events.Name */
+	{APM_COL_ARRAY_STRING},		/* Events.Name */
 	{APM_COL_ARRAY_MAP},		/* Events.Attributes */
-	{APM_COL_ARRAY_STRING},	/* Links.TraceId */
-	{APM_COL_ARRAY_STRING},	/* Links.SpanId */
-	{APM_COL_ARRAY_STRING},	/* Links.TraceState */
+	{APM_COL_ARRAY_STRING},		/* Links.TraceId */
+	{APM_COL_ARRAY_STRING},		/* Links.SpanId */
+	{APM_COL_ARRAY_STRING},		/* Links.TraceState */
 	{APM_COL_ARRAY_MAP}		/* Links.Attributes */
 };
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free a column value if its type owns allocated memory             *
+ *                                                                            *
+ * Parameters: value - [IN] value to free                                     *
+ *             col   - [IN] column definition describing the value type       *
+ *                                                                            *
+ *****************************************************************************/
 static void	apm_value_free(zbx_apm_value_t *value, const zbx_apm_col_t *col)
 {
 	switch (col->type)
@@ -218,7 +226,15 @@ static void	apm_value_free(zbx_apm_value_t *value, const zbx_apm_col_t *col)
 	}
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize rowset with the specified column definitions           *
+ *                                                                            *
+ * Parameters: rs       - [OUT] rowset to initialize                          *
+ *             cols     - [IN] column definitions                             *
+ *             cols_num - [IN] number of columns                              *
+ *                                                                            *
+ *****************************************************************************/
 static void	apm_rowset_init(zbx_apm_rowset_t *rs, const zbx_apm_col_t *cols, int cols_num)
 {
 	zbx_vector_apm_row_create(&rs->rows);
@@ -226,6 +242,15 @@ static void	apm_rowset_init(zbx_apm_rowset_t *rs, const zbx_apm_col_t *cols, int
 	rs->cols_num = cols_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free row contents of a rowset                                     *
+ *                                                                            *
+ * Parameters: rs - [IN/OUT] rowset to clear                                  *
+ *                                                                            *
+ * Comments: The rowset is cleared, but not destroyed.                        *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 {
 	for (int i = 0; i < rs->rows.values_num; i++)
@@ -237,6 +262,15 @@ void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: append a new zero-initialized row to the rowset                   *
+ *                                                                            *
+ * Parameters: rs - [IN/OUT] rowset to append the row to                      *
+ *                                                                            *
+ * Return value: the appended row                                             *
+ *                                                                            *
+ *****************************************************************************/
 zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs)
 {
 	zbx_apm_row_t	row;
@@ -247,6 +281,11 @@ zbx_apm_row_t	apm_rowset_add(zbx_apm_rowset_t *rs)
 	return row;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize dataset rowsets for all supported signal types         *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_dataset_init(zbx_apm_dataset_t *ds)
 {
 #define APM_ROWSET_INIT(rs, cols)	apm_rowset_init(rs, cols, (int)ARRSIZE(cols))
@@ -262,6 +301,11 @@ void	apm_dataset_init(zbx_apm_dataset_t *ds)
 #undef APM_ROWSET_INIT
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free all resources allocated by dataset rowsets                   *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_dataset_destroy(zbx_apm_dataset_t *ds)
 {
 	apm_rowset_clear(&ds->metrics_gauge);
@@ -286,6 +330,18 @@ void	apm_dataset_destroy(zbx_apm_dataset_t *ds)
 	zbx_vector_apm_row_destroy(&ds->traces.rows);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: append the string representation of a column value to a           *
+ *          dynamic buffer                                                    *
+ *                                                                            *
+ * Parameters: str        - [IN/OUT] dynamic buffer                           *
+ *             str_alloc  - [IN/OUT] allocated buffer size                    *
+ *             str_offset - [IN/OUT] current buffer offset                    *
+ *             value      - [IN] value to format                              *
+ *             col        - [IN] column definition describing the value type  *
+ *                                                                            *
+ *****************************************************************************/
 static void	apm_value_snprintf_alloc(char **str, size_t *str_alloc, size_t *str_offset,
 		const zbx_apm_value_t *value, const zbx_apm_col_t *col)
 {
@@ -323,6 +379,14 @@ static void	apm_value_snprintf_alloc(char **str, size_t *str_alloc, size_t *str_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write rowset rows to the trace log                                *
+ *                                                                            *
+ * Parameters: name - [IN] rowset name used in the trace log                  *
+ *             rs   - [IN] rowset to dump                                     *
+ *                                                                            *
+ *****************************************************************************/
 static void	apm_rowset_dump(const char *name, zbx_apm_rowset_t *rs)
 {
 	char	*row = NULL;
@@ -349,6 +413,11 @@ static void	apm_rowset_dump(const char *name, zbx_apm_rowset_t *rs)
 	zbx_free(row);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write dataset rowsets to the trace log                            *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_dataset_dump(zbx_apm_dataset_t *ds)
 {
 	apm_rowset_dump("metrics_gauge", &ds->metrics_gauge);
@@ -360,6 +429,14 @@ void	apm_dataset_dump(zbx_apm_dataset_t *ds)
 	apm_rowset_dump("traces", &ds->traces);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add dataset row counts to APM commit statistics                   *
+ *                                                                            *
+ * Parameters: ds    - [IN] dataset with rows to account for                  *
+ *             stats - [IN/OUT] commit statistics to update                   *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
 {
 	if (0 != ds->logs.rows.values_num)
@@ -387,6 +464,17 @@ void	apm_dataset_flush_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t
 		atomic_fetch_add(&stats->metrics_summary, (zbx_uint64_t)ds->metrics_summary.rows.values_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subtract dataset row counts from APM commit statistics            *
+ *                                                                            *
+ * Parameters: ds    - [IN] dataset with rows to account for                  *
+ *             stats - [IN/OUT] commit statistics to update                   *
+ *                                                                            *
+ * Comments: Used to revert counts added by apm_dataset_flush_stats() for     *
+ *           rows that failed to commit.                                      *
+ *                                                                            *
+ *****************************************************************************/
 void	apm_dataset_undo_stats(const zbx_apm_dataset_t *ds, zbx_apm_commit_stats_t *stats)
 {
 	if (0 != ds->logs.rows.values_num)
