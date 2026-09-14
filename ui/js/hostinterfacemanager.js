@@ -211,18 +211,6 @@ class HostInterfaceManager {
 					}
 				);
 			}
-
-			const input_max_rep = document.getElementById(`interfaces_${iface.interfaceid}_details_max_repetitions`);
-
-			if (input_max_rep.value.trim() === '' || input_max_rep.value.trim() === '0') {
-				input_max_rep.value = HostInterfaceManager.SNMP_MAX_REPETITIONS;
-			}
-
-			const input_community = document.getElementById(`interfaces_${iface.interfaceid}_details_community`);
-
-			if (input_community.value.trim() === '') {
-				input_community.value = HostInterfaceManager.SNMP_COMMUNITY;
-			}
 		}).trigger('change');
 	}
 
@@ -285,6 +273,16 @@ class HostInterfaceManager {
 		const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 		iface.type_name = this.INTERFACE_NAMES[iface.type];
+
+		if (iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP) {
+			iface.details.community = typeof iface.details.community === 'undefined'
+				? HostInterfaceManager.SNMP_COMMUNITY
+				: iface.details.community;
+
+			iface.details.max_repetitions = typeof iface.details.max_repetitions === 'undefined'
+				? HostInterfaceManager.SNMP_MAX_REPETITIONS
+				: iface.details.max_repetitions;
+		}
 
 		/*
 		 * New line break css selector :empty. Trim used to avoid this.
