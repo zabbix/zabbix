@@ -9704,6 +9704,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   .multiselect-description-container > .multiselect-control {
     margin-right: 5px; }
 
+.rules-status-title {
+  margin-bottom: 3px;
+  color: #768d99; }
+
 .rules-status-container .status-green,
 .rules-status-container .status-grey {
   margin: 3px 3px 3px 0; }
