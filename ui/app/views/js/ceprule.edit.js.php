@@ -668,7 +668,7 @@ window.ceprule_edit_popup = new class {
 			.querySelector(`#ceprule-operations-table [data-row_index="${operation.row_index}"]`);
 
 		row.nextElementSibling.remove();
-		row.replaceWith(this.#buildOperationRow(operation, true));
+		row.replaceWith(this.#buildOperationRow(operation));
 	}
 
 	#addOperationRow(operation) {

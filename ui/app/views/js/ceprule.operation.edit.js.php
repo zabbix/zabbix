@@ -183,7 +183,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	#editConditionRow(condition, index) {
 		this.form_element.querySelector(`#ceprule-operation-filter-conditions [data-row_index="${index}"]`)
-			.replaceWith(this.#buildConditionRow(condition, index, true));
+			.replaceWith(this.#buildConditionRow(condition, index));
 	}
 
 	#addConditionRow(condition) {
@@ -260,7 +260,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	#setValues(operation) {
 		for (const condition of Object.values(operation.filter.conditions || {})) {
-			this.#addConditionRow(condition, false);
+			this.#addConditionRow(condition);
 		}
 
 		this.form_element.querySelector(`[name="type"]`).value = operation.type;
@@ -430,7 +430,7 @@ window.ceprule_operation_edit_popup = new class {
 					action: overlay => ceprule_operation_condition_edit_popup.submit()
 							.then(fields => {
 								if (is_new) {
-									this.#addConditionRow(fields, true);
+									this.#addConditionRow(fields);
 								}
 								else {
 									this.#editConditionRow(fields, index);
