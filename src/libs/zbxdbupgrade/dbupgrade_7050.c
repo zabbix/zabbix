@@ -1282,8 +1282,6 @@ static int	DBpatch_7050093(void)
 	return DBmodify_field_type("role_rule", &field, NULL);
 }
 
-#endif
-
 static int	DBpatch_7050094(void)
 {
 	int			ret = SUCCEED;
