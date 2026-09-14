@@ -1349,6 +1349,10 @@ class CDataTable {
 
 		this.getData({check_changes, force_load})
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				if ('error' in response) {
 					const title = response.error.title || t('Unexpected server error.');
 					const messages = response.error.messages || [];
@@ -1359,6 +1363,10 @@ class CDataTable {
 				return response;
 			})
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				window.addEventListener('resize', this.onWindowResize);
 
 				this.dispatchEvent(CDataTable.EVENT_BEFORE_RENDER, {response});
