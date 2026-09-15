@@ -76,9 +76,9 @@ class CSideDrawer {
 
 		return promise_open
 			.then(response => {
-				this.#bindEvents();
-
 				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
+
+				this.#bindEvents();
 			})
 			.finally(() => {
 				this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
@@ -136,11 +136,21 @@ class CSideDrawer {
 	}
 
 	#bindEvents() {
+		const close_button = this.#drawer_element.querySelector('.js-close-button');
+		close_button?.addEventListener('click', this.#onClose);
+
 		document.addEventListener('keyup', this.#onKeyUp);
 	}
 
 	#unbindEvents() {
+		const close_button = this.#drawer_element.querySelector('.js-close-button');
+		close_button?.removeEventListener('click', this.#onClose);
+
 		document.removeEventListener('keyup', this.#onKeyUp);
+	}
+
+	#onClose = () => {
+		this.close();
 	}
 
 	#onKeyUp = e => {

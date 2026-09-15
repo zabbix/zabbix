@@ -170,12 +170,6 @@ class ZNavigationTree extends HTMLElement {
 		element.style.setProperty('--navigation-tree-depth', String(row.depth));
 		element.toggleAttribute('selected', this.#selected_id === item.id);
 
-		const toggle = document.createElement('button');
-		toggle.type = 'button';
-		toggle.className = 'z-navigation-tree-toggle';
-		toggle.disabled = !has_children;
-		toggle.textContent = has_children ? (is_expanded ? '⌄' : '›') : '';
-
 		const content = document.createElement('div');
 		content.className = 'z-navigation-tree-item';
 
@@ -195,6 +189,18 @@ class ZNavigationTree extends HTMLElement {
 		const meta = document.createElement('div');
 		meta.className = 'z-navigation-tree-meta';
 		meta.textContent = item.meta == null ? '' : String(item.meta);
+
+		const toggle = document.createElement('button');
+
+		if (has_children) {
+			toggle.type = 'button';
+			toggle.classList.add('btn-icon', is_expanded ? ZBX_ICON_CHEVRON_DOWN : ZBX_ICON_CHEVRON_UP);
+		}
+		else {
+			toggle.disabled = true;
+		}
+
+		toggle.classList.add('z-navigation-tree-toggle');
 
 		element.append(toggle, content, meta);
 

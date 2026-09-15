@@ -253,7 +253,7 @@ class TraceViewPage {
 	}
 
 	#renderOverview() {
-		const width = 1000;
+		const width = this.#overview.parentElement.offsetWidth;
 		const height = 56;
 		const rows = Array.from(this.#spans.values());
 		const elements = [];
@@ -300,11 +300,22 @@ class TraceViewPage {
 		const elements = [];
 
 		for (const tick of ticks) {
+			let position;
+			if (tick.ratio === 0) {
+				position = `11px`;
+			}
+			else if (tick.ratio === 1) {
+				position = `calc(100% - 11px)`;
+			}
+			else {
+				position = `${tick.ratio * 100}%`;
+			}
+
 			const tick_element = document.createElement('div');
 			const label = document.createElement('span');
 
 			tick_element.className = 'trace-time-tick';
-			tick_element.style.setProperty('--trace-tick-position', `${tick.ratio * 100}%`);
+			tick_element.style.setProperty('--trace-tick-position', position);
 
 			label.textContent = this.#formatTime(tick.value, tick.step);
 			tick_element.appendChild(label);
@@ -322,25 +333,36 @@ class TraceViewPage {
 		this.#marker_events.clear();
 
 		for (const row of rows) {
-			elements.push(this.#createWaterfallRow(row, ticks));
+			elements.push(this.#createWaterfallRow(row));
 		}
 
 		this.#waterfall.replaceChildren(...elements);
+
+		for (const tick of ticks) {
+			let position;
+			if (tick.ratio === 0) {
+				position = `11px`;
+			}
+			else if (tick.ratio === 1) {
+				position = `calc(100% - 11px)`;
+			}
+			else {
+				position = `${tick.ratio * 100}%`;
+			}
+
+			const line = document.createElement('div');
+			line.className = 'trace-grid-line';
+			line.style.setProperty('--trace-grid-line-position', position);
+			this.#waterfall.appendChild(line);
+		}
 	}
 
-	#createWaterfallRow(row, ticks) {
+	#createWaterfallRow(row) {
 		const span = row.item.span;
 		const row_element = document.createElement('div');
 
 		row_element.className = 'trace-waterfall-row';
 		row_element.dataset.spanId = span.id;
-
-		for (const tick of ticks) {
-			const line = document.createElement('div');
-			line.className = 'trace-grid-line';
-			line.style.setProperty('--trace-grid-line-position', `${tick.ratio * 100}%`);
-			row_element.appendChild(line);
-		}
 
 		if (this.#spanIntersectsSelectedRange(span)) {
 			const bar = document.createElement('div');
@@ -469,12 +491,11 @@ class TraceViewPage {
 		const target_count = Math.max(2, Math.floor(width / label_gap));
 		const target_step = range / target_count;
 		const steps = [
-			1, 2, 5, 10, 20, 50, 100, 200, 500,
-			1000, 2000, 5000, 10000, 15000, 30000,
-			60000, 120000, 300000, 600000, 900000, 1800000,
-			3600000, 7200000, 10800000, 21600000, 43200000,
-			86400000, 172800000, 604800000, 1209600000,
-			2592000000, 7776000000, 15552000000, 31536000000
+			1e-9, 2e-9, 5e-9, 1e-8, 2e-8, 5e-8, 1e-7, 2e-7, 5e-7,
+			1e-6, 2e-6, 5e-6, 1e-5, 1.5e-5, 3e-5, 6e-5, 1.2e-4,
+			3e-4, 6e-4, 9e-4, 1.8e-3, 3.6e-3, 7.2e-3, 1.08e-2,
+			2.16e-2, 4.32e-2, 8.64e-2, 1.728e-1, 6.048e-1,
+			1.2096, 2.592, 7.776, 15.552, 31.536
 		];
 
 		return steps.find(step => step >= target_step) || steps[steps.length - 1];
@@ -518,11 +539,25 @@ class TraceViewPage {
 
 		item.append(title, time);
 
-		if (event.description) {
-			const description = document.createElement('div');
-			description.className = 'trace-tooltip-description';
-			description.textContent = event.description;
-			item.appendChild(description);
+		if (event.attributes) {
+			const attributes = document.createElement('div');
+			attributes.className = 'trace-tooltip-attributes';
+
+			for (const [name, value] of Object.entries(event.attributes)) {
+				const attribute_name = document.createElement('span');
+				attribute_name.textContent = name;
+
+				const attribute_value = document.createElement('span');
+				attribute_value.textContent = String(value);
+
+				const attribute = document.createElement('div');
+				attribute.className = 'trace-tooltip-attribute';
+				attribute.append(attribute_name, attribute_value);
+
+				attributes.appendChild(attribute);
+			}
+
+			item.appendChild(attributes);
 		}
 
 		return item;

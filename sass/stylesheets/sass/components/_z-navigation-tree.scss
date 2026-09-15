@@ -22,7 +22,6 @@ z-navigation-tree {
 		min-inline-size: 0;
 		padding-inline: calc(8px + var(--navigation-tree-depth) * var(--navigation-tree-indent-size)) 8px;
 		column-gap: 4px;
-		border-block-end: 1px solid color-mix(in srgb, var(--navigation-tree-border-color) 55%, transparent);
 		cursor: default;
 
 		&[selected] {
@@ -33,14 +32,23 @@ z-navigation-tree {
 	.z-navigation-tree-toggle {
 		display: inline-flex;
 		align-items: center;
+		align-self: flex-start;
 		justify-content: center;
 		inline-size: 18px;
 		block-size: 18px;
+		margin: 10px 0 0 4px;
 		padding: 0;
 		border: 0;
 		background: transparent;
 		color: inherit;
 		cursor: pointer;
+		height: 13px;
+		min-width: auto;
+		width: 13px;
+
+		&::before {
+			font-size: 13px;
+		}
 
 		&:disabled {
 			cursor: default;
@@ -60,17 +68,17 @@ z-navigation-tree {
 	}
 
 	.z-navigation-tree-title {
-		font-weight: 700;
+		font-weight: 600;
 	}
 
 	.z-navigation-tree-subtitle {
 		margin-block-start: 2px;
 		color: var(--navigation-tree-muted-color);
-		font-size: 11px;
 	}
 
 	.z-navigation-tree-meta {
+		align-self: flex-start;
+		margin: 10px 0 0;
 		color: var(--navigation-tree-muted-color);
-		font-size: 11px;
 	}
 }

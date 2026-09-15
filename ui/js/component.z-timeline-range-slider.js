@@ -152,7 +152,7 @@ class ZTimelineRangeSlider extends HTMLElement {
 			this.#track.appendChild(node);
 		}
 
-		this.append(this.#track, this.#selection_layer, this.#scale);
+		this.append(this.#scale, this.#track, this.#selection_layer);
 	}
 
 	#addEventListeners() {
@@ -393,7 +393,7 @@ class ZTimelineRangeSlider extends HTMLElement {
 		const first_tick = Math.ceil(this.#start / tick_step) * tick_step;
 		const ticks = [];
 
-		for (let value = first_tick; value <= this.#end; value += tick_step) {
+		for (let value = first_tick; value <= this.#end + tick_step; value += tick_step) {
 			const ratio = (value - this.#start) / range;
 			const tick = document.createElement('div');
 			const label = document.createElement('span');
@@ -419,12 +419,11 @@ class ZTimelineRangeSlider extends HTMLElement {
 		const target_step = range / target_count;
 
 		const steps = [
-			1, 2, 5, 10, 20, 50, 100, 200, 500,
-			1000, 2000, 5000, 10000, 15000, 30000,
-			60000, 120000, 300000, 600000, 900000, 1800000,
-			3600000, 7200000, 10800000, 21600000, 43200000,
-			86400000, 172800000, 604800000, 1209600000,
-			2592000000, 7776000000, 15552000000, 31536000000
+			1e-9, 2e-9, 5e-9, 1e-8, 2e-8, 5e-8, 1e-7, 2e-7, 5e-7,
+			1e-6, 2e-6, 5e-6, 1e-5, 1.5e-5, 3e-5, 6e-5, 1.2e-4,
+			3e-4, 6e-4, 9e-4, 1.8e-3, 3.6e-3, 7.2e-3, 1.08e-2,
+			2.16e-2, 4.32e-2, 8.64e-2, 1.728e-1, 6.048e-1,
+			1.2096, 2.592, 7.776, 15.552, 31.536
 		];
 
 		return steps.find(step => step >= target_step) || steps[steps.length - 1];
@@ -439,6 +438,10 @@ class ZTimelineRangeSlider extends HTMLElement {
 		const day = String(date.getDate()).padStart(2, '0');
 		const month = String(date.getMonth() + 1).padStart(2, '0');
 		const year = String(date.getFullYear());
+
+		if (range <= 10) {
+			return this.#formatDuration(value);
+		}
 
 		if (range < 1000 || tick_step < 1000) {
 			return `${seconds}.${ms}s`;
@@ -457,6 +460,18 @@ class ZTimelineRangeSlider extends HTMLElement {
 		}
 
 		return `${year}-${month}-${day}`;
+	}
+
+	#formatDuration(value) {
+		if (value < 1e-6) {
+			return `${Math.round(value * 1e9)}ns`;
+		}
+
+		if (value < 1e-3) {
+			return `${Math.round(value * 1e6)}µs`;
+		}
+
+		return `${Math.round(value * 1e6) / 1000}ms`;
 	}
 
 	#getPixelCustomProperty(name, fallback) {

@@ -1,6 +1,7 @@
 z-timeline-range-slider {
 	--timeline-range-slider-scale-block-size: 24px;
 	--timeline-range-slider-empty-track-block-size: 56px;
+	--timeline-range-slider-scale-border-color: #{$ui-border-color};
 	--timeline-range-slider-selection-bg-color: #{rgba(0, 128, 255, .16)};
 	--timeline-range-slider-selection-border-color: #{$ui-selected-bg-color};
 	--timeline-range-slider-handle-size: 16px;
@@ -10,7 +11,7 @@ z-timeline-range-slider {
 
 	position: relative;
 	display: grid;
-	grid-template-rows: minmax(0, auto) auto;
+	grid-template-rows: auto minmax(0, auto);
 	min-inline-size: 0;
 	user-select: none;
 
@@ -22,7 +23,7 @@ z-timeline-range-slider {
 	}
 
 	& > .z-timeline-range-slider-track {
-		grid-row: 1;
+		grid-row: 2;
 		min-inline-size: 0;
 		min-block-size: 0;
 	}
@@ -33,6 +34,7 @@ z-timeline-range-slider {
 
 	& > .z-timeline-range-slider-selection-layer {
 		position: absolute;
+		bottom: 0;
 		z-index: 2;
 		inset-block: 0;
 		inset-inline: 0;
@@ -41,7 +43,7 @@ z-timeline-range-slider {
 	}
 
 	&[has-content][scale] > .z-timeline-range-slider-selection-layer {
-		inset-block-end: var(--timeline-range-slider-scale-block-size);
+		inset-block-start: var(--timeline-range-slider-scale-block-size);
 	}
 
 	.z-timeline-range-slider-selection {
@@ -66,8 +68,15 @@ z-timeline-range-slider {
 		position: absolute;
 		inset-block: 0;
 		inline-size: var(--timeline-range-slider-handle-size);
-		transform: translateX(-50%);
 		cursor: ew-resize;
+
+		&:first-child {
+			transform: translateX(100%);
+		}
+
+		&:last-child {
+			transform: translateX(-100%);
+		}
 	}
 
 	.z-timeline-range-slider-handle-start {
@@ -79,63 +88,25 @@ z-timeline-range-slider {
 	}
 
 	& > .z-timeline-range-slider-scale {
-		position: relative;
-		grid-row: 2;
+		grid-row: 1;
 		display: none;
+		align-items: center;
+		justify-content: space-between;
 		block-size: var(--timeline-range-slider-scale-block-size);
 		min-inline-size: 0;
 		overflow: hidden;
+		padding-inline: 11px;
 		pointer-events: none;
+		border-bottom: 1px solid var(--timeline-range-slider-scale-border-color);
 	}
 
 	&[scale] > .z-timeline-range-slider-scale,
 	&:not([has-content]) > .z-timeline-range-slider-scale {
-		display: block;
+		display: flex;
 	}
 
 	.z-timeline-range-slider-tick {
-		position: absolute;
-		inset-block: 0;
-		inset-inline-start: var(--tick-position);
 		color: var(--timeline-range-slider-label-color);
-		font-size: 11px;
-		line-height: 1;
 		white-space: nowrap;
-		transform: translateX(-50%);
-
-		&::before {
-			content: '';
-			position: absolute;
-			inset-block-start: 0;
-			inset-inline-start: 50%;
-			block-size: 6px;
-			inline-size: 1px;
-			background: var(--timeline-range-slider-tick-color);
-		}
-
-		> span {
-			position: absolute;
-			inset-block-start: 9px;
-			inset-inline-start: 50%;
-			transform: translateX(-50%);
-		}
-
-		&:first-child {
-			transform: none;
-
-			> span {
-				inset-inline-start: 0;
-				transform: none;
-			}
-		}
-
-		&:last-child {
-			transform: translateX(-100%);
-
-			> span {
-				inset-inline-start: 100%;
-				transform: translateX(-100%);
-			}
-		}
 	}
 }

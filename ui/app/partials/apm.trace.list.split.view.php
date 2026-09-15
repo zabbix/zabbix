@@ -25,9 +25,12 @@ $trace_view = (new CDiv())
 	->addItem(
 		(new CDiv())
 			->addClass('trace-view-header')
-			->addItem(
-				(new CDiv())->setAttribute('data-trace-id', '')
-			)
+			->addItem([
+				(new CDiv())->setAttribute('data-trace-id', ''),
+				(new CButtonIcon(ZBX_ICON_CLOSE))
+					->addClass('trace-view-close-button')
+					->addClass('js-close-button')
+			])
 	)
 	->addItem(
 		(new CTag('z-timeline-range-slider', true))

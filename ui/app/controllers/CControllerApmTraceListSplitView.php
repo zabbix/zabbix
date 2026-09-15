@@ -88,7 +88,7 @@ class CControllerApmTraceListSplitView extends CController {
 				return [
 					'time' => ((int) $event_timestamp[1] - $trace_start) * SEC_PER_NANOSEC,
 					'name' => $event['name'],
-					'description' => json_encode($event['attributes'])
+					'attributes' => $event['attributes']
 				];
 			}, $span['events']);
 
