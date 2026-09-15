@@ -364,8 +364,6 @@
 		}
 
 		#openSideDrawer(container, traceid) {
-			const url = zabbixUrl({action: 'apm.trace.list.split.view'});
-
 			if (this.#side_drawer === null) {
 				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
 				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
@@ -377,7 +375,7 @@
 
 			this.#side_drawer
 				.open(
-					fetch(url, {
+					fetch(zabbixUrl({action: 'apm.trace.list.split.view'}), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify({traceid}),
