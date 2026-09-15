@@ -757,7 +757,7 @@ class CHostPrototype extends CHostBase {
 					['if' => ['field' => 'type', 'in' => INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 						'version' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
 						'bulk' =>				['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
-						'retries' =>			['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [0, 100]), 'length' => DB::getFieldLength('interface_snmp', 'retries')],
+						'retries' =>			['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [SNMP_RETRIES_MIN, SNMP_RETRIES_MAX]), 'length' => DB::getFieldLength('interface_snmp', 'retries')],
 						'community' =>			['type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('interface_snmp', 'community')],
 													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('interface_snmp', 'community')]

@@ -1089,7 +1089,7 @@ class CHostInterface extends CApiService {
 	protected function checkSnmpRetries(array $interface) {
 		if (array_key_exists('retries', $interface['details'])) {
 			$rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'retries' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [0, 100]), 'length' => DB::getFieldLength('interface_snmp', 'retries')]
+				'retries' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [SNMP_RETRIES_MIN, SNMP_RETRIES_MAX]), 'length' => DB::getFieldLength('interface_snmp', 'retries')]
 			]];
 
 			if (!CApiInputValidator::validate($rules, $interface['details'], '', $error)) {
