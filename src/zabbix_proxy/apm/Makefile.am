@@ -81,8 +81,11 @@ libzbxapm_a_SOURCES = \
 	apm_grpc.cc \
 	apm_grpc.h \
 	apm_decode.cc \
-	apm_decode.h \
-	$(OTEL_PROTO_SRCS)
+	apm_decode.h
+
+nodist_libzbxapm_a_SOURCES = \
+	$(OTEL_PROTO_SRCS) \
+	$(OTEL_PROTO_HDRS)
 
 # --- message-only protos: --cpp_out only ---
 
