@@ -24,10 +24,10 @@ class CDetailsPanel {
 	/** @type {object} */
 	#data;
 
-	constructor(data) {
+	constructor(element, data) {
 		this.#data = this.#normalizeData(data);
 
-		this.#element = document.createElement('div');
+		this.#element = element;
 		this.#element.className = 'details-panel';
 
 		this.#groups = document.createElement('div');
@@ -52,7 +52,7 @@ class CDetailsPanel {
 			return;
 		}
 
-		const close_button = target.closest('.span-details-panel-close');
+		const close_button = target.closest('.details-panel-close');
 
 		if (close_button !== null) {
 			this.#dispatchEvent('close');
@@ -60,13 +60,7 @@ class CDetailsPanel {
 			return;
 		}
 
-		const group_header = target.closest('.span-details-group-header');
-
-		if (group_header === null) {
-			return;
-		}
-
-		const group = group_header.closest('.span-details-group');
+		const group = target.closest('.details-group');
 
 		if (group === null) {
 			return;
@@ -74,7 +68,9 @@ class CDetailsPanel {
 
 		const is_collapsed = group.toggleAttribute('collapsed');
 
-		group_header.setAttribute('aria-expanded', String(!is_collapsed));
+		target.setAttribute('aria-expanded', String(!is_collapsed));
+		target.classList.toggle(ZBX_ICON_CHEVRON_UP_SMALL, !is_collapsed);
+		target.classList.toggle(ZBX_ICON_CHEVRON_DOWN_SMALL, is_collapsed);
 
 		this.#dispatchEvent('toggle', {
 			index: Number(group.dataset.index),
@@ -92,7 +88,7 @@ class CDetailsPanel {
 
 		const close_button = document.createElement('button');
 		close_button.type = 'button';
-		close_button.className = 'details-panel-close';
+		close_button.classList.add('details-panel-close', ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_REMOVE_SMALL);
 		close_button.setAttribute('aria-label', 'Close');
 
 		header.append(title, close_button);
@@ -105,21 +101,21 @@ class CDetailsPanel {
 	}
 
 	#createGroup(group, index) {
-		const element = document.createElement('section');
+		const element = document.createElement('div');
 		element.className = 'details-group';
 		element.dataset.index = String(index);
 
-		const header = document.createElement('button');
-		header.type = 'button';
+		const header = document.createElement('div');
 		header.className = 'details-group-header';
-		header.setAttribute('aria-expanded', 'true');
 
 		const title = document.createElement('span');
 		title.className = 'details-group-title';
 		title.textContent = group.title;
 
-		const toggle = document.createElement('span');
-		toggle.className = 'details-group-toggle';
+		const toggle = document.createElement('button');
+		toggle.type = 'button';
+		toggle.classList.add(ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_CHEVRON_UP_SMALL);
+		toggle.setAttribute('aria-expanded', 'true');
 
 		header.append(title, toggle);
 
@@ -184,18 +180,8 @@ class CDetailsPanel {
 		}));
 	}
 
-	appendTo(container) {
-		container.appendChild(this.#element);
-
-		return this;
-	}
-
 	destroy() {
 		this.#removeEventListeners();
 		this.#element.remove();
-	}
-
-	get element() {
-		return this.#element;
 	}
 }

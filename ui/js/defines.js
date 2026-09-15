@@ -58,6 +58,7 @@ const ZBX_STYLE_BTN_GREY_ICON = 'btn-grey-icon';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
+const ZBX_STYLE_BTN_MEDIUM = 'btn-medium';
 const ZBX_STYLE_BTN_TAG = 'btn-tag';
 
 const ZBX_STYLE_ACTION_CONTAINER = 'action-container';
@@ -178,6 +179,7 @@ const ZBX_ICON_CHEVRON_DOWN_SMALL = 'zi-chevron-down-small';
 const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
 const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
+const ZBX_ICON_CHEVRON_UP_SMALL = 'zi-chevron-up-small';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_CONTEXT = 'zi-context';
 const ZBX_ICON_CLOSE = 'zi-close';

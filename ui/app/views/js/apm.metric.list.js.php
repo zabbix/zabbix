@@ -213,7 +213,7 @@
 			logs_link.href = '#';
 			logs_link.textContent = 'Logs';
 
-			const data_details = new CDetailsPanel({
+			new CDetailsPanel(document.getElementById('data-details'), {
 				title: 'Span details',
 				groups: [
 					{
@@ -281,8 +281,6 @@
 					}
 				]
 			});
-
-			data_details.appendTo(document.getElementById('data-details'));
 		}
 
 		#addRefreshMessage(messages) {
