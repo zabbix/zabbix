@@ -200,7 +200,7 @@ class TraceViewPage {
 
 		this.#normalizeSelectedRange();
 		this.#render();
-		this.#tree.expandToDepth(2);
+		this.#tree.expandToDepth(this.#spans.size);
 		this.#renderWaterfall();
 	}
 
@@ -600,8 +600,10 @@ class TraceViewPage {
 	}
 
 	#formatTime(value, step) {
-		if (this.#end - this.#start <= 10000) {
-			return `${Math.round(value * 1000) / 1000}ms`;
+		const duration = this.#end - this.#start;
+
+		if (duration <= 10) {
+			return this.#formatDuration(value);
 		}
 
 		const date = new Date(value);
@@ -622,7 +624,15 @@ class TraceViewPage {
 	}
 
 	#formatDuration(value) {
-		return `${Math.round(value * 1000) / 1000}ms`;
+		if (value < 1e-6) {
+			return `${Math.round(value * 1e9)}ns`;
+		}
+
+		if (value < 1e-3) {
+			return `${Math.round(value * 1e6)}µs`;
+		}
+
+		return `${Math.round(value * 1e6) / 1000}ms`;
 	}
 
 	#valueToRatio(value, start, end) {
