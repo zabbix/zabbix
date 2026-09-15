@@ -18,7 +18,8 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
-	const MAX_YAXIS_WIDTH = 150;
+	const YAXIS_WIDTH_STEP = 16;
+	const MAX_YAXIS_WIDTH = 197;
 	const MIN_YAXIS_WIDTH = 85;
 	const NO_YAXIS_WIDTH = 30;
 	const Y_AXIS_LABEL_GAP = 9;
@@ -2018,14 +2019,78 @@ class CLineGraphDraw extends CGraphDraw {
 				'power' => $this->power[$side]
 			] = $result;
 
-			$this->scale_values[$side] = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
+			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
 				$calc_min, $calc_max, $this->intervals[$side], (string) $display_units, $this->power[$side], 10
 			);
+
+			$this->scale_values[$side] = $this->truncateYAxisLabels($scale_values, (string) $display_units);
 
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];
 			}
 		}
+	}
+
+	private function truncateToWidth(string $value, int $max_width): string {
+		if (imageTextSize(8, 0, $value)['width'] <= $max_width) {
+			return $value;
+		}
+
+		$ellipsis = '...';
+		$truncated = $value;
+
+		while ($truncated !== '' && imageTextSize(8, 0, $truncated.$ellipsis)['width'] > $max_width) {
+			$truncated = mb_substr($truncated, 0, -1);
+		}
+
+		return $truncated.$ellipsis;
+	}
+
+	private function truncateYAxisLabels(array $rows, string $units): array {
+		$max_width = self::MAX_YAXIS_WIDTH - self::Y_AXIS_LABEL_GAP * 2;
+
+		$needs_truncation = false;
+		$split_ok = true;
+
+		foreach ($rows as $row) {
+			if (imageTextSize(8, 0, $row['value'])['width'] > $max_width) {
+				$needs_truncation = true;
+			}
+
+			if ($units !== '' && !str_ends_with($row['value'], $units)) {
+				$split_ok = false;
+			}
+		}
+
+		if (!$needs_truncation) {
+			return $rows;
+		}
+
+		if ($units === '' || !$split_ok) {
+			foreach ($rows as &$row) {
+				$row['value'] = $this->truncateToWidth($row['value'], $max_width);
+			}
+			unset($row);
+
+			return $rows;
+		}
+
+		$max_prefix_width = 0;
+
+		foreach ($rows as $row) {
+			$prefix = mb_substr($row['value'], 0, -mb_strlen($units));
+			$max_prefix_width = max($max_prefix_width, imageTextSize(8, 0, $prefix)['width']);
+		}
+
+		$truncated_units = $this->truncateToWidth($units, max(0, $max_width - $max_prefix_width));
+
+		foreach ($rows as &$row) {
+			$prefix = mb_substr($row['value'], 0, -mb_strlen($units));
+			$row['value'] = $prefix.$truncated_units;
+		}
+		unset($row);
+
+		return $rows;
 	}
 
 	private function calcYAxisWidth($side) {
@@ -2040,10 +2105,13 @@ class CLineGraphDraw extends CGraphDraw {
 		$width = 0;
 
 		foreach ($this->scale_values[$side] as ['value' => $value]) {
-			$width = max($width, imageTextSize(8,0, $value)['width']);
+			$width = max($width, imageTextSize(8, 0, $value)['width']);
 		}
 
-		return (int) min(self::MAX_YAXIS_WIDTH, max(self::MIN_YAXIS_WIDTH, $width + self::Y_AXIS_LABEL_GAP * 2));
+		$stepped = (int) (ceil(($width + self::Y_AXIS_LABEL_GAP * 2) / self::YAXIS_WIDTH_STEP)
+			* self::YAXIS_WIDTH_STEP);
+
+		return min(self::MAX_YAXIS_WIDTH, max(self::MIN_YAXIS_WIDTH, $stepped));
 	}
 
 	private function calcDimensions() {
