@@ -71,6 +71,11 @@ class CSettings extends CApiService {
 			'length' => 2048,
 			'default' => ''
 		],
+		'db' => [
+			'type' => API_STRING_UTF8,
+			'length' => 255,
+			'default' => ''
+		],
 		'authentication_type' => [
 			'type' => API_INT32,
 			'default' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD
@@ -81,11 +86,6 @@ class CSettings extends CApiService {
 			'default' => ''
 		],
 		'password' => [
-			'type' => API_STRING_UTF8,
-			'length' => 255,
-			'default' => ''
-		],
-		'db' => [
 			'type' => API_STRING_UTF8,
 			'length' => 255,
 			'default' => ''
@@ -125,10 +125,11 @@ class CSettings extends CApiService {
 		self::prepareApmGlobalDbForApi($db_settings);
 
 		if (array_key_exists('apm_global_db', $db_settings)) {
-			foreach ($db_settings['apm_global_db'] as $key => &$db_value) {
-				$db_value = self::APM_GLOBAL_DB_SCHEMA[$key]['type'] == API_INT32 ? (string) $db_value : $db_value;
+			foreach (['status', 'authentication_type', 'ssl_verify_peer', 'ssl_verify_host'] as $param) {
+				$db_settings['apm_global_db'][$param] = (string) $db_settings['apm_global_db'][$param];
 			}
-			unset($db_value, $db_settings['apm_global_db']['password']);
+
+			unset($db_settings['apm_global_db']['password']);
 		}
 
 		return $db_settings;
