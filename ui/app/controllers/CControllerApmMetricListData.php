@@ -16,12 +16,94 @@
 
 class CControllerApmMetricListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['metric_name', 'type', 'scope_name', 'metric_unit', 'service_name',
-		'start_time_unix', 'value', 'count'
+	protected array $allowed_data_fields = ['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
+		'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description',
+		'metric_unit', 'attributes', 'start_time_unix', 'time_unix', 'value', 'flags', 'exemplars',
+		'aggregation_temporality', 'is_monotonic', 'count', 'sum', 'bucket_counts', 'explicit_bounds', 'min', 'max',
+		'scale', 'zero_count', 'positive_offset', 'positive_bucket_counts', 'negative_offset', 'negative_bucket_counts'
 	];
+
+	protected array $filter;
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_APM_METRICS);
+	}
+
+	protected function checkInput(): bool {
+		$this->addValidationRules([
+			'filter' => 'array|required'
+		]);
+
+		if (!parent::checkInput()) {
+			return false;
+		}
+
+		$this->filter = $this->getInput('filter');
+
+		$validator = new CFormValidator(self::getFilterValidationRules());
+
+		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => _('Invalid request')
+					]
+				])])
+			);
+
+			return false;
+		}
+
+
+		return true;
+	}
+
+	protected static function getFilterValidationRules(): array {
+		return ['object', 'fields' => [
+			'metric_name' => ['string'],
+			'service_name' => ['string'],
+			'scope_name' => ['string'],
+			'types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
+				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]]],
+			'attributes_evaltype' => ['integer', 'required',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+			],
+			'attributes' => ['objects', 'required', 'fields' => [
+				'key' => ['string', 'required'],
+				'operator' => ['integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					]
+				],
+				'value' => ['string', 'required']
+			]],
+			'resource_attributes_evaltype' => ['integer', 'required',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+			],
+			'resource_attributes' => ['objects', 'required', 'fields' => [
+				'key' => ['string', 'required'],
+				'operator' => ['integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					]
+				],
+				'value' => ['string', 'required']
+			]],
+			'scope_attributes_evaltype' => ['integer', 'required',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+			],
+			'scope_attributes' => ['objects', 'required', 'fields' => [
+				'key' => ['string', 'required'],
+				'operator' => ['integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					]
+				],
+				'value' => ['string', 'required']
+			]],
+			'from' => ['string', 'required', 'use' => [CRangeTimeValidator::class]],
+			'to' => ['string', 'required', 'use' => [CRangeTimeValidator::class]]
+		]];
 	}
 
 	protected function getData(): array {
@@ -32,10 +114,6 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			];
 		}
 
-		$page = $this->getInput('page', 1);
-		$filter = $this->getInput('filter', []);
-		$search = array_intersect_key($filter, array_flip(['metric_name', 'service_name', 'scope_name']));
-
 		$sort_field = $this->getInput('sort_field', 'metric_name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 
@@ -43,46 +121,80 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		CProfile::update('web.apm.metric.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.metric.filter',
+			'profileIdx' => 'web.apm.log.filter',
 			'profileIdx2' => 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			'from' => $this->filter['from'],
+			'to' => $this->filter['to']
 		]);
 
-		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$attributes = array_filter($this->filter['attributes'],
+			static fn (array $attribute) => $attribute['key'] !== ''
+		);
 
-		$metrics = API::ApmMetric()->get([
-			'output' => $this->getDataFields(),
-			'types' => array_key_exists('types', $filter) && $filter['types'] ? $filter['types'] : null,
+		$resource_attributes = array_filter($this->filter['resource_attributes'],
+			static fn (array $attribute) => $attribute['key'] !== ''
+		);
+
+		$scope_attributes = array_filter($this->filter['scope_attributes'],
+			static fn (array $attribute) => $attribute['key'] !== ''
+		);
+
+		$output = ['type', 'resource_attributes', 'resource_schema_url', 'scope_name', 'scope_version',
+			'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit',
+			'attributes', 'start_time_unix', 'time_unix', 'value', 'flags', 'exemplars', 'aggregation_temporality',
+			'is_monotonic', 'count', 'sum', 'bucket_counts', 'explicit_bounds', 'min', 'max', 'scale', 'zero_count',
+			'positive_offset', 'positive_bucket_counts', 'negative_offset', 'negative_bucket_counts'
+		];
+
+		$result = [
+			'data_fields' => $this->getDataFields()
+		];
+
+		$options = [
+			'types' => $this->filter['types'] ?: null,
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
-			'search' => array_filter($search) ?: null,
-			'sortfield' => $this->getInput('sort_field', 'metric_name'),
+			'attributes_evaltype' => $this->filter['attributes_evaltype'],
+			'attributes' => $attributes ?: null,
+			'resource_attributes_evaltype' => $this->filter['resource_attributes_evaltype'],
+			'resource_attributes' => $resource_attributes ?: null,
+			'scope_attributes_evaltype' => $this->filter['scope_attributes_evaltype'],
+			'scope_attributes' => $scope_attributes ?: null,
+			'search' => [
+				'metric_name' => $this->filter['metric_name'] !== '' ? $this->filter['metric_name'] : null,
+				'service_name' => $this->filter['service_name'] !== '' ? $this->filter['service_name'] : null,
+				'scope_name' => $this->filter['scope_name'] !== '' ? $this->filter['scope_name'] : null
+			],
+			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
-			'limit' => $limit
+		];
+
+		$num_rows = (int) API::ApmMetric()->get($options + [
+			'countOutput' => true
 		]);
 
-		$rows = [];
+		if ($num_rows > 0) {
+			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
 
-		if ($metrics) {
-			$this->paging = $this->paginate($metrics, $page, $sort_order);
+			$metrics = API::ApmMetric()->get($options + [
+				'output' => $output,
+				'offset' => $offset,
+				'limit' => $limit
+			]);
 
-			$rows = array_values(array_map(static fn (array $metric) => [['renderer' => 'trace'], $metric], $metrics));
+			$result['rows'] = array_values(
+				array_map(static fn (array $metric) => [['renderer' => 'metric'], $metric], $metrics)
+			);
 		}
-
-		$output = [
-			'data_fields' => $this->getDataFields(),
-			'rows' => $rows
-		];
 
 		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
 
 		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
-			$output['debug'] = CProfiler::getInstance()->make()->toString();
+			$result['debug'] = CProfiler::getInstance()->make()->toString();
 		}
 
-		return $output;
+		return $result;
 	}
 
 	protected function isDataSourceConfigured(): bool {

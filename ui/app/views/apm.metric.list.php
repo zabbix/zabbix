@@ -30,10 +30,6 @@ $web_layout_mode = $this->getLayoutMode();
 $csrf_token = CCsrfTokenHelper::get('apm');
 $reset_url  = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
-if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attributes']) {
-	$data['filter']['attributes'] = [['key' => '', 'value' => '', 'operator' => 0]];
-}
-
 $filter = (new CFilter())
 	->setId('apm_metric_filter')
 	->setResetUrl($reset_url)
@@ -87,9 +83,43 @@ $filter = (new CFilter())
 				(new CLabel(_('Attributes'), 'filter_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
-						'evaltype' => $data['filter']['evaltype'],
-						'attributes' => $data['filter']['attributes']
+						'evaltype' => $data['filter']['attributes_evaltype'],
+						'attributes' => $data['filter']['attributes'] ?: [['key' => '', 'value' => '', 'operator' => 0]]
+					],
+					[
+						'evaltype_field_name' => 'filter_attributes_evaltype',
+						'attribute_field_name' => 'filter_attributes'
 					])
+				)
+			])
+			->addItem([
+				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['resource_attributes_evaltype'],
+						'attributes' => $data['filter']['resource_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => 0]
+						]
+					],
+					[
+						'evaltype_field_name' => 'filter_resource_evaltype',
+						'attribute_field_name' => 'filter_resource_attributes'
+					])->setId('filter-resource-attributes')
+				)
+			])
+			->addItem([
+				(new CLabel(_('Scope attributes'), 'filter_scope_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['scope_attributes_evaltype'],
+						'attributes' => $data['filter']['scope_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => 0]
+						]
+					],
+					[
+						'evaltype_field_name' => 'filter_scope_evaltype',
+						'attribute_field_name' => 'filter_scope_attributes'
+					])->setId('filter-scope-attributes')
 				)
 			])
 	]);
@@ -108,10 +138,7 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem([$filter, $form])
-	->setSideDrawer(
-		(new CDiv())->setId('data-details')
-	);
+	->addItem([$filter, $form]);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
@@ -139,6 +166,7 @@ $html_page->show();
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],
+		'filter_validation_rules' => $data['filter_validation_rules'],
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
