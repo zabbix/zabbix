@@ -31,7 +31,7 @@ import (
 
 const maxRedirectLimit = 1000
 
-var (
+const (
 	errInvalidParameters       = "invalid number of parameters"
 	errInvalidFirstParameter   = "invalid first parameter"
 	errInvalidFourthParameter  = "invalid fourth parameter"
