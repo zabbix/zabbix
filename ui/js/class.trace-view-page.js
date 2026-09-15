@@ -248,8 +248,8 @@ class TraceViewPage {
 	#renderTimeline() {
 		this.#timeline.setAttribute('start', String(this.#start));
 		this.#timeline.setAttribute('end', String(this.#end));
-		this.#timeline.setAttribute('selected-start', String(Math.round(this.#selected_start)));
-		this.#timeline.setAttribute('selected-end', String(Math.round(this.#selected_end)));
+		this.#timeline.setAttribute('selected-start', String(this.#selected_start));
+		this.#timeline.setAttribute('selected-end', String(this.#selected_end));
 	}
 
 	#renderOverview() {
