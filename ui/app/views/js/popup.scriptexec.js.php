@@ -38,7 +38,7 @@ $(document).ready(function() {
 		$content.append($logitems);
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Script execution log')) ?>,
 			content: $content,
 			class: 'modal-popup modal-popup-generic debug-modal',
@@ -55,5 +55,8 @@ $(document).ready(function() {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: opener
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	});
 });

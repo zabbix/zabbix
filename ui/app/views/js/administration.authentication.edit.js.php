@@ -74,7 +74,7 @@
 						let form_fields = this.form.querySelectorAll('[name^=http_]');
 
 						const http_auth_enabled = document.getElementById('http_auth_enabled');
-						overlayDialogue({
+						const overlay = overlayDialogue({
 							title: <?= json_encode(_('Confirm changes')) ?>,
 							content: document.createElement('span').innerText = <?= json_encode(
 								_('Enable HTTP authentication for all users.')
@@ -105,6 +105,9 @@
 							position: Overlay.prototype.POSITION_CENTER,
 							trigger_element: e.target
 						});
+
+						// Display the close button after the screen reader announces the dialog title.
+						overlay.$dialogue.$head.$close_button.show();
 					}
 				});
 			}

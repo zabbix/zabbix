@@ -71,6 +71,9 @@ function Overlay({
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
+	// Hide the button to prevent incorrect screen reader announcements when opening a dialog.
+	this.$dialogue.$head.$close_button.hide();
+
 	this.$dialogue.$head.append(this.$dialogue.$head.$header, this.$dialogue.$head.$close_button);
 
 	this.$dialogue.append(this.$dialogue.$head);
