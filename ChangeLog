@@ -5,6 +5,7 @@ New features:
 .........T [ZBXNEXT-10778] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates for version 13.1 (egordymov)
 
 Bug fixes:
+..F....... [ZBX-27793] fixed incorrect screen reader announcements for modal dialog windows (aluchko)
 ..F....... [ZBX-28110] fixed simple trigger hintbox closure in SVG graph (dfofanovs)
 .........T [ZBX-28099] fixed LLD session discovery in Veeam Backup and Replication by HTTP template (egordymov)
 ..F....... [ZBX-27857] fixed SVG graph widget legend min/max values for "all" approximation (kastafjevs)
