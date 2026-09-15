@@ -22,6 +22,10 @@ class ApmDbClickHouse {
 	private CurlShareHandle $curl_share;
 
 	private function __construct(array $config) {
+		if (!extension_loaded('curl')) {
+			throw new DBException(_('PHP cURL extension is not available. '), DB::INIT_ERROR);
+		}
+
 		$this->config = $config;
 		$this->curl_share = curl_share_init();
 
