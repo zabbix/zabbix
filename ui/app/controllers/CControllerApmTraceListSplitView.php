@@ -75,7 +75,7 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
 
 		$trace_view_spans = [];
-		foreach ($spans as $i => $span) {
+		foreach ($spans as $span) {
 			$span_timestamp = explode('.', $span['timestamp']);
 
 			$span_start = ((int) $span_timestamp[1] - $trace_start) * SEC_PER_NANOSEC;
@@ -95,7 +95,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'id' => $span['spanid'],
 				'parentId' => $span['parent_spanid'] ?: null,
 				'name' => $span['service_name'],
-				'operation' => $span['operation_name'],
+				'operation' => $span['span_name'],
 				'start' => $span_start,
 				'end' => $span_end,
 				'events' => $span_events
