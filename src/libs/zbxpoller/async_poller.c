@@ -276,9 +276,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		if (ZBX_APM_DB_TYPE_CLICKHOUSE != item_context->db_type)
 			THIS_SHOULD_NEVER_HAPPEN;
 
-		parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
-
-		if (FAIL == parse_ret)
+		if (FAIL == (parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values)))
 		{
 			error = zbx_strdup(NULL, "Failed to parse data store response");
 			status = FAIL;
