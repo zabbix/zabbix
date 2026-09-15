@@ -1,6 +1,7 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F.I..... [ZBXNEXT-10334] prevented access to all API methods for users whose role has an empty allow list (agriscenko, askolmeisters)
 ...G...... [ZBXNEXT-10451] added Zabbix agent 2 pprof profiler (opucka)
 A.F....... [ZBXNEXT-9962] added support for enforcing the 'URL (after login)' page for users through user roles; refactored request helper into Frontend Action Validator; refactored MVC response classes (aluchko, dfofanovs, dpankins)
 .........T [ZBXNEXT-10778] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates for version 13.1 (egordymov)
