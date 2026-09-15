@@ -47,8 +47,6 @@
 #include "autoreg/autoreg_proxy.h"
 #include "cachehistory/cachehistory_proxy.h"
 #include "stats/stats_proxy.h"
-#include "zabbix_proxy/apm/zbx_apm.h"
-
 
 #include "zbxcomms.h"
 #include "zbxvault.h"
