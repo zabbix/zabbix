@@ -36,8 +36,18 @@ class CControllerApmTraceList extends CController {
 			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class,]],
 			'filter_statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
 				APM_TRACE_STATUS_ERROR]]],
-			'filter_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
-			'filter_attributes' => ['array',
+			'filter_resource_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
+			'filter_resource_attributes' => ['array',
+				'field' => ['object', 'fields' => [
+					'key' => ['string', 'required'],
+					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
+						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
+						CONDITION_OPERATOR_NOT_LIKE]],
+					'value' => ['string', 'required']
+				]]
+			],
+			'filter_span_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
+			'filter_span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string', 'required'],
 					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
@@ -90,14 +100,36 @@ class CControllerApmTraceList extends CController {
 		];
 		updateTimeSelectorPeriod($timeselector_options);
 
-		$filter_attributes = [];
+		$filter_resource_attributes = [];
+		$filter_resource_attributes_evaltype = CProfile::get('web.apm.trace.filter_resource_attributes_evaltype',
+			CONDITION_EVAL_TYPE_AND_OR);
 
-		foreach (CProfile::getArray('web.apm.trace.filter_attributes.key', []) as $i => $attribute) {
-			$filter_attributes[] = [
+		foreach (CProfile::getArray('web.apm.trace.filter_resource_attributes.key', []) as $i => $attribute) {
+			$filter_resource_attributes[] = [
 				'key' => $attribute,
-				'value' => CProfile::get('web.apm.trace.filter_attributes.value', null, $i),
-				'operator' => CProfile::get('web.apm.trace.filter_attributes.operator', null, $i)
+				'value' => CProfile::get('web.apm.trace.filter_resource_attributes.value', null, $i),
+				'operator' => CProfile::get('web.apm.trace.filter_resource_attributes.operator', null, $i)
 			];
+		}
+
+		if (!$filter_resource_attributes) {
+			$filter_resource_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_EQUAL];
+		}
+
+		$filter_span_attributes = [];
+		$filter_span_attributes_evaltype = CProfile::get('web.apm.trace.filter_span_attributes_evaltype',
+			CONDITION_EVAL_TYPE_AND_OR);
+
+		foreach (CProfile::getArray('web.apm.trace.filter_span_attributes.key', []) as $i => $attribute) {
+			$filter_span_attributes[] = [
+				'key' => $attribute,
+				'value' => CProfile::get('web.apm.trace.filter_span_attributes.value', null, $i),
+				'operator' => CProfile::get('web.apm.trace.filter_span_attributes.operator', null, $i)
+			];
+		}
+
+		if (!$filter_span_attributes) {
+			$filter_span_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_EQUAL];
 		}
 
 		$filter = [
@@ -109,8 +141,10 @@ class CControllerApmTraceList extends CController {
 			'min_duration' => CProfile::get('web.apm.trace.filter_min_duration', ''),
 			'max_duration' => CProfile::get('web.apm.trace.filter_max_duration', ''),
 			'statuses' => CProfile::getArray('web.apm.trace.filter_statuses', []),
-			'evaltype' => CProfile::get('web.apm.trace.filter_evaltype', CONDITION_EVAL_TYPE_AND_OR),
-			'attributes' => $filter_attributes
+			'resource_attributes_evaltype' => $filter_resource_attributes_evaltype,
+			'resource_attributes' => $filter_resource_attributes,
+			'span_attributes_evaltype' => $filter_span_attributes_evaltype,
+			'span_attributes' => $filter_span_attributes
 		];
 
 		$data = [
@@ -140,18 +174,6 @@ class CControllerApmTraceList extends CController {
 	}
 
 	private function updateProfiles(): void {
-		$filter_attributes = [];
-
-		foreach ($this->getInput('filter_attributes', []) as $filter_attribute) {
-			if (!array_key_exists('key', $filter_attribute) || !array_key_exists('value', $filter_attribute)) {
-				continue;
-			}
-
-			if ($filter_attribute['key'] !== '' || $filter_attribute['value'] !== '') {
-				$filter_attributes[] = $filter_attribute;
-			}
-		}
-
 		CProfile::update('web.apm.trace.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.trace.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.trace.filter_service_name', $this->getInput('filter_service_name', ''),
@@ -165,14 +187,48 @@ class CControllerApmTraceList extends CController {
 			PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.trace.filter_statuses', $this->getInput('filter_statuses', []),
 			PROFILE_TYPE_INT);
-		CProfile::update('web.apm.trace.filter_evaltype',
-			$this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
-		CProfile::updateArray('web.apm.trace.filter_attributes.key', array_column($filter_attributes, 'key'),
-			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.trace.filter_attributes.value', array_column($filter_attributes, 'value'),
-			PROFILE_TYPE_STR);
-		CProfile::updateArray('web.apm.trace.filter_attributes.operator', array_column($filter_attributes, 'operator'),
-			PROFILE_TYPE_INT);
+
+		$filter_resource_attributes = [];
+
+		foreach ($this->getInput('filter_resource_attributes', []) as $resource_attribute) {
+			if (!array_key_exists('key', $resource_attribute) || !array_key_exists('value', $resource_attribute)) {
+				continue;
+			}
+
+			if ($resource_attribute['key'] !== '' || $resource_attribute['value'] !== '') {
+				$filter_resource_attributes[] = $resource_attribute;
+			}
+		}
+
+		CProfile::update('web.apm.trace.filter_resource_attributes_evaltype',
+			$this->getInput('filter_resource_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+		CProfile::updateArray('web.apm.trace.filter_resource_attributes.key',
+			array_column($filter_resource_attributes, 'key'), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.apm.trace.filter_resource_attributes.value',
+			array_column($filter_resource_attributes, 'value'), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.apm.trace.filter_resource_attributes.operator',
+			array_column($filter_resource_attributes, 'operator'), PROFILE_TYPE_INT);
+
+		$filter_span_attributes = [];
+
+		foreach ($this->getInput('filter_span_attributes', []) as $span_attribute) {
+			if (!array_key_exists('key', $span_attribute) || !array_key_exists('value', $span_attribute)) {
+				continue;
+			}
+
+			if ($span_attribute['key'] !== '' || $span_attribute['value'] !== '') {
+				$filter_span_attributes[] = $span_attribute;
+			}
+		}
+
+		CProfile::update('web.apm.trace.filter_span_attributes_evaltype',
+			$this->getInput('filter_span_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+		CProfile::updateArray('web.apm.trace.filter_span_attributes.key',
+			array_column($filter_span_attributes, 'key'), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.apm.trace.filter_span_attributes.value',
+			array_column($filter_span_attributes, 'value'), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.apm.trace.filter_span_attributes.operator',
+			array_column($filter_span_attributes, 'operator'), PROFILE_TYPE_INT);
 	}
 
 	private function deleteProfiles(): void {
@@ -184,9 +240,15 @@ class CControllerApmTraceList extends CController {
 		CProfile::delete('web.apm.trace.filter_min_duration');
 		CProfile::delete('web.apm.trace.filter_max_duration');
 		CProfile::deleteIdx('web.apm.trace.filter_statuses');
-		CProfile::delete('web.apm.trace.filter_evaltype');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.key');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.value');
-		CProfile::deleteIdx('web.apm.trace.filter_attributes.operator');
+
+		CProfile::delete('web.apm.trace.filter_resource_attributes_evaltype');
+		CProfile::deleteIdx('web.apm.trace.filter_resource_attributes.key');
+		CProfile::deleteIdx('web.apm.trace.filter_resource_attributes.value');
+		CProfile::deleteIdx('web.apm.trace.filter_resource_attributes.operator');
+
+		CProfile::delete('web.apm.trace.filter_span_attributes_evaltype');
+		CProfile::deleteIdx('web.apm.trace.filter_span_attributes.key');
+		CProfile::deleteIdx('web.apm.trace.filter_span_attributes.value');
+		CProfile::deleteIdx('web.apm.trace.filter_span_attributes.operator');
 	}
 }

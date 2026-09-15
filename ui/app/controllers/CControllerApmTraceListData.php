@@ -50,8 +50,22 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'max_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
 				APM_TRACE_STATUS_ERROR]]],
-			'evaltype' => ['integer', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
-			'attributes' => ['array',
+			'resource_attributes_evaltype' => ['integer', 'required',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+			],
+			'resource_attributes' => ['array',
+				'field' => ['object', 'fields' => [
+					'key' => ['string'],
+					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
+						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
+						CONDITION_OPERATOR_NOT_LIKE]],
+					'value' => ['string']
+				]]
+			],
+			'span_attributes_evaltype' => ['integer', 'required',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+			],
+			'span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
 					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
@@ -100,8 +114,14 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			? $this->filter['statuses']
 			: [];
 
-		$span_attributes = array_key_exists('attributes', $this->filter) && $this->filter['attributes']
-			? array_filter($this->filter['attributes'], static fn (array $attribute) => $attribute['key'] !== '')
+		$resource_attributes = array_key_exists('resource_attributes', $this->filter)
+			&& $this->filter['resource_attributes']
+				? array_filter($this->filter['resource_attributes'],
+					static fn (array $attribute) => $attribute['key'] !== '')
+				: null;
+
+		$span_attributes = array_key_exists('span_attributes', $this->filter) && $this->filter['span_attributes']
+			? array_filter($this->filter['span_attributes'], static fn (array $attribute) => $attribute['key'] !== '')
 			: null;
 
 		$filter = [];
@@ -132,8 +152,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'max_duration' => $max_duration,
 			'filter' => array_filter($filter) ?: null,
 			'search' => array_filter($search) ?: null,
+			'resource_attributes_evaltype' => $this->filter['resource_attributes_evaltype'],
+			'resource_attributes' => $resource_attributes,
+			'span_attributes_evaltype' => $this->filter['span_attributes_evaltype'],
 			'span_attributes' => $span_attributes,
-			'span_attributes_evaltype' => $this->filter['evaltype'],
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
 			'limit' => $limit

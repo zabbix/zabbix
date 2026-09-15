@@ -30,10 +30,6 @@ $web_layout_mode = $this->getLayoutMode();
 $csrf_token = CCsrfTokenHelper::get('apm');
 $reset_url  = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
-if (!array_key_exists('attributes', $data['filter']) || !$data['filter']['attributes']) {
-	$data['filter']['attributes'] = [['key' => '', 'value' => '', 'operator' => 0]];
-}
-
 $filter = (new CFilter())
 	->setId('apm_trace_filter')
 	->setResetUrl($reset_url)
@@ -82,9 +78,7 @@ $filter = (new CFilter())
 					(new CTextBox('filter_scope_name', $data['filter']['scope_name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-			]),
-		(new CFormGrid())
-			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			])
 			->addItem([
 				(new CLabel(_('Min. duration'), 'filter_min_duration')),
 				new CFormField(
@@ -98,6 +92,32 @@ $filter = (new CFilter())
 					(new CTextBox('filter_max_duration', $data['filter']['max_duration']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['resource_attributes_evaltype'],
+						'attributes' => $data['filter']['resource_attributes']
+					], [
+						'attribute_field_name' => 'filter_resource_attributes',
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype'
+					])
+				)
+			])
+			->addItem([
+				(new CLabel(_('Span attributes'), 'filter_span_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['span_attributes_evaltype'],
+						'attributes' => $data['filter']['span_attributes']
+					], [
+						'attribute_field_name' => 'filter_span_attributes',
+						'evaltype_field_name' => 'filter_span_attributes_evaltype'
+					])
+				)
 			])
 			->addItem([
 				(new CLabel(_('Status'), 'filter_statuses')),
@@ -108,15 +128,6 @@ $filter = (new CFilter())
 						->setChecked($data['filter']['statuses'])
 						->setColumns(3)
 						->showTitles()
-				)
-			])
-			->addItem([
-				(new CLabel(_('Attributes'), 'filter_attributes')),
-				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
-						'evaltype' => $data['filter']['evaltype'],
-						'attributes' => $data['filter']['attributes']
-					])
 				)
 			])
 	]);
