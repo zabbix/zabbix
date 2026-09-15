@@ -107,8 +107,8 @@ class CControllerProxyEdit extends CController {
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject'],
 					'custom_timeouts' => (int) $this->proxy['custom_timeouts'],
-					'data_collection_status' => $this->proxy['apm']['data_collection_status'],
-					'max_messages_per_second' => $this->proxy['apm']['max_messages_per_second'],
+					'data_collection_status' => (int) $this->proxy['apm']['data_collection_status'],
+					'max_messages_per_second' => (int) $this->proxy['apm']['max_messages_per_second'],
 					'additional_resource_attributes' => $this->proxy['apm']['additional_resource_attributes']
 				]
 			];

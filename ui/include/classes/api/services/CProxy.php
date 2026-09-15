@@ -242,6 +242,8 @@ class CProxy extends CApiService {
 				CArrayHelper::sort($apm['additional_resource_attributes'], ['signal_type', 'key']);
 
 				foreach ($apm['additional_resource_attributes'] as &$attribute) {
+					$attribute['signal_type'] = (string) $attribute['signal_type'];
+
 					unset($attribute['id']);
 				}
 				unset($attribute);
@@ -252,6 +254,17 @@ class CProxy extends CApiService {
 			$row['apm'] = array_intersect_key($apm, array_flip($options['selectApm']));
 		}
 		unset($row);
+
+		foreach ($result as &$apm) {
+			if (in_array('data_collection_status', $options['selectApm'])) {
+				$apm['apm']['data_collection_status'] = (string) $apm['apm']['data_collection_status'];
+			}
+
+			if (in_array('max_messages_per_second', $options['selectApm'])) {
+				$apm['apm']['max_messages_per_second'] = (string) $apm['apm']['max_messages_per_second'];
+			}
+		}
+		unset($apm);
 	}
 
 	private function addRelatedAssignedHosts(array $options, array &$result): void {
