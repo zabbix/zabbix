@@ -1284,6 +1284,20 @@ static int	DBpatch_7050093(void)
 
 static int	DBpatch_7050094(void)
 {
+	const zbx_db_field_t	field = {"max_repetitions", "10", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface_snmp", &field, NULL);
+}
+
+static int	DBpatch_7050095(void)
+{
+	const zbx_db_field_t	field = {"retries", "5", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
+
+static int	DBpatch_7050096(void)
+{
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	ids;
 	zbx_db_insert_t		db_insert;
@@ -2109,7 +2123,7 @@ static int	DBpatch_7050185(void)
 	return DBmodify_field_type("interface_snmp", &field, NULL);
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050186(void)
 {
 	const zbx_db_field_t	field = {"retries", "5", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -2308,5 +2322,6 @@ DBPATCH_ADD(7050182, 0, 1)
 DBPATCH_ADD(7050183, 0, 1)
 DBPATCH_ADD(7050184, 0, 1)
 DBPATCH_ADD(7050185, 0, 1)
+DBPATCH_ADD(7050186, 0, 1)
 
 DBPATCH_END()
