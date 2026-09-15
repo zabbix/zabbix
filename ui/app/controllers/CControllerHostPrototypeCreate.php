@@ -115,7 +115,7 @@ class CControllerHostPrototypeCreate extends CController {
 						],
 						'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
 							'use' => [CNumberValidator::class, [
-								'usermacros' => true, 'with_float' => false, 'lldmacros' => true,
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
 								'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
 							]]
 						],

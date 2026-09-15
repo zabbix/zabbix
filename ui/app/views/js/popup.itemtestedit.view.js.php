@@ -163,12 +163,7 @@ window.itemtestedit_view_popup = new class {
 		if (get_value_checked && this.#show_snmp_form) {
 			const snmp_version = this.#form.findFieldByName('interface[details][version]').getValue();
 
-			const show_row_classnames = ['js-popup-row-snmp-version'];
-
-			const snmp_oid = this.#form.findFieldByName('snmp_oid').getValue();
-			if (snmp_oid.substring(0, 4) === 'get[' || snmp_oid.substring(0, 5) === 'walk[') {
-				show_row_classnames.push('js-popup-row-snmp-retries');
-			}
+			const show_row_classnames = ['js-popup-row-snmp-version', 'js-popup-row-snmp-retries'];
 
 			if (snmp_version == '<?= SNMP_V1 ?>') {
 				show_row_classnames.push('js-popup-row-snmp-community');
