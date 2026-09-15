@@ -83,10 +83,9 @@ static int	send_query_http(const char *posts, const zbx_apm_db_config_t *apm_db_
 static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t lasttimestamp,
 		const zbx_apm_db_config_t *apm_db_config, zbx_vector_str_t *values, char **error)
 {
-	int			ret = FAIL;
+	int			ret = FAIL, parse_ret;
 	char			*posts = NULL;
 	char			*resp = NULL;
-	int			parse_ret;
 	zbx_tq_query_t		*query = item->telemetry_query;
 	char			*url = NULL;
 	unsigned char		post_type, output_format;
@@ -110,9 +109,7 @@ static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t las
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 
-	parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
-
-	if (FAIL == parse_ret)
+	if (FAIL == (parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values)))
 	{
 		*error = zbx_strdup(NULL, "Failed to parse data store response");
 		goto out;
@@ -136,9 +133,8 @@ out:
 
 int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
-	int			ret = NOTSUPPORTED;
+	int			ret = NOTSUPPORTED, values_ret;
 	time_t			now, lasttimestamp;
-	int			values_ret;
 	zbx_vector_str_t	values;
 	char			*error = NULL;
 
