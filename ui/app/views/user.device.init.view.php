@@ -28,7 +28,7 @@ $form = (new CForm('post'))
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-$form_grid = (new CFormGrid());
+$form->addVar('admin_mode', $data['admin_mode']);
 
 if ($data['admin_mode']) {
 	$form_grid = (new CFormGrid())
@@ -39,7 +39,6 @@ if ($data['admin_mode']) {
 					'name' => 'userid',
 					'object_name' => 'users',
 					'multiple' => false,
-					'data' => $data['ms_user'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'users',
@@ -54,13 +53,9 @@ if ($data['admin_mode']) {
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 		]);
-}
-else {
-	$form->addVar('userid', CWebUser::$data['userid']);
-	$form_grid->addClass('hidden');
-}
 
-$form->addItem($form_grid);
+	$form->addItem($form_grid);
+}
 
 $form->addItem(
 	(new CDiv([
@@ -71,14 +66,14 @@ $form->addItem(
 			new CDiv(_('Generating secure QR code...'))
 		]))
 			->addClass('js-qr-code-loading')
-			->addClass($data['admin_mode'] ? 'hidden' : null),
+			->addClass('hidden'),
 		(new CDiv([
 			(new CDiv())->addClass('qr-code'),
 			new CDiv(_('Scan this QR code to add your device and setup your notifications.')),
 			(new CDiv())->addClass('qr-code-expiration')
 		]))
 			->addClass('js-qr-code-wrapper')
-			->addClass('hidden')
+			->addClass($data['admin_mode'] ? 'hidden' : null)
 	]))
 		->addClass('qr-code-container')
 );
@@ -103,7 +98,8 @@ $output = [
 		$this->readJsFile('user.device.init.view.js.php').
 		'user_device_create_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
-			'admin_mode' => $data['admin_mode']
+			'admin_mode' => $data['admin_mode'],
+			'qrdata' => $data['qrdata']
 		]).');',
 	'dialogue_class' => 'modal-popup-medium'
 ];
