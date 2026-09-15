@@ -38,6 +38,8 @@
 		#refresh_message_box = null;
 		/** @type {CSideDrawer|null} */
 		#side_drawer = null;
+		/** @type {AbortController|null} */
+		#side_drawer_abort_controller = null;
 		/** @type {TraceViewPage|null} */
 		#trace_view_page = null;
 		/** @type {string|null} */
@@ -302,6 +304,9 @@
 					addMessage(makeMessageBox(type, messages, title));
 				})
 				.on(CPager.EVENT_SELECT, () => {
+					this.#side_drawer_abort_controller?.abort();
+					this.#side_drawer_abort_controller = null;
+
 					this.#side_drawer?.close();
 
 					this.#scheduleRefresh();
@@ -367,12 +372,19 @@
 				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
 			}
 
+			this.#side_drawer_abort_controller?.abort();
+			this.#side_drawer_abort_controller = new AbortController();
+
 			this.#side_drawer
-				.open(url, {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify({traceid})
-				})
+				.open(
+					fetch(url, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify({traceid}),
+						signal: this.#side_drawer_abort_controller.signal
+					})
+						.then(response => response.json())
+				)
 				.catch(error => {
 					if (error.name === 'AbortError') {
 						return;

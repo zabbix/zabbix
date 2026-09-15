@@ -33,9 +33,6 @@ class CSideDrawer {
 	/** @type {HTMLElement} */
 	#original_container_element;
 
-	/** @type {AbortController|null} */
-	#abort_controller = null;
-
 	constructor(container, {split_view_class = 'split-view', content_pane_class = 'content',
 			drawer_pane_class = 'side-drawer'} = {}) {
 
@@ -72,16 +69,12 @@ class CSideDrawer {
 	/**
 	 * @returns {Promise<any>}
 	 */
-	open(url, options = {}) {
-		this.#abort_controller?.abort();
-		this.#abort_controller = new AbortController();
-
+	open(promise_open) {
 		this.#mount();
 
 		this.#drawer_element.classList.add(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 
-		return fetch(url, {...options, signal: this.#abort_controller.signal})
-			.then(response => response.json())
+		return promise_open
 			.then(response => {
 				this.#bindEvents();
 
@@ -96,9 +89,6 @@ class CSideDrawer {
 	 * @returns {Promise<any>}
 	 */
 	close() {
-		this.#abort_controller?.abort();
-		this.#abort_controller = null;
-
 		return Promise.resolve().then(() => {
 			this.#unbindEvents();
 			this.#unmount();
