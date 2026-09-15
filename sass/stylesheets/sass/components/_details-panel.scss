@@ -42,10 +42,6 @@
 			.details-group-content {
 				display: none;
 			}
-
-			.details-group-toggle {
-				transform: rotate(135deg);
-			}
 		}
 	}
 
@@ -64,7 +60,6 @@
 		font: inherit;
 		font-weight: 700;
 		text-align: start;
-		cursor: pointer;
 		gap: 8px;
 	}
 
@@ -75,12 +70,6 @@
 
 	.details-group-toggle {
 		flex: 0 0 auto;
-		inline-size: 7px;
-		block-size: 7px;
-		margin-inline: 4px;
-		border-block-start: 2px solid #{$font-alt-color};
-		border-inline-start: 2px solid #{$font-alt-color};
-		transform: rotate(45deg);
 	}
 
 	.details-group-content {

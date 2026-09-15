@@ -46,36 +46,28 @@ class CDetailsPanel {
 	}
 
 	#onClick = event => {
-		const target = event.target instanceof Element ? event.target : null;
+		const button = event.target instanceof Element ? event.target : null;
 
-		if (target === null) {
+		if (button === null) {
 			return;
 		}
 
-		const close_button = target.closest('.details-panel-close');
-
-		if (close_button !== null) {
+		if (button.classList.contains('details-panel-close')) {
 			this.#dispatchEvent('close');
-
-			return;
 		}
+		else if (button.classList.contains('details-group-toggle')) {
+			const group = button.closest('.details-group');
+			const is_collapsed = group.toggleAttribute('collapsed');
 
-		const group = target.closest('.details-group');
+			button.setAttribute('aria-expanded', String(!is_collapsed));
+			button.classList.toggle(ZBX_ICON_CHEVRON_UP_SMALL, !is_collapsed);
+			button.classList.toggle(ZBX_ICON_CHEVRON_DOWN_SMALL, is_collapsed);
 
-		if (group === null) {
-			return;
+			this.#dispatchEvent('toggle', {
+				index: Number(group.dataset.index),
+				collapsed: is_collapsed
+			});
 		}
-
-		const is_collapsed = group.toggleAttribute('collapsed');
-
-		target.setAttribute('aria-expanded', String(!is_collapsed));
-		target.classList.toggle(ZBX_ICON_CHEVRON_UP_SMALL, !is_collapsed);
-		target.classList.toggle(ZBX_ICON_CHEVRON_DOWN_SMALL, is_collapsed);
-
-		this.#dispatchEvent('toggle', {
-			index: Number(group.dataset.index),
-			collapsed: is_collapsed
-		});
 	};
 
 	#render() {
@@ -114,7 +106,7 @@ class CDetailsPanel {
 
 		const toggle = document.createElement('button');
 		toggle.type = 'button';
-		toggle.classList.add(ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_CHEVRON_UP_SMALL);
+		toggle.classList.add('details-group-toggle', ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_CHEVRON_UP_SMALL);
 		toggle.setAttribute('aria-expanded', 'true');
 
 		header.append(title, toggle);
