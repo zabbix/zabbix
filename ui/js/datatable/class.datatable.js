@@ -1169,6 +1169,10 @@ class CDataTable {
 		this.updateUserConfig()
 			.getData()
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				this.#options_popup_updated = true;
 
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
@@ -1241,6 +1245,10 @@ class CDataTable {
 		}
 
 		this.getData().then(response => {
+			if (!response) {
+				return;
+			}
+
 			this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
@@ -1700,6 +1708,10 @@ class CDataTable {
 		target.removeAttribute('onclick');
 
 		this.getData({export_file: 'csv', force_load: true}).then(response => {
+			if (!response) {
+				return;
+			}
+
 			if ('error' in response && response.error) {
 				CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
 
@@ -2524,6 +2536,10 @@ class CDataTable {
 
 	#renderColumnDataCells(column) {
 		this.getData().then(response => {
+			if (!response) {
+				return;
+			}
+
 			const data_fields = response.data_fields;
 
 			for (const [row_index, data_cell] of column.getDataCells().entries()) {
