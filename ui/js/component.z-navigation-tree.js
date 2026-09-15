@@ -212,7 +212,6 @@ class ZNavigationTree extends HTMLElement {
 			}
 
 			rows.push({
-				index: rows.length,
 				id,
 				depth,
 				item

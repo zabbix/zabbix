@@ -349,7 +349,7 @@ class TraceViewPage {
 			bar.className = 'trace-span-bar';
 			bar.style.setProperty('--trace-span-start', `${this.#getClampedStartRatio(span) * 100}%`);
 			bar.style.setProperty('--trace-span-width', `${this.#getClampedWidthRatio(span) * 100}%`);
-			bar.style.setProperty('--trace-span-color', span.color || this.#getColor(row.index || 0));
+			bar.style.setProperty('--trace-span-color', span.color || this.#getColor(span.index || 0));
 
 			label.className = 'trace-span-label';
 			label.textContent = this.#formatDuration(Number(span.end) - Number(span.start));
