@@ -1119,8 +1119,6 @@ class testFormMaintenance extends CWebTest {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 
-		$form->fill($data['fields']);
-
 		if ($update) {
 			// Remove all periods.
 			$existing_periods = $this->query(self::PERIODS_TABLE)->asTable()->one()->getRows();
@@ -1139,6 +1137,8 @@ class testFormMaintenance extends CWebTest {
 				$period_overlay->waitUntilNotVisible();
 			}
 		}
+
+		$form->fill($data['fields']);
 
 		$form->submit();
 		$this->page->waitUntilReady();
