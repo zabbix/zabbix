@@ -154,7 +154,9 @@ class CMacrosResolverHelper {
 			'authpassphrase' => [],
 			'privpassphrase' => [],
 			'contextname' => [],
-			'community' => []
+			'community' => [],
+			'max_repetitions' => [],
+			'retries' => []
 		];
 
 		foreach ($interfaces as $index => $interface) {
@@ -179,6 +181,14 @@ class CMacrosResolverHelper {
 
 				if (array_key_exists('community', $interface['details'])) {
 					$data['community'][$hostid][$index] = $interface['details']['community'];
+				}
+
+				if (array_key_exists('max_repetitions', $interface['details'])) {
+					$data['max_repetitions'][$hostid][$index] = $interface['details']['max_repetitions'];
+				}
+
+				if (array_key_exists('retries', $interface['details'])) {
+					$data['retries'][$hostid][$index] = $interface['details']['retries'];
 				}
 			}
 		}
@@ -208,6 +218,16 @@ class CMacrosResolverHelper {
 			'data' => $data['community']
 		]);
 
+		$resolved_max_repetitions = CMacrosResolver::resolve([
+			'config' => 'hostInterfaceDetailsMaxRepetitions',
+			'data' => $data['max_repetitions']
+		]);
+
+		$resolved_retries = CMacrosResolver::resolve([
+			'config' => 'hostInterfaceDetailsRetries',
+			'data' => $data['retries']
+		]);
+
 		foreach ($interfaces as $index => $interface) {
 			$hostid = $interface['hostid'];
 
@@ -230,6 +250,14 @@ class CMacrosResolverHelper {
 
 				if (array_key_exists('community', $interface['details'])) {
 					$interfaces[$index]['details']['community'] = $resolved_community[$hostid][$index];
+				}
+
+				if (array_key_exists('max_repetitions', $interface['details'])) {
+					$interfaces[$index]['details']['max_repetitions'] = $resolved_max_repetitions[$hostid][$index];
+				}
+
+				if (array_key_exists('retries', $interface['details'])) {
+					$interfaces[$index]['details']['retries'] = $resolved_retries[$hostid][$index];
 				}
 			}
 		}

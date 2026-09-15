@@ -106,9 +106,19 @@ class CControllerHostPrototypeCreate extends CController {
 						'community' => ['db interface_snmp.community', 'required', 'not_empty', 'when' => [
 							'version', 'in' => [SNMP_V1, SNMP_V2C]
 						]],
-						'max_repetitions' => ['db interface_snmp.max_repetitions', 'in 1:'.ZBX_MAX_INT32, 'when' => [
-							'version', 'in' => [SNMP_V2C, SNMP_V3]
-						]],
+						'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]],
+							'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
+						],
+						'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'with_float' => false, 'lldmacros' => true,
+								'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
+							]]
+						],
 						'contextname' => ['db interface_snmp.contextname', 'when' => ['version', 'in' => [SNMP_V3]]],
 						'securityname' => ['db interface_snmp.securityname', 'when' => ['version', 'in' => [SNMP_V3]]],
 						'securitylevel' => [
