@@ -34,14 +34,21 @@ class ApmDbClickHouse {
 		curl_share_setopt($this->curl_share, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
 	}
 
+	/**
+	 * @throws DBException
+	 */
 	public static function getInstance(array $config): self {
-		$token = md5(json_encode($config));
-
-		if (!array_key_exists($token, self::$instances)) {
-			self::$instances[$token] = new self($config);
+		foreach (self::$instances as $instance) {
+			if ($instance->config == $config) {
+				return $instance;
+			}
 		}
 
-		return self::$instances[$token];
+		$instance = new self($config);
+
+		self::$instances[] = $instance;
+
+		return $instance;
 	}
 
 	/**
