@@ -88,13 +88,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 								'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
 							],
 							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
-								'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+								'use' => [CNumberValidator::class, ['with_float' => false,
 									'min' => 1, 'max' => ZBX_MAX_INT32
 								]],
 								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
 							],
 							'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
-								'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+								'use' => [CNumberValidator::class, ['with_float' => false,
 									'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
 								]]
 							],
@@ -142,7 +142,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						]]
 					],
 					'port' => ['db interface.port', 'not_empty', 'required',
-						'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+						'use' => [CNumberValidator::class, ['with_float' => false,
 							'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER
 						]],
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
