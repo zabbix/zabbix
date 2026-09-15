@@ -10680,6 +10680,10 @@ msgstr "Nedostupný používateľ"
 msgid "Inaccessible user group"
 msgstr "Neprístupná skupina používateľov"
 
+#: include/classes/helpers/CItemGeneralHelper.php:276
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "Neprístupný widget"
@@ -13500,6 +13504,10 @@ msgstr "Maximálny počet opakovaní"
 #: app/partials/configuration.host.interface.row.php:121
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Maximálny počet opakovaní sa vzťahuje len na prehľadávanie a snmpwalk."
+
+#: app/partials/configuration.host.interface.row.php:116
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
