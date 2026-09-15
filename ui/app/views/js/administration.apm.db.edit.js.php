@@ -173,6 +173,8 @@ const view = new class {
 			if (!this.#tls_automatically_checked && ssl_verify_peer !== null) {
 				this.#updateDisplayState([...ssl_verify_host_fields], true, true);
 
+				ssl_verify_peer.checked = true;
+
 				const ssl_verify_host = this.#form.findFieldByName('ssl_verify_host')?.getField();
 				if (ssl_verify_host !== null) {
 					ssl_verify_host.checked = true;
