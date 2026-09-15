@@ -16,6 +16,7 @@
 
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
 #include "zbxhash.h"
 
 #define	ZBX_SID_AUTH_TOKEN_LENGTH	64
@@ -110,6 +111,9 @@ static int	get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user,
 		goto out;
 	}
 
+	if (SUCCEED == ret && SUCCEED != zbx_db_check_user_perm2system(user->userid))
+		ret = FAIL;
+
 	if (FAIL == ret && NULL != result)
 		*result = zbx_dsprintf(*result, "Permission denied.");
 out:
@@ -130,9 +134,9 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticates a device.offboard request in a single lookup,       *
- *          accepting a Bearer-scheme token unconditionally or a DPoP-scheme  *
- *          token bound to the given device                                   *
+ * Purpose: authenticates a device.offboard request, accepting a Bearer-     *
+ *          scheme token or a DPoP-scheme token bound to the given device,    *
+ *          and checks user access to the system                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_user_from_json_for_device_offboard(const struct zbx_json_parse *jp, const char *device_uuid,

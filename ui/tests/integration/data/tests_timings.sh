@@ -53,6 +53,7 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosInItemNames]=20
   [testConnectorExport]=18
   [testBrowserMonitoring]=17
+  [testTrapperAuthentication]=17
   [testAutoregistrationHostMetaDataItem]=16
   [testAutoregistrationProxyGroup]=20
   [testWebScenarioDynamicVariables]=15
