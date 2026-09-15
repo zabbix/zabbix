@@ -52,6 +52,7 @@
 			this.#initFilter(filter_options);
 			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
 				storage_idx, user_configs});
+			this.#initDataDetails();
 
 			this.#scheduleRefresh();
 		}
@@ -205,6 +206,83 @@
 				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
 				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
+		}
+
+		#initDataDetails() {
+			const logs_link = document.createElement('a');
+			logs_link.href = '#';
+			logs_link.textContent = 'Logs';
+
+			const data_details = new CDetailsPanel({
+				title: 'Span details',
+				groups: [
+					{
+						title: 'Basic information',
+						items: [
+							{
+								name: 'Span ID:',
+								value: '8873650788389038'
+							},
+							{
+								name: 'Operation:',
+								value: 'backup.service.request'
+							},
+							{
+								name: 'Service name:',
+								value: 'HTTP GET'
+							},
+							{
+								name: 'Duration:',
+								value: '1.0m'
+							},
+							{
+								name: 'Start time:',
+								value: '0ms'
+							},
+							{
+								name: 'Related links:',
+								value: logs_link
+							}
+						]
+					},
+					{
+						title: 'Span attributes',
+						items: [
+							{
+								name: 'http.request.method',
+								value: 'GET'
+							},
+							{
+								name: 'server.address',
+								value: 'very-long-server-address.example.internal.company.net'
+							},
+							{
+								name: 'url.full',
+								value: 'https://example.com/a/very/long/path/which/must/wrap/inside/the/details/panel'
+							}
+						]
+					},
+					{
+						title: 'Resource attributes',
+						items: [
+							{
+								name: 'service.name',
+								value: 'backend-service'
+							},
+							{
+								name: 'service.version',
+								value: '8.0.0'
+							}
+						]
+					},
+					{
+						title: 'Events',
+						items: []
+					}
+				]
+			});
+
+			data_details.appendTo(document.getElementById('data-details'));
 		}
 
 		#addRefreshMessage(messages) {

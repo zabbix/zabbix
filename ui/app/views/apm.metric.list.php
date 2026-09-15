@@ -108,7 +108,10 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem([$filter, $form]);
+	->addItem([$filter, $form])
+	->setSideDrawer(
+		(new CDiv())->setId('data-details')
+	);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
