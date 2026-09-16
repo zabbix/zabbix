@@ -516,7 +516,8 @@ static int	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL, *max_repetitions = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL,
+				*max_repetitions = NULL, *retries = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -626,6 +627,16 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					items[i].snmp_max_repetitions = atoi(max_repetitions);
 				}
 				zbx_free(max_repetitions);
+
+				ZBX_STRDUP(retries, items[i].snmp_retries_orig);
+				zbx_dc_expand_user_and_func_macros(um_handle, &retries,
+						&items[i].host.hostid, 1, NULL);
+
+				if (NULL != retries)
+				{
+					items[i].snmp_retries = atoi(retries);
+				}
+				zbx_free(retries);
 
 				if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 						zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
@@ -849,7 +860,8 @@ void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num,
 
 void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, AGENT_RESULT *results)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL, *max_repetitions = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL,
+				*max_repetitions = NULL, *retries = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -932,6 +944,16 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 			items[i].snmp_max_repetitions = atoi(max_repetitions);
 		}
 		zbx_free(max_repetitions);
+
+		ZBX_STRDUP(retries, items[i].snmp_retries_orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, &retries, &items[i].hostid, 1, NULL);
+
+		if (NULL != retries)
+		{
+			items[i].snmp_retries = atoi(retries);
+		}
+		zbx_free(retries);
 
 		if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 				zbx_snmp_oid_subst_cb, um_handle, &items[i].hostid))

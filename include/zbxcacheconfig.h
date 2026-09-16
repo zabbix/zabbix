@@ -218,6 +218,8 @@ typedef struct
 	zbx_tq_query_t		*telemetry_query;
 	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
 	int			snmp_max_repetitions;
+	char			snmp_retries_orig[ZBX_ITEM_SNMP_RETRIES_LEN_MAX];
+	int			snmp_retries;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -264,6 +266,8 @@ typedef struct
 	int			timeout;
 	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
 	int			snmp_max_repetitions;
+	char			snmp_retries_orig[ZBX_ITEM_SNMP_RETRIES_LEN_MAX];
+	int			snmp_retries;
 	unsigned char		preprocessing;
 }
 zbx_dc_snmp_item_t;

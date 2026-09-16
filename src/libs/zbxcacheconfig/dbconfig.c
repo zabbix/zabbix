@@ -2230,6 +2230,8 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 		*modified = 1;
 	if (SUCCEED == dc_strpool_replace(found, &snmp->max_repetitions, row[22]))
 		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->retries, row[23]))
+		*modified = 1;
 
 	return snmp;
 }
@@ -2254,6 +2256,7 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	dc_strpool_release(snmp->privpassphrase);
 	dc_strpool_release(snmp->contextname);
 	dc_strpool_release(snmp->max_repetitions);
+	dc_strpool_release(snmp->retries);
 
 	zbx_hashset_remove_direct(&config->interfaces_snmp, snmp);
 
@@ -9495,6 +9498,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
 				zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+				zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 			}
 			else
 			{
@@ -9509,6 +9513,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 				dst_item->snmp_max_repetitions = 0;
+				dst_item->snmp_retries = 0;
 				dst_item->timeout = 0;
 			}
 
@@ -9718,6 +9723,7 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 		dst_item->snmp_version = snmp->version;
 		zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+		zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 	}
 	else
 	{
@@ -9732,6 +9738,7 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 		dst_item->snmp_max_repetitions = 0;
+		dst_item->snmp_retries = 0;
 		dst_item->timeout = 0;
 		dst_item->snmp_max_repetitions = 0;
 	}

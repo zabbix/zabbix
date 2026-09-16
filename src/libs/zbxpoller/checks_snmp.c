@@ -3955,6 +3955,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
+	snmp_context->retries = item->snmp_retries;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 
@@ -4015,6 +4016,7 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
+	snmp_context->retries = item->snmp_retries;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 

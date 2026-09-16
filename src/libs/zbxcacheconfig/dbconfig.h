@@ -629,6 +629,7 @@ typedef struct
 	unsigned char	max_succeed;
 	unsigned char	min_fail;
 	const char	*max_repetitions;
+	const char	*retries;
 }
 ZBX_DC_SNMPINTERFACE;
 
