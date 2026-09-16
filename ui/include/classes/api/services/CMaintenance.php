@@ -870,7 +870,6 @@ class CMaintenance extends CApiService {
 		}
 	}
 
-
 	/**
 	 * Update table "maintenance_tag".
 	 *
@@ -1544,10 +1543,10 @@ class CMaintenance extends CApiService {
 		}
 
 		$triggers = API::Trigger()->get([
-				'output' => $options['selectTriggers'],
-				'triggerids' => array_keys($trigger_maintenances),
-				'preservekeys' => true
-			]);
+			'output' => $options['selectTriggers'],
+			'triggerids' => array_keys($trigger_maintenances),
+			'preservekeys' => true
+		]);
 
 		foreach ($triggers as $triggerid => $trigger) {
 			foreach ($trigger_maintenances[$triggerid] as $maintenanceid) {

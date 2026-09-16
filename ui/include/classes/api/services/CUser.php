@@ -47,7 +47,7 @@ class CUser extends CApiService {
 	];
 
 	public const OWN_LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin',
-		'autologout', 'lang', 'refresh', 'default_maintenance_period', 'theme', 'attempt_failed', 'attempt_ip',
+		'autologout', 'lang', 'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip',
 		'attempt_clock', 'rows_per_page', 'timezone', 'roleid', 'provisioned'
 	];
 
@@ -202,14 +202,14 @@ class CUser extends CApiService {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
 			}
 
-			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
-				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
-			}
-
 			if (array_key_exists('default_maintenance_period', $options['filter'])
 					&& $options['filter']['default_maintenance_period'] !== null) {
 				$options['filter']['default_maintenance_period'] =
 					getTimeUnitFilters($options['filter']['default_maintenance_period']);
+			}
+
+			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
+				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
 			}
 
 			$provisioned_condition = null;

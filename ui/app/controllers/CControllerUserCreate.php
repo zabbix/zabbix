@@ -131,8 +131,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['username', 'name', 'surname', 'autologin', 'autologout', 'theme', 'refresh',
-			'default_maintenance_period', 'rows_per_page', 'lang', 'timezone', 'roleid'
+		$this->getInputs($user, ['username', 'name', 'surname', 'autologin', 'autologout', 'theme',
+			'default_maintenance_period', 'refresh', 'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 
 		if ($this->hasInput('autologout_visible') && $this->getInput('autologout_visible') == 0) {

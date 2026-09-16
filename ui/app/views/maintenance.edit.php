@@ -297,7 +297,9 @@ $form->addItem(
 			)
 		])
 		->addItem(
-			new CFormField((new CLabel(_('At least one host group, host or trigger must be selected.')))->setAsteriskMark())
+			new CFormField(
+				(new CLabel(_('At least one host group, host or trigger must be selected.')))->setAsteriskMark()
+			)
 		)
 		->addItem([
 			(new CLabel(_('Event name'))),

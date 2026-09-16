@@ -63,8 +63,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
-				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'default_maintenance_period', 'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
+				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout',
+					'default_maintenance_period', 'refresh', 'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
 				],
 				'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active',
 					'provisioned'
