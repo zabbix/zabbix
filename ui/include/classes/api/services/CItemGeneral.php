@@ -3008,7 +3008,9 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('query', $item)) {
-			$item['query'] = $item['query'] ? CItemTypeTelemetryQuery::prepareQueryFieldForDb($item['query']) : '';
+			$item['query'] = $item['query']
+				? CItemTypeTelemetryQuery::prepareQueryFieldForDb($item['query'])
+				: DB::getDefault('items', 'query');
 		}
 	}
 

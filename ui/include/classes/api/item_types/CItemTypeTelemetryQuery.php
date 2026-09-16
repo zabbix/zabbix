@@ -350,7 +350,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @param string $query  JSON encoded string with "item.query" configuration
 	 */
 	public static function prepareQueryFieldForApi(string $query): array {
-		if ($query === '') {
+		if ($query === DB::getDefault('items', 'query')) {
 			return [];
 		}
 
