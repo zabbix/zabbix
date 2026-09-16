@@ -27,7 +27,7 @@ libzbxcacheconfig_a_SOURCES = \
 	dbconfig_correlation.c \
 	dbconfig_correlation.h \
 	dbconfig_cep.c \
-	dbconfig_cep.h
+	dbconfig_cep.h \
 	macrotags.c
 
 libzbxcacheconfig_a_CFLAGS = \
