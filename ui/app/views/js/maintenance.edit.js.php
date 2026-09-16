@@ -68,8 +68,6 @@ window.maintenance_edit = new class {
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
-
-					this.#synchronizeActivesAndTimePeriod();
 				}
 			});
 
@@ -157,7 +155,7 @@ window.maintenance_edit = new class {
 				this.#addTimePeriod(e.detail);
 			}
 
-			this.#synchronizeActivesAndTimePeriod()
+			this.#synchronizeActivesAndTimePeriod(e.detail)
 		});
 	}
 
@@ -176,63 +174,55 @@ window.maintenance_edit = new class {
 		row.remove();
 	}
 
-	#synchronizeActivesAndTimePeriod() {
-		requestAnimationFrame(() => {
-			const fields = this.form.getAllValues();
+	#synchronizeActivesAndTimePeriod(timeperiod) {
+		if (timeperiod.timeperiod_type === <?= TIMEPERIOD_TYPE_ONETIME ?>) {
+			const dateFormatter = new Intl.DateTimeFormat('en', {
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit',
+				hour: '2-digit',
+				minute: '2-digit',
+				hourCycle: 'h23',
+				timeZone: <?= json_encode(date_default_timezone_get()) ?>
+			});
 
-			if (Object.keys(fields.timeperiods).length === 1) {
-				const timeperiod = Object.values(fields.timeperiods)[0];
+			const formatDate = (date) => {
+				const parts = Object.fromEntries(
+					dateFormatter.formatToParts(date)
+					.filter(({type}) => type !== 'literal')
+					.map(({type, value}) => [type, value])
+				);
 
-				if (timeperiod.timeperiod_type === '<?= TIMEPERIOD_TYPE_ONETIME ?>') {
-					const dateFormatter = new Intl.DateTimeFormat('en', {
-						year: 'numeric',
-						month: '2-digit',
-						day: '2-digit',
-						hour: '2-digit',
-						minute: '2-digit',
-						hourCycle: 'h23',
-						timeZone: <?= json_encode(date_default_timezone_get()) ?>
-					});
+				return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
+			};
 
-					const formatDate = (date) => {
-						const parts = Object.fromEntries(
-							dateFormatter.formatToParts(date)
-								.filter(({type}) => type !== 'literal')
-								.map(({type, value}) => [type, value])
-						);
+			const start_date = new Date(timeperiod.start_date * 1000);
+			const active_since = formatDate(start_date);
+			const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
 
-						return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
-					}
+			const isValidDate = (value) => {
+				const [year, month, day] = value.split(' ')[0].split('-').map(Number);
+				const date = new Date(year, month - 1, day);
 
-					const start_date = new Date(timeperiod.start_date * 1000);
-					const active_since = formatDate(start_date);
-					const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
+				return year >= 1970
+					&& date.getFullYear() === year
+					&& date.getMonth() === month - 1
+					&& date.getDate() === day;
+			};
 
-					const isValidDate = (value) => {
-						const [year, month, day] = value.split(' ')[0].split('-').map(Number);
-						const date = new Date(year, month - 1, day);
+			const active_since_input = document.getElementById('active_since');
+			const active_till_input = document.getElementById('active_till');
 
-						return year >= 1970
-							&& date.getFullYear() === year
-							&& date.getMonth() === month - 1
-							&& date.getDate() === day;
-					};
-
-					const active_since_input = document.getElementById('active_since');
-					const active_till_input = document.getElementById('active_till');
-
-					if (!isValidDate(active_since_input.value) || active_since_input.value > active_since) {
-						active_since_input.value = active_since;
-					}
-
-					if (!isValidDate(active_till_input.value) || active_till_input.value < active_till) {
-						active_till_input.value = active_till;
-					}
-
-					this.form.validateChanges(['active_since', 'active_till']);
-				}
+			if (!isValidDate(active_since_input.value) || active_since_input.value > active_since) {
+				active_since_input.value = active_since;
 			}
-		});
+
+			if (!isValidDate(active_till_input.value) || active_till_input.value < active_till) {
+				active_till_input.value = active_till;
+			}
+
+			this.form.validateChanges(['active_since', 'active_till']);
+		}
 	}
 
 	#updateEventNames(is_enabled) {
