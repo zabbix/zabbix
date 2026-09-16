@@ -1905,4 +1905,10 @@ void	zbx_cep_rule_release(zbx_cep_rule_t *rule);
 
 unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
 		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
+
+int	zbx_macro_event_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 #endif

@@ -31,7 +31,7 @@ zabbix_export:
         The `API URL` of the Cisco Secure Firewall Threat Defense REST API, e.g., `https://ftd.example.com/api/fdm/latest`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -75,9 +75,35 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   var Cisco = {
                   	api_url: '{$CISCO.FTD.API.URL}',
                   	http_proxy: '{$CISCO.FTD.HTTP_PROXY}',
+                  	tls: new CTlsConfig('{{$HTTP.TLS.VERIFY:"Cisco Secure Firewall Threat Defense"}.regsub("^(none|peer|full)$", "\1")}'),
                   
                   	getToken: function (params) {
                   		['access_token'].forEach(function (field) {
@@ -91,7 +117,7 @@ zabbix_export:
                   	request: function (url) {
                   
                   		var response,
-                  			request = new HttpRequest();
+                  			request = new HttpRequest(Cisco.tls.options);
                   
                   		if (typeof Cisco.http_proxy !== 'undefined' && Cisco.http_proxy !== '') {
                   			request.setProxy(Cisco.http_proxy);
@@ -105,6 +131,7 @@ zabbix_export:
                   
                   		Zabbix.log(4, '[ Cisco ] request url: ' + url);
                   
+                  		Cisco.tls.checkURL(url);
                   		response = request.get(url);
                   
                   		if (request.getStatus() !== 200) {
@@ -319,9 +346,35 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   var Cisco = {
                   	api_url: '{$CISCO.FTD.API.URL}',
                   	http_proxy: '{$CISCO.FTD.HTTP_PROXY}',
+                  	tls: new CTlsConfig('{{$HTTP.TLS.VERIFY:"Cisco Secure Firewall Threat Defense"}.regsub("^(none|peer|full)$", "\1")}'),
                   
                   	getToken: function (params) {
                   		['access_token'].forEach(function (field) {
@@ -350,7 +403,7 @@ zabbix_export:
                   	request: function (url) {
                   
                   		var response,
-                  			request = new HttpRequest();
+                  			request = new HttpRequest(Cisco.tls.options);
                   
                   		if (typeof Cisco.http_proxy !== 'undefined' && Cisco.http_proxy !== '') {
                   			request.setProxy(Cisco.http_proxy);
@@ -364,6 +417,7 @@ zabbix_export:
                   
                   		Zabbix.log(4, '[ Cisco ] request url: ' + url);
                   
+                  		Cisco.tls.checkURL(url);
                   		response = request.get(url);
                   
                   		if (request.getStatus() !== 200) {
@@ -1707,7 +1761,7 @@ zabbix_export:
           description: 'Cisco Secure Firewall Threat Defense REST API password.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'API password'
             description: 'Password for the Cisco Secure Firewall Threat Defense REST API.'
             required: 'YES'
@@ -1715,7 +1769,7 @@ zabbix_export:
           description: 'Cisco Secure Firewall Threat Defense REST API URL. Format example: `https://ftd.example.com/api/fdm/latest`'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: 'API URL'
             description: 'Cisco Secure Firewall Threat Defense REST API URL. Format example: `https://ftd.example.com/api/fdm/latest`'
             required: 'YES'
@@ -1723,7 +1777,7 @@ zabbix_export:
           description: 'Cisco Secure Firewall Threat Defense REST API username.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'API username'
             description: 'Cisco Secure Firewall Threat Defense REST API username.'
             required: 'YES'
@@ -1732,7 +1786,7 @@ zabbix_export:
           description: 'Warning threshold for FTD CPU utilization, expressed as a percentage.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'CPU utilization warning threshold'
             description: 'Warning threshold for CPU utilization (%).'
@@ -1741,7 +1795,7 @@ zabbix_export:
           description: 'Update interval for the HTTP item that retrieves data from the API. Can be used with context if needed (check the context values in relevant items).'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'API interval'
             description: 'Update interval for HTTP item (e.g., 1m).'
         - macro: '{$CISCO.FTD.DATA.TIMEOUT}'
@@ -1749,7 +1803,7 @@ zabbix_export:
           description: 'Response timeout for the Cisco Secure Firewall Threat Defense REST API.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'API timeout'
             description: 'Response timeout for the API (e.g., 15s).'
         - macro: '{$CISCO.FTD.FS.PUSED.WARN}'
@@ -1757,7 +1811,7 @@ zabbix_export:
           description: 'Threshold for the filesystem utilization trigger. Can be used with the filesystem name as context.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Thresholds
             label: 'Filesystem utilization warning threshold'
             description: 'Warning threshold for filesystem utilization (%).'
@@ -1773,7 +1827,7 @@ zabbix_export:
           description: 'Macro for the operational state of the interface for the "link down" trigger. Can be used with the interface name as context.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Thresholds
             label: 'Interface control macro'
             description: 'Macro for interface operational state (1=important, 0=not important).'
@@ -1782,7 +1836,7 @@ zabbix_export:
           description: 'Threshold for the error packet rate warning trigger. Can be used with the interface name as context.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Thresholds
             label: 'Interface error warning threshold'
             description: 'Warning threshold for interface error rate.'
@@ -1791,7 +1845,7 @@ zabbix_export:
           description: 'Filter for discoverable Accelerated Security Path dropped packets or connections by name.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: 'Discovery filters'
             label: 'ASP stats name matches'
             description: 'Regex to match ASP stats.'
@@ -1800,7 +1854,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Accelerated Security Path dropped packets or connections by name.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: 'Discovery filters'
             label: 'ASP stats name not matches'
             description: 'Regex to exclude ASP stats.'
@@ -1809,7 +1863,7 @@ zabbix_export:
           description: 'Filter for discoverable connections by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: 'Discovery filters'
             label: 'Connection stats name matches'
             description: 'Regex to match discoverable connections.'
@@ -1818,7 +1872,7 @@ zabbix_export:
           description: 'Filter to exclude discovered connections by name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: 'Discovery filters'
             label: 'Connection stats name not matches'
             description: 'Regex to exclude connections.'
@@ -1827,7 +1881,7 @@ zabbix_export:
           description: 'Filter for discoverable CPUs by name.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: 'Discovery filters'
             label: 'CPU name matches'
             description: 'Regex to match CPU names.'
@@ -1836,7 +1890,7 @@ zabbix_export:
           description: 'Filter to exclude discovered CPUs by name.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: 'Discovery filters'
             label: 'CPU name not matches'
             description: 'Regex to exclude CPU names.'
@@ -1845,7 +1899,7 @@ zabbix_export:
           description: 'Filter for discoverable filesystems by mount point.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: 'Discovery filters'
             label: 'Filesystem mount matches'
             description: 'Regex to match filesystem mount points.'
@@ -1854,7 +1908,7 @@ zabbix_export:
           description: 'Filter to exclude discovered filesystems by mount point.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: 'Discovery filters'
             label: 'Filesystem mount not matches'
             description: 'Regex to exclude filesystem mount points.'
@@ -1863,7 +1917,7 @@ zabbix_export:
           description: 'Filter for discoverable filesystems by name.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: 'Discovery filters'
             label: 'Filesystem name matches'
             description: 'Regex to match filesystems.'
@@ -1872,7 +1926,7 @@ zabbix_export:
           description: 'Filter to exclude discovered filesystems by name.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: 'Discovery filters'
             label: 'Filesystem name not matches'
             description: 'Regex to exclude filesystems.'
@@ -1881,7 +1935,7 @@ zabbix_export:
           description: 'Filter for discoverable interface descriptions.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: 'Discovery filters'
             label: 'Interface description matches'
             description: 'Regex to match interface descriptions.'
@@ -1890,7 +1944,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by description.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: 'Discovery filters'
             label: 'Interface description not matches'
             description: 'Regex to exclude interface descriptions.'
@@ -1899,7 +1953,7 @@ zabbix_export:
           description: 'Filter for discoverable interface names.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: 'Discovery filters'
             label: 'Interface name matches'
             description: 'Regex to match discoverable interfaces.'
@@ -1908,7 +1962,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: 'Discovery filters'
             label: 'Interface name not matches'
             description: 'Regex to exclude interfaces.'
@@ -1917,7 +1971,7 @@ zabbix_export:
           description: 'Filter for discoverable processes by name.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: 'Discovery filters'
             label: 'Process name matches'
             description: 'Regex to match process names.'
@@ -1926,7 +1980,7 @@ zabbix_export:
           description: 'Filter to exclude discovered processes by name.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: 'Discovery filters'
             label: 'Process name not matches'
             description: 'Regex to exclude process names.'
@@ -1935,7 +1989,7 @@ zabbix_export:
           description: 'Filter for discoverable temperature sensors by name.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: 'Discovery filters'
             label: 'Sensor name matches'
             description: 'Regex to match temperature sensors.'
@@ -1944,7 +1998,7 @@ zabbix_export:
           description: 'Filter to exclude discovered temperature sensors by name.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: 'Discovery filters'
             label: 'Sensor name not matches'
             description: 'Regex to exclude temperature sensors.'
@@ -1953,7 +2007,7 @@ zabbix_export:
           description: 'Filter for discoverable Snort and IDS/IPS statistics by name.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: 'Discovery filters'
             label: 'Snort ID matches'
             description: 'Regex to match Snort/IDS/IPS stats.'
@@ -1962,7 +2016,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Snort and IDS/IPS statistics by name.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: 'Discovery filters'
             label: 'Snort ID not matches'
             description: 'Regex to exclude Snort/IDS/IPS stats.'
@@ -1971,7 +2025,7 @@ zabbix_export:
           description: 'Filter for discoverable throughput interfaces by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: 'Discovery filters'
             label: 'Throughput interface name matches'
             description: 'Regex to match discoverable throughput interfaces.'
@@ -1980,7 +2034,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable throughput interfaces by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: 'Discovery filters'
             label: 'Throughput interface name not matches'
             description: 'Regex to exclude throughput interfaces.'
@@ -1989,7 +2043,7 @@ zabbix_export:
           description: 'Warning threshold for FTD memory utilization, expressed as a percentage.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Memory utilization warning threshold'
             description: 'Warning threshold for memory utilization (%).'
@@ -1998,7 +2052,7 @@ zabbix_export:
           description: 'Critical threshold for the temperature sensor trigger. Can be used with the interface name as context.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Thresholds
             label: 'Temperature critical threshold'
             description: 'Critical threshold for temperature sensors.'
@@ -2007,10 +2061,26 @@ zabbix_export:
           description: 'Warning threshold for the temperature sensor trigger. Can be used with the interface name as context.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Thresholds
             label: 'Temperature warning threshold'
             description: 'Warning threshold for temperature sensors.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco Secure Firewall Threat Defense", e.g. {$HTTP.TLS.VERIFY:"Cisco Secure Firewall Threat Defense"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 2433c7593dee4824b3f5ce1209bc5311
           name: 'Cisco Secure FTD: General'

@@ -28,6 +28,7 @@ libzbxcacheconfig_a_SOURCES = \
 	dbconfig_correlation.h \
 	dbconfig_cep.c \
 	dbconfig_cep.h
+	macrotags.c
 
 libzbxcacheconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

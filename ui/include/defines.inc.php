@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050150);
+define('ZABBIX_DB_VERSION',		7050153);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1657,6 +1657,7 @@ define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
 define('API_UUID_V7',				75);
+define('API_FRONTEND_ACTION',		76);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1732,6 +1733,16 @@ define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
 define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
+
+// Standard action layouts.
+define('ZBX_LAYOUT_DOWNLOAD',	'layout.download');
+define('ZBX_LAYOUT_HTMLPAGE',	'layout.htmlpage');
+define('ZBX_LAYOUT_IMAGE',		'layout.image');
+define('ZBX_LAYOUT_JAVASCRIPT',	'layout.javascript');
+define('ZBX_LAYOUT_JSON',		'layout.json');
+define('ZBX_LAYOUT_PRINT',		'layout.print');
+define('ZBX_LAYOUT_WARNING',	'layout.warning');
+define('ZBX_LAYOUT_WIDGET',		'layout.widget');
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',		0);
@@ -2090,9 +2101,9 @@ define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_COLUMNS', 'form-columns');
 define('ZBX_STYLE_FORM_DESCRIPTION', 'form-description');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
-define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
+define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
 define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');
 define('ZBX_STYLE_FORMATED_TEXT', 'formated-text');
@@ -2519,7 +2530,7 @@ define('ZABBIX_MOBILE_VERSION',			1);
 
 define('ZBX_DEVICE_STATUS_NEW',			0);
 define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
-define('ZBX_DEVICE_STATUS_ORPHANED',	2);
+define('ZBX_DEVICE_STATUS_UNASSIGNED',	2);
 
 define('MOBILE_KEY_SCOPE_IDENTITY',		0);
 define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
