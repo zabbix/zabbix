@@ -34,7 +34,7 @@
 		#layout_mode = null;
 		#refresh_interval = 0;
 		#refresh_interval_id = null;
-		#global_timerange = null;
+		#time_selector = null;
 		/** @type {CDataTable|null} */
 		#datatable = null;
 		/** @type {HTMLFormElement|null} */
@@ -45,6 +45,11 @@
 		#apply_filter_button = null;
 		#csrf_token = null;
 		#refresh_message_box = null;
+		/** @type {CSideDrawer|null} */
+		#side_drawer = null;
+		#rows_data = new Map();
+		/** @type {number|null} */
+		#selected_row_index = null;
 
 		init({
 			csrf_token,
@@ -74,7 +79,8 @@
 			this.#initEvents(filter_options);
 			this.#initFilter(filter_options);
 			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
-				storage_idx, user_configs});
+				storage_idx, user_configs
+			});
 
 			this.#scheduleRefresh();
 		}
@@ -92,8 +98,8 @@
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				if (data.idx === filter_options.idx) {
-					this.#global_timerange.from = data.from;
-					this.#global_timerange.to = data.to;
+					this.#time_selector.from = data.from;
+					this.#time_selector.to = data.to;
 				}
 
 				this.#refresh();
@@ -101,7 +107,7 @@
 		}
 
 		#initFilter(filter_options) {
-			this.#global_timerange = {
+			this.#time_selector = {
 				from: filter_options.timeselector.from,
 				to: filter_options.timeselector.to
 			};
@@ -147,11 +153,7 @@
 						.setWidth('auto')
 				])
 				.setPage(page)
-				.setFilter({
-					...filter,
-					from: this.#global_timerange.from,
-					to: this.#global_timerange.to,
-				})
+				.setFilter({...filter, ...this.#time_selector})
 				.setDefaultSortField(default_sort_field)
 				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
@@ -187,6 +189,19 @@
 
 					cell.appendChild(container);
 				})
+				.setRowRenderer('log', ({columns, data_fields, row, row_data, row_index, response}) => {
+					row.dataset.rowIndex = row_index;
+
+					const row_data_o = Object.create(null);
+
+					for (const [index, key] of data_fields.entries()) {
+						row_data_o[key] = row_data[index];
+					}
+
+					this.#rows_data.set(row_index, row_data_o);
+
+					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
+				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
 
@@ -195,7 +210,11 @@
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
+				.on(CPager.EVENT_SELECT, () => {
+					this.#side_drawer?.close();
+
+					this.#scheduleRefresh();
+				})
 				.on(CPager.EVENT_STATE_CHANGE, e => {
 					const {page} = e.detail;
 
@@ -207,6 +226,41 @@
 					if ('debug' in response) {
 						this.#refreshDebug(response.debug);
 					}
+
+					this.#rows_data.clear();
+				})
+				.on(CDataTable.EVENT_AFTER_RENDER, () => {
+					const datatable_element = this.#datatable.getElement();
+					const rows = datatable_element.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`);
+
+					for (const row of rows) {
+						const row_index = parseInt(row.getAttribute('data-row-index'));
+
+						if (row_index === this.#selected_row_index) {
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+						}
+
+						row.addEventListener('click', () => {
+							if (row.hasAttribute('data-hintbox')) {
+								return;
+							}
+
+							if (this.#selected_row_index === row_index) {
+								this.#side_drawer.close();
+
+								return;
+							}
+
+							datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
+								?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#selected_row_index = row_index;
+
+							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_index));
+						});
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
@@ -216,10 +270,132 @@
 				.init(user_configs);
 		}
 
+		#openSideDrawer(row_data) {
+			if (this.#side_drawer === null) {
+				const container = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+
+				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
+				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
+				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
+			}
+
+			this.#side_drawer.open(Promise.resolve(row_data));
+		}
+
+		#onSideDrawerOpen = e => {
+			new CDetailsPanel(this.#side_drawer.getElement(), {
+				title: <?= json_encode(_('Log details')) ?>,
+				groups: this.#createDetailGroups(e.detail.response)
+			});
+
+			this.#unscheduleRefresh();
+		}
+
+		#onSideDrawerClose = () => {
+			this.#selected_row_index = null;
+
+			const datatable_element = this.#datatable.getElement();
+
+			datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
+				?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			this.#scheduleRefresh();
+		}
+
 		#validateFormChanges() {
 			const values = this.#filter_form?.getAllValues() ?? {};
 
 			this.#filter_form?.validateChanges(Object.keys(values), true);
+		}
+
+		#createDetailGroups(row_data) {
+			const flags_decoded = [];
+
+			if ((row_data.flags & 1) === 1) {
+				flags_decoded.push(<?= json_encode(_('Sampled')) ?>);
+			}
+
+			if (flags_decoded.length === 0) {
+				flags_decoded.push(<?= json_encode(_('None')) ?>);
+			}
+
+			return [
+				{
+					title: <?= json_encode(_('Basic information')) ?>,
+					items: [
+						{
+							name: <?= json_encode(_('Timestamp')) ?>,
+							value: row_data.timestamp
+						},
+						{
+							name: <?= json_encode(_('Trace ID')) ?>,
+							value: row_data.traceid
+						},
+						{
+							name: <?= json_encode(_('Span ID')) ?>,
+							value: row_data.spanid
+						},
+						{
+							name: <?= json_encode(_('Flags')) ?>,
+							value: flags_decoded.join(', ')
+						},
+						{
+							name: <?= json_encode(_('Severity text')) ?>,
+							value: row_data.severity_text
+						},
+						{
+							name: <?= json_encode(_('Severity number')) ?>,
+							value: row_data.severity_number
+						},
+						{
+							name: <?= json_encode(_('Service name')) ?>,
+							value: row_data.service_name
+						},
+						{
+							name: <?= json_encode(_('Body')) ?>,
+							value: row_data.body
+						},
+						{
+							name: <?= json_encode(_('Resource schema URL')) ?>,
+							value: row_data.resource_schema_url
+						},
+						{
+							name: <?= json_encode(_('Scope schema URL')) ?>,
+							value: row_data.scope_schema_url
+						},
+						{
+							name: <?= json_encode(_('Scope name')) ?>,
+							value: row_data.resource_name
+						},
+						{
+							name: <?= json_encode(_('Scope version')) ?>,
+							value: row_data.resource_name
+						},
+						{
+							name: <?= json_encode(_('Event name')) ?>,
+							value: row_data.event_name
+						}
+					]
+				},
+				{
+					title: 'Log attributes',
+					items: Object.entries(row_data.log_attributes).map(
+						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+					)
+				},
+				{
+					title: 'Resource attributes',
+					items: Object.entries(row_data.resource_attributes).map(
+						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+					)
+				},
+				{
+					title: 'Scope attributes',
+					items: Object.entries(row_data.scope_attributes).map(
+						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+					)
+				}
+			];
 		}
 
 		#onFilterSet = (e) => {
@@ -273,15 +449,10 @@
 
 			this.#unscheduleRefresh();
 
-
-			this.#datatable.setFilter({
-				...this.#datatable.getFilter(),
-				from: this.#global_timerange.from,
-				to: this.#global_timerange.to,
-			});
-
+			const filter = this.#datatable.getFilter();
 
 			this.#datatable
+				.setFilter({...filter, ...this.#time_selector})
 				.updateUserConfig()
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,

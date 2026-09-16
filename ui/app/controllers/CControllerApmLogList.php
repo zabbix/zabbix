@@ -54,8 +54,8 @@ class CControllerApmLogList extends CController {
 			'sort' => ['string', 'in' => ['timestamp']],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
-			'filter_set' => ['integer', 'in' => ['1']],
-			'filter_rst' => ['integer', 'in' => ['1']]
+			'filter_set' => ['integer', 'in' => [1]],
+			'filter_rst' => ['integer', 'in' => [1]]
 		]];
 	}
 

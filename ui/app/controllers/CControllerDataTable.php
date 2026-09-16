@@ -174,7 +174,7 @@ abstract class CControllerDataTable extends CController {
 	}
 
 	protected function getDataFields(array $additional_data_fields = []): array {
-		$data_fields = array_merge($this->getInput('data_fields'), $additional_data_fields);
+		$data_fields = array_unique(array_merge($this->getInput('data_fields'), $additional_data_fields));
 
 		return array_values(array_intersect($data_fields, $this->allowed_data_fields));
 	}

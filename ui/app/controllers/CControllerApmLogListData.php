@@ -16,7 +16,10 @@
 
 class CControllerApmLogListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['timestamp', 'body', 'severity_text', 'severity_number'];
+	protected array $allowed_data_fields = ['timestamp', 'traceid', 'spanid', 'trace_flags', 'severity_text',
+		'severity_number', 'service_name', 'body', 'resource_schema_url', 'resource_attributes', 'scope_schema_url',
+		'scope_name', 'scope_version', 'scope_attributes', 'log_attributes', 'event_name'
+	];
 
 	protected array $filter;
 
@@ -25,9 +28,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 	}
 
 	protected function checkInput(): bool {
-		$this->addValidationRules([
-			'filter' => 'array|required'
-		]);
+		$this->addValidationRules(['filter' => 'array|required']);
 
 		if (!parent::checkInput()) {
 			return false;
@@ -89,7 +90,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 			];
 		}
 
-		$data_fields = $this->getDataFields();
+		$data_fields = $this->getDataFields($this->allowed_data_fields);
 
 		$sort_field = $this->getInput('sort_field', 'timestamp');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
@@ -119,7 +120,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 		);
 
 		$output = [
-			'data_fields' => $this->getDataFields(['traceid', 'spanid'])
+			'data_fields' => $data_fields
 		];
 
 		$options = [
@@ -136,7 +137,6 @@ class CControllerApmLogListData extends CControllerDataTable {
 				'body' => $this->filter['body'] !== '' ? $this->filter['body'] : null,
 				'service_name' => $this->filter['service_name'] !== '' ? $this->filter['service_name'] : null,
 				'scope_name' => $this->filter['scope_name'] !== '' ? $this->filter['scope_name'] : null
-
 			],
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order
@@ -150,7 +150,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
 
 			$logs = API::ApmLog()->get($options + [
-				'output' => array_unique(array_merge($data_fields, ['traceid', 'spanid'])),
+				'output' => $data_fields,
 				'offset' => $offset,
 				'limit' => $limit
 			]);
