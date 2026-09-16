@@ -84,7 +84,9 @@ $filter = (new CFilter())
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['attributes_evaltype'],
-						'attributes' => $data['filter']['attributes'] ?: [['key' => '', 'value' => '', 'operator' => 0]]
+						'attributes' => $data['filter']['attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						]
 					],
 					[
 						'evaltype_field_name' => 'filter_attributes_evaltype',
@@ -98,7 +100,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
 						'attributes' => $data['filter']['resource_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => 0]
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
 						]
 					],
 					[
@@ -113,7 +115,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['scope_attributes_evaltype'],
 						'attributes' => $data['filter']['scope_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => 0]
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
 						]
 					],
 					[
