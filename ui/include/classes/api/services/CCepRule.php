@@ -636,7 +636,7 @@ class CCepRule extends CApiService {
 			}
 
 			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'operations' =>	['type' => API_OBJECTS, 'flags' => $api_required | $api_not_empty | API_ALLOW_UNEXPECTED, 'uniq' => [['sortorder']], 'fields' => [
+				'operations' =>	['type' => API_OBJECTS, 'flags' => $api_required | $api_not_empty | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['sortorder']], 'fields' => [
 					'sortorder' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32],
 					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED]
 				]]
