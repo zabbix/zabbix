@@ -19,8 +19,8 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
 	const YAXIS_WIDTH_STEP = 16;
-	const MAX_YAXIS_WIDTH = 197;
-	const MIN_YAXIS_WIDTH = 85;
+	const MAX_YAXIS_WIDTH = 208;
+	const MIN_YAXIS_WIDTH = 80;
 	const NO_YAXIS_WIDTH = 30;
 	const Y_AXIS_LABEL_GAP = 9;
 
@@ -2048,6 +2048,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 	private function truncateYAxisLabels(array $rows, string $units): array {
 		$max_width = self::MAX_YAXIS_WIDTH - self::Y_AXIS_LABEL_GAP * 2;
+
+		if ($units !== '' && $units[0] === '!')
+		{
+			$units = substr($units, 1);
+		}
 
 		$needs_truncation = false;
 		$split_ok = true;
