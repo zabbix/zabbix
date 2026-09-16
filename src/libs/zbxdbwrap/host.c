@@ -530,8 +530,12 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			}
 			else
 			{
-				zbx_snprintf(error, max_error_len,
-						"failed to retrieve trigger or host for the matching items");
+				char	*err;
+				zbx_snprintf_alloc(&err, 128, 0, "failed to retrieve trigger description or host \
+						for triggerid %s and hostid %s", row[0], row[1]);
+				THIS_SHOULD_NEVER_HAPPEN_MSG(err);
+				zbx_snprintf(error, max_error_len, err);
+				free(err);
 			}
 
 			ret = FAIL;
