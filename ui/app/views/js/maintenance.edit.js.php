@@ -208,8 +208,28 @@ window.maintenance_edit = new class {
 					const active_since = formatDate(start_date);
 					const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
 
-					document.getElementById('active_since').value = active_since;
-					document.getElementById('active_till').value = active_till;
+					const isValidDate = (value) => {
+						const [year, month, day] = value.split(' ')[0].split('-').map(Number);
+						const date = new Date(year, month - 1, day);
+
+						return year >= 1970
+							&& date.getFullYear() === year
+							&& date.getMonth() === month - 1
+							&& date.getDate() === day;
+					};
+
+					const active_since_input = document.getElementById('active_since');
+					const active_till_input = document.getElementById('active_till');
+
+					if (!isValidDate(active_since_input.value) || active_since_input.value > active_since) {
+						active_since_input.value = active_since;
+					}
+
+					if (!isValidDate(active_till_input.value) || active_till_input.value < active_till) {
+						active_till_input.value = active_till;
+					}
+
+					this.form.validateChanges(['active_since', 'active_till']);
 				}
 			}
 		});
