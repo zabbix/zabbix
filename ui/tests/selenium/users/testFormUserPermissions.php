@@ -413,7 +413,7 @@ class testFormUserPermissions extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$this->assertEquals('Permissions can be assigned for user groups only.',
-				$this->query('xpath://ul[@id="permissionsFormList"]/li[4]')->one()->getText()
+				$this->query('xpath://ul[@id="permissionsFormList"]/li[7]')->one()->getText()
 		);
 		$table = $this->query($table_selector)->asTable()->one();
 		$this->assertEquals(['Group', 'Type', 'Permissions'], $table->getHeadersText());
