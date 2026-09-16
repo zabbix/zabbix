@@ -438,7 +438,7 @@
 
 		#prepareDetailsData(data) {
 			const details = {
-				title: <?= json_encode(_('Metric details')) ?>,
+				title: data.metric_name,
 				groups: [
 					{
 						title: <?= json_encode(_('Basic information')) ?>,
@@ -448,7 +448,7 @@
 								value: data.metric_name
 							},
 							{
-								name: <?= json_encode(_('Metric type')) ?>,
+								name: <?= json_encode(_('Type')) ?>,
 								value: this.#metric_types[data.type].label
 							},
 							{
@@ -461,16 +461,107 @@
 							},
 							{
 								name: <?= json_encode(_('Start time')) ?>,
-								value: data.star_time_unix
+								value: data.start_time_unix
 							},
 							{
 								name: <?= json_encode(_('Sum/Value')) ?>,
-								value: data.value
+								value: data.value ?? data.sum
+							},
+							{
+								name: <?= json_encode(_('Min')) ?>,
+								value: data.min
+							},
+							{
+								name: <?= json_encode(_('Max')) ?>,
+								value: data.max
 							},
 							{
 								name: <?= json_encode(_('Count')) ?>,
 								value: data.count
+							},
+							{
+								name: <?= json_encode(_('Zero count')) ?>,
+								value: data.zero_count
+							},
+							{
+								name: <?= json_encode(_('Scale')) ?>,
+								value: data.scale
+							},
+							{
+								name: <?= json_encode(_('Metric description')) ?>,
+								value: data.metric_description
+							},
+							{
+								name: <?= json_encode(_('Time')) ?>,
+								value: data.time_unix
+							},
+							{
+								name: <?= json_encode(_('Resource schema url')) ?>,
+								value: data.resource_schema_url
+							},
+							{
+								name: <?= json_encode(_('Bucket counts')) ?>,
+								value: data.bucket_counts
+							},
+							{
+								name: <?= json_encode(_('Positive offset')) ?>,
+								value: data.positive_offset
+							},
+							{
+								name: <?= json_encode(_('Positive bucket counts')) ?>,
+								value: data.positive_bucket_counts
+							},
+							{
+								name: <?= json_encode(_('Negative offset')) ?>,
+								value: data.negative_offset
+							},
+							{
+								name: <?= json_encode(_('Negative bucket counts')) ?>,
+								value: data.negative_bucket_counts
+							},
+							{
+								name: <?= json_encode(_('Aggregation temporality')) ?>,
+								value: data.aggregation_temporality
+							},
+							{
+								name: <?= json_encode(_('Monotonic')) ?>,
+								value: data.is_monotonic ? 'true' : 'false'
 							}
+						]
+					},
+					{
+						title: <?= json_encode(_('Attributes')) ?>,
+						items: Object.entries(data.attributes).map(
+							([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+						)
+					},
+					{
+						title: <?= json_encode(_('Resource attributes')) ?>,
+						items: Object.entries(data.resource_attributes).map(
+							([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+						)
+					},
+					{
+						title: <?= json_encode(_('Scope attributes')) ?>,
+						items: Object.entries(data.scope_attributes).map(
+							([name, value]) => Object.fromEntries([['name', name], ['value', value]])
+						)
+					},
+					{
+						title: <?= json_encode(_('Scope')) ?>,
+						items: [
+							{
+								name: <?= json_encode(_('name')) ?>,
+								value: data.scope_name
+							},
+							{
+								name: <?= json_encode(_('version')) ?>,
+								value: data.scope_version
+							},
+							{
+								name: <?= json_encode(_('schema url')) ?>,
+								value: data.scope_schema_url
+							},
 						]
 					}
 				]
