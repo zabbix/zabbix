@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -15,7 +15,7 @@
 
 
 /**
- * Class containing methods for operations with actions.
+ * Complex event processing rule API implementation.
  */
 class CCepRule extends CApiService {
 
