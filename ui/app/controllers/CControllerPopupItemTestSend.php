@@ -93,7 +93,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 								]],
 								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
 							],
-							'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
+							'retries' => ['db interface_snmp.retries', 'not_empty',
 								'use' => [CNumberValidator::class, ['with_float' => false,
 									'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
 								]]
