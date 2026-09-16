@@ -3206,6 +3206,10 @@ button {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
+z-split-view-pane .filter-forms .row {
+  justify-content: center;
+  flex-wrap: wrap; }
+
 .error-container:empty {
   display: none; }
 

@@ -377,7 +377,6 @@
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-			this.#metric_view_page?.destroy();
 			this.#metric_view_page = null;
 
 			this.#scheduleRefresh();
