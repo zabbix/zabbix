@@ -63,8 +63,8 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace = $traces[0] ?? null;
 
 		$spans = API::ApmSpan()->get([
-			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'timestamp', 'duration', 'events',
-				'resource_attributes', 'span_attributes'],
+			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp', 'duration',
+				'events', 'resource_attributes', 'span_attributes'],
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
 			'traceids' => [$traceid],
