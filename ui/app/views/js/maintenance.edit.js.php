@@ -196,28 +196,42 @@ window.maintenance_edit = new class {
 				return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
 			};
 
+			const active_since_input = document.getElementById('active_since');
+			const active_till_input = document.getElementById('active_till');
+
 			const start_date = new Date(timeperiod.start_date * 1000);
 			const active_since = formatDate(start_date);
 			const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
 
-			const isValidDate = (value) => {
-				const [year, month, day] = value.split(' ')[0].split('-').map(Number);
-				const date = new Date(year, month - 1, day);
+			const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+			const DAYS_IN_MONTH = (year) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-				return year >= 1970
-					&& date.getFullYear() === year
-					&& date.getMonth() === month - 1
-					&& date.getDate() === day;
+			const parseDateTime = (value) => {
+				const match = value.trim().match(/^(\d{1,4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2})(?::\d{1,2})?$/);
+
+				if (match === null) {
+					return null;
+				}
+
+				const [year, month, day, hour, minute] = match.slice(1).map(Number);
+
+				if (year < 1970 || month < 1 || month > 12 || day < 1 || day > DAYS_IN_MONTH(year)[month - 1]
+						|| hour > 23 || minute > 59) {
+					return null;
+				}
+
+				return [
+					String(year).padStart(4, '0'), String(month).padStart(2, '0'), String(day).padStart(2, '0')
+				].join('-') + ' ' + [String(hour).padStart(2, '0'), String(minute).padStart(2, '0')].join(':');
 			};
 
-			const active_since_input = document.getElementById('active_since');
-			const active_till_input = document.getElementById('active_till');
-
-			if (!isValidDate(active_since_input.value) || active_since_input.value > active_since) {
+			const active_since_canonical = parseDateTime(active_since_input.value);
+			if (active_since_canonical === null || active_since_canonical > active_since) {
 				active_since_input.value = active_since;
 			}
 
-			if (!isValidDate(active_till_input.value) || active_till_input.value < active_till) {
+			const active_till_canonical = parseDateTime(active_till_input.value);
+			if (active_till_canonical === null || active_till_canonical < active_till) {
 				active_till_input.value = active_till;
 			}
 
