@@ -18,14 +18,25 @@ class CControllerUserDeviceInitView extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 	}
 
-	protected function checkInput() {
-		$fields = [
-			'admin_mode' =>	'in 0,1'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'admin_mode' => ['boolean', 'required'],
+			'qrdata' => ['object', 'required',
+				'fields' => [
+					'uuid' => ['string', 'required', 'use' => [CUuidV7Validator::class]],
+					'expires_at' => ['integer', 'required'],
+					'url' => ['string', 'required', 'not_empty']
+				],
+				'when' => ['admin_mode', 'in' => [0]]
+			]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules(), true);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -40,7 +51,7 @@ class CControllerUserDeviceInitView extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (CWebUser::isGuest() || !CSettingsHelper::isMobileDevicesEnabled()) {
 			return false;
 		}
@@ -54,12 +65,10 @@ class CControllerUserDeviceInitView extends CController {
 		return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'admin_mode' => $this->getInput('admin_mode', 0) ? 1 : 0,
-			'ms_user' => $this->getInput('admin_mode', 0)
-				? []
-				: [['id' => CWebUser::$data['userid'], 'name' => getUserFullname(CWebUser::$data)]],
+			'qrdata' => $this->getInput('qrdata', []),
 			'js_validation_rules' => (new CFormValidator(CControllerUserDeviceInit::getValidationRules()))->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
