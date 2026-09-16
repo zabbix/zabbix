@@ -5928,8 +5928,7 @@ section {
         font-weight: 700; }
       .trace-view .trace-scroll .trace-tree z-navigation-tree {
         --navigation-tree-row-block-size: var(--trace-row-block-size);
-        grid-row: 2;
-        border-inline-end: 1px solid var(--trace-border-color); }
+        grid-row: 2; }
     .trace-view .trace-scroll .trace-time {
       display: grid;
       flex: 1 0;
