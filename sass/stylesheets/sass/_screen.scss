@@ -2010,6 +2010,31 @@ main {
 	}
 }
 
+// Graph list of Monitoring -> Hosts -> Graphs.
+.chart-title {
+	padding: 6px 10px;
+	line-height: 16px;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.chart-image {
+	overflow: hidden;
+	border-radius: var(--surface-border-radius);
+
+	// Graph images keep the header drawn into them, so a copied or saved image still names its graph. On the page
+	// that header is redundant - .chart-title carries the same text as selectable, searchable markup - and is
+	// clipped away here. The whole .flickerfreescreen is moved, not just the image inside it, because gtlc.js
+	// positions the time selection box absolutely against it; shifting only the image would offset the selection.
+	// 28px is the band CGraphDraw::drawHeader() writes into: an 11px DejaVuSans baseline at y=24, with ascenders
+	// reaching 14px above it and descenders 3px below.
+	> .flickerfreescreen {
+		margin-top: -28px;
+	}
+}
+
 // Analog Clock.
 .clock {
 	display: flex;
