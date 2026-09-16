@@ -34,6 +34,9 @@
 		#filter_form = null;
 		#side_drawer = null;
 		#metric_view_page = null;
+		#rows_data = new Map();
+		#selected_row_index = null;
+		#metric_types = null;
 
 		init({
 			csrf_token,
@@ -48,11 +51,14 @@
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs
+			user_configs,
+			metric_types
 		}) {
 			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
 			this.#csrf_token = csrf_token;
+
+			this.#metric_types = metric_types;
 
 			this.#filter_form_element = document.querySelector('[name="zbx_filter"]');
 			this.#filter_form = new CForm(this.#filter_form_element, filter_validation_rules);
@@ -107,7 +113,7 @@
 			});
 
 			$('#filter-resource-attributes')
-				.dynamicRows({template: '#filter-attributes-row-tmpl'})
+				.dynamicRows({template: '#filter-resource-attributes-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
 					const rows = this.querySelectorAll('.form_row');
 					new CApmAttrFilterItem(rows[rows.length - 1]);
@@ -118,7 +124,7 @@
 			});
 
 			$('#filter-scope-attributes')
-				.dynamicRows({template: '#filter-attributes-row-tmpl'})
+				.dynamicRows({template: '#filter-scope-attributes-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
 					const rows = this.querySelectorAll('.form_row');
 					new CApmAttrFilterItem(rows[rows.length - 1]);
@@ -187,9 +193,18 @@
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setStorageIdx(storage_idx)
-				.setRowRenderer('metric', data => {
-					data.row.side_drawer = data.row_config.metric;
-					this.#datatable.renderDataCells(data);
+				.setRowRenderer('metric', ({columns, data_fields, row, row_data, row_index, response}) => {
+					row.dataset.rowIndex = row_index;
+
+					const row_data_o = Object.create(null);
+
+					for (const [index, key] of data_fields.entries()) {
+						row_data_o[key] = row_data[index];
+					}
+
+					this.#rows_data.set(row_index, row_data_o);
+
+					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
 				})
 				.setCellRenderer('name', ({cell, cell_data}) => {
 					const [data] = cell_data;
@@ -218,9 +233,7 @@
 				.setCellRenderer('type', ({cell, cell_data}) => {
 					const [type] = cell_data;
 
-					const types = <?= json_encode(CApmMetricHelper::getTypes()) ?>;
-
-					const content = types[type].label;
+					const content = this.#metric_types[type].label;
 
 					/** @type {HTMLDivElement} */
 					const wordbreak = document.createElement('div');
@@ -259,11 +272,33 @@
 				.on(CDataTable.EVENT_AFTER_RENDER, () => {
 					const datatable_element = this.#datatable.getElement();
 					const rows = datatable_element.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`);
-					const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
 
 					for (const row of rows) {
+						const row_index = parseInt(row.getAttribute('data-row-index'));
+
+						if (row_index === this.#selected_row_index) {
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+						}
+
 						row.addEventListener('click', () => {
-							this.#openSideDrawer(wrapper, row.side_drawer ?? {});
+							if (row.hasAttribute('data-hintbox')) {
+								return;
+							}
+
+							if (this.#selected_row_index === row_index) {
+								this.#side_drawer.close();
+
+								return;
+							}
+
+							datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
+								?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#selected_row_index = row_index;
+
+							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_index));
 						});
 					}
 				})
@@ -316,22 +351,22 @@
 				});
 		}
 
-		#openSideDrawer(container, data) {
+		#openSideDrawer(data) {
 			if (this.#side_drawer === null) {
+				const container = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+
 				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
 				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
 				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
 			}
 
-			// this.#side_drawer.open(Promise.resolve(data));
+			this.#side_drawer.open(Promise.resolve(data));
 		}
 
 		#onSideDrawerOpen = e => {
-			const data = e.detail;
-
 			const element = this.#side_drawer.getElement();
 
-			this.#metric_view_page = new CDetailsPanel(element, data);
+			this.#metric_view_page = new CDetailsPanel(element, this.#prepareDetailsData(e.detail.response));
 
 			this.#unscheduleRefresh();
 		}
@@ -342,6 +377,7 @@
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
+			this.#metric_view_page?.destroy();
 			this.#metric_view_page = null;
 
 			this.#scheduleRefresh();
@@ -398,6 +434,49 @@
 			if ('messages' in response) {
 				this.#addRefreshMessage(response.messages);
 			}
+		}
+
+		#prepareDetailsData(data) {
+			const details = {
+				title: <?= json_encode(_('Metric details')) ?>,
+				groups: [
+					{
+						title: <?= json_encode(_('Basic information')) ?>,
+						items: [
+							{
+								name: <?= json_encode(_('Metric name')) ?>,
+								value: data.metric_name
+							},
+							{
+								name: <?= json_encode(_('Metric type')) ?>,
+								value: this.#metric_types[data.type].label
+							},
+							{
+								name: <?= json_encode(_('Unit')) ?>,
+								value: data.metric_unit
+							},
+							{
+								name: <?= json_encode(_('Service name')) ?>,
+								value: data.service_name
+							},
+							{
+								name: <?= json_encode(_('Start time')) ?>,
+								value: data.star_time_unix
+							},
+							{
+								name: <?= json_encode(_('Sum/Value')) ?>,
+								value: data.value
+							},
+							{
+								name: <?= json_encode(_('Count')) ?>,
+								value: data.count
+							}
+						]
+					}
+				]
+			}
+
+			return details;
 		}
 	}
 </script>

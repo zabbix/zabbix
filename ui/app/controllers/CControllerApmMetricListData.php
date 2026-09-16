@@ -64,7 +64,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'service_name' => ['string'],
 			'scope_name' => ['string'],
 			'types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
-				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]]],
+				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM
+			]]],
 			'attributes_evaltype' => ['integer', 'required',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
 			],
@@ -147,7 +148,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		];
 
 		$result = [
-			'data_fields' => $this->getDataFields()
+			'data_fields' => $this->getDataFields($output)
 		];
 
 		$options = [

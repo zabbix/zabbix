@@ -151,7 +151,36 @@ $html_page->show();
 		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 			'key' => '#{key}',
 			'value' => '#{value}',
-			'operator' => 0
+			'operator' => CONDITION_OPERATOR_LIKE
+		],
+		[
+			'attribute_field_name' => 'filter_attributes'
+		])
+	)
+	->show();
+
+(new CTemplateTag('filter-resource-attributes-row-tmpl'))
+	->addItem(
+		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
+			'key' => '#{key}',
+			'value' => '#{value}',
+			'operator' => CONDITION_OPERATOR_LIKE
+		],
+		[
+			'attribute_field_name' => 'filter_resource_attributes'
+		])
+	)
+	->show();
+
+(new CTemplateTag('filter-scope-attributes-row-tmpl'))
+	->addItem(
+		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
+			'key' => '#{key}',
+			'value' => '#{value}',
+			'operator' => CONDITION_OPERATOR_LIKE
+		],
+		[
+			'attribute_field_name' => 'filter_scope_attributes'
 		])
 	)
 	->show();
@@ -163,6 +192,7 @@ $html_page->show();
 		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
+		'metric_types' => CApmMetricHelper::getTypes(),
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],

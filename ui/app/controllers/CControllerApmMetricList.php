@@ -147,7 +147,9 @@ class CControllerApmMetricList extends CController {
 			'types' => CProfile::getArray('web.apm.metric.filter_types', []),
 			'service_name' => CProfile::get('web.apm.metric.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.metric.filter_scope_name', ''),
-			'attributes_evaltype' => CProfile::get('web.apm.metric.filter_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR),
+			'attributes_evaltype' => CProfile::get('web.apm.metric.filter_attributes_evaltype',
+				CONDITION_EVAL_TYPE_AND_OR
+			),
 			'attributes' => $filter_attributes,
 			'resource_attributes_evaltype' => CProfile::get('web.apm.metric.filter_resource_attributes_evaltype',
 				CONDITION_EVAL_TYPE_AND_OR
@@ -211,20 +213,29 @@ class CControllerApmMetricList extends CController {
 		}
 
 		CProfile::update('web.apm.metric.filter_metric_name', $this->getInput('filter_metric_name', ''),
-			PROFILE_TYPE_STR);
+			PROFILE_TYPE_STR
+		);
 		CProfile::updateArray('web.apm.metric.filter_types', $this->getInput('filter_types', []),
-			PROFILE_TYPE_INT);
+			PROFILE_TYPE_INT
+		);
 		CProfile::update('web.apm.metric.filter_service_name', $this->getInput('filter_service_name', ''),
-			PROFILE_TYPE_STR);
-		CProfile::update('web.apm.metric.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.metric.filter_evaltype', $this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR),
-			PROFILE_TYPE_INT);
+			PROFILE_TYPE_STR
+		);
+		CProfile::update('web.apm.metric.filter_scope_name', $this->getInput('filter_scope_name', ''),
+			PROFILE_TYPE_STR
+		);
+		CProfile::update('web.apm.metric.filter_evaltype',
+			$this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+		);
 		CProfile::updateArray('web.apm.metric.filter_attributes.key', array_column($filter_attributes, 'key'),
-			PROFILE_TYPE_STR);
+			PROFILE_TYPE_STR
+		);
 		CProfile::updateArray('web.apm.metric.filter_attributes.value', array_column($filter_attributes, 'value'),
-			PROFILE_TYPE_STR);
+			PROFILE_TYPE_STR
+		);
 		CProfile::updateArray('web.apm.metric.filter_attributes.operator', array_column($filter_attributes, 'operator'),
-			PROFILE_TYPE_INT);
+			PROFILE_TYPE_INT
+		);
 		CProfile::update('web.apm.metric.filter_resource_evaltype', $this->getInput('filter_resource_evaltype',
 			CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
