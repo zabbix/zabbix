@@ -18,11 +18,11 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
-	const YAXIS_WIDTH_STEP = 16;
 	const MAX_YAXIS_WIDTH = 208;
 	const MIN_YAXIS_WIDTH = 80;
 	const NO_YAXIS_WIDTH = 30;
-	const Y_AXIS_LABEL_GAP = 9;
+	const YAXIS_LABEL_GAP = 9;
+	const YAXIS_WIDTH_STEP = 16;
 
 	private $cell_height_min;
 	private $cell_width;
@@ -1285,7 +1285,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			foreach ($scale_values as ['relative_pos' => $relative_pos, 'value' => $value]) {
 				$pos_X = ($side == GRAPH_YAXIS_SIDE_LEFT)
-					? $this->shiftXleft - imageTextSize(8, 0, $value)['width'] - self::Y_AXIS_LABEL_GAP
+					? $this->shiftXleft - imageTextSize(8, 0, $value)['width'] - self::YAXIS_LABEL_GAP
 					: $this->sizeX + $this->shiftXleft + 12;
 
 				$pos_Y = $this->shiftY + $this->sizeY * (1 - $relative_pos);
@@ -2047,7 +2047,7 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	private function truncateYAxisLabels(array $rows, string $units): array {
-		$max_width = self::MAX_YAXIS_WIDTH - self::Y_AXIS_LABEL_GAP * 2;
+		$max_width = self::MAX_YAXIS_WIDTH - self::YAXIS_LABEL_GAP * 2;
 
 		if ($units !== '' && $units[0] === '!')
 		{
@@ -2113,7 +2113,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$width = max($width, imageTextSize(8, 0, $value)['width']);
 		}
 
-		$stepped = (int) (ceil(($width + self::Y_AXIS_LABEL_GAP * 2) / self::YAXIS_WIDTH_STEP)
+		$stepped = (int) (ceil(($width + self::YAXIS_LABEL_GAP * 2) / self::YAXIS_WIDTH_STEP)
 			* self::YAXIS_WIDTH_STEP);
 
 		return min(self::MAX_YAXIS_WIDTH, max(self::MIN_YAXIS_WIDTH, $stepped));
