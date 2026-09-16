@@ -183,7 +183,7 @@ class TraceViewPage {
 			this.#spans.set(String(span.id), {
 				...span,
 				id: String(span.id),
-				parentId: span.parentId == null ? null : String(span.parentId),
+				parent_id: span.parent_id == null ? null : String(span.parent_id),
 				events: Array.isArray(span.events) ? span.events : []
 			});
 		}
@@ -195,8 +195,8 @@ class TraceViewPage {
 			this.#end = this.#start + 1;
 		}
 
-		this.#selected_start = Number.isFinite(Number(trace?.selectedStart)) ? Number(trace.selectedStart) : this.#start;
-		this.#selected_end = Number.isFinite(Number(trace?.selectedEnd)) ? Number(trace.selectedEnd) : this.#end;
+		this.#selected_start = Number.isFinite(Number(trace?.selected_start)) ? Number(trace.selected_start) : this.#start;
+		this.#selected_end = Number.isFinite(Number(trace?.selected_end)) ? Number(trace.selected_end) : this.#end;
 
 		this.#normalizeSelectedRange();
 		this.#render();
@@ -209,8 +209,8 @@ class TraceViewPage {
 			return;
 		}
 
-		this.#selected_start = this.#parseNumber(value.selectedStart, this.#selected_start);
-		this.#selected_end = this.#parseNumber(value.selectedEnd, this.#selected_end);
+		this.#selected_start = this.#parseNumber(value.selected_start, this.#selected_start);
+		this.#selected_end = this.#parseNumber(value.selected_end, this.#selected_end);
 		this.#normalizeSelectedRange();
 
 		this.#renderTree();
@@ -222,8 +222,8 @@ class TraceViewPage {
 			detail: {
 				start: this.#start,
 				end: this.#end,
-				selectedStart: this.#selected_start,
-				selectedEnd: this.#selected_end
+				selected_start: this.#selected_start,
+				selected_end: this.#selected_end
 			}
 		}));
 	}
@@ -287,7 +287,7 @@ class TraceViewPage {
 			.filter(span => visible_ids.has(span.id))
 			.map(span => ({
 				id: span.id,
-				parentId: span.parentId,
+				parent_id: span.parent_id,
 				label: span.name || span.id,
 				subtitle: span.operation || '',
 				meta: span.count ?? '',
@@ -409,7 +409,7 @@ class TraceViewPage {
 
 			while (current !== undefined) {
 				ids.add(current.id);
-				current = current.parentId === null ? undefined : this.#spans.get(current.parentId);
+				current = current.parent_id === null ? undefined : this.#spans.get(current.parent_id);
 			}
 		}
 

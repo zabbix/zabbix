@@ -45,36 +45,29 @@ $trace_view = (new CDiv())
 	)
 	->addItem(
 		(new CDiv())
-			->addClass('trace-grid')
-			->addItem(
-				(new CDiv())
-					->addClass('trace-grid-header')
-					->addItem(
-						(new CDiv('Span tree'))
-							->addClass('trace-tree-header')
-					)
-					->addItem(
-						(new CDiv())
-							->addClass('trace-time-header')
-							->setAttribute('data-trace-time-header', '')
-					)
-			)
-	)
-	->addItem(
-		(new CDiv())
 			->addClass('trace-scroll')
 			->setAttribute('data-trace-scroll', '')
 			->addItem(
 				(new CDiv())
 					->addClass('trace-body')
-					->addItem(
-						(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
-					)
-					->addItem(
+					->addItem([
 						(new CDiv())
-							->addClass('trace-waterfall')
-							->setAttribute('data-trace-waterfall', '')
-					)
+							->addClass('trace-tree')
+							->addItem([
+								(new CDiv('Span tree'))->addClass('trace-tree-header'),
+								(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
+							]),
+						(new CDiv())
+							->addClass('trace-time')
+							->addItem([
+								(new CDiv())->addClass('trace-time-header')
+									->setAttribute('data-trace-time-header', ''),
+								(new CDiv())
+									->addClass('trace-waterfall')
+									->setAttribute('data-trace-waterfall', '')
+							]),
+						(new CDiv())->addClass('trace-details')->setAttribute('data-trace-details', '')
+					])
 			)
 	);
 

@@ -2,18 +2,21 @@
 	--details-panel-border-color: #{$ui-border-color};
 	--details-panel-background-color: #{$ui-bg-color};
 	--details-panel-padding: 10px;
-	--details-panel-header-height: 40px;
+	--details-panel-header-height: 38px;
 
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-rows: var(--details-panel-header-height) minmax(0, 1fr);
 	box-sizing: border-box;
 	block-size: 100%;
 	background: var(--details-panel-background-color);
 
 	.details-panel-header {
+		grid-row: 1;
 		display: flex;
 		align-items: center;
 		block-size: var(--details-panel-header-height);
+		border-block-end: 1px solid var(--details-panel-border-color);
+		box-sizing: border-box;
 		min-inline-size: 0;
 		padding-inline: var(--details-panel-padding);
 		gap: 8px;
@@ -27,12 +30,9 @@
 	}
 
 	.details-panel-groups {
-		flex: 1 1 auto;
+		grid-row: 2;
 		min-inline-size: 0;
 		min-block-size: 0;
-		overflow: auto;
-		overscroll-behavior-y: contain;
-		border-block-start: 1px solid var(--details-panel-border-color);
 	}
 
 	.details-group {
@@ -74,6 +74,18 @@
 
 	.details-group-content {
 		padding: 4px var(--details-panel-padding) 12px;
+
+		.details-group {
+			border: 1px solid var(--details-panel-border-color);
+
+			& + .details-group {
+				margin-block-start: var(--details-panel-padding);
+			}
+		}
+
+		.details-item + .details-group {
+			margin-block-start: var(--details-panel-padding);
+		}
 	}
 
 	.details-item {

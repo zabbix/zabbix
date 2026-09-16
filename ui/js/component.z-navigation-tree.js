@@ -51,16 +51,18 @@ class ZNavigationTree extends HTMLElement {
 	}
 
 	#addEventListeners() {
+		this.#content.addEventListener('deselect', this.#onDeselect);
 		this.#content.addEventListener('click', this.#onClick);
 	}
 
 	#removeEventListeners() {
 		this.#content.removeEventListener('click', this.#onClick);
+		this.#content.removeEventListener('deselect', this.#onDeselect);
 	}
 
-	#onClick = event => {
-		const row = event.target instanceof Element
-			? event.target.closest('.z-navigation-tree-row')
+	#onClick = e => {
+		const row = e.target instanceof Element
+			? e.target.closest('.z-navigation-tree-row')
 			: null;
 
 		if (row === null || !this.#content.contains(row)) {
@@ -79,7 +81,12 @@ class ZNavigationTree extends HTMLElement {
 		}
 
 		this.#select(id);
-	};
+	}
+
+	#onDeselect = () => {
+		this.#selected_id = null;
+		this.#render();
+	}
 
 	#toggle(id) {
 		const item = this.#items.get(id);
@@ -134,14 +141,14 @@ class ZNavigationTree extends HTMLElement {
 			this.#items.set(id, {
 				...item,
 				id,
-				parentId: item.parentId == null ? null : String(item.parentId),
+				parent_id: item.parent_id == null ? null : String(item.parent_id),
 				children: []
 			});
 		}
 
 		for (const item of this.#items.values()) {
-			if (item.parentId !== null && this.#items.has(item.parentId)) {
-				this.#items.get(item.parentId).children.push(item.id);
+			if (item.parent_id !== null && this.#items.has(item.parent_id)) {
+				this.#items.get(item.parent_id).children.push(item.id);
 			}
 			else {
 				this.#root_ids.push(item.id);

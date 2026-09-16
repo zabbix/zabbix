@@ -85,11 +85,17 @@ class CDetailsPanel {
 
 		header.append(title, close_button);
 
-		this.#groups.replaceChildren(
-			...this.#data.groups.map((group, index) => this.#createGroup(group, index))
-		);
+		this.#groups.replaceChildren(...this.#createGroups(this.#data.groups));
 
 		this.#element.replaceChildren(header, this.#groups);
+	}
+
+	#createGroups(groups) {
+		return groups.map((group, index) => this.#createGroup(group, index));
+	}
+
+	#createItems(items) {
+		return items.map((item, index) => this.#createItem(item, index));
 	}
 
 	#createGroup(group, index) {
@@ -106,7 +112,8 @@ class CDetailsPanel {
 
 		const toggle = document.createElement('button');
 		toggle.type = 'button';
-		toggle.classList.add('details-group-toggle', ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_CHEVRON_UP_SMALL);
+		toggle.classList.add('details-group-toggle', ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM,
+			ZBX_ICON_CHEVRON_UP_SMALL);
 		toggle.setAttribute('aria-expanded', 'true');
 
 		header.append(title, toggle);
@@ -114,16 +121,18 @@ class CDetailsPanel {
 		const content = document.createElement('div');
 		content.className = 'details-group-content';
 
-		content.replaceChildren(
-			...group.items.map(item => this.#createItem(item))
-		);
+		content.replaceChildren(...this.#createItems(group.items));
 
 		element.append(header, content);
 
 		return element;
 	}
 
-	#createItem(item) {
+	#createItem(item, index) {
+		if (item?.items) {
+			return this.#createGroup(item, index);
+		}
+
 		const row = document.createElement('div');
 		row.className = 'details-item';
 
@@ -146,22 +155,41 @@ class CDetailsPanel {
 		return row;
 	}
 
+	#normalizeItems(items) {
+		if (!Array.isArray(items)) {
+			return [];
+		}
+
+		return items.map(item => {
+			if (Array.isArray(item?.items)) {
+				return {
+					title: String(item?.title ?? item?.name ?? ''),
+					items: this.#normalizeItems(item.items)
+				};
+			}
+
+			return {
+				name: String(item?.name ?? ''),
+				value: item?.value instanceof Node ? item.value : String(item?.value ?? '')
+			};
+		});
+	}
+
+	#normalizeGroups(groups) {
+		if (!Array.isArray(groups)) {
+			return [];
+		}
+
+		return groups.map(group => ({
+			title: String(group?.title ?? ''),
+			items: this.#normalizeItems(group?.items)
+		}));
+	}
+
 	#normalizeData(data) {
 		return {
 			title: String(data?.title ?? ''),
-			groups: Array.isArray(data?.groups)
-				? data.groups.map(group => ({
-					title: String(group?.title ?? ''),
-					items: Array.isArray(group?.items)
-						? group.items.map(item => ({
-							name: String(item?.name ?? ''),
-							value: item?.value instanceof Node
-								? item.value
-								: String(item?.value ?? '')
-						}))
-						: []
-				}))
-				: []
+			groups: this.#normalizeGroups(data?.groups)
 		};
 	}
 

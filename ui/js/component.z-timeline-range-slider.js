@@ -513,8 +513,8 @@ class ZTimelineRangeSlider extends HTMLElement {
 		return {
 			start: this.#start,
 			end: this.#end,
-			selectedStart: this.#selected_start,
-			selectedEnd: this.#selected_end
+			selected_start: this.#selected_start,
+			selected_end: this.#selected_end
 		};
 	}
 

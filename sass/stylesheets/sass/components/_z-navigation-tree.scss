@@ -1,8 +1,9 @@
 z-navigation-tree {
 	--navigation-tree-row-block-size: 44px;
 	--navigation-tree-indent-size: 16px;
+	--navigation-tree-hover-bg-color: #{$ui-hover-bg-color};
 	--navigation-tree-border-color: #{$ui-border-color};
-	--navigation-tree-selected-bg-color: #{rgba($ui-selected-bg-color, .12)};
+	--navigation-tree-selected-bg-color: #{$lighter-yellow};
 	--navigation-tree-muted-color: #{$font-alt-color};
 
 	display: block;
@@ -22,10 +23,14 @@ z-navigation-tree {
 		min-inline-size: 0;
 		padding-inline: calc(8px + var(--navigation-tree-depth) * var(--navigation-tree-indent-size)) 8px;
 		column-gap: 4px;
-		cursor: default;
 
 		&[selected] {
 			background: var(--navigation-tree-selected-bg-color);
+		}
+
+		&:not([selected]):hover {
+			background: var(--navigation-tree-hover-bg-color);
+			cursor: pointer;
 		}
 	}
 

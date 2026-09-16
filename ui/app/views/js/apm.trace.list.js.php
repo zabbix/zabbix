@@ -371,6 +371,8 @@
 				.init(user_configs);
 		}
 
+		#trace_view_data = null;
+
 		#openSideDrawer(container, traceid) {
 			if (this.#side_drawer === null) {
 				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
@@ -407,6 +409,8 @@
 				});
 		}
 
+		#span_details = null;
+
 		#onSideDrawerOpen = e => {
 			const {response} = e.detail;
 			const {trace_view, trace_view_data} = response;
@@ -414,14 +418,32 @@
 			const element = this.#side_drawer.getElement();
 			element.innerHTML = trace_view;
 
+			this.#bindSideDrawerEvents();
+
 			this.#trace_view_page?.destroy();
 			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
 
 			this.#unscheduleRefresh();
 		}
 
+		#bindSideDrawerEvents() {
+			const element = this.#side_drawer?.getElement();
+
+			element?.addEventListener('span-select', this.#onSideDrawerSpanDetailsOpen);
+			element?.addEventListener('close', this.#onSideDrawerSpanDetailsClose);
+		}
+
+		#unbindSideDrawerEvents() {
+			const element = this.#side_drawer?.getElement();
+
+			element?.removeEventListener('close', this.#onSideDrawerSpanDetailsClose);
+			element?.removeEventListener('span-select', this.#onSideDrawerSpanDetailsOpen);
+		}
+
 		#onSideDrawerClose = () => {
 			const datatable_element = this.#datatable.getElement();
+
+			this.#unbindSideDrawerEvents()
 
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
@@ -430,8 +452,111 @@
 			this.#trace_view_page = null;
 
 			this.#selected_traceid = null;
+			this.#trace_view_data = null;
 
 			this.#scheduleRefresh();
+		}
+
+		#onSideDrawerSpanDetailsOpen = e => {
+			const trace_details = this.#side_drawer?.getElement()?.querySelector('[data-trace-details]');
+			if (trace_details === null) {
+				return;
+			}
+
+			const span = e.detail.item.span ?? null;
+			if (span === null) {
+				return;
+			}
+
+			const span_details = document.createElement('div');
+			trace_details.appendChild(span_details);
+
+			this.#span_details?.destroy();
+			this.#span_details = new CDetailsPanel(span_details, {
+				title: <?= json_encode(_('Span details')); ?>,
+				groups: this.#collectSpanDetailsGroups(span)
+			});
+		}
+
+		#onSideDrawerSpanDetailsClose = () => {
+			this.#span_details?.destroy();
+			this.#span_details = null;
+
+			const trace_tree_content = this.#side_drawer?.getElement()?.querySelector('.z-navigation-tree-content');
+			trace_tree_content?.dispatchEvent(new CustomEvent('deselect'));
+		}
+
+		#collectSpanDetailsGroups(span) {
+			const groups = [{
+				title: <?= json_encode(_('Basic information')); ?>,
+				items: [
+					{
+						name: <?= json_encode(_('Span ID')); ?>,
+						value: span.id
+					},
+					{
+						name: <?= json_encode(_('Operation')); ?>,
+						value: span.operation
+					},
+					{
+						name: <?= json_encode(_('Service name')); ?>,
+						value: span.service_name
+					},
+					{
+						name: <?= json_encode(_('Scope name')); ?>,
+						value: span.scope_name
+					},
+					{
+						name: <?= json_encode(_('Duration')); ?>,
+						value: span.duration
+					},
+					{
+						name: <?= json_encode(_('Start time')); ?>,
+						value: span.timestamp
+					}
+				]
+			}];
+
+			const resource_attributes = Object.entries(span.resource_attributes);
+			if (resource_attributes.length > 0) {
+				const items = [];
+				for (const [name, value] of resource_attributes) {
+					items.push({name, value});
+				}
+
+				groups.push({title: <?= json_encode(_('Resource attributes')); ?>, items});
+			}
+
+			const span_attributes = Object.entries(span.span_attributes);
+			if (span_attributes.length > 0) {
+				const items = [];
+				for (const [name, value] of span_attributes) {
+					items.push({name, value});
+				}
+
+				groups.push({title: <?= json_encode(_('Span attributes')); ?>, items});
+			}
+
+			if (span.events?.length > 0) {
+				const items = [];
+				for (const span_event of span.events) {
+					const attributes = [];
+					for (const [name, value] of Object.entries(span_event.attributes)) {
+						attributes.push({name, value});
+					}
+
+					const event = [
+						{name: <?= json_encode(_('Duration')); ?>, value: span_event.duration},
+						{title: <?= json_encode(_('Event attributes')); ?>, items: attributes}
+					];
+
+					items.push({title: span_event.name, items: event});
+				}
+
+				groups.push({title: <?= json_encode(_('Events')); ?>, items});
+			}
+
+			return groups;
 		}
 
 		#validateFormChanges() {
