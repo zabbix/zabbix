@@ -901,6 +901,8 @@ int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
 
+#if !defined(_WINDOWS)
+
 /* thread-safe channel for fixed-size message passing between threads */
 typedef struct
 {
@@ -924,6 +926,8 @@ int	zbx_chan_recv_timeout(zbx_channel_t *chan, void *message, int timeout_ms);
 int	zbx_chan_msg_num(zbx_channel_t *chan);
 int	zbx_chan_capacity(zbx_channel_t *chan);
 void	zbx_chan_compact(zbx_channel_t *chan, int min_capacity);
+
+#endif
 
 int	zbx_tag_compare(const void *a1, const void *a2);
 void	zbx_tag_clear(zbx_tag_t *tag);
