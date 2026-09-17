@@ -204,6 +204,12 @@ class CApmMetric extends CApmGeneral {
 			return $options['countOutput'] ? '0' : [];
 		}
 
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
+
 		$select_tables = $options['types'] !== null
 			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
 			: self::CLICKHOUSE_METRICS_TABLES;
@@ -314,7 +320,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
 			}
 
 			$db_metrics[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);

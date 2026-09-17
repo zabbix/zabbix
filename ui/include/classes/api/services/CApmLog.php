@@ -124,6 +124,12 @@ class CApmLog extends CApmGeneral {
 
 		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
+
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_logs', 'l', $db_schema, $options))
 			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
 			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
@@ -178,7 +184,7 @@ class CApmLog extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
 			}
 
 			$db_logs[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);

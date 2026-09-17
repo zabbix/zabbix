@@ -127,6 +127,12 @@ class CApmTrace extends CApmGeneral {
 
 		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
+
 		$inner_query = (new CClickHouseQuery())
 			->from('otel_traces', 'ti')
 			->select('ti.TraceId')
@@ -225,7 +231,7 @@ class CApmTrace extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
 			}
 
 			$db_traces[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);

@@ -125,6 +125,12 @@ class CApmSpan extends CApmGeneral {
 
 		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
+
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, $options))
 			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
 			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
@@ -169,7 +175,7 @@ class CApmSpan extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
 			}
 
 			$db_spans[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
