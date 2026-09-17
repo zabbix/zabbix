@@ -99,7 +99,7 @@ class CApmTrace extends CApmGeneral {
 			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
 			'min_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'max_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'status_code', 'status_message']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['trace_state', 'span_name', 'service_name', 'scope_name', 'scope_version', 'status_message']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],

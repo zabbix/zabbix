@@ -165,7 +165,7 @@ class CApmMetric extends CApmGeneral {
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'flags']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
