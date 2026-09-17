@@ -18,8 +18,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for internal java item verification.
  *
- * @required-components server
- * @hosts test_host
+ * @required-components server, java
  * @backup history
  */
 class testInternalJavaItem extends CIntegrationTest {
@@ -31,70 +30,6 @@ class testInternalJavaItem extends CIntegrationTest {
 			'type' => ITEM_TYPE_INTERNAL
 		]
 	];
-
-	private static $java_gateway_started = false;
-
-	/**
-	 * Start Zabbix Java Gateway.
-	 */
-	private static function startJavaGateway(): void {
-		$script = dirname(__DIR__, 3).'/sbin/zabbix_java/startup.sh';
-
-		if (!is_file($script)) {
-			throw new Exception('Zabbix Java Gateway startup script not found: '.$script);
-		}
-
-		self::executeCommand(escapeshellarg($script), []);
-
-		self::$java_gateway_started = true;
-	}
-
-	/**
-	 * Stop Zabbix Java Gateway.
-	 */
-	private static function stopJavaGateway(): void {
-		if (!self::$java_gateway_started) {
-			return;
-		}
-
-		$script = dirname(__DIR__, 3).'/sbin/zabbix_java/shutdown.sh';
-
-		try {
-			if (!is_file($script)) {
-				throw new Exception('Zabbix Java Gateway shutdown script not found: '.$script);
-			}
-
-			self::executeCommand(escapeshellarg($script), []);
-		}
-		finally {
-			self::$java_gateway_started = false;
-		}
-	}
-
-	/**
-	 * Start components required by the test and the Java Gateway.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-
-		self::startJavaGateway();
-	}
-
-	/**
-	 * Stop the Java Gateway and then the Zabbix components.
-	 *
-	 * @after
-	 */
-	public function onAfterTestCase() {
-		try {
-			self::stopJavaGateway();
-		}
-		finally {
-			parent::onAfterTestCase();
-		}
-	}
 
 	/**
 	 * @inheritdoc
@@ -166,73 +101,6 @@ class testInternalJavaItem extends CIntegrationTest {
 				'JavaGatewayPort' => 10053
 			]
 		];
-	}
-
-	/**
-	 * Get timestamp of log last line.
-	 *
-	 * @param string  $line       log line
-	 *
-	 * @return integer|false
-	 */
-	protected function getTimestamp($line) {
-		$matches = [];
-		$regex = '/\d+:(\d+:\d+.\d+)/';
-
-		if (preg_match($regex, $line, $matches) === 1) {
-			if ($matches[1]) {
-				$ts = DateTime::createFromFormat('Ymd:Gis.u', $matches[1]);
-				return $ts->format('U');
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Wait until line is present in log.
-	 *
-	 * @param string       $component     name of the component
-	 * @param string|array $lines         line(s) to look for
-	 * @param integer      $iterations    iteration count
-	 *
-	 * @return integer
-	 *
-	 * @throws Exception    on failed wait or if not able to retrieve timestamp	 */
-	protected function getLogLineTimestamp($lines, $iterations = null) {
-		if ($iterations === null) {
-			$iterations = self::LOG_LINE_WAIT_TIME;
-		}
-
-		for ($r = 0; $r < $iterations; $r++) {
-			$log_content = CLogHelper::readLogUntil(self::getLogPath(self::COMPONENT_SERVER), $lines);
-
-			if ($log_content !== null) {
-				$log_content = $this->getTimestamp(strrchr(rtrim($log_content, "\n"), "\n"));
-
-				if ($log_content === false) {
-				//	throw new Exception('Failed to get timestamp of the log line');
-				}
-
-				return $log_content;
-			}
-
-			sleep(1);
-		}
-
-		if (is_array($lines)) {
-			$quoted = [];
-			foreach ($lines as $line) {
-				$quoted[] = '"'.$line.'"';
-			}
-
-			$description = 'any of the lines ['.implode(', ', $quoted).']';
-		}
-		else {
-			$description = 'line "'.$lines.'"';
-		}
-
-		throw new Exception('Failed to wait for '.$description.' to be present in log file.');
 	}
 
 	/**
