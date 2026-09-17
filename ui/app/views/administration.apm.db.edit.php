@@ -34,7 +34,7 @@ $apm_tab = (new CFormGrid())
 		new CFormField(
 			(new CCheckBox('status'))
 				->setUncheckedValue(APM_GLOBAL_DB_STATUS_NOT_CONFIGURED)
-				->setChecked($data['values']['status'] === APM_GLOBAL_DB_STATUS_CONFIGURED),
+				->setChecked($data['values']['status'] == APM_GLOBAL_DB_STATUS_CONFIGURED),
 		)
 	])
 	->addItem([
