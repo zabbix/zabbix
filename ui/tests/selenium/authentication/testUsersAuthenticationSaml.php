@@ -129,11 +129,11 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'id:idp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded IdP certificate'],
 			'id:sp_private_key' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP private key'],
 			'id:sp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP certificate'],
-			'id:sign_messages' => ['value' => false, 'visible' => true],
-			'id:sign_assertions' => ['value' => false, 'visible' => true],
-			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_responses' => ['value' => false, 'visible' => true],
+			'id:sign_messages' => ['value' => true, 'visible' => true],
+			'id:sign_assertions' => ['value' => true, 'visible' => true],
+			'id:sign_authn_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_responses' => ['value' => true, 'visible' => true],
 			'id:encrypt_nameid' => ['value' => false, 'visible' => true],
 			'id:encrypt_assertions' => ['value' => false, 'visible' => true],
 			'Case-sensitive login' => ['value' => false, 'visible' => true],
@@ -1144,7 +1144,13 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
 				'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
 				'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
-				'Case-sensitive login' => false
+				'Case-sensitive login' => false,
+				// Sign.
+				'id:sign_messages' => false,
+				'id:sign_assertions' => false,
+				'id:sign_authn_requests' => false,
+				'id:sign_logout_requests' => false,
+				'id:sign_logout_responses' => false
 			]
 		];
 
