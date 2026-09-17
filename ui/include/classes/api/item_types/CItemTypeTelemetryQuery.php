@@ -326,9 +326,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
-	 * Serialize "item.query" to JSON string.
-	 * Convert "item.query.filter.formula" from "A or B" like notation to "{0} or {1}" notation
-	 * removing "formulaid" property for each condition.
+	 * Serialize "item.query" to JSON string. Additionally make following steps:
+	 * - "query.aggregated_columns[].parameters[]" for "function" AGGREGATE_PERCENTILE converted to string, server requires each parameter to be a string
 	 *
 	 * @param array $query  Array for "item.query" configuration
 	 */
@@ -350,7 +349,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @param string $query  JSON encoded string with "item.query" configuration
 	 */
 	public static function prepareQueryFieldForApi(string $query): array {
-		if ($query === '') {
+		if ($query === DB::getDefault('items', 'query')) {
 			return [];
 		}
 

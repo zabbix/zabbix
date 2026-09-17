@@ -269,29 +269,19 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			&response_code, &http_resp, &error) &&
 			SUCCEED == zbx_handle_response_code(status_codes, response_code, http_resp, &error))
 	{
-		int	parse_ret;
-
 		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
 
 		if (ZBX_APM_DB_TYPE_CLICKHOUSE != item_context->db_type)
 			THIS_SHOULD_NEVER_HAPPEN;
 
-		if (FAIL == (parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values)))
+		if (FAIL == (status = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values)))
 		{
 			error = zbx_strdup(NULL, "Failed to parse data store response");
-			status = FAIL;
 		}
-		else
+		else if (SUCCEED_PARTIAL == status)
 		{
-			if (SUCCEED_PARTIAL == parse_ret)
-			{
-				zabbix_log(LOG_LEVEL_WARNING,
-						"telemetry query result row limit (%d) exceeded for item \"%s:%s\", "
-						"result was truncated", ZBX_TQ_MAX_RESULT_ROWS, item_context->host_host,
-						item_context->key_orig);
-			}
-
-			status = SUCCEED;
+			error = zbx_dsprintf(NULL, "telemetry query result row limit (%d) exceeded",
+					ZBX_TQ_MAX_RESULT_ROWS);
 		}
 	}
 	else
@@ -301,7 +291,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 	if (ZBX_IS_RUNNING())
 	{
-		if (SUCCEED == status)
+		if (FAIL != status)
 		{
 			for (int i = 0; i < values.values_num; i++)
 			{
@@ -343,6 +333,15 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				zbx_free_agent_result(&result);
 			}
 
+			if (SUCCEED_PARTIAL == status)
+			{
+				/* if result was truncated, values are saved to history, lasttimestamp is updated, */
+				/* but the item becomes not supported */
+				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
+						item_context->flags, item_context->preprocessing, NULL, &timespec,
+						ITEM_STATE_NOTSUPPORTED, error);
+			}
+
 			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP;
 			cached_data.lasttimestamp = item_context->newlasttimestamp;
 
@@ -358,7 +357,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 					item_context->preprocessing, NULL,
 					&timespec, ITEM_STATE_NOTSUPPORTED, error);
 
-			/* leave cached_data the same if check is not successful, lasttimestamp does not change */
+			/* leave cached_data the same if the check resulted in item becoming not supported */
+			/* (except when result was truncated), lasttimestamp does not change */
 		}
 	}
 

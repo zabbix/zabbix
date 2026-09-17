@@ -987,7 +987,8 @@ $formgrid->addItem([
 			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
 			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
 			->setReadonly($readonly)
-			->setModern(),
+			->setModern()
+			->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('inherited_timeout', $item['inherited_timeout']))
 			->setReadonly(true)
@@ -1014,7 +1015,8 @@ $formgrid->addItem([
 			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
 			->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($item['discovered'])
-			->setModern(),
+			->setModern()
+			->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('history', $item['history'], $item['discovered']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -1058,7 +1060,8 @@ $formgrid
 				->addValue(_('Do not store'), ITEM_STORAGE_OFF)
 				->addValue(_('Store up to'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($item['discovered'])
-				->setModern(),
+				->setModern()
+				->addClass(ZBX_STYLE_ALIGN_TOP),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', $item['trends'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -1217,7 +1220,9 @@ function getViewCustomIntervalRow(array $item, array $data): array {
 				->setAttribute('data-error-label', _('Period'))
 				->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
 			$item['discovered'] ? null : (new CButtonLink(_('Remove')))->addClass('element-table-remove')
-		]))->addClass('form_row'),
+		]))
+			->addClass('form_row')
+			->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CRow())
 			->addClass('error-container-row')
 			->addItem((new CCol())->setId("delay_flex-$row_num-error-container")->setColSpan(4))

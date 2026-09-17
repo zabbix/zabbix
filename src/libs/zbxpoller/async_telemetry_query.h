@@ -28,8 +28,6 @@
 typedef struct
 {
 	zbx_uint64_t		itemid;
-	char			*key_orig;
-	char			host_host[ZBX_HOSTNAME_BUF_LEN];
 	unsigned char		value_type;
 	unsigned char		flags;
 	char			*posts;

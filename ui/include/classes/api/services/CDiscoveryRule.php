@@ -788,7 +788,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 					'enabled_lifetime', 'description', 'status'
 				],
-				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters', 'query'])
+				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
 				'hostid' => $templateids,
