@@ -406,7 +406,7 @@ class CHostInterface extends CApiService {
 	protected function sanitizeSnmpFields(array $interfaces): array {
 		$default_fields = [
 			'community' => '',
-			'max_repetitions' =>  DB::getDefault('interface_snmp', 'max_repetitions'),
+			'max_repetitions' => DB::getDefault('interface_snmp', 'max_repetitions'),
 			'retries' => DB::getDefault('interface_snmp', 'retries'),
 			'securityname' => '',
 			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
@@ -1177,11 +1177,11 @@ class CHostInterface extends CApiService {
 
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.version', SNMP_V2C, 'version'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', SNMP_BULK_ENABLED, 'bulk'), $sqlParts);
-			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.retries', '5', 'retries'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.community', '', 'community'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.max_repetitions', '10', 'max_repetitions'),
 				$sqlParts
 			);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.retries', '5', 'retries'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.securityname', '', 'securityname'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(
 				dbConditionCoalesce('his.securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'securitylevel'),
