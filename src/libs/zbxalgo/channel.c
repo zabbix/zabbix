@@ -17,7 +17,7 @@
 #include "zbxtypes.h"
 #include "zbxtime.h"
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 
 /******************************************************************************
  *                                                                            *
