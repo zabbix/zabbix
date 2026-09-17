@@ -32,9 +32,15 @@ function zbx_is_callable(array $names) {
 }
 
 /************ REQUEST ************/
-function redirect($url) {
-	$curl = (new CUrl($url))->removeArgument(CSRF_TOKEN_NAME);
-	header('Location: '.$curl->getUrl());
+
+function redirect(string $url): void {
+	header('Content-Type: text/html; charset=UTF-8');
+	header('Location: '.
+		(new CUrl($url))
+			->removeArgument(CSRF_TOKEN_NAME)
+			->getUrl()
+	);
+
 	exit;
 }
 
@@ -1509,7 +1515,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
 		if (detect_page_type() == PAGE_TYPE_JS) {
-			echo (new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
+			echo (new CView(ZBX_LAYOUT_JSON, ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
 		}
 		else {
 			echo (new CView('general.warning', $data))->getOutput();

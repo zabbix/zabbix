@@ -12,10 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxvariant.h"
+#include "zbxeval.h"
 
+#include "zbxvariant.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *
@@ -30,7 +32,7 @@
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
+int	zbx_eval_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
 #define ERROR_VALUE_MAX_CHAR	240
 	int		ret;
@@ -58,8 +60,15 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
+			break;
+		case ITEM_VALUE_TYPE_JSON:
+			/* Although JSON to string conversion is infallible an ill-formed JSON */
+			/* will cause problems later. Therefore JSON validation is here.       */
+			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_STR)))
+			{
+				ret = zbx_json_validate_ext(value->data.str, errmsg);
+			}
 			break;
 		case ITEM_VALUE_TYPE_NONE:
 		default:

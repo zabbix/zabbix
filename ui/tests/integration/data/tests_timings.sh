@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4556
+  [Integration]=4561
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
@@ -50,7 +50,8 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContextRegex]=21
   [testTriggerState]=21
   [testGoAgentDataCollection]=20
-  [testUserMacrosInItemNames]=18
+  [testUserMacrosInItemNames]=20
+  [testConnectorExport]=18
   [testBrowserMonitoring]=17
   [testAutoregistrationHostMetaDataItem]=16
   [testAutoregistrationProxyGroup]=20
@@ -62,5 +63,6 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
+  [testScheduledReports]=5
   [testFunctions]=3
 )

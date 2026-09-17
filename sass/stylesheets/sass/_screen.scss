@@ -2270,7 +2270,7 @@ svg {
 
 	.preprocessing-list-item {
 		.step-parameters {
-			align-items: baseline;
+			align-items: end;
 			line-height: 22px;
 		}
 	}
@@ -2956,6 +2956,11 @@ z-select {
 }
 
 // Users permissions tab.
+.rules-status-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
+}
+
 .rules-status-container {
 	.status-green,
 	.status-grey {
