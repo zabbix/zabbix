@@ -3014,10 +3014,13 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	zbx_vector_var_t		*result = NULL;
 	zbx_jsonpath_t			jsonpath_tmp;
 	zbx_timespec_t			ts_end = *ts;
+	zbx_vector_str_t		matches;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_history_record_vector_create(&values);
+
+	zbx_vector_str_create(&matches);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type
 			&& ITEM_VALUE_TYPE_LOG != item->value_type)
@@ -3087,7 +3090,6 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	{
 		const char	*json_str;
 		zbx_jsonobj_t	obj;
-		char		*matches = NULL;
 
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			json_str = values.values[i].value.log->value;
@@ -3100,15 +3102,17 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 			continue;
 		}
 
-		if (FAIL != zbx_jsonobj_query(&obj, pattern, &matches))
+		if (FAIL != zbx_jsonobj_query_vector_str(&obj, pattern, &matches))
 		{
-			if (NULL != matches)
+			for (int j = 0; j < matches.values_num; j++)
 			{
 				zbx_variant_t	elem;
 
-				zbx_variant_set_str(&elem, matches);
+				zbx_variant_set_str(&elem, matches.values[j]);
 				zbx_vector_var_append(result, elem);
 			}
+
+			zbx_vector_str_clear(&matches);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "jsonpath query failed: %s", zbx_json_strerror());
@@ -3122,6 +3126,8 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_vector_str_clear_ext(&matches, zbx_str_free);
+	zbx_vector_str_destroy(&matches);
 	zbx_free(pattern);
 
 	if (NULL != result)
