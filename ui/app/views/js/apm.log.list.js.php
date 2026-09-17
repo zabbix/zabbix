@@ -112,16 +112,18 @@
 				to: filter_options.timeselector.to
 			};
 
-			$('#filter-resource-attributes')
-				.dynamicRows({template: '#filter-resource-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
+			for (const type of ['log', 'resource', 'scope']) {
+				$(`#filter-${type}-attributes`)
+					.dynamicRows({template: `#filter-${type}-attributes-row-tmpl`})
+					.on('afteradd.dynamicRows', function () {
+						const rows = this.querySelectorAll('.form_row');
+						new CApmAttrFilterItem(rows[rows.length - 1]);
+					});
 
-			document.querySelectorAll(`#filter-resource-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
+				document.querySelectorAll(`#filter-${type}-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
+					new CApmAttrFilterItem(row);
+				});
+			}
 		}
 
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,

@@ -26,6 +26,17 @@ class CControllerApmLogList extends CController {
 	}
 
 	public static function getValidationRules(): array {
+		$filter_attributes_evaltype = ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]];
+		$filter_attributes = ['objects', 'fields' => [
+			'key' => ['string', 'required'],
+			'operator' => ['integer', 'required',
+				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+				]
+			],
+			'value' => ['string', 'required']
+		]];
+
 		return ['object', 'fields' => [
 			'filter_body' => ['string'],
 			'filter_traceid' => ['string'],
@@ -37,18 +48,12 @@ class CControllerApmLogList extends CController {
 					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
-			'filter_resource_attributes_evaltype' => ['integer',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
-			],
-			'filter_resource_attributes' => ['objects', 'fields' => [
-				'key' => ['string', 'required'],
-				'operator' => ['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
-					]
-				],
-				'value' => ['string', 'required']
-			]],
+			'filter_log_attributes_evaltype' => $filter_attributes_evaltype,
+			'filter_log_attributes' => $filter_attributes,
+			'filter_resource_attributes_evaltype' => $filter_attributes_evaltype,
+			'filter_resource_attributes' => $filter_attributes,
+			'filter_scope_attributes_evaltype' => $filter_attributes_evaltype,
+			'filter_scope_attributes' => $filter_attributes,
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'sort' => ['string', 'in' => ['timestamp']],
@@ -93,16 +98,6 @@ class CControllerApmLogList extends CController {
 		];
 		updateTimeSelectorPeriod($timeselector_options);
 
-		$filter_resource_attributes = [];
-
-		foreach (CProfile::getArray('web.apm.log.filter_resource_attributes.key', []) as $i => $key) {
-			$filter_resource_attributes[] = [
-				'key' => $key,
-				'value' => CProfile::get('web.apm.log.filter_resource_attributes.value', null, $i),
-				'operator' => CProfile::get('web.apm.log.filter_resource_attributes.operator', null, $i)
-			];
-		}
-
 		$filter = [
 			'body' => CProfile::get('web.apm.log.filter_body', ''),
 			'traceid' => CProfile::get('web.apm.log.filter_traceid', ''),
@@ -110,11 +105,23 @@ class CControllerApmLogList extends CController {
 			'service_name' => CProfile::get('web.apm.log.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.log.filter_scope_name', ''),
 			'severities' =>	CProfile::getArray('web.apm.log.filter_severities', []),
-			'resource_attributes_evaltype' => CProfile::get('web.apm.log.filter_resource_attributes_evaltype',
-				CONDITION_EVAL_TYPE_AND_OR
-			),
-			'resource_attributes' => $filter_resource_attributes
 		];
+
+		foreach (['log', 'resource', 'scope'] as $type) {
+			$filter[$type.'_attributes_evaltype'] = CProfile::get('web.apm.log.filter_log_attributes_evaltype',
+				CONDITION_EVAL_TYPE_AND_OR
+			);
+
+			$filter[$type.'_attributes'] = [];
+
+			foreach (CProfile::getArray('web.apm.log.filter_'.$type.'_attributes.key', []) as $i => $key) {
+				$filter[$type.'_attributes'][] = [
+					'key' => $key,
+					'value' => CProfile::get('web.apm.log.filter_'.$type.'_attributes.value', null, $i),
+					'operator' => CProfile::get('web.apm.log.filter_'.$type.'_attributes.operator', null, $i)
+				];
+			}
+		}
 
 		$data = [
 			'action' => $this->getAction(),
@@ -134,7 +141,8 @@ class CControllerApmLogList extends CController {
 			'storage_idx' => $storage_idx,
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
-				CProfile::getArray($storage_idx, []))
+				CProfile::getArray($storage_idx, [])
+			)
 		];
 
 		$response = new CControllerResponseData($data);
@@ -143,14 +151,6 @@ class CControllerApmLogList extends CController {
 	}
 
 	private function updateProfiles(): void {
-		$filter_resource_attributes = [];
-
-		foreach ($this->getInput('filter_resource_attributes', []) as $attribute) {
-			if ($attribute['key'] !== '') {
-				$filter_resource_attributes[] = $attribute;
-			}
-		}
-
 		CProfile::update('web.apm.log.filter_body', $this->getInput('filter_body', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.log.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.log.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
@@ -161,22 +161,34 @@ class CControllerApmLogList extends CController {
 		CProfile::updateArray('web.apm.log.filter_severities', $this->getInput('filter_severities', []),
 			PROFILE_TYPE_INT
 		);
-		CProfile::update('web.apm.log.filter_resource_attributes_evaltype',
-			$this->getInput('filter_resource_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR),
-			PROFILE_TYPE_INT
-		);
-		CProfile::updateArray('web.apm.log.filter_resource_attributes.key',
-			array_column($filter_resource_attributes, 'key'),
-			PROFILE_TYPE_STR
-		);
-		CProfile::updateArray('web.apm.log.filter_resource_attributes.value',
-			array_column($filter_resource_attributes, 'value'),
-			PROFILE_TYPE_STR
-		);
-		CProfile::updateArray('web.apm.log.filter_resource_attributes.operator',
-			array_column($filter_resource_attributes, 'operator'),
-			PROFILE_TYPE_INT
-		);
+
+		foreach (['log', 'resource', 'scope'] as $type) {
+			CProfile::update('web.apm.log.filter_'.$type.'_attributes_evaltype',
+				$this->getInput('filter_'.$type.'_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR),
+				PROFILE_TYPE_INT
+			);
+
+			$filter_attributes = [];
+
+			foreach ($this->getInput('filter_'.$type.'_attributes', []) as $attribute) {
+				if ($attribute['key'] !== '') {
+					$filter_attributes[] = $attribute;
+				}
+			}
+
+			CProfile::updateArray('web.apm.log.filter_'.$type.'_attributes.key',
+				array_column($filter_attributes, 'key'),
+				PROFILE_TYPE_STR
+			);
+			CProfile::updateArray('web.apm.log.filter_'.$type.'_attributes.value',
+				array_column($filter_attributes, 'value'),
+				PROFILE_TYPE_STR
+			);
+			CProfile::updateArray('web.apm.log.filter_'.$type.'_attributes.operator',
+				array_column($filter_attributes, 'operator'),
+				PROFILE_TYPE_INT
+			);
+		}
 	}
 
 	private function deleteProfiles(): void {
@@ -186,9 +198,12 @@ class CControllerApmLogList extends CController {
 		CProfile::delete('web.apm.log.filter_service_name');
 		CProfile::delete('web.apm.log.filter_scope_name');
 		CProfile::deleteIdx('web.apm.log.filter_severities');
-		CProfile::delete('web.apm.log.filter_resource_attributes_evaltype');
-		CProfile::deleteIdx('web.apm.log.filter_resource_attributes.key');
-		CProfile::deleteIdx('web.apm.log.filter_resource_attributes.value');
-		CProfile::deleteIdx('web.apm.log.filter_resource_attributes.operator');
+
+		foreach (['log', 'resource', 'scope'] as $type) {
+			CProfile::delete('web.apm.log.filter_'.$type.'_attributes_evaltype');
+			CProfile::deleteIdx('web.apm.log.filter_'.$type.'_attributes.key');
+			CProfile::deleteIdx('web.apm.log.filter_'.$type.'_attributes.value');
+			CProfile::deleteIdx('web.apm.log.filter_'.$type.'_attributes.operator');
+		}
 	}
 }

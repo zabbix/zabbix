@@ -54,6 +54,17 @@ class CControllerApmLogListData extends CControllerDataTable {
 	}
 
 	protected static function getFilterValidationRules(): array {
+		$filter_attributes_evaltype = ['integer', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]];
+		$filter_attributes = ['objects', 'required', 'fields' => [
+			'key' => ['string', 'required'],
+			'operator' => ['integer', 'required',
+				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+				]
+			],
+			'value' => ['string', 'required']
+		]];
+
 		return ['object', 'fields' => [
 			'body' => ['string', 'required'],
 			'traceid' => ['string', 'required'],
@@ -65,18 +76,12 @@ class CControllerApmLogListData extends CControllerDataTable {
 					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
-			'resource_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
-			],
-			'resource_attributes' => ['objects', 'required', 'fields' => [
-				'key' => ['string', 'required'],
-				'operator' => ['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
-					]
-				],
-				'value' => ['string', 'required']
-			]],
+			'log_attributes_evaltype' => $filter_attributes_evaltype,
+			'log_attributes' => $filter_attributes,
+			'resource_attributes_evaltype' => $filter_attributes_evaltype,
+			'resource_attributes' => $filter_attributes,
+			'scope_attributes_evaltype' => $filter_attributes_evaltype,
+			'scope_attributes' => $filter_attributes,
 			'from' => ['string', 'required', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'required', 'use' => [CRangeTimeValidator::class]]
 		]];
@@ -115,10 +120,6 @@ class CControllerApmLogListData extends CControllerDataTable {
 			}
 		}
 
-		$resource_attributes = array_filter($this->filter['resource_attributes'],
-			static fn (array $attribute) => $attribute['key'] !== ''
-		);
-
 		$output = [
 			'data_fields' => $data_fields
 		];
@@ -127,8 +128,18 @@ class CControllerApmLogListData extends CControllerDataTable {
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
 			'severity_numbers' => $severity_numbers,
+			'log_attributes_evaltype' => $this->filter['log_attributes_evaltype'],
+			'log_attributes' => array_filter($this->filter['log_attributes'],
+				static fn (array $attribute) => $attribute['key'] !== ''
+			),
 			'resource_attributes_evaltype' => $this->filter['resource_attributes_evaltype'],
-			'resource_attributes' => $resource_attributes,
+			'resource_attributes' => array_filter($this->filter['resource_attributes'],
+				static fn (array $attribute) => $attribute['key'] !== ''
+			),
+			'scope_attributes_evaltype' => $this->filter['scope_attributes_evaltype'],
+			'scope_attributes' => array_filter($this->filter['scope_attributes'],
+				static fn (array $attribute) => $attribute['key'] !== ''
+			),
 			'filter' => [
 				'traceid' => $this->filter['traceid'] !== '' ? $this->filter['traceid'] : null,
 				'spanid' => $this->filter['spanid'] !== '' ? $this->filter['spanid'] : null

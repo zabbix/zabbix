@@ -94,6 +94,20 @@ $filter = (new CFilter())
 				)
 			])
 			->addItem([
+				(new CLabel(_('Log attributes'), 'filter_log_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['log_attributes_evaltype'],
+						'attributes' => $data['filter']['log_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						]
+					], [
+						'evaltype_field_name' => 'filter_log_attributes_evaltype',
+						'attribute_field_name' => 'filter_log_attributes'
+					])->setId('filter-log-attributes')
+				)
+			])
+			->addItem([
 				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
@@ -105,6 +119,20 @@ $filter = (new CFilter())
 						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
 						'attribute_field_name' => 'filter_resource_attributes'
 					])->setId('filter-resource-attributes')
+				)
+			])
+			->addItem([
+				(new CLabel(_('Scope attributes'), 'filter_scope_attributes')),
+				new CFormField(
+					CApmAttrFilterFieldHelper::getFilterField([
+						'evaltype' => $data['filter']['scope_attributes_evaltype'],
+						'attributes' => $data['filter']['scope_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						]
+					], [
+						'evaltype_field_name' => 'filter_scope_attributes_evaltype',
+						'attribute_field_name' => 'filter_scope_attributes'
+					])->setId('filter-scope-attributes')
 				)
 			])
 	]);
@@ -131,17 +159,19 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-resource-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
-		], [
-			'attribute_field_name' => 'filter_resource_attributes'
-		])
-	)
-	->show();
+foreach (['log', 'resource', 'scope'] as $type) {
+	(new CTemplateTag('filter-'.$type.'-attributes-row-tmpl'))
+		->addItem(
+			CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
+				'key' => '#{key}',
+				'value' => '#{value}',
+				'operator' => CONDITION_OPERATOR_LIKE
+			], [
+				'attribute_field_name' => 'filter_'.$type.'_attributes'
+			])
+		)
+		->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([
