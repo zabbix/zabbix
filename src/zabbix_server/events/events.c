@@ -29,7 +29,6 @@
 #include "zbxjson.h"
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
-#include "zbx_expression_constants.h"
 #include "zbx_cep_client.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
