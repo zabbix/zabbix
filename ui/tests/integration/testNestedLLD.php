@@ -374,8 +374,8 @@ class testNestedLLD extends CIntegrationTest{
 				'details' => [
 					'version' => 3,
 					'bulk' => 1,
-					'retries' => 5,
 					'max_repetitions' => 10,
+					'retries' => 5,
 					'securityname' => 'zabbix',
 					'securitylevel' => 0,
 					'authprotocol' => 0,

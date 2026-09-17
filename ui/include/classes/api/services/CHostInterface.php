@@ -406,8 +406,8 @@ class CHostInterface extends CApiService {
 	protected function sanitizeSnmpFields(array $interfaces): array {
 		$default_fields = [
 			'community' => '',
-			'retries' => DB::getDefault('interface_snmp', 'retries'),
 			'max_repetitions' =>  DB::getDefault('interface_snmp', 'max_repetitions'),
+			'retries' => DB::getDefault('interface_snmp', 'retries'),
 			'securityname' => '',
 			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
 			'authpassphrase' => '',
