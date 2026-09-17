@@ -1329,6 +1329,86 @@ out:
 	return ret;
 }
 
+static int	DBpatch_7050095(void)
+{
+	const zbx_db_field_t	field =
+			{"default_maintenance_period", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_trigger", "maintenance_triggerid", 0,
+				{
+					{"maintenance_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050097(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_1", "maintenanceid,triggerid", 1);
+}
+
+static int	DBpatch_7050098(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_2", "triggerid", 0);
+}
+
+static int	DBpatch_7050099(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 1, &field);
+}
+
+static int	DBpatch_7050100(void)
+{
+	const zbx_db_field_t	field =
+			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 2, &field);
+}
+
+static int	DBpatch_7050101(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_eventname", "maintenance_eventnameid", 0,
+				{
+					{"maintenance_eventnameid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050102(void)
+{
+	return DBcreate_index("maintenance_eventname", "maintenance_eventname_1", "maintenanceid", 0);
+}
+
+static int	DBpatch_7050103(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_eventname", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1430,5 +1510,14 @@ DBPATCH_ADD(7050091, 0, 1)
 DBPATCH_ADD(7050092, 0, 1)
 DBPATCH_ADD(7050093, 0, 1)
 DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
+DBPATCH_ADD(7050097, 0, 1)
+DBPATCH_ADD(7050098, 0, 1)
+DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
+DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
 
 DBPATCH_END()

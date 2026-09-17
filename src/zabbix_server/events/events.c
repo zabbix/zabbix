@@ -2189,6 +2189,8 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 		query->eventid = event->eventid;
+		query->triggerid = event->trigger.triggerid;
+		query->event_name = zbx_strdup(NULL, event->name);
 
 		zbx_vector_uint64_create(&query->hostids);
 		zbx_vector_uint64_create(&query->functionids);

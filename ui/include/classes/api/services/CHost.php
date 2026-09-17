@@ -1308,8 +1308,8 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Check that no maintenance object will be left without hosts and host groups as the result of the given hosts
-	 * deletion.
+	 * Check that no maintenance object will be left without host groups, hosts and triggers as the result of the
+	 * given hosts deletion.
 	 *
 	 * @param array $hostids
 	 *
@@ -1317,7 +1317,7 @@ class CHost extends CHostGeneral {
 	 */
 	private static function checkMaintenances(array $hostids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT DISTINCT mh.maintenanceid,m.name'.
+			'SELECT mh.maintenanceid,m.name'.
 			' FROM maintenances_hosts mh'.
 			' JOIN maintenances m ON mh.maintenanceid=m.maintenanceid'.
 			' WHERE '.dbConditionId('mh.hostid', $hostids).
@@ -1331,20 +1331,26 @@ class CHost extends CHostGeneral {
 					'SELECT NULL'.
 					' FROM maintenances_groups mg'.
 					' WHERE mh.maintenanceid=mg.maintenanceid'.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenance_trigger mt'.
+					' WHERE mh.maintenanceid=mt.maintenanceid'.
 				')'
-		, 1));
+			, 1));
 
 		if ($maintenance) {
 			$maintenance_hosts = DBfetchColumn(DBselect(
 				'SELECT h.host'.
 				' FROM maintenances_hosts mh,hosts h'.
 				' WHERE mh.hostid=h.hostid'.
-					' AND '.dbConditionId('mh.maintenanceid', [$maintenance['maintenanceid']])
+				' 	AND '.dbConditionId('mh.maintenanceid', [$maintenance['maintenanceid']])
 			), 'host');
+			natsort($maintenance_hosts);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-				'Cannot delete host %1$s because maintenance "%2$s" must contain at least one host or host group.',
-				'Cannot delete hosts %1$s because maintenance "%2$s" must contain at least one host or host group.',
+				'Cannot delete host %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
+				'Cannot delete hosts %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
 				'"'.implode('", "', $maintenance_hosts).'"', $maintenance['name'], count($maintenance_hosts)
 			));
 		}
