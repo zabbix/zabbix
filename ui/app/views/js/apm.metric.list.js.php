@@ -175,6 +175,7 @@
 						.setWidth('auto'),
 					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
 						.setFields(['value'])
+						.setRenderer('value')
 						.setWidth('auto'),
 					new CDataTableColumn('count', <?= json_encode(_('Count')); ?>)
 						.setFields(['count'])
@@ -240,6 +241,20 @@
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
 					wordbreak.textContent = content;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('value', ({row_index, cell}) => {
+					const data = this.#rows_data.get(row_index);
+					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
+						? data.sum
+						: data.value;
+
+					/** @type {HTMLDivElement} */
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
+					wordbreak.style.setProperty('--line-clamp', '2');
+					wordbreak.textContent = value;
 
 					cell.appendChild(wordbreak);
 				})
@@ -436,98 +451,213 @@
 			}
 		}
 
+		#prepareHistogramItems(explicit_bounds, bucket_counts) {
+			const buckets = [];
+
+			for (let i = 0; i < bucket_counts.length; i++) {
+				let name;
+
+				if (i === 0) {
+					name = `≤ ${explicit_bounds[0]}`;
+				} else if (i < explicit_bounds.length) {
+					name = `> ${explicit_bounds[i - 1]} – ${explicit_bounds[i]}`;
+				} else {
+					name = `> ${explicit_bounds[explicit_bounds.length - 1]}`;
+				}
+
+				buckets.push({
+					name,
+					value: bucket_counts[i],
+				});
+			}
+
+			return buckets;
+		}
+
+		#prepareExponentialHistogramItems({scale, positive_offset, positive_bucket_counts, negative_offset,
+				negative_bucket_counts, zero_count}) {
+			const buckets = [];
+
+			const scale_factor = 2 ** scale;
+
+			for (let i = 0; i < negative_bucket_counts.length; i++) {
+				const index = negative_offset + i;
+
+				const lower = 2 ** (index / scale_factor);
+				const upper = 2 ** ((index + 1) / scale_factor);
+
+				buckets.push({
+					name: `${i === 0 ? '>=' : '>'} ${(-upper).toFixed(4)} - ${(-lower).toFixed(4)}`,
+					value: negative_bucket_counts[i],
+				});
+			}
+
+			if (zero_count > 0) {
+				buckets.push({
+					name: '0',
+					value: zero_count
+				});
+			}
+
+			for (let i = 0; i < positive_bucket_counts.length; i++) {
+				const index = positive_offset + i;
+
+				const lower = 2 ** (index / scale_factor);
+				const upper = 2 ** ((index + 1) / scale_factor);
+
+				buckets.push({
+					name:	`${i === 0 ? '>=' : '>'} ${(lower).toFixed(4)} - ${(upper).toFixed(4)}`,
+					value: positive_bucket_counts[i],
+				});
+			}
+
+			return buckets;
+		}
+
 		#prepareDetailsData(data) {
+			const type = data.type;
+
+			const aggregation_temporality_labels = {
+				[APM_METRIC_AGGREGATION_TEMPORALITY_UNSPECIFIED]: <?= json_encode(_('Unspecified')) ?>,
+				[APM_METRIC_AGGREGATION_TEMPORALITY_DELTA]: <?= json_encode(_('Delta')) ?>,
+				[APM_METRIC_AGGREGATION_TEMPORALITY_CUMULATIVE]: <?= json_encode(_('Cumulative')) ?>
+			};
+
+			const flags_labels = {
+				[APM_METRIC_FLAG_NONE]: <?= json_encode(_('None')) ?>,
+				[APM_METRIC_FLAG_NO_RECODED_VALUE]: <?= json_encode(_('No recoded value')) ?>,
+			};
+
+			const common_metric_items = [
+				{
+					name: <?= json_encode(_('Resource schema url')) ?>,
+					value: data.resource_schema_url
+				},
+				{
+					name: <?= json_encode(_('Metric description')) ?>,
+					value: data.metric_description
+				},
+				{
+					name: <?= json_encode(_('Time')) ?>,
+					value: data.time_unix
+				},
+				{
+					name: <?= json_encode(_('Flags')) ?>,
+					value: data.flags & 1 !== 0
+						? flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
+						: flags_labels[APM_METRIC_FLAG_NONE]
+				}
+			];
+
+			let metric_items = [];
+
+			switch (type) {
+				case APM_METRIC_TYPE_SUM: {
+					metric_items = [
+						{
+							name: <?= json_encode(_('Value')) ?>,
+							value: data.value
+						},
+						{
+							name: <?= json_encode(_('Aggregation temporality')) ?>,
+							value: aggregation_temporality_labels[data.aggregation_temporality]
+						},
+						{
+							name: <?= json_encode(_('Monotonic')) ?>,
+							value: data.is_monotonic ? 'true' : 'false'
+						},
+						...common_metric_items
+					];
+
+					break;
+				}
+				case APM_METRIC_TYPE_GAUGE: {
+					metric_items = [
+						{
+							name: <?= json_encode(_('Value')) ?>,
+							value: data.value
+						},
+						...common_metric_items
+					];
+					break;
+				}
+				case APM_METRIC_TYPE_HISTOGRAM:
+				case APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM: {
+					metric_items = [
+						{
+							name: <?= json_encode(_('Sum')) ?>,
+							value: data.sum
+						},
+						{
+							name: <?= json_encode(_('Aggregation temporality')) ?>,
+							value: aggregation_temporality_labels[data.aggregation_temporality]
+						},
+						{
+							name: <?= json_encode(_('Count')) ?>,
+							value: data.count
+						},
+						{
+							name: <?= json_encode(_('Min')) ?>,
+							value: data.min
+						},
+						{
+							name: <?= json_encode(_('Max')) ?>,
+							value: data.max
+						},
+						...common_metric_items
+					];
+					break;
+				}
+			}
+
+			const groups = [
+				{
+					title: <?= json_encode(_('Basic information')) ?>,
+					items: [
+						{
+							name: <?= json_encode(_('Metric name')) ?>,
+							value: data.metric_name
+						},
+						{
+							name: <?= json_encode(_('Type')) ?>,
+							value: this.#metric_types[type].label
+						},
+						{
+							name: <?= json_encode(_('Unit')) ?>,
+							value: data.metric_unit
+						},
+						{
+							name: <?= json_encode(_('Service name')) ?>,
+							value: data.service_name
+						},
+						{
+							name: <?= json_encode(_('Start time')) ?>,
+							value: data.start_time_unix
+						}
+					]
+				}
+			];
+
+			if (data.type === APM_METRIC_TYPE_HISTOGRAM) {
+				groups.push({
+					title: <?= json_encode(_('Histogram')) ?>,
+					items: this.#prepareHistogramItems(data.explicit_bounds, data.bucket_counts)
+				});
+			}
+			else if (data.type === APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM) {
+				groups.push({
+					title: <?= json_encode(_('Exponential histogram')) ?>,
+					items: this.#prepareExponentialHistogramItems(data)
+				});
+			}
+
 			const details = {
 				title: data.metric_name,
 				groups: [
+					...groups,
 					{
-						title: <?= json_encode(_('Basic information')) ?>,
-						items: [
-							{
-								name: <?= json_encode(_('Metric name')) ?>,
-								value: data.metric_name
-							},
-							{
-								name: <?= json_encode(_('Type')) ?>,
-								value: this.#metric_types[data.type].label
-							},
-							{
-								name: <?= json_encode(_('Unit')) ?>,
-								value: data.metric_unit
-							},
-							{
-								name: <?= json_encode(_('Service name')) ?>,
-								value: data.service_name
-							},
-							{
-								name: <?= json_encode(_('Start time')) ?>,
-								value: data.start_time_unix
-							},
-							{
-								name: <?= json_encode(_('Sum/Value')) ?>,
-								value: data.value ?? data.sum
-							},
-							{
-								name: <?= json_encode(_('Min')) ?>,
-								value: data.min
-							},
-							{
-								name: <?= json_encode(_('Max')) ?>,
-								value: data.max
-							},
-							{
-								name: <?= json_encode(_('Count')) ?>,
-								value: data.count
-							},
-							{
-								name: <?= json_encode(_('Zero count')) ?>,
-								value: data.zero_count
-							},
-							{
-								name: <?= json_encode(_('Scale')) ?>,
-								value: data.scale
-							},
-							{
-								name: <?= json_encode(_('Metric description')) ?>,
-								value: data.metric_description
-							},
-							{
-								name: <?= json_encode(_('Time')) ?>,
-								value: data.time_unix
-							},
-							{
-								name: <?= json_encode(_('Resource schema url')) ?>,
-								value: data.resource_schema_url
-							},
-							{
-								name: <?= json_encode(_('Bucket counts')) ?>,
-								value: data.bucket_counts
-							},
-							{
-								name: <?= json_encode(_('Positive offset')) ?>,
-								value: data.positive_offset
-							},
-							{
-								name: <?= json_encode(_('Positive bucket counts')) ?>,
-								value: data.positive_bucket_counts
-							},
-							{
-								name: <?= json_encode(_('Negative offset')) ?>,
-								value: data.negative_offset
-							},
-							{
-								name: <?= json_encode(_('Negative bucket counts')) ?>,
-								value: data.negative_bucket_counts
-							},
-							{
-								name: <?= json_encode(_('Aggregation temporality')) ?>,
-								value: data.aggregation_temporality
-							},
-							{
-								name: <?= json_encode(_('Monotonic')) ?>,
-								value: data.is_monotonic ? 'true' : 'false'
-							}
-						]
+						title: <?= json_encode(_('Metric information')) ?>,
+						items: metric_items
 					},
 					{
 						title: <?= json_encode(_('Attributes')) ?>,
@@ -565,7 +695,7 @@
 						]
 					}
 				]
-			}
+			};
 
 			return details;
 		}
