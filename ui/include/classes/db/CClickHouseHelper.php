@@ -294,7 +294,10 @@ final class CClickHouseHelper {
 		}
 
 		if ($where) {
-			$query->where(implode($eval_type === CONDITION_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where));
+			$where_sql = implode($eval_type === CONDITION_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where);
+			$where_sql = count($where) > 1 ? '('.$where_sql.')' : $where_sql;
+
+			$query->where($where_sql);
 		}
 	}
 }
