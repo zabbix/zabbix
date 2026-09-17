@@ -15,8 +15,6 @@
 #include "browser_error.h"
 
 #include "duktape.h"
-#include "duk_config.h"
-#include "webdriver.h"
 
 #ifdef HAVE_LIBCURL
 

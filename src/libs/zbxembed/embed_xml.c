@@ -13,7 +13,7 @@
 **/
 
 #include "embed_xml.h"
-#include "duktape.h"
+
 #include "zbxvariant.h"
 #include "embed.h"
 #include "zbxxml.h"
