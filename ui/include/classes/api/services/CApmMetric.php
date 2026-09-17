@@ -252,11 +252,12 @@ class CApmMetric extends CApmGeneral {
 			}
 
 			if (!$options['countOutput']) {
-				// Type inclusion is mandatory for sorting capability.
-				$sub_query->select($type, 'Type');
+				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']));
 
-				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
+				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $select_fields) as $field) {
 					if ($field === 'Type') {
+						$sub_query->select($type, 'Type');
+
 						continue;
 					}
 
