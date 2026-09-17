@@ -198,7 +198,7 @@ class CApmMetric extends CApmGeneral {
 	private function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
-		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
 		if ($options['types'] !== null && !$options['types']) {
 			return $options['countOutput'] ? '0' : [];
@@ -316,7 +316,7 @@ class CApmMetric extends CApmGeneral {
 				return (string) $row['rowscount'];
 			}
 
-			$db_metrics[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
+			$db_metrics[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
 		}
 
 		return $db_metrics;

@@ -19,7 +19,7 @@
  */
 class CApmGeneral extends CApiService {
 
-	protected static function fixOptionsForClickHouse(array $options, array $output_fields): array {
+	protected static function translateOptionsForClickHouse(array $options, array $output_fields): array {
 		$output = [];
 
 		foreach ($options['output'] as $field) {
@@ -58,7 +58,7 @@ class CApmGeneral extends CApiService {
 		return $options;
 	}
 
-	protected static function fixRowForClickHouse(array $db_row, array $fields_spec): array {
+	protected static function translateRowForClickHouse(array $db_row, array $fields_spec): array {
 		$row = [];
 
 		foreach ($db_row as $field => $value) {
