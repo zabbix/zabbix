@@ -100,12 +100,12 @@ class CApmSpan extends CApmGeneral {
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'parent_spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['trace_state', 'span_name', 'service_name', 'scope_name', 'scope_version', 'status_message']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],

@@ -168,12 +168,12 @@ class CApmMetric extends CApmGeneral {
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'start_time_unix', 'time_unix']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
