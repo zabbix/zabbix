@@ -29,7 +29,7 @@ final class CClickHouseHelper {
 			'searchWildcardsEnabled' => false,
 			'sortfield' => null,
 			'sortorder' => null,
-			'limit' => null,
+			'limit' => null
 		], $options);
 
 		$query = (new CClickHouseQuery())

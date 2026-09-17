@@ -39,7 +39,7 @@ class CConfigFile {
 		ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
 	];
 
-	public const SUPPORTED_TELEMETRY_SOURCE = ['clickhouse', /* 'zabbix' */];
+	public const SUPPORTED_TELEMETRY_SOURCE = ['clickhouse' /* 'zabbix' */];
 
 	private static $supported_db_types = [
 		ZBX_DB_MYSQL => true,
