@@ -1331,33 +1331,42 @@ out:
 
 static int	DBpatch_7050095(void)
 {
-	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"query", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_7050096(void)
 {
-	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("items", &field);
+#ifdef HAVE_MYSQL
+	if (ZBX_DB_OK > zbx_db_execute("update items set query='{}'"))
+		return FAIL;
+#endif
+	return SUCCEED;
 }
 
 static int	DBpatch_7050097(void)
 {
-	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_7050098(void)
 {
-	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_7050099(void)
+{
+	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050100(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
@@ -1368,14 +1377,14 @@ static int	DBpatch_7050099(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050101(void)
 {
 	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050102(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update proxy set timeout_telemetry_query='3s' where custom_timeouts=1"))
 		return FAIL;
@@ -1383,7 +1392,7 @@ static int	DBpatch_7050101(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050103(void)
 {
 	const zbx_db_field_t	field = {"storage_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -1499,5 +1508,6 @@ DBPATCH_ADD(7050099, 0, 1)
 DBPATCH_ADD(7050100, 0, 1)
 DBPATCH_ADD(7050101, 0, 1)
 DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
 
 DBPATCH_END()

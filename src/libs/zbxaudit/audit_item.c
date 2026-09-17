@@ -1546,13 +1546,13 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 
 	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
 
-	if ('\0' == *val_old)
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val_old, 0))
 	{
 		zbx_audit_item_update_json_add_query(audit_context_mode, itemid, flags, val_new);
 		return;
 	}
 
-	if ('\0' == *val_new)
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val_new, 0))
 	{
 		zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prop);
 		return;
