@@ -114,9 +114,9 @@ const view = new class {
 		}
 	}
 
-	#getAllValues(raw_fields = []) {
+	#getAllValues(untrimmed_fields = []) {
 		/** @type {Object<string, any>} */
-		let values = this.#form.getAllValues(raw_fields);
+		let values = this.#form.getAllValues(untrimmed_fields);
 
 		for (const field of ['status', 'ssl_verify_peer', 'ssl_verify_host']) {
 			if (field in values) {
