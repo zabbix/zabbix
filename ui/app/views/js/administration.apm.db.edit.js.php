@@ -164,9 +164,6 @@ const view = new class {
 
 		this.#updateDisplayState([...ssl_verify_host_fields], show_ssl_verify_peer_fields, true);
 
-		const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
-			&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
-
 		if (initial_values.status === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED && this.#url_changed && show_ssl_fields) {
 			const ssl_verify_peer = this.#form.findFieldByName('ssl_verify_peer')?.getField();
 
@@ -184,6 +181,8 @@ const view = new class {
 			}
 		}
 
+		const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
+			&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
 		const show_change_password_btn = configured_authtype_password && !this.#url_changed && !this.#password_changed;
 
 		this.#updateDisabledState([this.#password_input], show_change_password_btn);
