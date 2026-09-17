@@ -168,7 +168,7 @@ class CForm {
 		return Object.values(all_fields).filter(x => !Object.values(sub_fields).includes(x));
 	}
 
-	getAllValues(raw_fields = []) {
+	getAllValues(untrimmed_fields = []) {
 		let result = Object.create(null);
 		let simple_fields = Object.create(null);
 
@@ -185,7 +185,7 @@ class CForm {
 				}
 			}
 			else {
-				simple_fields[key] = raw_fields?.includes(field.getName()) ? field.getValue() : field.getValueTrimmed();
+				simple_fields[key] = untrimmed_fields.includes(field.getName()) ? field.getValue() : field.getValueTrimmed();
 			}
 		}
 
