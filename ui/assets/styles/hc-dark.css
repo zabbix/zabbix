@@ -9262,7 +9262,7 @@ svg {
     .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
   .preprocessing-list .preprocessing-list-item .step-parameters {
-    align-items: baseline;
+    align-items: end;
     line-height: 22px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
@@ -9653,6 +9653,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   align-items: center; }
   .multiselect-description-container > .multiselect-control {
     margin-right: 5px; }
+
+.rules-status-title {
+  margin-bottom: 3px;
+  color: #cacaca; }
 
 .rules-status-container .status-green,
 .rules-status-container .status-grey {

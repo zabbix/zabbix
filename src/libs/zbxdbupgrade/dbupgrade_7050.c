@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 /*
  * 8.0 development database patches
@@ -1283,13 +1284,60 @@ static int	DBpatch_7050093(void)
 
 static int	DBpatch_7050094(void)
 {
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" where rr.name='api.mode' and rr.value_int=1"
+				" and not exists ("
+					"select null"
+					" from role_rule rr2"
+					" where rr2.roleid=rr.roleid"
+						" and rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
+	{
+#define ZBX_ROLE_RULE_TYPE_STR	1
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
+				"*");
+#undef ZBX_ROLE_RULE_TYPE_STR
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_7050095(void)
+{
 	const zbx_db_field_t	field =
 			{"default_maintenance_period", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("users", &field);
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050096(void)
 {
 	const zbx_db_table_t	table =
 			{"maintenance_trigger", "maintenance_triggerid", 0,
@@ -1305,17 +1353,17 @@ static int	DBpatch_7050095(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050097(void)
 {
 	return DBcreate_index("maintenance_trigger", "maintenance_trigger_1", "maintenanceid,triggerid", 1);
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050098(void)
 {
 	return DBcreate_index("maintenance_trigger", "maintenance_trigger_2", "triggerid", 0);
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050099(void)
 {
 	const zbx_db_field_t	field =
 			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1323,7 +1371,7 @@ static int	DBpatch_7050098(void)
 	return DBadd_foreign_key("maintenance_trigger", 1, &field);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050100(void)
 {
 	const zbx_db_field_t	field =
 			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1331,7 +1379,7 @@ static int	DBpatch_7050099(void)
 	return DBadd_foreign_key("maintenance_trigger", 2, &field);
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050101(void)
 {
 	const zbx_db_table_t	table =
 			{"maintenance_eventname", "maintenance_eventnameid", 0,
@@ -1348,12 +1396,12 @@ static int	DBpatch_7050100(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050102(void)
 {
 	return DBcreate_index("maintenance_eventname", "maintenance_eventname_1", "maintenanceid", 0);
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050103(void)
 {
 	const zbx_db_field_t	field =
 			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1470,5 +1518,6 @@ DBPATCH_ADD(7050099, 0, 1)
 DBPATCH_ADD(7050100, 0, 1)
 DBPATCH_ADD(7050101, 0, 1)
 DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
 
 DBPATCH_END()
