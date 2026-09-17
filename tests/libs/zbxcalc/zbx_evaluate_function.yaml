@@ -6048,7 +6048,8 @@ in:
   params: '10m,"$.val"'
 out:
   return: SUCCEED
-  value: ['[123,"asdf",{},[[]],"\""]', '[]', '', '{"a":2}', 'null', '2', 'str']
+  value:
+    strset: ['[123,"asdf",{},[[]],"\""]', '[]', '', '{"a":2}', 'null', '2', 'str']
 ---
 test case: Evaluate jsonpath(5m,"$.val") single history value
 in:
@@ -6063,7 +6064,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
 ---
 test case: Evaluate jsonpath(5m,"$.val") no history values
 in:
@@ -6076,7 +6078,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate jsonpath(5m,"$.val") empty result for every history value
 in:
@@ -6091,7 +6094,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate jsonpath(5m,"$.val") invalid json
 in:
@@ -6108,7 +6112,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
 ---
 test case: Evaluate jsonpath(5m,"$.val") only invalid json
 in:
@@ -6125,7 +6130,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate jsonpath(5m,"invalid jsonpath") invalid jsonpath
 in:
@@ -6154,7 +6160,8 @@ in:
   params: '5m,"$.val.sum()"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate jsonpath(5m,"$.val") log data type
 in:
@@ -6173,7 +6180,8 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
 ---
 test case: Evaluate jsonpath(5m,"$.val") str data type
 in:
@@ -6188,7 +6196,42 @@ in:
   params: '5m,"$.val"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
+---
+test case: Evaluate jsonpath(5m,"$.*") multiple matches, single history value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str","val2":123,"val3":{"a":"b"}}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.*"'
+out:
+  return: SUCCEED
+  value:
+    strset: ['{"a":"b"}', '123', 'str']
+---
+test case: Evaluate jsonpath(5m,"$.*") multiple matches, multiple history values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str","val2":123,"val3":{"a":"b"}}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: '{"val":"","val2":null,"val3":[1,2,3]}'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.*"'
+out:
+  return: SUCCEED
+  value:
+    strset: ['[1,2,3]', 'null', '', '{"a":"b"}', '123', 'str']
 ---
 test case: Evaluate xmlxpath(15m,"/root/val")
 in:
@@ -6222,14 +6265,15 @@ in:
 out:
   return: SUCCEED
   value:
-    - '<val/>'
-    - '<val><item>123</item><item>asdf</item><item/><item><item/></item><item>"</item></val>'
-    - '<val type="array"/>'
-    - '<val/>'
-    - '<val><a>2</a></val>'
-    - '<val type="asdf"/>'
-    - '<val>2</val>'
-    - '<val>str</val>'
+    strset:
+      - '<val/>'
+      - '<val><item>123</item><item>asdf</item><item/><item><item/></item><item>"</item></val>'
+      - '<val type="array"/>'
+      - '<val/>'
+      - '<val><a>2</a></val>'
+      - '<val type="asdf"/>'
+      - '<val>2</val>'
+      - '<val>str</val>'
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") single history value
 in:
@@ -6244,7 +6288,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: ['<val>str</val>']
+  value:
+    strset: ['<val>str</val>']
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") no history values
 in:
@@ -6257,7 +6302,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") empty result for every history value
 in:
@@ -6272,7 +6318,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") invalid xml
 in:
@@ -6289,7 +6336,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: ['<val>str</val>']
+  value:
+    strset: ['<val>str</val>']
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") only invalid xml
 in:
@@ -6306,7 +6354,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate xmlxpath(5m,"invalid xpath") invalid xpath
 in:
@@ -6339,7 +6388,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: ['<val>str</val>']
+  value:
+    strset: ['<val>str</val>']
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") str data type
 in:
@@ -6354,7 +6404,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: ['<val>str</val>']
+  value:
+    strset: ['<val>str</val>']
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") nodeset
 in:
@@ -6369,7 +6420,8 @@ in:
   params: '5m,"/root/val"'
 out:
   return: SUCCEED
-  value: ['<val>one</val><val>two</val><val><nested>three</nested></val>']
+  value:
+    strset: ['<val>one</val><val>two</val><val><nested>three</nested></val>']
 ---
 test case: Evaluate xmlxpath(5m,"/root/val/text()") text()
 in:
@@ -6384,7 +6436,8 @@ in:
   params: '5m,"/root/val/text()"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
 ---
 test case: Evaluate xmlxpath(5m,"string(/root/val)") string(...)
 in:
@@ -6399,7 +6452,8 @@ in:
   params: '5m,"string(/root/val)"'
 out:
   return: SUCCEED
-  value: ['str']
+  value:
+    strset: ['str']
 ---
 test case: Evaluate xmlxpath(5m,"count(/root/val)") count(...)
 in:
@@ -6416,7 +6470,8 @@ in:
   params: '5m,"count(/root/val)"'
 out:
   return: SUCCEED
-  value: ['0', '1']
+  value:
+    strset: ['0', '1']
 ---
 test case: Evaluate xmlxpath(5m,"sum(/root/val)") failed sum(...)
 in:
@@ -6431,7 +6486,8 @@ in:
   params: '5m,"sum(/root/val)"'
 out:
   return: SUCCEED
-  value: []
+  value:
+    strset: []
 ---
 test case: Evaluate xmlxpath(5m,"boolean(/root/val)") boolean(...)
 in:
@@ -6448,5 +6504,6 @@ in:
   params: '5m,"boolean(/root/val)"'
 out:
   return: SUCCEED
-  value: ['0', '1']
+  value:
+    strset: ['0', '1']
 ...

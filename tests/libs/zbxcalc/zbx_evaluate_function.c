@@ -18,6 +18,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockdb.h"
 
+#include "zbxalgo.h"
 #include "zbxcachevalue.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
@@ -122,13 +123,96 @@ static void	check_variant_equal(const zbx_variant_t *v, zbx_mock_handle_t expect
 			i++;
 		}
 
+		if (0 == i && ZBX_MOCK_NOT_A_VECTOR == err)
+		{
+			zbx_vector_str_t	expected_elems;
+			zbx_vector_str_t	actual_elems;
+			zbx_mock_handle_t	helem;
+
+			/* check vector as unordered multi-set of strings */
+
+			zbx_vector_str_create(&actual_elems);
+
+			for (i = 0; i < v->data.vector->values_num; i++)
+			{
+				zbx_variant_t	*pelem = &v->data.vector->values[i];
+				zbx_variant_t	vstr;
+
+				zbx_variant_copy(&vstr, pelem);
+
+				if (SUCCEED != zbx_variant_convert(&vstr, ZBX_VARIANT_STR))
+				{
+					fail_msg("%s: Failed to convert value of type %s to string: %s", path,
+							zbx_variant_type_desc(pelem), zbx_variant_value_desc(pelem));
+				}
+
+				zbx_vector_str_append(&actual_elems, vstr.data.str);
+			}
+
+			if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(expected_handle, "strset", &hvalue)))
+			{
+				fail_msg("%s: Cannot read output value as an unordered multi-set of strings "
+						"(resulting value: %s): %s",
+						path, zbx_variant_value_desc(v), zbx_mock_error_string(err));
+			}
+
+			zbx_vector_str_create(&expected_elems);
+
+			while (ZBX_MOCK_SUCCESS == (err = zbx_mock_vector_element(hvalue, &helem)))
+			{
+				const char	*str;
+
+				if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(helem, &str)))
+					break;
+
+				zbx_vector_str_append(&expected_elems, (char *)str);
+			}
+
+			if (ZBX_MOCK_END_OF_VECTOR != err)
+			{
+				fail_msg("%s: Cannot read output value as an unordered multi-set of strings "
+					"(resulting value: %s): %s", path,
+					zbx_variant_value_desc(v), zbx_mock_error_string(err));
+			}
+
+			if (expected_elems.values_num != actual_elems.values_num)
+			{
+				fail_msg("%s: element count differs from expected (expected: %d): %d", path,
+						expected_elems.values_num, actual_elems.values_num);
+			}
+
+			zbx_vector_str_sort(&actual_elems, ZBX_DEFAULT_STR_COMPARE_FUNC);
+			zbx_vector_str_sort(&expected_elems, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+			for (i = 0; i < actual_elems.values_num; i++)
+			{
+				size_t	old_path_strlen = strlen(path);
+				zbx_snprintf(path + old_path_strlen, path_size - old_path_strlen, "[\"%s\"]",
+						expected_elems.values[i]);
+
+				zbx_mock_assert_str_eq(path, expected_elems.values[i], actual_elems.values[i]);
+
+				path[old_path_strlen] = '\0';
+			}
+
+			zbx_vector_str_destroy(&expected_elems);
+			zbx_vector_str_clear_ext(&actual_elems, zbx_str_free);
+			zbx_vector_str_destroy(&actual_elems);
+
+			return;
+		}
+
 		if (ZBX_MOCK_END_OF_VECTOR != err)
+		{
 			fail_msg("%s: Cannot read output value as vector (resulting value: %s): %s", path,
 					zbx_variant_value_desc(v), zbx_mock_error_string(err));
+		}
 
 		if (i < v->data.vector->values_num)
+		{
 			fail_msg("%s: Result vector has more elements than expected (expected: %d, got: %d)", path, i,
 					v->data.vector->values_num);
+		}
 
 		return;
 	}
