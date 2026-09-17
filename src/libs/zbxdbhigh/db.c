@@ -287,9 +287,10 @@ int	zbx_db_connect(int flag)
 		{
 			/* zbx_db_connect() can be called from within a zbx_block_signals()-protected region     */
 			/* (e.g. the history syncer main loop). SIGUSR2, sent by the parent on shutdown, would   */
-			/* then stay pending and ZBX_IS_RUNNING() could never see it change - briefly unblock    */
-			/* the signals here so a pending shutdown signal gets delivered and processed before we  */
-			/* decide whether to keep retrying; the actual connect/sleep below stays fully protected */
+			/* then stay pending and ZBX_IS_RUNNING() could never see this change. Solution: briefly */
+			/* unblock the signals here so a pending shutdown signal gets delivered and processed    */
+			/* before we decide whether to keep retrying. The actual connect/sleep below stays fully */
+			/* protected.                                                                            */
 			sigset_t	signal_mask, orig_mask;
 			int		running;
 
@@ -489,7 +490,7 @@ int	zbx_db_end(int ret)
  *                                                                            *
  * Purpose: prepares a SQL statement for execution                            *
  *                                                                            *
- * Comments: retry until DB is up                                             *
+ * Comments: retry until DB is up or shutdown is requested                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_statement_prepare(const char *sql)
@@ -520,7 +521,7 @@ void	zbx_db_statement_prepare(const char *sql)
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
- * Comments: retry until DB is up                                             *
+ * Comments: retry until DB is up or shutdown is requested                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_execute(const char *fmt, ...)
@@ -628,7 +629,7 @@ zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- * Comments: retry until DB is up                                             *
+ * Comments: retry until DB is up or shutdown is requested                    *
  *                                                                            *
  ******************************************************************************/
 zbx_db_result_t	zbx_db_select(const char *fmt, ...)
@@ -671,7 +672,7 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Purpose: execute a select statement and get the first N entries            *
  *                                                                            *
- * Comments: retry until DB is up                                             *
+ * Comments: retry until DB is up or shutdown is requested                    *
  *                                                                            *
  ******************************************************************************/
 zbx_db_result_t	zbx_db_select_n(const char *query, int n)
