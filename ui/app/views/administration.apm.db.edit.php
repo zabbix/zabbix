@@ -123,7 +123,14 @@ $apm_tab = (new CFormGrid())
 $apm_view = (new CTabView())
 	->addTab('apm', _('APM'), $apm_tab)
 	->setFooter(makeFormFooter(
-		(new CSubmit('', _('Update')))->addClass('js-submit')
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
+		[
+			(new CButton('', _('Test')))
+				->setAttribute('hidden', '')
+				->setEnabled(false)
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-test')
+		]
 	));
 
 $form = (new CForm())

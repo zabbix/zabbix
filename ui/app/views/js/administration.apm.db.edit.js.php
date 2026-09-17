@@ -55,6 +55,9 @@ const view = new class {
 	/** @type {boolean} */
 	#tls_automatically_checked = false;
 
+	/** @type {HTMLButtonElement|null} */
+	#test_button = null;
+
 	init({rules}) {
 		this.#rules = rules;
 
@@ -66,6 +69,8 @@ const view = new class {
 		this.#password_input = this.#getFormField('password');
 		this.#password_warning = document.querySelector('.js-password-warning');
 		this.#change_password_btn = document.querySelector('.js-change-password');
+
+		this.#test_button = document.querySelector('.js-test');
 
 		const initial_values = this.#getAllValues();
 		this.#bindEvents({initial_values});
@@ -112,6 +117,8 @@ const view = new class {
 		for (const name of ['status', 'authentication_type', 'ssl_verify_peer']) {
 			this.#getFormField(name)?.addEventListener('change', () => this.#updateForm({initial_values}));
 		}
+
+		this.#test_button?.addEventListener('click', this.#testForm);
 	}
 
 	#getAllValues(untrimmed_fields = []) {
@@ -193,6 +200,11 @@ const view = new class {
 
 		this.#updateDisplayState([this.#password_input], !show_change_password_btn);
 		this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
+
+		const show_test_button = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
+
+		this.#updateDisplayState([this.#test_button], show_test_button);
+		this.#updateDisabledState([this.#test_button], !show_test_button);
 	}
 
 	#getFormField(name) {
@@ -236,52 +248,78 @@ const view = new class {
 		this.#form_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 	}
 
+	#testForm = e => {
+		e.preventDefault();
+		this.#setLoadingStatus('js-test');
+		clearMessages();
+		const values = this.#getAllValues(['password']);
+
+		this.#form.validateSubmit(values).then(result => {
+			if (!result) {
+				this.#unsetLoadingStatus();
+				return;
+			}
+
+			this.#postAction('apm.db.test', values, response => {
+				if ('success' in response) {
+					addMessage(makeMessageBox('good', response.success.messages ?? [],
+						response.success.title));
+				}
+			});
+		});
+	}
+
 	#submitForm = e => {
 		e.preventDefault();
 		this.#setLoadingStatus('js-submit');
 		clearMessages();
 		const values = this.#getAllValues(['password']);
 
-		this.#form.validateSubmit(values)
-			.then(result => {
-				if (!result) {
-					this.#unsetLoadingStatus();
-					return;
+		this.#form.validateSubmit(values).then(result => {
+			if (!result) {
+				this.#unsetLoadingStatus();
+				return;
+			}
+
+			this.#postAction('apm.db.update', values, response => {
+				if ('success' in response) {
+					postMessageOk(response.success.title);
+
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
+					}
+
+					location.href = location.href;
 				}
-
-				const url = new URL('zabbix.php', location.href);
-				url.searchParams.set('action', 'apm.db.update');
-
-				fetch(url.toString(), {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(values)
-				})
-					.then(response => response.json())
-					.then(response => {
-						if ('error' in response) {
-							throw {error: response.error};
-						}
-
-						if ('form_errors' in response) {
-							this.#form.setErrors(response.form_errors, true, true);
-							this.#form.renderErrors();
-							return;
-						}
-
-						if ('success' in response) {
-							postMessageOk(response.success.title);
-
-							if ('messages' in response.success) {
-								postMessageDetails('success', response.success.messages);
-							}
-
-							location.href = location.href;
-						}
-					})
-					.catch(exception => this.#handleFormError(exception))
-					.finally(() => this.#unsetLoadingStatus());
 			});
+		});
+	}
+
+	#postAction(action, values, callback) {
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', action);
+
+		fetch(url.toString(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(values)
+		})
+		.then(response => response.json())
+		.then(response => {
+			if ('error' in response) {
+				throw {error: response.error};
+			}
+
+			if ('form_errors' in response) {
+				this.#form.setErrors(response.form_errors, true, true);
+				this.#form.renderErrors();
+				return;
+			}
+
+			callback(response);
+		})
+		.catch(exception => this.#handleFormError(exception))
+		.finally(() => this.#unsetLoadingStatus());
 	}
 
 	#handleFormError(exception) {

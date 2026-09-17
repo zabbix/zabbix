@@ -66,6 +66,7 @@ final class CRouter {
 		'actionlog.list'							=> [CControllerActionLogList::class,							ZBX_LAYOUT_HTMLPAGE,	'reports.actionlog.list'],
 		'apm.db.edit'								=> [CControllerApmDbEdit::class,								ZBX_LAYOUT_HTMLPAGE,	'administration.apm.db.edit'],
 		'apm.db.update'								=> [CControllerApmDbUpdate::class,								ZBX_LAYOUT_JSON,		null],
+		'apm.db.test'								=> [CControllerApmDbTest::class,								ZBX_LAYOUT_JSON,		null],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,						ZBX_LAYOUT_HTMLPAGE,	'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class, 						ZBX_LAYOUT_JSON,		null],
 		'auditlog.csv'								=> [CControllerAuditLogList::class,								ZBX_LAYOUT_DOWNLOAD,	'reports.auditlog.list.csv'],
