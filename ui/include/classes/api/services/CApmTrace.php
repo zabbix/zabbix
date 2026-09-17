@@ -180,14 +180,13 @@ class CApmTrace extends CApmGeneral {
 				->offset($options['offset']);
 		}
 
-		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, [
-			'countOutput' => $options['countOutput']
-		]))
+		$query = (new CClickHouseQuery())
 			->linkQuery($outer_query)
+			->from('otel_traces', 't')
 			->where('t.TraceId IN ('.$outer_query->getSql().')');
 
 		if ($options['countOutput']) {
-			$query->where('t.ParentSpanId=\'\'');
+			$query->select('count(DISTINCT t.TraceId) as rowscount');
 		}
 		else {
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
