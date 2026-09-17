@@ -753,12 +753,12 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
  * Parameters: mediatypes - [IN]                                              *
  *             data       - [IN] serialized alert results                     *
  *                                                                            *
- * Return value: count of results                                             *
+ * Return value: count of results flushed                                     *
  *                                                                            *
  ******************************************************************************/
 static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *data)
 {
-	int				results_num;
+	int				results_num, ret = ZBX_DB_OK;
 	zbx_vector_events_tags_t	update_events_tags;
 	zbx_am_result_t			**results;
 
@@ -770,7 +770,6 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 
 	if (0 != results_num)
 	{
-		int 		ret;
 		char		*sql;
 		size_t		sql_alloc = results_num * 128, sql_offset;
 		zbx_db_insert_t	db_event, db_problem;
@@ -861,9 +860,12 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 	zbx_vector_events_tags_destroy(&update_events_tags);
 	zbx_free(results);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
+	int	results_flushed = (ZBX_DB_OK == ret) ? results_num : 0;
 
-	return results_num;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() results_flushed:%d results_num:%d",
+			__func__, results_flushed, results_num);
+
+	return results_flushed;
 }
 
 /******************************************************************************
