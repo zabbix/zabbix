@@ -21,6 +21,7 @@
 #include "zbxnix.h"
 
 static pid_t	rebuild_pid = ZBX_THREAD_HANDLE_NULL;
+static pid_t	rebuild_parent_pid = -1;
 
 typedef struct
 {
@@ -28,6 +29,11 @@ typedef struct
 	zbx_vector_uint64_t	groupids;
 	zbx_vector_uint64_t	ids;
 } zbx_group_set_t;
+
+static int	permissions_rebuild_is_running(void)
+{
+	return ZBX_IS_RUNNING() && getppid() == rebuild_parent_pid;
+}
 
 static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_name_id,
 		const char *fld_name_groupid, const char *tbl_name_groups, zbx_hashset_t *group_sets,
@@ -45,7 +51,7 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 	{
 		zbx_group_set_t	gset;
 
-		if (!ZBX_IS_RUNNING())
+		if (!permissions_rebuild_is_running())
 		{
 			ret = FAIL;
 			goto out;
@@ -122,7 +128,7 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 	{
 		int	i;
 
-		if (!ZBX_IS_RUNNING())
+		if (!permissions_rebuild_is_running())
 			return FAIL;
 
 		zbx_db_insert_add_values(db_gset, gsetid, gset_ptr->hash_str);
@@ -363,6 +369,8 @@ void	zbx_permissions_rebuild_start(void)
 
 	pid_t	pid;
 
+	rebuild_parent_pid = getpid();
+
 	switch (pid = zbx_fork())
 	{
 		case -1:
@@ -370,6 +378,9 @@ void	zbx_permissions_rebuild_start(void)
 					" cache: %s", zbx_strerror(errno));
 			break;
 		case 0: /* child */
+			if (getppid() != rebuild_parent_pid)
+				exit(EXIT_FAILURE);
+
 			zbx_setproctitle("permissions rebuild");
 			permissions_rebuild_task();
 			exit(EXIT_SUCCESS);
@@ -416,9 +427,10 @@ void	zbx_permissions_rebuild_stop(void)
 	if (ZBX_THREAD_HANDLE_NULL == rebuild_pid)
 		return;
 
-	if (-1 == kill(rebuild_pid, SIGKILL))
+	if (-1 == kill(rebuild_pid, SIGHUP))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot kill permissions cache rebuild process: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot terminate permissions cache rebuild process: %s",
+				zbx_strerror(errno));
 	}
 
 	pid_t	pid;
