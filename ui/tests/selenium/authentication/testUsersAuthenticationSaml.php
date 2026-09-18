@@ -165,9 +165,16 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		$this->assertEquals(0, $saml_form->query('button:Choose file')->all()->filter(CElementFilter::CLICKABLE)->count());
 
 		// Check visible mandatory fields.
-		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID', 'IdP certificate'],
-				$saml_form->getRequiredLabels()
-		);
+		$visible_mandatory_fields = [
+			'IdP entity ID',
+			'SSO service URL',
+			'Username attribute',
+			'SP entity ID',
+			'IdP certificate',
+			'SP private key',
+			'SP certificate'
+		];
+		$this->assertEquals($visible_mandatory_fields, $saml_form->getRequiredLabels());
 
 		// Check invisible mandatory field.
 		foreach (['Group name attribute', 'User group mapping'] as $manadatory_field) {
@@ -828,7 +835,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SSO service URL' => 'SSO',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP',
-						'IdP certificate' => self::SSL_CERTIFICATE
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'id:sign_messages' => false,
+						'id:sign_assertions' => false,
+						'id:sign_authn_requests' => false,
+						'id:sign_logout_requests' => false,
+						'id:sign_logout_responses' => false
 					],
 					'db_check' => [
 						'userdirectory_saml' => [
@@ -854,7 +866,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP',
 						'IdP certificate' => self::SSL_CERTIFICATE,
 						'SP private key' => self::SSL_PRIVATE_KEY,
-						'SP certificate' => self::SSL_CERTIFICATE
+						'SP certificate' => self::SSL_CERTIFICATE,
+						'id:sign_messages' => false,
+						'id:sign_assertions' => false,
+						'id:sign_authn_requests' => false,
+						'id:sign_logout_requests' => false,
+						'id:sign_logout_responses' => false
 					],
 					'db_check' => [
 						'userdirectory_saml' => [
