@@ -6547,8 +6547,8 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 				",privpassphrase='%s'"
 				",authprotocol=%d"
 				",privprotocol=%d"
-				",contextname='%s',"
-				",max_repetitions='%s',"
+				",contextname='%s'"
+				",max_repetitions='%s'"
 				",retries='%s'"
 			" where interfaceid=" ZBX_FS_UI64,
 			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
