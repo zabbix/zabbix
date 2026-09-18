@@ -18,8 +18,8 @@
 #include "zbxdbschema.h"
 #include "zbxtypes.h"
 
-static zbx_dbconn_t	*dbconn;
-static int		db_autoincrement;
+static ZBX_THREAD_LOCAL	zbx_dbconn_t	*dbconn  = NULL;
+static int				db_autoincrement = 0;
 
 void	zbx_db_init_autoincrement_options(void)
 {
@@ -801,3 +801,137 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 {
 	zbx_dbconn_large_query_append_sql(query, sql);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get database connection object                                    *
+ *                                                                            *
+ * Return value: pointer to database connection object                        *
+ *                                                                            *
+ * Comments: This function must be used only by standalone processes/threads, *
+ *           not from multiple threads within one process.                    *
+ *                                                                            *
+ ******************************************************************************/
+zbx_dbconn_t	*zbx_db_dbconn(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return dbconn;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: stash database connection for legacy db api usage                 *
+ *                                                                            *
+ * Parameters: db - [IN] database connection to stash                         *
+ *                                                                            *
+ * Comments: Use stash/unstash approach when calling functions that uses      *
+ *           old (process) database access somewhere deep inside,             *
+ *           for example resolves macros.                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_stash_connection(zbx_dbconn_t *db)
+{
+	if (NULL != dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to double stash db connection");
+		exit(EXIT_FAILURE);
+	}
+	dbconn = db;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unstash database connection from legacy db api usage              *
+ *                                                                            *
+ * Parameters: db - [IN] database connection to stash                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_unstash_connection(zbx_dbconn_t *db)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to unstash empty db connection stash");
+		exit(EXIT_FAILURE);
+	}
+
+	if (db != dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to unstash wrong db connection");
+		exit(EXIT_FAILURE);
+	}
+
+	dbconn = NULL;
+}
+char	*zbx_db_dyn_escape_like_pattern(const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_like_pattern(dbconn, src);
+}
+
+char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_field(dbconn, table_name, field_name, src);
+}
+
+char	*zbx_db_dyn_escape_string(const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_string(dbconn, src);
+}
+
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_string_len(dbconn, src, length);
+}
+
+void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char * const *values, const int num)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_add_str_condition_alloc(dbconn, sql, sql_alloc, sql_offset, fieldname, values, num);
+}
+
+#if defined(HAVE_POSTGRESQL)
+char	*zbx_db_get_schema_esc(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_get_schema_esc(dbconn);
+}
+#endif

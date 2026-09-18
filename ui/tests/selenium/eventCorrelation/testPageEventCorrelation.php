@@ -318,13 +318,13 @@ class testPageEventCorrelation extends CWebTest {
 	public function testPageEventCorrelation_Layout($data) {
 		$event_count = count($data);
 
-		$this->page->login()->open('zabbix.php?action=correlation.list');
-		$this->page->assertTitle('Event correlation rules');
-		$this->page->assertHeader('Event correlation');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
+		$this->page->assertTitle('Configuration of event processing rules');
+		$this->page->assertHeader('Event processing');
 
 		// Check buttons on the Event correlation page.
-		$this->assertEquals(3, $this->query('button', ['Create event correlation', 'Apply', 'Reset'])
-				->all()->filter(CElementFilter::CLICKABLE)->count()
+		$this->assertEquals(4, $this->query('button', ['Create complex event processing', 'Create event correlation',
+				'Apply', 'Reset'])->all()->filter(CElementFilter::CLICKABLE)->count()
 		);
 
 		$this->assertEquals(0, $this->query('button', ['Enable', 'Disable', 'Delete'])
@@ -344,8 +344,8 @@ class testPageEventCorrelation extends CWebTest {
 		}
 
 		// Check filter labels and default values.
-		$this->assertEquals(['Name', 'Status'], $filter_form->getLabels()->asText());
-		$filter_form->checkValue(['Name' => '', 'Status' => 'Any']);
+		$this->assertEquals(['Name', 'Status', 'Type'], $filter_form->getLabels()->asText());
+		$filter_form->checkValue(['Name' => '', 'Status' => 'All', 'Type' => 'All']);
 		$this->assertEquals('255', $filter_form->getField('Name')->getAttribute('maxlength'));
 
 		// Check the count of returned events and the count of selected events.
@@ -365,10 +365,12 @@ class testPageEventCorrelation extends CWebTest {
 
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['', 'Name', 'Conditions', 'Operations', 'Status'], $table->getHeadersText());
+		$this->assertEquals(['', 'Name', 'Type', 'Conditions', 'Time window processing', 'Operations',
+				'Stop after this rule', 'Sort order', 'Status', 'Info'], $table->getHeadersText()
+		);
 
 		// Check sortable headers.
-		$this->assertEquals(['Name', 'Status'], $table->getHeaders()->query('tag:a')->asText());
+		$this->assertEquals(['Name', 'Sort order', 'Status'], $table->getHeaders()->query('tag:a')->asText());
 
 		// Check Event correlation table content.
 		$this->assertTableHasData($data);
@@ -550,7 +552,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'event',
-						'Status' => 'Any'
+						'Status' => 'All'
 					],
 					'expected' => [
 						self::EVENT_NEW_OPERATIONS,
@@ -569,7 +571,7 @@ class testPageEventCorrelation extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageEventCorrelation_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=correlation.list');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->getTable();
 
@@ -627,7 +629,7 @@ class testPageEventCorrelation extends CWebTest {
 	 * @dataProvider getSortData
 	 */
 	public function testPageEventCorrelation_Sort($data) {
-		$this->page->login()->open('zabbix.php?action=correlation.list');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('link', $data['sort_field'])->one();
 
@@ -686,7 +688,7 @@ class testPageEventCorrelation extends CWebTest {
 			$data['name'] = [$data['name']];
 		}
 
-		$this->page->login()->open('zabbix.php?action=correlation.list');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
 
 		// Events count that will be selected before Enable/Disable/Delete action.
 		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::CORRELATION_SQL);
@@ -694,7 +696,7 @@ class testPageEventCorrelation extends CWebTest {
 		$this->assertSelectedCount($selected_count);
 		$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
 
-		$message = $data['action'].' selected event correlation'.($selected_count === 1 ? '?' : 's?');
+		$message = $data['action'].' selected complex event processing rule'.($selected_count === 1 ? '?' : 's?');
 		$this->assertEquals($message, $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
@@ -766,7 +768,7 @@ class testPageEventCorrelation extends CWebTest {
 	 * @dataProvider getStatusData
 	 */
 	public function testPageEventCorrelation_ChangeStatus($data) {
-		$this->page->login()->open('zabbix.php?action=correlation.list');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
 
 		// Event correlation(s) count that will be enabled or disabled via button.
 		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
@@ -787,13 +789,13 @@ class testPageEventCorrelation extends CWebTest {
 			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
 
 			// Check alert message.
-			$this->assertEquals($data['action'].' selected event correlation'.$plural.'?', $this->page->getAlertText());
+			$this->assertEquals($data['action'].' selected complex event processing rule'.$plural.'?', $this->page->getAlertText());
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 		}
 
 		// Check success message.
-		$this->assertMessage(TEST_GOOD, 'Event correlation'.$plural.' '.lcfirst($data['action']).'d');
+		$this->assertMessage(TEST_GOOD, 'Event processing rule'.$plural.' '.lcfirst($data['action']).'d');
 		CMessageElement::find()->one()->close();
 
 		// Check that status in 'Status' column is correct.
@@ -832,17 +834,17 @@ class testPageEventCorrelation extends CWebTest {
 	protected function deleteAction($names = []) {
 		$plural = (count($names) === 1) ? '' : 's';
 		$all = CDBHelper::getCount(self::CORRELATION_SQL);
-		$this->page->login()->open('zabbix.php?action=correlation.list');
+		$this->page->login()->open('zabbix.php?action=ceprule.list');
 
 		// Delete event correlation(s).
 		$this->selectTableRows($names);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
-		$this->assertEquals('Delete selected event correlation'.$plural.'?', $this->page->getAlertText());
+		$this->assertEquals('Delete selected complex event processing rule'.$plural.'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check that event correlation(s) is/are deleted.
-		$this->assertMessage(TEST_GOOD, 'Event correlation'.$plural.' deleted');
+		$this->assertMessage(TEST_GOOD, 'Event processing rule'.$plural.' deleted');
 		$this->assertSelectedCount(0);
 		$this->assertTableStats($names === [] ? 0 : $all - count($names));
 		$this->assertEquals(0, ($names === [])

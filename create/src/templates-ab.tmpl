@@ -15181,6 +15181,77 @@ ROW   |31111    |{46502}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}                   
 ROW   |31112    |{46503}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}                                                                                |Linux: FS [{#FSNAME}]: Space is low                                                      |    |0     |2       |The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%` limit.&eol;The trigger expression is based on the current used and maximum available spaces.&eol;Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.                                                                                                                                                                                                                                                                                        |31102     |0   |2    |0            |                                                                                                                 |0               |               |1           |Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%                                                                     |0       |Linux: FS [{#FSNAME}]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)                    |    |        |
 ROW   |31113    |{46504}=0 and {46505}=1                                                                                                     |Linux: FS [{#FSNAME}]: Filesystem has become read-only                                   |    |0     |3       |The filesystem has become read-only, possibly due to an I/O error. Available only for Zabbix agents 6.4 and higher.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |31103     |0   |2    |1            |{46505}=0                                                                                                        |0               |               |1           |                                                                                                               |0       |                                                                                                                                                                                            |    |        |
 
+TABLE |trigger_rtdata
+FIELDS|triggerid|
+ROW   |22389    |
+ROW   |22382    |
+ROW   |22383    |
+ROW   |22392    |
+ROW   |22384    |
+ROW   |22390    |
+ROW   |22393    |
+ROW   |22394    |
+ROW   |22395    |
+ROW   |23162    |
+ROW   |22387    |
+ROW   |22385    |
+ROW   |22386    |
+ROW   |22391    |
+ROW   |22388    |
+ROW   |13487    |
+ROW   |13488    |
+ROW   |13489    |
+ROW   |13490    |
+ROW   |13075    |
+ROW   |13537    |
+ROW   |13486    |
+ROW   |15854    |
+ROW   |15856    |
+ROW   |21198    |
+ROW   |23299    |
+ROW   |13567    |
+ROW   |16274    |
+ROW   |13467    |
+ROW   |17537    |
+ROW   |23762    |
+ROW   |13468    |
+ROW   |23763    |
+ROW   |23225    |
+ROW   |23226    |
+ROW   |23288    |
+ROW   |23289    |
+ROW   |13471    |
+ROW   |17538    |
+ROW   |13472    |
+ROW   |13473    |
+ROW   |23300    |
+ROW   |13474    |
+ROW   |13475    |
+ROW   |23764    |
+ROW   |13563    |
+ROW   |13476    |
+ROW   |13477    |
+ROW   |13479    |
+ROW   |13570    |
+ROW   |13571    |
+ROW   |23765    |
+ROW   |13480    |
+ROW   |18532    |
+ROW   |18533    |
+ROW   |13481    |
+ROW   |18981    |
+ROW   |23396    |
+ROW   |13482    |
+ROW   |13560    |
+ROW   |13483    |
+ROW   |13484    |
+ROW   |18982    |
+ROW   |13485    |
+ROW   |13436    |
+ROW   |18983    |
+ROW   |24685    |
+ROW   |13558    |
+
 TABLE |trigger_depends
 FIELDS|triggerdepid|triggerid_down|triggerid_up|
 ROW   |48959       |15948         |15949       |

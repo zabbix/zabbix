@@ -754,7 +754,7 @@ class CWidgetNavTree extends CWidget {
 					content += response.debug;
 				}
 
-				overlayDialogue({
+				const overlay = overlayDialogue({
 					title: t('Edit tree element'),
 					class: 'modal-popup modal-popup-small',
 					content,
@@ -914,6 +914,9 @@ class CWidgetNavTree extends CWidget {
 					dialogueid: 'navtreeitem',
 					trigger_element
 				});
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
 			}
 		});
 	}

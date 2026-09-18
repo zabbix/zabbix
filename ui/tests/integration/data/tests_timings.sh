@@ -2,6 +2,8 @@ PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
   [Integration]=4561
+  [testTriggerCEPRestart]=1800
+  [testTriggerCEP]=900
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
@@ -45,7 +47,7 @@ declare -A BASELINE_TIMES=(
   [testConfigVariables]=31
   [testFunctionChangeCount]=26
   [testTriggerLinking]=26
-  [testLldLinking]=26
+  [testLLDLinking]=26
   [testScriptManualInput]=25
   [testUserMacrosWithContextRegex]=21
   [testTriggerState]=21

@@ -387,7 +387,8 @@ $form
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
 				'rules' => $data['js_validation_rules'],
-				'proxyid' => $data['proxyid']
+				'proxyid' => $data['proxyid'],
+				'warnings' => $data['warnings']
 			]).');
 		'))->setOnDocumentReady()
 	);

@@ -13,6 +13,7 @@
 **/
 
 #include "service_actions.h"
+#include "service_manager_impl.h"
 
 #include "zbxnum.h"
 #include "zbxdbhigh.h"

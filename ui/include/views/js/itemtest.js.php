@@ -306,6 +306,9 @@
 			data: cached_values
 		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
 
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
+
 		overlay.$dialogue[0].addEventListener('itemtest.close', (e) => {
 			$row.data('test-data', e.detail);
 		});

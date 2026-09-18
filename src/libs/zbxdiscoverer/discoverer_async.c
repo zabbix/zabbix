@@ -15,6 +15,8 @@
 #include "discoverer_async.h"
 
 #include "discoverer_job.h"
+#include "discoverer_int.h"
+#include "discoverer_queue.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 

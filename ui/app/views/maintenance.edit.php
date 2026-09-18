@@ -72,6 +72,53 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
+$event_names = (new CTable())
+	->setId('event_names')
+	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->setHeader(new CRowHeader([_('Operator'), _('Name')]))
+	->setFooter(
+		(new CCol(
+			(new CButtonLink(_('Add')))
+				->addClass('element-table-add')
+				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+		))
+	)
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'event_names');
+
+$event_names_template = (new CTemplateTag('event-names-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CRadioButtonList('event_names[#{rowNum}][operator]', MAINTENANCE_EVENT_NAME_OPERATOR_LIKE))
+				->setAttribute('data-error-container', 'event_names_#{rowNum}_error_container')
+				->setAttribute('data-error-label', _('Operator'))
+				->addValue(_('Contains'), MAINTENANCE_EVENT_NAME_OPERATOR_LIKE)
+				->addValue(_('Does not contain'), MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE)
+				->setModern()
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
+			(new CTextAreaFlexible('event_names[#{rowNum}][value]', '#{value}'))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setMaxlength(DB::getFieldLength('maintenance_eventname', 'value'))
+				->setAttribute('placeholder',  _('value'))
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setErrorContainer('event_names_#{rowNum}_error_container')
+				->setErrorLabel(_('Value')),
+			(new CCol(
+				(new CButton('event_names[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->setWidth('100%')
+		]))->addClass('form_row')
+	)
+	->addItem(
+		(new CRow([
+			(new CCol())
+				->setId('event_names_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(3)
+		]))->addClass('form_row')
+	);
+
 $tags_evaltype = (new CDiv(
 	(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
 		->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
@@ -103,12 +150,17 @@ $tag_template = (new CTemplateTag('tag-row-tmpl'))
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 				->setErrorContainer('tags_#{rowNum}_error_container')
 				->setErrorLabel(_('Tag')),
-			(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
+			(new CSelect('tags[#{rowNum}][operator]'))
 				->setAttribute('data-error-container', 'tags_#{rowNum}_error_container')
 				->setAttribute('data-error-label', _('Operator'))
-				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-				->setModern()
+				->addOptions(CSelect::createOptionsFromArray([
+					MAINTENANCE_TAG_OPERATOR_EQUAL => _('Equals'),
+					MAINTENANCE_TAG_OPERATOR_LIKE => _('Contains'),
+					MAINTENANCE_TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					MAINTENANCE_TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue(MAINTENANCE_TAG_OPERATOR_LIKE)
+				->setAttribute('data-prevent-validation-on-change', 1)
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 			(new CTextAreaFlexible('tags[#{rowNum}][value]', '#{value}'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -223,9 +275,39 @@ $form->addItem(
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
+		->addItem([
+			new CLabel(_('Triggers'), 'triggerids__ms'),
+			new CFormField(
+				(new CMultiSelect([
+					'name' => 'triggerids[]',
+					'object_name' => 'triggers',
+					'data' => $data['triggers_ms'],
+					'readonly' => !$data['allowed_edit'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'triggers',
+							'srcfld1' => 'triggerid',
+							'dstfrm' => $form->getName(),
+							'dstfld1' => 'triggerids_',
+							'editable' => true,
+							'real_hosts' => true
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		])
 		->addItem(
-			new CFormField((new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark())
+			new CFormField(
+				(new CLabel(_('At least one host group, host or trigger must be selected.')))->setAsteriskMark()
+			)
 		)
+		->addItem([
+			(new CLabel(_('Event name'))),
+			new CFormField(
+				(new CDiv([$event_names, $event_names_template]))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			)
+		])
 		->addItem([
 			new CLabel(_('Tags')),
 			new CFormField([$tags_evaltype, $tags, $tag_template])
@@ -291,6 +373,7 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'clone_rules' => $data['js_clone_validation_rules'],
 			'timeperiods' => $data['timeperiods'],
+			'event_names' => $data['event_names'],
 			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit']
 		]).');'

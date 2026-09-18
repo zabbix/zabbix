@@ -2386,7 +2386,7 @@ json_parse_error:
 		}
 
 		if (NULL != events_cbs->process_events_cb)
-			events_cbs->process_events_cb(NULL, NULL, NULL);
+			events_cbs->process_events_cb();
 
 		if (NULL != events_cbs->clean_events_cb)
 			events_cbs->clean_events_cb();

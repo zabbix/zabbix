@@ -1169,6 +1169,10 @@ class CDataTable {
 		this.updateUserConfig()
 			.getData()
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				this.#options_popup_updated = true;
 
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
@@ -1241,6 +1245,10 @@ class CDataTable {
 		}
 
 		this.getData().then(response => {
+			if (!response) {
+				return;
+			}
+
 			this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
@@ -1349,6 +1357,10 @@ class CDataTable {
 
 		this.getData({check_changes, force_load})
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				if ('error' in response) {
 					const title = response.error.title || t('Unexpected server error.');
 					const messages = response.error.messages || [];
@@ -1359,6 +1371,10 @@ class CDataTable {
 				return response;
 			})
 			.then(response => {
+				if (!response) {
+					return;
+				}
+
 				window.addEventListener('resize', this.onWindowResize);
 
 				this.dispatchEvent(CDataTable.EVENT_BEFORE_RENDER, {response});
@@ -1367,13 +1383,7 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
-				if (window.unloading) {
-					return;
-				}
-
-				if (error.name != 'AbortError') {
-					CMessageHelper.error(this.#element, [error.message], error.name);
-				}
+				CMessageHelper.error(this.#element, [error.message], error.name);
 
 				onError(error);
 			})
@@ -1698,6 +1708,10 @@ class CDataTable {
 		target.removeAttribute('onclick');
 
 		this.getData({export_file: 'csv', force_load: true}).then(response => {
+			if (!response) {
+				return;
+			}
+
 			if ('error' in response && response.error) {
 				CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
 
@@ -2522,6 +2536,10 @@ class CDataTable {
 
 	#renderColumnDataCells(column) {
 		this.getData().then(response => {
+			if (!response) {
+				return;
+			}
+
 			const data_fields = response.data_fields;
 
 			for (const [row_index, data_cell] of column.getDataCells().entries()) {
@@ -2578,10 +2596,6 @@ class CDataTable {
 		this.#options_popup?.resize();
 	}
 
-	onWindowBeforeUnload = () => {
-		window.unloading = true;
-	}
-
 	onWrapperScroll = () => {
 		this.#options_popup?.position();
 		this.#options_popup?.resize();
@@ -2597,8 +2611,6 @@ class CDataTable {
 				.on(CPager.EVENT_SELECT, this.onPagerSelect)
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
-
-		window.addEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
@@ -2631,7 +2643,6 @@ class CDataTable {
 		}
 
 		window.removeEventListener('resize', this.onWindowResize);
-		window.removeEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.removeEventListener('scroll', this.onWrapperScroll);
 
@@ -2737,9 +2748,11 @@ class CDataTable {
 		/* global updateUserProfile */
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
 			.catch(error => {
-				if (error.name != 'AbortError') {
-					CMessageHelper.error(this.#element, [error.message], error.name);
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
 				}
+
+				CMessageHelper.error(this.#element, [error.message], error.name);
 			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
