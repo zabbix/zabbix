@@ -14,19 +14,12 @@
 **/
 
 
-class CHtmlUrlValidator {
+/**
+ * @var CView $this
+ * @var array $data
+ */
 
-	/**
-	 * Verifies that URL will not lead to third party pages.
-	 *
-	 * @param string $url
-	 *
-	 * @return bool
-	 */
-	public static function validateSameSite(string $url): bool {
-		$root_path = __DIR__.'/../../../';
-		preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $url, $url_parts);
+header('Content-Type: '.$data['file']['mime_type'].'; charset=utf-8');
+header('Content-Disposition: attachment; filename="'.$data['file']['name'].'"');
 
-		return array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']);
-	}
-}
+echo $data['main_block'];

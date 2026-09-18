@@ -402,7 +402,7 @@ function submitPopup(overlay) {
 	}
 
 	if (warning_message !== '') {
-		overlayDialogue({
+		const warning_overlay = overlayDialogue({
 			title: <?= json_encode(_('Warning')) ?>,
 			content: $('<span>').text(warning_message),
 			buttons: [
@@ -416,6 +416,9 @@ function submitPopup(overlay) {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: overlay.$btn_submit
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		warning_overlay.$dialogue.$head.$close_button.show();
 
 		overlay.unsetLoading();
 		return false;

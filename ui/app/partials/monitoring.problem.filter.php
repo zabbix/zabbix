@@ -518,8 +518,6 @@ if (array_key_exists('render_html', $data)) {
 
 		$('#show_' + data.uniqid, container).change(eventHandler.show).trigger('change');
 		$('[name="age_state"]').change(eventHandler.age_state).trigger('change');
-		// $('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
-		// $('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
 		$('[name="acknowledgement_status"]', container).change(eventHandler.unack_by_me).trigger('change');
 
 		// Initialize src_url.

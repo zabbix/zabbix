@@ -27,7 +27,7 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_roleids' =>			'array_db role.roleid',
 			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
-			'filter_status' =>			'in '.implode(',', [-1, ZBX_DEVICE_STATUS_NEW, ZBX_DEVICE_STATUS_ACTIVATED, ZBX_DEVICE_STATUS_ORPHANED]),
+			'filter_status' =>			'in '.implode(',', [-1, ZBX_DEVICE_STATUS_NEW, ZBX_DEVICE_STATUS_ACTIVATED, ZBX_DEVICE_STATUS_UNASSIGNED]),
 			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role,status',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
@@ -140,6 +140,9 @@ class CControllerUserDeviceList extends CController {
 
 	private function getDevices(array $filter): array {
 		$options = [
+			'output' => ['deviceid', 'userid', 'uuid', 'name', 'status', 'activated_at', 'lastaccess',
+				'enrollment_token_expires_at'
+			],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
@@ -181,7 +184,8 @@ class CControllerUserDeviceList extends CController {
 			}
 
 			CArrayHelper::sort($devices, [
-				['field' => $filter['sort'], 'order' => $filter['sortorder']]
+				['field' => $filter['sort'], 'order' => $filter['sortorder']],
+				['field' => 'deviceid', 'order' => ZBX_SORT_DOWN]
 			]);
 		}
 
@@ -220,7 +224,7 @@ class CControllerUserDeviceList extends CController {
 			'device_statuses' => [
 				ZBX_DEVICE_STATUS_NEW => _('New'),
 				ZBX_DEVICE_STATUS_ACTIVATED => _('Active'),
-				ZBX_DEVICE_STATUS_ORPHANED => _('Orphaned')
+				ZBX_DEVICE_STATUS_UNASSIGNED => _('Unassigned')
 			]
 		];
 

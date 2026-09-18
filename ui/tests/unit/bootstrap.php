@@ -45,6 +45,7 @@ $autoloader->addNamespace('', [
 	__DIR__.'/../../include/classes/data',
 	__DIR__.'/../../include/classes/core',
 	__DIR__.'/../../include/classes/helpers',
+	__DIR__.'/../../include/classes/mvc',
 	__DIR__.'/../../include/classes/db',
 	__DIR__.'/../../include/classes/parsers',
 	__DIR__.'/../../include/classes/parsers/results',

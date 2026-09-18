@@ -203,8 +203,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for unsigned'],
 					// If problem is Acknowledged - label is changed to Unacknowledge.
+					// Two last empty labels belong to the "Suppress trigger" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
@@ -231,8 +232,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
+					// Two last empty labels belong to the "Suppress triggers" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-						'Acknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
@@ -250,8 +252,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problem selected - History label is absent.
+					// Two last empty labels belong to the "Suppress triggers" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-						'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -286,9 +289,13 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check form labels.
 		$count = count($data['problems']);
+		// Two last empty labels belong to the "Suppress trigger(s)" link and to the error message container.
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Convert to cause', 'Close problem', ''];
+				'Acknowledge', 'Convert to cause', 'Close problem', '', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
+
+		// Check the link that leads to the ad-hoc maintenance creation form.
+		$this->assertTrue($form->query('link', 'Suppress trigger'.($count > 1 ? 's' : ''))->one()->isClickable());
 
 		// Check "Problem" field value.
 		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];

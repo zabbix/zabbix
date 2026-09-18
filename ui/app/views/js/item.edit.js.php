@@ -483,7 +483,7 @@ window.item_edit_form = new class {
 	}
 
 	#showErrorDialog(body, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup',
 			content: jQuery('<span>').html(body),
@@ -497,6 +497,9 @@ window.item_edit_form = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: jQuery(trigger_element)
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#getFormFields() {
