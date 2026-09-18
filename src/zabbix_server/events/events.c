@@ -578,6 +578,8 @@ static void	add_event_maintenances(zbx_vector_db_event_t *problems, zbx_vector_u
 
 		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 		query->eventid = event->eventid;
+		query->triggerid = event->trigger.triggerid;
+		query->event_name = zbx_strdup(NULL, event->name);
 
 		zbx_vector_uint64_create(&query->hostids);
 		zbx_vector_uint64_create(&query->functionids);

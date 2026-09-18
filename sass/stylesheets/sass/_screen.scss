@@ -2964,8 +2964,15 @@ z-select {
 
 .rules-status-container {
 	.status-green,
-	.status-grey {
+	.status-grey,
+	.btn-plus-more {
 		margin: 3px 3px 3px 0;
+	}
+
+	.status-green,
+	.status-grey {
+		max-width: 100%;
+		@extend %overflow-ellipsis;
 	}
 }
 

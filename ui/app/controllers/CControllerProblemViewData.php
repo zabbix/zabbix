@@ -254,7 +254,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 
 			$problem['info'] = (string) $cell_info;
-			$problem['host'] = $data['triggers_hosts'][$trigger['triggerid']];
+			$problem['host'] = array_values($data['triggers_hosts'][$trigger['triggerid']]);
 
 			$opdata = null;
 

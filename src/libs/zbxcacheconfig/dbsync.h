@@ -243,9 +243,11 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_eventnames(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_triggers(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_settings(zbx_dbsync_t *sync);
 

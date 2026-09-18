@@ -161,6 +161,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'default_maintenance_period' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1h'
 			]
 		]
 	],
@@ -1809,6 +1815,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
+			],
+			'proxy_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'proxy_group_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -4119,6 +4137,30 @@ return [
 				'length' => 20,
 				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid'
+			]
+		]
+	],
+	'maintenance_trigger' => [
+		'key' => 'maintenance_triggerid',
+		'fields' => [
+			'maintenance_triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'maintenanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'maintenances',
+				'ref_field' => 'maintenanceid'
+			],
+			'triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'triggers',
+				'ref_field' => 'triggerid'
 			]
 		]
 	],
@@ -7799,6 +7841,35 @@ return [
 			]
 		]
 	],
+	'maintenance_eventname' => [
+		'key' => 'maintenance_eventnameid',
+		'fields' => [
+			'maintenance_eventnameid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'maintenanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'maintenances',
+				'ref_field' => 'maintenanceid'
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2'
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			]
+		]
+	],
 	'lld_macro_path' => [
 		'key' => 'lld_macro_pathid',
 		'fields' => [
@@ -10110,6 +10181,54 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 512,
 				'default' => ''
+			]
+		]
+	],
+	'usrgrp_proxy' => [
+		'key' => 'usrgrp_proxyid',
+		'fields' => [
+			'usrgrp_proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
+			]
+		]
+	],
+	'usrgrp_proxy_group' => [
+		'key' => 'usrgrp_proxy_groupid',
+		'fields' => [
+			'usrgrp_proxy_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'proxy_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy_group',
+				'ref_field' => 'proxy_groupid'
 			]
 		]
 	],
