@@ -152,7 +152,40 @@
 						.setWidth('auto'),
 					new CDataTableColumn('severity_number', <?= json_encode(_('Severity number')) ?>)
 						.setFields(['severity_number'])
+						.setWidth('auto'),
+					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
+						.setFields(['traceid'])
 						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')) ?>)
+						.setFields(['spanid'])
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('flags', <?= json_encode(_('Flags')) ?>)
+						.setFields(['flags'])
+						.setRenderer('flags')
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('service_name', <?= json_encode(_('Service name')) ?>)
+						.setFields(['service_name'])
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('body', <?= json_encode(_('Body')) ?>)
+						.setFields(['body'])
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')) ?>)
+						.setFields(['scope_name'])
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('scope_version', <?= json_encode(_('Scope version')) ?>)
+						.setFields(['scope_version'])
+						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('event_name', <?= json_encode(_('Event name')) ?>)
+						.setFields(['event_name'])
+						.setWidth('auto')
+						.setVisible(false)
 				])
 				.setPage(page)
 				.setFilter({...filter, ...this.#time_selector})
@@ -190,6 +223,11 @@
 					container.appendChild(severity_span);
 
 					cell.appendChild(container);
+				})
+				.setCellRenderer('flags', ({cell, cell_data}) => {
+					const [flags] = cell_data;
+
+					cell.textContent = this.#decodeFlags(flags);
 				})
 				.setRowRenderer('log', ({columns, data_fields, row, row_data, row_index, response}) => {
 					row.dataset.rowIndex = row_index;
@@ -311,16 +349,6 @@
 		}
 
 		#createDetailGroups(row_data) {
-			const flags_decoded = [];
-
-			if ((row_data.flags & 1) === 1) {
-				flags_decoded.push(<?= json_encode(_('Sampled')) ?>);
-			}
-
-			if (flags_decoded.length === 0) {
-				flags_decoded.push(<?= json_encode(_('None')) ?>);
-			}
-
 			return [
 				{
 					title: <?= json_encode(_('Basic information')) ?>,
@@ -339,7 +367,7 @@
 						},
 						{
 							name: <?= json_encode(_('Flags')) ?>,
-							value: flags_decoded.join(', ')
+							value: this.#decodeFlags(row_data.flags)
 						},
 						{
 							name: <?= json_encode(_('Severity text')) ?>,
@@ -398,6 +426,16 @@
 					)
 				}
 			];
+		}
+
+		#decodeFlags(flags) {
+			const flags_decoded = [];
+
+			if ((flags & 1) === 1) {
+				flags_decoded.push(<?= json_encode(_('Sampled')) ?>);
+			}
+
+			return flags_decoded.join(', ');
 		}
 
 		#onFilterSet = (e) => {
