@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && {form} == "update"'],
+	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && ({form} == "update"  || {form} == "clone")'],
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
@@ -62,7 +62,6 @@ $fields = [
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, P_SYS,		null,			null],
-	'backurl' =>			[T_ZBX_STR, O_OPT, null,		null,			null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
@@ -102,9 +101,15 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 /*
  * Permissions
  */
+$backurl = (new CUrl('graphs.php'))->setArgument('context', getRequest('context'));
+
 $hostid = getRequest('hostid', 0);
 
 if (hasRequest('parent_discoveryid')) {
+	$backurl = (new CUrl('graphs.php'))
+		->setArgument('context', getRequest('context'))
+		->setArgument('parent_discoveryid', getRequest('parent_discoveryid'));
+
 	// check whether discovery rule is editable by user
 	$discoveryRule = API::DiscoveryRule()->get([
 		'output' => ['itemid', 'hostid'],
@@ -126,6 +131,7 @@ if (hasRequest('parent_discoveryid')) {
 			'editable' => true
 		]);
 		if (!$graphPrototype) {
+			zbx_add_post_js("history.replaceState({}, '');");
 			access_deny();
 		}
 	}
@@ -138,15 +144,11 @@ elseif (hasRequest('graphid')) {
 		'editable' => true
 	]);
 	if (!$graph) {
+		zbx_add_post_js("history.replaceState({}, '');");
 		access_deny();
 	}
 }
 elseif ($hostid && !isWritableHostTemplates([$hostid])) {
-	access_deny();
-}
-
-// Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -176,8 +178,6 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	else {
 		$graph = array_merge($graph, $_REQUEST);
 	}
-
-	unset($_REQUEST['graphid']);
 
 	$_REQUEST['form'] = 'clone';
 }
@@ -216,51 +216,53 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('parent_discoveryid')) {
 		$graph['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 
-		if (hasRequest('graphid')) {
+		if (hasRequest('graphid') && getRequest('form') !== 'clone') {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
 
-			$messageSuccess = _('Graph prototype updated');
-			$messageFailed = _('Cannot update graph prototype');
+			$message_success = _('Graph prototype updated');
+			$message_failed = _('Cannot update graph prototype');
 		}
 		else {
 			$result = API::GraphPrototype()->create($graph);
 
-			$messageSuccess = _('Graph prototype added');
-			$messageFailed = _('Cannot add graph prototype');
+			$message_success = _('Graph prototype added');
+			$message_failed = _('Cannot add graph prototype');
 		}
 
-		$cookieId = getRequest('parent_discoveryid');
+		$cookieid = getRequest('parent_discoveryid');
 	}
 	// create and update graphs
 	else {
-		if (hasRequest('graphid')) {
+		if (hasRequest('graphid') && getRequest('form') !== 'clone') {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::Graph()->update($graph);
 
-			$messageSuccess = _('Graph updated');
-			$messageFailed = _('Cannot update graph');
+			$message_success = _('Graph updated');
+			$message_failed = _('Cannot update graph');
 		}
 		else {
 			$result = API::Graph()->create($graph);
 
-			$messageSuccess = _('Graph added');
-			$messageFailed = _('Cannot add graph');
+			$message_success = _('Graph added');
+			$message_failed = _('Cannot add graph');
 		}
 
-		$cookieId = $hostid;
-	}
-
-	if ($result) {
-		unset($_REQUEST['form']);
+		$cookieid = $hostid;
 	}
 
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows($cookieId);
+		CMessageHelper::setSuccessTitle($message_success);
+
+		uncheckTableRows($cookieid);
+
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
+
+	show_error_message($message_failed);
 }
 elseif (hasRequest('delete') && hasRequest('graphid')) {
 	$graphId = getRequest('graphid');
@@ -269,22 +271,27 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		$result = API::GraphPrototype()->delete([$graphId]);
 
 		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Graph prototype deleted'));
 			uncheckTableRows(getRequest('parent_discoveryid'));
 		}
-		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
+		else {
+			CMessageHelper::seterrorTitle(_('Cannot delete graph prototype'));
+		}
 	}
 	else {
 		$result = API::Graph()->delete([$graphId]);
 
 		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Graph deleted'));
 			uncheckTableRows($hostid);
 		}
-		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
+		else {
+			CMessageHelper::seterrorTitle(_('Cannot delete graph'));
+		}
 	}
 
-	if ($result) {
-		unset($_REQUEST['form']);
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updatediscover') {
 	$result = API::GraphPrototype()->update([
@@ -299,10 +306,8 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 		CMessageHelper::setErrorTitle(_('Cannot update graph prototype'));
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
@@ -313,6 +318,9 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 		if ($result) {
 			uncheckTableRows(getRequest('parent_discoveryid'));
+
+			$message_success = _n('Graph prototype deleted', 'Graph prototypes deleted', $graphs_count);
+			CMessageHelper::setSuccessTitle($message_success);
 		}
 		else {
 			$graphs = API::GraphPrototype()->get([
@@ -322,18 +330,19 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 			]);
 
 			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
+
+			$message_failed = _n('Cannot delete graph prototype', 'Cannot delete graph prototypes', $graphs_count);
+			CMessageHelper::setErrorTitle($message_failed);
 		}
-
-		$messageSuccess = _n('Graph prototype deleted', 'Graph prototypes deleted', $graphs_count);
-		$messageFailed = _n('Cannot delete graph prototype', 'Cannot delete graph prototypes', $graphs_count);
-
-		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
 
 		if ($result) {
 			uncheckTableRows($hostid);
+
+			$message_success = _n('Graph deleted', 'Graphs deleted', $graphs_count);
+			CMessageHelper::setSuccessTitle($message_success);
 		}
 		else {
 			$graphs = API::Graph()->get([
@@ -343,12 +352,13 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 			]);
 
 			uncheckTableRows($hostid, zbx_objectValues($graphs, 'graphid'));
+
+			$message_failed = _n('Cannot delete graph', 'Cannot delete graphs', $graphs_count);
+			CMessageHelper::setErrorTitle($message_failed);
 		}
 
-		$messageSuccess = _n('Graph deleted', 'Graphs deleted', $graphs_count);
-		$messageFailed = _n('Cannot delete graph', 'Cannot delete graphs', $graphs_count);
-
-		show_messages($result, $messageSuccess, $messageFailed);
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
 	}
 }
 

@@ -43,13 +43,15 @@ function Overlay(type, dialogueid) {
 
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
-	const $close_btn = jQuery('<button>', {
+	// Hide the button to prevent incorrect screen reader announcements when opening a dialog.
+	this.$dialogue.$close_btn = jQuery('<button>', {
 		class: 'btn-overlay-close',
-		title: t('S_CLOSE')
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
 		e.preventDefault();
-	}.bind(this));
+	}.bind(this))
+		.attr('aria-label', t('Close modal window'))
+		.hide();
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
@@ -58,7 +60,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.$head.append(this.$dialogue.$header, $close_btn);
+	this.$dialogue.$head.append(this.$dialogue.$header, this.$dialogue.$close_btn);
 
 	this.$dialogue.append(this.$dialogue.$head);
 	this.$dialogue.append(this.$dialogue.$body);
@@ -496,7 +498,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" aria-label="${t('Open Zabbix documentation in a new tab')}" href="${obj[key]}"></a>
 				`);
 				break;
 
