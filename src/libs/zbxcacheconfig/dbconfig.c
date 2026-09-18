@@ -17368,17 +17368,12 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 
 void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids)
 {
-	const ZBX_DC_TRIGGER	*dc_trigger;
-
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	if (NULL != (dc_trigger = (const ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid)))
-	{
-		ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
-		if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
-			dc_get_trigger_deps_rec(trigdep, 0, depids);
-	}
+	if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
+		dc_get_trigger_deps_rec(trigdep, 0, depids);
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
