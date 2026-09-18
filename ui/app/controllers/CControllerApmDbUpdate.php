@@ -25,7 +25,7 @@ class CControllerApmDbUpdate extends CController {
 		$status_configured = ['status', 'in' => [APM_GLOBAL_DB_STATUS_CONFIGURED]];
 		$auth_type_password = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD]];
 		$verify_certificate = ['ssl_verify_peer', 'in' => [APM_GLOBAL_DB_VERIFY_PEER_ENABLED]];
-		$url_scheme_https = ['url', 'regex' => '/^https\:\/\//'];
+		$url_scheme_https = ['url', 'regex' => '/^https\:\/\//i'];
 
 		return ['object', 'fields' => [
 			'status' => ['boolean', 'required',
