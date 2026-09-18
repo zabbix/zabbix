@@ -356,7 +356,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (400720, 2, 120004,' Item eth0', '', 'item[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34046, 400720, 400710, 'item[{#NAME}]');
-INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (300002,'{99001}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (300002,'{99001}>0','Trigger eth0', 2, 4, '');
+INSERT INTO trigger_rtdata (triggerid, value) VALUES (300002, 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99001, 400720, 300002, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (300002, 300001);
 
@@ -367,7 +368,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (400740, 18, 120004,' Item_child eth0', '', 'item_child[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4, 400720);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34048, 400740, 400730, 'item[{#NAME}]');
-INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (300004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (300004,'{99003}>0','Trigger eth0', 2, 4, '');
+INSERT INTO trigger_rtdata (triggerid, value) VALUES (300004, 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 400740, 300004, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (300004, 300003);
 

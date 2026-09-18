@@ -30,15 +30,10 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
+#include "zbxsupervisor_client.h"
 #include "zbxcurl.h"
 
 static sigset_t			orig_mask;
-
-static zbx_export_file_t	*problems_export = NULL;
-static zbx_export_file_t	*get_problems_export(void)
-{
-	return problems_export;
-}
 
 static zbx_export_file_t	*history_export = NULL;
 static zbx_export_file_t	*get_history_export(void)
@@ -149,10 +144,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		trends_export = zbx_trends_export_init(get_trends_export, "history-syncer", process_num);
 
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		problems_export = zbx_problems_export_init(get_problems_export, "history-syncer", process_num);
-
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbsyncer_args->config_timeout, &rtc);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	for (;;)
 	{
@@ -175,7 +169,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_block_signals(&orig_mask);
 
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, &sync_stats);
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, &sync_stats);
+
 		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
@@ -249,14 +244,21 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		}
 
 		if (ZBX_SYNC_MORE == sync_stats.more)
+		{
+			if (0 == running)
+				zabbix_log(LOG_LEVEL_DEBUG, "shutdown data sync in progress ...");
 			continue;
+		}
 
 		/* always check if there are values to sync when stopping */
 		if (0 == running)
 			break;
 
-		if (!ZBX_IS_RUNNING())
+		if (!ZBX_IS_RUNNING() && 0 != running)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "shutdown in progress...");
 			running = 0;
+		}
 	}
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
@@ -290,9 +292,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		zbx_export_deinit(trends_export);
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_free(stats);

@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050116);
+define('ZABBIX_DB_VERSION',		7050175);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -332,6 +332,14 @@ define('ZBX_CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 define('ZBX_CONDITION_TYPE_SERVICE',			27);
 define('ZBX_CONDITION_TYPE_SERVICE_NAME',		28);
 define('ZBX_CONDITION_TYPE_PROXY_GROUP',		29);
+define('ZBX_CONDITION_TYPE_EVENT_OPEN',			30);
+define('ZBX_CONDITION_TYPE_EVENT_FIRST',		31);
+define('ZBX_CONDITION_TYPE_EVENT_LAST',			32);
+define('ZBX_CONDITION_TYPE_EVENT_SYMPTOM',		33);
+define('ZBX_CONDITION_TYPE_EVENT_COPIED',		34);
+define('ZBX_CONDITION_TYPE_EVENT_SUPPRESSED',	35);
+define('ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME',	36);
+define('ZBX_CONDITION_TYPE_HOST_GROUP_NAME',	37);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -1210,6 +1218,7 @@ define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',			0x080);
 define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',		0x100);
 define('ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS',	0x200);
 define('ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS',	0x400);
+define('ZBX_PROBLEM_UPDATE_CEP',					0x800);
 
 define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
 
@@ -1218,6 +1227,7 @@ define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',	1);
 define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',	2);
 define('ZBX_EVENT_HISTORY_ALERT',			3);
 define('ZBX_EVENT_HISTORY_MAINTENANCE',		4);
+define('ZBX_EVENT_HISTORY_CEP_UPDATE',		5);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 	1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',		4);
@@ -2069,6 +2079,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_HIDDEN', 'hidden');
+define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_ERROR_CONTAINER', 'error-container');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
@@ -2386,6 +2397,7 @@ define('ZBX_ICON_BULLET_RIGHT_WITH_CONTENT', 'zi-bullet-right-with-content');
 define('ZBX_ICON_CALENDAR', 'zi-calendar');
 define('ZBX_ICON_CALENDAR_CHECK', 'zi-calendar-check');
 define('ZBX_ICON_CALENDAR_WARNING', 'zi-calendar-warning');
+define('ZBX_ICON_CEP', 'zi-cep');
 define('ZBX_ICON_CHEVRON_DOUBLE_LEFT', 'zi-chevron-double-left');
 define('ZBX_ICON_CHECK', 'zi-check');
 define('ZBX_ICON_CHECKBOX', 'zi-checkbox');

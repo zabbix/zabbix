@@ -136,7 +136,7 @@ function getSystemStatusData(array $filter) {
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		unset($options['suppressed']);
-		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid'];
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid'];
 	}
 
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {

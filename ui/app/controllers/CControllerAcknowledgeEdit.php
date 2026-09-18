@@ -104,10 +104,10 @@ class CControllerAcknowledgeEdit extends CController {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-				'suppress_until', 'maintenanceid'
+				'suppress_until', 'maintenanceid', 'details', 'cep_ruleid'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
-				? ['maintenanceid', 'suppress_until']
+				? ['maintenanceid', 'suppress_until', 'cep_ruleid']
 				: null,
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -125,6 +125,17 @@ class CControllerAcknowledgeEdit extends CController {
 				'preservekeys' => true
 			]);
 			$data['problem_name'] = $event['name'];
+
+			$ceprule_actions = array_filter($event['acknowledges'],
+				fn (array $ack) => ($ack['action'] & ZBX_PROBLEM_UPDATE_CEP) == ZBX_PROBLEM_UPDATE_CEP
+			);
+			$data['ceprules'] = $ceprule_actions
+				? API::CepRule()->get([
+					'output' => ['name'],
+					'cep_ruleids' => array_column($ceprule_actions, 'cep_ruleid'),
+					'preservekeys' => true
+				])
+				: [];
 
 			$data['maintenances'] = API::Maintenance()->get([
 				'output' => ['name'],
@@ -163,7 +174,7 @@ class CControllerAcknowledgeEdit extends CController {
 			// Only manually suppressed problems can be unsuppressed.
 			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
 				foreach ($event['suppression_data'] as $suppression) {
-					if ($suppression['maintenanceid'] == 0) {
+					if ($suppression['maintenanceid'] == 0 && $suppression['cep_ruleid'] == 0) {
 						$can_be_unsuppressed = true;
 					}
 				}
