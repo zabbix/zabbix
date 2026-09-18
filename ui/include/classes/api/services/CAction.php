@@ -186,6 +186,53 @@ class CAction extends CApiService {
 					' AND p.hgsetid IS NULL'.
 			')';
 
+			// Check permissions for proxies used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
+			')';
+
+			// Check permissions for proxy group used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN proxy_group pg ON '.zbx_dbcast_2bigint('c.value').'=pg.proxy_groupid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY_GROUP.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg').
+					')'.
+			')';
+
+			// Check permissions for discovery rules used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN drules dr ON '.zbx_dbcast_2bigint('c.value').'=dr.druleid'.
+				' JOIN proxy p ON dr.proxyid=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
+			')';
+
+			// Check permissions for discovery checks used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN dchecks dc ON '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
+				' JOIN drules dr ON dc.druleid=dr.druleid'.
+				' JOIN proxy p ON dr.proxyid=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
+			')';
+
 			// Check permissions of user groups mentioned for "send message" operations.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -3320,15 +3367,29 @@ class CAction extends CApiService {
 
 		$proxyids = array_keys($proxyids);
 
-		$count = API::Proxy()->get([
-			'countOutput' => true,
-			'proxyids' => $proxyids
+		$proxies = API::Proxy()->get([
+			'output' => [],
+			'proxyids' => $proxyids,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($proxyids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-			);
+		foreach ($actions as $i1 => $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $i2 => $condition) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_PROXY) {
+					continue;
+				}
+
+				if (!array_key_exists($condition['value'], $proxies)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value',
+						_('object does not exist, or you have no permissions to it')
+					));
+				}
+			}
 		}
 	}
 
@@ -3360,15 +3421,29 @@ class CAction extends CApiService {
 
 		$proxy_groupids = array_keys($proxy_groupids);
 
-		$count = API::ProxyGroup()->get([
-			'countOutput' => true,
-			'proxy_groupids' => $proxy_groupids
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => [],
+			'proxy_groupids' => $proxy_groupids,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($proxy_groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Incorrect action condition proxy group. Proxy group does not exist or you have no access to it.')
-			);
+		foreach ($actions as $i1 => $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $i2 => $condition) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_PROXY_GROUP) {
+					continue;
+				}
+
+				if (!array_key_exists($condition['value'], $proxy_groups)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value',
+						_('object does not exist, or you have no permissions to it')
+					));
+				}
+			}
 		}
 	}
 

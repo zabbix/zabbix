@@ -163,6 +163,9 @@ ZBX_PTR_VECTOR_IMPL(dc_host_ptr, ZBX_DC_HOST *)
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_PTR_VECTOR_IMPL(dc_function_ptr, ZBX_DC_FUNCTION *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
+ZBX_PTR_VECTOR_IMPL(dc_maintenance_ptr, zbx_dc_maintenance_t *)
+ZBX_PTR_VECTOR_IMPL(dc_maintenance_eventname_ptr, zbx_dc_maintenance_eventname_t *)
+ZBX_PTR_VECTOR_IMPL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_trigger_t *)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
@@ -5187,7 +5190,8 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		if (NULL == (trigger_tag = (zbx_dc_trigger_tag_t *)zbx_hashset_search(&config->trigger_tags, &rowid)))
 			continue;
 
-		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &trigger_tag->triggerid)))
+		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+				&trigger_tag->triggerid)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -7484,11 +7488,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
-			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
-			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
-			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
-			proxy_group_sync, hp_sync, autoreg_config_sync, cep_rule_sync, cep_condition_sync,
-			cep_window_sync, cep_operation_sync, cep_op_condition_sync;
+			maintenance_tag_sync, maintenance_eventname_sync, maintenance_group_sync, maintenance_host_sync,
+			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
+			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
+			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync,
+			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7591,8 +7595,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init(&maintenance_sync, "maintenances", mode, db);
 	zbx_dbsync_init(&maintenance_period_sync, "maintenances_windows", mode, db);
 	zbx_dbsync_init(&maintenance_tag_sync, "maintenance_tag",  mode, db);
+	zbx_dbsync_init(&maintenance_eventname_sync, "maintenance_eventname",  mode, db);
 	zbx_dbsync_init(&maintenance_group_sync, "maintenances_groups", mode, db);
 	zbx_dbsync_init(&maintenance_host_sync, "maintenances_hosts", mode, db);
+	zbx_dbsync_init(&maintenance_trigger_sync, "maintenance_trigger", mode, db);
 
 	zbx_dbsync_init_changelog(&drules_sync, "drules", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&dchecks_sync, "dchecks", changelog_sync_mode, db);
@@ -7684,11 +7690,15 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
 		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_eventnames(&maintenance_eventname_sync))
+		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_periods(&maintenance_period_sync))
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_groups(&maintenance_group_sync))
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_triggers(&maintenance_trigger_sync))
 		goto out;
 
 	if (FAIL == zbx_dbsync_prepare_drules(&drules_sync))
@@ -7730,8 +7740,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 
 	DCsync_maintenances(&maintenance_sync);
 	DCsync_maintenance_tags(&maintenance_tag_sync);
+	DCsync_maintenance_eventnames(&maintenance_eventname_sync);
 	DCsync_maintenance_groups(&maintenance_group_sync);
 	DCsync_maintenance_hosts(&maintenance_host_sync);
+	DCsync_maintenance_triggers(&maintenance_trigger_sync);
 	DCsync_maintenance_periods(&maintenance_period_sync);
 
 	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
@@ -8053,8 +8065,13 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 				config->maintenances.num_data, config->maintenances.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint tags : %d (%d slots)", __func__,
 				config->maintenance_tags.num_data, config->maintenance_tags.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint evtnames: %d (%d slots)", __func__,
+				config->maintenance_eventnames.num_data, config->maintenance_eventnames.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __func__,
 				config->maintenance_periods.num_data, config->maintenance_periods.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint trig : %d (%d slots)", __func__,
+				config->maintenances_for_triggers.num_data,
+				config->maintenances_for_triggers.num_slots);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : %d (%d slots)", __func__,
 				config->drules.num_data, config->drules.num_slots);
@@ -8199,8 +8216,10 @@ clean:
 	zbx_dbsync_clear(&maintenance_sync);
 	zbx_dbsync_clear(&maintenance_period_sync);
 	zbx_dbsync_clear(&maintenance_tag_sync);
+	zbx_dbsync_clear(&maintenance_eventname_sync);
 	zbx_dbsync_clear(&maintenance_group_sync);
 	zbx_dbsync_clear(&maintenance_host_sync);
+	zbx_dbsync_clear(&maintenance_trigger_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
 	zbx_dbsync_clear(&drules_sync);
 	zbx_dbsync_clear(&dchecks_sync);
@@ -8689,6 +8708,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->maintenances, 0);
 	CREATE_HASHSET(config->maintenance_periods, 0);
 	CREATE_HASHSET(config->maintenance_tags, 0);
+	CREATE_HASHSET(config->maintenance_eventnames, 0);
+	CREATE_HASHSET(config->maintenances_for_triggers, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 0, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -17361,17 +17382,12 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 
 void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids)
 {
-	const ZBX_DC_TRIGGER	*dc_trigger;
-
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	if (NULL != (dc_trigger = (const ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid)))
-	{
-		ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
-		if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
-			dc_get_trigger_deps_rec(trigdep, 0, depids);
-	}
+	if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
+		dc_get_trigger_deps_rec(trigdep, 0, depids);
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }

@@ -347,7 +347,7 @@ function actionConditionValueToString(array $actions): array {
 						break;
 
 					case ZBX_CONDITION_TYPE_DCHECK:
-						if (array_key_exists($id, $dchecks)) {
+						if (array_key_exists($id, $dchecks) && $dchecks[$id]['drules']) {
 							$drule = reset($dchecks[$id]['drules']);
 							$type = $dchecks[$id]['type'];
 							$key_ = $dchecks[$id]['key_'];

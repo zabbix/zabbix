@@ -617,5 +617,8 @@ void	zbx_db_stash_connection(zbx_dbconn_t *db);
 #define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
 #define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
+
 #endif
 

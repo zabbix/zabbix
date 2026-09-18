@@ -17,7 +17,6 @@
 #include "zbx_trigger_constants.h"
 
 #include "zbxcrypto.h"
-#include "zbxdbwrap.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbx_host_constants.h"

@@ -1813,7 +1813,7 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 
 		/* clear the hashset in the case loading was retried because of database connection failure */
 		zbx_hashset_iter_reset(&pool->windows, &iter);
-		while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
+		while (NULL != (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter))
 			zbx_hashset_iter_remove(&iter);
 
 		zbx_dbconn_begin(db);
