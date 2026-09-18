@@ -84,6 +84,7 @@ const view = new class {
 
 		this.#url_input?.addEventListener('input', () => {
 			this.#url_changed = true;
+			this.#tls_automatically_checked = false;
 
 			if (this.#password_input !== null && !this.#password_changed) {
 				const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
@@ -132,24 +133,31 @@ const view = new class {
 		}
 
 		if (values.status === APM_GLOBAL_DB_STATUS_CONFIGURED) {
-			const url = values.url?.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, '') ?? '';
 			const auth_type_input = this.#getFormField('authentication_type')?.querySelector('input:checked');
 			const authentication_type = parseInt(auth_type_input?.value ?? APM_GLOBAL_DB_AUTHTYPE_PASSWORD);
 
-			return {...values, url, authentication_type};
+			return {
+				...values,
+				url: this.#sanitizeUrl(values.url),
+				authentication_type
+			};
 		}
 
 		return values;
 	}
 
+	#sanitizeUrl(url) {
+		return url?.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, '') ?? '';
+	}
+
 	#updateForm({initial_values}) {
 		const values = this.#getAllValues();
+		const url = this.#sanitizeUrl(this.#form.findFieldByName('url')?.getField()?.value);
+		const ssl_verify_peer = this.#form.findFieldByName('ssl_verify_peer')?.getField();
 
 		const show_fields = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
 		const show_user_fields = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
-		const show_ssl_fields = show_fields && values.url.substring(0, 8).toLowerCase() === 'https://';
-		const show_ssl_verify_peer_fields = show_ssl_fields
-			&& values.ssl_verify_peer === APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
+		const show_ssl_fields = show_fields && url.substring(0, 8).toLowerCase() === 'https://';
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-url'),
@@ -167,26 +175,27 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-peer')
 		], show_ssl_fields, true);
 
-		const ssl_verify_host_fields = document.querySelectorAll('.js-ssl-verify-host');
+		if ((initial_values.status === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED || this.#url_changed) && show_ssl_fields
+				&& !this.#tls_automatically_checked) {
 
-		this.#updateDisplayState([...ssl_verify_host_fields], show_ssl_verify_peer_fields, true);
-
-		if (initial_values.status === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED && this.#url_changed && show_ssl_fields) {
-			const ssl_verify_peer = this.#form.findFieldByName('ssl_verify_peer')?.getField();
-
-			if (!this.#tls_automatically_checked && ssl_verify_peer !== null) {
-				this.#updateDisplayState([...ssl_verify_host_fields], true, true);
-
+			if (ssl_verify_peer !== null) {
 				ssl_verify_peer.checked = true;
-
-				const ssl_verify_host = this.#form.findFieldByName('ssl_verify_host')?.getField();
-				if (ssl_verify_host !== null) {
-					ssl_verify_host.checked = true;
-				}
-
-				this.#tls_automatically_checked = true;
 			}
+
+			const ssl_verify_host = this.#form.findFieldByName('ssl_verify_host')?.getField();
+
+			if (ssl_verify_host !== null) {
+				ssl_verify_host.checked = true;
+			}
+
+			this.#tls_automatically_checked = true;
 		}
+
+		const show_ssl_verify_host_fields = show_ssl_fields && ssl_verify_peer?.checked;
+
+		this.#updateDisplayState([
+			...document.querySelectorAll('.js-ssl-verify-host')
+		], show_ssl_verify_host_fields, true);
 
 		const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
 			&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
