@@ -9512,7 +9512,9 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				*dst_item->snmp_max_repetitions_orig = '\0';
 				dst_item->snmp_max_repetitions = 0;
+				*dst_item->snmp_retries_orig = '\0';
 				dst_item->snmp_retries = 0;
 				dst_item->timeout = 0;
 			}
@@ -9737,7 +9739,9 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		dst_item->snmpv3_privprotocol = 0;
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+		*dst_item->snmp_max_repetitions_orig = '\0';
 		dst_item->snmp_max_repetitions = 0;
+		*dst_item->snmp_retries_orig = '\0';
 		dst_item->snmp_retries = 0;
 		dst_item->timeout = 0;
 		dst_item->snmp_max_repetitions = 0;
