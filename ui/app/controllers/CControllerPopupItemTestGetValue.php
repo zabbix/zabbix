@@ -220,6 +220,12 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 	protected function checkInput() {
 		$ret = $this->validateInput(self::getValidationRules());
 
+		if ($ret && $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY
+				&& $this->getInput('proxyid', 0) == 0) {
+			error(_('Proxy is not assigned yet.'));
+			$ret = false;
+		}
+
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 			$response = $form_errors
@@ -239,6 +245,22 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions() {
+		if (!parent::checkPermissions()) {
+			return false;
+		}
+
+		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
+			$proxyid = $this->getInput('proxyid', 0);
+
+			return bccomp($proxyid, $this->host['proxyid']) == 0
+				|| ($proxyid != 0 && !CProxyHelper::resolveProxyOption($proxyid)['inaccessible']);
+		}
+
+		return true;
 	}
 
 	protected function doAction() {

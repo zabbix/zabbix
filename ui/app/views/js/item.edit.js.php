@@ -1110,9 +1110,16 @@ window.item_edit_form = new class {
 	#updateTimeoutOverrideVisibility() {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
+		const timeout_inaccessible = this.form_element.querySelector('#js-item-timeout-inaccessible');
 
-		this.form_element.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
 		this.form_element.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
+
+		if (timeout_inaccessible !== null) {
+			timeout_inaccessible.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
+		else {
+			this.form_element.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
 	}
 
 	#updateTimeoutVisibility() {

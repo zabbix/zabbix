@@ -483,6 +483,8 @@ class CAudit {
 		'itemprototype.tags' => 'item_tag',
 		'maintenance.groups' => 'maintenances_groups',
 		'maintenance.hosts' => 'maintenances_hosts',
+		'maintenance.triggers' => 'maintenance_trigger',
+		'maintenance.event_names' => 'maintenance_eventname',
 		'maintenance.tags' => 'maintenance_tag',
 		'maintenance.timeperiods' => 'timeperiods',
 		'mediatype.message_templates' => 'media_type_message',
@@ -518,7 +520,9 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups'
+		'usergroup.users' => 'users_groups',
+		'usergroup.proxies' => 'usrgrp_proxy',
+		'usergroup.proxy_groups' => 'usrgrp_proxy_group'
 	];
 
 	/**
@@ -615,6 +619,8 @@ class CAudit {
 		'itemprototype.query.filter.conditions' => null,
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
+		'maintenance.triggers' => 'maintenance_triggerid',
+		'maintenance.event_names' => 'maintenance_eventnameid',
 		'maintenance.tags' => 'maintenancetagid',
 		'maintenance.timeperiods' => 'timeperiodid',
 		'mediatype.message_templates' => 'mediatype_messageid',
@@ -650,7 +656,9 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
-		'usergroup.users' => 'id'
+		'usergroup.users' => 'id',
+		'usergroup.proxies' => 'proxyid',
+		'usergroup.proxy_groups' => 'proxy_groupid'
 	];
 
 	/**

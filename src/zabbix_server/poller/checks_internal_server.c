@@ -111,7 +111,11 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 		int	res;
 		char	*error = NULL;
 
-		/* this item is always processed by server */
+		if (HOST_MONITORED_BY_SERVER != item->host.monitored_by)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Can be monitored only by server."));
+			goto out;
+		}
 
 		if (2 > nparams || 3 < nparams)
 		{
@@ -309,11 +313,14 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 	/* zabbix["proxy group",<groupname>,"state" OR "available" OR "pavailable" OR "proxies" ] */
 	else if (0 == strcmp(param1, "proxy group"))
 	{
-		char		*error = NULL;
+		char		*data, *error = NULL;
 		zbx_pg_stats_t	stats;
-		char		*data;
 
-		/* this item is always processed by server */
+		if (HOST_MONITORED_BY_SERVER != item->host.monitored_by)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Can be monitored only by server."));
+			goto out;
+		}
 
 		if (2 != nparams && 3 != nparams)
 		{
