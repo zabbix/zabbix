@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-07-24 01:03+0000\n"
+"PO-Revision-Date: 2026-09-15 06:41+0000\n"
 "Last-Translator: Haruka K <hkageyama@odp.co.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -15249,7 +15249,7 @@ msgstr "OID接頭辞"
 #: include/classes/screens/CScreenHttpTest.php:139 include/maps.inc.php:428
 #: include/triggers.inc.php:72
 msgid "OK"
-msgstr "正常"
+msgstr "OK"
 
 #: app/partials/trigger.edit.trigger.tab.php:245
 msgid "OK event closes"
