@@ -117,7 +117,8 @@ static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t las
 	else if (SUCCEED_PARTIAL == parse_ret)
 	{
 		/* when testing an item, if result is truncated, the check is considered not successful */
-		*error = zbx_dsprintf(NULL, "telemetry query result row limit (%d) exceeded", ZBX_TQ_MAX_RESULT_ROWS);
+		*error = zbx_dsprintf(NULL, "Telemetry query result row limit (%d) exceeded, result was truncated",
+				ZBX_TQ_MAX_RESULT_ROWS);
 		goto out;
 	}
 
