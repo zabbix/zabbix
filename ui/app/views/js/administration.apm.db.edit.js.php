@@ -132,7 +132,7 @@ const view = new class {
 		}
 
 		if (values.status === APM_GLOBAL_DB_STATUS_CONFIGURED) {
-			const url = values.url?.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, '')?.toLowerCase() ?? '';
+			const url = values.url?.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, '') ?? '';
 			const auth_type_input = this.#getFormField('authentication_type')?.querySelector('input:checked');
 			const authentication_type = parseInt(auth_type_input?.value ?? APM_GLOBAL_DB_AUTHTYPE_PASSWORD);
 
