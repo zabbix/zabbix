@@ -1678,11 +1678,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->page->waituntilReady();
 
 		$this->assertTableDataColumn($column_content, 'Name');
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {

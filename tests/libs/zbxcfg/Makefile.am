@@ -8,7 +8,7 @@ parse_cfg_file_SOURCES = \
 	../../zbxmocktest.h
 
 CFG_LIBS = \
-	$(CFG_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

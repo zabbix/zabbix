@@ -485,7 +485,7 @@ window.item_edit_form = new class {
 	}
 
 	#showErrorDialog(body, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup',
 			content: jQuery('<span>').html(body),
@@ -499,11 +499,13 @@ window.item_edit_form = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: jQuery(trigger_element)
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
-		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';
@@ -643,10 +645,12 @@ window.item_edit_form = new class {
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
 
-				const $tags_table = jQuery(this.tags_table);
+				if (!('readonly' in this.tags_table.dataset)) {
+					const $tags_table = jQuery(this.tags_table);
 
-				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+					$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+				}
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

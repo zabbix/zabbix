@@ -191,6 +191,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProviderTLS() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+		}
+
 		self::$certBaseDirAgent = self::generateCertificates();
 		$baseDir = self::$certBaseDirAgent;
 		return [
@@ -233,8 +237,11 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED ' .
@@ -430,6 +437,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
+	if ($this->detectTLSLibrary() === 'none') {
+		$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+	}
+
 	self::$certBaseDirProxy = self::generateCertificates();
 	$baseDir = self::$certBaseDirProxy;
 
@@ -492,20 +503,29 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+		$openssl = ('gnutls' !== $this->detectTLSLibrary());
+
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_accept():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 

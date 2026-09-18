@@ -256,7 +256,7 @@ class CFormValidator {
 			while (path_for_data_lookup.length) {
 				const part = path_for_data_lookup.shift();
 
-				if (!(part in field_data)) {
+				if (typeof(field_data) !== 'object' || !(part in field_data)) {
 					return null;
 				}
 
@@ -430,8 +430,20 @@ class CFormValidator {
 		const checkField = (rule_set, field, data, field_path) => {
 			const when_paths = updateWhenReferences(rule_set, field_path);
 
+			const when_match = when_paths.every((when_path, index) => {
+				const when_rules = {...rule_set.when[index]};
+				delete when_rules[0];
+
+				return when_path in when_fields_data
+					&& this.#checkValue(when_rules, when_fields_data[when_path]);
+			});
+
+			if (!when_match) {
+				return;
+			}
+
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
-				if (data[field] !== null) {
+				if (this.#isTypeObject(data) && field in data && data[field] !== null) {
 					Object.entries(data[field]).forEach(([key, value]) => {
 						scanObject(value, field_path + '/' + key);
 
@@ -442,11 +454,12 @@ class CFormValidator {
 				}
 			}
 			else if (rule_set.type === 'object') {
-				if (data[field] !== null) {
-					scanObject(data[field], field_path);
+				if (this.#isTypeObject(data)) {
+					scanObject(field in data ? data[field] : null, field_path);
 				}
 			}
-			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type)) {
+			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type) && this.#isTypeObject(data)
+					&& field in data) {
 				if (!when_paths.length) {
 					checkUse(rule_set, field_path);
 				}
@@ -465,10 +478,6 @@ class CFormValidator {
 		};
 
 		const scanObject = (data, field_path) => {
-			if (!this.#isTypeObject(data)) {
-				return;
-			}
-
 			const rule_sets = getRuleSetsByPath(field_path);
 
 			rule_sets.forEach(rule_set => {
@@ -476,9 +485,7 @@ class CFormValidator {
 
 				if ('fields' in rule_set) {
 					Object.entries(rule_set.fields).forEach(([field, rule_sets]) => {
-						if (field in data) {
-							rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
-						}
+						rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
 					});
 				}
 			});
@@ -788,15 +795,28 @@ class CFormValidator {
 
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
-				const current_field_name = current_rule_path.split('/').at(-1);
 				let related_fields = [];
+
+				const getFieldNameByRefPath = (ref_field_path, current_rule_path) => {
+					let name_parts = 1;
+
+					while (ref_field_path.startsWith('../')) {
+						ref_field_path = ref_field_path.substring(3);
+						name_parts++;
+					}
+
+					return current_rule_path.split('/').splice(-name_parts).join('/');
+				}
 
 				Object.entries(rules).forEach(([rule_key, rule_value]) => {
 					if (rule_key === 'when') {
 						rule_value.forEach((when) => {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
-								related_fields.push(this.#getFieldAbsolutePath(current_field_name, lookup_field_path));
+								related_fields.push(this.#getFieldAbsolutePath(
+									getFieldNameByRefPath(when[0], current_rule_path),
+									lookup_field_path
+								));
 							}
 						});
 					}
@@ -896,6 +916,7 @@ class CFormValidator {
 		};
 
 		let subset = Object.create(null);
+		fields_to_validate.sort();
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);
@@ -1373,15 +1394,11 @@ class CFormValidator {
 	 */
 	#validateArray(rules, array_values, path) {
 		/*
-		 * Some arrays received from form are interpreted as objects so, if it's object but all keys are numeric, it's
-		 * actually array.
+		 * All keys must be numeric. Not all values are always validated therefore some keys might be missing.
 		 */
 		if (this.#isTypeObject(array_values)
-			&& Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
-			array_values = Object.values(array_values);
-		}
+				&& !Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
 
-		if (!Array.isArray(array_values)) {
 			this.#addError(path, this.#getMessage(rules, 'type', t('An array is expected.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1389,7 +1406,7 @@ class CFormValidator {
 			return {result: CFormValidator.ERROR};
 		}
 
-		if ('not_empty' in rules && !array_values.filter(v => v !== null).length) {
+		if ('not_empty' in rules && !Object.values(array_values).filter(v => v !== null).length) {
 			this.#addError(path, this.#getMessage(rules, 'not_empty', t('This field cannot be empty.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1398,22 +1415,28 @@ class CFormValidator {
 		}
 
 		if ('field' in rules) {
-			const normalized_values = [];
+			const normalized_values = Object.create(null);
+			let has_error = false;
 
-			for (let i = 0; array_values.length > i; i++) {
+			for (const i of Object.keys(array_values)) {
 				const {result, error, value = array_values} = this.#validateField(rules.field, array_values, i,
 					path + '/' + i
 				);
 
 				if (result === CFormValidator.ERROR) {
-					error && this.#addError(path, error, CFormValidator.ERROR_LEVEL_PRIMARY);
-
-					return {result: CFormValidator.ERROR};
+					has_error = true;
+					error && this.#addError(path + '/' + i, error, CFormValidator.ERROR_LEVEL_PRIMARY);
 				}
 				else {
-					normalized_values.push(value[i]);
+					this.#addPath(path + '/' + i, CFormValidator.ERROR_LEVEL_PRIMARY);
+					normalized_values[i] = value[i];
 				}
 			}
+
+			if (has_error) {
+				return {result: CFormValidator.ERROR};
+			}
+
 			array_values = normalized_values;
 		}
 
@@ -1607,7 +1630,14 @@ class CFormValidator {
 	 * @returns {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
-		const target_path = [...field_path.split('/').slice(0, -1), field_name];
+		const target_path = field_path.split('/').slice(0, -1);
+
+		while (field_name.startsWith('../')) {
+			field_name = field_name.substring(3);
+			target_path.pop();
+		}
+
+		target_path.push(field_name);
 
 		return `/${target_path.join('/')}`.replace(/\/\/+/g, '/');
 	}

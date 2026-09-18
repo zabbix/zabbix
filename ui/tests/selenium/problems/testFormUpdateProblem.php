@@ -313,7 +313,7 @@ class testFormUpdateProblem extends CWebTest {
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
 				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
 			}
@@ -390,7 +390,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check other buttons in overlay.
 		$button_queries = [
 			// Button ? (help) is covered in testDocumentationLinks.
-			'xpath:.//button[@title="Close"]' => true,
+			'xpath:.//button[@aria-label="Close modal window"]' => true,
 			'xpath:.//button[@id="suppress_until_problem_calendar"]' => false,
 			'button:Update' => true,
 			'button:Cancel' => true
@@ -861,7 +861,7 @@ class testFormUpdateProblem extends CWebTest {
 				'Acknowledge' => true
 		]);
 
-		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
+		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@aria-label="Close modal window"]' : 'button:Cancel')->one()
 				->waitUntilClickable()->click();
 		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
@@ -930,8 +930,8 @@ class testFormUpdateProblem extends CWebTest {
 		$row->invalidate();
 		$unsuppress_button = 'xpath:.//button['.CXPathHelper::fromClass('zi-eye').']';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
-		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue wordbreak"]')->asOverlayDialog()
-				->one()->waitUntilReady();
+
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilVisible()->one();
 		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');
 		$hint->close();
 
