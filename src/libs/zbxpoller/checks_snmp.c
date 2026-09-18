@@ -1044,7 +1044,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 		unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, unsigned char *securityEngineID,
 		size_t securityEngineIDLen, unsigned char *securityAuthKey, size_t securityAuthKeyLen,
 		unsigned char *securityPrivKey, size_t securityPrivKeyLen, char *error,
-		size_t max_error_len, int timeout, const char *config_source_ip, zbx_uint64_t itemid)
+		size_t max_error_len, int timeout, int retries, const char *config_source_ip, zbx_uint64_t itemid)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -1089,6 +1089,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 	session.timeout = timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
+	session.retries = retries;
 	if (SUCCEED == zbx_is_ip4(ip))
 		zbx_snprintf(addr, sizeof(addr), "%s:%hu", ip, port);
 	else
@@ -3672,7 +3673,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 				snmp_context->snmpv3_privprotocol, snmp_context->snmpv3_privpassphrase,
 				securityEngineID, securityEngineIDLen, securityAuthKey, securityAuthKeyLen,
 				securityPrivKey, securityPrivKeyLen, error, sizeof(error), 0,
-				snmp_context->config_source_ip, snmp_context->item.itemid)))
+				snmp_context->retries, snmp_context->config_source_ip, snmp_context->item.itemid)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
@@ -4463,7 +4464,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
-			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			error, sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4487,7 +4488,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
-			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			error, sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4511,7 +4512,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0,  NULL, 0, error,
-			sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
