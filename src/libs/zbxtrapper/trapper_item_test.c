@@ -19,6 +19,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
+#include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -32,6 +33,7 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxexpr.h"
 
@@ -217,6 +219,90 @@ static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_
 	return FAIL;
 }
 
+static int	fill_test_item_host(zbx_dc_item_t *item, const struct zbx_json_parse *jp_host, char **info)
+{
+	int				ret = FAIL;
+	char				tmp[MAX_STRING_LEN + 1];
+	AGENT_REQUEST			request;
+	const char			*param1;
+	static const zbx_db_table_t	*table_hosts;
+
+	if (SUCCEED == zbx_json_value_by_name(jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(item->host.hostid, tmp);
+	else
+		item->host.hostid = 0;
+
+	zbx_init_agent_request(&request);
+
+	if (ITEM_TYPE_INTERNAL == item->type)
+	{
+		if (SUCCEED != zbx_parse_item_key(item->key, &request))
+		{
+			*info = zbx_strdup(NULL, "Invalid item key format.");
+			goto out;
+		}
+
+		if (NULL == (param1 = get_rparam(&request, 0)))
+		{
+			*info = zbx_strdup(NULL, "Invalid number of parameters.");
+			goto out;
+		}
+
+		if (0 == strcmp(param1, "proxy") || (0 == strcmp(param1, "proxy group")))
+		{
+			if (FAIL == zbx_dc_get_host_by_hostid(&item->host, item->host.hostid))
+			{
+				*info = zbx_strdup(NULL, "Can be tested only on host.");
+				goto out;
+			}
+		}
+	}
+
+	ret = SUCCEED;
+
+	if (NULL == table_hosts)
+		table_hosts = zbx_db_get_table("hosts");
+
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item->host.host, sizeof(item->host.host));
+
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_MAINTENANCE_STATUS, table_hosts, "maintenance_status",
+			&item->host.maintenance_status);
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
+			&item->host.maintenance_type);
+
+	if (SUCCEED == zbx_json_value_by_name(jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
+	{
+		item->host.ipmi_authtype = (signed char)atoi(tmp);
+	}
+	else
+	{
+		item->host.ipmi_authtype = (signed char)atoi(
+				zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	}
+
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
+			&item->host.ipmi_privilege);
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
+			item->host.ipmi_username, sizeof(item->host.ipmi_username));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
+			item->host.ipmi_password, sizeof(item->host.ipmi_password));
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item->host.tls_connect);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item->host.tls_issuer,
+			sizeof(item->host.tls_issuer));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_SUBJECT, table_hosts, "tls_subject", item->host.tls_subject,
+			sizeof(item->host.tls_subject));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_PSK_IDENTITY, table_hosts, "tls_psk_identity",
+			item->host.tls_psk_identity, sizeof(item->host.tls_psk_identity));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item->host.tls_psk,
+			sizeof(item->host.tls_psk));
+#endif
+out:
+	zbx_free_agent_request(&request);
+
+	return ret;
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
@@ -226,7 +312,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
-	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
+	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp;
 	struct zbx_json_parse		jp_item, jp_host, jp_steps, jp_interface, jp_details, jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
@@ -430,48 +516,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.snmpv3_contextname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_CONTEXTNAME, table_interface_snmp,
 			"contextname");
 
-	if (NULL == table_hosts)
-		table_hosts = zbx_db_get_table("hosts");
-
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
-
-	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UINT64(item.host.hostid, tmp);
-	else
-		item.host.hostid = 0;
-
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_STATUS, table_hosts, "maintenance_status",
-			&item.host.maintenance_status);
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
-			&item.host.maintenance_type);
-
-	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
-	{
-		item.host.ipmi_authtype = (signed char)atoi(tmp);
-	}
-	else
-	{
-		item.host.ipmi_authtype =
-				(signed char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
-	}
-
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
-			&item.host.ipmi_privilege);
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
-			item.host.ipmi_username, sizeof(item.host.ipmi_username));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
-			item.host.ipmi_password, sizeof(item.host.ipmi_password));
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item.host.tls_connect);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item.host.tls_issuer,
-			sizeof(item.host.tls_issuer));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_SUBJECT, table_hosts, "tls_subject", item.host.tls_subject,
-			sizeof(item.host.tls_subject));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK_IDENTITY, table_hosts, "tls_psk_identity",
-			item.host.tls_psk_identity, sizeof(item.host.tls_psk_identity));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
-			sizeof(item.host.tls_psk));
-#endif
+	if (FAIL == fill_test_item_host(&item, &jp_host, info))
+		goto out;
 
 	if (FAIL == process_zero_pollers_items(&item, get_config_forks, info))
 	{
@@ -633,10 +679,11 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		char **error)
 {
 	zbx_user_t		user;
+	zbx_dc_host_t		host;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
 	zbx_uint64_t		proxyid = 0;
-	int			ret = FAIL, state = 0, value_found;
+	int			ret = FAIL, state = 0, value_found, monitoring_allowed;
 	size_t			value_size = 0, key_size = 0;
 	zbx_apm_db_config_t	apm_db_config;
 
@@ -700,8 +747,57 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	else
 		goto preproc_test;
 
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+	{
+		ZBX_STR2UINT64(host.hostid, tmp);
+
+		if (FAIL == zbx_dc_get_host_by_hostid(&host, host.hostid) ||
+				PERM_READ_WRITE != zbx_get_host_permission(&user, host.hostid))
+		{
+			*error = zbx_strdup(NULL, "Failed to validate host permissions.");
+			goto out;
+		}
+	}
+	else
+		host.hostid = 0;
+
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
+
+	if (0 == proxyid)
+		monitoring_allowed = zbx_db_server_allowed_for_monitoring(&user);
+	else
+		monitoring_allowed = zbx_db_proxy_allowed_for_monitoring(&user, proxyid);
+
+	if (FAIL == monitoring_allowed && 0 != host.hostid)
+	{
+		if (0 == proxyid)
+		{
+			if (HOST_MONITORED_BY_SERVER == host.monitored_by)
+				monitoring_allowed = SUCCEED;
+		}
+		else if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+		{
+			if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+			{
+				if (FAIL == zbx_dc_get_host_proxyid_by_name(host.host, &host.proxyid))
+					host.proxyid = 0;
+			}
+
+			if (host.proxyid == proxyid)
+				monitoring_allowed = SUCCEED;
+		}
+	}
+
+	if (FAIL == monitoring_allowed)
+	{
+		if (0 == proxyid)
+			*error = zbx_strdup(NULL, "Server monitoring permission denied.");
+		else
+			*error = zbx_strdup(NULL, "Proxy monitoring permission denied.");
+
+		goto out;
+	}
 
 	zbx_dc_config_get_apm_db_config(&apm_db_config, config_apm_db_config, config_comms->config_source_ip,
 			config_comms->config_ssl_ca_location);

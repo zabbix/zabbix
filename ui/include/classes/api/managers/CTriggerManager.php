@@ -49,6 +49,7 @@ class CTriggerManager {
 		$del_triggerids = array_keys($del_triggerids);
 
 		self::checkUsedInActions($del_triggerids);
+		self::checkMaintenances($del_triggerids);
 
 		API::Map()->unlinkTriggers($del_triggerids);
 
@@ -78,6 +79,53 @@ class CTriggerManager {
 		if ($row) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete trigger "%1$s": %2$s.',
 				$row['description'], _s('action "%1$s" uses this trigger', $row['name'])
+			));
+		}
+	}
+
+	/**
+	 * Check that no maintenance object will be left without host groups, hosts and triggers as the result of the
+	 * given triggers deletion.
+	 *
+	 * @throws APIException
+	 */
+	private static function checkMaintenances(array $triggerids): void {
+		$maintenance = DBfetch(DBselect(
+			'SELECT mt.maintenanceid,m.name'.
+			' FROM maintenance_trigger mt'.
+			' JOIN maintenances m ON mt.maintenanceid=m.maintenanceid'.
+			' WHERE '.dbConditionId('mt.triggerid', $triggerids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenance_trigger mt1'.
+					' WHERE mt.maintenanceid=mt1.maintenanceid'.
+						' AND '.dbConditionId('mt1.triggerid', $triggerids, true).
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh'.
+					' WHERE mt.maintenanceid=mh.maintenanceid'.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg'.
+					' WHERE mt.maintenanceid=mg.maintenanceid'.
+				')'
+		, 1));
+
+		if ($maintenance) {
+			$maintenance_triggers = DBfetchColumn(DBselect(
+				'SELECT t.description'.
+				' FROM maintenance_trigger mt,triggers t'.
+				' WHERE mt.triggerid=t.triggerid'.
+					' AND '.dbConditionId('mt.maintenanceid', [$maintenance['maintenanceid']])
+			), 'description');
+			natsort($maintenance_triggers);
+
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete trigger %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
+				'Cannot delete triggers %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
+				'"'.implode('", "', $maintenance_triggers).'"', $maintenance['name'], count($maintenance_triggers)
 			));
 		}
 	}

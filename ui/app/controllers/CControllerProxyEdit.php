@@ -106,7 +106,8 @@ class CControllerProxyEdit extends CController {
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject'],
 					'custom_timeouts' => (int) $this->proxy['custom_timeouts']
-				]
+				],
+				'warnings' => []
 			];
 
 			$data['form'] += $this->proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED
@@ -136,6 +137,21 @@ class CControllerProxyEdit extends CController {
 					'timeout_browser' => $this->proxy['timeout_browser'],
 					'timeout_telemetry_query' => $this->proxy['timeout_telemetry_query']
 				];
+
+			$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
+
+			$usrgrps = API::UserGroup()->get([
+				'output' => ['name'],
+				'proxyids' => $this->proxy['proxyid'],
+				'limit' => $limit
+			]);
+
+			if ($usrgrps) {
+				$data['warnings'][] = _s(
+					'By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s.',
+					implode(', ', array_column($usrgrps, 'name'))
+				);
+			}
 		}
 		else {
 			$data = [
@@ -169,7 +185,8 @@ class CControllerProxyEdit extends CController {
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
 					'timeout_telemetry_query' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
-				]
+				],
+				'warnings' => []
 			];
 		}
 

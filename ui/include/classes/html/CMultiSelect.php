@@ -253,7 +253,7 @@ class CMultiSelect extends CTag {
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
 					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned',
-					'has_devices_access', 'userid'
+					'has_devices_access', 'userid', 'without_proxy_group'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -441,6 +441,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('has_devices_access', $parameters) && $parameters['has_devices_access']) {
 					$popup_parameters['has_devices_access'] = 1;
 					$autocomplete_parameters['has_devices_access'] = 1;
+				}
+
+				if (array_key_exists('without_proxy_group', $parameters) && $parameters['without_proxy_group']) {
+					$popup_parameters['without_proxy_group'] = '1';
+					$autocomplete_parameters['without_proxy_group'] = true;
 				}
 			}
 

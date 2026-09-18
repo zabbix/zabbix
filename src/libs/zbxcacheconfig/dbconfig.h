@@ -874,20 +874,34 @@ zbx_dc_item_param_t;
 
 typedef struct
 {
-	zbx_uint64_t		maintenanceid;
-	unsigned char		type;
-	unsigned char		tags_evaltype;
-	unsigned char		state;
-	int			active_since;
-	int			active_until;
-	int			running_since;
-	int			running_until;
-	zbx_vector_uint64_t	groupids;
-	zbx_vector_uint64_t	hostids;
-	zbx_vector_ptr_t	tags;
-	zbx_vector_ptr_t	periods;
+	zbx_uint64_t	maintenance_eventnameid;
+	zbx_uint64_t	maintenanceid;
+	unsigned char	op;		/* condition operator */
+	const char	*value;
+}
+zbx_dc_maintenance_eventname_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenance_eventname_ptr, zbx_dc_maintenance_eventname_t *)
+
+typedef struct
+{
+	zbx_uint64_t					maintenanceid;
+	unsigned char					type;
+	unsigned char					tags_evaltype;
+	unsigned char					state;
+	int						active_since;
+	int						active_until;
+	int						running_since;
+	int						running_until;
+	zbx_vector_uint64_t				groupids;
+	zbx_vector_uint64_t				hostids;
+	zbx_vector_ptr_t				tags;
+	zbx_vector_dc_maintenance_eventname_ptr_t	eventnames;
+	zbx_vector_ptr_t				periods;
 }
 zbx_dc_maintenance_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenance_ptr, zbx_dc_maintenance_t *)
 
 typedef struct
 {
@@ -913,6 +927,15 @@ typedef struct
 	int		start_date;
 }
 zbx_dc_maintenance_period_t;
+
+typedef struct
+{
+	zbx_uint64_t			triggerid;
+	zbx_vector_dc_maintenance_ptr_t	maintenances;
+}
+zbx_dc_maintenances_for_trigger_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_trigger_t *)
 
 typedef struct
 {
@@ -1070,6 +1093,8 @@ typedef struct
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
+	zbx_hashset_t		maintenance_eventnames;
+	zbx_hashset_t		maintenances_for_triggers;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -1183,9 +1208,11 @@ typedef struct zbx_dbsync zbx_dbsync_t;
 
 void	DCsync_maintenances(zbx_dbsync_t *sync);
 void	DCsync_maintenance_tags(zbx_dbsync_t *sync);
+void	DCsync_maintenance_eventnames(zbx_dbsync_t *sync);
 void	DCsync_maintenance_periods(zbx_dbsync_t *sync);
 void	DCsync_maintenance_groups(zbx_dbsync_t *sync);
 void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
+void	DCsync_maintenance_triggers(zbx_dbsync_t *sync);
 
 /* maintenance support */
 

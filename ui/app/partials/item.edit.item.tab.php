@@ -990,10 +990,17 @@ $formgrid->addItem([
 			->setModern()
 			->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$item['timeout_inaccessible']
+			? (new CSpan(makeWarningIcon(
+				_('The timeout value is unavailable because it is configured on a proxy that you do not have permission to.')
+			)))
+				->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null)
+				->setId('js-item-timeout-inaccessible')
+			: null,
 		(new CTextBox('inherited_timeout', $item['inherited_timeout']))
 			->setReadonly(true)
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null),
+			->addClass($custom_timeout_enabled || $item['timeout_inaccessible'] ? ZBX_STYLE_DISPLAY_NONE : null),
 		(new CTextBox('timeout', $item['timeout'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->addClass($custom_timeout_enabled ? null : ZBX_STYLE_DISPLAY_NONE)
