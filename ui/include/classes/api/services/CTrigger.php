@@ -43,6 +43,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['triggerids']
+	 * @param array $options['maintenanceids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['count']
@@ -198,6 +199,16 @@ class CTrigger extends CTriggerGeneral {
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['where']['triggerid'] = dbConditionInt('t.triggerid', $options['triggerids']);
+		}
+
+		// maintenanceids
+		if ($options['maintenanceids'] !== null) {
+			$sqlParts['join']['mt'] = ['table' => 'maintenance_trigger', 'using' => 'triggerid'];
+			$sqlParts['where'][] = dbConditionInt('mt.maintenanceid', $options['maintenanceids']);
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['mt'] = 'mt.maintenanceid';
+			}
 		}
 
 		// itemids
@@ -515,6 +526,7 @@ class CTrigger extends CTriggerGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
+			'maintenanceids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],

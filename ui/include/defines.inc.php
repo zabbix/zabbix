@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050090);
+define('ZABBIX_DB_VERSION',	7050103);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -31,6 +31,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2026');
 
+define('ZBX_CLOUD_URL', 'https://cloud.zabbix.com');
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
 define('ZBX_BCRYPT_COST',		10);
@@ -330,6 +331,7 @@ define('ZBX_CONDITION_TYPE_EVENT_TAG',			25);
 define('ZBX_CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 define('ZBX_CONDITION_TYPE_SERVICE',			27);
 define('ZBX_CONDITION_TYPE_SERVICE_NAME',		28);
+define('ZBX_CONDITION_TYPE_PROXY_GROUP',		29);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -464,10 +466,15 @@ define('LOGO_TYPE_NORMAL',			0);
 define('LOGO_TYPE_SIDEBAR',			1);
 define('LOGO_TYPE_SIDEBAR_COMPACT',	2);
 
-define('MAINTENANCE_TAG_EVAL_TYPE_AND_OR',	0);
-define('MAINTENANCE_TAG_EVAL_TYPE_OR',		2);
-define('MAINTENANCE_TAG_OPERATOR_EQUAL',	0);
-define('MAINTENANCE_TAG_OPERATOR_LIKE',		2);
+define('MAINTENANCE_EVENT_NAME_OPERATOR_LIKE',		2);
+define('MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE',	3);
+
+define('MAINTENANCE_TAG_EVAL_TYPE_AND_OR',		0);
+define('MAINTENANCE_TAG_EVAL_TYPE_OR',			2);
+define('MAINTENANCE_TAG_OPERATOR_EQUAL',		0);
+define('MAINTENANCE_TAG_OPERATOR_NOT_EQUAL',	1);
+define('MAINTENANCE_TAG_OPERATOR_LIKE',			2);
+define('MAINTENANCE_TAG_OPERATOR_NOT_LIKE',		3);
 
 define('MAINTENANCE_TYPE_NORMAL',	0);
 define('MAINTENANCE_TYPE_NODATA',	1);
@@ -1645,6 +1652,7 @@ define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
 define('API_UUID_V7',				75);
+define('API_FRONTEND_ACTION',		76);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1720,6 +1728,16 @@ define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
 define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
+
+// Standard action layouts.
+define('ZBX_LAYOUT_DOWNLOAD',	'layout.download');
+define('ZBX_LAYOUT_HTMLPAGE',	'layout.htmlpage');
+define('ZBX_LAYOUT_IMAGE',		'layout.image');
+define('ZBX_LAYOUT_JAVASCRIPT',	'layout.javascript');
+define('ZBX_LAYOUT_JSON',		'layout.json');
+define('ZBX_LAYOUT_PRINT',		'layout.print');
+define('ZBX_LAYOUT_WARNING',	'layout.warning');
+define('ZBX_LAYOUT_WIDGET',		'layout.widget');
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',		0);
@@ -1952,6 +1970,7 @@ define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
+define('ZBX_STYLE_ACTION_WRAPPER', 'action-wrapper');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ALIGN_TOP', 'align-top');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -2020,9 +2039,7 @@ define('ZBX_STYLE_COLOR_ICON', 'color-icon');
 define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
 define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
 define('ZBX_STYLE_COLOR_WARNING', 'color-warning');
-define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
-define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
-define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
+define('ZBX_STYLE_COLUMN_TAGS', 'column-tags');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBOARD', 'dashboard');
@@ -2067,6 +2084,7 @@ define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
+define('ZBX_STYLE_FLEX_WRAPPER', 'flex-wrapper');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
 define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
@@ -2077,9 +2095,9 @@ define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_COLUMNS', 'form-columns');
 define('ZBX_STYLE_FORM_DESCRIPTION', 'form-description');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
-define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
+define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
 define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');
 define('ZBX_STYLE_FORMATED_TEXT', 'formated-text');
@@ -2108,6 +2126,7 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
+define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
@@ -2120,7 +2139,6 @@ define('ZBX_STYLE_LINK_EXTERNAL', 'link-external');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
-define('ZBX_STYLE_LIST_TABLE_FIXED', 'fixed');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_TABLE_STICKY_HEADER', 'sticky-header');
@@ -2181,7 +2199,6 @@ define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
 define('ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE', 'mappings-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
-define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
@@ -2227,7 +2244,6 @@ define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_SUBFORMS', 'table-subforms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
-define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK', 'overflow-break');
@@ -2257,7 +2273,6 @@ define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
 define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
-define('ZBX_STYLE_SECOND_COL', 'second-col');
 define('ZBX_STYLE_TOC', 'toc');
 define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
 define('ZBX_STYLE_TOC_ITEM', 'toc-item');
@@ -2434,7 +2449,7 @@ define('ZBX_ICON_SPEAKER', 'zi-speaker');
 define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
 define('ZBX_ICON_STAR', 'zi-star');
 define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
-define('ZBX_ICON_SUPPORT', 'zi-support');
+define('ZBX_ICON_SUBSCRIPTIONS', 'zi-subscriptions');
 define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
@@ -2508,7 +2523,7 @@ define('ZABBIX_MOBILE_VERSION',			1);
 
 define('ZBX_DEVICE_STATUS_NEW',			0);
 define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
-define('ZBX_DEVICE_STATUS_ORPHANED',	2);
+define('ZBX_DEVICE_STATUS_UNASSIGNED',	2);
 
 define('MOBILE_KEY_SCOPE_IDENTITY',		0);
 define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);

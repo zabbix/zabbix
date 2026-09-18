@@ -203,6 +203,9 @@ ZBX_PTR_VECTOR_IMPL(dc_host_ptr, ZBX_DC_HOST *)
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_PTR_VECTOR_IMPL(dc_function_ptr, ZBX_DC_FUNCTION *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
+ZBX_PTR_VECTOR_IMPL(dc_maintenance_ptr, zbx_dc_maintenance_t *)
+ZBX_PTR_VECTOR_IMPL(dc_maintenance_eventname_ptr, zbx_dc_maintenance_eventname_t *)
+ZBX_PTR_VECTOR_IMPL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_trigger_t *)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
@@ -219,12 +222,6 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
-
-static zbx_uint32_t	denyitemtypes_mask = 0;
-static zbx_uint32_t	get_denyitemtypes_mask(void)
-{
-	return denyitemtypes_mask;
-}
 
 zbx_dc_config_t		*config = NULL;
 zbx_dc_config_private_t	config_private;
@@ -490,7 +487,21 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-static unsigned char	poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the type of poller responsible for the item type           *
+ *                                                                            *
+ * Parameters: type              - [IN] item type [ITEM_TYPE_* flag]          *
+ *             key               - [IN] item key                              *
+ *             snmp_oid_type     - [IN] [ZBX_SNMP_OID_TYPE* flag]             *
+ *             get_config_forks  - [IN] call-back function for access to conf *
+ *             proc_type         - [OUT] [ZBX_PROCESS_TYPE_* flag]            *
+ *                                                                            *
+ * Return value: [ZBX_POLLER_TYPE_*] flag                                     *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_type)
 {
 	switch (type)
 	{
@@ -500,7 +511,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 			{
-				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_PINGER))
+				if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_PINGER))
 					break;
 
 				return ZBX_POLLER_TYPE_PINGER;
@@ -510,60 +521,63 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_SCRIPT:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_BROWSER:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_BROWSERPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_BROWSER;
 		case ITEM_TYPE_INTERNAL:
+			*proc_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
 			return ZBX_POLLER_TYPE_INTERNAL;
 		case ITEM_TYPE_DB_MONITOR:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_ODBCPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_ODBC;
 		case ITEM_TYPE_CALCULATED:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HISTORYPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_HISTORYPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_HISTORY;
 		case ITEM_TYPE_IPMI:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_IPMIPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_IPMIPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_JAVAPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_JAVAPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
 		case ITEM_TYPE_HTTPAGENT:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
 		case ITEM_TYPE_ZABBIX:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_AGENT_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
 			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type || ZBX_SNMP_OID_TYPE_GET == snmp_oid_type)
 			{
-				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
+				if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_SNMP_POLLER))
 					break;
 
 				return ZBX_POLLER_TYPE_SNMP;
 			}
 
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		default:
+			*proc_type = ZBX_PROCESS_TYPE_UNKNOWN;
 	}
 
 	return ZBX_NO_POLLER;
@@ -805,7 +819,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
-	unsigned char	poller_type;
+	unsigned char	poller_type, proc_type;
 	unsigned char	snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO; /* oid type is only used by ITEM_TYPE_SNMP*/
 
 	if (HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
@@ -818,7 +832,7 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	if (ITEM_TYPE_SNMP == dc_item->type)
 		snmp_oid_type = dc_item->itemtype.snmpitem->snmp_oid_type;
 
-	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid_type);
+	poller_type = zbx_poller_by_item(dc_item->type, dc_item->key, snmp_oid_type, get_config_forks_cb, &proc_type);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -3289,52 +3303,29 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
-static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned char poller_type,
-		const char *start_poller_config_name)
+static void	make_item_unsupported(ZBX_DC_ITEM *item, const char *msg)
 {
-	if (0 == get_config_forks_cb(poller_type))
-	{
-		time_t		now = time(NULL);
-		zbx_timespec_t	ts = {now, 0};
-		char		*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+	time_t		now = time(NULL);
+	zbx_timespec_t	ts = {(int)now, 0};
 
-		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
-
-		zbx_free(msg);
-	}
+	zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
 }
 
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 {
-	switch (item->type)
+	unsigned char	proc_type, snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+
+	if (ITEM_TYPE_SNMP == item->type)
+		snmp_oid_type = item->itemtype.snmpitem->snmp_oid_type;
+
+	if (ZBX_NO_POLLER == zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks_cb, &proc_type)
+			&& ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
 	{
-		case ITEM_TYPE_ZABBIX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent pollers");
-			break;
-		case ITEM_TYPE_JMX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC pollers");
-			break;
-		case ITEM_TYPE_HTTPAGENT:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
-					"HTTPAgent pollers");
-			break;
-		case ITEM_TYPE_SNMP:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
-			break;
-		case ITEM_TYPE_BROWSER:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
-			break;
-		case ITEM_TYPE_SCRIPT:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
-			break;
-		case ITEM_TYPE_IPMI:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
-			break;
-		default:
-			return;
+		char	msg[MAX_STRING_LEN];
+
+		zbx_snprintf(msg, sizeof(msg),
+				"\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+		make_item_unsupported(item, msg);
 	}
 }
 
@@ -3626,21 +3617,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), item->type))
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			zbx_timespec_t	ts = {(int)now, 0};
-
-			item->nextcheck = 0;
-			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
-			item->poller_type = ZBX_NO_POLLER;
-
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
-		}
-		else if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
-		{
-			unsigned char	state = ITEM_STATE_NORMAL;
-
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
@@ -3663,19 +3641,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 					if (0 == host->proxyid)
 					{
 						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								(state = ITEM_STATE_NOTSUPPORTED), error);
+								ITEM_STATE_NOTSUPPORTED, error);
 					}
 					zbx_free(error);
 				}
-			}
-
-			if (ITEM_STATE_NOTSUPPORTED != state &&
-					0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), old_type))
-			{
-				AGENT_RESULT	r = {0};
-				zbx_timespec_t	ts = {(int)now, 0};
-
-				zbx_dc_add_history(item->itemid, item->value_type, 0, &r, &ts, state, NULL);
 			}
 		}
 		else
@@ -3690,8 +3659,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-					"Nested LLD rule type is supported only for discovered LLD rules or hosts.");
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
+							" LLD rules or hosts.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -7960,10 +7930,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
-			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
-			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
-			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
-			proxy_group_sync, hp_sync, autoreg_config_sync;
+			maintenance_tag_sync, maintenance_eventname_sync, maintenance_group_sync, maintenance_host_sync,
+			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
+			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
+			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -8061,8 +8031,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&maintenance_sync, "maintenances", mode);
 	zbx_dbsync_init(&maintenance_period_sync, "maintenances_windows", mode);
 	zbx_dbsync_init(&maintenance_tag_sync, "maintenance_tag",  mode);
+	zbx_dbsync_init(&maintenance_eventname_sync, "maintenance_eventname",  mode);
 	zbx_dbsync_init(&maintenance_group_sync, "maintenances_groups", mode);
 	zbx_dbsync_init(&maintenance_host_sync, "maintenances_hosts", mode);
+	zbx_dbsync_init(&maintenance_trigger_sync, "maintenance_trigger", mode);
 
 	zbx_dbsync_init_changelog(&drules_sync, "drules", changelog_sync_mode);
 	zbx_dbsync_init_changelog(&dchecks_sync, "dchecks", changelog_sync_mode);
@@ -8154,11 +8126,15 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
 		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_eventnames(&maintenance_eventname_sync))
+		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_periods(&maintenance_period_sync))
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_groups(&maintenance_group_sync))
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_triggers(&maintenance_trigger_sync))
 		goto out;
 
 	if (FAIL == zbx_dbsync_prepare_drules(&drules_sync))
@@ -8200,8 +8176,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	DCsync_maintenances(&maintenance_sync);
 	DCsync_maintenance_tags(&maintenance_tag_sync);
+	DCsync_maintenance_eventnames(&maintenance_eventname_sync);
 	DCsync_maintenance_groups(&maintenance_group_sync);
 	DCsync_maintenance_hosts(&maintenance_host_sync);
+	DCsync_maintenance_triggers(&maintenance_trigger_sync);
 	DCsync_maintenance_periods(&maintenance_period_sync);
 
 	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
@@ -8503,8 +8481,13 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				config->maintenances.num_data, config->maintenances.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint tags : %d (%d slots)", __func__,
 				config->maintenance_tags.num_data, config->maintenance_tags.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint evtnames: %d (%d slots)", __func__,
+				config->maintenance_eventnames.num_data, config->maintenance_eventnames.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __func__,
 				config->maintenance_periods.num_data, config->maintenance_periods.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint trig : %d (%d slots)", __func__,
+				config->maintenances_for_triggers.num_data,
+				config->maintenances_for_triggers.num_slots);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : %d (%d slots)", __func__,
 				config->drules.num_data, config->drules.num_slots);
@@ -8649,8 +8632,10 @@ clean:
 	zbx_dbsync_clear(&maintenance_sync);
 	zbx_dbsync_clear(&maintenance_period_sync);
 	zbx_dbsync_clear(&maintenance_tag_sync);
+	zbx_dbsync_clear(&maintenance_eventname_sync);
 	zbx_dbsync_clear(&maintenance_group_sync);
 	zbx_dbsync_clear(&maintenance_host_sync);
+	zbx_dbsync_clear(&maintenance_trigger_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
 	zbx_dbsync_clear(&drules_sync);
 	zbx_dbsync_clear(&dchecks_sync);
@@ -9055,8 +9040,7 @@ static void	config_unlock_shmem_on_oom(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,
-		char **error)
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error)
 {
 	int	i, ret;
 
@@ -9064,7 +9048,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	get_program_type_cb = get_program_type;
 	get_config_forks_cb = get_config_forks;
-	denyitemtypes_mask = config_denyitemtypes_mask;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto fail;
@@ -9139,6 +9122,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->maintenances, 0);
 	CREATE_HASHSET(config->maintenance_periods, 0);
 	CREATE_HASHSET(config->maintenance_tags, 0);
+	CREATE_HASHSET(config->maintenance_eventnames, 0);
+	CREATE_HASHSET(config->maintenances_for_triggers, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 0, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -10471,11 +10456,8 @@ int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 		zbx_hashset_iter_reset(&dc_host->items, &iter);
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type &&
-					0 == ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
-			{
+			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type)
 				num++;
-			}
 		}
 	}
 
@@ -10500,9 +10482,6 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ITEM_TYPE_ZABBIX_ACTIVE != ref->item->type)
-				continue;
-
-			if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
 				continue;
 
 			DCget_item(&items[j], ref->item);
@@ -15593,13 +15572,6 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
 					": item is not in cache", itemids->values[i]);
 
-			proxyid = 0;
-		}
-		else if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), dc_item->type))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot perform check now for item \"%s\" on host \"%s\""
-					": item type is denied by the \"DenyItemTypes\" configuration parameter.",
-					dc_item->key, dc_host->host);
 			proxyid = 0;
 		}
 		else if (ZBX_JAN_2038 == dc_item->nextcheck)

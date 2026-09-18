@@ -74,22 +74,20 @@ $form_list
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->addClass('js-operation-checkbox')
 				->setChecked($data['change_severity'])
-				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
+				->setEnabled($data['allowed_change_severity'] && $data['editable_triggers_count'] > 0),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
-			->addClass(ZBX_STYLE_HOR_LIST)
+			->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Suppress'),
 			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
 		], 'suppress_problem'),
 		(new CList([
-			(new CListItem(
-				(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
-					->addClass('js-operation-checkbox')
-					->setChecked($data['suppress_problem'])
-					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addClass(ZBX_STYLE_ALIGN_TOP),
+			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
+				->addClass('js-operation-checkbox')
+				->setChecked($data['suppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed']),
 			(new CListItem(
 				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
 					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
@@ -102,7 +100,7 @@ $form_list
 				->setPlaceholder(_($data['suppress_until_problem']))
 				->setAriaRequired()
 				->setEnabled(false)
-		]))->addClass(ZBX_STYLE_HOR_LIST)
+		]))->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))], 'unsuppress_problem'),
@@ -162,7 +160,31 @@ $form_list
 			->addClass('js-operation-checkbox')
 			->setChecked($data['close_problem'])
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
-	)
+	);
+
+if ($data['allowed_ui_conf_maintenance'] && $data['allowed_edit_maintenance']) {
+	if ($data['editable_triggers_count'] > 0) {
+		$maintenance_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'maintenance.edit')
+			->setArgument('context', 'trigger');
+
+		foreach ($data['eventids'] as $key => $eventid) {
+			$maintenance_url->setArgument("eventids[{$key}]", $eventid);
+		}
+
+		$form_list->addRow('',
+			(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['editable_triggers_count']), $maintenance_url))
+		);
+	}
+	else {
+		$form_list->addRow('',
+			(new CSpan(_n('Suppress trigger', 'Suppress triggers', $selected_events)))->addClass(ZBX_STYLE_DISABLED)
+		);
+	}
+}
+
+$form_list
 	->addRow('',
 		(new CDiv(''))->setId('operations-count-error-container')
 	);

@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 /*
  * 8.0 development database patches
@@ -1192,6 +1193,222 @@ static int	DBpatch_7050090(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050091(void)
+{
+	int		i;
+	const char	*values[] = {
+		"web.hosts.host_discovery.filter.active", "web.hosts.lldrules.filter.active",
+		"web.hosts.host_discovery.filter.groupids", "web.hosts.lldrules.filter.groupids",
+		"web.hosts.host_discovery.filter.hostids", "web.hosts.lldrules.filter.hostids",
+		"web.hosts.host_discovery.filter.name", "web.hosts.lldrules.filter.name",
+		"web.hosts.host_discovery.filter.key", "web.hosts.lldrules.filter.key",
+		"web.hosts.host_discovery.filter.type", "web.hosts.lldrules.filter.type",
+		"web.hosts.host_discovery.filter.delay", "web.hosts.lldrules.filter.delay",
+		"web.hosts.host_discovery.filter.lifetime_type", "web.hosts.lldrules.filter.lifetime_type",
+		"web.hosts.host_discovery.filter.lifetime", "web.hosts.lldrules.filter.lifetime",
+		"web.hosts.host_discovery.filter.enabled_lifetime_type",
+		"web.hosts.lldrules.filter.enabled_lifetime_type",
+		"web.hosts.host_discovery.filter.enabled_lifetime", "web.hosts.lldrules.filter.enabled_lifetime",
+		"web.hosts.host_discovery.filter.snmp_oid", "web.hosts.lldrules.filter.snmp_oid",
+		"web.hosts.host_discovery.filter.state", "web.hosts.lldrules.filter.state",
+		"web.hosts.host_discovery.filter.status", "web.hosts.lldrules.filter.status",
+		"web.hosts.host_discovery.php.sort", "web.hosts.lldrules.sort",
+		"web.hosts.host_discovery.php.sortorder", "web.hosts.lldrules.sortorder",
+
+		"web.templates.host_discovery.filter.active", "web.templates.lldrules.filter.active",
+		"web.templates.host_discovery.filter.groupids", "web.templates.lldrules.filter.groupids",
+		"web.templates.host_discovery.filter.hostids", "web.templates.lldrules.filter.hostids",
+		"web.templates.host_discovery.filter.name", "web.templates.lldrules.filter.name",
+		"web.templates.host_discovery.filter.key", "web.templates.lldrules.filter.key",
+		"web.templates.host_discovery.filter.type", "web.templates.lldrules.filter.type",
+		"web.templates.host_discovery.filter.delay", "web.templates.lldrules.filter.delay",
+		"web.templates.host_discovery.filter.lifetime_type", "web.templates.lldrules.filter.lifetime_type",
+		"web.templates.host_discovery.filter.lifetime", "web.templates.lldrules.filter.lifetime",
+		"web.templates.host_discovery.filter.enabled_lifetime_type",
+		"web.templates.lldrules.filter.enabled_lifetime_type",
+		"web.templates.host_discovery.filter.enabled_lifetime",
+		"web.templates.lldrules.filter.enabled_lifetime",
+		"web.templates.host_discovery.filter.snmp_oid", "web.templates.lldrules.filter.snmp_oid",
+		"web.templates.host_discovery.filter.state", "web.templates.lldrules.filter.state",
+		"web.templates.host_discovery.filter.status", "web.templates.lldrules.filter.status",
+		"web.templates.host_discovery.php.sort", "web.templates.lldrules.sort",
+		"web.templates.host_discovery.php.sortorder", "web.templates.lldrules.sortorder",
+
+		"web.hosts.discovery_prototypes.filter.active", "web.hosts.lldrules.prototypes.filter.active",
+		"web.hosts.host_discovery_prototypes.php.sort", "web.hosts.lldrules.prototypes.sort",
+		"web.hosts.host_discovery_prototypes.php.sortorder", "web.hosts.lldrules.prototypes.sortorder",
+
+		"web.templates.discovery_prototypes.filter.active", "web.templates.lldrules.prototypes.filter.active",
+		"web.templates.host_discovery_prototypes.php.sort", "web.templates.lldrules.prototypes.sort",
+		"web.templates.host_discovery_prototypes.php.sortorder", "web.templates.lldrules.prototypes.sortorder"
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050092(void)
+{
+#define ZBX_COLORPALETTE_DARK	"199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"	\
+				"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4"
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute(
+			"insert into graph_theme"
+			" values (7,'dark-blue-theme','001F42','001F42','004FA8','004FA8','004FA8','E5F1FF',"
+				"'FF5555','10B981','FF5555','002247','" ZBX_COLORPALETTE_DARK "')"))
+	{
+		return SUCCEED;
+	}
+#undef ZBX_COLORPALETTE_DARK
+
+	return FAIL;
+}
+
+static int	DBpatch_7050093(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("role_rule", &field, NULL);
+}
+
+static int	DBpatch_7050094(void)
+{
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" where rr.name='api.mode' and rr.value_int=1"
+				" and not exists ("
+					"select null"
+					" from role_rule rr2"
+					" where rr2.roleid=rr.roleid"
+						" and rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
+	{
+#define ZBX_ROLE_RULE_TYPE_STR	1
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
+				"*");
+#undef ZBX_ROLE_RULE_TYPE_STR
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_7050095(void)
+{
+	const zbx_db_field_t	field =
+			{"default_maintenance_period", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_trigger", "maintenance_triggerid", 0,
+				{
+					{"maintenance_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050097(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_1", "maintenanceid,triggerid", 1);
+}
+
+static int	DBpatch_7050098(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_2", "triggerid", 0);
+}
+
+static int	DBpatch_7050099(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 1, &field);
+}
+
+static int	DBpatch_7050100(void)
+{
+	const zbx_db_field_t	field =
+			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 2, &field);
+}
+
+static int	DBpatch_7050101(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_eventname", "maintenance_eventnameid", 0,
+				{
+					{"maintenance_eventnameid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050102(void)
+{
+	return DBcreate_index("maintenance_eventname", "maintenance_eventname_1", "maintenanceid", 0);
+}
+
+static int	DBpatch_7050103(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_eventname", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1289,5 +1506,18 @@ DBPATCH_ADD(7050087, 0, 1)
 DBPATCH_ADD(7050088, 0, 1)
 DBPATCH_ADD(7050089, 0, 1)
 DBPATCH_ADD(7050090, 0, 1)
+DBPATCH_ADD(7050091, 0, 1)
+DBPATCH_ADD(7050092, 0, 1)
+DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
+DBPATCH_ADD(7050097, 0, 1)
+DBPATCH_ADD(7050098, 0, 1)
+DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
+DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
 
 DBPATCH_END()

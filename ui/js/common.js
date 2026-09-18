@@ -376,6 +376,9 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
+
 				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
 						form.dispatchEvent(new CustomEvent('form.destroyed'));
@@ -1168,6 +1171,14 @@ function objectSetDeepValue(object, path, value) {
 
 		if (!Object.hasOwn(tmp, key)) {
 			tmp[key] = Object.create(null);
+		}
+		else if (tmp[key] === null) {
+			if (value === null) {
+				return object;
+			}
+			else {
+				throw Error('Trying to set value to null object.');
+			}
 		}
 
 		if (typeof tmp[key] !== 'object') {

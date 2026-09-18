@@ -31,6 +31,7 @@ It is recommended to fill in the values of the filter macros to avoid getting re
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Microsoft SharePoint", e.g. {$HTTP.TLS.VERIFY:"Microsoft SharePoint"}.</p>|`full`|
 |{$SHAREPOINT.USER}|||
 |{$SHAREPOINT.PASSWORD}|||
 |{$SHAREPOINT.URL}|<p>Portal page URL. For example http://sharepoint.companyname.local/</p>||

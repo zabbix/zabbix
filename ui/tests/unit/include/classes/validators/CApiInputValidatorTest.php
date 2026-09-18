@@ -8981,6 +8981,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				str_repeat('abc123 ', 1429),
 				'/1/sp_private_key',
 				'Invalid parameter "/1/sp_private_key": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'index.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list',
+				'/1/action_url',
+				'zabbix.php?action=host.list'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list&keys[]=param',
+				'/1/action_url',
+				'zabbix.php?action=host.list&keys[]=param'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action[]=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=unknown.action',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": invalid action in the frontend URL.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'non_zabbix.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'unknown.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'https://www.zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'',
+				'/1/action_url',
+				''
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": cannot be empty.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 64],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 65],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now'
 			]
 		];
 	}

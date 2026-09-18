@@ -380,8 +380,10 @@ class testFormTabIndicators extends CWebTest {
 			// #7 LLD rule configuration form tab data.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&context=host&hostid=10084',
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]=10084',
+					'create_button' => 'Create discovery rule',
 					'form' => 'name:itemForm',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Preprocessing',
@@ -448,8 +450,10 @@ class testFormTabIndicators extends CWebTest {
 			// #8 LLD rule prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_discovery_prototypes.php?form=create&hostid=40001&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid=133800&context=host',
+					'create_button' => 'Create discovery prototype',
 					'form' => 'name:itemForm',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Preprocessing',

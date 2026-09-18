@@ -34,6 +34,7 @@ This template has been tested on:
 |{$CLAUDE.API.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$CLAUDE.API.INTERVAL}|<p>Update interval for raw items.</p>|`1h`|
 |{$CLAUDE.API.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Claude API", e.g. {$HTTP.TLS.VERIFY:"Claude API"}.</p>|`full`|
 |{$CLAUDE.API.MSG.USAGE.BUCKET}|<p>Time period and gathering interval for Claude API message usage report data.</p>|`1m`|
 |{$CLAUDE.API.CODE.COST.WARN}|<p>Warning threshold for estimated Claude Code usage cost.</p>|`10`|
 |{$CLAUDE.API.MODEL.COST.WARN}|<p>Warning threshold for previous day expenses. Supports macro context for per-workspace threshold tuning.</p>|`10`|

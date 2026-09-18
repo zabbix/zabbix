@@ -30,25 +30,26 @@ FIELD		|hash		|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|hash
 
 TABLE|users|userid|ZBX_DATA
-FIELD		|userid		|t_id		|	|NOT NULL	|0
-FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|passwd		|t_varchar(60)	|''	|NOT NULL	|0
-FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
-FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
-FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
-FIELD		|refresh	|t_varchar(32)	|'30s'	|NOT NULL	|0
-FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
-FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
-FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
-FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
-FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
-FIELD		|roleid		|t_id			|NULL	|NULL	|0	|1|role
-FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|ZBX_NODATA	|2|userdirectory	|userdirectoryid	|RESTRICT
-FIELD		|ts_provisioned		|t_time	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|userid				|t_id		|	|NOT NULL	|0
+FIELD		|username			|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|name				|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|surname			|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|passwd				|t_varchar(60)	|''	|NOT NULL	|0
+FIELD		|url				|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|autologin			|t_integer	|'0'	|NOT NULL	|0
+FIELD		|autologout			|t_varchar(32)	|'15m'	|NOT NULL	|0
+FIELD		|lang				|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
+FIELD		|refresh			|t_varchar(32)	|'30s'	|NOT NULL	|0
+FIELD		|theme				|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
+FIELD		|attempt_failed			|t_integer	|0	|NOT NULL	|ZBX_NODATA
+FIELD		|attempt_ip			|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|attempt_clock			|t_integer	|0	|NOT NULL	|ZBX_NODATA
+FIELD		|rows_per_page			|t_integer	|50	|NOT NULL	|0
+FIELD		|timezone			|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
+FIELD		|roleid				|t_id		|NULL	|NULL		|0		|1|role
+FIELD		|userdirectoryid		|t_id		|NULL	|NULL		|ZBX_NODATA	|2|userdirectory	|userdirectoryid	|RESTRICT
+FIELD		|ts_provisioned			|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|default_maintenance_period	|t_varchar(32)	|'1h'	|NOT NULL	|0
 UNIQUE		|1		|username
 INDEX		|2		|userdirectoryid
 INDEX		|3		|roleid
@@ -946,6 +947,13 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp
 UNIQUE		|1		|maintenanceid,groupid
 INDEX		|2		|groupid
 
+TABLE|maintenance_trigger|maintenance_triggerid|ZBX_DATA
+FIELD		|maintenance_triggerid	|t_id	|	|NOT NULL	|0
+FIELD		|maintenanceid		|t_id	|	|NOT NULL	|0			|1|maintenances
+FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
+UNIQUE		|1		|maintenanceid,triggerid
+INDEX		|2		|triggerid
+
 TABLE|timeperiods|timeperiodid|ZBX_DATA
 FIELD		|timeperiodid	|t_id		|	|NOT NULL	|0
 FIELD		|timeperiod_type|t_integer	|'0'	|NOT NULL	|0
@@ -1738,6 +1746,13 @@ FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|maintenanceid
 
+TABLE|maintenance_eventname|maintenance_eventnameid|ZBX_DATA
+FIELD		|maintenance_eventnameid|t_id		|	|NOT NULL	|0
+FIELD		|maintenanceid		|t_id		|	|NOT NULL	|0		|1|maintenances
+FIELD		|operator		|t_integer	|'2'	|NOT NULL	|0
+FIELD		|value			|t_varchar(2048)|''	|NOT NULL	|0
+INDEX		|1		|maintenanceid
+
 TABLE|lld_macro_path|lld_macro_pathid|ZBX_TEMPLATE
 FIELD		|lld_macro_pathid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
@@ -1874,9 +1889,9 @@ FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
-FIELD		|value_serviceid|t_id		|	|NULL	|0			|3|services	|serviceid
+FIELD		|value_serviceid|t_id		|	|NULL		|0			|3|services	|serviceid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
 INDEX		|3		|value_serviceid
@@ -2337,4 +2352,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050090	|7050090
+ROW		|1		|7050103	|7050103

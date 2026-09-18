@@ -14,6 +14,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once dirname(__FILE__).'/../../include/classes/api/helpers/CApiTokenHelper.php';
 
 /**
  * Skeleton for bridge-adapter integration coverage.
@@ -98,6 +99,8 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const CROSS_USER_INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000106';
 	private const CROSS_USER_OFFBOARD_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000107';
 	private const INVALID_SESSION_ID = 'deadbeefdeadbeefdeadbeefdeadbeef';
+	private const TOKEN_AUTH_INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000108';
+	private const DPOP_TOKEN_INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000109';
 	private const RESTRICTED_USER_NAME = 'bridge_adapter_restricted';
 	private const RESTRICTED_USER_PASSWD = 'BridgeAdapterR3stricted!';
 	private const ACKNOWLEDGER_USER_NAME = 'bridge_adapter_acknowledger';
@@ -130,8 +133,21 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static array $severity_itemids = [];
 	private static array $severity_triggerids = [];
 	private static array $severity_actionids = [];
+	private static array $auth_scheme_test_tokenids = [];
+	private static array $bearer_auth_test_tokenids = [];
 
 	public function serverConfigurationProvider(): array {
+		if (self::detectTLSLibrary() === 'none') {
+			return [
+				self::COMPONENT_SERVER => [
+					'DebugLevel' => 4,
+					'LogFileSize' => 20,
+					'EnableMobileDevices' => 1,
+					'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
+				]
+			];
+		}
+
 		self::$cert_base_dir = self::generateCertificates();
 		$base_dir = self::$cert_base_dir;
 
@@ -401,6 +417,17 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		self::deleteRealNotificationMedia();
 
+		if (self::$bearer_auth_test_tokenids) {
+			CDataHelper::call('token.delete', self::$bearer_auth_test_tokenids);
+			self::$bearer_auth_test_tokenids = [];
+		}
+
+		if (self::$auth_scheme_test_tokenids) {
+			DB::delete('token_device', ['tokenid' => self::$auth_scheme_test_tokenids]);
+			DB::delete('token', ['tokenid' => self::$auth_scheme_test_tokenids]);
+			self::$auth_scheme_test_tokenids = [];
+		}
+
 		if (self::$deviceids) {
 			$tokenids = array_keys(DB::select('token_device', [
 				'output' => [],
@@ -463,6 +490,47 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 
 		return [$client, CAPIHelper::getSessionId()];
+	}
+
+	private function createAuthSchemeToken(int $auth_scheme, ?string $deviceid = null): string {
+		if ($auth_scheme === ZBX_AUTH_SCHEME_BEARER) {
+			$response = $this->call('token.create', [
+				'name' => 'bridge-adapter-auth-scheme-bearer-'.uniqid(),
+				'userid' => 1
+			]);
+			$this->assertArrayHasKey('tokenids', $response['result']);
+
+			$tokenid = $response['result']['tokenids'][0];
+
+			$response = $this->call('token.generate', [$tokenid]);
+			$this->assertArrayHasKey('token', $response['result'][0]);
+
+			self::$bearer_auth_test_tokenids[] = $tokenid;
+
+			return $response['result'][0]['token'];
+		}
+
+		$token = CApiTokenHelper::generateToken();
+		$tokenid = DB::reserveIds('token', 1);
+
+		DB::insertBatch('token', [[
+			'tokenid' => $tokenid,
+			'name' => 'bridge-adapter-auth-scheme-'.$auth_scheme.'-'.$tokenid,
+			'userid' => 1,
+			'token' => CApiTokenHelper::hashToken($token),
+			'auth_scheme' => $auth_scheme
+		]], false);
+
+		if ($deviceid !== null) {
+			DB::insertBatch('token_device', [[
+				'tokenid' => $tokenid,
+				'deviceid' => $deviceid
+			]], false);
+		}
+
+		self::$auth_scheme_test_tokenids[] = $tokenid;
+
+		return $token;
 	}
 
 	private function createRealNotificationObjects(): void {
@@ -698,7 +766,9 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 	}
 
-	private static function startBridgeAdapterMockInternal(array $extra_args = [], bool $tls = true): void {
+	private static function startBridgeAdapterMockInternal(array $extra_args = [], ?bool $tls = null): void {
+		$tls ??= (self::detectTLSLibrary() !== 'none');
+
 		self::$adapter_log_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.log';
 		self::$adapter_pid_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.pid';
 
@@ -1793,6 +1863,146 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_INVALID_SESSION, true, 120, 1);
 
 		$this->assertFalse($init_response);
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initWithBearerTokenAccepted(): void {
+		[$client] = $this->getServerClientAndSid();
+
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_BEARER);
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::TOKEN_AUTH_INIT_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true, 120, 1);
+
+		$this->assertNotFalse($init_response, $client->getError() ?? '');
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::TOKEN_AUTH_INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initWithDpopTokenRejected(): void {
+		[$client] = $this->getServerClientAndSid();
+
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP);
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::DPOP_TOKEN_INIT_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_INVALID_SESSION, true, 120, 1);
+
+		$this->assertFalse($init_response,
+			'A DPoP-scheme token must not authenticate a trapper device.init request.'
+		);
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardWithBoundDpopTokenAccepted(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP, self::$deviceids[1]);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+				120, 1);
+
+		$this->assertNotFalse($offboard_response, $client->getError() ?? '');
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	public function testBridgeAdapter_offboardWithDpopTokenBoundToAnotherDeviceRejected(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP, self::$deviceids[0]);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_INVALID_SESSION, true,
+				120, 1);
+
+		$this->assertFalse($offboard_response,
+			'A DPoP token must not offboard a device to which it is not bound.'
+		);
+	}
+
+	/**
+	 * A regular Bearer-scheme API token must also be accepted for device.offboard, the same as it already
+	 * is for device.init - the DPoP token bound to a specific device is only an additional accepted
+	 * credential for offboarding, not a replacement for the existing authentication methods.
+	 *
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardWithBearerTokenAccepted(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_BEARER);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+				120, 1);
+
+		$error = $client->getError();
+		$this->assertNotFalse($offboard_response, $error !== null ? $error : '');
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * A DPoP-scheme token must not authenticate a trapper request unrelated to mobile devices at all, to
+	 * show the additional acceptance carved out for device.offboard did not loosen authentication for
+	 * trapper requests in general.
+	 */
+	public function testBridgeAdapter_dpopTokenRejectedForItemTest(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP);
+
+		$result = $client->testItem([], $token);
+
+		$this->assertFalse($result,
+			'A DPoP-scheme token must not authenticate an item test request.'
+		);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
+	}
+
+	/**
+	 * Same check as above, against a second unrelated trapper request, to confirm the restriction is not
+	 * tied to one specific request handler.
+	 */
+	public function testBridgeAdapter_dpopTokenRejectedForExpressionsEvaluate(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP);
+
+		$result = $client->expressionsEvaluate([], $token);
+
+		$this->assertFalse($result,
+			'A DPoP-scheme token must not authenticate an expression evaluation request.'
+		);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
 	}
 
 	public function testBridgeAdapter_initMissingUserid(): void {

@@ -163,7 +163,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 				'userid' => self::$data['userids']['user_device_inactive'],
 				'uuid' => self::$data['uuids']['user_device_inactive'],
 				'name' => 'superadmin2',
-				'status' => ZBX_DEVICE_STATUS_ORPHANED
+				'status' => ZBX_DEVICE_STATUS_UNASSIGNED
 			]
 		];
 

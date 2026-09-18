@@ -35,7 +35,7 @@ zabbix_export:
         3\. Customize host wizard configuration field values if needed.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Power
       items:
@@ -736,10 +736,6 @@ zabbix_export:
             2 - unknown
           valuemap:
             name: zabbix.host.available
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: health
@@ -1351,6 +1347,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TIME.PERIOD}'
           value: 15m
           description: 'Time period for trigger expression.'
@@ -1577,12 +1582,19 @@ zabbix_export:
   triggers:
     - uuid: b0959bdb606542bcb2952e820ac972c9
       expression: |
-        (last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
-        or (last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC UPS by SNMP/system.net.uptime[sysUpTime.0])<10m)
+        (last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/APC UPS by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/APC UPS by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/APC UPS by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/APC UPS by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/APC UPS by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'APC UPS: Host has been restarted'
-      event_name: 'APC UPS: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'APC UPS: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'APC UPS: No SNMP data collection'
