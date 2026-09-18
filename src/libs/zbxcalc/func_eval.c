@@ -3102,7 +3102,7 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 			continue;
 		}
 
-		if (FAIL != zbx_jsonobj_query_vector_str(&obj, pattern, &matches))
+		if (SUCCEED == zbx_jsonobj_query_vector_str(&obj, pattern, &matches))
 		{
 			for (int j = 0; j < matches.values_num; j++)
 			{
@@ -3248,7 +3248,6 @@ static int	evaluate_XMLXPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	for (int i = 0; i < values.values_num; i++)
 	{
 		zbx_variant_t	matches;
-		int		is_empty;
 		char		*error_query = NULL;
 
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
@@ -3256,12 +3255,12 @@ static int	evaluate_XMLXPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		else
 			zbx_variant_set_str(&matches, zbx_strdup(NULL, values.values[i].value.str));
 
-		if (FAIL != zbx_query_xpath_contents(&matches, pattern, &is_empty, &error_query))
+		if (SUCCEED == zbx_query_xpath_vector(&matches, pattern, &error_query))
 		{
-			if (SUCCEED != is_empty)
-				zbx_vector_var_append(result, matches);
-			else
-				zbx_variant_clear(&matches);
+			zbx_vector_var_append_array(result, matches.data.vector->values,
+					matches.data.vector->values_num);
+			zbx_vector_var_clear(matches.data.vector);
+			zbx_variant_clear(&matches);
 		}
 		else
 		{

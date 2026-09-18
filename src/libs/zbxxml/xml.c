@@ -198,24 +198,148 @@ void zbx_xml_escape_xpath(char **data)
 	*data = buffer;
 }
 
-static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
+#ifdef HAVE_LIBXML2
+static int	xpath_query_result_is_empty(xmlXPathObject *xpathObj)
 {
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(params);
-	ZBX_UNUSED(is_empty);
-	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+	return XPATH_NODESET == xpathObj->type && 0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval) ? SUCCEED : FAIL;
+}
 
-	return FAIL;
-#else
-	int		ret = FAIL;
+static int	format_xpath_obj_primitive(xmlXPathObject *xpathObj, zbx_variant_t *out, char **errmsg)
+{
 	char		buffer[32], *ptr;
+
+	switch (xpathObj->type)
+	{
+		case XPATH_STRING:
+			zbx_variant_set_str(out, zbx_strdup(NULL, (const char *)xpathObj->stringval));
+			return SUCCEED;
+		case XPATH_BOOLEAN:
+			zbx_variant_set_str(out, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
+			return SUCCEED;
+		case XPATH_NUMBER:
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
+
+			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90 */
+			/* so simply check the result starts with digit (accounting for -inf) */
+			if ('-' == *(ptr = buffer))
+				ptr++;
+
+			if (0 == isdigit(*ptr))
+			{
+				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
+				return FAIL;
+			}
+
+			zbx_del_zeros(buffer);
+			zbx_variant_set_str(out, zbx_strdup(NULL, buffer));
+			return SUCCEED;
+		case XPATH_NODESET:
+			*errmsg = zbx_dsprintf(*errmsg, "Invalid XPath primitive object type %d", (int)xpathObj->type);
+			return FAIL;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "Unknown XPath object type %d", (int)xpathObj->type);
+			return FAIL;
+	}
+}
+
+typedef int	(*xpath_format_query_result_func_t)(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg);
+
+static int	format_xpath_query_result_default(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg)
+{
+	xmlBufferPtr	xmlBufferLocal;
+
+	if (XPATH_NODESET != xpathObj->type)
+		return format_xpath_obj_primitive(xpathObj, out, errmsg);
+
+	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+		return FAIL;
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		xmlNodeSetPtr	nodeset = xpathObj->nodesetval;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+	}
+
+	zbx_variant_set_str(out, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+
+	xmlBufferFree(xmlBufferLocal);
+	return SUCCEED;
+}
+
+static int	format_xpath_query_result_vector(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg)
+{
+	int			ret = FAIL;
+	zbx_vector_var_t	*matches;
+	xmlBufferPtr		xmlBufferLocal;
+
+	matches = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+	zbx_vector_var_create(matches);
+
+	if (XPATH_NODESET != xpathObj->type)
+	{
+		zbx_variant_t	v;
+
+		zbx_variant_set_none(&v);
+
+		if (SUCCEED != (ret = format_xpath_obj_primitive(xpathObj, &v, errmsg)))
+			goto out;
+
+		zbx_vector_var_append(matches, v);
+
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+		goto out;
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		xmlNodeSetPtr	nodeset = xpathObj->nodesetval;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+		{
+			zbx_variant_t	v;
+
+			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+			zbx_variant_set_str(&v, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+			xmlBufferEmpty(xmlBufferLocal);
+
+			zbx_vector_var_append(matches, v);
+		}
+	}
+
+	xmlBufferFree(xmlBufferLocal);
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+	{
+		zbx_variant_set_vector(out, matches);
+	}
+	else
+	{
+		zbx_vector_var_clear_ext(matches);
+		zbx_vector_var_destroy(matches);
+		zbx_free(matches);
+	}
+
+	return ret;
+}
+
+static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty,
+		xpath_format_query_result_func_t query_result_format_func, char **errmsg)
+{
+	int		ret = FAIL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
 	const xmlError	*pErr;
-	xmlBufferPtr	xmlBufferLocal;
 	zbx_fs_size_t	len = strlen(value->data.str);
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, len, "noname.xml", NULL, XML_PARSE_NOERROR)))
@@ -252,97 +376,26 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 		goto out;
 	}
 
-	/* set is_empty before switch because of different possible XPATH types */
 	if (NULL != is_empty)
-		*is_empty = FAIL;
+		*is_empty = xpath_query_result_is_empty(xpathObj);
 
-	switch (xpathObj->type)
-	{
-		case XPATH_NODESET:
-			if (NULL == (xmlBufferLocal = xmlBufferCreate()))
-				break;
-
-			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-			{
-				nodeset = xpathObj->nodesetval;
-
-				if (0 == nodeset->nodeNr && NULL != is_empty)
-					*is_empty = SUCCEED;
-
-				for (int i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
-			}
-			else if (NULL != is_empty)
-				*is_empty = SUCCEED;
-
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
-
-			xmlBufferFree(xmlBufferLocal);
-			ret = SUCCEED;
-			break;
-		case XPATH_STRING:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xpathObj->stringval));
-			ret = SUCCEED;
-			break;
-		case XPATH_BOOLEAN:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
-			ret = SUCCEED;
-			break;
-		case XPATH_NUMBER:
-			zbx_variant_clear(value);
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
-
-			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90 */
-			/* so simply check the result starts with digit (accounting for -inf) */
-			if ('-' == *(ptr = buffer))
-				ptr++;
-			if (0 != isdigit(*ptr))
-			{
-				zbx_del_zeros(buffer);
-				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
-				ret = SUCCEED;
-			}
-			else
-				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
-			break;
-		default:
-			*errmsg = zbx_dsprintf(*errmsg, "Unknown XPath object type %d", (int)xpathObj->type);
-			break;
-	}
+	zbx_variant_clear(value);
+	ret = query_result_format_func(xpathObj, doc, value, errmsg);
 out:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 
 	return ret;
-#endif
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: execute xpath query                                               *
- *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message                                   *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	return query_xpath(value, params, NULL, errmsg);
-}
+#endif /* HAVE_LIBXML2 */
 
 /******************************************************************************
  *                                                                            *
  * Purpose: execute xpath query and return the contents of the result         *
  *                                                                            *
- * Parameters: value    - [IN/OUT] the value to process                       *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
  *             params   - [IN] the operation parameters                       *
  *             is_empty - [OUT] whether the xpath returned empty nodeset      *
  *             errmsg   - [OUT] error message                                 *
@@ -353,7 +406,61 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
  ******************************************************************************/
 int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
 {
-	return query_xpath(value, params, is_empty, errmsg);
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	ZBX_UNUSED(is_empty);
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+
+	return FAIL;
+#else
+	return query_xpath(value, params, is_empty, format_xpath_query_result_default, errmsg);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	return zbx_query_xpath_contents(value, params, NULL, errmsg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query and return the contents of the result as      *
+ *          a vector                                                          *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath_vector(zbx_variant_t *value, const char *params, char **errmsg)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+
+	return FAIL;
+#else
+	return query_xpath(value, params, NULL, format_xpath_query_result_vector, errmsg);
+#endif
 }
 
 #ifdef HAVE_LIBXML2
