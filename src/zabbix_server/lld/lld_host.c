@@ -5520,14 +5520,10 @@ static zbx_uint64_t	lld_interface_compare(const zbx_lld_interface_t *ifold, cons
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 
 		if (0 != strcmp(ifold->lld_row.snmp->max_repetitions, ifnew->lld_row.snmp->max_repetitions))
-		{
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS;
-		}
 
 		if (0 != strcmp(ifold->lld_row.snmp->retries, ifnew->lld_row.snmp->retries))
-		{
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_RETRIES;
-		}
 	}
 
 	return (snmp_flags << 32) | flags;

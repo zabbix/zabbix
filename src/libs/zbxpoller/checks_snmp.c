@@ -3847,7 +3847,7 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 		goto out;
 	}
 
-		if (SNMP_MSG_GETBULK == pdu_type && 1 > snmp_context->snmp_max_repetitions)
+	if (SNMP_MSG_GETBULK == pdu_type && 1 > snmp_context->snmp_max_repetitions)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid max repetition count: it should be at least 1."));
 		ret = CONFIG_ERROR;
