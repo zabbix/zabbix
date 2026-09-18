@@ -1331,13 +1331,93 @@ out:
 
 static int	DBpatch_7050095(void)
 {
+	const zbx_db_field_t	field =
+			{"default_maintenance_period", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_trigger", "maintenance_triggerid", 0,
+				{
+					{"maintenance_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050097(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_1", "maintenanceid,triggerid", 1);
+}
+
+static int	DBpatch_7050098(void)
+{
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_2", "triggerid", 0);
+}
+
+static int	DBpatch_7050099(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 1, &field);
+}
+
+static int	DBpatch_7050100(void)
+{
+	const zbx_db_field_t	field =
+			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_trigger", 2, &field);
+}
+
+static int	DBpatch_7050101(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_eventname", "maintenance_eventnameid", 0,
+				{
+					{"maintenance_eventnameid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050102(void)
+{
+	return DBcreate_index("maintenance_eventname", "maintenance_eventname_1", "maintenanceid", 0);
+}
+
+static int	DBpatch_7050103(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_eventname", 1, &field);
+}
+
+static int	DBpatch_7050104(void)
+{
 	/* 1 - PROXY_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050105(void)
 {
 	/* 1 - PROXY_GROUP_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_group_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -1345,7 +1425,7 @@ static int	DBpatch_7050096(void)
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050106(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy", "usrgrp_proxyid", 0,
@@ -1361,31 +1441,31 @@ static int	DBpatch_7050097(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050107(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050108(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050109(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 1, &field);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050110(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 2, &field);
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050111(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy_group", "usrgrp_proxy_groupid", 0,
@@ -1401,24 +1481,24 @@ static int	DBpatch_7050102(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050103(void)
+static int	DBpatch_7050112(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
 }
 
-static int	DBpatch_7050104(void)
+static int	DBpatch_7050113(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
 }
 
-static int	DBpatch_7050105(void)
+static int	DBpatch_7050114(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy_group", 1, &field);
 }
 
-static int	DBpatch_7050106(void)
+static int	DBpatch_7050115(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1426,7 +1506,7 @@ static int	DBpatch_7050106(void)
 	return DBadd_foreign_key("usrgrp_proxy_group", 2, &field);
 }
 
-static int	DBpatch_7050107(void)
+static int	DBpatch_7050116(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1552,5 +1632,14 @@ DBPATCH_ADD(7050104, 0, 1)
 DBPATCH_ADD(7050105, 0, 1)
 DBPATCH_ADD(7050106, 0, 1)
 DBPATCH_ADD(7050107, 0, 1)
+DBPATCH_ADD(7050108, 0, 1)
+DBPATCH_ADD(7050109, 0, 1)
+DBPATCH_ADD(7050110, 0, 1)
+DBPATCH_ADD(7050111, 0, 1)
+DBPATCH_ADD(7050112, 0, 1)
+DBPATCH_ADD(7050113, 0, 1)
+DBPATCH_ADD(7050114, 0, 1)
+DBPATCH_ADD(7050115, 0, 1)
+DBPATCH_ADD(7050116, 0, 1)
 
 DBPATCH_END()

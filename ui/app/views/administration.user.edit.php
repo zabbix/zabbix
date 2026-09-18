@@ -303,6 +303,13 @@ $default_url_label = array_key_exists('profile_redirect_url', $data) && $data['p
 	: null;
 
 $user_form_list
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
+		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
+			DB::getFieldLength('users', 'default_maintenance_period'))
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
