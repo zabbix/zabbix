@@ -37,6 +37,8 @@
 		#rows_data = new Map();
 		#selected_row_index = null;
 		#metric_types = null;
+		#aggregation_temporality_labels = null;
+		#flags_labels = null;
 
 		init({
 			csrf_token,
@@ -63,6 +65,17 @@
 			this.#filter_form_element = document.querySelector('[name="zbx_filter"]');
 			this.#filter_form = new CForm(this.#filter_form_element, filter_validation_rules);
 			this.#apply_filter_button = this.#filter_form_element?.querySelector('[name="filter_set"]');
+
+			this.#aggregation_temporality_labels = {
+				[APM_METRIC_AGGREGATION_TEMPORALITY_UNSPECIFIED]: <?= json_encode(_('Unspecified')) ?>,
+				[APM_METRIC_AGGREGATION_TEMPORALITY_DELTA]: <?= json_encode(_('Delta')) ?>,
+				[APM_METRIC_AGGREGATION_TEMPORALITY_CUMULATIVE]: <?= json_encode(_('Cumulative')) ?>
+			};
+
+			this.#flags_labels = {
+				[APM_METRIC_FLAG_NONE]: <?= json_encode(_('None')) ?>,
+				[APM_METRIC_FLAG_NO_RECODED_VALUE]: <?= json_encode(_('No recoded value')) ?>
+			};
 
 			this.#validateFormChanges();
 
@@ -149,36 +162,58 @@
 				.setColumns([
 					new CDataTableColumn('metric_name', <?= json_encode(_('Metric name')); ?>)
 						.setFields(['metric_name'])
-						.setRenderer(['name'])
+						.setRenderer(['text_field'])
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type'])
-						.setRenderer('type')
+						.setRenderer(['type'])
 						.setWidth('auto'),
 					new CDataTableColumn('metric_unit', <?= json_encode(_('Unit')); ?>)
 						.setFields(['metric_unit'])
+						.setRenderer(['text_field'])
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name'])
-						.setRenderer(['name'])
+						.setRenderer(['text_field'])
 						.setWidth('auto'),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
 						.setFields(['scope_name'])
-						.setRenderer(['name'])
+						.setRenderer(['text_field'])
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time_unix', <?= json_encode(_('Start time')); ?>)
 						.setFields(['start_time_unix'])
 						.setSortable(true)
-						.setRenderer('start_time_unix')
+						.setRenderer(['time'])
 						.setWidth('auto'),
 					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
 						.setFields(['value'])
-						.setRenderer('value')
+						.setRenderer(['value'])
 						.setWidth('auto'),
 					new CDataTableColumn('count', <?= json_encode(_('Count')); ?>)
 						.setFields(['count'])
+						.setRenderer(['count'])
+						.setWidth('auto'),
+				new CDataTableColumn('time_unix', <?= json_encode(_('Time')); ?>)
+						.setFields(['time_unix'])
+						.setVisible(false)
+						.setRenderer(['time'])
+						.setWidth('auto'),
+					new CDataTableColumn('flags', <?= json_encode(_('Flags')); ?>)
+						.setFields(['flags'])
+						.setVisible(false)
+						.setRenderer(['flags'])
+						.setWidth('auto'),
+					new CDataTableColumn('aggregation_temporality', <?= json_encode(_('Aggregation temporality')); ?>)
+						.setFields(['aggregation_temporality'])
+						.setVisible(false)
+						.setRenderer(['aggregation_temporality'])
+						.setWidth('auto'),
+					new CDataTableColumn('metric_description', <?= json_encode(_('Metric description')); ?>)
+						.setFields(['metric_description'])
+						.setVisible(false)
+						.setRenderer(['metric_description'])
 						.setWidth('auto')
 				])
 				.setPage(page)
@@ -207,42 +242,27 @@
 
 					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
 				})
-				.setCellRenderer('name', ({cell, cell_data}) => {
+				.setCellRenderer('text_field', ({cell, cell_data}) => {
 					const [data] = cell_data;
 
-					const name = document.createElement('div');
-					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					name.textContent = data;
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					flex_wrapper.appendChild(name);
-
-					cell.appendChild(flex_wrapper);
+					cell.appendChild(this.#prepareTextCell(data));
 				})
-				.setCellRenderer('start_time_unix', ({cell, cell_data}) => {
-					const [start_time_unix] = cell_data;
+				.setCellRenderer('time', ({cell, cell_data}) => {
+					const [time] = cell_data;
 
 					/** @type {HTMLDivElement} */
 					const wordbreak = document.createElement('div');
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
-					wordbreak.textContent = start_time_unix;
+					wordbreak.textContent = time;
 
 					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('type', ({cell, cell_data}) => {
 					const [type] = cell_data;
+					const value = this.#metric_types[type].label;
 
-					const content = this.#metric_types[type].label;
-
-					/** @type {HTMLDivElement} */
-					const wordbreak = document.createElement('div');
-					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
-					wordbreak.style.setProperty('--line-clamp', '2');
-					wordbreak.textContent = content;
-
-					cell.appendChild(wordbreak);
+					cell.appendChild(this.#prepareTextCell(value));
 				})
 				.setCellRenderer('value', ({row_index, cell}) => {
 					const data = this.#rows_data.get(row_index);
@@ -250,11 +270,40 @@
 						? data.sum
 						: data.value;
 
-					/** @type {HTMLDivElement} */
-					const wordbreak = document.createElement('div');
+					cell.appendChild(this.#prepareTextCell(value, value));
+				})
+				.setCellRenderer('count', ({row_index, cell}) => {
+					const data = this.#rows_data.get(row_index);
+					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
+						? data.count
+						: '';
+
+					cell.appendChild(this.#prepareTextCell(value, value ?? null));
+				})
+				.setCellRenderer('aggregation_temporality', ({row_index, cell}) => {
+					const data = this.#rows_data.get(row_index);
+					const value = this.#aggregation_temporality_labels[data.aggregation_temporality];
+
+					cell.appendChild(this.#prepareTextCell(value));
+				})
+				.setCellRenderer('flags', ({row_index, cell}) => {
+					const data = this.#rows_data.get(row_index);
+					const value = data.flags & 1 !== 0
+						? this.#flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
+						: this.#flags_labels[APM_METRIC_FLAG_NONE];
+
+					cell.appendChild(this.#prepareTextCell(value));
+				})
+				.setCellRenderer('metric_description', ({cell, cell_data}) => {
+					const [metric_description] = cell_data;
+
+					const wordbreak = document.createElement('span');
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
-					wordbreak.textContent = value;
+					wordbreak.textContent = metric_description;
+					wordbreak.dataset.hintbox = '1';
+					wordbreak.dataset.hintboxStatic = '1';
+					wordbreak.dataset.hintboxHtml = metric_description;
 
 					cell.appendChild(wordbreak);
 				})
@@ -295,8 +344,8 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', () => {
-							if (row.hasAttribute('data-hintbox')) {
+						row.addEventListener('click', (e) => {
+							if (e.target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
@@ -451,6 +500,27 @@
 			}
 		}
 
+		#prepareTextCell(value, hint = null) {
+			const content = document.createElement('div');
+			content.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+			content.textContent = value;
+
+			if (hint !== null) {
+				content.dataset.hintbox = '1';
+				content.dataset.hintboxStatic = '1';
+				content.dataset.hintboxHtml = value;
+			}
+			else {
+				content.title = value;
+			}
+
+			const flex_wrapper = document.createElement('div');
+			flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+			flex_wrapper.appendChild(content);
+
+			return flex_wrapper;
+		}
+
 		#prepareHistogramItems(explicit_bounds, bucket_counts) {
 			const buckets = [];
 
@@ -517,17 +587,6 @@
 		#prepareDetailsData(data) {
 			const type = data.type;
 
-			const aggregation_temporality_labels = {
-				[APM_METRIC_AGGREGATION_TEMPORALITY_UNSPECIFIED]: <?= json_encode(_('Unspecified')) ?>,
-				[APM_METRIC_AGGREGATION_TEMPORALITY_DELTA]: <?= json_encode(_('Delta')) ?>,
-				[APM_METRIC_AGGREGATION_TEMPORALITY_CUMULATIVE]: <?= json_encode(_('Cumulative')) ?>
-			};
-
-			const flags_labels = {
-				[APM_METRIC_FLAG_NONE]: <?= json_encode(_('None')) ?>,
-				[APM_METRIC_FLAG_NO_RECODED_VALUE]: <?= json_encode(_('No recoded value')) ?>,
-			};
-
 			const common_metric_items = [
 				{
 					name: <?= json_encode(_('Resource schema url')) ?>,
@@ -544,8 +603,8 @@
 				{
 					name: <?= json_encode(_('Flags')) ?>,
 					value: data.flags & 1 !== 0
-						? flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
-						: flags_labels[APM_METRIC_FLAG_NONE]
+						? this.#flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
+						: this.#flags_labels[APM_METRIC_FLAG_NONE]
 				}
 			];
 
@@ -560,10 +619,10 @@
 						},
 						{
 							name: <?= json_encode(_('Aggregation temporality')) ?>,
-							value: aggregation_temporality_labels[data.aggregation_temporality]
+							value: this.#aggregation_temporality_labels[data.aggregation_temporality]
 						},
 						{
-							name: <?= json_encode(_('Monotonic')) ?>,
+							name: <?= json_encode(_('Is monotonic')) ?>,
 							value: data.is_monotonic ? 'true' : 'false'
 						},
 						...common_metric_items
@@ -590,7 +649,7 @@
 						},
 						{
 							name: <?= json_encode(_('Aggregation temporality')) ?>,
-							value: aggregation_temporality_labels[data.aggregation_temporality]
+							value: this.#aggregation_temporality_labels[data.aggregation_temporality]
 						},
 						{
 							name: <?= json_encode(_('Count')) ?>,
