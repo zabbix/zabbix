@@ -199,10 +199,15 @@ final class CClickHouseHelper {
 			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
-		$output = array_intersect(array_keys($table_schema), $options['output']);
+		foreach (array_intersect_key($table_schema, array_flip($options['output'])) as $field => ['type' => $type]) {
+			switch ($type) {
+				case 'DateTime64(9)':
+					$query->select('toUnixTimestamp64Nano('.$table_alias.'.'.$field.')', $field);
+					break;
 
-		foreach ($output as $field) {
-			$query->select($table_alias.'.'.$field);
+				default:
+					$query->select($table_alias.'.'.$field);
+			}
 		}
 	}
 
