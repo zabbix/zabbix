@@ -45,6 +45,7 @@ Please provide the necessary access levels for both the User and the Token:
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>|`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`|
 |{$PVE.ROOT.PUSE.MAX.WARN}|<p>Maximum used root space in percentage.</p>|`90`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Proxmox VE", e.g. {$HTTP.TLS.VERIFY:"Proxmox VE"}.</p>|`full`|
 |{$PVE.MEMORY.PUSE.MAX.WARN}|<p>Maximum used memory in percentage.</p>|`90`|
 |{$PVE.CPU.PUSE.MAX.WARN}|<p>Maximum used CPU in percentage.</p>|`90`|
 |{$PVE.SWAP.PUSE.MAX.WARN}|<p>Maximum used swap space in percentage.</p>|`90`|

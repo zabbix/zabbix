@@ -761,6 +761,15 @@ class testUsers extends CAPITest {
 		}
 	}
 
+	public function testUsers_GetOutputBooleanTrue(): void {
+		$result = $this->call('user.get', [
+			'output' => true,
+			'userids' => ['1']
+		]);
+
+		$this->assertArrayNotHasKey('passwd', $result['result'][0]);
+	}
+
 	public static function user_create() {
 		return [
 			// Check user password.
