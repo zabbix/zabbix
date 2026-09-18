@@ -4336,6 +4336,8 @@ div.dashboard-widget-geomap {
   white-space: normal; }
   .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
+  .geomap-hintbox .widget-info-maintenance {
+    display: inline-block; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
