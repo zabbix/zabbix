@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050103);
+define('ZABBIX_DB_VERSION',	7050116);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -386,6 +386,12 @@ define('HOST_STATUS_TEMPLATE',		3);
 
 define('PROXY_OPERATING_MODE_ACTIVE',	0);
 define('PROXY_OPERATING_MODE_PASSIVE',	1);
+
+define('PROXY_MODE_DENY', 0);
+define('PROXY_MODE_ALLOW', 1);
+
+define('PROXY_GROUP_MODE_DENY', 0);
+define('PROXY_GROUP_MODE_ALLOW', 1);
 
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
@@ -1949,6 +1955,7 @@ define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_HOST_PERMISSIONS', 'host-permissions');
 define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_PROXY_ACCESS_LIST', 'proxy-access-list');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_PROXY_TIMEOUTS', 'proxy-timeouts');
 define('TAB_INDICATOR_SCATTER_PLOT_AXES', 'scatter-plot-axes');
@@ -2012,6 +2019,7 @@ define('ZBX_STYLE_BTN_SMALL', 'btn-small');
 define('ZBX_STYLE_BTN_TAG', 'btn-tag');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_ZOOMOUT', 'btn-time-zoomout');
+define('ZBX_STYLE_BTN_PLUS_MORE', 'btn-plus-more');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');

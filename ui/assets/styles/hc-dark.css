@@ -19,7 +19,8 @@
 .form-grid .collapsible > label,
 .form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .cell.cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .cell.cell-header .header-name, .datatable .cell.cell-header.cell-header-link .header-link, .datatable .cell.cell-header.cell-header-link .header-link .name, .datatable .cell.cell-data .flex-wrapper > .link-action, .datatable .cell.cell-data .flex-wrapper .flex-item > .link-action, .datatable .cell.cell-data .timeline-date, .list-table .action-container .link-action, .tag, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
-.totals-list.totals-list-horizontal .name {
+.totals-list.totals-list-horizontal .name, .rules-status-container .status-green,
+.rules-status-container .status-grey {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -119,12 +120,12 @@ z-select .focusable::after, .link-external::after, .markdown a::after, .modal-po
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-grey-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-grey-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker-no-color::after, .drag-icon {
+button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-grey-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, [class^="zi-"].btn-plus-more, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-grey-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, [class*=" zi-"].btn-plus-more, .btn-overlay-close, .icon, .color-picker-no-color::after, .drag-icon {
   position: relative;
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-grey-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-grey-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker-no-color:empty::after, .drag-icon:empty {
+  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-grey-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, [class^="zi-"].btn-plus-more:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-grey-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, [class*=" zi-"].btn-plus-more:empty, .btn-overlay-close:empty, .icon:empty, .color-picker-no-color:empty::after, .drag-icon:empty {
     justify-content: center; }
 
 .zi-administration:before {
@@ -1364,7 +1365,7 @@ footer {
       paint-order: stroke fill;
       -webkit-text-stroke: 1px currentColor; }
 
-button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
+button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug, .btn-plus-more {
   position: relative;
   min-width: 24px;
   height: 24px;
@@ -1376,29 +1377,29 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-ov
   cursor: pointer;
   border: 1px solid;
   border-radius: var(--button-border-radius); }
-  button:empty, .btn:empty, .btn-alt:empty, .btn-grey:empty, .btn-icon:empty, .btn-grey-icon:empty, .btn-link:empty, .btn-overlay-close:empty, .btn-debug:empty {
+  button:empty, .btn:empty, .btn-alt:empty, .btn-grey:empty, .btn-icon:empty, .btn-grey-icon:empty, .btn-link:empty, .btn-overlay-close:empty, .btn-debug:empty, .btn-plus-more:empty {
     padding-right: 0;
     padding-left: 0; }
-  button:active, .btn:active, .btn-alt:active, .btn-grey:active, .btn-icon:active, .btn-grey-icon:active, .btn-link:active, .btn-overlay-close:active, .btn-debug:active, button:focus, .btn:focus, .btn-alt:focus, .btn-grey:focus, .btn-icon:focus, .btn-grey-icon:focus, .btn-link:focus, .btn-overlay-close:focus, .btn-debug:focus {
+  button:active, .btn:active, .btn-alt:active, .btn-grey:active, .btn-icon:active, .btn-grey-icon:active, .btn-link:active, .btn-overlay-close:active, .btn-debug:active, .btn-plus-more:active, button:focus, .btn:focus, .btn-alt:focus, .btn-grey:focus, .btn-icon:focus, .btn-grey-icon:focus, .btn-link:focus, .btn-overlay-close:focus, .btn-debug:focus, .btn-plus-more:focus {
     box-shadow: 0 0 0 2px #ffffff;
     outline: none; }
-  button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug {
+  button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .btn-small.btn-plus-more {
     line-height: 14px; }
-  button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug {
+  button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-medium.btn-plus-more {
     line-height: 16px; }
-  button[class^="zi-"]:not(:empty)::before, [class^="zi-"].btn:not(:empty)::before, [class^="zi-"].btn-alt:not(:empty)::before, [class^="zi-"].btn-grey:not(:empty)::before, [class^="zi-"].btn-icon:not(:empty)::before, [class^="zi-"].btn-grey-icon:not(:empty)::before, [class^="zi-"].btn-link:not(:empty)::before, [class^="zi-"].btn-overlay-close:not(:empty)::before, [class^="zi-"].btn-debug:not(:empty)::before, button[class*=" zi-"]:not(:empty)::before, [class*=" zi-"].btn:not(:empty)::before, [class*=" zi-"].btn-alt:not(:empty)::before, [class*=" zi-"].btn-grey:not(:empty)::before, [class*=" zi-"].btn-icon:not(:empty)::before, [class*=" zi-"].btn-grey-icon:not(:empty)::before, [class*=" zi-"].btn-link:not(:empty)::before, [class*=" zi-"].btn-overlay-close:not(:empty)::before, [class*=" zi-"].btn-debug:not(:empty)::before {
+  button[class^="zi-"]:not(:empty)::before, [class^="zi-"].btn:not(:empty)::before, [class^="zi-"].btn-alt:not(:empty)::before, [class^="zi-"].btn-grey:not(:empty)::before, [class^="zi-"].btn-icon:not(:empty)::before, [class^="zi-"].btn-grey-icon:not(:empty)::before, [class^="zi-"].btn-link:not(:empty)::before, [class^="zi-"].btn-overlay-close:not(:empty)::before, [class^="zi-"].btn-debug:not(:empty)::before, [class^="zi-"].btn-plus-more:not(:empty)::before, button[class*=" zi-"]:not(:empty)::before, [class*=" zi-"].btn:not(:empty)::before, [class*=" zi-"].btn-alt:not(:empty)::before, [class*=" zi-"].btn-grey:not(:empty)::before, [class*=" zi-"].btn-icon:not(:empty)::before, [class*=" zi-"].btn-grey-icon:not(:empty)::before, [class*=" zi-"].btn-link:not(:empty)::before, [class*=" zi-"].btn-overlay-close:not(:empty)::before, [class*=" zi-"].btn-debug:not(:empty)::before, [class*=" zi-"].btn-plus-more:not(:empty)::before {
     margin-right: 4px;
     margin-left: -6px; }
 
 .form-grid table .btn-icon,
-.form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
+.form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-grey-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-medium.btn-plus-more, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
 .list-table .icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .overlay-dialogue .overlay-dialogue-header .btn-icon, .service-info .service-info-value .service-info-value-sla .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
 .table-forms .table-forms-td-right table .icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-piechart .list-item-actions .btn-icon, form.dashboard-widget-scatterplot .list-item-actions .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon {
   min-width: 18px;
   height: 18px; }
 
 .form-grid table .btn-icon.btn-small,
-.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
+.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-grey-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .btn-small.btn-plus-more, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -1426,15 +1427,15 @@ button, .btn {
     background-color: #d3d3d3;
     border-color: #d3d3d3; }
 
-.btn-grey, .btn-grey-icon, .btn-debug {
+.btn-grey, .btn-grey-icon, .btn-debug, .btn-plus-more {
   color: #f2f2f2;
   background-color: #383838;
   border-color: #666666; }
-  .btn-grey:hover, .btn-grey-icon:hover, .btn-debug:hover {
+  .btn-grey:hover, .btn-grey-icon:hover, .btn-debug:hover, .btn-plus-more:hover {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #666666; }
-  .btn-grey:active, .btn-grey-icon:active, .btn-debug:active, .btn-grey:focus, .btn-grey-icon:focus, .btn-debug:focus {
+  .btn-grey:active, .btn-grey-icon:active, .btn-debug:active, .btn-plus-more:active, .btn-grey:focus, .btn-grey-icon:focus, .btn-debug:focus, .btn-plus-more:focus {
     color: #f2f2f2;
     background-color: #414141;
     border-color: #bbbbbb; }
@@ -1468,7 +1469,7 @@ button, .btn {
     background: transparent;
     border-color: rgba(211, 211, 211, 0.5); }
 
-button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey, [disabled].btn-grey-icon {
+button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey, [disabled].btn-grey-icon, [disabled].btn-plus-more {
   pointer-events: none;
   color: #7d7d7d;
   background-color: transparent;
@@ -1575,6 +1576,15 @@ button {
   opacity: 0; }
   .btn-debug.visible {
     opacity: 0.75; }
+
+.btn-plus-more {
+  padding: 0 3px;
+  font-size: 0.917em;
+  height: 16px;
+  line-height: 15px;
+  color: #f2f2f2;
+  background-color: #383838;
+  border-color: #666666; }
 
 .zi-filter-large::before, .zi-search-large::before, .zi-widget-awaiting-data-large::before, .zi-widget-empty-references-large::before {
   font-size: 40px; }
@@ -4792,6 +4802,14 @@ section {
     border-bottom-right-radius: 0; }
   .status-container [class^="status-"][data-hintbox='1'] {
     cursor: pointer; }
+
+.status-list-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+  .status-list-wrapper .status-green, .status-list-wrapper .status-grey {
+    margin-top: 1px;
+    margin-bottom: 1px; }
 
 .status-na-bg,
 .status-info-bg,
@@ -9659,8 +9677,12 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #cacaca; }
 
 .rules-status-container .status-green,
-.rules-status-container .status-grey {
+.rules-status-container .status-grey,
+.rules-status-container .btn-plus-more {
   margin: 3px 3px 3px 0; }
+.rules-status-container .status-green,
+.rules-status-container .status-grey {
+  max-width: 100%; }
 
 .input-section-header {
   padding-top: 10px; }

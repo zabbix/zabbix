@@ -112,6 +112,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
+			'proxies_list' => CProxyHelper::getDefaultAccessHtml(PROXY_MODE_DENY),
+			'proxy_groups_list' => CProxyHelper::getDefaultAccessHtml(PROXY_MODE_DENY),
 			'user_type' => '',
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -172,10 +174,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name', 'userdirectoryid'],
+				'output' => ['usrgrpid', 'name', 'userdirectoryid', 'proxy_mode', 'proxy_group_mode'],
+				'selectProxies' => ['proxyid', 'name'],
+				'selectProxyGroups' => ['proxy_groupid', 'name'],
 				'usrgrpids' => $user_groups
 			])
 			: [];
+
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
@@ -264,10 +269,26 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'grouped' => '1'
 				]
 			];
+			$data['proxies_list'] = CProxyHelper::getDefaultAccessHtml(PROXY_MODE_ALLOW);
+			$data['proxy_groups_list'] = CProxyHelper::getDefaultAccessHtml(PROXY_MODE_ALLOW);
 		}
 		else {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
+
+			$db_proxies = API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxy_groupids' => 0
+			]);
+			CArrayHelper::sort($db_proxies, ['name']);
+
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name']
+			]);
+			CArrayHelper::sort($db_proxy_groups, ['name']);
+
+			$data['proxies_list'] = CProxyHelper::getProxiesHtml($db_proxies, $data['groups']);
+			$data['proxy_groups_list'] = CProxyHelper::getProxyGroupsHtml($db_proxy_groups, $data['groups']);
 		}
 
 		$data['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];

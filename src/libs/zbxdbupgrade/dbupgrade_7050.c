@@ -1409,6 +1409,115 @@ static int	DBpatch_7050103(void)
 	return DBadd_foreign_key("maintenance_eventname", 1, &field);
 }
 
+static int	DBpatch_7050104(void)
+{
+	/* 1 - PROXY_MODE_ALLOW */
+	const zbx_db_field_t	field = {"proxy_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_7050105(void)
+{
+	/* 1 - PROXY_GROUP_MODE_ALLOW */
+	const zbx_db_field_t	field = {"proxy_group_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_7050106(void)
+{
+	const zbx_db_table_t	table =
+			{"usrgrp_proxy", "usrgrp_proxyid", 0,
+				{
+					{"usrgrp_proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050107(void)
+{
+	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
+}
+
+static int	DBpatch_7050108(void)
+{
+	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
+}
+
+static int	DBpatch_7050109(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_proxy", 1, &field);
+}
+
+static int	DBpatch_7050110(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_proxy", 2, &field);
+}
+
+static int	DBpatch_7050111(void)
+{
+	const zbx_db_table_t	table =
+			{"usrgrp_proxy_group", "usrgrp_proxy_groupid", 0,
+				{
+					{"usrgrp_proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050112(void)
+{
+	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
+}
+
+static int	DBpatch_7050113(void)
+{
+	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
+}
+
+static int	DBpatch_7050114(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_proxy_group", 1, &field);
+}
+
+static int	DBpatch_7050115(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_proxy_group", 2, &field);
+}
+
+static int	DBpatch_7050116(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - PROXY_MODE_DENY, PROXY_GROUP_MODE_DENY */
+	if (ZBX_DB_OK > zbx_db_execute("update usrgrp set proxy_mode=0,proxy_group_mode=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1519,5 +1628,18 @@ DBPATCH_ADD(7050100, 0, 1)
 DBPATCH_ADD(7050101, 0, 1)
 DBPATCH_ADD(7050102, 0, 1)
 DBPATCH_ADD(7050103, 0, 1)
+DBPATCH_ADD(7050104, 0, 1)
+DBPATCH_ADD(7050105, 0, 1)
+DBPATCH_ADD(7050106, 0, 1)
+DBPATCH_ADD(7050107, 0, 1)
+DBPATCH_ADD(7050108, 0, 1)
+DBPATCH_ADD(7050109, 0, 1)
+DBPATCH_ADD(7050110, 0, 1)
+DBPATCH_ADD(7050111, 0, 1)
+DBPATCH_ADD(7050112, 0, 1)
+DBPATCH_ADD(7050113, 0, 1)
+DBPATCH_ADD(7050114, 0, 1)
+DBPATCH_ADD(7050115, 0, 1)
+DBPATCH_ADD(7050116, 0, 1)
 
 DBPATCH_END()

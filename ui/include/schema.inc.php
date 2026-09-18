@@ -1815,6 +1815,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
+			],
+			'proxy_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'proxy_group_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -10147,6 +10159,54 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 512,
 				'default' => ''
+			]
+		]
+	],
+	'usrgrp_proxy' => [
+		'key' => 'usrgrp_proxyid',
+		'fields' => [
+			'usrgrp_proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
+			]
+		]
+	],
+	'usrgrp_proxy_group' => [
+		'key' => 'usrgrp_proxy_groupid',
+		'fields' => [
+			'usrgrp_proxy_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'proxy_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy_group',
+				'ref_field' => 'proxy_groupid'
 			]
 		]
 	],

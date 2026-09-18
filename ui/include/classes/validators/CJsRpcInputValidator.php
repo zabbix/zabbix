@@ -412,12 +412,17 @@ class CJsRpcInputValidator {
 
 			case 'devices':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
-						'userid' => ['type' => API_ID]
-					]];
+					'userid' => ['type' => API_ID]
+				]];
+				break;
+
+			case 'proxies':
+				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
+					'without_proxy_group' => ['type' => API_INT32]
+				]];
 				break;
 
 			// "search" parameter has already been validated at this point. Skip further validation for these methods.
-			case 'proxies':
 			case 'proxy_groups':
 			case 'roles':
 			case 'actions':
