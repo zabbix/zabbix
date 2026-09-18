@@ -280,8 +280,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		}
 		else if (SUCCEED_PARTIAL == status)
 		{
-			error = zbx_dsprintf(NULL, "telemetry query result row limit (%d) exceeded",
-					ZBX_TQ_MAX_RESULT_ROWS);
+			error = zbx_dsprintf(NULL, "Telemetry query result row limit (%d) exceeded, "
+					"result was truncated", ZBX_TQ_MAX_RESULT_ROWS);
 		}
 	}
 	else
