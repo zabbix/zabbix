@@ -3357,6 +3357,12 @@ static int	host_prototype_interfaces_compare(const zbx_interfaces_prototype_t *i
 
 		if (0 != strcmp(ifold->data.snmp->contextname, ifnew->data.snmp->contextname))
 			return FAIL;
+
+		if (0 != strcmp(ifold->data.snmp->max_repetitions, ifnew->data.snmp->max_repetitions))
+			return FAIL;
+
+		if (0 != strcmp(ifold->data.snmp->retries, ifnew->data.snmp->retries))
+			return FAIL;
 	}
 
 	return SUCCEED;
