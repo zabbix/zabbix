@@ -411,7 +411,7 @@ function submitPopup(overlay) {
 	}
 
 	if (warning_message !== '') {
-		overlayDialogue({
+		let warning_overlay = overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
 			'class': 'position-middle',
@@ -424,6 +424,9 @@ function submitPopup(overlay) {
 				}
 			]
 		}, overlay.$btn_submit);
+
+		// Display the close button after the screen reader announces the dialog title.
+		warning_overlay.$dialogue.$close_btn.show();
 
 		overlay.unsetLoading();
 		return false;

@@ -122,7 +122,7 @@ class testPageServicesServices extends CWebTest {
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD);
 
 		// Check Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.
@@ -130,7 +130,7 @@ class testPageServicesServices extends CWebTest {
 		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
 		$this->assertTrue($this->query('id:service-list')->exists());
 
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.
@@ -160,7 +160,7 @@ class testPageServicesServices extends CWebTest {
 		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true), true);
 
 		// Check there is no Kiosk mode button.
-		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+		$this->assertFalse($this->query('xpath://button[@aria-label="Enter full screen mode"]')->exists());
 
 		// Check Info/Filter tabs switching.
 		foreach (['Filter' => 'tab_1', 'Info' => 'tab_info'] as $tab => $id) {

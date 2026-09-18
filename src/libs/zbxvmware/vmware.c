@@ -1452,6 +1452,8 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 			alarm->entity_type = NULL;
 		}
 
+		alarm->entity_uuid = NULL;
+		alarm->entity_name = NULL;
 		zbx_vector_vmware_alarm_ptr_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
 	}
@@ -1496,9 +1498,6 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 	for (i = 0; i < data->alarms.values_num; i++)
 	{
 		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
-
-		alarm->entity_uuid = NULL;	/* we can't guarantee that we will find any uuid */
-		alarm->entity_name = NULL;
 
 		if (NULL == alarm->entity_id)
 			continue;

@@ -32,6 +32,8 @@ zabbix_export:
           value: P5
         - name: severity_warning
           value: P4
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"TOPdesk"}'
         - name: topdesk_api
           value: '<put your TOPdesk API URL>'
         - name: topdesk_issue_key
@@ -48,241 +50,255 @@ zabbix_export:
           value: '{$ZABBIX.URL}'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         var Media = {
-            params: {},
-            name: '',
-            labels: [],
-            HTTPProxy: '',
+        	params: {},
+        	name: '',
+        	labels: [],
+        	HTTPProxy: '',
         
-            setParams: function (params) {
-                if (typeof params !== 'object') {
-                    return;
-                }
+        	setParams: function (params) {
+        		if (typeof params !== 'object') {
+        			return;
+        		}
         
-                Media.params = params;
-                Media.params.api += Media.params.api.endsWith('/') ? '' : '/';
-            },
+        		Media.params = params;
+        		Media.params.api += Media.params.api.endsWith('/') ? '' : '/';
+        	},
         
-            setProxy: function (HTTPProxy) {
-                if (typeof HTTPProxy !== 'undefined' && HTTPProxy.trim() !== '') {
-                    Media.HTTPProxy = HTTPProxy;
-                }
-            },
+        	setProxy: function (HTTPProxy) {
+        		if (typeof HTTPProxy !== 'undefined' && HTTPProxy.trim() !== '') {
+        			Media.HTTPProxy = HTTPProxy;
+        		}
+        	},
         
-            request: function (method, query, data) {
-                ['api', 'token'].forEach(function (field) {
-                    if (typeof Media.params !== 'object' || typeof Media.params[field] === 'undefined'
-                            || Media.params[field] === '') {
-                        throw 'Required ' + Media.name + ' param is not set: "' + field + '".';
-                    }
-                });
+        	request: function (method, query, data) {
+        		['api', 'token'].forEach(function (field) {
+        			if (typeof Media.params !== 'object' || typeof Media.params[field] === 'undefined'
+        					|| Media.params[field] === '') {
+        				throw 'Required ' + Media.name + ' param is not set: "' + field + '".';
+        			}
+        		});
         
-                var response,
-                    url = Media.params.api + query,
-                    request = new HttpRequest();
+        		var response,
+        			url = Media.params.api + query,
+        			request = new HttpRequest(tls.options);
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Accept: application/json');
-                request.addHeader('Authorization: ' + Media.params.token);
-                request.setProxy(Media.HTTPProxy);
+        		request.addHeader('Content-Type: application/json');
+        		request.addHeader('Accept: application/json');
+        		request.addHeader('Authorization: ' + Media.params.token);
+        		request.setProxy(Media.HTTPProxy);
         
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+        		if (typeof data !== 'undefined') {
+        			data = JSON.stringify(data);
+        		}
         
-                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Sending request: ' +
-                    url + ((typeof data === 'string') ? ('\n' + data) : ''));
+        		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Sending request: ' +
+        			url + ((typeof data === 'string') ? ('\n' + data) : ''));
         
-                switch (method) {
-                    case 'get':
-                        response = request.get(url, data);
-                        break;
+        		switch (method) {
+        			case 'get':
+        				response = request.get(tls.checkURL(url), data);
+        				break;
         
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
+        			case 'post':
+        				response = request.post(tls.checkURL(url), data);
+        				break;
         
-                    case 'put':
-                        response = request.put(url, data);
-                        break;
+        			case 'put':
+        				response = request.put(tls.checkURL(url), data);
+        				break;
         
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
+        			default:
+        				throw 'Unsupported HTTP request method: ' + method;
+        		}
         
-                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+        		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
+        			request.getStatus() + '\n' + response);
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');
-                        response = null;
-                    }
-                }
+        		if (response !== null) {
+        			try {
+        				response = JSON.parse(response);
+        			}
+        			catch (error) {
+        				Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');
+        				response = null;
+        			}
+        		}
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+        			var message = 'Request failed with status code ' + request.getStatus();
         
-                    if (response !== null) {
-                        if (typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
-                            message += ': ' + JSON.stringify(response.errors);
-                        }
-                        else if (typeof response.errorMessages === 'object' && Object.keys(response.errorMessages).length > 0) {
-                            message += ': ' + JSON.stringify(response.errorMessages);
-                        }
-                        else if (typeof response.message === 'string') {
-                            message += ': ' + response.message;
-                        }
-                    }
+        			if (response !== null) {
+        				if (typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
+        					message += ': ' + JSON.stringify(response.errors);
+        				}
+        				else if (typeof response.errorMessages === 'object' && Object.keys(response.errorMessages).length > 0) {
+        					message += ': ' + JSON.stringify(response.errorMessages);
+        				}
+        				else if (typeof response.message === 'string') {
+        					message += ': ' + response.message;
+        				}
+        			}
         
-                    throw message + ' Check debug log for more information.';
-                }
+        			throw message + ' Check debug log for more information.';
+        		}
         
-                return {
-                    status: request.getStatus(),
-                    response: response
-                };
-            }
+        		return {
+        			status: request.getStatus(),
+        			response: response
+        		};
+        	}
         };
         
         try {
-            var result = {tags: {}},
-                params = JSON.parse(value),
-                media = {},
-                fields = {},
-                resp = {},
-                required_params = [
-                    'alert_subject',
-                    'alert_message',
-                    'event_id',
-                    'event_source',
-                    'event_value',
-                    'event_update_status',
-                    'topdesk_api',
-                    'topdesk_user',
-                    'topdesk_password'
-                ],
-                severities = [
-                    'not_classified',
-                    'information',
-                    'warning',
-                    'average',
-                    'high',
-                    'disaster',
-                    'resolved',
-                    'default'
-                ],
-                priority;
+        	var result = {tags: {}},
+        		params = JSON.parse(value),
+        		tls = new CTlsConfig(params.tls_verify),
+        		media = {},
+        		fields = {},
+        		resp = {},
+        		required_params = [
+        			'alert_subject',
+        			'alert_message',
+        			'event_id',
+        			'event_source',
+        			'event_value',
+        			'event_update_status',
+        			'topdesk_api',
+        			'topdesk_user',
+        			'topdesk_password'
+        		],
+        		severities = [
+        			'not_classified',
+        			'information',
+        			'warning',
+        			'average',
+        			'high',
+        			'disaster',
+        			'resolved',
+        			'default'
+        		],
+        		priority;
         
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
-                        throw 'Parameter "' + key + '" cannot be empty.';
-                    }
-                    if (key.startsWith('topdesk_')) {
-                        media[key.substring(8)] = params[key];
-                    }
-                });
+        	Object.keys(params)
+        		.forEach(function (key) {
+        			if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+        				throw 'Parameter "' + key + '" cannot be empty.';
+        			}
+        			if (key.startsWith('topdesk_')) {
+        				media[key.substring(8)] = params[key];
+        			}
+        		});
         
-            // Possible values of event_source:
-            // 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal.
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
-            }
+        	if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+        		throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+        	}
         
-            // Check event_value for trigger-based and internal events.
-            // Possible values: 1 for problem, 0 for recovering
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
+        	if (params.event_value !== '0' && params.event_value !== '1'
+        		&& (params.event_source === '0' || params.event_source === '3')) {
+        		throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+        	}
         
-            // Check event_update_status only for trigger-based events.
-            // Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
-            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
+        	if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+        		throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+        	}
         
-            // Check event_id for a numeric value.
-            if (isNaN(parseInt(params.event_id)) || params.event_id < 1) {
-                throw 'Incorrect "event_id" parameter given: ' + params.event_id + '\nMust be a positive number.';
-            }
+        	if (isNaN(parseInt(params.event_id)) || params.event_id < 1) {
+        		throw 'Incorrect "event_id" parameter given: ' + params.event_id + '\nMust be a positive number.';
+        	}
         
-            if ((params.event_source === '1' || params.event_source === '2')  && params.event_value === '0') {
-                throw 'Recovery operations are supported only for Trigger and Internal actions.';
-            }
+        	if ((params.event_source === '1' || params.event_source === '2')  && params.event_value === '0') {
+        		throw 'Recovery operations are supported only for Trigger and Internal actions.';
+        	}
         
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                params.event_nseverity = '7';
-            }
+        	if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+        		params.event_nseverity = '7';
+        	}
         
-            if (params.event_value === '0') {
-                params.event_nseverity = '6';
-            }
+        	if (params.event_value === '0') {
+        		params.event_nseverity = '6';
+        	}
         
-            priority = params['severity_' + severities[params.event_nseverity]];
-            params.zbxurl = params.zbxurl + (params.zbxurl.endsWith('/') ? '' : '/');
+        	priority = params['severity_' + severities[params.event_nseverity]];
+        	params.zbxurl = params.zbxurl + (params.zbxurl.endsWith('/') ? '' : '/');
         
-            Media.name = 'TOPdesk';
-            Media.setParams(media);
-            Media.params.token = 'Basic ' + btoa(Media.params.user + ':' + Media.params.password);
-            Media.setProxy(params.HTTPProxy);
+        	Media.name = 'TOPdesk';
+        	Media.setParams(media);
+        	Media.params.token = 'Basic ' + btoa(Media.params.user + ':' + Media.params.password);
+        	Media.setProxy(params.HTTPProxy);
         
-            // Create an issue.
-            // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).
-            // Numeric value of the problem update status. Possible values:
-            // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
-            if ((params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0)
-                    || (params.event_source == 3 && params.event_value == 1)
-                    || params.event_source == 1 || params.event_source == 2) {
-                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket creating.');
-                fields.caller = {dynamicName: 'Zabbix'};
-                fields.briefDescription = params.alert_subject;
-                fields.request = params.alert_message.replace(/\n/g, '<br>');
-                fields.priority = {name: priority};
-                fields.processingStatus = {name: Media.params.status};
-                fields.externalNumber = params.event_id;
-                fields.request += '<br>' + params.zbxurl;
+        	if ((params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0)
+        			|| (params.event_source == 3 && params.event_value == 1)
+        			|| params.event_source == 1 || params.event_source == 2) {
+        		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket creating.');
+        		fields.caller = {dynamicName: 'Zabbix'};
+        		fields.briefDescription = params.alert_subject;
+        		fields.request = params.alert_message.replace(/\n/g, '<br>');
+        		fields.priority = {name: priority};
+        		fields.processingStatus = {name: Media.params.status};
+        		fields.externalNumber = params.event_id;
+        		fields.request += '<br>' + params.zbxurl;
         
-                if (params.event_source === '0') {
-                    fields.request += 'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id;
-                }
+        		if (params.event_source === '0') {
+        			fields.request += 'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id;
+        		}
         
-                resp = Media.request('post', 'tas/api/incidents', fields);
-                if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined') {
-                    throw 'Cannot create ' + Media.name + ' issue. Check debug log for more information.';
-                }
+        		resp = Media.request('post', 'tas/api/incidents', fields);
+        		if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined') {
+        			throw 'Cannot create ' + Media.name + ' issue. Check debug log for more information.';
+        		}
         
-                if (params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0) {
-                    result.tags.__zbx_tpd_issuekey = resp.response.number;
-                    result.tags.__zbx_tpd_issuelink = Media.params.api +
-                        'tas/secure/incident?action=show&unid=' + resp.response.id;
-                }
-            }
-            // Update a created issue.
-            else {
-                if (params.event_source == 3 && params.event_value == 0) {
-                    throw 'Internal event recovery actions are not supported.';
-                }
+        		if (params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0) {
+        			result.tags.__zbx_tpd_issuekey = resp.response.number;
+        			result.tags.__zbx_tpd_issuelink = Media.params.api +
+        				'tas/secure/incident?action=show&unid=' + resp.response.id;
+        		}
+        	}
+        	else {
+        		if (params.event_source == 3 && params.event_value == 0) {
+        			throw 'Internal event recovery actions are not supported.';
+        		}
         
-                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
-                fields.action = params.alert_message.replace(/\n/g, '<br>');
+        		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
+        		fields.action = params.alert_message.replace(/\n/g, '<br>');
         
-                resp = Media.request('put', 'tas/api/incidents/number/' + Media.params.issue_key, fields);
-                if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined'
-                        || resp.response.number !== Media.params.issue_key) {
-                    throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';
-                }
-            }
+        		resp = Media.request('put', 'tas/api/incidents/number/' + encodeURIComponent(Media.params.issue_key), fields);
+        		if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined'
+        				|| resp.response.number !== Media.params.issue_key) {
+        			throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';
+        		}
+        	}
         
-            return JSON.stringify(result);
+        	return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ ' + Media.name + ' Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Zabbix.log(3, '[ ' + Media.name + ' Webhook ] ERROR: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
@@ -290,7 +306,7 @@ zabbix_export:
       event_menu_name: 'TOPdesk: {EVENT.TAGS.__zbx_tpd_issuekey}'
       description: |
         Please refer to https://developers.topdesk.com/documentation/index.html and https://www.zabbix.com/documentation/7.0/manual/config/notifications/media/webhook#example_scripts.
-          
+        
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "TOPdesk".
         Change the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
@@ -310,9 +326,8 @@ zabbix_export:
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
-            Problem duration: {EVENT.DURATION}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
@@ -347,3 +362,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

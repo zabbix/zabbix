@@ -35,6 +35,7 @@ This template has been tested on:
 |{$ILO.USER}|<p>The name of the user that is used for monitoring.</p>||
 |{$ILO.PASSWORD}|<p>The password of the user that is used for monitoring.</p>||
 |{$ILO.HTTP_PROXY}|<p>The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE iLO", e.g. {$HTTP.TLS.VERIFY:"HPE iLO"}.</p>|`full`|
 |{$ILO.INTERVAL}|<p>The update interval for the script item that retrieves data from API.</p>|`1m`|
 |{$ILO.TIMEOUT}|<p>The timeout threshold for the script item that retrieves data from API.</p>|`15s`|
 |{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES}|<p>The computer system hostname regex filter to use in computer systems related metrics discovery for including. Can be used with the following context to include metrics of the particular entity: System, Storage, Controller, Drive, Volume.</p>|`.+`|
