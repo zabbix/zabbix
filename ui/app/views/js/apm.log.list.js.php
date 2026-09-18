@@ -139,7 +139,7 @@
 			this.#datatable = new CDataTable(document.getElementById('datatable-logs'), data_provider)
 				.setColumns([
 					new CDataTableColumn('timestamp', <?= json_encode(_('Timestamp')) ?>)
-						.setFields(['timestamp'])
+						.setFields(['timestamp_formatted'])
 						.setSortable(true)
 						.setRenderer('timestamp')
 						.setWidth('auto'),
@@ -197,13 +197,13 @@
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setCellRenderer('timestamp', ({cell, cell_data}) => {
-					const [timestamp] = cell_data;
+					const [timestamp_formatted] = cell_data;
 
 					/** @type {HTMLDivElement} */
 					const wordbreak = document.createElement('div');
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
-					wordbreak.textContent = timestamp;
+					wordbreak.textContent = timestamp_formatted;
 
 					cell.appendChild(wordbreak);
 				})
@@ -355,7 +355,7 @@
 					items: [
 						{
 							name: <?= json_encode(_('Timestamp')) ?>,
-							value: row_data.timestamp
+							value: row_data.timestamp_ns_formatted
 						},
 						{
 							name: <?= json_encode(_('Trace ID')) ?>,

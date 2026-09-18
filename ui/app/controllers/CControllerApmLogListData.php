@@ -16,9 +16,10 @@
 
 class CControllerApmLogListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['timestamp', 'traceid', 'spanid', 'trace_flags', 'severity_text',
-		'severity_number', 'service_name', 'body', 'resource_schema_url', 'resource_attributes', 'scope_schema_url',
-		'scope_name', 'scope_version', 'scope_attributes', 'log_attributes', 'event_name'
+	protected array $allowed_data_fields = ['timestamp_formatted', 'timestamp_ns_formatted', 'traceid', 'spanid',
+		'trace_flags', 'severity_text', 'severity_number', 'service_name', 'body', 'resource_schema_url',
+		'resource_attributes', 'scope_schema_url', 'scope_name', 'scope_version', 'scope_attributes', 'log_attributes',
+		'event_name'
 	];
 
 	protected array $filter;
@@ -160,11 +161,45 @@ class CControllerApmLogListData extends CControllerDataTable {
 		if ($num_rows > 0) {
 			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
 
+			$select_fields = $data_fields;
+
+			if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
+				$select_fields = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
+				$select_fields[] = 'timestamp';
+			}
+
 			$logs = API::ApmLog()->get($options + [
-				'output' => $data_fields,
+				'output' => $select_fields,
 				'offset' => $offset,
 				'limit' => $limit
 			]);
+
+			if (in_array('timestamp', $select_fields)) {
+				$today = strtotime('today');
+
+				foreach ($logs as &$log) {
+					$clock = floor($log['timestamp'] / 1000000000);
+
+					if (in_array('timestamp_formatted', $data_fields)) {
+						$log['timestamp_formatted'] = $clock >= $today
+							? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
+							: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
+					}
+
+					if (in_array('timestamp_ns_formatted', $data_fields)) {
+						$ns = str_pad((string) ($log['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+						$log['timestamp_ns_formatted'] = $clock >= $today
+							? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+							: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+								['!' => $ns]
+							);
+					}
+
+					unset($log['timestamp']);
+				}
+				unset($log);
+			}
 
 			$output['rows'] = array_values(array_map(static fn (array $log) => [['renderer' => 'log'], $log], $logs));
 		}
