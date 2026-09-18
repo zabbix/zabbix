@@ -219,9 +219,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		]);
 
 		$disabled_modules = array_filter($db_modules,
-			static function(array $db_module): bool {
-				return $db_module['status'] == MODULE_STATUS_DISABLED;
-			}
+			static fn(array $db_module): bool => $db_module['status'] == MODULE_STATUS_DISABLED
 		);
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
@@ -243,100 +241,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);
-	}
-
-	private function getFormData(array $data): array {
-		$this->getInputs($data, ['name', 'type']);
-
-		// Overwrite default access inputs.
-		if ($this->hasInput('ui_default_access')) {
-			$data['rules']['ui.default_access'] = $this->getInput('ui_default_access');
-		}
-
-		if ($this->hasInput('modules_default_access')) {
-			$data['rules']['modules.default_access'] = $this->getInput('modules_default_access');
-		}
-
-		if ($this->hasInput('actions_default_access')) {
-			$data['rules']['actions.default_access'] = $this->getInput('actions_default_access');
-		}
-
-		// UI section.
-		foreach (CRoleHelper::getUiElementsByUserType((int) $data['type']) as $label) {
-			$input_name = str_replace('.', '_', $label);
-
-			if ($this->hasInput($input_name)) {
-				$data['rules']['ui'][$label] = $this->getInput($input_name);
-			}
-		}
-
-		// Services section.
-		if ($this->hasInput('service_read_access')) {
-			$data['rules']['service_read_access'] = $this->getInput('service_read_access');
-		}
-
-		if ($data['rules']['service_read_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
-			if ($this->hasInput('service_read_list')) {
-				foreach ($this->getInput('service_read_list') as $serviceid) {
-					$data['rules']['service_read_list'][] = ['serviceid' => $serviceid];
-				}
-			}
-
-			if ($this->hasInput('service_read_tag_tag')) {
-				$data['rules']['service_read_tag']['tag'] = trim($this->getInput('service_read_tag_tag'));
-			}
-
-			if ($this->hasInput('service_read_tag_value')) {
-				$data['rules']['service_read_tag']['value'] = trim($this->getInput('service_read_tag_value'));
-			}
-		}
-
-		if ($this->hasInput('service_write_access')) {
-			$data['rules']['service_write_access'] = $this->getInput('service_write_access');
-		}
-
-		if ($data['rules']['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
-			if ($this->hasInput('service_write_list')) {
-				foreach ($this->getInput('service_write_list') as $serviceid) {
-					$data['rules']['service_write_list'][] = ['serviceid' => $serviceid];
-				}
-			}
-
-			if ($this->hasInput('service_write_tag_tag')) {
-				$data['rules']['service_write_tag']['tag'] = trim($this->getInput('service_write_tag_tag'));
-			}
-
-			if ($this->hasInput('service_write_tag_value')) {
-				$data['rules']['service_write_tag']['value'] = trim($this->getInput('service_write_tag_value'));
-			}
-		}
-
-		// Modules section.
-		if ($this->hasInput('modules')) {
-			$data['rules']['modules'] = $this->getInput('modules');
-		}
-
-		// API section.
-		if ($this->hasInput('api_access')) {
-			$data['rules']['api.access'] = $this->getInput('api_access');
-		}
-		if ($this->hasInput('api_mode')) {
-			$data['rules']['api.mode'] = $this->getInput('api_mode');
-		}
-		foreach ($this->getInput('api_methods', []) as $method) {
-			$data['rules']['api'][] = ['id' => $method, 'name' => $method];
-		}
-
-		// Actions section.
-		foreach (CRoleHelper::getActionsByUserType((int) $data['type']) as $label) {
-			$input_name = str_replace('.', '_', $label);
-
-			if ($this->hasInput($input_name)) {
-				$data['rules']['actions'][$label] = $this->getInput($input_name);
-			}
-		}
-
-		return $data;
 	}
 
 	private function getLabels(array $db_modules): array {
@@ -443,12 +347,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		if ($input['api']) {
 			$rules['api'] = array_map(
-				static function (string $method): array {
-					return [
-						'id' => $method,
-						'name' => $method
-					];
-				},
+				static fn(string $method): array => [
+					'id' => $method,
+					'name' => $method
+				],
 				$input['api']
 			);
 		}
