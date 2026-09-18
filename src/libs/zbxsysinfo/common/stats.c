@@ -15,7 +15,10 @@
 #include "stats.h"
 #include "zbxsysinfo.h"
 #include "cpustat.h"
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "diskdevices.h"
+#endif
 
 #include "zbxlog.h"
 #include "zbxtime.h"

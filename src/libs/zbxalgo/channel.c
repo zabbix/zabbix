@@ -17,6 +17,8 @@
 #include "zbxtypes.h"
 #include "zbxtime.h"
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: grow channel capacity by 1.5x factor                              *
@@ -370,4 +372,5 @@ out:
 	pthread_mutex_unlock(&chan->lock);
 }
 
+#endif
 

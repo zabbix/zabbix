@@ -57,6 +57,7 @@ require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
@@ -80,6 +81,7 @@ require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
+require_once dirname(__FILE__).'/testScheduledReports.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -130,6 +132,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
@@ -151,13 +154,13 @@ class IntegrationTests {
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
+		$suite->addTestSuite('testScheduledReports');
 		$suite->addTestSuite('testTriggerCEP');
 		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
-
 		return $suite;
 	}
 }

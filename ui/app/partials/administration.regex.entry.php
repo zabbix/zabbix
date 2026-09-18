@@ -28,6 +28,7 @@
 		->setValue($data['type'])
 		->setErrorContainer('expressions-'.$data['index'].'-error-container')
 		->setErrorLabel(_('Expression type'))
+		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	)
 	->addItem(
 		(new CCol(
