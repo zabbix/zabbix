@@ -956,8 +956,11 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 	{
 		zbx_mw_task_t	*t;
 		zbx_db_event	*db_event;
+		zbx_timespec_t	ts;
 
-		db_event = cep_db_event_create(&event->origin, event->name, event->clock, event->ns, event->severity,
+		zbx_timespec(&ts);
+
+		db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
 				TRIGGER_VALUE_OK, &event->tags);
 
 		t = cep_create_task_event_by_cep_rule(db_event, event->eventid, ruleid);
