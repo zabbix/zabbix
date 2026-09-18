@@ -42,8 +42,12 @@
 		#side_drawer_abort_controller = null;
 		/** @type {TraceViewPage|null} */
 		#trace_view_page = null;
+		/** @type {Object<string, any>} */
+		#trace_view_data = null;
 		/** @type {string|null} */
 		#selected_traceid = null;
+		/** @type {CDetailsPanel|null} */
+		#details_panel = null;
 
 		init({
 			csrf_token,
@@ -371,8 +375,6 @@
 				.init(user_configs);
 		}
 
-		#trace_view_data = null;
-
 		#openSideDrawer(container, traceid) {
 			if (this.#side_drawer === null) {
 				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
@@ -408,8 +410,6 @@
 					}
 				});
 		}
-
-		#span_details = null;
 
 		#onSideDrawerOpen = e => {
 			const {response} = e.detail;
@@ -471,16 +471,16 @@
 			const span_details = document.createElement('div');
 			trace_details.appendChild(span_details);
 
-			this.#span_details?.destroy();
-			this.#span_details = new CDetailsPanel(span_details, {
+			this.#details_panel?.destroy();
+			this.#details_panel = new CDetailsPanel(span_details, {
 				title: <?= json_encode(_('Span details')); ?>,
 				groups: this.#collectSpanDetailsGroups(span)
 			});
 		}
 
 		#onSideDrawerSpanDetailsClose = () => {
-			this.#span_details?.destroy();
-			this.#span_details = null;
+			this.#details_panel?.destroy();
+			this.#details_panel = null;
 
 			const trace_tree_content = this.#side_drawer?.getElement()?.querySelector('.z-navigation-tree-content');
 			trace_tree_content?.dispatchEvent(new CustomEvent('deselect'));
