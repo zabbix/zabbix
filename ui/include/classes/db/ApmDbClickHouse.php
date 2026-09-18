@@ -16,6 +16,11 @@
 
 class ApmDbClickHouse {
 
+	/**
+	 * The maximum number of seconds to allow cURL functions to execute.
+	 */
+	private const TIMEOUT = 5;
+
 	private static array $instances = [];
 
 	private array $config;
@@ -158,7 +163,8 @@ class ApmDbClickHouse {
 			CURLOPT_SHARE => $this->curl_share,
 			CURLOPT_SSL_VERIFYPEER => $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
-			CURLOPT_HTTPHEADER => $http_headers
+			CURLOPT_HTTPHEADER => $http_headers,
+			CURLOPT_TIMEOUT => self::TIMEOUT
 		];
 
 		if ($params) {
@@ -175,10 +181,15 @@ class ApmDbClickHouse {
 		}
 
 		if ($this->config['username'] !== '') {
-			$curl_options += [
-				CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-				CURLOPT_USERPWD => $this->config['username'].':'.$this->config['password']
-			];
+			if ($this->config['password'] !== '') {
+				$curl_options += [
+					CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+					CURLOPT_USERPWD  => $this->config['username'] . ':' . $this->config['password']
+				];
+			}
+			else {
+				$curl_options[CURLOPT_URL] .= '?' . http_build_query(['user' => $this->config['username']]);
+			}
 		}
 
 		if ($this->config['ssl_ca_file'] !== '') {

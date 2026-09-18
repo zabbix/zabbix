@@ -46,7 +46,14 @@ class CControllerApmDbTest extends CController {
 	}
 
 	protected function doAction(): void {
-		$apm = $this->getInputAll();
+		$apm = $this->getInputAll() + [
+			'ssl_verify_host' => 0,
+			'ssl_cert_file' => '',
+			'ssl_key_file' => '',
+			'ssl_key_password' => '',
+			'ssl_ca_file' => '',
+			'ssl_ca_location' => ''
+		];
 
 		$output = [];
 
@@ -62,9 +69,10 @@ class CControllerApmDbTest extends CController {
 			$output['success'] = [
 				'title' => _('Successfully connected to APM data source.')
 			];
-		} catch (Exception) {
+		} catch (Exception $e) {
 			$output['error'] = [
-				'title' => _('Could not connect to APM data source.')
+				'title' => _('Could not connect to APM data source.'),
+				'messages' => [$e->getMessage()]
 			];
 		}
 
