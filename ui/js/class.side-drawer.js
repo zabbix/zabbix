@@ -16,6 +16,7 @@
 class CSideDrawer {
 
 	static EVENT_OPEN = 'sidedrawer.open';
+	static EVENT_BEFORE_CLOSE = 'sidedrawer.before-close';
 	static EVENT_CLOSE = 'sidedrawer.close';
 
 	/** @type {HTMLElement} */
@@ -90,8 +91,12 @@ class CSideDrawer {
 	 */
 	close() {
 		return Promise.resolve().then(() => {
+			this.dispatchEvent(CSideDrawer.EVENT_BEFORE_CLOSE);
+
 			this.#unbindEvents();
 			this.#unmount();
+
+			this.#drawer_element.innerHTML = '';
 
 			this.dispatchEvent(CSideDrawer.EVENT_CLOSE);
 		});

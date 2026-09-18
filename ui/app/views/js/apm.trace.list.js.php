@@ -133,30 +133,73 @@
 
 			this.#datatable = new CDataTable(document.getElementById('datatable-traces'), data_provider)
 				.setColumns([
+					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')); ?>)
+						.setFields(['traceid'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')); ?>)
+						.setFields(['spanid'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('trace_state', <?= json_encode(_('Trace state')); ?>)
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setFields(['trace_state'])
+						.setVisible(false)
+						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name', 'span_count', 'error_count'])
 						.setRenderer('service_name')
 						.setWidth('auto'),
-					new CDataTableColumn('operation_name', <?= json_encode(_('Operation name')); ?>)
+					new CDataTableColumn('span_name', <?= json_encode(_('Operation name')); ?>)
 						.setFields(['span_name'])
-						.setRenderer('operation_name')
+						.setRenderer('span_name')
 						.setWidth('auto'),
-					new CDataTableColumn('timestamp', <?= json_encode(_('Start time')); ?>)
+					new CDataTableColumn('span_kind', <?= json_encode(_('Span kind')); ?>)
+						.setFields(['span_kind'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
+						.setFields(['scope_name'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('scope_version', <?= json_encode(_('Scope version')); ?>)
+						.setFields(['scope_version'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('status_code', <?= json_encode(_('Status code')); ?>)
+						.setFields(['status_code'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('status_message', <?= json_encode(_('Status message')); ?>)
+						.setFields(['status_message'])
+						.setVisible(false)
+						.setWidth('auto'),
+					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
 						.setFields(['timestamp'])
 						.setSortable(true)
-						.setRenderer('timestamp')
+						.setRenderer('start_time')
 						.setWidth('auto'),
-					new CDataTableColumn('attributes', <?= json_encode(_('Attributes')); ?>)
+					new CDataTableColumn('span_attributes', <?= json_encode(_('Span attributes')); ?>)
 						.setColumnOptions({
 							number_of_attributes: 3
 						})
 						.setFields(['span_attributes'])
 						.setRenderer('attributes')
 						.setWidth('auto'),
+					new CDataTableColumn('resource_attributes', <?= json_encode(_('Resource attributes')); ?>)
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setFields(['resource_attributes'])
+						.setRenderer('attributes')
+						.setVisible(false)
+						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
-						.setWidth('auto')
+						.setWidth('auto'),
 				])
 				.setPage(page)
 				.setFilter({...filter, ...this.#time_selector})
@@ -193,7 +236,7 @@
 
 					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('operation_name', ({cell, cell_data}) => {
+				.setCellRenderer('span_name', ({cell, cell_data}) => {
 					const [operation_name] = cell_data;
 
 					const name = document.createElement('div');
@@ -206,7 +249,7 @@
 
 					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('timestamp', ({cell, cell_data}) => {
+				.setCellRenderer('start_time', ({cell, cell_data}) => {
 					const [timestamp] = cell_data;
 
 					/** @type {HTMLDivElement} */
@@ -347,8 +390,8 @@
 
 							if (this.#selected_traceid !== traceid) {
 								if (this.#selected_traceid !== null) {
-									const row_selected = datatable_element.querySelector(
-										`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+									const row_selected = datatable_element
+										.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 									row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 								}
 
@@ -379,7 +422,8 @@
 			if (this.#side_drawer === null) {
 				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
 				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
-				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
+				this.#side_drawer.on(CSideDrawer.EVENT_BEFORE_CLOSE, () => this.#onSideDrawerBeforeClose())
+				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, () => this.#onSideDrawerClose());
 			}
 
 			const side_drawer_abort_controller = new AbortController();
@@ -440,16 +484,21 @@
 			element?.removeEventListener('span-select', this.#onSideDrawerSpanDetailsOpen);
 		}
 
-		#onSideDrawerClose = () => {
-			const datatable_element = this.#datatable.getElement();
-
-			this.#unbindSideDrawerEvents()
-
-			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
-			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+		#onSideDrawerBeforeClose = () => {
+			this.#details_panel?.destroy();
+			this.#details_panel = null;
 
 			this.#trace_view_page?.destroy();
 			this.#trace_view_page = null;
+		}
+
+		#onSideDrawerClose = () => {
+			const datatable_element = this.#datatable.getElement();
+
+			this.#unbindSideDrawerEvents();
+
+			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 			this.#selected_traceid = null;
 			this.#trace_view_data = null;

@@ -16,8 +16,10 @@
 
 class CControllerApmTraceListData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['traceid', 'service_name', 'span_count', 'error_count', 'span_name',
-		'timestamp', 'span_attributes', 'duration', 'duration_time_units', 'duration_percentage'];
+	protected array $allowed_data_fields = ['traceid', 'spanid', 'service_name', 'span_count', 'error_count',
+		'span_name', 'span_kind', 'scope_name', 'scope_version', 'status_code', 'status_message', 'timestamp',
+		'trace_state', 'span_attributes', 'resource_attributes', 'duration', 'duration_time_units',
+		'duration_percentage'];
 
 	protected array $filter = [];
 
