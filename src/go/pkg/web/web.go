@@ -34,7 +34,7 @@ import (
 
 var errTooManyRedirects = errs.New("too many redirects")
 
-// Get fetches the specified URL content with a timeout. If dump is true,
+// Get returns the specified URL content with a timeout. If dump is true,
 // it returns the response headers (including all responses if following redirects)
 // concatenated with the final response body. Parameter redirectLimit specifies
 // the maximum number of redirects to follow; a value of 0 disables redirect following.
