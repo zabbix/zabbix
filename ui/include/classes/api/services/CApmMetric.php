@@ -107,8 +107,8 @@ class CApmMetric extends CApmGeneral {
 		'MetricDescription'				=> '\'\'',
 		'MetricUnit'					=> '\'\'',
 		'Attributes'					=> '[]',
-		'StartTimeUnix'					=> '1970-01-01 00:00:00.000000000',
-		'TimeUnix'						=> '1970-01-01 00:00:00.000000000',
+		'StartTimeUnix'					=> '0',
+		'TimeUnix'						=> '0',
 		'Value'							=> '0',
 		'Flags'							=> '0',
 		'Exemplars.FilteredAttributes'	=> '[]',
@@ -268,7 +268,9 @@ class CApmMetric extends CApmGeneral {
 					}
 
 					if (array_key_exists($field, $db_schema[$table])) {
-						$sub_query->select($table_alias.'.'.$field);
+						CClickHouseHelper::selectForType($sub_query, $db_schema[$table][$field]['type'], $field,
+							$table_alias
+						);
 					}
 					else {
 						$sub_query->select(self::CLICKHOUSE_FIELDS_DEFAULTS[$field], $field);

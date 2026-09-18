@@ -200,14 +200,19 @@ final class CClickHouseHelper {
 		$table_schema = $db_schema[$table];
 
 		foreach (array_intersect_key($table_schema, array_flip($options['output'])) as $field => ['type' => $type]) {
-			switch ($type) {
-				case 'DateTime64(9)':
-					$query->select('toUnixTimestamp64Nano('.$table_alias.'.'.$field.')', $field);
-					break;
+			self::selectForType($query, $type, $field, $table_alias);
+		}
+	}
 
-				default:
-					$query->select($table_alias.'.'.$field);
-			}
+	public static function selectForType(CClickHouseQuery $query, string $type, string $field, string $table_alias)
+			: void {
+		switch ($type) {
+			case 'DateTime64(9)':
+				$query->select('toUnixTimestamp64Nano('.$table_alias.'.'.$field.')', $field);
+				break;
+
+			default:
+				$query->select($table_alias.'.'.$field);
 		}
 	}
 
