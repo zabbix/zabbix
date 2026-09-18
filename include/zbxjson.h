@@ -234,6 +234,8 @@
 #define ZBX_PROTO_TAG_IDLE_TIMEOUT		"idle_timeout"
 #define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
 #define ZBX_PROTO_TAG_MAX_OPEN			"max_open"
+#define ZBX_PROTO_TAG_CEP_RULEID		"cep_ruleid"
+
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -283,6 +285,8 @@
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 
 #define ZBX_PROTO_VALUE_TRUE			"true"
+
+#define ZBX_PROTO_VALUE_CEP_RULE_RESET		"cep.rule.reset"
 
 typedef enum
 {
@@ -372,6 +376,7 @@ int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struc
 char		*zbx_json_raw_value_by_path_dyn(const struct zbx_json_parse *jp, const char *path);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
 struct zbx_json	*zbx_json_clone(const struct zbx_json *src);
+void	zbx_json_copy(struct zbx_json *dst, const struct zbx_json *src);
 
 /* jsonpath support */
 

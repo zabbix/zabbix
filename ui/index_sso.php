@@ -22,13 +22,7 @@ $request = CSessionHelper::get('request');
 CSessionHelper::unset(['request']);
 
 if (hasRequest('request')) {
-	$request = getRequest('request');
-	preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $request, $test_request);
-
-	if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
-			|| $test_request['filename'] === basename(__FILE__)) {
-		$request = '';
-	}
+	$request = (new CFrontendActionValidator())->validate(getRequest('request')) ? getRequest('request') : '';
 
 	if ($request !== '') {
 		$redirect_to->setArgument('request', $request);
@@ -243,7 +237,7 @@ try {
 
 		CSessionHelper::set('saml_data', $saml_data);
 
-		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
+		if (hasRequest('RelayState') && (new CFrontendActionValidator())->validate(getRequest('RelayState'))) {
 			$relay_state = getRequest('RelayState');
 		}
 	}
@@ -341,8 +335,21 @@ try {
 			'auth' => CWebUser::$data['sessionid']
 		];
 
-		$redirect = array_filter([$request, CWebUser::$data['url'], $relay_state, CMenuHelper::getFirstUrl()]);
-		redirect(reset($redirect));
+		CMessageHelper::clear();
+
+		$redirect = CWebUser::getRedirectUrl();
+
+		if ($redirect['error']) {
+			CMessageHelper::addError(_('Invalid redirect URL.'));
+		}
+
+		$redirect = array_filter([$request, $redirect['url'], $relay_state, CMenuHelper::getFirstUrl()]);
+
+		$response = new CControllerResponseRedirect(
+			new CUrl(reset($redirect))
+		);
+
+		$response->redirect();
 	}
 
 	$auth->login(null, [], hasRequest('force_authn'));

@@ -100,7 +100,8 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 
 (new CScriptTag('media_tab.init('.json_encode([
 	'userid' => $data['userid'] ? $data['userid'] : 0,
-	'medias' => $data['medias']
+	'medias' => $data['medias'],
+	'devices' => $data['devices']
 ]).');'))
 	->setOnDocumentReady()
 	->show();

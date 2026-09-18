@@ -660,7 +660,7 @@
 					proxy_url.searchParams.set('popup', 'proxy.edit');
 
 					if (monitored_by == ZBX_MONITORED_BY_PROXY) {
-						if (can_edit_proxies) {
+						if (can_edit_proxies && !proxy.inaccessible) {
 							proxy_url.searchParams.set('proxyid', proxyid);
 
 							const proxy_link = document.createElement('a');
@@ -676,7 +676,7 @@
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
-						if (can_edit_proxy_groups) {
+						if (can_edit_proxy_groups && !proxy_group.inaccessible) {
 							const proxy_group_url = new URL('zabbix.php', location.href);
 							proxy_group_url.searchParams.set('action', 'popup');
 							proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
@@ -694,10 +694,10 @@
 							cell.innerHTML = escapeHtml(proxy_group.name);
 						}
 
-						if (assigned_proxyid != 0) {
+						if (assigned_proxyid != 0 && !proxy_group.inaccessible) {
 							cell.innerHTML += NAME_DELIMITER;
 
-							if (can_edit_proxies) {
+							if (can_edit_proxies && !assigned_proxy.inaccessible) {
 								proxy_url.searchParams.set('proxyid', assigned_proxyid);
 
 								const proxy_link = document.createElement('a');

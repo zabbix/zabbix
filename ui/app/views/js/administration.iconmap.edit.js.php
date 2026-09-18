@@ -104,10 +104,6 @@
 
 			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
 				?.addEventListener('click', () => this.#delete());
-
-			document.querySelectorAll('z-select').forEach(zselect => {
-				zselect.setAttribute('width', zselect._listWidth());
-			});
 		}
 
 		#clone() {

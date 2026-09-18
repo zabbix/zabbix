@@ -240,9 +240,13 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate triggers discovery in DB.
 		foreach ($discovered_triggers as $discovered_trigger) {
-			DBexecute('INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags)'.
+			DBexecute('INSERT INTO triggers (triggerid, description, expression, status, priority, comments, flags)'.
 					' VALUES ('.zbx_dbstr($discovered_trigger['triggerid']).', '.zbx_dbstr($discovered_trigger['description']).
-					', '.zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').', '.$discovered_trigger['status'].', 0, 0, \'\', 0, 4)'
+					', '.zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').', '.$discovered_trigger['status'].', 0, \'\', 4)'
+			);
+
+			DBexecute('INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES ('.
+					zbx_dbstr($discovered_trigger['triggerid']).', 0, 0, 0, \'\')'
 			);
 
 			DBexecute('INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES ('.

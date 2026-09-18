@@ -152,7 +152,7 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_int32_t		lastclocks;
 	sigjmp_buf			jmp_ret;
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;

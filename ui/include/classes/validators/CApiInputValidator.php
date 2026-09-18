@@ -279,6 +279,9 @@ class CApiInputValidator {
 
 			case API_SSL_PRIVATE_KEY:
 				return self::validateSslPrivateKey($rule, $data, $path, $error);
+
+			case API_FRONTEND_ACTION:
+				return self::validateFrontendAction($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -364,6 +367,7 @@ class CApiInputValidator {
 			case API_SELEMENTID:
 			case API_SSL_CERTIFICATE:
 			case API_SSL_PRIVATE_KEY:
+			case API_FRONTEND_ACTION:
 				return true;
 
 			case API_OBJECT:
@@ -783,8 +787,9 @@ class CApiInputValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -798,9 +803,29 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
+		$is_macro = false;
+
+		if (is_string($data)
+				&& ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data)))) {
+			$is_macro = true;
+		}
+
+		if ((!is_int($data) && !is_string($data))
+				|| (!$is_macro && !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data)))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
+		}
+
+		$supports_macro = $flags & (API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO);
+
+		if ($supports_macro && array_key_exists('length', $rule) && mb_strlen(strval($data)) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($is_macro) {
+			return true;
 		}
 
 		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
@@ -812,9 +837,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (is_string($data)) {
-			$data = (int) $data;
-		}
+		$data = $supports_macro ? (string) $data : (int) $data;
 
 		return true;
 	}
@@ -4372,6 +4395,46 @@ class CApiInputValidator {
 
 		if (!openssl_pkey_get_private($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate the relative URL to a registered frontend action.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFrontendAction(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$validator = new CFrontendActionValidator();
+
+		if (!$validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $validator->getError());
 
 			return false;
 		}
