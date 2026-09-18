@@ -950,15 +950,21 @@ window.host_wizard_edit = new class {
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
 							[`interfaces.${row_index}.details.max_repetitions`]: {
 								row_index,
+								type: 'integer',
 								required: (row_index) => {
 									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
-								}
+								},
+								min: 1,
+								max: <?= ZBX_MAX_INT32 ?>
 							}
 						}),
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
 							[`interfaces.${row_index}.details.retries`]: {
 								row_index,
-								required: true
+								type: 'integer',
+								required: true,
+								min: <?= SNMP_RETRIES_MIN ?>,
+								max: <?= SNMP_RETRIES_MAX ?>
 							}
 						})
 					}
