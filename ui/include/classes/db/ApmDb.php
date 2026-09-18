@@ -125,7 +125,7 @@ class ApmDb {
 	/**
 	 * @throws DBException
 	 */
-	public static function resolveApmGlobalConfiguration(array $config): array {
+	private static function resolveApmGlobalConfiguration(array $config): array {
 		if ($config['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
 			throw new DBException(_('APM DB is not configured.'), DB::INIT_ERROR);
 		}

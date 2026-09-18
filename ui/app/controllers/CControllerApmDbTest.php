@@ -46,13 +46,18 @@ class CControllerApmDbTest extends CController {
 	}
 
 	protected function doAction(): void {
-		$apm = $this->getInputAll() + ['ssl_verify_peer' => false, 'ssl_verify_host' => false];
+		$apm = $this->getInputAll();
+
 		$output = [];
 
 		try {
-			$config = ApmDb::resolveApmGlobalConfiguration($apm);
+			$apm_global_db = CSettingsHelper::getApmGlobalDb();
 
-			ApmDbClickHouse::getInstance($config)->fetch('SELECT 1')->current();
+			if (!array_key_exists('password', $apm)) {
+				$apm['password'] = $apm_global_db['password'];
+			}
+
+			ApmDbClickHouse::getInstance($apm)->fetch('SELECT 1')->current();
 
 			$output['success'] = [
 				'title' => _('Successfully connected to APM data source.')
