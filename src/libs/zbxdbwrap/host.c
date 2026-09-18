@@ -6435,6 +6435,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	unsigned char		db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
+	const zbx_db_table_t	*tbl;
 	const char		*max_repetitions = NULL, *retries = NULL;
 	int			break_loop = 0;
 
@@ -6501,8 +6502,6 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	privpassphrase_esc = zbx_db_dyn_escape_field("interface_snmp", "privpassphrase", privpassphrase);
 	contextname_esc = zbx_db_dyn_escape_field("interface_snmp", "contextname", contextname);
 
-	const zbx_db_table_t	*tbl;
-
 	if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -6518,11 +6517,12 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	{
 		zbx_db_execute("insert into interface_snmp"
 				" (interfaceid,version,bulk,community,securityname,securitylevel,authpassphrase,"
-				" privpassphrase,authprotocol,privprotocol,contextname)"
+				" privpassphrase,authprotocol,privprotocol,contextname,max_repetitions,retries)"
 			" values"
-				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
+				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s','%s','%s')",
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
-			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
+			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
+			max_repetitions_esc, retries_esc);
 
 		zbx_audit_host_update_json_add_snmp_interface(audit_context_mode, hostid, version, bulk, community_esc,
 				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,
@@ -6541,11 +6541,13 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 				",privpassphrase='%s'"
 				",authprotocol=%d"
 				",privprotocol=%d"
-				",contextname='%s'"
+				",contextname='%s',"
+				",max_repetitions='%s',"
+				",retries='%s'"
 			" where interfaceid=" ZBX_FS_UI64,
 			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
-			interfaceid);
+			max_repetitions_esc, retries_esc, interfaceid);
 
 		zbx_audit_host_update_json_update_snmp_interface(audit_context_mode, hostid, db_version, version,
 				db_bulk, bulk, row[2], community_esc, row[3], securityname_esc, db_securitylevel,
