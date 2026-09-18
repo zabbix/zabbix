@@ -484,8 +484,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				errcodes[i] = zbx_async_check_snmp(&items.snmp_items[i], &results[i],
 						process_snmp_result, poller_config, poller_config,
 						poller_config->base, poller_config->channel, poller_config->dnsbase,
-						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO,
-						ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
+						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 #else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
