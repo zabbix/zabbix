@@ -5189,7 +5189,8 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		if (NULL == (trigger_tag = (zbx_dc_trigger_tag_t *)zbx_hashset_search(&config->trigger_tags, &rowid)))
 			continue;
 
-		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &trigger_tag->triggerid)))
+		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+				&trigger_tag->triggerid)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
