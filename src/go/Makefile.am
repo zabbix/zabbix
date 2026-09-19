@@ -2,8 +2,8 @@
 
 EXTRA_DIST = .
 
-BUILD_TIME=`date +%H:%M:%S`
-BUILD_DATE=`date +"%b %_d %Y"`
+BUILD_TIME=`date -u -d @$${SOURCE_DATE_EPOCH:-$$(date +%s)} +%H:%M:%S`
+BUILD_DATE=`date -u -d @$${SOURCE_DATE_EPOCH:-$$(date +%s)} +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
 PKG=golang.zabbix.com/agent2/pkg/version
