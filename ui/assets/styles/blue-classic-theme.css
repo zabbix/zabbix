@@ -9185,6 +9185,20 @@ main .server-name {
   .flickerfreescreen img {
     border-radius: var(--surface-border-radius); }
 
+.chart-title {
+  padding: 6px 10px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+
+.chart-image {
+  overflow: hidden;
+  border-radius: var(--surface-border-radius); }
+  .chart-image > .flickerfreescreen {
+    margin-top: -28px; }
+
 .clock {
   display: flex;
   justify-content: center;

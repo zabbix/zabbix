@@ -2042,6 +2042,8 @@ define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_EXPRESSION', 'expression-cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
+define('ZBX_STYLE_CHART_IMAGE', 'chart-image');
+define('ZBX_STYLE_CHART_TITLE', 'chart-title');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
