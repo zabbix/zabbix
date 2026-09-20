@@ -220,6 +220,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 						);
 				}
 
+				$clock = floor($metric['time_unix'] / 1000000000);
+
 				if (in_array('time_formatted', $data_fields)) {
 					$metric['time_formatted'] = $clock >= $today
 						? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
@@ -268,6 +270,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 							['!' => $ns]
 						);
 				}
+
+				$metric['exemplars'] = $this->prepareExemplars($metric['exemplars'], $today);
 
 				unset($metric['start_time_unix'], $metric['time_unix']);
 
@@ -354,6 +358,56 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		return $buckets;
 	}
 
+	private function prepareExemplars(array $exemplars, $today): array {
+		$groups = [];
+
+		foreach ($exemplars as $i => $exemplar) {
+//			$clock = floor($exemplar['time_unix'] / 1000000000);
+//
+//			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
+//
+//			$time = $clock >= $today
+//				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+//				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+//					['!' => $ns]
+//				);
+
+			$time = $exemplar['time_unix'];
+
+			$group = [
+				'title' => _s('Exemplar %1$s', $i + 1),
+				'items' => [
+					[
+						'name' => _s('Timestamp'),
+						'value' => $time
+					],
+					[
+						'name' => _s('Value'),
+						'value' => $exemplar['value'],
+					],
+					[
+						'name' => _s('Trace ID'),
+						'value' => $exemplar['traceid'],
+					],
+					[
+						'name' => _s('Span ID'),
+						'value' => $exemplar['spanid'],
+					]
+				]
+			];
+
+			foreach ($exemplar['filtered_attributes'] as $key => $value) {
+				$group['items'][] = [
+					'name' => $key,
+					'value' => $value,
+				];
+			}
+
+			$groups[] = $group;
+		}
+
+		return $groups;
+	}
 
 	protected function isDataSourceConfigured(): bool {
 		try {

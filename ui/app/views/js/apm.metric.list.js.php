@@ -694,7 +694,8 @@
 								value: data.scope_schema_url
 							},
 						]
-					}
+					},
+					...data.exemplars
 				]
 			};
 
