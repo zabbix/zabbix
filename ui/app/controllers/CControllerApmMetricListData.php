@@ -118,6 +118,13 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', 'metric_name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 
+		if ($sort_field === 'start_time_formatted') {
+			$sort_field = 'start_time_unix';
+		}
+		elseif ($sort_field === 'time_formatted') {
+			$sort_field = 'time_unix';
+		}
+
 		CProfile::update('web.apm.metric.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.apm.metric.sortorder', $sort_order, PROFILE_TYPE_STR);
 

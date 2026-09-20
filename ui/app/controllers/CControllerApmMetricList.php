@@ -70,7 +70,9 @@ class CControllerApmMetricList extends CController {
 			]],
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
-			'sort' => ['string', 'in' => ['metric_name', 'start_time_unix']],
+			'sort' => ['string', 'in' => ['metric_name', 'type', 'metric_unit', 'start_time_formatted', 'service_name',
+				'scope_name', 'time_formatted'
+			]],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
 			'filter_set' => ['integer', 'in' => ['1']],

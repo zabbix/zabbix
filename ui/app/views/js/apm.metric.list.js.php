@@ -167,18 +167,22 @@
 						.setWidth('auto'),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type'])
+						.setSortable(true)
 						.setRenderer(['type'])
 						.setWidth('auto'),
 					new CDataTableColumn('metric_unit', <?= json_encode(_('Unit')); ?>)
 						.setFields(['metric_unit'])
+						.setSortable(true)
 						.setRenderer(['text_field'])
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name'])
+						.setSortable(true)
 						.setRenderer(['text_field'])
 						.setWidth('auto'),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
 						.setFields(['scope_name'])
+						.setSortable(true)
 						.setRenderer(['text_field'])
 						.setVisible(false)
 						.setWidth('auto'),
@@ -197,6 +201,7 @@
 						.setWidth('auto'),
 				new CDataTableColumn('time_formatted', <?= json_encode(_('Time')); ?>)
 						.setFields(['time_formatted'])
+						.setSortable(true)
 						.setVisible(false)
 						.setRenderer(['time_formatted'])
 						.setWidth('auto'),
