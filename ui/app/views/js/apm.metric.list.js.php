@@ -182,10 +182,10 @@
 						.setRenderer(['text_field'])
 						.setVisible(false)
 						.setWidth('auto'),
-					new CDataTableColumn('start_time_unix', <?= json_encode(_('Start time')); ?>)
-						.setFields(['start_time_unix'])
+					new CDataTableColumn('start_time_formatted', <?= json_encode(_('Start time')); ?>)
+						.setFields(['start_time_formatted'])
 						.setSortable(true)
-						.setRenderer(['time'])
+						.setRenderer(['time_formatted'])
 						.setWidth('auto'),
 					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
 						.setFields(['value'])
@@ -195,10 +195,10 @@
 						.setFields(['count'])
 						.setRenderer(['count'])
 						.setWidth('auto'),
-				new CDataTableColumn('time_unix', <?= json_encode(_('Time')); ?>)
-						.setFields(['time_unix'])
+				new CDataTableColumn('time_formatted', <?= json_encode(_('Time')); ?>)
+						.setFields(['time_formatted'])
 						.setVisible(false)
-						.setRenderer(['time'])
+						.setRenderer(['time_formatted'])
 						.setWidth('auto'),
 					new CDataTableColumn('flags', <?= json_encode(_('Flags')); ?>)
 						.setFields(['flags'])
@@ -247,7 +247,7 @@
 
 					cell.appendChild(this.#prepareTextCell(data));
 				})
-				.setCellRenderer('time', ({cell, cell_data}) => {
+				.setCellRenderer('time_formatted', ({cell, cell_data}) => {
 					const [time] = cell_data;
 
 					/** @type {HTMLDivElement} */
@@ -521,69 +521,6 @@
 			return flex_wrapper;
 		}
 
-		#prepareHistogramItems(explicit_bounds, bucket_counts) {
-			const buckets = [];
-
-			for (let i = 0; i < bucket_counts.length; i++) {
-				let name;
-
-				if (i === 0) {
-					name = `≤ ${explicit_bounds[0]}`;
-				} else if (i < explicit_bounds.length) {
-					name = `> ${explicit_bounds[i - 1]} – ${explicit_bounds[i]}`;
-				} else {
-					name = `> ${explicit_bounds[explicit_bounds.length - 1]}`;
-				}
-
-				buckets.push({
-					name,
-					value: bucket_counts[i],
-				});
-			}
-
-			return buckets;
-		}
-
-		#prepareExponentialHistogramItems({scale, positive_offset, positive_bucket_counts, negative_offset,
-				negative_bucket_counts, zero_count}) {
-			const buckets = [];
-
-			const scale_factor = 2 ** scale;
-
-			for (let i = 0; i < negative_bucket_counts.length; i++) {
-				const index = negative_offset + i;
-
-				const lower = 2 ** (index / scale_factor);
-				const upper = 2 ** ((index + 1) / scale_factor);
-
-				buckets.push({
-					name: `${i === 0 ? '>=' : '>'} ${(-upper).toFixed(4)} - ${(-lower).toFixed(4)}`,
-					value: negative_bucket_counts[i],
-				});
-			}
-
-			if (zero_count > 0) {
-				buckets.push({
-					name: '0',
-					value: zero_count
-				});
-			}
-
-			for (let i = 0; i < positive_bucket_counts.length; i++) {
-				const index = positive_offset + i;
-
-				const lower = 2 ** (index / scale_factor);
-				const upper = 2 ** ((index + 1) / scale_factor);
-
-				buckets.push({
-					name:	`${i === 0 ? '>=' : '>'} ${(lower).toFixed(4)} - ${(upper).toFixed(4)}`,
-					value: positive_bucket_counts[i],
-				});
-			}
-
-			return buckets;
-		}
-
 		#prepareDetailsData(data) {
 			const type = data.type;
 
@@ -598,7 +535,7 @@
 				},
 				{
 					name: <?= json_encode(_('Time')) ?>,
-					value: data.time_unix
+					value: data.time_ns_formatted
 				},
 				{
 					name: <?= json_encode(_('Flags')) ?>,
@@ -700,13 +637,13 @@
 			if (data.type === APM_METRIC_TYPE_HISTOGRAM) {
 				groups.push({
 					title: <?= json_encode(_('Histogram')) ?>,
-					items: this.#prepareHistogramItems(data.explicit_bounds, data.bucket_counts)
+					items: data.histogram_buckets
 				});
 			}
 			else if (data.type === APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM) {
 				groups.push({
 					title: <?= json_encode(_('Exponential histogram')) ?>,
-					items: this.#prepareExponentialHistogramItems(data)
+					items: data.histogram_buckets
 				});
 			}
 

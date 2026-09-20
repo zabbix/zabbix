@@ -19,8 +19,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
 		'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description',
 		'metric_unit', 'attributes', 'start_time_unix', 'time_unix', 'value', 'flags', 'exemplars',
-		'aggregation_temporality', 'is_monotonic', 'count', 'sum', 'bucket_counts', 'explicit_bounds', 'min', 'max',
-		'scale', 'zero_count', 'positive_offset', 'positive_bucket_counts', 'negative_offset', 'negative_bucket_counts'
+		'aggregation_temporality', 'count', 'sum', 'min', 'max', 'histogram_buckets', 'start_time_formatted',
+		'start_time_ns_formatted', 'time_formatted', 'time_ns_formatted'
 	];
 
 	protected array $filter;
@@ -147,8 +147,15 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'positive_offset', 'positive_bucket_counts', 'negative_offset', 'negative_bucket_counts'
 		];
 
+		$data_fields = $this->getDataFields(['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
+			'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name',
+			'metric_description', 'metric_unit', 'attributes', 'start_time_unix', 'time_unix', 'value', 'flags',
+			'exemplars', 'aggregation_temporality', 'count', 'sum', 'min', 'max', 'histogram_buckets',
+			'start_time_ns_formatted', 'time_ns_formatted'
+		]);
+
 		$result = [
-			'data_fields' => $this->getDataFields($output)
+			'data_fields' => $data_fields
 		];
 
 		$options = [
@@ -183,9 +190,84 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				'limit' => $limit
 			]);
 
-			$result['rows'] = array_values(
-				array_map(static fn (array $metric) => [['renderer' => 'metric'], $metric], $metrics)
-			);
+			$result['rows'] = [];
+
+			$today = strtotime('today');
+
+			foreach ($metrics as $metric) {
+				$clock = floor($metric['start_time_unix'] / 1000000000);
+
+				if (in_array('start_time_formatted', $data_fields)) {
+					$metric['start_time_formatted'] = $clock >= $today
+						? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
+						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
+				}
+
+				if (in_array('start_time_ns_formatted', $data_fields)) {
+					$ns = str_pad((string) ($metric['start_time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+					$metric['start_time_ns_formatted'] = $clock >= $today
+						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+							['!' => $ns]
+						);
+				}
+
+				if (in_array('time_formatted', $data_fields)) {
+					$metric['time_formatted'] = $clock >= $today
+						? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
+						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
+				}
+
+				if (in_array('time_ns_formatted', $data_fields)) {
+					$ns = str_pad((string) ($metric['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+					$metric['time_ns_formatted'] = $clock >= $today
+						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+							['!' => $ns]
+						);
+				}
+
+				if ($metric['type'] == APM_METRIC_TYPE_HISTOGRAM) {
+					$metric['histogram_buckets'] = $this->prepareHistogramBuckets($metric['explicit_bounds'],
+						$metric['bucket_counts']
+					);
+				}
+				elseif ($metric['type'] == APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM) {
+					$metric['histogram_buckets'] = $this->prepareExponentialHistogramBuckets($metric['scale'],
+						$metric['positive_offset'], $metric['positive_bucket_counts'], $metric['negative_offset'],
+						$metric['negative_bucket_counts'], $metric['zero_count']
+					);
+				}
+				else {
+					$metric['histogram_buckets'] = null;
+				}
+
+				$clock = floor($metric['timestamp'] / 1000000000);
+
+				if (in_array('timestamp_formatted', $data_fields)) {
+					$metric['timestamp_formatted'] = $clock >= $today
+						? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
+						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
+				}
+
+				if (in_array('timestamp_ns_formatted', $data_fields)) {
+					$ns = str_pad((string) ($metric['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+					$metric['timestamp_ns_formatted'] = $clock >= $today
+						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+							['!' => $ns]
+						);
+				}
+
+				unset($metric['start_time_unix'], $metric['time_unix']);
+
+				$metric = array_intersect_key($metric, array_flip($data_fields));
+
+				$result['rows'][] = [['renderer' => 'metric'], $metric];
+			}
 		}
 
 		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
@@ -197,6 +279,74 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 		return $result;
 	}
+
+	private function prepareHistogramBuckets(array $explicit_bounds, array $bucket_counts): array {
+		$buckets = [];
+		$explicit_bounds_count = count($explicit_bounds);
+
+		foreach ($bucket_counts as $i => $count) {
+			if ($i === 0) {
+				$name = '≤ '.convertUnits(['value' => $explicit_bounds[0]]);
+			}
+			elseif ($i < $explicit_bounds_count) {
+				$lower = convertUnits(['value' => $explicit_bounds[$i - 1]]);
+				$upper = convertUnits(['value' =>$explicit_bounds[$i]]);
+
+				$name = '> '.$lower.' - '.$upper;
+			}
+			else {
+				$name = '> '.convertUnits(['value' => $explicit_bounds[$explicit_bounds_count - 1]]);
+			}
+
+			$buckets[] = [
+				'name' => $name,
+				'value' => $count
+			];
+		}
+
+		return $buckets;
+	}
+
+	private function prepareExponentialHistogramBuckets(int $scale, int $positive_offset, array $positive_bucket_counts,
+			int $negative_offset, array $negative_bucket_counts, int $zero_count): array {
+		$buckets = [];
+
+		$scale_factor = 2 ** $scale;
+
+		foreach ($negative_bucket_counts as $i => $counts) {
+			$index = $negative_offset + $i;
+
+			$lower = convertUnits(['value' => 2 ** ($index / $scale_factor)]);
+			$upper = convertUnits(['value' => 2 ** (($index + 1) / $scale_factor)]);
+
+			$buckets[] = [
+				'name' => ($i === 0 ? '>= ' : '> ').(-$upper).'-'.(-$lower),
+				'value' => $counts
+			];
+		}
+
+		if ($zero_count > 0) {
+			$buckets[] = [
+				'name' => '0',
+				'value' => convertUnits(['value' => $zero_count])
+			];
+		}
+
+		foreach ($positive_bucket_counts as $i => $counts) {
+			$index = $positive_offset + $i;
+
+			$lower = convertUnits(['value' => 2 ** ($index / $scale_factor)]);
+			$upper = convertUnits(['value' => 2 ** (($index + 1) / $scale_factor)]);
+
+			$buckets[] = [
+				'name' => ($i === 0 ? '>= ' : '> ' ).$lower.' - '.$upper,
+				'value' => $counts
+			];
+		}
+
+		return $buckets;
+	}
+
 
 	protected function isDataSourceConfigured(): bool {
 		try {
