@@ -213,18 +213,13 @@
 				.setCellRenderer('service_name', ({cell, cell_data}) => {
 					const [service_name, span_count, error_count] = cell_data;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
-					const name = document.createElement('div');
-					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					name.textContent = service_name;
+					const flex_wrapper = this.#prepareTextCell(service_name, service_name);
 
 					const spans = document.createElement('div');
 					spans.classList.add(ZBX_STYLE_SPAN_COUNT);
 					spans.textContent = span_count;
 
-					flex_wrapper.append(name, spans);
+					flex_wrapper.appendChild(spans);
 
 					if (error_count > 0) {
 						const errors = document.createElement('div');
@@ -239,15 +234,7 @@
 				.setCellRenderer('span_name', ({cell, cell_data}) => {
 					const [operation_name] = cell_data;
 
-					const name = document.createElement('div');
-					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					name.textContent = operation_name;
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					flex_wrapper.appendChild(name);
-
-					cell.appendChild(flex_wrapper);
+					cell.appendChild(this.#prepareTextCell(operation_name, operation_name));
 				})
 				.setCellRenderer('start_time', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
@@ -257,6 +244,9 @@
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
 					wordbreak.textContent = timestamp_formatted;
+					wordbreak.dataset.hintbox = '1';
+					wordbreak.dataset.hintboxStatic = '1';
+					wordbreak.dataset.hintboxHtml = timestamp_formatted;
 
 					cell.appendChild(wordbreak);
 				})
@@ -324,9 +314,13 @@
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					overflow_ellipsis.textContent = duration_time_units;
 
+					/** @type {HTMLDivElement} */
 					const time_units = document.createElement('div');
 					time_units.classList.add(ZBX_STYLE_DURATION_TIME_UNITS);
 					time_units.appendChild(overflow_ellipsis);
+					time_units.dataset.hintbox = '1';
+					time_units.dataset.hintboxStatic = '1';
+					time_units.dataset.hintboxHtml = duration_time_units;
 
 					const duration = document.createElement('div');
 					duration.classList.add(ZBX_STYLE_DURATION);
@@ -606,6 +600,27 @@
 			}
 
 			return groups;
+		}
+
+		#prepareTextCell(value, hint = null) {
+			const content = document.createElement('div');
+			content.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+			content.textContent = value;
+
+			if (hint !== null) {
+				content.dataset.hintbox = '1';
+				content.dataset.hintboxStatic = '1';
+				content.dataset.hintboxHtml = value;
+			}
+			else {
+				content.title = value;
+			}
+
+			const flex_wrapper = document.createElement('div');
+			flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+			flex_wrapper.appendChild(content);
+
+			return flex_wrapper;
 		}
 
 		#validateFormChanges() {
