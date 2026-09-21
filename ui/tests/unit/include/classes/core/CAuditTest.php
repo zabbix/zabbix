@@ -478,8 +478,8 @@ class CAuditTest extends TestCase {
 				]
 			],
 			[
-				'item.query.columns[1]' => [CAudit::DETAILS_ACTION_DELETE],
-				'item.query.columns[2]' => [CAudit::DETAILS_ACTION_DELETE]
+				'item.query.columns[0]' => [CAudit::DETAILS_ACTION_DELETE],
+				'item.query.columns[1]' => [CAudit::DETAILS_ACTION_DELETE]
 			]
 		];
 		yield '"item.query.aggregated_columns[1].alias" change from "min" to "minimum"' => [
@@ -659,6 +659,6 @@ class CAuditTest extends TestCase {
 			);
 		}
 
-		$this->assertEqualsCanonicalizing($expected, $closure($resource, $action, $object, $db_object));
+		$this->assertEquals($expected, $closure($resource, $action, $object, $db_object));
 	}
 }
