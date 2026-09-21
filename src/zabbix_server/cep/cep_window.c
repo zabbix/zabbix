@@ -1888,6 +1888,8 @@ static void	cep_window_ref_dump(const char *prefix, zbx_cep_window_ref_t *ref)
 	zbx_cep_event_handle_t	hevent;
 	zbx_cep_window_t	*window = ref->window;
 
+	cep_window_lock(window);
+
 	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x hostid:" ZBX_FS_UI64 " hostgroupid:"
 			ZBX_FS_UI64 " tag:%s=%s] created:" ZBX_FS_TIME_T " nextcheck:" ZBX_FS_UI64,
 			prefix, window->ruleid, window->type, ref->group_by, ref->hostid, ref->hostgroupid,
@@ -1928,6 +1930,8 @@ static void	cep_window_ref_dump(const char *prefix, zbx_cep_window_ref_t *ref)
 		zbx_free(events);
 		zbx_vector_cep_event_handle_destroy(&hevents);
 	}
+
+	cep_window_unlock(window);
 }
 
 /******************************************************************************
