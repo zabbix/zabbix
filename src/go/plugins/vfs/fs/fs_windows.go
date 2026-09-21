@@ -211,7 +211,7 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 	return data, nil
 }
 
-func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, error) {
+func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, err error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
 		return
