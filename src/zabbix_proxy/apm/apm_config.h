@@ -19,8 +19,15 @@
 #include "zbxtypes.h"
 #include "zbxtypes_ext.h"
 
-#define APM_STATUS_ENABLED	1
 #define APM_STATUS_DISABLED	0
+#define APM_STATUS_ENABLED	1
+
+typedef enum
+{
+	ZBX_APM_CONFIG_SET = 1,
+	ZBX_APM_CONFIG_DEFAULT
+}
+zbx_apm_config_state_t;
 
 typedef struct
 {
@@ -36,7 +43,9 @@ typedef struct
 {
 	zbx_uint64_t		revision;
 	zbx_uint64_t		quota;
-	int			status;
+	int			enabled;
+
+	zbx_apm_config_state_t	state;
 
 	zbx_apm_config_attrs_t	*attrs;
 }

@@ -147,7 +147,7 @@ fail:
  ******************************************************************************/
 void	apm_config_attrs_release(zbx_apm_config_attrs_t *attrs)
 {
-	if (1 != atomic_fetch_sub(&attrs->refcount, 1))
+	if (NULL == attrs || 1 != atomic_fetch_sub(&attrs->refcount, 1))
 		return;
 
 	apm_config_attrs_free(attrs);
@@ -178,8 +178,9 @@ zbx_apm_config_attrs_t	*apm_config_attrs_acquire(zbx_apm_config_attrs_t *attrs)
 void	apm_config_init(zbx_apm_config_t *cfg)
 {
 	cfg->attrs = apm_config_attrs_create(NULL);
-	cfg->status = APM_STATUS_DISABLED;
+	cfg->enabled = APM_STATUS_DISABLED;
 	cfg->quota = 0;
+	cfg->state = ZBX_APM_CONFIG_DEFAULT;
 }
 
 /******************************************************************************
@@ -193,8 +194,11 @@ void	apm_config_init(zbx_apm_config_t *cfg)
  ******************************************************************************/
 void	apm_config_reset(zbx_apm_config_t *cfg)
 {
-	apm_config_attrs_release(cfg->attrs);
-	apm_config_init(cfg);
+	if (ZBX_APM_CONFIG_DEFAULT != cfg->state)
+	{
+		apm_config_attrs_release(cfg->attrs);
+		apm_config_init(cfg);
+	}
 }
 
 /******************************************************************************
@@ -235,7 +239,7 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 		return FAIL;
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, APM_STATUS, buf, sizeof(buf), NULL) ||
-			SUCCEED != zbx_is_uint31(buf, &cfg->status))
+			SUCCEED != zbx_is_uint31(buf, &cfg->enabled))
 	{
 		return FAIL;
 	}
@@ -255,6 +259,7 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 	apm_config_attrs_release(cfg->attrs);
 	cfg->attrs = attrs;
 	cfg->revision = revision;
+	cfg->state = ZBX_APM_CONFIG_SET;
 
 	return SUCCEED;
 

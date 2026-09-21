@@ -376,7 +376,7 @@ void	*zbx_apm_manager_thread(void *args)
 	quota = apm_config.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (APM_STATUS_ENABLED != apm_config.status ? 1 : APM_WORKERS_DEFAULT);
+	workers_num = (APM_STATUS_ENABLED != apm_config.enabled ? 1 : APM_WORKERS_DEFAULT);
 
 	if (NULL == (manager = apm_manager_create(info, workers_num, apm_config.quota,
 			apm_args->export_config, &error)))
@@ -432,9 +432,9 @@ void	*zbx_apm_manager_thread(void *args)
 				/* TODO: override apm_config.status when global confg is active and disabled */
 			}
 
-			if (apm_status != apm_config.status)
+			if (apm_status != apm_config.enabled)
 			{
-				if (APM_STATUS_ENABLED == apm_config.status)
+				if (APM_STATUS_ENABLED == apm_config.enabled)
 				{
 					if (FAIL == apm_manager_activate(manager, apm_args->export_config->source_ip,
 							apm_args->port, tls, &error))
@@ -449,7 +449,7 @@ void	*zbx_apm_manager_thread(void *args)
 				{
 					apm_manager_deactivate(manager);
 				}
-				apm_status = apm_config.status;
+				apm_status = apm_config.enabled;
 			}
 
 			if (quota != apm_config.quota)
