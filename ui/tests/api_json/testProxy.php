@@ -260,7 +260,6 @@ class testProxy extends CAPITest {
 							'value' => 'value_2',
 							'signal_type' => SIGNAL_TYPE_LOGS
 						]
-
 					]
 				]
 			],
@@ -1234,7 +1233,54 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			]
+			],
+
+			// Check "selectApm" option.
+			'Test proxy.get: "selectApm" for proxy with apm' => [
+				'request' => [
+					'output' => [],
+					"proxyids" => 'with_apm',
+					'selectApm' => 'extend'
+				],
+				'expected_result' => [
+					[
+						'apm' => [
+							'data_collection_status' => (string) PROXY_APM_DATA_COLLECTION_ENABLED,
+							'max_messages_per_second' => (string) 100,
+							'additional_resource_attributes' => [
+								[
+									'key' => 'key_1',
+									'value' => 'value_1',
+									'signal_type' => (string) SIGNAL_TYPE_METRICS
+								],
+								[
+									'key' => 'key_2',
+									'value' => 'value_2',
+									'signal_type' => (string) SIGNAL_TYPE_LOGS
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.get: "selectApm" for proxy without apm' => [
+				'request' => [
+					'output' => [],
+					"proxyids" => 'without_apm',
+					'selectApm' => 'extend'
+				],
+				'expected_result' => [
+					[
+						'apm' => [
+							'data_collection_status' => (string) PROXY_APM_DATA_COLLECTION_DISABLED,
+							'max_messages_per_second' => (string) 0,
+							'additional_resource_attributes' => []
+						]
+					]
+				],
+				'expected_error' => null
+			],
 		];
 	}
 
@@ -5482,9 +5528,9 @@ class testProxy extends CAPITest {
 					'proxyid' => 'without_apm',
 					'apm' => [
 						'additional_resource_attributes' => [
-								'key' => 'key',
-								'value' => 'value',
-								'signal_type' => SIGNAL_TYPE_LOGS
+							'key' => 'key',
+							'value' => 'value',
+							'signal_type' => SIGNAL_TYPE_LOGS
 						]
 					]
 				],
