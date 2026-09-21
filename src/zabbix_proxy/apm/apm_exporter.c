@@ -376,7 +376,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t
 
 	memset(cfg, 0, sizeof(zbx_apm_exporter_cfg_t));
 
-	if (0 == export_config->have_local_config)
+	if (0 == export_config->status)
 	{
 		cfg->type = APM_EXPORTER_GLOBAL;
 		ret = SUCCEED;

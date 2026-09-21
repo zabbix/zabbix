@@ -2107,12 +2107,23 @@ static int	DBpatch_7050184(void)
 
 static int	DBpatch_7050185(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
+			" values ('apm_global_db', %d, '{}')", ZBX_SETTING_TYPE_STR))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050186(void)
+{
 	const zbx_db_field_t	field = {"apm", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050186(void)
+static int	DBpatch_7050187(void)
 {
 	return zbx_db_settings_set_value(ZBX_SETTINGS_APM, "{}", ZBX_SETTING_TYPE_STR);
 }
@@ -2310,5 +2321,6 @@ DBPATCH_ADD(7050183, 0, 1)
 DBPATCH_ADD(7050184, 0, 1)
 DBPATCH_ADD(7050185, 0, 1)
 DBPATCH_ADD(7050186, 0, 1)
+DBPATCH_ADD(7050187, 0, 1)
 
 DBPATCH_END()
