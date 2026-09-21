@@ -289,7 +289,7 @@ func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
 		name := device.Name
 
 		g.Go(func() error {
-			deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
+			deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
 			if err != nil {
 				p.Debugf("failed to collect SMART data for device %q, skipping it: %s", name, err)
 
@@ -559,8 +559,8 @@ func (p *Plugin) getRaidDevice(deviceName, devType string) (*smartCtlDeviceData,
 // used for the current platform or device. The matched text is emitted directly by smartmontools:
 // "Unknown device type" by the generic device factory and "requires device name" by the Windows
 // Areca backend when the required /dev/arcmsrX device is missing:
-// https://github.com/smartmontools/smartmontools/blob/618fcaede4478bc7d17fa2a8db5fd18af3744e20/lib/dev_interface.cpp#L517
-// https://github.com/smartmontools/smartmontools/blob/618fcaede4478bc7d17fa2a8db5fd18af3744e20/lib/os_win32.cpp#L4318
+// https://github.com/smartmontools/smartmontools/commit/618fcaede4478bc7d17fa2a8db5fd18af3744e20
+// lib/dev_interface.cpp:517 and lib/os_win32.cpp:4318.
 // smartctl does not expose structured reason codes for these failures. If the diagnostic text
 // changes, the consecutive-error limit still bounds discovery; this check only avoids unnecessary
 // probes for known diagnostics.
