@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-07-24 01:03+0000\n"
+"PO-Revision-Date: 2026-09-15 06:41+0000\n"
 "Last-Translator: Haruka K <hkageyama@odp.co.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -10417,6 +10417,10 @@ msgstr "アクセスできないユーザー"
 msgid "Inaccessible user group"
 msgstr "アクセスできないユーザーグループ"
 
+#: include/classes/helpers/CItemGeneralHelper.php:276
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "アクセスできないウィジェット"
@@ -13210,6 +13214,10 @@ msgstr "最大繰り返し回数"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用されます。"
 
+#: app/partials/configuration.host.interface.row.php:116
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "最大ズームレベル"
@@ -15241,7 +15249,7 @@ msgstr "OID接頭辞"
 #: include/classes/screens/CScreenHttpTest.php:139 include/maps.inc.php:428
 #: include/triggers.inc.php:72
 msgid "OK"
-msgstr "正常"
+msgstr "OK"
 
 #: app/partials/trigger.edit.trigger.tab.php:245
 msgid "OK event closes"
