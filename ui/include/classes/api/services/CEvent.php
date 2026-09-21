@@ -29,8 +29,8 @@ class CEvent extends CApiService {
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
 	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
-		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata',
-		'suppressed', 'urls'
+		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cep_ruleid', 'cause_eventid',
+		'opdata', 'suppressed', 'urls', 'flags'
 	];
 
 	/**
@@ -42,7 +42,8 @@ class CEvent extends CApiService {
 	 */
 	public function get(array $options = []) {
 		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
-			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname', 'maintenanceid'
+			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname', 'maintenanceid',
+			'details', 'cep_ruleid'
 		];
 		$alert_output_fields = array_diff(CAlert::OUTPUT_FIELDS, ['eventid']);
 
@@ -64,7 +65,7 @@ class CEvent extends CApiService {
 			'problem_time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'problem_time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'acknowledged' =>			['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM), 'default' => null],
+			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM | ZBX_PROBLEM_UPDATE_CEP), 'default' => null],
 			'action_userids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'suppressed' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'symptom' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
@@ -96,7 +97,7 @@ class CEvent extends CApiService {
 											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost())],
 											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
 			]],
-			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
+			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid']), 'default' => null],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount'])), 'uniq' => true, 'default' => []],
@@ -257,6 +258,31 @@ class CEvent extends CApiService {
 
 				if ($options['editable']) {
 					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+			}
+			elseif ($options['source'] == EVENT_SOURCE_DISCOVERY) {
+				if ($options['object'] == EVENT_OBJECT_DHOST) {
+					$sql_parts['join']['dh'] = ['table' => 'dhosts', 'on' => ['objectid' => 'dhostid']];
+					$sql_parts['join']['dr'] = ['left_table' => 'dh', 'table' => 'drules', 'using' => 'druleid'];
+					$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
+						'using' => 'proxyid'
+					];
+					$sql_parts['where'][] = '('.
+						'dr.proxyid IS NULL'.
+						' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')';
+				}
+				elseif ($options['object'] == EVENT_OBJECT_DSERVICE) {
+					$sql_parts['join']['ds'] = ['table' => 'dservices', 'on' => ['objectid' => 'dserviceid']];
+					$sql_parts['join']['dc'] = ['left_table' => 'ds', 'table' => 'dchecks', 'using' => 'dcheckid'];
+					$sql_parts['join']['dr'] = ['left_table' => 'dc', 'table' => 'drules', 'using' => 'druleid'];
+					$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
+						'using' => 'proxyid'
+					];
+					$sql_parts['where'][] = '('.
+						'dr.proxyid IS NULL'.
+						' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')';
 				}
 			}
 		}
@@ -566,7 +592,7 @@ class CEvent extends CApiService {
 
 		// Select fields from event_recovery table using LEFT JOIN.
 		$left_join_recovery = false;
-		foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+		foreach (['c_eventid', 'correlationid', 'userid', 'cep_ruleid'] as $field) {
 			if ($this->outputIsRequested($field, $options['output'])) {
 				$sql_parts['select'][$field] = 'er2.'.$field;
 				$left_join_recovery = true;
@@ -672,7 +698,7 @@ class CEvent extends CApiService {
 		if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid', 'maintenanceid'
+					'suppress_until', 'taskid', 'maintenanceid', 'details', 'cep_ruleid'
 				]
 				: array_diff($options['selectAcknowledges'], ['username', 'name', 'surname']);
 
@@ -865,32 +891,26 @@ class CEvent extends CApiService {
 		}
 	}
 
-	private static function addRelatedSuppressionData(array $options, array &$result): void {
+	private static function addRelatedSuppressionData(array $options, array &$events): void {
 		if ($options['selectSuppressionData'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['suppression_data'] = [];
+		foreach ($events as &$event) {
+			$event['suppression_data'] = [];
 		}
-		unset($row);
-
-		$output = $options['selectSuppressionData'] === API_OUTPUT_EXTEND
-			? ['event_suppressid', 'eventid', 'maintenanceid', 'suppress_until', 'userid']
-			: array_unique(array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']));
+		unset($event);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['eventid' => array_keys($result)]
+			'output' => array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']),
+			'filter' => ['eventid' => array_keys($events)]
 		];
-		$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
 
-		while ($db_suppression_data = DBfetch($db_event_suppress)) {
-			$eventid = $db_suppression_data['eventid'];
+		$resource = DBselect(DB::makeSql('event_suppress', $sql_options));
 
-			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
-
-			$result[$eventid]['suppression_data'][] = $db_suppression_data;
+		while ($row = DBfetch($resource)) {
+			$events[$row['eventid']]['suppression_data'][] =
+				array_diff_key($row, array_flip(['event_suppressid', 'eventid']));
 		}
 	}
 

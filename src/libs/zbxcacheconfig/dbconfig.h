@@ -51,9 +51,8 @@ typedef struct
 	const char		*correlation_tag;
 	const char		*opdata;
 	const char		*event_name;
-	const unsigned char	*expression_bin;
-	const unsigned char	*recovery_expression_bin;
-	int			lastchange;
+	unsigned char		*expression_bin;
+	unsigned char		*recovery_expression_bin;
 	zbx_uint64_t		revision;
 	zbx_uint64_t		timer_revision;
 	unsigned char		topoindex;
@@ -67,7 +66,6 @@ typedef struct
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
 	unsigned char		timer;
-	unsigned char		flags;
 
 	zbx_uint64_t		*itemids;
 
@@ -82,6 +80,14 @@ ZBX_PTR_VECTOR_DECL(trigger_ptr, ZBX_DC_TRIGGER *)
 #define ZBX_TRIGGER_TIMER_DEFAULT		0x00
 #define ZBX_TRIGGER_TIMER_EXPRESSION		0x01
 #define ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION	0x02
+
+typedef struct
+{
+	zbx_uint64_t	triggerdepid;
+	zbx_uint64_t	triggerid_down;
+	zbx_uint64_t	triggerid_up;
+}
+zbx_dc_trigger_depends_t;
 
 typedef struct zbx_dc_trigger_deplist
 {
@@ -442,6 +448,7 @@ typedef struct
 
 	zbx_vector_dc_httptest_ptr_t	httptests;
 	zbx_hashset_t			items;
+	zbx_hashset_t			groupids;
 }
 ZBX_DC_HOST;
 
@@ -749,78 +756,11 @@ zbx_dc_host_tag_index_t;
 
 typedef struct
 {
-	const char	*tag;
-}
-zbx_dc_corr_condition_tag_t;
-
-typedef struct
-{
-	const char	*tag;
-	const char	*value;
-	unsigned char	op;
-}
-zbx_dc_corr_condition_tag_value_t;
-
-typedef struct
-{
-	zbx_uint64_t	groupid;
-	unsigned char	op;
-}
-zbx_dc_corr_condition_group_t;
-
-typedef struct
-{
-	const char	*oldtag;
-	const char	*newtag;
-}
-zbx_dc_corr_condition_tag_pair_t;
-
-typedef union
-{
-	zbx_dc_corr_condition_tag_t		tag;
-	zbx_dc_corr_condition_tag_value_t	tag_value;
-	zbx_dc_corr_condition_group_t		group;
-	zbx_dc_corr_condition_tag_pair_t	tag_pair;
-}
-zbx_dc_corr_condition_data_t;
-
-typedef struct
-{
-	zbx_uint64_t			corr_conditionid;
-	zbx_uint64_t			correlationid;
-	int				type;
-
-	zbx_dc_corr_condition_data_t	data;
-}
-zbx_dc_corr_condition_t;
-
-ZBX_PTR_VECTOR_DECL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
-
-int     zbx_dc_corr_condition_compare_func(const void *d1, const void *d2);
-
-typedef struct
-{
 	zbx_uint64_t	corr_operationid;
 	zbx_uint64_t	correlationid;
 	unsigned char	type;
 }
 zbx_dc_corr_operation_t;
-
-ZBX_PTR_VECTOR_DECL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
-
-int     zbx_dc_corr_operation_compare_func(const void *d1, const void *d2);
-
-typedef struct
-{
-	zbx_uint64_t				correlationid;
-	const char				*name;
-	const char				*formula;
-	unsigned char				evaltype;
-
-	zbx_vector_dc_corr_condition_ptr_t	conditions;
-	zbx_vector_dc_corr_operation_ptr_t	operations;
-}
-zbx_dc_correlation_t;
 
 #define ZBX_DC_HOSTGROUP_FLAGS_NONE		0
 #define ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS	1
@@ -859,20 +799,34 @@ zbx_dc_item_param_t;
 
 typedef struct
 {
-	zbx_uint64_t		maintenanceid;
-	unsigned char		type;
-	unsigned char		tags_evaltype;
-	unsigned char		state;
-	int			active_since;
-	int			active_until;
-	int			running_since;
-	int			running_until;
-	zbx_vector_uint64_t	groupids;
-	zbx_vector_uint64_t	hostids;
-	zbx_vector_ptr_t	tags;
-	zbx_vector_ptr_t	periods;
+	zbx_uint64_t	maintenance_eventnameid;
+	zbx_uint64_t	maintenanceid;
+	unsigned char	op;		/* condition operator */
+	const char	*value;
+}
+zbx_dc_maintenance_eventname_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenance_eventname_ptr, zbx_dc_maintenance_eventname_t *)
+
+typedef struct
+{
+	zbx_uint64_t					maintenanceid;
+	unsigned char					type;
+	unsigned char					tags_evaltype;
+	unsigned char					state;
+	int						active_since;
+	int						active_until;
+	int						running_since;
+	int						running_until;
+	zbx_vector_uint64_t				groupids;
+	zbx_vector_uint64_t				hostids;
+	zbx_vector_ptr_t				tags;
+	zbx_vector_dc_maintenance_eventname_ptr_t	eventnames;
+	zbx_vector_ptr_t				periods;
 }
 zbx_dc_maintenance_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenance_ptr, zbx_dc_maintenance_t *)
 
 typedef struct
 {
@@ -898,6 +852,15 @@ typedef struct
 	int		start_date;
 }
 zbx_dc_maintenance_period_t;
+
+typedef struct
+{
+	zbx_uint64_t			triggerid;
+	zbx_vector_dc_maintenance_ptr_t	maintenances;
+}
+zbx_dc_maintenances_for_trigger_t;
+
+ZBX_PTR_VECTOR_DECL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_trigger_t *)
 
 typedef struct
 {
@@ -1000,7 +963,6 @@ typedef struct
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
 	zbx_dc_revision_t	revision;
-	int		        itservices_num;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
@@ -1042,9 +1004,6 @@ typedef struct
 	zbx_hashset_t		trigger_tags;
 	zbx_hashset_t		host_tags;
 	zbx_hashset_t		host_tags_index;	/* host tag index by hostid */
-	zbx_hashset_t		correlations;
-	zbx_hashset_t		corr_conditions;
-	zbx_hashset_t		corr_operations;
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
 	zbx_vector_ptr_t	kvs_paths;
@@ -1055,6 +1014,8 @@ typedef struct
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
+	zbx_hashset_t		maintenance_eventnames;
+	zbx_hashset_t		maintenances_for_triggers;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -1168,9 +1129,11 @@ typedef struct zbx_dbsync zbx_dbsync_t;
 
 void	DCsync_maintenances(zbx_dbsync_t *sync);
 void	DCsync_maintenance_tags(zbx_dbsync_t *sync);
+void	DCsync_maintenance_eventnames(zbx_dbsync_t *sync);
 void	DCsync_maintenance_periods(zbx_dbsync_t *sync);
 void	DCsync_maintenance_groups(zbx_dbsync_t *sync);
 void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
+void	DCsync_maintenance_triggers(zbx_dbsync_t *sync);
 
 /* maintenance support */
 

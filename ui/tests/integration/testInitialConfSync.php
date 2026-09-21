@@ -1792,6 +1792,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->updateAction();
 		$this->updateTlsForHost();
 
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
@@ -1830,6 +1831,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeHostGroups();
 
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);

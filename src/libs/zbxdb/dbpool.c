@@ -290,7 +290,7 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
 		return FAIL;
 	}
 
-	pattern = zbx_db_dyn_escape_string(ZBX_SETTINGS_DBPOOL);
+	pattern = zbx_dbconn_dyn_escape_string(db, ZBX_SETTINGS_DBPOOL);
 	result = zbx_dbconn_select(db, "select name,value_int from settings where name like '%s%%'", pattern);
 	zbx_free(pattern);
 
@@ -412,6 +412,9 @@ zbx_dbconn_pool_t	*zbx_dbconn_pool_create(char **error)
  ******************************************************************************/
 void	zbx_dbconn_pool_free(zbx_dbconn_pool_t *pool)
 {
+	if (pool->available.values_num != pool->conns.values_num)
+		zabbix_log(LOG_LEVEL_WARNING, "database connection pool is being freed with unreleased connections");
+
 	pthread_mutex_destroy(&pool->lock);
 	pthread_cond_destroy(&pool->event);
 
@@ -471,6 +474,12 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
  ******************************************************************************/
 void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *db)
 {
+	if (0 != db->txn_level)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("releasing db connection with active transaction");
+		exit(EXIT_FAILURE);
+	}
+
 	dbconn_pool_lock(pool);
 
 	dbconn_pool_update_stats(pool, zbx_time(), 0.0, 0, db);

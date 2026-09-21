@@ -22,9 +22,11 @@
 #if defined(HAVE_STDATOMIC_H)
 typedef _Atomic uint64_t zbx_atomic_uint64_t;
 typedef _Atomic uint32_t zbx_atomic_uint32_t;
+typedef _Atomic int zbx_atomic_int_t;
 #else
-typedef uint64_t zbx_atomic_uint64_t;
-typedef uint32_t zbx_atomic_uint32_t;
+typedef volatile uint64_t zbx_atomic_uint64_t;
+typedef volatile uint32_t zbx_atomic_uint32_t;
+typedef volatile int zbx_atomic_int_t;
 #endif
 
 #endif

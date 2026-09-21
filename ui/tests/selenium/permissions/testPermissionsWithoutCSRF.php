@@ -341,8 +341,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'create',
+					'link' => 'zabbix.php?action=ceprule.list',
+					'overlay' => 'create_correlation',
 					'fields' => [
 						'id:name' => 'CSRF validation event correlation',
 						'id:operations_0' => true
@@ -360,15 +360,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 								'id:tag' => 'event_tag'
 							]
 						]
-					]
+					],
+					'multiple_messages' => true
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'update'
+					'link' => 'zabbix.php?action=ceprule.list',
+					'overlay' => 'update',
+					'multiple_messages' => true
 				]
 			],
 			// #26 Discovery create.
@@ -822,6 +824,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			$selectors = [
 				'create' => '//div[@class="header-controls"]//button',
 				'create_host' => '//div[@class="header-controls"]//button[@class="js-create-host"]',
+				'create_correlation' => '//button[text()="Create event correlation"]',
 				'update' => '//table[@class="list-table"]//tr[1]/td[2]/a|//div[contains(@class, "datatable-scrollable")]'.
 						'//div[@class="row"][1]/div[2]//a',
 				'trigger_update' => '//table[@class="list-table"]//tr[1]/td[4]/a',
@@ -878,7 +881,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Check the error message depending on case.
 		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST : self::ACCESS_DENIED;
-		$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
+
+		// Event correlation form has multiple messages, so the "msg-bad" message is checked specifically.
+		if (CTestArrayHelper::get($data, 'multiple_messages')) {
+			$message = $this->query('class:msg-bad')->waitUntilVisible()->asMessage()->one();
+			$this->assertTrue($message->isBad());
+			$this->assertEquals($error['message'], $message->getTitle());
+			$this->assertTrue($message->hasLine($error['details']));
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
+		}
 		$this->checkReturnButton($data);
 
 		// Compare db hashes to check that form didn't make any changes.

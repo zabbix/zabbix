@@ -43,6 +43,7 @@ const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_NO_INDENT = 'no-indent';
 const ZBX_STYLE_WORDBREAK = 'wordbreak';
+const ZBX_STYLE_SEPARATOR = 'separator';
 
 const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
 

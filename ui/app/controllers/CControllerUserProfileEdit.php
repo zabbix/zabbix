@@ -29,8 +29,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		}
 
 		$users = API::User()->get([
-			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone', 'provisioned'
+			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout',
+				'default_maintenance_period', 'refresh', 'rows_per_page', 'url', 'timezone', 'provisioned'
 			],
 			'userids' => CWebUser::$data['userid'],
 			'editable' => true
@@ -54,6 +54,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'userids' => CWebUser::$data['userid']
 		]);
 
+		$redirect_enforce = CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE);
+
 		$data = [
 			'change_password' => 0,
 			'allow_empty_password' => !CControllerUserUpdateGeneral::hasInternalAuth($usrgrps),
@@ -65,9 +67,12 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'theme' => $this->user['theme'],
 			'autologin' => $this->user['autologin'],
 			'autologout' => $this->user['autologout'],
+			'default_maintenance_period' => $this->user['default_maintenance_period'],
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
-			'url' => $this->user['url'],
+			'url' => $redirect_enforce ? '' : $this->user['url'],
+			'profile_redirect_enforce' => $redirect_enforce,
+			'profile_redirect_url' => CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL) ?: '',
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],

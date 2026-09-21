@@ -72,7 +72,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
-				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
+				'StartDBSyncers' => '24' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
 				/*'HistoryProvider'=> [
 					'clickhouse;value_types="uint,dbl,str,log,text,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix'
 				]*/
@@ -668,6 +668,26 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDHistorySyncAtScale_TriggerRecoverUnknown() {
 		$this-> testLLDHistorySyncAtScale_TriggerRecovery();
+	}
+
+	/**
+	 * Send value 0 (OK) for all items again after recovering from the UNKNOWN state; triggers
+	 * are already OK so their value must stay unchanged.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerRecoverUnknown
+	 */
+	public function testLLDHistorySyncAtScale_TriggerUnchangedZeroSend() {
+		self::$vps_last = $this->getVpsWritten();
+		$this->sendHistoryAt(time(), '0');
+	}
+
+	/**
+	 * Verify that the VPS written counter increased by the number of zero values sent.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerUnchangedZeroSend
+	 */
+	public function testLLDHistorySyncAtScale_TriggerUnchangedZeroVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
 	}
 
 	/**

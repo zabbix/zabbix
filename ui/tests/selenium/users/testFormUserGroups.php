@@ -107,7 +107,7 @@ class testFormUserGroups extends CWebTest {
 		$this->page->assertHeader('User groups');
 		$this->page->assertTitle('Configuration of user groups');
 		$form = $this->query('id:user-group-form')->asForm()->one();
-		$this->assertEquals(['User group', 'Template permissions', 'Host permissions', 'Problem tag filter'], $form->getTabs());
+		$this->assertEquals(['User group', 'Template permissions', 'Host permissions', 'Proxy access list', 'Problem tag filter'], $form->getTabs());
 		$this->assertEquals('User group', $form->getSelectedTab());
 
 		$this->assertEquals(['Group name', 'Users', 'Frontend access', 'LDAP Server', 'Multi-factor authentication',
