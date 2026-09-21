@@ -907,7 +907,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=templategroup.list']
@@ -922,7 +922,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=hostgroup.list']
@@ -937,7 +937,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Hosts',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=template.list']
@@ -952,7 +952,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Templates',
 						'Maintenance',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=host.list']
@@ -967,7 +967,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Host groups',
 						'Templates',
 						'Hosts',
-						'Event correlation',
+						'Event processing',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=maintenance.list']
@@ -976,7 +976,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Data collection',
-					'page' => 'Event correlation',
+					'page' => 'Event processing',
 					'displayed_ui' => [
 						'Template groups',
 						'Host groups',
@@ -985,7 +985,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Maintenance',
 						'Discovery'
 					],
-					'link' => ['zabbix.php?action=correlation.list']
+					'link' => ['zabbix.php?action=ceprule.list']
 				]
 			],
 			[
@@ -998,7 +998,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Event correlation'
+						'Event processing'
 					],
 					'link' => ['zabbix.php?action=discovery.list']
 				]

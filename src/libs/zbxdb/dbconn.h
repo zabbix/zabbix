@@ -95,6 +95,8 @@ char	*dbconn_dyn_escape_field_len(const zbx_dbconn_t *db, const zbx_db_field_t *
 		zbx_escape_sequence_t flag);
 int	dbconn_is_escape_sequence(const zbx_dbconn_t *db, char c);
 
+zbx_uint32_t	db_get_server_version(void);
+
 void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_config_t *cfg);
 
 #endif

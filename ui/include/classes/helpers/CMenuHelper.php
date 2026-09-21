@@ -194,10 +194,10 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
 				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
-				? (new CMenuItem(_('Event correlation')))
-					->setAction('correlation.list')
-					->setAliases(['correlation.edit'])
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES)
+				? (new CMenuItem(_('Event processing')))
+					->setAction('ceprule.list')
+					->setAliases(['ceprule.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))

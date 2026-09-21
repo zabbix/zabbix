@@ -91,6 +91,12 @@ zbx_db_config_t;
 #endif
 
 #ifdef HAVE_MYSQL
+#	define ZBX_SQL_FORCE_PK		" force index (primary)"
+#else
+#	define ZBX_SQL_FORCE_PK		""
+#endif
+
+#ifdef HAVE_MYSQL
 #	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else
 #	define	ZBX_SQL_STRCMP			"%s'%s'"
@@ -114,6 +120,12 @@ zbx_db_config_t;
 			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
+
+#define ZBX_DBROW2STR(str, row)				\
+	if (NULL == str || 0 != strcmp(str, row))	\
+	{						\
+		str = zbx_strdup(str, row);		\
+	}
 
 #ifdef HAVE_MYSQL
 #	define ZBX_SQL_SORT_ASC(field)	field " asc"
@@ -354,6 +366,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db);
 int	zbx_dbconn_end(zbx_dbconn_t *db, int ret);
 
 zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, int num);
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
@@ -369,6 +382,7 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
 int	zbx_db_insert_get_row_count(zbx_db_insert_t *self);
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -382,6 +396,8 @@ int	zbx_dbconn_lock_record(zbx_dbconn_t *db, const char *table, zbx_uint64_t id,
 		zbx_uint64_t add_id);
 int	zbx_dbconn_lock_records(zbx_dbconn_t *db, const char *table, const zbx_vector_uint64_t *ids);
 int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids);
 
 int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char program_type);
 void	zbx_db_config_validate(zbx_db_config_t *config);
@@ -491,9 +507,6 @@ void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *d
 zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
-
-/* connection pool */
-typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
 
 typedef struct
 {
@@ -608,11 +621,19 @@ char	*zbx_db_get_schema_esc(void);
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
+zbx_dbconn_t	*zbx_db_dbconn(void);
+
+void	zbx_db_unstash_connection(zbx_dbconn_t *db);
+void	zbx_db_stash_connection(zbx_dbconn_t *db);
+
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"
 #define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
 #define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
 #define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #endif
 

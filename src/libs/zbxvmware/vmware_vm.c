@@ -13,6 +13,7 @@
 **/
 
 #include "vmware_vm.h"
+#include "vmware_internal.h"
 
 #include "zbxcommon.h"
 
