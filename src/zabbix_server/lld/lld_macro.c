@@ -16,6 +16,7 @@
 
 #include "zbxexpr.h"
 #include "zbxeval.h"
+#include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxvariant.h"
 #include "zbxregexp.h"

@@ -80,6 +80,10 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_cert_file:'%s'", item->ssl_cert_file);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_key_file:'%s'", item->ssl_key_file);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_key_password:'%s'", item->ssl_key_password);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  query:'%s'", item->query);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  time_shift: %d", item->time_shift);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  lookback_limit: %d", item->lookback_limit);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  granularity: %d", item->granularity);
 		zbx_log_handle(LOG_LEVEL_TRACE, "interfaceid: " ZBX_FS_UI64, item->interface.interfaceid);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  useip: %u", item->interface.useip);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
@@ -304,7 +308,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url)
+		const char *config_webdriver_url, const zbx_apm_db_config_t *apm_db_config)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -394,6 +398,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_BROWSER:
 		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_TELEMETRY_QUERY:
 			db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
 					sizeof(item.timeout_orig));
 			break;
@@ -414,6 +419,15 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.ssl_key_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
+
+	item.query = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_QUERY, table_items, "query");
+
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIME_SHIFT, table_items, "time_shift", item.time_shift_orig,
+			sizeof(item.time_shift_orig));
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_LOOKBACK_LIMIT, table_items, "lookback_limit",
+			item.lookback_limit_orig, sizeof(item.lookback_limit_orig));
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_GRANULARITY, table_items, "granularity", item.granularity_orig,
+			sizeof(item.granularity_orig));
 
 	zbx_vector_ptr_pair_create(&item.script_params);
 	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&
@@ -556,7 +570,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
-				config_ssh_key_location, config_webdriver_url);
+				config_ssh_key_location, config_webdriver_url, apm_db_config);
 #ifdef HAVE_NETSNMP
 		if (ITEM_TYPE_SNMP == item.type)
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
@@ -610,6 +624,7 @@ out:
 	zbx_free(item.snmpv3_authpassphrase);
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
+	zbx_free(item.query);
 	for (int i = 0; i < item.script_params.values_num; i++)
 	{
 		zbx_free(item.script_params.values[i].first);
@@ -659,7 +674,8 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location, const char *config_webdriver_url, struct zbx_json *json,
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		const zbx_apm_db_config_t *apm_db_config, struct zbx_json *json,
 		char **error)
 {
 	zbx_user_t		user;
@@ -785,7 +801,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url);
+			config_webdriver_url, apm_db_config);
 
 	if (FAIL == ret)
 		state = ITEM_STATE_NOTSUPPORTED;
@@ -840,7 +856,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip)
+		const char *config_frontend_allowed_ip, const zbx_apm_db_config_t *apm_db_config)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -855,7 +871,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
 			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
-			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url, &json, &error)))
+			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url,
+			apm_db_config, &json, &error)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);

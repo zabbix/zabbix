@@ -414,7 +414,7 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char **error)
+int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, char **error)
 {
 #define	APM_PROVIDER_CLICKHOUSE		"clickhouse"
 	ssize_t		len;
@@ -424,7 +424,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 	memset(cfg, 0, sizeof(zbx_apm_exporter_cfg_t));
 	zbx_vector_config_option_create(&cfg->options);
 
-	if (NULL == options)
+	if (NULL == *options)
 	{
 		cfg->type = APM_EXPORTER_GLOBAL;
 		ret = SUCCEED;
@@ -432,14 +432,14 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 		goto out;
 	}
 
-	len = zbx_config_option_parse_param(options);
-	ptr = options + len;
+	len = zbx_config_option_parse_param(*options);
+	ptr = *options + len;
 	while (' ' == *ptr)
 		ptr++;
 
 	if (0 == len || ';' != *ptr)
 	{
-		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", options);
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", *options);
 		goto out;
 	}
 
@@ -460,7 +460,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char
 	}
 	else
 	{
-		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider\"%s\"", options);
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider\"%s\"", *options);
 		goto out;
 	}
 

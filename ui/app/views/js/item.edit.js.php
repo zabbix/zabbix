@@ -31,6 +31,8 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
+const ITEM_TYPE_TELEMETRY_QUERY = <?= ITEM_TYPE_TELEMETRY_QUERY ?>;
+const CONDITION_EVAL_TYPE_EXPRESSION = <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
@@ -47,9 +49,14 @@ window.item_edit_form = new class {
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
 		type_with_key_select, value_type_keys, source, return_url, test_rules, history_override,
-		history_override_hint_html, storage_value_types
+		history_override_hint_html, storage_value_types, telemetry_columns_config, telemetry_function_labels,
+		telemetry_operator_labels, telemetry_signal_type_metrics
 	}) {
 		this.actions = actions;
+		this.telemetry_columns_config = telemetry_columns_config;
+		this.telemetry_function_labels = telemetry_function_labels;
+		this.telemetry_operator_labels = telemetry_operator_labels;
+		this.telemetry_signal_type_metrics = telemetry_signal_type_metrics;
 		this.form_data = form_data;
 		this.form_readonly = readonly;
 		this.host = host;
@@ -106,6 +113,8 @@ window.item_edit_form = new class {
 			this.initItemPrototypeEvents();
 		}
 
+		this.#initTelemetryRows();
+
 		this.updateFieldsVisibility();
 
 		this.form.discoverAllFields();
@@ -116,6 +125,9 @@ window.item_edit_form = new class {
 		this.form.findFieldByName('interfaceid')?.setChanged();
 		this.form.findFieldByName('type').setChanged();
 		this.form.validateChanges(['interfaceid', 'type']);
+
+		this.form.findFieldByName('aggregated_columns')
+			.setButtonOnBlur('js-add-aggregated-column', 'telemetry-aggregated-column');
 	}
 
 	initForm(field_switches) {
@@ -143,7 +155,12 @@ window.item_edit_form = new class {
 			value_type_steps: this.form_element.querySelector('[name="value_type_steps"]'),
 			ipmi_sensor: this.form_element.querySelector('[name="ipmi_sensor"]'),
 			request_method: this.form_element.querySelector('[name="request_method"'),
-			retrieve_mode: this.form_element.querySelectorAll('[name="retrieve_mode"]')
+			retrieve_mode: this.form_element.querySelectorAll('[name="retrieve_mode"]'),
+			signal_type: this.form_element.querySelector('[name="signal_type"]'),
+			metric_point_type: this.form_element.querySelectorAll('[name="metric_point_type"]'),
+			evaltype: this.form_element.querySelector('[name="evaltype"]'),
+			formula: this.form_element.querySelector('[name="formula"]'),
+			expression: this.form_element.querySelector('#expression')
 		};
 		this.label = {
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
@@ -151,7 +168,7 @@ window.item_edit_form = new class {
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
 			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
-			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint')
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -182,6 +199,27 @@ window.item_edit_form = new class {
 				enable_sorting: !this.form_readonly
 			}
 		});
+		jQuery('#columns-table').dynamicRows({
+			template: '#column-row-tmpl',
+			rows: this.form_data.columns,
+			allow_empty: true,
+			sortable: true,
+			sortable_options: {
+				target: 'tbody',
+				selector_span: ':not(.error-container-row)',
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1,
+				enable_sorting: !this.form_readonly
+			}
+		}).on('afteradd.dynamicRows', (e) => {
+			for (const select of e.target.querySelectorAll('.js-column')) {
+				if (select.getOptions().length === 0) {
+					this.#populateColumnSelect(select);
+					this.#toggleAttributeKey(select);
+				}
+			}
+		});
+
 		this.form_element.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
 			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
 
@@ -224,6 +262,14 @@ window.item_edit_form = new class {
 			else if (e.target.classList.contains('element-table-remove')) {
 				e.target.closest('tr').nextSibling.remove();
 				e.target.closest('tr').remove();
+
+				this.#updateTelemetryIndicators();
+			}
+		});
+
+		table.addEventListener('input', e => {
+			if (e.target.matches('[name$="[delay]"]')) {
+				this.#updateTelemetryIndicators();
 			}
 		});
 	}
@@ -253,6 +299,56 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
+		this.field.signal_type.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
+
+		for (const radio of this.field.metric_point_type) {
+			radio.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
+		}
+
+		this.field.evaltype.addEventListener('change', this.updateFieldsVisibility.bind(this));
+
+		for (const name of ['delay', 'lookback_limit', 'granularity']) {
+			this.form_element.querySelector(`[name="${name}"]`)
+				.addEventListener('input', () => this.#updateTelemetryIndicators());
+		}
+
+		this.form_element.querySelector('.js-add-aggregated-column')
+			.addEventListener('click', (e) => this.#openAggregatedColumnModal(e.target));
+
+		this.form_element.querySelector('.js-add-condition')
+			.addEventListener('click', (e) => this.#openConditionModal(e.target));
+
+		this.form_element.querySelector('#columns-table').addEventListener('change', (e) => {
+			if (e.target.classList.contains('js-column')) {
+				this.#toggleAttributeKey(e.target);
+			}
+		});
+
+		for (const id of ['aggregated-columns-table', 'conditions-table']) {
+			this.form_element.querySelector(`#${id}`).addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-remove-row')) {
+					const row = e.target.closest('tr');
+
+					this.#removeRelatedErrorContainer(row);
+					row.remove();
+
+					this.updateFieldsVisibility();
+				}
+			});
+		}
+
+		this.form_element.querySelector('#aggregated-columns-table').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-row')) {
+				this.#openAggregatedColumnModal(e.target, e.target.closest('tr'));
+			}
+		});
+
+		this.form_element.querySelector('#conditions-table').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-row')) {
+				this.#openConditionModal(e.target, e.target.closest('tr'));
+			}
+		});
+
 		this.form_element.addEventListener('click', e => {
 			const target = e.target;
 
@@ -312,6 +408,7 @@ window.item_edit_form = new class {
 		};
 		jQuery('#query-fields-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
 		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
+		jQuery('#columns-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'columns'));
 
 		// Tags tab events.
 		document.getElementById('show_inherited_tags')
@@ -471,6 +568,7 @@ window.item_edit_form = new class {
 		this.#updateRetrieveModeVisibility();
 		this.#updateTimeoutVisibility();
 		this.#updateTimeoutOverrideVisibility();
+		this.#updateTelemetryVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -480,6 +578,337 @@ window.item_edit_form = new class {
 		this.form_element.querySelectorAll('.js-item-preprocessing-type').forEach(
 			node => node.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !preprocessing_active)
 		);
+	}
+
+	#getTelemetryColumns() {
+		const signal_type = this.field.signal_type.value;
+
+		if (signal_type == this.telemetry_signal_type_metrics) {
+			const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
+
+			return this.telemetry_columns_config.columns[signal_type][metric_point_type];
+		}
+		else {
+			return this.telemetry_columns_config.columns[signal_type];
+		}
+	}
+
+	#populateColumnSelect(select) {
+		const value = select.value;
+		const names = this.#getTelemetryColumns();
+		const is_unavailable = value !== null && value !== '' && !names.includes(value);
+		const options = is_unavailable ? [...names, value].sort() : names;
+
+		select.clearOptions();
+		select.addOptions(options.map((name) => ({value: name, label: name})));
+
+		if (value === null || value === '') {
+			select.preselectHightlighted();
+
+			return;
+		}
+
+		select.value = value;
+
+		if (is_unavailable) {
+			select.getOptionByValue(value).disabled = true;
+		}
+	}
+
+	#toggleAttributeKey(select) {
+		const is_complex = this.telemetry_columns_config.complex.includes(select.value);
+		const attribute_key = select.closest('tr').querySelector('.js-attribute-key');
+
+		attribute_key.style.display = is_complex ? '' : 'none';
+
+		if (!is_complex) {
+			attribute_key.value = '';
+		}
+	}
+
+	#refreshTelemetryColumns() {
+		for (const select of this.form_element.querySelectorAll('#columns-table tbody .js-column')) {
+			this.#populateColumnSelect(select);
+			this.#toggleAttributeKey(select);
+		}
+	}
+
+	#telemetrySignalChangeHandler() {
+		this.#refreshTelemetryColumns();
+		this.updateFieldsVisibility();
+		this.form.validateChanges(['columns', 'aggregated_columns', 'conditions']);
+	}
+
+	#removeRelatedErrorContainer(row) {
+		const next_sibling = row.nextElementSibling;
+
+		if (next_sibling !== null && next_sibling.classList.contains('error-container-row')) {
+			next_sibling.remove();
+		}
+	}
+
+	#getExistingAliases(exclude_row = null) {
+		const rows = this.form_element.querySelectorAll('#aggregated-columns-table tbody [data-row_index]');
+
+		return [...rows]
+			.filter((row) => row !== exclude_row)
+			.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
+	}
+
+	#openAggregatedColumnModal(trigger, row = null) {
+		const signal_type = this.field.signal_type.value;
+		const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
+
+		const parameters = {
+			signal_type: signal_type,
+			metric_point_type: metric_point_type,
+			existing_aliases: this.#getExistingAliases(row)
+		};
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			parameters.edit = '1';
+			parameters.row_index = row_index;
+			parameters.column = row.querySelector(`[name="aggregated_columns[${row_index}][column]"]`).value;
+			parameters.function = row.querySelector(`[name="aggregated_columns[${row_index}][function]"]`).value;
+			parameters.percentile = row.querySelector(`[name="aggregated_columns[${row_index}][percentile]"]`).value;
+			parameters.alias = row.querySelector(`[name="aggregated_columns[${row_index}][alias]"]`).value;
+		}
+		else {
+			let row_index = 0;
+
+			while (this.form_element.querySelector(`#aggregated-columns-table [data-row_index="${row_index}"]`)
+					!== null) {
+				row_index++;
+			}
+
+			parameters.row_index = row_index;
+		}
+
+		const overlay = PopUp('popup.telemetry.aggregatedcolumn.edit', parameters, {
+			dialogueid: 'telemetry-aggregated-column',
+			dialogue_class: 'modal-popup-medium',
+			trigger_element: trigger
+		});
+
+		overlay.$dialogue[0].addEventListener('telemetry_aggregated_column.submit',
+			(e) => this.#addAggregatedColumnRow(e.detail)
+		);
+	}
+
+	#openConditionModal(trigger, row = null) {
+		const signal_type = this.field.signal_type.value;
+		const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
+
+		const parameters = {
+			signal_type: signal_type,
+			metric_point_type: metric_point_type
+		};
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			parameters.edit = '1';
+			parameters.row_index = row_index;
+			parameters.column = row.querySelector(`[name="conditions[${row_index}][column]"]`).value;
+			parameters.attribute_key = row.querySelector(`[name="conditions[${row_index}][attribute_key]"]`).value;
+			parameters.operator = row.querySelector(`[name="conditions[${row_index}][operator]"]`).value;
+			parameters.value = row.querySelector(`[name="conditions[${row_index}][value]"]`).value;
+		}
+		else {
+			let row_index = 0;
+
+			while (this.form_element.querySelector(`#conditions-table [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
+
+			parameters.row_index = row_index;
+		}
+
+		const overlay = PopUp('popup.telemetry.condition.edit', parameters, {
+			dialogueid: 'telemetry-condition',
+			dialogue_class: 'modal-popup-medium',
+			trigger_element: trigger
+		});
+
+		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', (e) => {
+			this.#addConditionRow(e.detail);
+			this.updateFieldsVisibility();
+		});
+	}
+
+	#addAggregatedColumnRow(data) {
+		const tbody = this.form_element.querySelector('#aggregated-columns-table tbody');
+		const percentile = data.percentile ?? '';
+		let function_label = this.telemetry_function_labels[data.function];
+
+		if (data.function == <?= AGGREGATE_PERCENTILE ?>) {
+			function_label += `(${data.column}, ${percentile})`;
+		}
+		else if (data.function != <?= AGGREGATE_COUNT ?>) {
+			function_label += `(${data.column})`;
+		}
+
+		const source = document.getElementById('aggregated-column-row-tmpl').innerHTML;
+		const html = new Template(source).evaluate({...data, function_label, percentile});
+		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
+
+		if (existing !== null) {
+			this.#removeRelatedErrorContainer(existing);
+
+			existing.insertAdjacentHTML('afterend', html);
+			existing.remove();
+		}
+		else {
+			tbody.querySelector('.js-add-aggregated-column').closest('tr').insertAdjacentHTML('beforebegin', html);
+		}
+	}
+
+	#addConditionRow(data) {
+		const config = this.telemetry_columns_config;
+		const tbody = this.form_element.querySelector('#conditions-table tbody');
+		const is_complex = config.complex.includes(data.column);
+		const is_exists = data.operator == <?= CONDITION_OPERATOR_EXISTS ?>;
+		const source = document.getElementById('condition-row-tmpl').innerHTML;
+		const html = new Template(source).evaluate({
+			...data,
+			formulaid: num2letter(data.row_index),
+			attribute_key_name: is_complex ? data.attribute_key : '',
+			operator_name: this.telemetry_operator_labels[data.operator],
+			value_name: is_exists ? '' : data.value
+		});
+		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
+
+		if (existing !== null) {
+			this.#removeRelatedErrorContainer(existing);
+
+			existing.insertAdjacentHTML('afterend', html);
+			existing.remove();
+		}
+		else {
+			tbody.querySelector('.js-add-condition').closest('tr').insertAdjacentHTML('beforebegin', html);
+		}
+	}
+
+	#initTelemetryRows() {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
+			return;
+		}
+
+		for (const select of this.form_element.querySelectorAll('#columns-table .js-column')) {
+			this.#populateColumnSelect(select);
+			this.#toggleAttributeKey(select);
+		}
+
+		this.form_data.aggregated_columns.forEach((column, row_index) => {
+			this.#addAggregatedColumnRow({...column, row_index});
+		});
+
+		this.form_data.conditions.forEach((condition, row_index) => {
+			this.#addConditionRow({...condition, row_index});
+		});
+	}
+
+	#updateTelemetryVisibility() {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
+			return;
+		}
+
+		const is_metrics = this.field.signal_type.value == this.telemetry_signal_type_metrics;
+		const switcher = globalAllObjForViewSwitcher['type'];
+
+		// "Metric points" is shown only for "Metrics".
+		['js-item-metric-point-type-label', 'js-item-metric-point-type-field'].forEach(
+			id => switcher[is_metrics ? 'showObj' : 'hideObj']({id})
+		);
+
+		// "Type of calculation" is shown only when there is more than one condition.
+		const has_calculation = this.form_element
+			.querySelectorAll('#conditions-table tbody [data-row_index]').length > 1;
+
+		if (!has_calculation) {
+			this.field.evaltype.value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+		}
+
+		['js-item-evaltype-label', 'js-item-evaltype-field'].forEach(
+			id => switcher[has_calculation ? 'showObj' : 'hideObj']({id})
+		);
+
+		// The formula field is shown only for the "Custom expression" calculation type.
+		const is_custom_expression = this.field.evaltype.value == CONDITION_EVAL_TYPE_EXPRESSION;
+
+		this.field.formula.style.display = is_custom_expression ? '' : 'none';
+		this.field.expression.style.display = is_custom_expression ? 'none' : '';
+
+		if (!is_custom_expression) {
+			this.field.expression.innerHTML = getConditionFormula(this.#getTelemetryConditions(),
+				+ this.field.evaltype.value
+			);
+		}
+
+		this.#updateTelemetryIndicators();
+	}
+
+	#getTelemetryConditions() {
+		const conditions = [];
+
+		for (const row of this.form_element.querySelectorAll('#conditions-table tbody [data-row_index]')) {
+			const row_index = row.dataset.row_index;
+			const formulaid = row.querySelector(`[name="conditions[${row_index}][formulaid]"]`).value;
+			const column = row.querySelector(`[name="conditions[${row_index}][column]"]`).value;
+			const attribute_key = row.querySelector(`[name="conditions[${row_index}][attribute_key]"]`).value;
+
+			conditions.push({
+				id: formulaid,
+				type: `${column}.${attribute_key}`
+			});
+		}
+
+		return conditions;
+	}
+
+	#updateTelemetryIndicators() {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
+			return;
+		}
+
+		const delays = this.#getDelays();
+		const lookback_limit = timeUnitToSeconds(
+			this.form_element.querySelector('[name="lookback_limit"]').value.trim(), false
+		);
+		const granularity = timeUnitToSeconds(
+			this.form_element.querySelector('[name="granularity"]').value.trim(), false
+		);
+
+		const data_gaps = lookback_limit !== null && delays.some((delay) => lookback_limit < delay);
+		const data_overlap = granularity !== null && delays.some((delay) => granularity > delay);
+
+		this.form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
+		this.form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
+	}
+
+	#getDelays() {
+		const delays = [];
+		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+
+		if (delay > 0) {
+			delays.push(delay);
+		}
+
+		for (const row of this.form_element.querySelectorAll('#delay-flex-table .form_row')) {
+			if (row.querySelector('[name$="[type]"]:checked').value != ITEM_DELAY_FLEXIBLE) {
+				continue;
+			}
+
+			const flexible_delay = timeUnitToSeconds(row.querySelector('[name$="[delay]"]').value.trim(), false);
+
+			if (flexible_delay > 0) {
+				delays.push(flexible_delay);
+			}
+		}
+
+		return delays;
 	}
 
 	#showErrorDialog(body, trigger_element) {
@@ -826,6 +1255,8 @@ window.item_edit_form = new class {
 		row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+
+		this.#updateTelemetryIndicators();
 	}
 
 	#valueTypeChangeHandler(e) {

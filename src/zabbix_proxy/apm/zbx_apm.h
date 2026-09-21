@@ -18,7 +18,7 @@
 typedef struct
 {
 	int		config_timeout;
-	const char	*exporter_options;
+	const char	**exporter_options;
 	const char	*sourceip;
 	const char	*port;
 	const char	*ca_file;

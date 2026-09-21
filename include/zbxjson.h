@@ -155,6 +155,10 @@
 #define ZBX_PROTO_TAG_SSL_CERT_FILE		"ssl_cert_file"
 #define ZBX_PROTO_TAG_SSL_KEY_FILE		"ssl_key_file"
 #define ZBX_PROTO_TAG_SSL_KEY_PASSWORD		"ssl_key_password"
+#define ZBX_PROTO_TAG_QUERY			"query"
+#define ZBX_PROTO_TAG_TIME_SHIFT		"time_shift"
+#define ZBX_PROTO_TAG_LOOKBACK_LIMIT		"lookback_limit"
+#define ZBX_PROTO_TAG_GRANULARITY		"granularity"
 #define ZBX_PROTO_TAG_MAINTENANCE_STATUS	"maintenance_status"
 #define ZBX_PROTO_TAG_MAINTENANCE_TYPE		"maintenance_type"
 #define ZBX_PROTO_TAG_IPMI_AUTHTYPE		"ipmi_authtype"
@@ -360,6 +364,8 @@ const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, 
 const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
 		size_t *string_alloc, zbx_json_type_t *type);
 const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
+const char	*zbx_json_pair_next_dyn(const struct zbx_json_parse *jp, const char *p, char **name,
+		size_t *name_alloc);
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len,
 		zbx_json_type_t *type);

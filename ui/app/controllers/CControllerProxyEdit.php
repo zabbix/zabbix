@@ -60,7 +60,8 @@ class CControllerProxyEdit extends CController {
 					'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 					'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'compatibility'
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
+					'timeout_telemetry_query', 'compatibility'
 				],
 				'selectProxyGroup' => ['name'],
 				'selectApm' => ['additional_resource_attributes', 'data_collection_status', 'max_messages_per_second'],
@@ -125,7 +126,8 @@ class CControllerProxyEdit extends CController {
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
-					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
+					'timeout_telemetry_query' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
 				]
 				: [
 					'timeout_zabbix_agent' => $this->proxy['timeout_zabbix_agent'],
@@ -137,7 +139,8 @@ class CControllerProxyEdit extends CController {
 					'timeout_ssh_agent' => $this->proxy['timeout_ssh_agent'],
 					'timeout_telnet_agent' => $this->proxy['timeout_telnet_agent'],
 					'timeout_script' => $this->proxy['timeout_script'],
-					'timeout_browser' => $this->proxy['timeout_browser']
+					'timeout_browser' => $this->proxy['timeout_browser'],
+					'timeout_telemetry_query' => $this->proxy['timeout_telemetry_query']
 				];
 
 			$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
@@ -185,7 +188,8 @@ class CControllerProxyEdit extends CController {
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
-					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
+					'timeout_telemetry_query' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
 				] + array_map(static fn(array $field) => $field['default'], CProxy::APM_SCHEMA),
 				'warnings' => []
 			];

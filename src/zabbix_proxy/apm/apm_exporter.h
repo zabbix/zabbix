@@ -72,7 +72,7 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool);
 
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool);
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter);
-int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char **error);
+int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, char **error);
 
 #define APM_COMMIT_OK		0x00
 #define APM_COMMIT_ERR		0x01

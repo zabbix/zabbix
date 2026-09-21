@@ -16,10 +16,10 @@
 
 #include "dbupgrade_common.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxdb.h"
-#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"
 
@@ -2037,12 +2037,82 @@ static int	DBpatch_7050175(void)
 
 static int	DBpatch_7050176(void)
 {
+	const zbx_db_field_t	field = {"query", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050177(void)
+{
+#ifdef HAVE_MYSQL
+	if (ZBX_DB_OK > zbx_db_execute("update items set query='{}'"))
+		return FAIL;
+#endif
+	return SUCCEED;
+}
+
+static int	DBpatch_7050178(void)
+{
+	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050179(void)
+{
+	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050180(void)
+{
+	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050181(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
+			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050182(void)
+{
+	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_7050183(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update proxy set timeout_telemetry_query='3s' where custom_timeouts=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050184(void)
+{
+	const zbx_db_field_t	field = {"storage_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050185(void)
+{
 	const zbx_db_field_t	field = {"apm", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050177(void)
+static int	DBpatch_7050186(void)
 {
 	return zbx_db_settings_set_value(ZBX_SETTINGS_APM, "{}", ZBX_SETTING_TYPE_STR);
 }
@@ -2231,5 +2301,14 @@ DBPATCH_ADD(7050174, 0, 1)
 DBPATCH_ADD(7050175, 0, 1)
 DBPATCH_ADD(7050176, 0, 1)
 DBPATCH_ADD(7050177, 0, 1)
+DBPATCH_ADD(7050178, 0, 1)
+DBPATCH_ADD(7050179, 0, 1)
+DBPATCH_ADD(7050180, 0, 1)
+DBPATCH_ADD(7050181, 0, 1)
+DBPATCH_ADD(7050182, 0, 1)
+DBPATCH_ADD(7050183, 0, 1)
+DBPATCH_ADD(7050184, 0, 1)
+DBPATCH_ADD(7050185, 0, 1)
+DBPATCH_ADD(7050186, 0, 1)
 
 DBPATCH_END()

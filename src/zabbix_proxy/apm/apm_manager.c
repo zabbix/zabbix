@@ -112,7 +112,7 @@ static void	apm_manager_free(zbx_apm_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int workers_num, zbx_uint64_t quota,
-		const char *options, char **error)
+		const char **options, char **error)
 {
 #define APM_COMMIT_LIMIT	10
 	zbx_apm_manager_t	*manager;
