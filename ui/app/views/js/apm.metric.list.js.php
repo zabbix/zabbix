@@ -26,16 +26,22 @@
 		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#global_timerange = null;
+		/** @type {CDataTable|null} */
 		#datatable = null;
 		#csrf_token = null;
 		#refresh_message_box = null;
 		#apply_filter_button = null;
 		/** @type {string|null} */
 		#side_drawer_position = null;
+		/** @type {HTMLButtonElement|null} */
 		#filter_form_element = null;
+		/** @type {HTMLFormElement|null} */
 		#filter_form = null;
+		/** @type {CSideDrawer|null} */
 		#side_drawer = null;
-		#metric_view_page = null;
+		/** @type {CDetailsPanel|null} */
+		#details_panel = null;
+		/** @type {Map} */
 		#rows_data = new Map();
 		#selected_row_index = null;
 		#metric_types = null;
@@ -445,7 +451,7 @@
 		#onSideDrawerOpen = e => {
 			const element = this.#side_drawer.getElement();
 
-			this.#metric_view_page = new CDetailsPanel(element, this.#prepareDetailsData(e.detail.response));
+			this.#details_panel = new CDetailsPanel(element, this.#prepareDetailsData(e.detail.response));
 
 			this.#unscheduleRefresh();
 		}
@@ -457,7 +463,7 @@
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 			this.#selected_row_index = null;
-			this.#metric_view_page = null;
+			this.#details_panel = null;
 
 			this.#scheduleRefresh();
 		}
@@ -540,6 +546,84 @@
 			flex_wrapper.appendChild(content);
 
 			return flex_wrapper;
+		}
+
+		#createLink(name, url_params) {
+			const link = document.createElement('a');
+			link.href = zabbixUrl(url_params);
+			link.ariaLabel = name;
+			link.innerText = name;
+
+			return link;
+		}
+
+		#prepareExemplarsGroups(exemplars) {
+			const groups = [];
+
+			exemplars.forEach((exemplar, i) => {
+				const traceid_traces_link = this.#createLink(<?= json_encode(_('Traces')) ?>, {
+					action: 'apm.trace.list',
+					filter_traceid: exemplar.traceid,
+					filter_set: 1
+				});
+
+				const spanid_traces_link = this.#createLink(<?= json_encode(_('Traces')) ?>, {
+					action: 'apm.trace.list',
+					filter_spanid: exemplar.spanid,
+					filter_set: 1
+				});
+
+				const traceid_logs_link =  this.#createLink(<?= json_encode(_('Logs')) ?>, {
+					action: 'apm.log.list',
+					filter_traceid: exemplar.traceid,
+					filter_set: 1
+				});
+
+				const spanid_logs_link =  this.#createLink(<?= json_encode(_('Logs')) ?>, {
+					action: 'apm.log.list',
+					filter_spanid: exemplar.spanid,
+					filter_set: 1
+				});
+
+				const traceid_div = document.createElement('div');
+				traceid_div.append(exemplar.traceid, ' ', traceid_logs_link, ' ', traceid_traces_link);
+
+				const spanid_div = document.createElement('div');
+				spanid_div.append(exemplar.spanid, ' ', spanid_logs_link, ' ', spanid_traces_link);
+
+				const group = {
+					title: sprintf(<?= json_encode(_('Exemplar  %1$s')) ?>, i + 1),
+					items: [
+						{
+							name: <?= json_encode(_('Timestamp')) ?>,
+							value: exemplar.time_ns_formatted
+						},
+						{
+							name: <?= json_encode(_('Value')) ?>,
+							value: exemplar.value
+						},
+						{
+							name: <?= json_encode(_('Trace ID')) ?>,
+							value: traceid_div
+						},
+						{
+							name: <?= json_encode(_('Span ID')) ?>,
+							value: spanid_div
+						}
+					]
+				};
+
+				Object.entries(exemplar.filtered_attributes).forEach(([key, value]) => {
+					group.items.push({
+						name: key,
+						value
+					});
+				});
+
+				groups.push(group);
+			});
+
+			return groups;
 		}
 
 		#prepareDetailsData(data) {
@@ -711,7 +795,7 @@
 							},
 						]
 					},
-					...data.exemplars
+					...this.#prepareExemplarsGroups(data.exemplars)
 				]
 			};
 

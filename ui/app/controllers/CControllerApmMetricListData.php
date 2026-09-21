@@ -341,9 +341,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 	}
 
 	private function prepareExemplars(array $exemplars, $today): array {
-		$groups = [];
-
-		foreach ($exemplars as $i => $exemplar) {
+		foreach ($exemplars as &$exemplar) {
 			$clock = floor($exemplar['time_unix'] / 1000000000);
 			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
 			$time = $clock >= $today
@@ -352,39 +350,13 @@ class CControllerApmMetricListData extends CControllerDataTable {
 					['!' => $ns]
 				);
 
-			$group = [
-				'title' => _s('Exemplar %1$s', $i + 1),
-				'items' => [
-					[
-						'name' => _s('Timestamp'),
-						'value' => $time
-					],
-					[
-						'name' => _s('Value'),
-						'value' => $exemplar['value'],
-					],
-					[
-						'name' => _s('Trace ID'),
-						'value' => $exemplar['traceid'],
-					],
-					[
-						'name' => _s('Span ID'),
-						'value' => $exemplar['spanid'],
-					]
-				]
-			];
+			$exemplar['time_ns_formatted'] = $time;
 
-			foreach ($exemplar['filtered_attributes'] as $key => $value) {
-				$group['items'][] = [
-					'name' => $key,
-					'value' => $value,
-				];
-			}
-
-			$groups[] = $group;
+			unset($exemplar['time_unix']);
 		}
+		unset($exemplar);
 
-		return $groups;
+		return $exemplars;
 	}
 
 	protected function isDataSourceConfigured(): bool {
