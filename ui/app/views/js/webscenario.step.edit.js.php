@@ -272,7 +272,7 @@ window.webscenario_step_edit_popup = new class {
 	}
 
 	#showErrorDialog(message, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(message),
@@ -283,6 +283,9 @@ window.webscenario_step_edit_popup = new class {
 				action: function() {}
 			}]
 		}, jQuery(trigger_element));
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$close_btn.show();
 	}
 
 	#updateForm() {
