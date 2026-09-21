@@ -6449,7 +6449,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 
 	result = zbx_db_select(
 			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
-			"authprotocol,privprotocol,contextname,max_repetitions,retries"
+			"authprotocol,privprotocol,contextname"
 			" from interface_snmp"
 			" where interfaceid=" ZBX_FS_UI64,
 			interfaceid);
@@ -6523,9 +6523,9 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	{
 		zbx_db_execute("insert into interface_snmp"
 				" (interfaceid,version,bulk,community,securityname,securitylevel,authpassphrase,"
-				" privpassphrase,authprotocol,privprotocol,contextname,max_repetitions,retries)"
+				" privpassphrase,authprotocol,privprotocol,contextname)"
 			" values"
-				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s','%s','%s')",
+				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
 			max_repetitions_esc, retries_esc);
