@@ -463,7 +463,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					);
 				}
 
-				$valuemap = $this->getInput('valuemapid', 0) == 0
+				$valuemap = ($this->getInput('valuemapid', 0) == 0 || $result_preproc['result'] === null)
 					? []
 					: API::ValueMap()->get([
 						'output' => [],
@@ -471,7 +471,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						'valuemapids' => $this->getInput('valuemapid')
 					])[0];
 
-				if ($valuemap && $result_preproc['result'] !== null) {
+				if ($valuemap) {
 					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
 						$result_preproc['result'], $valuemap
 					);
