@@ -143,7 +143,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp_unix']);
+		$data_fields = $this->getDataFields(['traceid', 'duration']);
 
 		$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
 
