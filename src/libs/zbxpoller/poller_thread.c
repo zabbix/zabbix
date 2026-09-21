@@ -626,41 +626,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
 						&items[i].host.hostid, 1, NULL);
 
-				zbx_uint64_t	value_uint64;
-
-				if (SUCCEED != zbx_is_uint64(max_repetitions, &value_uint64) ||
-					NULL == max_repetitions || 0 == value_uint64 || INT32_MAX < value_uint64)
-				{
-					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-							"Invalid SNMP max_repetitions value [%s].",
-							ZBX_NULL2EMPTY_STR(max_repetitions)));
-					errcodes[i] = CONFIG_ERROR;
-					zbx_free(max_repetitions);
-					zbx_free(timeout);
-					continue;
-				}
-
-				items[i].snmp_max_repetitions = atoi(max_repetitions);
-				zbx_free(max_repetitions);
-
 				ZBX_STRDUP(retries, items[i].snmp_retries_orig);
 				zbx_dc_expand_user_and_func_macros(um_handle, &retries,
 						&items[i].host.hostid, 1, NULL);
-
-				if (SUCCEED != zbx_is_uint64(retries, &value_uint64) ||
-					NULL == retries || 100 < value_uint64)
-				{
-					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-							"Invalid SNMP retries value [%s].",
-							ZBX_NULL2EMPTY_STR(retries)));
-					errcodes[i] = CONFIG_ERROR;
-					zbx_free(retries);
-					zbx_free(timeout);
-					continue;
-				}
-
-				items[i].snmp_retries = atoi(retries);
-				zbx_free(retries);
 
 				if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 						zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
@@ -825,8 +793,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			}
 			else
 				items[i].snmp_max_repetitions = max_repetitions_int;
+
+			zbx_free(max_repetitions);
 		}
-		zbx_free(max_repetitions);
 
 		if (NULL != retries)
 		{
@@ -839,8 +808,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			}
 			else
 				items[i].snmp_retries = retries_int;
+
+			zbx_free(retries);
 		}
-		zbx_free(retries);
 	}
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
@@ -992,39 +962,43 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions, &items[i].hostid, 1, NULL);
 
-		zbx_uint64_t	value_uint64;
-
-		if (NULL == max_repetitions || SUCCEED != zbx_is_uint64(max_repetitions, &value_uint64) ||
-				0 == value_uint64 || INT32_MAX < value_uint64)
+		if (NULL != max_repetitions)
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-					"Invalid SNMP max_repetitions value [%s].",
-					ZBX_NULL2EMPTY_STR(max_repetitions)));
-			errcodes[i] = CONFIG_ERROR;
-			zbx_free(max_repetitions);
-			zbx_free(timeout);
-			continue;
-		}
+			int max_repetitions_int = 0;
 
-		items[i].snmp_max_repetitions = atoi(max_repetitions);
-		zbx_free(max_repetitions);
+			if (FAIL == zbx_validate_item_max_repetitions(max_repetitions,
+				&max_repetitions_int, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+				zbx_free(max_repetitions);
+				continue;
+			}
+
+			items[i].snmp_max_repetitions = max_repetitions_int;
+			zbx_free(max_repetitions);
+		}
 
 		ZBX_STRDUP(retries, items[i].snmp_retries_orig);
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &retries, &items[i].hostid, 1, NULL);
 
-		if (NULL == retries || SUCCEED != zbx_is_uint64(retries, &value_uint64) || 100 < value_uint64)
+		if (NULL != retries)
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-					"Invalid SNMP retries value [%s].", ZBX_NULL2EMPTY_STR(retries)));
-			errcodes[i] = CONFIG_ERROR;
-			zbx_free(retries);
-			zbx_free(timeout);
-			continue;
-		}
+			int retries_int = 0;
 
-		items[i].snmp_retries = atoi(retries);
-		zbx_free(retries);
+			if (FAIL == zbx_validate_item_retries(retries,
+				&retries_int, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+				zbx_free(retries);
+				continue;
+			}
+
+			items[i].snmp_retries = retries_int;
+			zbx_free(retries);
+		}
 
 		if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 				zbx_snmp_oid_subst_cb, um_handle, &items[i].hostid))

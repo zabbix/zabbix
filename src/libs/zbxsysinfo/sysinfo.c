@@ -2313,9 +2313,9 @@ int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error
 int	zbx_validate_item_max_repetitions(const char *max_repetitions_str, int *max_repetitions_out, char *error,
 		size_t error_len)
 {
-	zbx_uint64_t	max_repetitions;
+	zbx_uint32_t	max_repetitions;
 
-	if (SUCCEED != zbx_is_uint64(max_repetitions_str, &max_repetitions) || 1 > max_repetitions ||
+	if (SUCCEED != zbx_is_uint32(max_repetitions_str, &max_repetitions) || 1 > max_repetitions ||
 			INT32_MAX < max_repetitions)
 	{
 		zbx_strlcpy(error, "Unsupported max repetitions value.", error_len);
@@ -2330,9 +2330,9 @@ int	zbx_validate_item_max_repetitions(const char *max_repetitions_str, int *max_
 
 int	zbx_validate_item_retries(const char *retries_str, int *retries_out, char *error, size_t error_len)
 {
-	zbx_uint64_t	retries;
+	zbx_uint32_t	retries;
 
-	if (SUCCEED != zbx_is_uint64(retries_str, &retries) || 100 < retries)
+	if (SUCCEED != zbx_is_uint32(retries_str, &retries) || 100 < retries)
 	{
 		zbx_strlcpy(error, "Unsupported retries value.", error_len);
 		return FAIL;
