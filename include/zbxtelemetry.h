@@ -113,15 +113,17 @@ typedef struct
 }
 zbx_tq_column_info_t;
 
+/* SYNC WITH PHP! */
 typedef enum
 {
 	ZBX_TQ_SIGNAL_TYPE_UNKNOWN	= -1,
 	ZBX_TQ_SIGNAL_TYPE_TRACES	= 0,
 	ZBX_TQ_SIGNAL_TYPE_METRICS	= 1,
-	ZBX_TQ_SIGNAL_TYPE_LOGS	= 2,
+	ZBX_TQ_SIGNAL_TYPE_LOGS		= 2,
 }
 zbx_tq_signal_type_t;
 
+/* SYNC WITH PHP! */
 typedef enum
 {
 	ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN		= -1,
@@ -132,6 +134,7 @@ typedef enum
 }
 zbx_tq_metric_point_type_t;
 
+/* SYNC WITH PHP! */
 typedef enum
 {
 	ZBX_TQ_FUNCTION_UNKNOWN		= -1,
@@ -144,6 +147,7 @@ typedef enum
 }
 zbx_tq_function_type_t;
 
+/* SYNC WITH PHP! */
 typedef enum
 {
 	ZBX_TQ_EVAL_TYPE_UNKNOWN	= -1,
@@ -154,6 +158,7 @@ typedef enum
 }
 zbx_tq_eval_type_t;
 
+/* SYNC WITH PHP! */
 typedef enum
 {
 	ZBX_TQ_OPERATOR_UNKNOWN		= -1,
