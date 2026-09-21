@@ -6174,7 +6174,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
-		zbx_uint64_t	value;
+		zbx_uint32_t	value;
 
 		if (ZBX_IF_SNMP_VERSION_3 > interface->lld_row.snmp->version)
 		{
@@ -6188,9 +6188,8 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 			}
 		}
 
-		if (FAIL == zbx_is_uint64(interface->lld_row.snmp->max_repetitions, &value) &&
-				FAIL == zbx_is_user_macro(interface->lld_row.snmp->max_repetitions) &&
-				FAIL == lld_text_has_lld_macro(interface->lld_row.snmp->max_repetitions))
+		if (FAIL == zbx_is_uint32(interface->lld_row.snmp->max_repetitions, &value) &&
+				FAIL == zbx_is_user_macro(interface->lld_row.snmp->max_repetitions))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"invalid SNMP max repetitions value \"%s\".\n",
@@ -6200,7 +6199,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 			return FAIL;
 		}
 
-		if (SUCCEED == zbx_is_uint64(interface->lld_row.snmp->max_repetitions, &value) &&
+		if (SUCCEED == zbx_is_uint32(interface->lld_row.snmp->max_repetitions, &value) &&
 				(0 == value || INT32_MAX < value))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
@@ -6210,9 +6209,8 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 			return FAIL;
 		}
 
-		if (FAIL == zbx_is_uint64(interface->lld_row.snmp->retries, &value) &&
-				FAIL == zbx_is_user_macro(interface->lld_row.snmp->retries) &&
-				FAIL == lld_text_has_lld_macro(interface->lld_row.snmp->retries))
+		if (FAIL == zbx_is_uint32(interface->lld_row.snmp->retries, &value) &&
+				FAIL == zbx_is_user_macro(interface->lld_row.snmp->retries))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"invalid SNMP retries value \"%s\".\n",
@@ -6222,7 +6220,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 			return FAIL;
 		}
 
-		if (SUCCEED == zbx_is_uint64(interface->lld_row.snmp->retries, &value) && 100 < value)
+		if (SUCCEED == zbx_is_uint32(interface->lld_row.snmp->retries, &value) && 100 < value)
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 					"SNMP retries value must be between 0 and 100.\n",
