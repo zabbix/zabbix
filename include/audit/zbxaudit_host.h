@@ -32,9 +32,7 @@ void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_
 		zbx_uint64_t securitylevel_new, const char *authpassphrase_old,	const char *authpassphrase_new,	\
 		const char *privpassphrase_old, const char *privpassphrase_new,	zbx_uint64_t authprotocol_old,	\
 		zbx_uint64_t authprotocol_new, zbx_uint64_t privprotocol_old, zbx_uint64_t privprotocol_new,	\
-		const char *contextname_old, const char *contextname_new, const char *max_repetitions_old,	\
-		const char *max_repetitions_new, zbx_uint64_t interfaceid,					\
-		const char *retries_old, const char *retries_new);						\
+		const char *contextname_old, const char *contextname_new, zbx_uint64_t interfaceid);		\
 
 PREPARE_AUDIT_SNMP_INTERFACE_H(host)
 PREPARE_AUDIT_SNMP_INTERFACE_H(host_prototype)

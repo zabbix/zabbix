@@ -6548,18 +6548,15 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 				",authprotocol=%d"
 				",privprotocol=%d"
 				",contextname='%s'"
-				",max_repetitions='%s'"
-				",retries='%s'"
 			" where interfaceid=" ZBX_FS_UI64,
 			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
-			max_repetitions_esc, retries_esc, interfaceid);
+			interfaceid);
 
 		zbx_audit_host_update_json_update_snmp_interface(audit_context_mode, hostid, db_version, version,
 				db_bulk, bulk, row[2], community_esc, row[3], securityname_esc, db_securitylevel,
 				securitylevel, row[5], authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol,
-				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc,
-				row[10], max_repetitions_esc, interfaceid, row[11], retries_esc);
+				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc, interfaceid);
 	}
 
 	zbx_free(community_esc);
