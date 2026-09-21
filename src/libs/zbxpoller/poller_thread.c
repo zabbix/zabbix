@@ -516,8 +516,8 @@ static int	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL,
-				*max_repetitions = NULL, *retries = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL, *max_repetitions = NULL,
+				*retries = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -622,7 +622,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_community,
 						&items[i].host.hostid, 1, NULL);
 
-
 				if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 						zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
 				{
@@ -636,8 +635,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
 						&items[i].host.hostid, 1, NULL);
-				zbx_dc_expand_user_and_func_macros(um_handle, &retries,
-						&items[i].host.hostid, 1, NULL);
+				zbx_dc_expand_user_and_func_macros(um_handle, &retries, &items[i].host.hostid, 1, NULL);
 				zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid, 1, NULL);
 				break;
 			case ITEM_TYPE_SCRIPT:
