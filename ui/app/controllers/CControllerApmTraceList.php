@@ -113,7 +113,7 @@ class CControllerApmTraceList extends CController {
 		}
 
 		if (!$filter_resource_attributes) {
-			$filter_resource_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_EQUAL];
+			$filter_resource_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE];
 		}
 
 		$filter_span_attributes = [];
@@ -129,7 +129,7 @@ class CControllerApmTraceList extends CController {
 		}
 
 		if (!$filter_span_attributes) {
-			$filter_span_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_EQUAL];
+			$filter_span_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE];
 		}
 
 		$filter = [
