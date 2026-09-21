@@ -50,7 +50,7 @@ struct zbx_db_result
 
 static const zbx_db_config_t	*db_config = NULL;
 
-static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+static ZBX_THREAD_LOCAL zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
@@ -98,8 +98,8 @@ int	dbconn_init(char **error)
 		}
 		else
 		{
-			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
-			zbx_dbconn_close(db);
+			dbconn_execute(db, "%s", zbx_dbschema_get_schema());
+			dbconn_close(db);
 		}
 
 		zbx_dbconn_free(db);
@@ -177,10 +177,10 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 	{
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
-	}
 
-	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
-		db_mask_printable_sql_values(sql_printable);
+		if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+			db_mask_printable_sql_values(sql_printable);
+	}
 
 	return *sql_printable;
 }
@@ -188,7 +188,7 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_errno, const char *db_error,
 		const char *context)
 {
-	char	*s;
+	char	*s, *sql_printable = NULL;
 
 	db->last_db_errcode = zbx_errno;
 
@@ -223,8 +223,8 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, db->last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
-					db->last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s [%s]", db_errno,
+					db->last_db_strerror, db_replace_nonprintable_chars(context, &sql_printable));
 			break;
 		case ERR_Z3009:
 			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
@@ -237,6 +237,7 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
+	zbx_free(sql_printable);
 }
 
 #if defined(HAVE_MYSQL)
@@ -1599,8 +1600,8 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1656,8 +1657,8 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
-		zbx_dbconn_close(db);
-		rc = zbx_dbconn_open(db);
+		dbconn_close(db);
+		rc = dbconn_open(db);
 	}
 	else
 	{
@@ -1706,8 +1707,8 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1758,8 +1759,8 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1810,8 +1811,8 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{
@@ -2190,7 +2191,7 @@ out:
  ******************************************************************************/
 char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db)
 {
-	static char	*name;
+	static ZBX_THREAD_LOCAL char	*name;
 
 	if (NULL == name)
 	{

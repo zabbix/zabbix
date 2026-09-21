@@ -40,6 +40,7 @@ require_once dirname(__FILE__).'/testAuditlogUser.php';
 require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 require_once dirname(__FILE__).'/testAutoregistration.php';
+require_once dirname(__FILE__).'/testCepRule.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testConnector.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
@@ -124,6 +125,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuditlogUserGroups');
 		$suite->addTestSuite('testAuthentication');
 		$suite->addTestSuite('testAutoregistration');
+		$suite->addTestSuite('testCepRule');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testConnector');
 		$suite->addTestSuite('testCorrelation');

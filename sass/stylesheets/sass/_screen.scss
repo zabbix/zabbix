@@ -124,6 +124,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/modal/host-wizard";
 @import "components/modal/user-device-init-view";
+@import "components/modal/cep-edit";
 
 .link-action {
 	@extend %link-action-style;
@@ -520,7 +521,7 @@ form {
 }
 
 .list-check-radio {
-	li {
+	> li {
 		display: block;
 		line-height: 24px;
 	}

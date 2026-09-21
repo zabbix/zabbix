@@ -641,3 +641,20 @@ int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
 {
 	return self->rows.values_num;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if database insert structure is prepared                    *
+ *                                                                            *
+ * Parameters: self - [IN] pointer to the database insert structure           *
+ *                                                                            *
+ * Return value: SUCCEED - insert structure is prepared                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Works only if db_insert is initialized with {0}.                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self)
+{
+	return NULL != self->db ? SUCCEED : FAIL;
+}

@@ -47,7 +47,7 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_DISCOVERY_ACTIONS =  'ui.configuration.discovery_actions';
 	public const UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS =  'ui.configuration.autoregistration_actions';
 	public const UI_CONFIGURATION_INTERNAL_ACTIONS =  'ui.configuration.internal_actions';
-	public const UI_CONFIGURATION_EVENT_CORRELATION = 'ui.configuration.event_correlation';
+	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
@@ -299,7 +299,7 @@ class CRoleHelper {
 			$rules = array_merge($rules, [
 				self::UI_REPORTS_AUDIT,
 				self::UI_REPORTS_ACTION_LOG,
-				self::UI_CONFIGURATION_EVENT_CORRELATION,
+				self::UI_CONFIGURATION_CEPRULES,
 				self::UI_ADMINISTRATION_MEDIA_TYPES,
 				self::UI_ADMINISTRATION_SCRIPTS,
 				self::UI_ADMINISTRATION_USER_GROUPS,
@@ -485,7 +485,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event correlation')];
+					$labels += [self::UI_CONFIGURATION_CEPRULES => _('Event processing')];
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {

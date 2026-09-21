@@ -34,7 +34,7 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
 					"escalations", "autoreg_host", "event_suppress", "trigger_queue",
 					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy",
-					"lld_macro_export"
+					"lld_macro_export", "cep_window"
 };
 
 #define ZBX_IDS_SIZE	ARRSIZE(idcache_tables)
@@ -321,6 +321,44 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 			__func__, ret2 - num + 1, table->table, table->recid);
 
 	return ret2 - num + 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve and reserve a range of cached ids for a table            *
+ *                                                                            *
+ * Parameters: tablename - [IN] name of the table to get ids for              *
+ *             num       - [IN] number of ids to reserve                      *
+ *                                                                            *
+ * Return value: first id of the reserved range, 0 if the table is not        *
+ *               cached or has not yet had an id cached for it                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num)
+{
+	const char	**ptr;
+	size_t		index;
+	zbx_uint64_t	nextid = 0;
+
+	if (NULL == (ptr = (const char **)bsearch(&tablename, idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]),
+			compare_table_names)))
+	{
+		return 0;
+	}
+
+	index = (size_t)(ptr - idcache_tables);
+
+	zbx_mutex_lock(idcache_mutex);
+
+	if (0 != idcache->lastids[index])
+	{
+		nextid = idcache->lastids[index] + 1;
+		idcache->lastids[index] += (zbx_uint64_t)num;
+	}
+
+	zbx_mutex_unlock(idcache_mutex);
+
+	return nextid;
 }
 
 /******************************************************************************
@@ -1265,10 +1303,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: locks a records in a table by field name                          *
+ * Purpose: locks a records in a table by field name using index hint         *
  *                                                                            *
- * Parameters: table      - [IN] the target table                             *
- *             field_name - [IN] field name                                   *
+ * Parameters: db         - [IN] database connection                          *
+ *             table      - [IN] target table name                            *
+ *             field_name - [IN]                                              *
+ *             index_hint - [IN] index hint for MYSQL, "" if not used         *
  *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
  *                                   OUT - resulting array of locked IDs      *
  *                                                                            *
@@ -1277,7 +1317,8 @@ out:
  *               FAIL    - no records were locked                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+static int	dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *index_hint, zbx_vector_uint64_t *ids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1289,7 +1330,8 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 	if (0 == ids->values_num)
 		return FAIL;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s%s where", field_name, table_name,
+			index_hint);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
 	result = zbx_dbconn_select(db, "%s", sql);
@@ -1308,6 +1350,51 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 		zbx_vector_uint64_remove_noorder(ids, i);
 
 	return (0 != ids->values_num ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locks a records in a table by field name                          *
+ *                                                                            *
+ * Parameters: db        - [IN] database connection                           *
+ *             table      - [IN] the target table                             *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	return dbconn_lock_ids(db, table_name, field_name, "", ids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lock records in a table by field name using the primary key       *
+ *                                                                            *
+ * Parameters: db         - [IN] database connection                          *
+ *             table_name - [IN] target table                                 *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ * Comments: The primary key index is forced only for MySQL, where the query  *
+ *           optimizer may otherwise skip the index entirely and end up       *
+ *           locking more rows than intended.                                 *
+ *                                                                            *
+ *****************************************************************************/
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids)
+{
+	return dbconn_lock_ids(db, table_name, field_name, ZBX_SQL_FORCE_PK, ids);
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)

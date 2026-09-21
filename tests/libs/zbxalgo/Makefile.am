@@ -8,7 +8,8 @@ noinst_PROGRAMS = \
 	zbx_binary_heap \
 	zbx_binary_heap_direct \
 	zbx_compare_tags_natural \
-	zbx_vector
+	zbx_vector \
+	zbx_channel
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
@@ -113,4 +114,19 @@ zbx_vector_LDADD = \
 	$(ALGO_LIBS)
 
 zbx_vector_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_channel
+
+zbx_channel_SOURCES = \
+	zbx_channel.c \
+	$(COMMON_SRC_FILES)
+
+zbx_channel_LDADD = \
+	$(ALGO_LIBS)
+
+zbx_channel_LDADD += @SERVER_LIBS@
+
+zbx_channel_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_channel_CFLAGS = $(COMMON_COMPILER_FLAGS)
 

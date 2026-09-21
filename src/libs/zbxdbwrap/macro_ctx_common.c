@@ -622,7 +622,8 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 	{
 		ret = macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
 
-		if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object)
+		if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object &&
+				0 != (p->token.type & (ZBX_TOKEN_MACRO | ZBX_TOKEN_FUNC_MACRO)))
 		{
 			if (0 == strcmp(p->macro, MVAR_TIME))
 			{
@@ -646,6 +647,121 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 			{
 				zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to,
 						zbx_evaluate_function, 1);
+			}
+		}
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolves macros in trigger tags                                   *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - zbx_dc_um_handle_t *um_handle: user     *
+ *                                      macro cache handle                    *
+ *                                  - const zbx_db_event *event: event        *
+ *                                  - const char *tz: name of timezone        *
+ *                                      (can be NULL)                         *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving)            *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL)                      *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL)                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_macro_trigger_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
+{
+	int				ret = SUCCEED;
+	const zbx_vector_uint64_t	*phostids;
+
+	/* Passed arguments */
+	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	const zbx_db_event	*event = va_arg(args, const zbx_db_event *);
+	const char		*tz = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	{
+		if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
+				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
+		{
+			if (SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
+			{
+				zbx_dc_get_user_macro(um_handle, p->macro, phostids->values, phostids->values_num,
+						replace_with);
+			}
+			p->pos = (int)p->token.loc.r;
+		}
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+		{
+			ret = zbx_dc_get_host_inventory(p->macro, &event->trigger, replace_with, p->index);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_ID))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_ID);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_HOST);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_NAME);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_IP);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_DNS))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_DNS);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_CONN);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
+		{
+			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_with, p->index,
+					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_PORT);
+		}
+
+		if (EVENT_SOURCE_TRIGGERS == event->source)
+		{
+			if (0 == strcmp(p->macro, MVAR_ITEM_LASTVALUE))
+			{
+				ret = zbx_db_item_lastvalue(&event->trigger, replace_with, p->index, p->raw_value, tz,
+						ZBX_VALUE_PROPERTY_VALUE);
+			}
+			else if (0 == strcmp(p->macro, MVAR_ITEM_VALUE))
+			{
+				ret = zbx_db_item_value(&event->trigger, replace_with, p->index, event->clock,
+						event->ns, p->raw_value, tz, ZBX_VALUE_PROPERTY_VALUE);
+			}
+			else if (0 == strncmp(p->macro, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+			{
+				ret = zbx_get_history_log_value(p->macro, &event->trigger, replace_with, p->index,
+						event->clock, event->ns, tz);
+			}
+			else if (0 == strcmp(p->macro, MVAR_TRIGGER_ID))
+			{
+				*replace_with = zbx_dsprintf(*replace_with, ZBX_FS_UI64, event->objectid);
 			}
 		}
 	}
@@ -1291,7 +1407,7 @@ static int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **repla
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = zbx_db_select("select error from triggers where triggerid=" ZBX_FS_UI64,
+	if (NULL == (result = zbx_db_select("select error from trigger_rtdata where triggerid=" ZBX_FS_UI64,
 			trigger->triggerid)))
 	{
 		ret = FAIL;

@@ -46,11 +46,11 @@
  *                                                                            *
  ******************************************************************************/
 
-static const char	*ptr;		/* character being looked at */
-static int		level;		/* expression nesting level  */
+static ZBX_THREAD_LOCAL const char	*ptr;		/* character being looked at */
+static ZBX_THREAD_LOCAL int		level;		/* expression nesting level  */
 
-static char		*buffer;	/* error message buffer      */
-static size_t		max_buffer_len;	/* error message buffer size */
+static ZBX_THREAD_LOCAL char		*buffer;	/* error message buffer      */
+static ZBX_THREAD_LOCAL size_t		max_buffer_len;	/* error message buffer size */
 
 /******************************************************************************
  *                                                                            *

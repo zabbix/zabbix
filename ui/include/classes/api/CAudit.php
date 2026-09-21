@@ -88,6 +88,7 @@ class CAudit {
 	public const RESOURCE_PROXY_GROUP = 55;
 	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
 	public const RESOURCE_DEVICE = 57;
+	public const RESOURCE_CEP_RULE = 58;
 
 	/**
 	 * Audit details actions.
@@ -114,6 +115,7 @@ class CAudit {
 	private const TABLE_NAMES = [
 		self::RESOURCE_ACTION => 'actions',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_CEP_RULE => 'cep_rule',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
@@ -167,6 +169,7 @@ class CAudit {
 	private const FIELD_NAMES = [
 		self::RESOURCE_ACTION => 'name',
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_CEP_RULE => 'name',
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
@@ -212,6 +215,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CEP_RULE => 'ceprule',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
@@ -420,6 +424,12 @@ class CAudit {
 		'action.update_operations.opcommand' => 'opcommand',
 		'action.update_operations.opcommand_grp' => 'opcommand_grp',
 		'action.update_operations.opcommand_hst' => 'opcommand_hst',
+		'ceprule.filter' => 'cep_rule',
+		'ceprule.filter.conditions' => 'cep_condition',
+		'ceprule.operations' => 'cep_operation',
+		'ceprule.operations.filter' => 'cep_operation',
+		'ceprule.operations.filter.conditions' => 'cep_operation_condition',
+		'ceprule.window' => 'cep_rule_window',
 		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
@@ -562,6 +572,9 @@ class CAudit {
 		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
 		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
 		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
+		'ceprule.filter.conditions' => 'cep_conditionid',
+		'ceprule.operations' => 'cep_operationid',
+		'ceprule.operations.filter.conditions' => 'cep_operation_conditionid',
 		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
