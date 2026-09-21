@@ -208,7 +208,7 @@ final class CClickHouseHelper {
 			: void {
 		switch ($type) {
 			case 'DateTime64(9)':
-				$query->select('toUnixTimestamp64Nano('.$table_alias.'.'.$field.')', $field);
+				$query->select('toUnixTimestamp64Nano(toDateTime64('.$table_alias.'.'.$field.',9))', $field);
 				break;
 
 			default:
