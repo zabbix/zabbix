@@ -388,7 +388,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(out_str);
 
 	return cookie;
@@ -1505,6 +1505,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
 				mediatypeids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by mediatypeid");
 
 		result = zbx_db_select("%s", sql);
 
@@ -1867,7 +1868,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);

@@ -110,7 +110,7 @@ class testFormHostFromStandalone extends testFormHost {
 						'Test of discovered host Template: Template item',
 						'Test of discovered host Template: Template item with tag'
 					],
-					'after_unlink' =>  [
+					'after_unlink' => [
 						// This template was unlinked but not cleared.
 						'Template1 item1',
 						'Template1 item2',
@@ -129,7 +129,7 @@ class testFormHostFromStandalone extends testFormHost {
 						'Test of discovered host 2 template for clear: Template2 trigger',
 						'Test of discovered host Template: Template trigger'
 					],
-					'after_unlink' =>  [
+					'after_unlink' => [
 						// This template was unlinked but not cleared.
 						'Template1 trigger',
 						// This template was not unlinked.
@@ -146,7 +146,7 @@ class testFormHostFromStandalone extends testFormHost {
 						'Test of discovered host 2 template for clear: Template2 graph',
 						'Test of discovered host Template: Template graph'
 					],
-					'after_unlink' =>  [
+					'after_unlink' => [
 						// This template was unlinked but not cleared.
 						'Template1 graph',
 						// This template was not unlinked.
@@ -163,7 +163,7 @@ class testFormHostFromStandalone extends testFormHost {
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
 						'Test of discovered host Template: Template discovery rule'
 					],
-					'after_unlink' =>  [
+					'after_unlink' => [
 						// This template was unlinked but not cleared.
 						'Template1 discovery rule',
 						// This template was not unlinked.
@@ -180,7 +180,7 @@ class testFormHostFromStandalone extends testFormHost {
 						'Test of discovered host 1 template for unlink: Template web scenario 1',
 						'Test of discovered host 2 template for clear: Template web scenario 2'
 					],
-					'after_unlink' =>  [
+					'after_unlink' => [
 						// This template was not unlinked.
 						'Test of discovered host Template: Template web scenario',
 						// This template was unlinked but not cleared.

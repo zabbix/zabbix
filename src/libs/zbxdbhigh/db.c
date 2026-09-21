@@ -913,7 +913,7 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "proxy_dhistory") ||
 			0 == strcmp(tablename, "proxy_autoreg_host") ||
 			0 == strcmp(tablename, "host_proxy"))
-		return zbx_cb_nextid(tablename, num);
+		return zbx_cb_nextid(tablename, num); /* zbx_dc_get_nextid() */
 
 	return DBget_nextid(tablename, num);
 }
@@ -933,7 +933,7 @@ void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *
@@ -3088,7 +3088,7 @@ static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
 
 	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 #if defined (HAVE_MYSQL)
-	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len + 1);
 	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
 #elif defined (HAVE_POSTGRESQL)
 	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);
@@ -3719,6 +3719,7 @@ out:
  ******************************************************************************/
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
+	char		*formatted_auth_token_hash_esc = NULL;
 	int		ret = FAIL;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
@@ -3734,6 +3735,8 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 		goto out;
 	}
 
+	formatted_auth_token_hash_esc = zbx_db_dyn_escape_string(formatted_auth_token_hash);
+
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
 				" from token t,users u,role r"
@@ -3742,8 +3745,8 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+			formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED,
+			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t)))
 	{
 		goto out;
 	}
@@ -3758,6 +3761,7 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(formatted_auth_token_hash_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

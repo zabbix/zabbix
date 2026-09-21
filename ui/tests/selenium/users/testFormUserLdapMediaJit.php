@@ -425,13 +425,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		}
-
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit');
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
+		}
 
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
@@ -829,12 +829,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'MS Teams',
+								'Media type' => 'GLPI',
 								'Use if severity' => ['High', 'Disaster']
 							],
 							'expected' => [
 								'fields' => [
-									'Type' => 'MS Teams',
+									'Type' => 'GLPI',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
 									'Use if severity' => [

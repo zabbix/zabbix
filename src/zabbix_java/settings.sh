@@ -1,6 +1,19 @@
 # This is a configuration file for Zabbix Java Gateway.
 # It is sourced by startup.sh and shutdown.sh scripts.
 
+### Option: zabbix.server
+#	List of comma delimited IP addresses, optionally in CIDR notation, or DNS names of Zabbix servers and Zabbix proxies.
+#	Incoming connections will be accepted only from the hosts listed here.
+#	If not set or empty, all incoming connections are accepted.
+#	If IPv6 support is enabled then '127.0.0.1', '::127.0.0.1', '::ffff:127.0.0.1' are treated equally
+#	and '::/0' will allow any IPv4 or IPv6 address.
+#	'0.0.0.0/0' can be used to allow any IPv4 address.
+#	Example: SERVER="127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com"
+#
+# Mandatory: no
+# Default:
+# SERVER=
+
 ### Option: zabbix.listenIP
 #	IP address to listen on.
 #

@@ -801,8 +801,11 @@ if ($data['action'] !== 'user.edit') {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(CSeverityHelper::getName($severity))
-				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
-				->setUncheckedValue(0),
+				->setChecked(
+					array_key_exists($severity, $data['messages']['triggers.severities'])
+						&& $data['messages']['triggers.severities'][$severity] == TRIGGER_SEVERITY_ON
+				)
+				->setUncheckedValue(TRIGGER_SEVERITY_OFF),
 			[
 				(new CSelect('messages[sounds.'.$severity.']'))
 					->setId('messages_sounds.'.$severity)

@@ -52,6 +52,12 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
+	onResize() {
+		if (this._map !== null) {
+			this._map.invalidateSize();
+		}
+	}
+
 	promiseReady() {
 		if (this._map === null){
 			return super.promiseReady();
@@ -247,7 +253,6 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
 			node.hintBoxItem = hintBox.createBox(cluster.originalEvent, node, hintbox, '', true);
@@ -255,16 +260,8 @@ class CWidgetGeoMap extends CWidget {
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(cluster.originalEvent, node, node.hintBoxItem);
 
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._markers.on('click keypress', (e) => {
@@ -290,7 +287,6 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent([e.layer.feature]));
 
 			node.hintBoxItem = hintBox.createBox(e.originalEvent, node, hintbox, '', true);
@@ -299,16 +295,8 @@ class CWidgetGeoMap extends CWidget {
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(e.originalEvent, node, node.hintBoxItem);
 
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {

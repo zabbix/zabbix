@@ -124,7 +124,7 @@ class CControllerTemplateEdit extends CController {
 			}
 
 			// Prepare macros data.
-			$macros = cleanInheritedMacros(getRequest('macros', []));
+			$macros = cleanInheritedMacros($this->getInput('macros', []));
 
 			// Remove empty macro lines.
 			$macros = array_filter($macros, function($macro) {
