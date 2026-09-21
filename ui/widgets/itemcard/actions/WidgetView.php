@@ -69,6 +69,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'item' => $item,
 			'triggers' => $triggers,
 			'trigger_parent_templates' => $trigger_parent_templates,
+			'maintenances' => $item ? $this->getMaintenances($item) : [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -82,7 +83,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => ['itemid', 'type', 'hostid', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 				'units', 'templateid', 'flags', 'description', 'inventory_link', 'master_itemid', 'state', 'error'
 			],
-			'selectHosts' => ['hostid', 'name'],
+			'selectHosts' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
 			'selectDiscoveryData' => ['parent_itemid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
@@ -446,5 +447,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sources' => ['expression', 'recovery_expression'],
 			'context' => $context
 		]);
+	}
+
+	private function getMaintenances(array $item): array {
+		$maintenanceids = array_fill_keys(array_column($item['hosts'], 'maintenanceid'), true);
+
+		$maintenances = API::Maintenance()->get([
+			'output' => ['name', 'description'],
+			'maintenanceids' => array_keys($maintenanceids),
+			'preservekeys' => true
+		]);
+
+		return $maintenances;
 	}
 }

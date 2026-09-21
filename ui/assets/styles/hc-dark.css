@@ -4754,6 +4754,8 @@ div.dashboard-widget-geomap {
   white-space: normal; }
   .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
+  .geomap-hintbox .widget-info-maintenance {
+    display: inline-block; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
@@ -5140,11 +5142,16 @@ div.dashboard-widget-itemcard .item-card {
     div.dashboard-widget-itemcard .item-card .sections-header .section-path {
       display: flex;
       gap: 5px;
-      height: 17px;
-      line-height: 17px; }
+      height: 20px;
+      line-height: 20px; }
       div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element {
         flex: 1 1 0;
         max-width: fit-content; }
+      div.dashboard-widget-itemcard .item-card .sections-header .section-path .zi-wrench-alt-small {
+        min-width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        margin-left: -5px; }
   div.dashboard-widget-itemcard .item-card .sections {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

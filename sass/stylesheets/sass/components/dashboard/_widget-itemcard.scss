@@ -45,14 +45,21 @@ div.dashboard-widget-itemcard {
 
 				display: flex;
 				gap: 5px;
-				height: 17px;
-				line-height: 17px;
+				height: 20px;
+				line-height: 20px;
 
 				.path-element {
 					@extend %overflow-ellipsis;
 
 					flex: 1 1 0;
 					max-width: fit-content;
+				}
+
+				.zi-wrench-alt-small {
+					min-width: 18px;
+					height: 18px;
+					margin-top: 1px;
+					margin-left: -5px;
 				}
 			}
 		}
@@ -175,7 +182,6 @@ div.dashboard-widget-itemcard {
 				}
 
 				&.section-triggers {
-
 					.triggers {
 						max-height: 36px;
 						overflow: hidden;
