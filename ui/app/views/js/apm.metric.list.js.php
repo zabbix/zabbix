@@ -633,7 +633,7 @@
 						},
 						{
 							name: <?= json_encode(_('Start time')) ?>,
-							value: data.start_time_unix
+							value: data.start_time_ns_formatted
 						}
 					]
 				}
