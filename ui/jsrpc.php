@@ -376,6 +376,7 @@ switch ($data['method']) {
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'proxy_groupids' => array_key_exists('without_proxy_group', $data) ? 0 : null,
 					'limit' => $limit
 				]);
 
@@ -911,7 +912,7 @@ switch ($data['method']) {
 		if ($db_result) {
 			$db_result = array_flip(array_column($db_result, 'name'));
 
-			if (array_key_exists($search, $db_result)) {
+			if ($search !== null && array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);
 			}
 

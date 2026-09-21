@@ -73,6 +73,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 		$proxyids = null;
 		$proxy_groupids = null;
+		$monitored_by = null;
 
 		switch ($filter['monitored_by']) {
 			case ZBX_MONITORED_BY_SERVER:
@@ -81,19 +82,21 @@ class CControllerHostListData extends CControllerDataTable {
 				break;
 
 			case ZBX_MONITORED_BY_PROXY:
-				$proxyids = $filter['proxyids'] ?: array_keys(API::Proxy()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
-				$proxy_groupids = 0;
+				if ($filter['proxyids']) {
+					$proxyids = $filter['proxyids'];
+				}
+				else {
+					$monitored_by = ZBX_MONITORED_BY_PROXY;
+				}
 				break;
 
 			case ZBX_MONITORED_BY_PROXY_GROUP:
-				$proxyids = 0;
-				$proxy_groupids = $filter['proxy_groupids'] ?: array_keys(API::ProxyGroup()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
+				if ($filter['proxy_groupids']) {
+					$proxy_groupids = $filter['proxy_groupids'];
+				}
+				else {
+					$monitored_by = ZBX_MONITORED_BY_PROXY_GROUP;
+				}
 				break;
 		}
 
@@ -117,6 +120,7 @@ class CControllerHostListData extends CControllerDataTable {
 				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
+				'monitored_by' => $monitored_by,
 				'port' => $filter['port'] === '' ? null : $filter['port'],
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			]
@@ -319,14 +323,19 @@ class CControllerHostListData extends CControllerDataTable {
 				}
 			}
 
+			$inaccessible_proxy = ['name' => _('Inaccessible proxy'), 'inaccessible' => true];
+			$inaccessible_proxy_group = ['name' => _('Inaccessible proxy group'), 'inaccessible' => true];
+
 			$host['proxy'] = array_key_exists('proxyid', $host) && $host['proxyid']
-				? array_merge($proxies[$host['proxyid']], ['proxyid' => $host['proxyid']])
+				? ($proxies[$host['proxyid']] ?? $inaccessible_proxy) + ['proxyid' => $host['proxyid']]
 				: null;
 			$host['proxy_group'] = array_key_exists('proxy_groupid', $host) && $host['proxy_groupid']
-				? array_merge($proxy_groups[$host['proxy_groupid']], ['proxy_groupid' => $host['proxy_groupid']])
+				? ($proxy_groups[$host['proxy_groupid']] ?? $inaccessible_proxy_group)
+					+ ['proxy_groupid' => $host['proxy_groupid']]
 				: null;
 			$host['assigned_proxy'] = array_key_exists('assigned_proxyid', $host) && $host['assigned_proxyid']
-				? array_merge($proxies[$host['assigned_proxyid']], ['proxyid' => $host['assigned_proxyid']])
+				? ($proxies[$host['assigned_proxyid']] ?? $inaccessible_proxy)
+					+ ['proxyid' => $host['assigned_proxyid']]
 				: null;
 
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);

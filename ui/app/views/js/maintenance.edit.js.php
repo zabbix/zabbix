@@ -27,7 +27,7 @@ window.maintenance_edit = new class {
 	 */
 	form;
 
-	init({rules, clone_rules, timeperiods, tags, allowed_edit}) {
+	init({rules, clone_rules, timeperiods, event_names, tags, allowed_edit}) {
 		this.overlay = overlays_stack.getById('maintenance.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
@@ -42,6 +42,13 @@ window.maintenance_edit = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => this.#addTimePeriod({row_index, ...timeperiod}));
+
+		// Setup Event Names.
+		jQuery(document.getElementById('event_names')).dynamicRows({
+			template: '#event-names-row-tmpl',
+			rows: event_names,
+			allow_empty: true
+		});
 
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
@@ -76,6 +83,11 @@ window.maintenance_edit = new class {
 			$hostids.on('change', () => this.#updateMultiselect($hostids));
 			this.#updateMultiselect($hostids);
 
+			const $triggerids = $('#triggerids_');
+
+			$triggerids.on('change', () => this.#updateMultiselect($triggerids));
+			this.#updateMultiselect($triggerids);
+
 			// Update form field state according to the form data.
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
 			this.form.findFieldByName('timeperiods').setButtonOnBlur('js-add', 'maintenance-timeperiod-edit');
@@ -92,38 +104,13 @@ window.maintenance_edit = new class {
 	}
 
 	#update() {
-		const tags_enabled = this.form_element
+		const is_enabled = this.form_element
 			.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
-		const tags_container = document.getElementById('tags');
 
-		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
-			text_input.disabled = !tags_enabled;
+		$('#triggerids_').multiSelect(!is_enabled || !this._allowed_edit ? 'disable' : 'enable');
 
-			const field = this.form.findFieldByName(text_input.name);
-
-			if (field && text_input.disabled) {
-				field.unsetErrors();
-			}
-		});
-
-		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]');
-		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
-
-		[...tags_evaltypes, ...tags_operators].forEach((radio_button) =>
-			radio_button.disabled = !tags_enabled || !this._allowed_edit
-		);
-
-		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
-			button.disabled = !tags_enabled || !this._allowed_edit
-		);
-
-		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) =>
-			tag_text_input.placeholder = tags_enabled ? <?= json_encode(_('tag')) ?> : ''
-		);
-
-		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
-			value_text_input.placeholder = tags_enabled ? <?= json_encode(_('value')) ?> : ''
-		);
+		this.#updateEventNames(is_enabled);
+		this.#updateTags(is_enabled);
 	}
 
 	#editTimePeriod(row = null) {
@@ -167,6 +154,8 @@ window.maintenance_edit = new class {
 			else {
 				this.#addTimePeriod(e.detail);
 			}
+
+			this.#synchronizeActivesAndTimePeriod(e.detail)
 		});
 	}
 
@@ -183,6 +172,132 @@ window.maintenance_edit = new class {
 
 		row.insertAdjacentHTML('afterend', template.evaluate(timeperiod));
 		row.remove();
+	}
+
+	#synchronizeActivesAndTimePeriod(timeperiod) {
+		if (timeperiod.timeperiod_type === <?= TIMEPERIOD_TYPE_ONETIME ?>) {
+			const dateFormatter = new Intl.DateTimeFormat('en', {
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit',
+				hour: '2-digit',
+				minute: '2-digit',
+				hourCycle: 'h23',
+				timeZone: <?= json_encode(date_default_timezone_get()) ?>
+			});
+
+			const formatDate = (date) => {
+				const parts = Object.fromEntries(
+					dateFormatter.formatToParts(date)
+					.filter(({type}) => type !== 'literal')
+					.map(({type, value}) => [type, value])
+				);
+
+				return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
+			};
+
+			const active_since_input = document.getElementById('active_since');
+			const active_till_input = document.getElementById('active_till');
+
+			const start_date = new Date(timeperiod.start_date * 1000);
+			const active_since = formatDate(start_date);
+			const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
+
+			const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+			const DAYS_IN_MONTH = (year) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+			const parseDateTime = (value) => {
+				const match = value.trim().match(/^(\d{1,4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2})(?::\d{1,2})?$/);
+
+				if (match === null) {
+					return null;
+				}
+
+				const [year, month, day, hour, minute] = match.slice(1).map(Number);
+
+				if (year < 1970 || month < 1 || month > 12 || day < 1 || day > DAYS_IN_MONTH(year)[month - 1]
+						|| hour > 23 || minute > 59) {
+					return null;
+				}
+
+				return [
+					String(year).padStart(4, '0'), String(month).padStart(2, '0'), String(day).padStart(2, '0')
+				].join('-') + ' ' + [String(hour).padStart(2, '0'), String(minute).padStart(2, '0')].join(':');
+			};
+
+			const active_since_canonical = parseDateTime(active_since_input.value);
+			if (active_since_canonical === null || active_since_canonical > active_since) {
+				active_since_input.value = active_since;
+			}
+
+			const active_till_canonical = parseDateTime(active_till_input.value);
+			if (active_till_canonical === null || active_till_canonical < active_till) {
+				active_till_input.value = active_till;
+			}
+
+			this.form.validateChanges(['active_since', 'active_till']);
+		}
+	}
+
+	#updateEventNames(is_enabled) {
+		const event_names_container = document.getElementById('event_names');
+
+		event_names_container.querySelectorAll('[name$="[value]"]').forEach((text_input) => {
+			text_input.disabled = !is_enabled;
+		});
+
+		const event_names_operators = event_names_container.querySelectorAll('[name$="[operator]"]');
+
+		[...event_names_operators].forEach((radio_button) => {
+			radio_button.disabled = !is_enabled || !this._allowed_edit
+
+			const field = this.form.findFieldByName(radio_button.name);
+
+			if (field && radio_button.disabled) {
+				field.unsetErrors();
+			}
+		});
+
+		event_names_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
+			button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		event_names_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
+			value_text_input.placeholder = is_enabled ? <?= json_encode(_('value')) ?> : ''
+		);
+	}
+
+	#updateTags(is_enabled) {
+		const tags_container = document.getElementById('tags');
+
+		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
+			text_input.disabled = !is_enabled;
+
+			const field = this.form.findFieldByName(text_input.name);
+
+			if (field && text_input.disabled) {
+				field.unsetErrors();
+			}
+		});
+
+		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]');
+		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
+
+		[...tags_evaltypes, ...tags_operators].forEach((radio_button) =>
+			radio_button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
+			button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) =>
+			tag_text_input.placeholder = is_enabled ? <?= json_encode(_('tag')) ?> : ''
+		);
+
+		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
+			value_text_input.placeholder = is_enabled ? <?= json_encode(_('value')) ?> : ''
+		);
 	}
 
 	#clone() {

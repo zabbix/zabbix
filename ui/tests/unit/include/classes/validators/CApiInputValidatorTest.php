@@ -847,6 +847,138 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
 			],
 			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 5],
+				'{$MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,60:900'],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_USER_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 5],
+				'{#MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_LLD_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
 				['type' => API_INTS32],
 				[0, 1],
 				'/output',
@@ -8981,6 +9113,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				str_repeat('abc123 ', 1429),
 				'/1/sp_private_key',
 				'Invalid parameter "/1/sp_private_key": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'index.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list',
+				'/1/action_url',
+				'zabbix.php?action=host.list'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list&keys[]=param',
+				'/1/action_url',
+				'zabbix.php?action=host.list&keys[]=param'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action[]=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=unknown.action',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": invalid action in the frontend URL.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'non_zabbix.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'unknown.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'https://www.zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'',
+				'/1/action_url',
+				''
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": cannot be empty.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 64],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 65],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now'
 			]
 		];
 	}

@@ -483,7 +483,7 @@ window.item_edit_form = new class {
 	}
 
 	#showErrorDialog(body, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup',
 			content: jQuery('<span>').html(body),
@@ -497,6 +497,9 @@ window.item_edit_form = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: jQuery(trigger_element)
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#getFormFields() {
@@ -678,9 +681,16 @@ window.item_edit_form = new class {
 	#updateTimeoutOverrideVisibility() {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
+		const timeout_inaccessible = this.form_element.querySelector('#js-item-timeout-inaccessible');
 
-		this.form_element.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
 		this.form_element.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
+
+		if (timeout_inaccessible !== null) {
+			timeout_inaccessible.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
+		else {
+			this.form_element.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
 	}
 
 	#updateTimeoutVisibility() {
