@@ -1235,7 +1235,7 @@ class testProxy extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Check "selectApm" option.
+			// Check "selectApm".
 			'Test proxy.get: "selectApm" for proxy with apm' => [
 				'request' => [
 					'output' => [],
@@ -1280,7 +1280,7 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
