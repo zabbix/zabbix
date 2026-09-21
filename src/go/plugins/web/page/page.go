@@ -31,12 +31,12 @@ import (
 
 const maxRedirectLimit = 1000
 
-const (
-	errInvalidParameters       = "invalid number of parameters"
-	errInvalidFirstParameter   = "invalid first parameter"
-	errInvalidFourthParameter  = "invalid fourth parameter"
-	errInvalidFifthParameter   = "invalid fifth parameter"
-	errInvalidSeventhParameter = "invalid seventh parameter"
+var (
+	errInvalidParameters       = errs.New("invalid number of parameters")
+	errInvalidFirstParameter   = errs.New("invalid first parameter")
+	errInvalidFourthParameter  = errs.New("invalid fourth parameter")
+	errInvalidFifthParameter   = errs.New("invalid fifth parameter")
+	errInvalidSeventhParameter = errs.New("invalid seventh parameter")
 )
 
 var impl Plugin
@@ -59,7 +59,7 @@ func init() {
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
 	if len(params) == 0 || params[0] == "" {
-		return nil, errs.New(errInvalidFirstParameter)
+		return nil, errInvalidFirstParameter
 	}
 
 	u, err := url.Parse(params[0])
@@ -95,17 +95,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		if len(params) < 4 {
-			return nil, errs.New(errInvalidParameters)
+			return nil, errInvalidParameters
 		}
 
 		rx, err := regexp.Compile(params[3])
 		if err != nil {
-			return nil, errs.Wrap(err, errInvalidFourthParameter)
+			return nil, errs.WrapConst(err, errInvalidFourthParameter)
 		}
 
 		if len(params) > 4 && params[4] != "" {
 			if n, err := strconv.Atoi(params[4]); err != nil {
-				return nil, errs.Wrap(err, errInvalidFifthParameter)
+				return nil, errs.WrapConst(err, errInvalidFifthParameter)
 			} else {
 				length = &n
 			}
@@ -119,7 +119,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 6)
 		if err != nil {
-			return nil, errs.Wrap(err, errInvalidSeventhParameter)
+			return nil, errs.WrapConst(err, errInvalidSeventhParameter)
 		}
 
 		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
@@ -145,7 +145,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 3)
 		if err != nil {
-			return nil, errs.Wrap(err, errInvalidFourthParameter)
+			return nil, errs.WrapConst(err, errInvalidFourthParameter)
 		}
 
 		start := time.Now()
@@ -164,7 +164,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		redirectLimit, err := parseRedirectLimit(params, 3)
 		if err != nil {
-			return nil, errs.Wrap(err, errInvalidFourthParameter)
+			return nil, errs.WrapConst(err, errInvalidFourthParameter)
 		}
 		//nolint:wrapcheck
 		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
