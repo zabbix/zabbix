@@ -211,6 +211,12 @@ final class CClickHouseHelper {
 				$query->select('toUnixTimestamp64Nano(toDateTime64('.$table_alias.'.'.$field.',9))', $field);
 				break;
 
+			case 'Array(DateTime64(9))':
+				$query->select('arrayMap(p -> toUnixTimestamp64Nano(toDateTime64(p,9)),'.$table_alias.'.'.$field.')',
+					$field
+				);
+				break;
+
 			default:
 				$query->select($table_alias.'.'.$field);
 		}
