@@ -55,6 +55,13 @@ class CApiService {
 	protected $sortColumns = [];
 
 	/**
+	 * An array of fields that can be used for grouping.
+	 *
+	 * @var array
+	 */
+	protected $groupByColumns = [];
+
+	/**
 	 * An array of allowed get() options that are supported by all APIs.
 	 *
 	 * @var array
@@ -495,6 +502,7 @@ class CApiService {
 			array $sql_parts) {
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
+		$group_by_fields = $this->getGroupByFields($options);
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
@@ -515,9 +523,9 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
-				foreach ($options['groupBy'] as $field) {
-					if (is_string($field) && $this->hasField($field, $table_name)) {
+			elseif ($group_by_fields) {
+				foreach ($group_by_fields as $field) {
+					if ($this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -526,11 +534,11 @@ class CApiService {
 				}
 			}
 		}
-		elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
+		elseif ($group_by_fields) {
 			$sql_parts['select'] = [];
 
-			foreach ($options['groupBy'] as $field) {
-				if (is_string($field) && $this->hasField($field, $table_name)) {
+			foreach ($group_by_fields as $field) {
+				if ($this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -630,6 +638,20 @@ class CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returns the requested groupBy fields that are allowed for the API service.
+	 *
+	 * @param array $options
+	 * @return array
+	 */
+	private function getGroupByFields(array $options): array {
+		if (!$this->groupByColumns || !array_key_exists('groupBy', $options) || !is_array($options['groupBy'])) {
+			return [];
+		}
+
+		return array_intersect(array_filter($options['groupBy'], 'is_string'), $this->groupByColumns);
 	}
 
 	/**
