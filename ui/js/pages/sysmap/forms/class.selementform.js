@@ -181,7 +181,7 @@ class SelementForm {
 			object_name: 'triggers',
 			name: 'elementValue',
 			objectOptions: {
-				real_hosts: true
+				real_hosts: 1
 			},
 			popup: {
 				parameters: {

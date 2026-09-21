@@ -517,8 +517,6 @@ function hasEventCloseAction(array $acknowledges): bool {
  * @return bool
  */
 function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (!array_key_exists('suppress_until', $ack)) {
 			continue;
@@ -550,8 +548,6 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
  * @return bool
  */
 function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
 			return false;
@@ -762,6 +758,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				}
 
 				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
+					->setAttribute('aria-label', _('Show all tags'))
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP . ' ' . ZBX_STYLE_TAGS_WRAPPER);
 			}
 		}

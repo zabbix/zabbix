@@ -78,17 +78,6 @@ window.trigger_edit_popup = new class {
 			this.name.dispatchEvent(new Event('input'));
 		});
 
-		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
-		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
-			if (e.key === 'Enter') {
-				if (e.target.readOnly) {
-					return;
-				}
-
-				$(this.form_element).submit();
-			}
-		});
-
 		// Tags tab events.
 		this.form_element.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', e => this.#toggleInheritedTags()));
@@ -702,7 +691,6 @@ window.trigger_edit_popup = new class {
 		let form_fields = {
 			dependencies: [],
 			discover: String(<?= TRIGGER_NO_DISCOVER ?>),
-			manual_close: String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>),
 			status: String(<?= TRIGGER_STATUS_DISABLED ?>),
 			...this.#getFormFields()
 		}

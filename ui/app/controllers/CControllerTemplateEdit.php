@@ -20,6 +20,7 @@ class CControllerTemplateEdit extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
@@ -124,7 +125,7 @@ class CControllerTemplateEdit extends CController {
 			}
 
 			// Prepare macros data.
-			$macros = cleanInheritedMacros(getRequest('macros', []));
+			$macros = cleanInheritedMacros($this->getInput('macros', []));
 
 			// Remove empty macro lines.
 			$macros = array_filter($macros, function($macro) {

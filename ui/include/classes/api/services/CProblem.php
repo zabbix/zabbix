@@ -455,8 +455,8 @@ class CProblem extends CApiService {
 			$sql_options = [
 				'output' => $output,
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN]
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN]
 			];
 			$db_acknowledges = DBselect(DB::makeSql('acknowledges', $sql_options));
 

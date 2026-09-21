@@ -31,6 +31,11 @@ require_once __DIR__.'/../common/testWidgets.php';
 class testDashboardClockWidget extends testWidgets {
 
 	/**
+	 * There are two labels "Time zone", so the xpath is used for Time zone container in Advanced configuration block.
+	 */
+	const TZONE_FIELDS_GROUP = 'xpath:.//div[@class="fields-group fields-group-tzone"]';
+
+	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
@@ -48,18 +53,6 @@ class testDashboardClockWidget extends testWidgets {
 	 * @var integer
 	 */
 	protected static $dashboardid;
-
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid '.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid, wf.value_graphid';
 
 	/**
 	 * Create data for autotests which use ClockWidget.
@@ -225,7 +218,7 @@ class testDashboardClockWidget extends testWidgets {
 		$fields = ['Type', 'Show header', 'Name', 'Refresh interval', 'Time type', 'Clock type'];
 
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
-			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+			$form->fill(['Time type' => $type]);
 
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
@@ -234,6 +227,7 @@ class testDashboardClockWidget extends testWidgets {
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
+				$form->getField('Item')->waitUntilVisible();
 				array_splice($fields, 5, 0, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
@@ -272,9 +266,8 @@ class testDashboardClockWidget extends testWidgets {
 				$form->fill(['Advanced configuration' => true]);
 
 				// Check that only Background colour and Time fields are visible (because only Time checkbox is checked).
-				// There are two labels "Time zone", so the xpath is used for the container.
 				foreach (['Background colour' => true, 'Date' => false, 'Time' => true,
-							'xpath:.//div[@class="fields-group fields-group-tzone"]' => false] as $name => $visible) {
+							self::TZONE_FIELDS_GROUP => false] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 
@@ -293,27 +286,34 @@ class testDashboardClockWidget extends testWidgets {
 						'id:time_format' => '24-hour'
 					],
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
-					'xpath:.//div[@class="fields-group fields-group-tzone"]' => [
+					self::TZONE_FIELDS_GROUP => [
 						'id:tzone_bold' => false,
 						'xpath:.//z-color-picker[@color-field-name="date_color"]' => null,
-						'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
+						'id:tzone_timezone' => null,
 						'id:tzone_format' => 'Short'
 					]
 				];
 
 				// Check Advanced config fields depending on Time type.
 				foreach (['Local time', 'Server time', 'Host time'] as $type) {
-					$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+					$form->fill(['Time type' => $type]);
 					$form->fill(['Advanced configuration' => true]);
 
-					// Check that with Host time 'Time zone' and 'Format' fields disappear.
+					// Check that with Host time 'Time zone' and 'Format' fields disappear,
+					// otherwise 'Time zone' default value depends on selected Time type.
 					if ($type === 'Host time') {
-						$advanced_configuration['xpath:.//div[@class="fields-group fields-group-tzone"]'] =
+						$form->getField('Item')->waitUntilVisible();
+						$advanced_configuration[self::TZONE_FIELDS_GROUP] =
 								['id:tzone_bold' => false, 'xpath:.//z-color-picker[@color-field-name="tzone_color"]' => null];
 
 						foreach (['id:tzone_timezone', 'id:tzone_format'] as $id) {
 							$this->assertFalse($form->getField($id)->isVisible());
 						}
+					}
+					else {
+						$advanced_configuration[self::TZONE_FIELDS_GROUP]['id:tzone_timezone'] =
+							($type === 'Local time' ? 'Local default: ' : 'System default: ').
+							CDateTimeHelper::getTimeZoneFormat('Europe/Riga');
 					}
 
 					// Check Advanced fields' visibility and values.
@@ -335,8 +335,7 @@ class testDashboardClockWidget extends testWidgets {
 				// Now remove the Time checkbox from Show field and check that only its Advanced config disappeared.
 				$form->fill(['id:show_2' => false]);
 
-				foreach ( ['Date' => true, 'Time' => false, 'xpath:.//div[@class="fields-group fields-group-tzone"]' => true]
-						as $name => $visible) {
+				foreach ( ['Date' => true, 'Time' => false, self::TZONE_FIELDS_GROUP => true] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 			}
@@ -400,7 +399,7 @@ class testDashboardClockWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type changed to Server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -410,7 +409,7 @@ class testDashboardClockWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type changed to Local time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time')
+						'Time type' => 'Local time'
 					]
 				]
 			],
@@ -420,7 +419,7 @@ class testDashboardClockWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Clock',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time'),
+						'Time type' => 'Server time',
 						'Refresh interval' => '10 seconds',
 						'Name' => 'Time type and refresh interval changed'
 					]
@@ -461,7 +460,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'Updated_name',
 						'Refresh interval' => '10 minutes',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -473,7 +472,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => false,
 						'Name' => 'ClockWithoutItem',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Clock type' => 'Analog'
 					],
 					'Error message' => [
@@ -487,7 +486,7 @@ class testDashboardClockWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type with item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget'
 					]
 				]
@@ -498,7 +497,7 @@ class testDashboardClockWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Update item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget 2'
 					]
 				]
@@ -511,7 +510,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'HostTimeClock',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget',
 						'Clock type' => 'Analog'
 					]
@@ -525,7 +524,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'LocalTimeClock123',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Analog'
 					]
 				]
@@ -539,7 +538,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => '1233212',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Analog'
 					]
 				]
@@ -553,7 +552,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => false,
@@ -570,7 +569,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock2',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -587,7 +586,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock3',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -604,7 +603,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock4',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => false,
@@ -622,7 +621,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock5',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => false,
@@ -643,7 +642,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock6',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -668,7 +667,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock7',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -693,7 +692,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock8',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -723,7 +722,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock9',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+						'Time type' => 'Local time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -753,7 +752,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Show header' => true,
 						'Name' => 'DigitalClock11',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Clock type' => 'Digital',
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -989,7 +988,7 @@ class testDashboardClockWidget extends testWidgets {
 			$form->fill([
 				'Name' => 'Widget to be cancelled',
 				'Refresh interval' => '10 minutes',
-				'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
+				'Time type' => 'Local time',
 				'Clock type' => 'Digital',
 				'id:show_1' => true,
 				'id:show_2' => false,

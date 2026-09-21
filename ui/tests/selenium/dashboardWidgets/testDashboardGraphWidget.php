@@ -290,12 +290,11 @@ class testDashboardGraphWidget extends testWidgets {
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
 			if ($tab === 'Overrides') {
-				$button = $form->query('button:Add new override')->one()->click();
-				// Remove border radius from button element.
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+				$form->query('button:Add new override')->one()->click();
 			}
 
 			$this->page->removeFocus();
+			$this->page->updateViewport();
 			sleep(1);
 			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);
 		}
@@ -2100,8 +2099,8 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Fill graph widget form with provided data.
 	 *
-	 * @param array $data		data provider with fields values
-	 * @param array $form		CFormElement
+	 * @param array 		$data		data provider with fields values
+	 * @param CFormElement	$form		widget configuration form element
 	 */
 	protected function fillForm($data, $form) {
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
@@ -2803,18 +2802,21 @@ class testDashboardGraphWidget extends testWidgets {
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
-			'id:evaltype',													// Tag type.
-			'id:tags_0_tag',												// Tag name.
-			'id:tags_0_operator',											// Tag operator.
-			'id:tags_0_value',												// Tag value
-			'id:tags_0_remove',												// Tag remove button.
-			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
+			'id:tags_0_tag',		// Tag name.
+			'id:tags_0_operator',	// Tag operator.
+			'id:tags_0_value'		// Tag value.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
+		$this->assertEquals(0, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
-		// Set "Show problems" and check that fields enabled now.
+		// Set "Show problems" and check that fields and buttons are enabled now.
 		$form->fill(['Show problems' => true]);
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
+		$this->assertEquals(2, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -2962,7 +2964,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Check hint next to the "Data set label" field.
 		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
 		$this->fillForm($input_data, $form);

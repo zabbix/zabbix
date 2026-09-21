@@ -45,7 +45,9 @@ func init() {
 
 func (p *Plugin) run() {
 	p.Debugf("activating plugin")
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 
 run:
 	for {

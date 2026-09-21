@@ -1,14 +1,54 @@
-# LINE webhook 
+![](images/logo.png?raw=true)
+# Line webhook
+
+## Overview
 
 This guide describes how to integrate your Zabbix installation with LINE messenger using Zabbix webhook feature. It also provides instructions on setting up a media type, a user and an action in Zabbix.
 
-## In LINE developer console
+## Requirements
+
+Zabbix version: 7.4 and higher.
+
+## Parameters
+
+After importing the webhook, you can configure it using webhook parameters.
+
+### Configurable parameters
+
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|bot_token|\<PLACE BOT TOKEN\>||
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Line"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Line", e.g. {$HTTP.TLS.VERIFY:"Line"}.|
+|zabbix_url|\{$ZABBIX\.URL\}|some description|
+
+### Internal parameters
+
+Internal parameters are reserved for predefined macros that are not meant to be changed.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+|alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
+|event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
+|event_nseverity|\{EVENT\.NSEVERITY\}|Numeric value of the event severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_source|\{EVENT\.SOURCE\}|Numeric value of the event source. Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal, 4 - Service.|
+|event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
+|event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
+|send_to|\{ALERT\.SENDTO\}|'Send to' value from user media configuration.|
+|trigger_description|\{TRIGGER\.DESCRIPTION\}|Trigger description.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
+
+## Service setup
 
 1. Create a messaging `channel access token` following original instructions on [How to use the messaging API](https://developers.line.biz/en/docs/messaging-api/overview/).
 
 2. Copy the `channel access token` of your new integration to be used in Zabbix.
 
-## In Zabbix
+## Zabbix configuration
 
 The configuration consists of a _Media type_ in Zabbix, which will invoke the webhook to send alerts to LINE messenger through the LINE messaging API.
 
@@ -52,10 +92,8 @@ Media testing can be done manually, from `Media types` page. Press `Test` button
 
 2. Having successfully sent a message from Zabbix, check if it has been received by the recipient.
 
-## Supported Versions
-
-Zabbix 7.4, LINE messaging API.
-
 ## Feedback
-Please report any issues with this media type at https://support.zabbix.com.
-You can also provide feedback, discuss the template, or ask for help at ZABBIX forums.
+
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

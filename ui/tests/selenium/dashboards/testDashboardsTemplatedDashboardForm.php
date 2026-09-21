@@ -20,6 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * @backup dashboard, hosts
@@ -2927,7 +2928,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -2938,7 +2939,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -2949,7 +2950,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4551,7 +4552,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4565,8 +4566,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:sparkline_time_period_to' => 'now'
 					],
 					'page' => '2nd page',
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -4785,7 +4787,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
-			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+			/*
+			 * Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+			 * while being clicked. Retry the click if that happens.
+			 */
+			$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+			try {
+				$add_button->click();
+			}
+			catch (ElementNotInteractableException $exception) {
+				$add_button->click();
+			}
+
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();
 
@@ -5017,7 +5032,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$form->checkValue($reference_data);
 			}
 
-			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			// If required, define max days count in error since it depends on leap year presence in desired period.
 			if (CTestArrayHelper::get($data, 'days_count')) {
 				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
 			}

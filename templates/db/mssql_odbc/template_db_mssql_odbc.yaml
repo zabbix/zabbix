@@ -94,7 +94,7 @@ zabbix_export:
             - Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Databases
       items:
@@ -438,7 +438,7 @@ zabbix_export:
               SELECT cntr_value,
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
-              WHERE counter_name = 'Cache Hit Ratio base'
+              WHERE counter_name = 'Cache Hit Ratio Base'
                 AND OBJECT_NAME = @SQLNAME + ':Plan Cache'
                 AND instance_name = '_Total'
             ) b

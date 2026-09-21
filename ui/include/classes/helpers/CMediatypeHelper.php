@@ -47,6 +47,8 @@ class CMediatypeHelper {
 		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
 	];
 
+	public const OAUTH_URL_SCHEMES = ['http', 'https'];
+
 	/**
 	 * Returns an array of Email providers default settings.
 	 *

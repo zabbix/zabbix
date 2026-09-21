@@ -451,14 +451,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.data.flags & ZBX_VARIANT_FLAG_CHANGED))
+	if (ZBX_VARIANT_NONE == d->result.type)
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
 			d->preproc->dep_itemids_num)))
 	{
 		zbx_pp_task_t	*dep_task;
-		zbx_variant_t	value = {0};
+		zbx_variant_t	value;
 
 		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
@@ -1007,8 +1007,8 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
  *                                                                            *
  * Purpose: flush processed value task                                        *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] processed tasks                                 *
+ * Parameters: manager  - [IN] preprocessing manager                          *
+ *             task     - [IN] processed task                                 *
  *                                                                            *
  ******************************************************************************/
 static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
@@ -1028,7 +1028,7 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
  *                                                                            *
  * Purpose: send back result of processed test task                           *
  *                                                                            *
- * Parameters: tasks - [IN] processed tasks                                   *
+ * Parameters: task - [IN] processed task                                     *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_test_result(zbx_pp_task_t *task)

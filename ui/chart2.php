@@ -35,7 +35,8 @@ $fields = [
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
-	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
+	'download' =>		[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
@@ -100,6 +101,10 @@ $graph = new CLineGraphDraw($dbGraph['graphtype']);
 if (getRequest('widget_view') === '1') {
 	$graph->draw_header = false;
 	$graph->with_vertical_padding = false;
+}
+
+if (getRequest('download') === '1') {
+	$graph->with_bottom_padding = true;
 }
 
 // array sorting

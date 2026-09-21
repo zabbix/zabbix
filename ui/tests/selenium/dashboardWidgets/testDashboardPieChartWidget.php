@@ -189,7 +189,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 
 		// Check modal Help and Close buttons.
-		foreach (['xpath:.//*[@title="Help"]', 'xpath:.//button[@title="Close"]'] as $selector) {
+		foreach (['xpath:.//*[@aria-label="Open Zabbix documentation in a new tab"]', 'xpath:.//button[@aria-label="Close modal window"]'] as $selector) {
 			$this->assertTrue($dialog->query($selector)->one()->isClickable());
 		}
 
@@ -1379,9 +1379,9 @@ class testDashboardPieChartWidget extends testWidgets {
 		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
-			$hint->query('xpath:./button')->one()->click();
+			$hint->query('xpath:.//button[contains(@class, "btn-overlay-close")]')->one()->click();
 		}
 	}
 

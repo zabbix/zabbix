@@ -47,6 +47,7 @@ This template has been tested on:
 |{$RIBBON.PASSWORD}|<p>Ribbon SBC user password.</p>||
 |{$RIBBON.URL}|<p>Ribbon SBC API IP.</p>||
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC Edge", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}.</p>|`full`|
 |{$RIBBON.INTERVAL}|<p>The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`1m`|
 |{$RIBBON.INTERVAL:"get_system_stats"}|<p>The update interval for the script item that retrieve the system stats.</p>|`1m`|
 |{$RIBBON.INTERVAL:"get_interface"}|<p>The update interval for the script item that retrieve the interface data.</p>|`1m`|

@@ -776,7 +776,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged),
-			$tags[$problem['eventid']]
+			(new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 		]));
 	}
 
