@@ -485,13 +485,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getMaintenances(array $db_hosts): array {
 		$maintenanceids = array_fill_keys(array_column($db_hosts, 'maintenanceid'), true);
 
-		$maintenances = API::Maintenance()->get([
+		return API::Maintenance()->get([
 			'output' => ['name', 'description'],
 			'maintenanceids' => array_keys($maintenanceids),
 			'preservekeys' => true
 		]);
-
-		return $maintenances;
 	}
 
 	private static function concatenateTables(array $tables): array {

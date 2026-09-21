@@ -450,14 +450,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getMaintenances(array $item): array {
-		$maintenanceids = array_fill_keys(array_column($item['hosts'], 'maintenanceid'), true);
-
-		$maintenances = API::Maintenance()->get([
+		return API::Maintenance()->get([
 			'output' => ['name', 'description'],
-			'maintenanceids' => array_keys($maintenanceids),
+			'maintenanceids' => [$item['hosts'][0]['maintenanceid']],
 			'preservekeys' => true
 		]);
-
-		return $maintenances;
 	}
 }
