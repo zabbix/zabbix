@@ -970,12 +970,10 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 
 		int retries_int = 0;
 
-		if (FAIL == zbx_validate_item_retries(retries,
-			&retries_int, error, sizeof(error)))
+		if (FAIL == zbx_validate_item_retries(retries, &retries_int, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
-			zbx_free(retries);
 			continue;
 		}
 
