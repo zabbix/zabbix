@@ -57,8 +57,15 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 			goto out;
 		}
 
-		result = zbx_db_select("select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
+		result = zbx_db_select_once("select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
 				fld_name_groupid, tbl_name_groups, fld_name_id, ids->values[i], fld_name_groupid);
+
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot fetch %s, from %s", fld_name_groupid, tbl_name_groups);
+			ret = FAIL;
+			goto out;
+		}
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -104,23 +111,32 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 		zbx_vector_uint64_append(&gset_ptr->ids, ids->values[i]);
 		zbx_vector_uint64_clear(&groupids);
 	}
-
-	zbx_vector_uint64_destroy(&groupids);
 out:
+	zbx_vector_uint64_destroy(&groupids);
+
 	return ret;
 }
 
-static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *group_sets, zbx_db_insert_t *db_gset,
+/*******************************************************************************
+ *                                                                             *
+ * Comments: This function is used only for the hgset and ugset tables. The    *
+ *           correct way to get the next id is to call zbx_db_get_maxid_num(). *
+ *           However, that function calls zbx_db_select(), which must not be   *
+ *           used with ZBX_DB_CONNECT_ONCE connections. Since this function is *
+ *           used only for these two tables, which are always empty at this    *
+ *           point, the next hgsetid and ugsetid values are always 1.          *
+ *                                                                             *
+ ******************************************************************************/
+static int	permission_groupsets_insert(zbx_hashset_t *group_sets, zbx_db_insert_t *db_gset,
 		zbx_db_insert_t *db_gset_groups, zbx_db_insert_t *db_gset_parents)
 {
-	zbx_uint64_t		gsetid;
+#define FIRST_ID	1
+	zbx_uint64_t		gsetid = FIRST_ID;
 	zbx_hashset_iter_t	iter;
 	zbx_group_set_t		*gset_ptr;
 
 	if (0 == group_sets->num_data)
 		return SUCCEED;
-
-	gsetid = zbx_db_get_maxid_num(tbl_name, group_sets->num_data);
 
 	zbx_hashset_iter_reset(group_sets, &iter);
 
@@ -150,6 +166,7 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 	}
 
 	return SUCCEED;
+#undef FIRST_ID
 }
 
 static zbx_hash_t	permission_group_set_hash(const void *data)
@@ -195,7 +212,7 @@ static int	permission_hgsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_prepare(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "hostid", "groupid", "hosts_groups", &hgsets, 0)))
-		ret = permission_groupsets_insert("hgset", &hgsets, &db_insert, &db_insert_groups, &db_insert_hosts);
+		ret = permission_groupsets_insert(&hgsets, &db_insert, &db_insert_groups, &db_insert_hosts);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_groups);
@@ -218,7 +235,7 @@ static int	permission_ugsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_prepare(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "userid", "usrgrpid", "users_groups", &ugsets, 1)))
-		ret = permission_groupsets_insert("ugset", &ugsets, &db_insert, &db_insert_groups, &db_insert_users);
+		ret = permission_groupsets_insert(&ugsets, &db_insert, &db_insert_groups, &db_insert_users);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_groups);
@@ -227,6 +244,39 @@ static int	permission_ugsets_add(zbx_vector_uint64_t *ids)
 	permission_groupsets_destroy(&ugsets);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: sql - [IN] SQL statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ * Comments: Checks select query result assuming a ZBX_DB_CONNECT_ONCE        *
+ *           connection is used.                                              *
+ *                                                                            *
+ *****************************************************************************/
+static int	select_uint64_once(const char *sql, zbx_vector_uint64_t *ids)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_uint64_t	id;
+
+	result = zbx_db_select_once("%s", sql);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		return FAIL;
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -251,8 +301,21 @@ static void	permissions_rebuild_task(void)
 
 	zbx_vector_uint64_create(&ids);
 
-	(void)zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	zbx_db_begin();
+	if (ZBX_DB_OK != zbx_db_connect(ZBX_DB_CONNECT_ONCE))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to database for rebuilding the permissions cache");
+
+		res = FAIL;
+		goto skip;
+	}
+
+	if (ZBX_DB_OK != zbx_db_begin_basic())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot begin database transaction for rebuilding the permissions cache");
+
+		res = FAIL;
+		goto skip;
+	}
 
 	for (int i = 0; i < (int)ARRSIZE(tables); i++)
 	{
@@ -265,11 +328,14 @@ static void	permissions_rebuild_task(void)
 	}
 
 	sql = zbx_dsprintf(NULL, "select hostid from hosts where flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE);
-	zbx_db_select_uint64(sql, &ids);
 
-	res = permission_hgsets_add(&ids);
+	if (SUCCEED != (res = select_uint64_once(sql, &ids)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch hosts");
+		goto out;
+	}
 
-	if (SUCCEED != res)
+	if (SUCCEED != (res = permission_hgsets_add(&ids)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add permission hgsets");
 		goto out;
@@ -286,11 +352,14 @@ static void	permissions_rebuild_task(void)
 					"select userid"
 					" from users_groups"
 				")", USER_TYPE_SUPER_ADMIN);
-	zbx_db_select_uint64(sql, &ids);
 
-	res = permission_ugsets_add(&ids);
+	if (SUCCEED != (res = select_uint64_once(sql, &ids)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch users");
+		goto out;
+	}
 
-	if (SUCCEED != res)
+	if (SUCCEED != (res = permission_ugsets_add(&ids)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add permission ugsets");
 		goto out;
@@ -302,7 +371,7 @@ static void	permissions_rebuild_task(void)
 
 	zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
 
-	result = zbx_db_select("select u.ugsetid,h.hgsetid,max(r.permission)"
+	result = zbx_db_select_once("select u.ugsetid,h.hgsetid,max(r.permission)"
 			" from hgset h"
 			" join hgset_group hg"
 				" on h.hgsetid=hg.hgsetid"
@@ -314,6 +383,16 @@ static void	permissions_rebuild_task(void)
 			" group by u.ugsetid,h.hgsetid"
 			" having min(r.permission)>0"
 			" order by u.ugsetid,h.hgsetid");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch user groups, host groups and their permissions");
+
+		zbx_db_insert_clean(&db_insert);
+
+		res = FAIL;
+		goto out;
+	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -341,10 +420,10 @@ out:
 	}
 	else
 		zbx_db_rollback();
-
+skip:
+	zbx_vector_uint64_destroy(&ids);
 	zbx_db_close();
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_WARNING, "permissions rebuild: %s", zbx_result_string(res));
 
