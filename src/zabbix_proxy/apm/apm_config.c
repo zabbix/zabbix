@@ -270,7 +270,7 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
  ******************************************************************************/
 void	apm_config_clear(zbx_apm_config_t *cfg)
 {
-	if (0 != cfg->revision)
+	if (NULL != cfg->attrs)
 		apm_config_attrs_release(cfg->attrs);
 }
 

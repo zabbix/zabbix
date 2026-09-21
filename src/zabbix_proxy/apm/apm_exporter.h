@@ -19,6 +19,7 @@
 #include "apm_clickhouse.h"
 #include "zbxcfg.h"
 #include "zbxalgo.h"
+#include "zbxtelemetry.h"
 
 typedef enum
 {
@@ -36,8 +37,7 @@ zbx_apm_exporter_cfg_data_t;
 
 typedef struct
 {
-	zbx_apm_exporter_type_t	type;
-	zbx_vector_config_option_t	options;
+	zbx_apm_exporter_type_t		type;
 	zbx_apm_exporter_cfg_data_t	data;
 }
 zbx_apm_exporter_cfg_t;
@@ -72,7 +72,7 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool);
 
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool);
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter);
-int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, char **error);
+int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t *export_config, char **error);
 
 #define APM_COMMIT_OK		0x00
 #define APM_COMMIT_ERR		0x01

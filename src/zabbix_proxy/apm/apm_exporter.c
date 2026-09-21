@@ -15,75 +15,36 @@
 #include "apm_exporter.h"
 #include "apm_clickhouse.h"
 #include "apm_dataset.h"
-#include "zbxcfg.h"
 #include "zbxcommon.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "config.h"
 
-#define APM_EXPORTER_PROVIDER_URL	"url"
-#define APM_EXPORTER_PROVIDER_USERNAME	"username"
-#define APM_EXPORTER_PROVIDER_PASSWORD	"password"
-#define APM_EXPORTER_PROVIDER_DB	"db"
-
-
 ZBX_PTR_VECTOR_LITE_IMPL(apm_exporter_ptr, zbx_apm_exporter_t *)
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get option value, duplicated into a new buffer                    *
- *                                                                            *
- * Parameters: options     - [IN] provider options                            *
- *             options_num - [IN] number of options                           *
- *             key         - [IN] option name to look up                      *
- *             error       - [OUT] error message if the option is missing     *
- *                                                                            *
- * Return value: newly allocated option value, or NULL if the option is       *
- *               missing                                                      *
- *                                                                            *
- ******************************************************************************/
-static char	*apm_option_dup(const zbx_config_option_t *options, int options_num, const char *key, char **error)
-{
-	const char	*value;
-
-	if (NULL == (value = zbx_config_option_value(options, options_num, key)))
-	{
-		*error = zbx_dsprintf(NULL, "missing mandatory ClickHouse telemetry provider option \"%s\"", key);
-		return NULL;
-	}
-
-	return zbx_strdup(NULL, value);
-
-}
 
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize ClickHouse exporter configuration from provider        *
  *          options                                                           *
  *                                                                            *
- * Parameters: cfg         - [OUT] ClickHouse exporter configuration          *
- *             options     - [IN] provider options                            *
- *             options_num - [IN] number of options                           *
- *             error       - [OUT] error message if a mandatory option is     *
+ * Parameters: cfg           - [OUT] ClickHouse exporter configuration        *
+ *             export_config - [IN] provider options                          *
+ *             error         - [OUT] error message if a mandatory option is   *
  *                                  missing or curl support is unavailable    *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
-		int options_num, char **error)
+static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
+		char **error)
 {
 #if defined(HAVE_LIBCURL)
-	if (NULL == (cfg->url = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_URL, error)))
-		return FAIL;
+	ZBX_UNUSED(error);
 
-	if (NULL == (cfg->database = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_DB, error)))
-		return FAIL;
-
-	if (NULL == (cfg->username = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_USERNAME, error)))
-		return FAIL;
-
-	if (NULL == (cfg->password = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_PASSWORD, error)))
-		return FAIL;
+	cfg->url = zbx_strdup(NULL, export_config->url);
+	cfg->database = zbx_strdup(NULL, export_config->db);
+	cfg->username = zbx_strdup(NULL, export_config->username);
+	cfg->password = zbx_strdup(NULL, export_config->password);
 
 	return SUCCEED;
 #else
@@ -145,9 +106,6 @@ static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 			apm_clickhouse_cfg_clear(&cfg->data.clickhouse);
 			break;
 	}
-
-	zbx_config_option_clear_options(cfg->options.values, cfg->options.values_num);
-	zbx_vector_config_option_destroy(&cfg->options);
 }
 
 /******************************************************************************
@@ -161,7 +119,6 @@ static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 static void	apm_exporter_cfg_copy(zbx_apm_exporter_cfg_t *dst, const zbx_apm_exporter_cfg_t *src)
 {
 	dst->type = src->type;
-	zbx_vector_config_option_create(&dst->options);
 
 	switch (src->type)
 	{
@@ -406,25 +363,20 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
  * Purpose: parse TelemetryProvider configuration into exporter               *
  *          configuration                                                     *
  *                                                                            *
- * Parameters: cfg     - [OUT] exporter configuration                         *
- *             options - [IN] TelemetryProvider option string, or NULL        *
- *                             to use the global exporter configuration       *
- *             error   - [OUT] error message if the operation fails           *
+ * Parameters: cfg           - [OUT] exporter configuration                   *
+ *             export_config - [IN] TelemetryProvider configuration           *
+ *             error         - [OUT] error message if the operation fails     *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, char **error)
+int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t *export_config, char **error)
 {
-#define	APM_PROVIDER_CLICKHOUSE		"clickhouse"
-	ssize_t		len;
-	const char	*ptr;
 	int		ret = FAIL;
 
 	memset(cfg, 0, sizeof(zbx_apm_exporter_cfg_t));
-	zbx_vector_config_option_create(&cfg->options);
 
-	if (NULL == *options)
+	if (0 == export_config->have_local_config)
 	{
 		cfg->type = APM_EXPORTER_GLOBAL;
 		ret = SUCCEED;
@@ -432,35 +384,17 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, cha
 		goto out;
 	}
 
-	len = zbx_config_option_parse_param(*options);
-	ptr = *options + len;
-	while (' ' == *ptr)
-		ptr++;
-
-	if (0 == len || ';' != *ptr)
-	{
-		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", *options);
-		goto out;
-	}
-
-	while (' ' == *(++ptr))
-		;
-
-	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
-		goto out;
-
-	if (len == ZBX_CONST_STRLEN(APM_PROVIDER_CLICKHOUSE) && 0 == memcmp(options, APM_PROVIDER_CLICKHOUSE, len))
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == export_config->db_type)
 	{
 		cfg->type = APM_EXPORTER_CLICKHOUSE;
-		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
-				cfg->options.values_num, error))
+		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, export_config, error))
 		{
 			goto out;
 		}
 	}
 	else
 	{
-		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider\"%s\"", *options);
+		*error = zbx_dsprintf(NULL, "unknown telemetry provoder type \"%u\"", export_config->db_type);
 		goto out;
 	}
 
@@ -468,8 +402,6 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char **options, cha
 out:
 	if (FAIL == ret)
 		apm_exporter_cfg_clear(cfg);
-
-#undef APM_PROVIDER_CLICKHOUSE
 
 	return ret;
 }

@@ -260,6 +260,8 @@ void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 
 		zbx_free(rs->rows.values[i].cols);
 	}
+
+	zbx_vector_apm_row_clear(&rs->rows);
 }
 
 /******************************************************************************

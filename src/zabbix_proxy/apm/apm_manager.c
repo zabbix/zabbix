@@ -101,18 +101,18 @@ static void	apm_manager_free(zbx_apm_manager_t *manager)
  *                                                                            *
  * Purpose: create and initialize APM manager                                 *
  *                                                                            *
- * Parameters: info        - [IN] process info                                *
- *             workers_num - [IN] number of active worker threads             *
- *             quota       - [IN] initial ingestion quota, messages per       *
+ * Parameters: info          - [IN] process info                              *
+ *             workers_num   - [IN] number of active worker threads           *
+ *             quota         - [IN] initial ingestion quota, messages per     *
  *                                 second                                     *
- *             options     - [IN] TelemetryProvider configuration options     *
- *             error       - [OUT] error message if the operation fails       *
+ *             export_config - [IN] TelemetryProvider configuration options   *
+ *             error         - [OUT] error message if the operation fails     *
  *                                                                            *
  * Return value: created manager, or NULL on error                            *
  *                                                                            *
  ******************************************************************************/
 static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int workers_num, zbx_uint64_t quota,
-		const char **options, char **error)
+		zbx_apm_db_config_t *export_config, char **error)
 {
 #define APM_COMMIT_LIMIT	10
 	zbx_apm_manager_t	*manager;
@@ -125,7 +125,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 	workers = (zbx_apm_worker_t **)zbx_calloc(NULL, (size_t)APM_WORKERS_MAX, sizeof(zbx_apm_worker_t *));
 	queue = apm_queue_create(quota);
 
-	if (SUCCEED != apm_exporter_cfg_init(&cfg, options, error))
+	if (SUCCEED != apm_exporter_cfg_init(&cfg, export_config, error))
 		goto out;
 
 	if (NULL == (manager->exporters = apm_exporter_pool_create(&cfg, error)))
@@ -379,7 +379,7 @@ void	*zbx_apm_manager_thread(void *args)
 	workers_num = (APM_STATUS_ENABLED != apm_config.status ? 1 : APM_WORKERS_DEFAULT);
 
 	if (NULL == (manager = apm_manager_create(info, workers_num, apm_config.quota,
-			apm_args->exporter_options, &error)))
+			apm_args->export_config, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
@@ -436,8 +436,8 @@ void	*zbx_apm_manager_thread(void *args)
 			{
 				if (APM_STATUS_ENABLED == apm_config.status)
 				{
-					if (FAIL == apm_manager_activate(manager, apm_args->sourceip, apm_args->port,
-							tls, &error))
+					if (FAIL == apm_manager_activate(manager, apm_args->export_config->source_ip,
+							apm_args->port, tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
 								" %s", error);
@@ -462,6 +462,8 @@ void	*zbx_apm_manager_thread(void *args)
 						ZBX_FS_UI64, quota, apm_config.quota);
 				quota = apm_config.quota;
 			}
+
+			time_config = time_start;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
@@ -524,6 +526,7 @@ void	*zbx_apm_manager_thread(void *args)
 
 	apm_manager_free(manager);
 
+	zbx_apm_db_config_clear(apm_args->export_config);
 	zbx_free(proxy_apm_config);
 	apm_config_clear(&apm_config);
 	zbx_dc_config_local_release();

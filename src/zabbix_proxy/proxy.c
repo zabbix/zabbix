@@ -1752,8 +1752,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	zbx_thread_apm_manager_args_t	apm_args =
 	{
 		.config_timeout = zbx_config_timeout,
-		.exporter_options = (const char **)config_telemetry_providers,
-		.sourceip = config_apm_sourceip,
+		.export_config = &apm_db_config,
 		.port = config_apm_port,
 		.ca_file = config_apm_ca_file,
 		.cert_file = config_apm_cert_file,
