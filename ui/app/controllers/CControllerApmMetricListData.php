@@ -262,7 +262,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				}
 
 				if (in_array('timestamp_ns_formatted', $data_fields)) {
-					$ns = str_pad((string) ($metric['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+					$ns = str_pad((string) ($metric['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
 
 					$metric['timestamp_ns_formatted'] = $clock >= $today
 						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
@@ -363,9 +363,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 		foreach ($exemplars as $i => $exemplar) {
 //			$clock = floor($exemplar['time_unix'] / 1000000000);
-//
 //			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
-//
 //			$time = $clock >= $today
 //				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
 //				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
