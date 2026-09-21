@@ -622,13 +622,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_community,
 						&items[i].host.hostid, 1, NULL);
 
-				ZBX_STRDUP(max_repetitions, items[i].snmp_max_repetitions_orig);
-				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
-						&items[i].host.hostid, 1, NULL);
-
-				ZBX_STRDUP(retries, items[i].snmp_retries_orig);
-				zbx_dc_expand_user_and_func_macros(um_handle, &retries,
-						&items[i].host.hostid, 1, NULL);
 
 				if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 						zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
@@ -636,9 +629,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
 					zbx_free(timeout);
+					zbx_free(max_repetitions);
+					zbx_free(retries);
 					continue;
 				}
 
+				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
+						&items[i].host.hostid, 1, NULL);
+				zbx_dc_expand_user_and_func_macros(um_handle, &retries,
+						&items[i].host.hostid, 1, NULL);
 				zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid, 1, NULL);
 				break;
 			case ITEM_TYPE_SCRIPT:
@@ -778,8 +777,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			}
 			else
 				items[i].timeout = timeout_sec;
+
+			zbx_free(timeout);
 		}
-		zbx_free(timeout);
 
 		if (NULL != max_repetitions)
 		{
