@@ -570,12 +570,16 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
-			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_SCRIPT:
 			case ITEM_TYPE_BROWSER:
 			case ITEM_TYPE_HTTPAGENT:
 			case ITEM_TYPE_TELEMETRY_QUERY:
 				ZBX_STRDUP(timeout, items[i].timeout_orig);
+				break;
+			case ITEM_TYPE_SNMP:
+				ZBX_STRDUP(timeout, items[i].timeout_orig);
+				ZBX_STRDUP(max_repetitions, items[i].snmp_max_repetitions_orig);
+				ZBX_STRDUP(retries, items[i].snmp_retries_orig);
 				break;
 		}
 
@@ -808,6 +812,35 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				items[i].timeout = timeout_sec;
 		}
 		zbx_free(timeout);
+
+		if (NULL != max_repetitions)
+		{
+			int	max_repetitions_int = 0;
+
+			if (FAIL == zbx_validate_item_max_repetitions(max_repetitions, &max_repetitions_int,
+					error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+			}
+			else
+				items[i].snmp_max_repetitions = max_repetitions_int;
+		}
+		zbx_free(max_repetitions);
+
+		if (NULL != retries)
+		{
+			int	retries_int = 0;
+
+			if (FAIL == zbx_validate_item_retries(retries, &retries_int, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+			}
+			else
+				items[i].snmp_retries = retries_int;
+		}
+		zbx_free(retries);
 	}
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
