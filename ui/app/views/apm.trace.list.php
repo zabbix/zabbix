@@ -178,7 +178,8 @@ $html_page->show();
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs']
+		'user_configs' => $data['user_configs'],
+		'side_drawer_position' => $data['side_drawer_position']
 	]).');
 '))
 	->setOnDocumentReady()

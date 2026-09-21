@@ -30,6 +30,8 @@
 		#csrf_token = null;
 		#refresh_message_box = null;
 		#apply_filter_button = null;
+		/** @type {string|null} */
+		#side_drawer_position = null;
 		#filter_form_element = null;
 		#filter_form = null;
 		#side_drawer = null;
@@ -54,6 +56,7 @@
 			sort_order,
 			storage_idx,
 			user_configs,
+			side_drawer_position,
 			metric_types
 		}) {
 			this.#layout_mode = layout_mode;
@@ -65,6 +68,7 @@
 			this.#filter_form_element = document.querySelector('[name="zbx_filter"]');
 			this.#filter_form = new CForm(this.#filter_form_element, filter_validation_rules);
 			this.#apply_filter_button = this.#filter_form_element?.querySelector('[name="filter_set"]');
+			this.#side_drawer_position = side_drawer_position;
 
 			this.#aggregation_temporality_labels = {
 				[APM_METRIC_AGGREGATION_TEMPORALITY_UNSPECIFIED]: <?= json_encode(_('Unspecified')) ?>,
@@ -424,9 +428,15 @@
 			if (this.#side_drawer === null) {
 				const container = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
 
-				this.#side_drawer = new CSideDrawer(container, {content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER});
+				this.#side_drawer = new CSideDrawer(container, {
+					content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER,
+					position: this.#side_drawer_position,
+					position_min: '10%',
+					position_max: '90%'
+				});
 				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
 				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
+				this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));
 			}
 
 			this.#side_drawer.open(Promise.resolve(data));
@@ -450,6 +460,12 @@
 			this.#metric_view_page = null;
 
 			this.#scheduleRefresh();
+		}
+
+		#onSideDrawerPosition = e => {
+			this.#side_drawer_position = e.detail.position;
+
+			updateUserProfile('web.apm.metric.side_drawer.position', this.#side_drawer_position, [], PROFILE_TYPE_STR);
 		}
 
 		#validateFormChanges() {
