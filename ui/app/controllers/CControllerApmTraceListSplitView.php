@@ -72,7 +72,7 @@ class CControllerApmTraceListSplitView extends CController {
 			'sortorder' => ZBX_SORT_UP
 		]);
 
-		$trace_timestamp = str_pad((string)($trace['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+		$trace_timestamp = (int) str_pad((string)($trace['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
 		$trace_start = $trace_timestamp;
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
 
@@ -80,14 +80,14 @@ class CControllerApmTraceListSplitView extends CController {
 
 		$trace_view_spans = [];
 		foreach ($spans as $i => $span) {
-			$span_timestamp = str_pad((string)($span['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+			$span_timestamp = (int) str_pad((string)($span['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
 
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
 
 			$span_events = array_map(static function (array $event) use ($trace_start) {
-				$event_timestamp = explode('.', $event['timestamp']);
-				$event_time = ((int) $event_timestamp[1] - $trace_start) * SEC_PER_NANOSEC;
+				$event_timestamp = (int) str_pad((string)($event['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+				$event_time = ($event_timestamp - $trace_start) * SEC_PER_NANOSEC;
 				$event_duration = $event_time
 					? convertSecondsToTimeUnits($event_time, ['combine_last_subsecond_parts' => true])
 					: '0'._x('ns', 'nanosecond short');
