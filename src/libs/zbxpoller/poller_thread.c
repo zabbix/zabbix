@@ -627,10 +627,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
-					zbx_free(timeout);
-					zbx_free(max_repetitions);
-					zbx_free(retries);
-					continue;
+					goto cleanup;
 				}
 
 				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
@@ -724,8 +721,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
 							"Cannot encode URL into punycode"));
 					errcodes[i] = CONFIG_ERROR;
-					zbx_free(timeout);
-					continue;
+					goto cleanup;
 				}
 
 				if (FAIL == parse_query_fields(items[i].host.hostid, items[i].host.host,
@@ -734,8 +730,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
-					zbx_free(timeout);
-					continue;
+					goto cleanup;
 				}
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
@@ -772,11 +767,10 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
+				goto cleanup;
 			}
 			else
 				items[i].timeout = timeout_sec;
-
-			zbx_free(timeout);
 		}
 
 		if (NULL != max_repetitions)
@@ -788,11 +782,10 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
+				goto cleanup;
 			}
 			else
 				items[i].snmp_max_repetitions = max_repetitions_int;
-
-			zbx_free(max_repetitions);
 		}
 
 		if (NULL != retries)
@@ -806,9 +799,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			}
 			else
 				items[i].snmp_retries = retries_int;
-
-			zbx_free(retries);
 		}
+cleanup:
+		zbx_free(timeout);
+		zbx_free(max_repetitions);
+		zbx_free(retries);
 	}
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
