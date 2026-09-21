@@ -6527,8 +6527,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 			" values"
 				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
-			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
-			max_repetitions_esc, retries_esc);
+			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
 
 		zbx_audit_host_update_json_add_snmp_interface(audit_context_mode, hostid, version, bulk, community_esc,
 				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,

@@ -909,19 +909,16 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].hostid, 1, NULL);
 
-		if (NULL != timeout)
+		int	timeout_sec = 0;
+
+		if (FAIL == zbx_validate_item_timeout(timeout, &timeout_sec, error, sizeof(error)))
 		{
-			int	timeout_sec = 0;
-
-			if (FAIL == zbx_validate_item_timeout(timeout, &timeout_sec, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				continue;
-			}
-
-			items[i].timeout = timeout_sec;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
+			continue;
 		}
+
+		items[i].timeout = timeout_sec;
 
 		if (FAIL == zbx_is_ushort(items[i].interface.port_orig, &items[i].interface.port))
 		{
@@ -960,43 +957,34 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions, &items[i].hostid, 1, NULL);
 
-		if (NULL != max_repetitions)
+		int max_repetitions_int = 0;
+
+		if (FAIL == zbx_validate_item_max_repetitions(max_repetitions,
+			&max_repetitions_int, error, sizeof(error)))
 		{
-			int max_repetitions_int = 0;
-
-			if (FAIL == zbx_validate_item_max_repetitions(max_repetitions,
-				&max_repetitions_int, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				zbx_free(max_repetitions);
-				continue;
-			}
-
-			items[i].snmp_max_repetitions = max_repetitions_int;
-			zbx_free(max_repetitions);
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
+			continue;
 		}
+
+		items[i].snmp_max_repetitions = max_repetitions_int;
 
 		ZBX_STRDUP(retries, items[i].snmp_retries_orig);
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &retries, &items[i].hostid, 1, NULL);
 
-		if (NULL != retries)
+		int retries_int = 0;
+
+		if (FAIL == zbx_validate_item_retries(retries,
+			&retries_int, error, sizeof(error)))
 		{
-			int retries_int = 0;
-
-			if (FAIL == zbx_validate_item_retries(retries,
-				&retries_int, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				zbx_free(retries);
-				continue;
-			}
-
-			items[i].snmp_retries = retries_int;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
 			zbx_free(retries);
+			continue;
 		}
+
+		items[i].snmp_retries = retries_int;
 
 		if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 				zbx_snmp_oid_subst_cb, um_handle, &items[i].hostid))
@@ -1007,6 +995,8 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 	}
 
 	zbx_free(timeout);
+	zbx_free(retries);
+	zbx_free(max_repetitions);
 
 	zbx_dc_close_user_macros(um_handle_secure);
 	zbx_dc_close_user_macros(um_handle);
