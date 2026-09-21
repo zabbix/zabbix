@@ -6174,6 +6174,8 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
+		zbx_uint64_t	value;
+
 		if (ZBX_IF_SNMP_VERSION_3 > interface->lld_row.snmp->version)
 		{
 			if ('\0' == *interface->lld_row.snmp->community)
@@ -6184,6 +6186,49 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 
 				return FAIL;
 			}
+		}
+
+		if (FAIL == zbx_is_uint64(interface->lld_row.snmp->max_repetitions, &value) &&
+				FAIL == zbx_is_user_macro(interface->lld_row.snmp->max_repetitions) &&
+				FAIL == lld_text_has_lld_macro(interface->lld_row.snmp->max_repetitions))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"invalid SNMP max repetitions value \"%s\".\n",
+					op, zbx_interface_type_string(interface->type_orig), hostname,
+					interface->lld_row.snmp->max_repetitions);
+
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_is_uint64(interface->lld_row.snmp->max_repetitions, &value) &&
+				(0 == value || INT32_MAX < value))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"SNMP max repetitions value must be between 1 and %d.\n",
+					op, zbx_interface_type_string(interface->type_orig), hostname, INT32_MAX);
+
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_uint64(interface->lld_row.snmp->retries, &value) &&
+				FAIL == zbx_is_user_macro(interface->lld_row.snmp->retries) &&
+				FAIL == lld_text_has_lld_macro(interface->lld_row.snmp->retries))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"invalid SNMP retries value \"%s\".\n",
+					op, zbx_interface_type_string(interface->type_orig), hostname,
+					interface->lld_row.snmp->retries);
+
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_is_uint64(interface->lld_row.snmp->retries, &value) && 100 < value)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"SNMP retries value must be between 0 and 100.\n",
+					op, zbx_interface_type_string(interface->type_orig), hostname);
+
+			return FAIL;
 		}
 	}
 
