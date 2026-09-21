@@ -57,12 +57,14 @@ class CMacrosResolverHelper {
 	 * @param string $interfaces[n]['ip']
 	 * @param string $interfaces[n]['dns']
 	 * @param string $interfaces[n]['port']
-	 * @param array  $interfaces[n]['details']                    (optional)
-	 * @param string $interfaces[n]['details']['securityname']    (optional)
-	 * @param string $interfaces[n]['details']['authpassphrase']  (optional)
-	 * @param string $interfaces[n]['details']['privpassphrase']  (optional)
-	 * @param string $interfaces[n]['details']['contextname']     (optional)
-	 * @param string $interfaces[n]['details']['community']       (optional)
+	 * @param array  $interfaces[n]['details']                     (optional)
+	 * @param string $interfaces[n]['details']['securityname']     (optional)
+	 * @param string $interfaces[n]['details']['authpassphrase']   (optional)
+	 * @param string $interfaces[n]['details']['privpassphrase']   (optional)
+	 * @param string $interfaces[n]['details']['contextname']      (optional)
+	 * @param string $interfaces[n]['details']['community']        (optional)
+	 * @param string $interfaces[n]['details']['max_repetitions']  (optional)
+	 * @param string $interfaces[n]['details']['retries']          (optional)
 	 *
 	 * @return array
 	 */

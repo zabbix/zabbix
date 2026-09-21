@@ -112,14 +112,14 @@ class CControllerHostPrototypeUpdate extends CController {
 						]],
 						'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
 							'use' => [CNumberValidator::class, [
-								'usermacros' => true, 'with_float' => false, 'lldmacros' => true,
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
 								'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
 						],
 						'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
 							'use' => [CNumberValidator::class, [
-								'usermacros' => true, 'with_float' => false, 'lldmacros' => true,
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
 								'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
 							]]
 						],
