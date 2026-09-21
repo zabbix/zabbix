@@ -32,6 +32,15 @@ class ZSplitView extends HTMLElement {
 	/** @type {string} */
 	#handle_max_position = '100%';
 
+	/** @type {'start' | 'end'} */
+	#fixed = 'end';
+
+	/** @type {number | null} */
+	#fixed_size = null;
+
+	/** @type {boolean} */
+	#is_container_resizing = false;
+
 	/** @type {boolean} */
 	#is_vertical = false;
 
@@ -54,7 +63,7 @@ class ZSplitView extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['position', 'min', 'max', 'vertical'];
+		return ['position', 'min', 'max', 'fixed', 'vertical'];
 	}
 
 	connectedCallback() {
@@ -65,7 +74,10 @@ class ZSplitView extends HTMLElement {
 		this.#applyAttributes();
 		this.#addEventListeners();
 
-		this.#resize_observer = new ResizeObserver(() => this.#updateHandleControlSize());
+		this.#updateHandleControlSize();
+		this.#updateFixedSize();
+
+		this.#resize_observer = new ResizeObserver(() => this.#onResize());
 		this.#resize_observer.observe(this);
 	}
 
@@ -101,13 +113,20 @@ class ZSplitView extends HTMLElement {
 					const split_view_rect = this.getBoundingClientRect();
 
 					const position = this.#is_vertical
-						? `${control_rect.top + control_rect.height / 2 - split_view_rect.top}px`
-						: `${control_rect.left + control_rect.width / 2 - split_view_rect.left}px`;
+						? control_rect.top + control_rect.height / 2 - split_view_rect.top
+						: control_rect.left + control_rect.width / 2 - split_view_rect.left;
 
-					if (control_rect.width > 0 && control_rect.height > 0 && this.#handle_position !== position) {
-						this.position = position;
+					if (!this.#is_container_resizing) {
+						this.#updateFixedSize(position);
+					}
+
+					const position_value = `${position}px`;
+
+					if (this.#handle_position !== position_value) {
+						this.position = position_value;
 					}
 				}
+
 				break;
 
 			case 'min':
@@ -118,6 +137,14 @@ class ZSplitView extends HTMLElement {
 			case 'max':
 				this.#handle_max_position = value?.trim() || '100%';
 				this.style.setProperty('--split-view-handle-max-position', this.#handle_max_position);
+				break;
+
+			case 'fixed':
+				this.#fixed = value === 'start' ? 'start' : 'end';
+
+				if (this.isConnected) {
+					this.#updateFixedSize();
+				}
 				break;
 
 			case 'vertical':
@@ -133,9 +160,11 @@ class ZSplitView extends HTMLElement {
 		const rect = this.getBoundingClientRect();
 
 		if (this.vertical) {
+			this.#handle_control.style.height = '';
 			this.#handle_control.style.width = `${rect.width}px`;
 		}
 		else {
+			this.#handle_control.style.width = '';
 			this.#handle_control.style.height = `${rect.height}px`;
 		}
 	}
@@ -146,6 +175,67 @@ class ZSplitView extends HTMLElement {
 
 	#removeEventListeners() {
 		this.#handle.removeEventListener('pointerdown', this.#onPointerDown);
+	}
+
+	#getAvailableSize() {
+		const rect = this.getBoundingClientRect();
+
+		return this.#is_vertical ? rect.height : rect.width;
+	}
+
+	#getCurrentPosition() {
+		const control_rect = this.#handle_control.getBoundingClientRect();
+
+		if (control_rect.width === 0 || control_rect.height === 0) {
+			return null;
+		}
+
+		const split_view_rect = this.getBoundingClientRect();
+
+		return this.#is_vertical
+			? control_rect.top + control_rect.height / 2 - split_view_rect.top
+			: control_rect.left + control_rect.width / 2 - split_view_rect.left;
+	}
+
+	#updateFixedSize(position = null) {
+		const available_size = this.#getAvailableSize();
+
+		if (available_size <= 0) {
+			return;
+		}
+
+		position ??= this.#getCurrentPosition();
+
+		if (position === null) {
+			return;
+		}
+
+		position = Math.min(available_size, Math.max(0, position));
+
+		this.#fixed_size = this.#fixed === 'start' ? position : available_size - position;
+	}
+
+	#onResize() {
+		this.#updateHandleControlSize();
+
+		const available_size = this.#getAvailableSize();
+
+		if (available_size <= 0) {
+			return;
+		}
+
+		if (this.#fixed_size === null) {
+			this.#updateFixedSize();
+			return;
+		}
+
+		const position = this.#fixed === 'start' ? this.#fixed_size : available_size - this.#fixed_size;
+
+		this.#is_container_resizing = true;
+
+		this.position = `${Math.min(available_size, Math.max(0, position))}px`;
+
+		this.#is_container_resizing = false;
 	}
 
 	#onPointerDown = e => {
@@ -268,6 +358,19 @@ class ZSplitView extends HTMLElement {
 		}
 		else {
 			this.removeAttribute('max');
+		}
+	}
+
+	get fixed() {
+		return this.#fixed;
+	}
+
+	set fixed(value) {
+		if (value !== null) {
+			this.setAttribute('fixed', value === 'start' ? 'start' : 'end');
+		}
+		else {
+			this.removeAttribute('fixed');
 		}
 	}
 

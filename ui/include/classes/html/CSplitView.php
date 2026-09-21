@@ -16,6 +16,9 @@
 
 class CSplitView extends CTag {
 
+	const PANE_FIXED_START = 'start';
+	const PANE_FIXED_END = 'end';
+
 	public function __construct($items = null) {
 		parent::__construct('z-split-view', true);
 		parent::addItem($items);
@@ -43,6 +46,12 @@ class CSplitView extends CTag {
 
 	public function setPosition(string $position): self {
 		$this->setAttribute('position', $position);
+
+		return $this;
+	}
+
+	public function setFixed(string $fixed_pane): self {
+		$this->setAttribute('fixed', $fixed_pane);
 
 		return $this;
 	}
