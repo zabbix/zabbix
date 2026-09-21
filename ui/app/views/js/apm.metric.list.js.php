@@ -229,6 +229,30 @@
 						.setFields(['metric_description'])
 						.setVisible(false)
 						.setRenderer(['metric_description'])
+						.setWidth('auto'),
+					new CDataTableColumn('attributes', <?= json_encode(_('Attributes')); ?>)
+						.setFields(['attributes'])
+						.setVisible(false)
+						.setRenderer(['attributes'])
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setWidth('auto'),
+					new CDataTableColumn('resource_attributes', <?= json_encode(_('Resource attributes')); ?>)
+						.setFields(['resource_attributes'])
+						.setVisible(false)
+						.setRenderer(['attributes'])
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setWidth('auto'),
+					new CDataTableColumn('scope_attributes', <?= json_encode(_('Scope attributes')); ?>)
+						.setFields(['scope_attributes'])
+						.setVisible(false)
+						.setRenderer(['attributes'])
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
 						.setWidth('auto')
 				])
 				.setPage(page)
@@ -321,6 +345,64 @@
 					wordbreak.dataset.hintboxHtml = metric_description;
 
 					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
+					const [span_attributes] = cell_data;
+
+					console.log(span_attributes);
+
+					if (!span_attributes || span_attributes.length === 0) {
+						return;
+					}
+
+					const span_attribute_labels = [];
+
+					const tags_wrapper = document.createElement('div');
+					tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
+
+					const column_options = column.getColumnOptions();
+
+					let count = column_options.number_of_attributes;
+
+					for (const [attr_name, attr_value] of Object.entries(span_attributes)) {
+						const content = `${attr_name}: ${attr_value}`
+						const span_attribute_label = document.createElement('span');
+						span_attribute_label.classList.add(ZBX_STYLE_TAG);
+						span_attribute_label.textContent = content;
+						span_attribute_label.dataset.hintbox = '1';
+						span_attribute_label.dataset.hintboxStatic = '1';
+						span_attribute_label.dataset.hintboxHtml = content;
+						span_attribute_label.ariaExpanded = 'false';
+
+						span_attribute_labels.push(span_attribute_label);
+
+						if (count > 0) {
+							tags_wrapper.appendChild(span_attribute_label);
+
+							count--;
+						}
+					}
+
+					if (Object.keys(span_attributes).length > column_options.number_of_attributes) {
+						const more_attributes_hintbox = document.createElement('div');
+
+						for (const tag_label of span_attribute_labels) {
+							more_attributes_hintbox.appendChild(tag_label.cloneNode(true));
+						}
+
+						const more_attributes = document.createElement('button');
+						more_attributes.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
+						more_attributes.dataset.hintboxHtml = more_attributes_hintbox.innerHTML;
+						more_attributes.dataset.hintboxClass = `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`;
+						more_attributes.dataset.hintbox = '1';
+						more_attributes.dataset.hintboxStatic = '1';
+						more_attributes.ariaExpanded = 'false';
+						more_attributes.ariaLabel = t('Show all span attributes');
+
+						tags_wrapper.appendChild(more_attributes);
+					}
+
+					cell.appendChild(tags_wrapper);
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
