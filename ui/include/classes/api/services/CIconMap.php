@@ -551,13 +551,17 @@ class CIconMap extends CApiService {
 
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
 			$mappings = API::getApiService()->select('icon_mapping', [
-				'output' => $this->outputExtend($options['selectMappings'], ['iconmapid', 'iconmappingid']),
+				'output' => $this->outputExtend($options['selectMappings'], ['iconmapid', 'iconmappingid', 'sortorder']),
 				'filter' => ['iconmapid' => $iconMapIds],
 				'preservekeys' => true
 			]);
+			CArrayHelper::sort($mappings, [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
+
 			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
 
-			$mappings = $this->unsetExtraFields($mappings, ['iconmapid', 'iconmappingid'], $options['selectMappings']);
+			$mappings = $this->unsetExtraFields($mappings, ['iconmapid', 'iconmappingid', 'sortorder'],
+				$options['selectMappings']
+			);
 			$result = $relationMap->mapMany($result, $mappings, 'mappings');
 		}
 
