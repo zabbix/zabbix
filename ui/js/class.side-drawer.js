@@ -18,6 +18,7 @@ class CSideDrawer {
 	static EVENT_OPEN = 'sidedrawer.open';
 	static EVENT_BEFORE_CLOSE = 'sidedrawer.before-close';
 	static EVENT_CLOSE = 'sidedrawer.close';
+	static EVENT_POSITION = 'sidedrawer.position';
 
 	/** @type {HTMLElement} */
 	#split_view_element;
@@ -34,9 +35,14 @@ class CSideDrawer {
 	/** @type {HTMLElement} */
 	#original_container_element;
 
-	constructor(container, {split_view_class = 'split-view', content_pane_class = 'content',
-			drawer_pane_class = 'side-drawer'} = {}) {
-
+	constructor(container, {
+		split_view_class = 'split-view',
+		content_pane_class = 'content',
+		drawer_pane_class = 'side-drawer',
+		position = null,
+		position_min = null,
+		position_max = null
+	} = {}) {
 		this.#target_container_element = container;
 		this.#original_container_element = container.cloneNode();
 
@@ -44,6 +50,18 @@ class CSideDrawer {
 		if (this.#split_view_element === null) {
 			this.#split_view_element = document.createElement('z-split-view');
 			this.#split_view_element.classList.add('split-view', split_view_class);
+
+			for (const [attribute, value] of Object.entries({position, min: position_min, max: position_max})) {
+				if (value !== null) {
+					this.#split_view_element.setAttribute(attribute, value);
+				}
+			}
+
+			this.#split_view_element.addEventListener('split-end', () => {
+				this.dispatchEvent(CSideDrawer.EVENT_POSITION, {
+					position: this.#split_view_element.getAttribute('position')
+				});
+			});
 		}
 
 		this.#content_pane_element = document.querySelector(`z-split-view-pane.${content_pane_class}`);

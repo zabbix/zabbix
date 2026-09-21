@@ -142,7 +142,8 @@ class CControllerApmLogList extends CController {
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])
-			)
+			),
+			'side_drawer_position' => CProfile::get('web.apm.log.side_drawer.position', '20%')
 		];
 
 		$response = new CControllerResponseData($data);
