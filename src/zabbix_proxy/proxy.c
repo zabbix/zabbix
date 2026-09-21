@@ -81,6 +81,10 @@
 #include "zbxipmi.h"
 #endif
 
+#ifdef HAVE_APM
+#include "zabbix_proxy/apm/zbx_apm.h"
+#endif
+
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 static const char	title_message[] = "zabbix_proxy";
