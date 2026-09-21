@@ -30,13 +30,9 @@ const (
 )
 
 var (
-	//nolint:revive,staticcheck
-	errInvalidParameters = errs.New("invalid number of parameters")
-	//nolint:revive,staticcheck
-	errTooManyParameters = errs.New("too many parameters")
-	//nolint:revive,staticcheck
-	errInvalidFirstParameter = errs.New("invalid first parameter")
-	//nolint:revive,staticcheck
+	errInvalidParameters      = errs.New("invalid number of parameters")
+	errTooManyParameters      = errs.New("too many parameters")
+	errInvalidFirstParameter  = errs.New("invalid first parameter")
 	errInvalidSecondParameter = errs.New("invalid second parameter")
 )
 
