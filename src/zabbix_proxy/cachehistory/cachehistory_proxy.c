@@ -103,8 +103,12 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other than       *
- *          ITEM_VALUE_TYPE_LOG containing meta information in result         *
+ * Comment: This function is meant for items with value_type other than       *
+ *          ITEM_VALUE_TYPE_LOG containing meta information in result.        *
+ *                                                                            *
+ *          Note, meta (lastlogsize/mtime) comes from a log-reading item KEY  *
+ *          like: log or eventlog. It is not dependent on the item's          *
+ *          configured VALUE TYPE.                                            *
  *                                                                            *
  ******************************************************************************/
 static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
@@ -127,6 +131,7 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				pvalue = h->entry.value.str;
 				break;
 			default:
@@ -374,11 +379,10 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	zbx_vector_uint64_destroy(&itemids);
 }
 
-void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		zbx_history_sync_stats_t *stats)
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, int mode, zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
-	ZBX_UNUSED(rtc);
+	ZBX_UNUSED(mode);
 
 	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;

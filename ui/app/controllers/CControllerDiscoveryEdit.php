@@ -77,7 +77,7 @@ class CControllerDiscoveryEdit extends CController {
 
 				foreach ($drule['dchecks'] as $dcheck) {
 					if ($dcheck['uniq']) {
-						$uniqueness_criteria = $dcheck['dcheckid'];
+						$uniqueness_criteria = '_'.$dcheck['dcheckid'];
 					}
 
 					if ($dcheck['host_source'] == ZBX_DISCOVERY_VALUE) {
@@ -126,20 +126,36 @@ class CControllerDiscoveryEdit extends CController {
 			$this->drule['concurrency_max'] = ZBX_DISCOVERY_CHECKS_UNLIMITED;
 		}
 
+		$can_select_server_for_discovery_by = CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+
 		$data = [
 			'drule' => $this->drule,
-			'discovery_by' => (int) ($this->drule['proxyid'] != 0),
+			'discovery_by' => ($this->drule['proxyid'] != 0
+					|| ($this->drule['druleid'] === null && !$can_select_server_for_discovery_by))
+				? ZBX_DISCOVERY_BY_PROXY
+				: ZBX_DISCOVERY_BY_SERVER,
 			'ms_proxy' => [],
 			'concurrency_max_type' => $concurrency_max_type,
-			'user' => ['debug_mode' => $this->getDebugMode()]
+			'user' => [
+				'debug_mode' => $this->getDebugMode(),
+				'can_edit_discovery_by' => !$this->drule['druleid'] || $can_select_server_for_discovery_by
+			]
 		];
 
 		if ($data['drule']['proxyid'] != 0) {
-			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'proxyids' => $data['drule']['proxyid']
-			]), ['proxyid' => 'id']);
+			$proxy = CProxyHelper::resolveProxyOption($data['drule']['proxyid']);
+
+			$data['ms_proxy'] = [$proxy];
+			$data['user']['can_edit_discovery_by'] = !$proxy['inaccessible'];
 		}
+
+		$data['js_validation_rules'] = $data['drule']['druleid'] === null
+			? CControllerDiscoveryCreate::getValidationRules()
+			: CControllerDiscoveryUpdate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerDiscoveryCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

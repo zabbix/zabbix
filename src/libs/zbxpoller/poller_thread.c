@@ -94,8 +94,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result, config_comms, config_startup_time, config_java_gateway,
-					config_java_gateway_port, get_config_forks, get_value_internal_ext_cb,
-					program_type);
+					config_java_gateway_port, get_value_internal_ext_cb, program_type);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
@@ -1033,21 +1032,9 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_webdriver_url)
 {
-	if (0 != ZBX_ITEM_TYPE_DENIED(config_denyitemtypes_mask , items[0].type))
-	{
-		for (int i = 0; i < num; i++)
-		{
-			if (SUCCEED != errcodes[i])
-				continue;
-
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Item type is denied by the \"DenyItemTypes\""
-					" configuration parameter."));
-			errcodes[i] = CONFIG_ERROR;
-		}
-	}
-	else if (ITEM_TYPE_SNMP == items[0].type)
+	if (ITEM_TYPE_SNMP == items[0].type)
 	{
 #ifndef HAVE_NETSNMP
 		ZBX_UNUSED(poller_type);
@@ -1232,8 +1219,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		int config_unreachable_delay, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location, const char *config_webdriver_url,
-		zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	zbx_dc_item_t			item, *items;
 	zbx_dc_poller_item_t		poller_item;
@@ -1263,7 +1249,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
 			program_type, progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, config_denyitemtypes_mask);
+			config_webdriver_url);
 
 	zbx_timespec(&timespec);
 
@@ -1452,8 +1438,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
 					poller_args_in->config_externalscripts,
 					poller_args_in->zbx_get_value_internal_ext_cb,
-					poller_args_in->config_ssh_key_location, poller_args_in->config_webdriver_url,
-					poller_args_in->config_denyitemtypes_mask);
+					poller_args_in->config_ssh_key_location, poller_args_in->config_webdriver_url);
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}

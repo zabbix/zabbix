@@ -35,7 +35,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.availabilityreport.filter.active':
 				case 'web.charts.filter.active':
 				case 'web.connector.filter.active':
-				case 'web.correlation.filter.active':
+				case 'web.ceprule.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':
 				case 'web.dashboard.last_widget_type':
@@ -47,9 +47,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
 				case 'web.hosts.graph.list.filter.active':
-				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
 				case 'web.hosts.items.list.filter.active':
+				case 'web.hosts.lldrules.filter.active':
 				case 'web.hosts.trigger.list.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpdetails.filter.active':
@@ -75,9 +75,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templategroups.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graph.list.filter.active':
-				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
 				case 'web.templates.items.list.filter.active':
+				case 'web.templates.lldrules.filter.active':
 				case 'web.templates.trigger.list.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':

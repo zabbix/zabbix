@@ -24,7 +24,6 @@
 
 static zbx_get_export_file_f	get_history_file;
 static zbx_get_export_file_f	get_trends_file;
-static zbx_get_export_file_f	get_problems_file;
 static zbx_config_export_t	*config_export;
 
 /******************************************************************************
@@ -38,10 +37,11 @@ static zbx_config_export_t	*config_export;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
+int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 {
 	int		ret = SUCCEED;
-	zbx_uint32_t	mask;
+	char		*start = export_type;
+	uint32_t	mask;
 	char		*types[] = {
 				ZBX_OPTION_EXPTYPE_EVENTS,
 				ZBX_OPTION_EXPTYPE_HISTORY,
@@ -53,22 +53,24 @@ int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
 				ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_TRENDS),
 				0};
 
-	if (NULL != export_type)
+	if (NULL != start)
 	{
-		const char	*token = NULL, *list = export_type;
-		size_t		token_len;
-
 		mask = 0;
 
-		while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))
+		do
 		{
 			int	i;
+			char	*end;
+
+			end = strchr(start, ',');
 
 			for (i = 0; NULL != types[i]; i++)
 			{
-				if (lengths[i] == token_len && 0 == strncmp(token, types[i], token_len))
+				if ((NULL != end && lengths[i] == (size_t)(end - start) &&
+						0 == strncmp(start, types[i], lengths[i])) ||
+						(NULL == end && 0 == strcmp(start, types[i])))
 				{
-					mask |= (zbx_uint32_t)(1 << i);
+					mask |= (uint32_t)(1 << i);
 					break;
 				}
 			}
@@ -78,7 +80,12 @@ int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
 				ret = FAIL;
 				break;
 			}
-		}
+
+			if (NULL == end)
+				break;
+
+			start = end;
+		} while (NULL != start++);
 	}
 	else
 		mask = ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_HISTORY | ZBX_FLAG_EXPTYPE_TRENDS;
@@ -89,10 +96,10 @@ int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
 	return ret;
 }
 
-static int	is_export_enabled(zbx_config_export_t *zbx_config_export, zbx_uint32_t flags)
+static int	is_export_enabled(zbx_config_export_t *zbx_config_export, uint32_t flags)
 {
 	int			ret = FAIL;
-	static zbx_uint32_t	export_types;
+	static uint32_t		export_types;
 
 	if (NULL == zbx_config_export || NULL == zbx_config_export->dir)
 		return ret;
@@ -123,7 +130,7 @@ static int	is_export_enabled(zbx_config_export_t *zbx_config_export, zbx_uint32_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_export_enabled(zbx_uint32_t flags)
+int	zbx_is_export_enabled(uint32_t flags)
 {
 	return is_export_enabled(config_export, flags);
 }
@@ -189,7 +196,6 @@ void	zbx_deinit_library_export(void)
 	}
 	get_history_file = NULL;
 	get_trends_file = NULL;
-	get_problems_file = NULL;
 }
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
@@ -263,11 +269,8 @@ zbx_export_file_t	*zbx_trends_export_init(zbx_get_export_file_f get_export_file_
 	return export_init("trends", process_name, process_num);
 }
 
-zbx_export_file_t	*zbx_problems_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
-		int process_num)
+zbx_export_file_t	*zbx_problems_export_init(const char *process_name, int process_num)
 {
-	get_problems_file = get_export_file_cb;
-
 	return export_init("problems", process_name, process_num);
 }
 
@@ -384,9 +387,9 @@ error:
 #undef ZBX_LOGGING_SUSPEND_TIME
 }
 
-void	zbx_problems_export_write(const char *buf, size_t count)
+void	zbx_problems_export_write(zbx_export_file_t *file, const char *buf, size_t count)
 {
-	export_write(buf, count, get_problems_file());
+	export_write(buf, count, file);
 }
 
 void	zbx_history_export_write(const char *buf, size_t count)
@@ -405,9 +408,9 @@ static void	export_flush(zbx_export_file_t *file)
 		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file->name, zbx_strerror(errno));
 }
 
-void	zbx_problems_export_flush(void)
+void	zbx_problems_export_flush(zbx_export_file_t *file)
 {
-	export_flush(get_problems_file());
+	export_flush(file);
 }
 
 void	zbx_history_export_flush(void)

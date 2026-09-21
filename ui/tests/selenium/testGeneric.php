@@ -349,7 +349,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'host_discovery.php?context=template',
+					'url' => 'zabbix.php?action=lldrule.list&context=template',
 					'title' => 'Configuration of discovery rules',
 					'header' => 'Discovery rules'
 				]
@@ -377,7 +377,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'host_discovery.php?context=host',
+					'url' => 'zabbix.php?action=lldrule.list&context=host',
 					'title' => 'Configuration of discovery rules',
 					'header' => 'Discovery rules'
 				]
@@ -398,9 +398,9 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
-					'title' => 'Event correlation rules',
-					'header' => 'Event correlation'
+					'url' => 'zabbix.php?action=ceprule.list',
+					'title' => 'Configuration of event processing rules',
+					'header' => 'Event processing'
 				]
 			],
 			[
@@ -725,7 +725,7 @@ class testGeneric extends CWebTest {
 		}
 
 		// Verify that user menu contains default sections.
-		$menu_user = ['Support', 'Integrations', 'Help', 'User settings', 'Sign out'];
+		$menu_user = ['Subscriptions', 'Integrations', 'Help', 'User settings', 'Sign out'];
 		foreach ($menu_user as $text) {
 			$this->assertTrue($this->query('link', $text)->exists());
 		}

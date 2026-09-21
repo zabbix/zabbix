@@ -19,6 +19,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
+#include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -32,6 +33,7 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxexpr.h"
 
@@ -144,16 +146,169 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
+static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
+{
+	unsigned char	proc_type, snmp_oid_type = 0;
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_DB_MONITOR:
+#ifndef HAVE_UNIXODBC
+			*info = zbx_strdup(NULL, "Support for ODBC was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_IPMI:
+#ifndef HAVE_OPENIPMI
+			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SSH:
+#if !defined(HAVE_SSH) && !defined(HAVE_SSH2)
+			*info = zbx_strdup(NULL, "Support for SSH was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SNMP:
+#ifndef HAVE_NETSNMP
+			*info = zbx_strdup(NULL, "Support for SNMP was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_BROWSER:
+#ifndef HAVE_LIBCURL
+			*info = zbx_strdup(NULL, "Support for libCURL was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+	}
+
+	if (ITEM_TYPE_SNMP == item->type)
+	{
+#		define ZBX_SNMP_OID_TYPE_WALK	3
+#		define ZBX_SNMP_OID_TYPE_GET	4
+
+		if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+		else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
+
+#		undef ZBX_SNMP_OID_TYPE_WALK
+#		undef ZBX_SNMP_OID_TYPE_GET
+	}
+
+	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type) ||
+			ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		return SUCCEED;
+	}
+
+	*info = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+
+	return FAIL;
+}
+
+static int	fill_test_item_host(zbx_dc_item_t *item, const struct zbx_json_parse *jp_host, char **info)
+{
+	int				ret = FAIL;
+	char				tmp[MAX_STRING_LEN + 1];
+	AGENT_REQUEST			request;
+	const char			*param1;
+	static const zbx_db_table_t	*table_hosts;
+
+	if (SUCCEED == zbx_json_value_by_name(jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(item->host.hostid, tmp);
+	else
+		item->host.hostid = 0;
+
+	zbx_init_agent_request(&request);
+
+	if (ITEM_TYPE_INTERNAL == item->type)
+	{
+		if (SUCCEED != zbx_parse_item_key(item->key, &request))
+		{
+			*info = zbx_strdup(NULL, "Invalid item key format.");
+			goto out;
+		}
+
+		if (NULL == (param1 = get_rparam(&request, 0)))
+		{
+			*info = zbx_strdup(NULL, "Invalid number of parameters.");
+			goto out;
+		}
+
+		if (0 == strcmp(param1, "proxy") || (0 == strcmp(param1, "proxy group")))
+		{
+			if (FAIL == zbx_dc_get_host_by_hostid(&item->host, item->host.hostid))
+			{
+				*info = zbx_strdup(NULL, "Can be tested only on host.");
+				goto out;
+			}
+		}
+	}
+
+	ret = SUCCEED;
+
+	if (NULL == table_hosts)
+		table_hosts = zbx_db_get_table("hosts");
+
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item->host.host, sizeof(item->host.host));
+
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_MAINTENANCE_STATUS, table_hosts, "maintenance_status",
+			&item->host.maintenance_status);
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
+			&item->host.maintenance_type);
+
+	if (SUCCEED == zbx_json_value_by_name(jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
+	{
+		item->host.ipmi_authtype = (signed char)atoi(tmp);
+	}
+	else
+	{
+		item->host.ipmi_authtype = (signed char)atoi(
+				zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	}
+
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
+			&item->host.ipmi_privilege);
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
+			item->host.ipmi_username, sizeof(item->host.ipmi_username));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
+			item->host.ipmi_password, sizeof(item->host.ipmi_password));
+	db_uchar_from_json(jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item->host.tls_connect);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item->host.tls_issuer,
+			sizeof(item->host.tls_issuer));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_SUBJECT, table_hosts, "tls_subject", item->host.tls_subject,
+			sizeof(item->host.tls_subject));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_PSK_IDENTITY, table_hosts, "tls_psk_identity",
+			item->host.tls_psk_identity, sizeof(item->host.tls_psk_identity));
+	db_string_from_json(jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item->host.tls_psk,
+			sizeof(item->host.tls_psk));
+#endif
+out:
+	zbx_free_agent_request(&request);
+
+	return ret;
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_webdriver_url)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
-	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
+	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp;
 	struct zbx_json_parse		jp_item, jp_host, jp_steps, jp_interface, jp_details, jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
@@ -347,50 +502,15 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.snmpv3_contextname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_CONTEXTNAME, table_interface_snmp,
 			"contextname");
 
-	if (NULL == table_hosts)
-		table_hosts = zbx_db_get_table("hosts");
+	if (FAIL == fill_test_item_host(&item, &jp_host, info))
+		goto out;
 
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
-
-	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UINT64(item.host.hostid, tmp);
-	else
-		item.host.hostid = 0;
-
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_STATUS, table_hosts, "maintenance_status",
-			&item.host.maintenance_status);
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
-			&item.host.maintenance_type);
-
-	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
+	if (FAIL == process_zero_pollers_items(&item, get_config_forks, info))
 	{
-		item.host.ipmi_authtype = (signed char)atoi(tmp);
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
 	}
-	else
-	{
-		item.host.ipmi_authtype =
-				(signed char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
-	}
-
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
-			&item.host.ipmi_privilege);
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
-			item.host.ipmi_username, sizeof(item.host.ipmi_username));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
-			item.host.ipmi_password, sizeof(item.host.ipmi_password));
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item.host.tls_connect);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item.host.tls_issuer,
-			sizeof(item.host.tls_issuer));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_SUBJECT, table_hosts, "tls_subject", item.host.tls_subject,
-			sizeof(item.host.tls_subject));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK_IDENTITY, table_hosts, "tls_psk_identity",
-			item.host.tls_psk_identity, sizeof(item.host.tls_psk_identity));
-	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_PSK, table_hosts, "tls_psk", item.host.tls_psk,
-			sizeof(item.host.tls_psk));
-#endif
-
-	if (ITEM_TYPE_IPMI == item.type)
+	else if (ITEM_TYPE_IPMI == item.type)
 	{
 		zbx_init_agent_result(&result);
 
@@ -398,21 +518,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		{
 			*info = zbx_dsprintf(NULL, "Invalid port number [%s]", item.interface.port_orig);
 		}
-		else
-		{
 #ifdef HAVE_OPENIPMI
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
-			{
-				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
-						" \"StartIPMIPollers\" is 0.");
-			}
-			else
-				ret = zbx_ipmi_test_item(&item, info);
-#else
-			ZBX_UNUSED(get_config_forks);
-			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+		else
+			ret = zbx_ipmi_test_item(&item, info);
 #endif
-		}
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
@@ -447,7 +556,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
 				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
-				config_ssh_key_location, config_webdriver_url, config_denyitemtypes_mask);
+				config_ssh_key_location, config_webdriver_url);
 #ifdef HAVE_NETSNMP
 		if (ITEM_TYPE_SNMP == item.type)
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_TRAPPER, FAIL);
@@ -550,14 +659,15 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location, const char *config_webdriver_url,
-		zbx_uint32_t config_denyitemtypes_mask, struct zbx_json *json, char **error)
+		const char *config_ssh_key_location, const char *config_webdriver_url, struct zbx_json *json,
+		char **error)
 {
 	zbx_user_t		user;
+	zbx_dc_host_t		host;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
 	zbx_uint64_t		proxyid = 0;
-	int			ret = FAIL, state = 0, value_found;
+	int			ret = FAIL, state = 0, value_found, monitoring_allowed;
 	size_t			value_size = 0, key_size = 0;
 
 	zbx_user_init(&user);
@@ -620,13 +730,62 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	else
 		goto preproc_test;
 
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+	{
+		ZBX_STR2UINT64(host.hostid, tmp);
+
+		if (FAIL == zbx_dc_get_host_by_hostid(&host, host.hostid) ||
+				PERM_READ_WRITE != zbx_get_host_permission(&user, host.hostid))
+		{
+			*error = zbx_strdup(NULL, "Failed to validate host permissions.");
+			goto out;
+		}
+	}
+	else
+		host.hostid = 0;
+
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
+
+	if (0 == proxyid)
+		monitoring_allowed = zbx_db_server_allowed_for_monitoring(&user);
+	else
+		monitoring_allowed = zbx_db_proxy_allowed_for_monitoring(&user, proxyid);
+
+	if (FAIL == monitoring_allowed && 0 != host.hostid)
+	{
+		if (0 == proxyid)
+		{
+			if (HOST_MONITORED_BY_SERVER == host.monitored_by)
+				monitoring_allowed = SUCCEED;
+		}
+		else if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+		{
+			if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+			{
+				if (FAIL == zbx_dc_get_host_proxyid_by_name(host.host, &host.proxyid))
+					host.proxyid = 0;
+			}
+
+			if (host.proxyid == proxyid)
+				monitoring_allowed = SUCCEED;
+		}
+	}
+
+	if (FAIL == monitoring_allowed)
+	{
+		if (0 == proxyid)
+			*error = zbx_strdup(NULL, "Server monitoring permission denied.");
+		else
+			*error = zbx_strdup(NULL, "Proxy monitoring permission denied.");
+
+		goto out;
+	}
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, config_denyitemtypes_mask);
+			config_webdriver_url);
 
 	if (FAIL == ret)
 		state = ITEM_STATE_NOTSUPPORTED;
@@ -681,7 +840,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, zbx_uint32_t config_denyitemtypes_mask)
+		const char *config_frontend_allowed_ip)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -696,8 +855,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
 			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
-			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url,
-			config_denyitemtypes_mask, &json, &error)))
+			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url, &json, &error)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);

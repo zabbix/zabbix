@@ -85,6 +85,7 @@ ZBX_SERVER_PROXY_LIBS = \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
+	$(top_builddir)/src/libs/zbxmw/libzbxmw.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
@@ -132,6 +133,7 @@ ZBX_SERVER_LIBS = \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
+	$(top_builddir)/src/libs/zbxcep_client/libzbxcep_client.a \
 	$(top_builddir)/src/zabbix_server/audit/libzbxaudit_server.a \
 	$(top_builddir)/src/zabbix_server/rtc/libzbxrtc_server.a \
 	$(top_builddir)/src/zabbix_server/dbconfigworker/libdbconfigworker.a \
@@ -159,6 +161,7 @@ ZBX_SERVER_LIBS = \
 	$(top_builddir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_builddir)/src/zabbix_server/diag/libzbxdiag_server.a \
 	$(top_builddir)/src/zabbix_server/cachehistory/libzbxcachehistory_server.a \
+	$(top_builddir)/src/zabbix_server/cep/libzbxcep.a \
 	@SERVER_LIBS@
 
 ZBX_PROXY_LIBS = \
@@ -201,7 +204,7 @@ else
 ZBX_IPMI_LIB =
 endif
 
-include ../grouped-libs.mk.inc
+include $(top_srcdir)/tests/libs/grouped-libs.mk.inc
 
 if SERVER
 ANY_GROUPED_LIBS = $(SERVER_GROUPED_LIBS)

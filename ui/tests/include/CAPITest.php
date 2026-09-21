@@ -16,9 +16,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CTest.php';
-
-define('TEST_GOOD', 0);
-define('TEST_BAD', 1);
+require_once __DIR__.'/helpers/CTestDataHelper.php';
 
 /**
  * Base class for Zabbix API tests.

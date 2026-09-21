@@ -13,6 +13,7 @@
 **/
 
 #include "config.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
@@ -101,6 +102,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zabbix_server/cep/zbx_cep.h"
 #include "zbxcurl.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
@@ -163,15 +165,15 @@ static const char	*help_message[] = {
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, alert syncer, availability manager,",
 	"                                  browser poller, configuration syncer, configuration syncer worker,",
-	"                                  connector manager, connector worker, discovery manager, discovery worker,",
-	"                                  escalator, ha manager, history poller, history syncer, housekeeper,",
-	"                                  http poller, http agent poller, icmp pinger, internal poller,",
+	"                                  connector manager, connector worker, discovery manager, escalator,",
+	"                                  event manager, event processor, ha manager, history poller, history syncer,",
+	"                                  housekeeper, http poller, http agent poller, icmp pinger, internal poller,",
 	"                                  ipmi manager, ipmi poller, java poller, lld manager, lld worker,",
 	"                                  odbc poller, poller, agent poller, preprocessing manager,",
 	"                                  preprocessing worker, proxy poller, proxy group manager, report manager,",
 	"                                  report writer, self-monitoring, service manager, snmp poller, snmp trapper,",
-	"                                  task manager, timer, trapper, trigger housekeeper, unreachable poller,",
-	"                                  vmware collector)",
+	"                                  supervisor, task manager, timer, trapper, trigger housekeeper,",
+	"                                  unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
 	"",
@@ -179,12 +181,12 @@ static const char	*help_message[] = {
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, alert syncer, availability manager,",
 	"                                  browser poller, configuration syncer, configuration syncer worker,",
-	"                                  connector manager, connector worker, discovery manager, discovery worker,",
-	"                                  escalator, ha manager, history poller, history syncer, housekeeper,",
+	"                                  connector manager, connector worker, discovery manager, escalator,",
+	"                                  ha manager, history poller, history syncer, housekeeper,",
 	"                                  http poller, http agent poller, icmp pinger, internal poller,",
 	"                                  ipmi manager, ipmi poller, java poller, lld manager, lld worker,",
 	"                                  odbc poller, poller, agent poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller, proxy group manager, report manager,",
+	"                                  proxy poller, proxy group manager, report manager,",
 	"                                  report writer, self-monitoring, service manager, snmp poller, snmp trapper,",
 	"                                  task manager, timer, trapper, trigger housekeeper, unreachable poller,",
 	"                                  vmware collector)",
@@ -239,7 +241,6 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 static sigset_t	orig_mask;
 
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
-ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, trends_export, NULL)
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_SERVER)
@@ -294,6 +295,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 	1, /* ZBX_PROCESS_TYPE_HA_MANAGER */
 	1, /* ZBX_PROCESS_TYPE_SUPERVISOR */
+	1, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
+	10, /* ZBX_PROCESS_TYPE_CEP_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -375,7 +378,9 @@ static char	*config_webdriver_url = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
-static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	zbx_config_vault = {.name = NULL, .url = NULL, .token = NULL, .tls_cert_file = NULL,
+						.tls_key_file = NULL, .db_path = NULL, .prefix = NULL,
+						.app_role_id = NULL, .app_secret_id = NULL};
 
 static zbx_db_config_t		*zbx_db_config = NULL;
 
@@ -399,8 +404,6 @@ static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
-static char	*config_denyitemtypes			= NULL;
-ZBX_GET_CONFIG_VAR(zbx_uint32_t, config_denyitemtypes_mask, 0)
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* bridge adapter config */
@@ -416,10 +419,7 @@ static int	server_has_started = 0;
 static	const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= zbx_add_event,
 	.process_events_cb		= zbx_process_events,
-	.clean_events_cb		= zbx_clean_events,
-	.reset_event_recovery_cb	= zbx_reset_event_recovery,
-	.export_events_cb		= zbx_export_events,
-	.events_update_itservices_cb	= zbx_events_update_itservices
+	.clean_events_cb		= zbx_clean_events
 };
 
 typedef struct
@@ -653,6 +653,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_type = ZBX_PROCESS_TYPE_PG_MANAGER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PG_MANAGER];
 	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_CEP_MANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CEP_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_CEP_MANAGER];
+	}
 	else
 		return FAIL;
 
@@ -722,7 +727,7 @@ static void	zbx_set_defaults(void)
 		config_forks[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
-		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER])
 		config_forks[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
@@ -732,8 +737,6 @@ static void	zbx_set_defaults(void)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERER])
 		config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
-
-	(void)zbx_parse_item_types(config_denyitemtypes, &config_denyitemtypes_mask, NULL);
 }
 
 /******************************************************************************
@@ -814,12 +817,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 	zbx_free(address);
 
-	if (SUCCEED != zbx_parse_item_types(config_denyitemtypes, NULL, NULL))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DenyItemTypes\" configuration parameter: %s",
-				config_denyitemtypes);
-		err = 1;
-	}
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == zbx_check_cfg_feature_str("Fping6Location", zbx_config_fping6_location, "IPv6 support"));
 #endif
@@ -834,6 +831,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
 	err |= (FAIL == zbx_check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
 	err |= (FAIL == zbx_check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultAppRoleID", zbx_config_vault.app_role_id, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultAppSecretID", zbx_config_vault.app_secret_id, "cURL library"));
 
 	err |= (FAIL == zbx_check_cfg_feature_int("StartReportWriters", config_forks[ZBX_PROCESS_TYPE_REPORTWRITER],
 			"cURL library"));
@@ -848,6 +847,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err |= (FAIL == zbx_check_cfg_feature_str("VaultToken", zbx_config_vault.token,
 				"cURL library that supports SSL/TLS"));
 		err |= (FAIL == zbx_check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path,
+				"cURL library that supports SSL/TLS"));
+		err |= (FAIL == zbx_check_cfg_feature_str("VaultAppRoleID", zbx_config_vault.app_role_id,
+				"cURL library that supports SSL/TLS"));
+		err |= (FAIL == zbx_check_cfg_feature_str("VaultAppSecretID", zbx_config_vault.app_secret_id,
 				"cURL library that supports SSL/TLS"));
 	}
 #endif
@@ -1102,6 +1105,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultDBPath",			&(zbx_config_vault.db_path),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultAppRoleID",		&(zbx_config_vault.app_role_id),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultAppSecretID",		&(zbx_config_vault.app_secret_id),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBSocket",			&(zbx_db_config->dbsocket),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBPort",			&(zbx_db_config->dbport),	ZBX_CFG_TYPE_INT,
@@ -1268,7 +1275,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
-				ZBX_CONF_PARM_OPT,	0,			0},
+			ZBX_CONF_PARM_OPT,	0,			0},
 		{"HistoryProvider",		&config_history_providers,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"EnableMobileDevices",		&config_enable_mobile_devices,		ZBX_CFG_TYPE_INT,
@@ -1276,8 +1283,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"BridgeAdapterURL",		&config_bridge_adapter_url,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
-				ZBX_CONF_PARM_OPT,	0,			0},
-		{"DenyItemTypes",		&config_denyitemtypes,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1375,11 +1380,15 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	{
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "closing ipc services");
+
 		if (NULL != args->listen_sock)
 			zbx_tcp_unlisten(args->listen_sock);
 
 		if (NULL != args->rtc)
 			zbx_ipc_service_close(&args->rtc->service);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "ipc services closed");
 	}
 
 	zbx_close_log();
@@ -1387,9 +1396,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_locks_destroy();
 
 	zbx_setproctitle_deinit();
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_export_deinit(problems_export);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		zbx_export_deinit(history_export);
@@ -1437,8 +1443,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
-	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush,
-			get_config_denyitemtypes_mask);
+	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(zbx_program_type);
 	zbx_init_library_stats(get_zbx_program_type);
@@ -1697,8 +1702,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_externalscripts = config_externalscripts,
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url,
-			.config_denyitemtypes_mask = get_config_denyitemtypes_mask()
+			.config_webdriver_url = config_webdriver_url
 		};
 
 	zbx_thread_trapper_args		trapper_args =
@@ -1724,8 +1728,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip,
 			.config_bridge_adapter_url = config_bridge_adapter_url,
-			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to,
-			.config_denyitemtypes_mask = get_config_denyitemtypes_mask()
+			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -1753,8 +1756,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_ssl_key_location = config_ssl_key_location,
 			.events_cbs = &events_cbs,
 			.proxyconfig_frequency = config_proxyconfig_frequency,
-			.proxydata_frequency = config_proxydata_frequency,
-			.config_denyitemtypes_mask = get_config_denyitemtypes_mask()
+			.proxydata_frequency = config_proxydata_frequency
 		};
 
 	zbx_thread_httppoller_args	httppoller_args =
@@ -1941,6 +1943,14 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_tls = zbx_config_tls,
 		};
 
+	zbx_thread_cep_manager_args_t	cep_manager_args =
+		{
+			.workers_num = config_forks[ZBX_PROCESS_TYPE_CEP_WORKER],
+			.config_timeout = zbx_config_timeout,
+			.config_source_ip = zbx_config_source_ip,
+			.commit_limit = config_forks[ZBX_PROCESS_TYPE_HISTSYNCER]
+		};
+
 	/* cleanup curl before forking to avoid issues with forked initialized state */
 	zbx_curl_cleanup();
 
@@ -1956,6 +1966,16 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CONFSYNCER] = (zbx_supervisor_unit_def_t){
 			.entry = zbx_dbconfig_thread,
 			.args = &dbconfig_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CEP_MANAGER] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_cep_manager_thread,
+		.args = &cep_manager_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_SERVICEMAN] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_service_manager_thread,
+		.args = &service_manager_args
 	};
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
@@ -1979,11 +1999,6 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SUPERVISOR;
 				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
-				thread_args.args = &service_manager_args;
-				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
@@ -2173,7 +2188,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			NULL, get_config_denyitemtypes_mask(), &error))
+			NULL, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -2235,7 +2250,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		}
 	}
 
-	zbx_threads_num = zbx_supervisor_get_process_count(config_forks);
+	zbx_threads_num = zbx_supervisor_prepare(config_forks);
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
 
@@ -2286,6 +2301,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			if (1 < i && !ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of termination");
+				ret = FAIL;
 				break;
 			}
 
@@ -2494,13 +2510,13 @@ static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
 		if (NULL != args->rtc)
-			event_active(args->rtc->service.ev_timer, 0, 0);
+			zbx_ipc_service_alert(&args->rtc->service);
 	}
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char	*error = NULL, *smtp_auth_feature_status = NULL;
+	char	*error = NULL, *smtp_auth_feature_status = NULL, *old_token = NULL;
 	int	i, db_type, ha_status_old;
 	pid_t	pid;
 
@@ -2625,8 +2641,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_config_forks,
-			get_process_info_by_thread, &error))
+	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_process_info_by_thread, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
@@ -2643,22 +2658,35 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
+	if (SUCCEED == zbx_vault_is_configured(&zbx_config_vault))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
+		if (SUCCEED != zbx_vault_validate_config(&zbx_config_vault, zbx_db_config->dbuser,
+				zbx_db_config->dbpassword, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "invalid vault configuration: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
+
+		zbx_vault_init(zbx_config_vault.name);
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
 	}
 
 	zbx_unblock_signals(&orig_mask);
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
-			&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location, &error))
+	if (SUCCEED == zbx_vault_is_configured(&zbx_config_vault))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
+		if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
+				&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
 	}
 
 	if (SUCCEED != zbx_db_library_init(&error))
@@ -2761,9 +2789,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		problems_export = zbx_problems_export_init(get_problems_export, "main-process", 0);
-
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		history_export = zbx_history_export_init(get_history_export, "main-process", 0);
 
@@ -2840,7 +2865,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else
 		{
-			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
+			if (ZBX_RTC_VAULT_RELOGIN == message->code)
+			{
+				if (NULL != zbx_config_vault.token &&
+					0 == strcmp(zbx_config_vault.token, (char *)message->data))
+				{
+					zbx_free(zbx_config_vault.token);
+				}
+			}
+			else if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
 				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex_server);
@@ -2848,12 +2881,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			else
 			{
 				const char	*result = "Runtime commands can be executed only in active mode\n";
+
 				zbx_ipc_client_send(client, message->code, (const unsigned char *)result,
 						(zbx_uint32_t)strlen(result) + 1);
 			}
 		}
 
 		zbx_ipc_message_free(message);
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
+
+		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
+		{
+			old_token = zbx_strdup(old_token, zbx_config_vault.token);
+
+			zbx_rtc_notify(&rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_VAULT_NEW_TOKEN,
+					(const char *)zbx_config_vault.token,
+					(zbx_uint32_t)strlen(zbx_config_vault.token) + 1);
+		}
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
@@ -2880,6 +2927,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
+					if (NULL != zbx_config_vault.app_role_id)
+					{
+						/* force AppRole re-login to get a fresh token after standby */
+						zbx_free(zbx_config_vault.token);
+						zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip,
+								config_ssl_ca_location, config_ssl_cert_location,
+								config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_FORCE,
+								&zbx_config_vault.token);
+					}
+
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay,
 							&exit_args))
 					{
@@ -2940,9 +2997,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_set_exiting_with_fail();
 			break;
 		}
-
-		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location);
 
 		__zbx_update_env(zbx_time());
 	}

@@ -111,7 +111,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 					timeout, connect_timeout, config_tls->connect_mode, tls_arg1,
 					tls_arg2, LOG_LEVEL_DEBUG)))
 			{
-				int	now = (int)time(NULL);
+				int	now = (int)time(NULL), retries_num = retry_interval;
 
 				if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
@@ -119,10 +119,10 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 					lastlogtime = now;
 				}
 
-				while (ZBX_IS_RUNNING() && 0 < retry_interval)
+				while (ZBX_IS_RUNNING() && 0 < retries_num)
 				{
 					sleep(1);
-					retry_interval--;
+					retries_num--;
 				}
 			}
 

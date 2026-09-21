@@ -58,11 +58,6 @@ class CDataTableColumn {
 	#defaults = null;
 
 	/**
-	 * @type {number|null}
-	 */
-	#duplicate_column_index = null;
-
-	/**
 	 * @type {string}
 	 */
 	#renderer = CDataTableColumn.RENDERER_HTML;
@@ -121,6 +116,11 @@ class CDataTableColumn {
 	 * @type {boolean}
 	 */
 	#resizable = true;
+
+	/**
+	 * @type {boolean}
+	 */
+	#show_options_popup = true;
 
 	/**
 	 * @type {boolean}
@@ -219,23 +219,6 @@ class CDataTableColumn {
 	}
 
 	/**
-	 * @returns {string}
-	 */
-	getOptionsPopupHandleIcon() {
-		return this.#options_popup_handle_icon;
-	}
-
-	/**
-	 * @param {string} context_popup_handle_icon
-	 * @returns {CDataTableColumn}
-	 */
-	setOptionsPopupHandleIcon(context_popup_handle_icon) {
-		this.#options_popup_handle_icon = context_popup_handle_icon;
-
-		return this;
-	}
-
-	/**
 	 * @returns {Object}
 	 */
 	getColumnOptions() {
@@ -269,6 +252,26 @@ class CDataTableColumn {
 		return this;
 	}
 
+	/**
+	 * @returns {string}
+	 */
+	getOptionsPopupHandleIcon() {
+		return this.#options_popup_handle_icon;
+	}
+
+	/**
+	 * @param {string} context_popup_handle_icon
+	 * @returns {CDataTableColumn}
+	 */
+	setOptionsPopupHandleIcon(context_popup_handle_icon) {
+		this.#options_popup_handle_icon = context_popup_handle_icon;
+
+		return this;
+	}
+
+	/**
+	 * @returns {CDataTableColumn|null}
+	 */
 	getDefaults() {
 		return this.#defaults;
 	}
@@ -279,23 +282,6 @@ class CDataTableColumn {
 	 */
 	setDefaults(defaults) {
 		this.#defaults = defaults;
-
-		return this;
-	}
-
-	/**
-	 * @returns {number|null}
-	 */
-	getDuplicateColumnIndex() {
-		return this.#duplicate_column_index;
-	}
-
-	/**
-	 * @param {number|null} duplicate_column_index
-	 * @returns {CDataTableColumn}
-	 */
-	setDuplicateColumnIndex(duplicate_column_index) {
-		this.#duplicate_column_index = duplicate_column_index;
 
 		return this;
 	}
@@ -489,6 +475,23 @@ class CDataTableColumn {
 	 */
 	setResizable(resizable) {
 		this.#resizable = resizable;
+
+		return this;
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	isShowOptionsPopup() {
+		return this.#show_options_popup;
+	}
+
+	/**
+	 * @param {boolean} show_options_popup
+	 * @returns {CDataTableColumn}
+	 */
+	setShowOptionsPopup(show_options_popup) {
+		this.#show_options_popup = show_options_popup;
 
 		return this;
 	}
@@ -694,7 +697,6 @@ class CDataTableColumn {
 			column_options: this.#column_options,
 			options_popup_handler: this.#options_popup_handler,
 			options_popup_handle_icon: this.#options_popup_handle_icon,
-			duplicate_column_index: this.#duplicate_column_index,
 			duplicate: this.#duplicate,
 			duplicatable: this.#duplicatable,
 			fields: this.#fields,
@@ -706,6 +708,7 @@ class CDataTableColumn {
 			renderer: this.#renderer,
 			resized: this.#resized,
 			resizable: this.#resizable,
+			show_options_popup: this.#show_options_popup,
 			show_in_table_options: this.#show_in_table_options,
 			sortable: this.#sortable,
 			sort_field: this.#sort_field,

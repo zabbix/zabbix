@@ -16,7 +16,7 @@
 
 #include "zbxhistory.h"
 #include "zbxcachevalue.h"
-#include "zbxdb.h"
+#include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 #include "zbxcalc.h"
@@ -77,26 +77,16 @@ int	zbx_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functio
  ******************************************************************************/
 int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts, time_t *tstamp)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+	unsigned char	value_type;
+	zbx_uint64_t	valuemapid;
+	char		units[ZBX_ITEM_UNITS_LEN + 1];
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = zbx_db_select(
-			"select value_type,valuemapid,units"
-			" from items"
-			" where itemid=" ZBX_FS_UI64,
-			itemid);
-
-	if (NULL != (row = zbx_db_fetch(result)))
+	if (SUCCEED == zbx_dc_config_get_item_format(itemid, &value_type, &valuemapid, units, sizeof(units)))
 	{
-		unsigned char		value_type;
-		zbx_uint64_t		valuemapid;
 		zbx_history_record_t	vc_value;
-
-		value_type = (unsigned char)atoi(row[0]);
-		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
 		if (SUCCEED == zbx_vc_get_value(itemid, value_type, ts, &vc_value))
 		{
@@ -107,7 +97,7 @@ int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_ti
 			zbx_history_record_clear(&vc_value, value_type);
 
 			if (0 == raw)
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+				zbx_format_value(tmp, sizeof(tmp), valuemapid, units, value_type);
 
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
@@ -117,7 +107,6 @@ int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_ti
 			ret = SUCCEED;
 		}
 	}
-	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

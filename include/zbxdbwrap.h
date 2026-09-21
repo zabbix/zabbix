@@ -35,6 +35,13 @@ typedef enum
 }
 zbx_host_template_link_type;
 
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
+
 typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
 		const char *, const zbx_timespec_t *, zbx_history_selector_t *selector, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
@@ -43,12 +50,10 @@ typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned c
 		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
 typedef size_t (*zbx_preprocessor_flush_func_t)(void);
-typedef zbx_uint32_t (*zbx_get_denyitemtypes_mask_func_t)(void);
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 		zbx_preprocess_item_value_func_t preprocess_item_value_func,
-		zbx_preprocessor_flush_func_t preprocessor_flush_func,
-		zbx_get_denyitemtypes_mask_func_t get_denyitemtypes_mask_func);
+		zbx_preprocessor_flush_func_t preprocessor_flush_func);
 
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
@@ -139,10 +144,11 @@ void		zbx_db_get_event_data_triggers(zbx_db_event *event);
 void		zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids);
 zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid);
 zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid);
-void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanceid);
+void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanceid, int until);
 
 void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger);
 int	zbx_db_trigger_get_constant(const zbx_db_trigger *trigger, int index, char **out);
 int	zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const zbx_vector_uint64_t **hostids);
 int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint64_t *itemid);
@@ -159,9 +165,10 @@ void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index,
 
 int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
 char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
-
-#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
-#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
+int	zbx_db_user_has_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule);
+int	zbx_db_server_allowed_for_monitoring(const zbx_user_t *user);
+int	zbx_db_proxy_allowed_for_monitoring(const zbx_user_t *user, zbx_uint64_t proxyid);
 
 const char	*zbx_permission_string(int perm);
 int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
@@ -217,6 +224,9 @@ int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		char **data, char *error, size_t maxerrlen);
 int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen);
+int	zbx_macro_trigger_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 
 int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t token_type, char **value,
 		char **error, va_list args);

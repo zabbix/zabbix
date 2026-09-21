@@ -686,19 +686,23 @@ class CConfigurationExport {
 			}
 		}
 
-		$db_proxies = $proxyids
-			? DBfetchArray(DBselect(
-				'SELECT p.proxyid,p.name'.
-				' FROM proxy p'.
-				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids))
-			))
-			: [];
-		$db_proxies = array_column($db_proxies, null, 'proxyid');
+		$accessible_proxies = API::Proxy()->get([
+			'output' => ['name'],
+			'proxyids' => array_keys($proxyids),
+			'preservekeys' => true
+		]);
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxyid']]['name']]
-				: [];
+			if ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $accessible_proxies)) {
+				$host['proxy'] = ['name' => $accessible_proxies[$host['proxyid']]['name']];
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$host['proxy'] = [];
+				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
+			}
+			else {
+				$host['proxy'] = [];
+			}
 		}
 		unset($host);
 
@@ -721,20 +725,23 @@ class CConfigurationExport {
 			}
 		}
 
-		$db_proxy_groups = $proxy_groupids
-			? DBfetchArray(DBselect(
-				'SELECT pg.proxy_groupid,pg.name'.
-				' FROM proxy_group pg'.
-				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids))
-			))
-			: [];
-		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
+		$accessible_proxy_groups = API::ProxyGroup()->get([
+			'output' => ['name'],
+			'proxy_groupids' => array_keys($proxy_groupids),
+			'preservekeys' => true
+		]);
 
 		foreach ($hosts as &$host) {
-			$host['proxy_group'] = $host['proxy_groupid'] != 0
-					&& array_key_exists($host['proxy_groupid'], $db_proxy_groups)
-				? ['name' => $db_proxy_groups[$host['proxy_groupid']]['name']]
-				: [];
+			if ($host['proxy_groupid'] != 0 && array_key_exists($host['proxy_groupid'], $accessible_proxy_groups)) {
+				$host['proxy_group'] = ['name' => $accessible_proxy_groups[$host['proxy_groupid']]['name']];
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				$host['proxy_group'] = [];
+				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
+			}
+			else {
+				$host['proxy_group'] = [];
+			}
 		}
 		unset($host);
 

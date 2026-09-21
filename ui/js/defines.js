@@ -33,11 +33,17 @@ const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
+const ZBX_STYLE_CURSOR_POINTER = 'cursor-pointer';
+const ZBX_STYLE_FLEX_WRAPPER = 'flex-wrapper';
+const ZBX_STYLE_OVERFLOW_ELLIPSIS = 'overflow-ellipsis';
+const ZBX_STYLE_TRIMMED_CONTENT = 'trimmed-content';
+
 const ZBX_STYLE_NO_DATA = 'no-data';
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_NO_INDENT = 'no-indent';
 const ZBX_STYLE_WORDBREAK = 'wordbreak';
+const ZBX_STYLE_SEPARATOR = 'separator';
 
 const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
 
@@ -145,6 +151,7 @@ const ZBX_STYLE_REL_CONTAINER = 'rel-container';
 
 const ZBX_STYLE_SELECTED_ITEM_COUNT = 'selected-item-count';
 
+const ZBX_STYLE_HINTBOX_RAW_DATA = 'hintbox-raw-data';
 const ZBX_STYLE_HINTBOX_WRAP = 'hintbox-wrap';
 
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
@@ -223,6 +230,8 @@ const TRIGGER_SEVERITY_WARNING = 2;
 const TRIGGER_SEVERITY_AVERAGE = 3;
 const TRIGGER_SEVERITY_HIGH = 4;
 const TRIGGER_SEVERITY_DISASTER = 5;
+
+const ZBX_HINTBOX_HTML_LIMIT = 8192;
 
 const ZBX_SECRET_MASK = '******';
 

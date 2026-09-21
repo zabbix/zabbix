@@ -41,7 +41,9 @@ class WidgetProblems extends CTableInfo {
 	public function __construct(array $data) {
 		$this->data = $data;
 
-		$this->highlight_rows = $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON;
+		$this->highlight_rows = array_key_exists('highlight_row', $this->data['fields'])
+			? $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON
+			: ZBX_HIGHLIGHT_OFF;
 
 		parent::__construct();
 	}
@@ -266,7 +268,16 @@ class WidgetProblems extends CTableInfo {
 			}
 
 			if ($problem['r_eventid'] != 0) {
-				if ($problem['correlationid'] != 0) {
+				if ($problem['cep_ruleid'] != 0) {
+					$info_icons[] = makeInformationIcon(
+						array_key_exists($problem['cep_ruleid'], $data['cep_rules'])
+							? _s('Resolved by complex event processing rule "%1$s".',
+							$data['cep_rules'][$problem['cep_ruleid']]['name']
+						)
+							: _('Resolved by complex event processing rule.')
+					);
+				}
+				elseif ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
 							? _s('Resolved by event correlation rule "%1$s".',

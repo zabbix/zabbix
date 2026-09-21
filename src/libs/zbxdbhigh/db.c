@@ -13,13 +13,15 @@
 **/
 
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbx_trigger_constants.h"
 
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbx_host_constants.h"
+#include "zbx_bridge_adapter_constants.h"
 #include "zbxalgo.h"
-#include "zbxdb.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -30,10 +32,12 @@
 #endif
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+ZBX_VECTOR_IMPL(db_event_recovery, zbx_db_event_recovery_t)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
+ZBX_VECTOR_LITE_IMPL(db_event_suppress, zbx_db_event_suppress_t)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -612,48 +616,84 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate that token is not expired and is active and then get     *
- *          associated user data                                              *
+ * Purpose: validate a token for the given lookup mode and get associated     *
+ *          user data                                                         *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             user                      - [OUT] user information             *
+ *             mode                      - [IN] which token schemes to        *
+ *                                              accept - see                  *
+ *                                              zbx_auth_lookup_mode_t        *
+ *             device_uuid               - [IN] (optional) device DPoP-       *
+ *                                              scheme token must bind to;    *
+ *                                              required in device.offboard   *
+ *                                              lookup mode, unused otherwise *
+ *             user                      - [OUT]                              *
  *                                                                            *
- * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ * Return value:  SUCCEED - a token matching an accepted scheme was found     *
+ *                          (a DPoP-scheme match additionally requires it     *
+ *                          to be bound to device_uuid)                       *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_lookup_mode_t mode,
+		const char *device_uuid, zbx_user_t *user)
 {
+	char		*formatted_auth_token_hash_esc = NULL, *device_uuid_esc = NULL;
 	int		ret = FAIL;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
 	time_t		t;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
-
-	t = time(NULL);
-
-	if ((time_t) - 1 == t)
+	if ((time_t) - 1 == (t = time(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
 		goto out;
 	}
 
-	if (NULL == (result = zbx_db_select(
-			"select u.userid,u.roleid,u.username,r.type"
-				" from token t,users u,role r"
-			" where t.userid=u.userid"
-				" and t.token='%s'"
-				" and u.roleid=r.roleid"
-				" and t.status=%d"
-				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+	formatted_auth_token_hash_esc = zbx_db_dyn_escape_string(formatted_auth_token_hash);
+
+	switch (mode)
 	{
-		goto out;
+		case ZBX_AUTH_LOOKUP_GENERIC:
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and t.auth_scheme=%d"
+						" and (t.expires_at=%d or t.expires_at>%lu)",
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
+			break;
+		case ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD:
+			device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and (t.expires_at=%d or t.expires_at>%lu)"
+						" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
+							"select null from token_device td,device d"
+							" where td.tokenid=t.tokenid"
+								" and td.deviceid=d.deviceid"
+								" and d.uuid='%s'"
+								" and d.userid=t.userid"
+								" and d.status=%d)))",
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_SCHEME_DPOP, device_uuid_esc, ZBX_DEVICE_STATUS_ACTIVATED);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected auth lookup mode:%d", (int)mode);
+			goto out;
 	}
 
-	if (NULL == (row = zbx_db_fetch(result)))
+	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
@@ -663,6 +703,65 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(formatted_auth_token_hash_esc);
+	zbx_free(device_uuid_esc);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that token is not expired and is active and then get     *
+ *          associated user data                                              *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             user                      - [OUT]                              *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_GENERIC, NULL, user);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate a token for device.offboard and get associated user      *
+ *          data, in a single query                                           *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             device_uuid               - [IN]                               *
+ *             user                      - [OUT]                              *
+ *                                                                            *
+ * Comments: a Bearer-scheme token is accepted unconditionally, the same as   *
+ *           for any other trapper request. A DPoP-scheme token is accepted   *
+ *           only if it is bound (via token_device) to the given active       *
+ *           device.                                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid (and, if DPoP-scheme, bound to     *
+ *                          the device)                                       *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_user_by_offboard_token(const char *formatted_auth_token_hash, const char *device_uuid,
+		zbx_user_t *user)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s device uuid:%s", __func__,
+			formatted_auth_token_hash, device_uuid);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD, device_uuid, user);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -753,6 +852,40 @@ int	zbx_db_update_software_update_checkid(void)
 	zbx_db_free_result(result);
 
 	return ret;
+}
+
+zbx_db_event	*zbx_create_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+	int clock, int ns, int value)
+{
+	zbx_db_event	*event;
+
+	event = zbx_malloc(NULL, sizeof(zbx_db_event));
+	memset(event, 0, sizeof(zbx_db_event));
+
+	event->source = source;
+	event->object = object;
+	event->objectid = objectid;
+	event->clock = clock;
+	event->ns = ns;
+	event->value = value;
+	event->acknowledged = EVENT_NOT_ACKNOWLEDGED;
+	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+
+	return event;
+}
+
+zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size)
+{
+	zbx_vector_db_event_suppress_t	*suppress;
+
+	suppress = (zbx_vector_db_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_vector_db_event_suppress_t));
+	zbx_vector_db_event_suppress_create(suppress);
+	if (0 != size)
+		zbx_vector_db_event_suppress_reserve(suppress, (size_t)size);
+
+	return suppress;
 }
 
 /******************************************************************************

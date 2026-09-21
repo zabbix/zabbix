@@ -33,7 +33,7 @@ window.user_device_create_popup = new class {
 	#refresh_interval_device_status = null;
 	#abort_controller = null;
 
-	init({rules, admin_mode}) {
+	init({rules, admin_mode, qrdata}) {
 		this.#overlay = overlays_stack.getById('user.device.init.view');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
@@ -46,12 +46,15 @@ window.user_device_create_popup = new class {
 
 		if (!this.#admin_mode) {
 			this.#footer.querySelector('.js-cancel').remove();
-			this.#submit();
+			this.#displayQRCode(qrdata);
 		}
 	}
 
 	#initEvents() {
-		this.#footer.querySelector('.js-submit')?.addEventListener('click', () => this.#submit());
+		if (this.#admin_mode) {
+			this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		}
+
 		this.#dialogue.addEventListener('dialogue.close', () => {
 			this.#abort_controller.abort();
 			clearInterval(this.#refresh_interval_countdown);
@@ -74,29 +77,28 @@ window.user_device_create_popup = new class {
 				}
 
 				this.#post(zabbixUrl({action: 'user.device.init'}), fields, (response) => {
-					this.#footer.querySelector('.js-submit')?.remove();
-					this.#footer.querySelector('.js-cancel')?.remove();
-					this.#qr_expires_at_ms = response.expires_at * 1000;
-					this.#refresh_interval_countdown = setInterval(() => this.#updateCountdownMessage(), 200);
-
+					this.#footer.querySelector('.js-submit').remove();
+					this.#footer.querySelector('.js-cancel').remove();
 					this.#form_element.querySelector('.form-grid').classList.add('hidden');
 					this.#form_element.querySelector('.js-qr-code-loading').classList.add('hidden');
 					this.#form_element.querySelector('.js-qr-code-wrapper').classList.remove('hidden');
 					this.#form_element.querySelector('.qr-code-container').classList.remove('hidden');
-					this.#displayQRCode(response.url);
-					this.#device_uuid = response.uuid;
 
-					this.#refresh_interval_device_status = setInterval(() => this.#checkDeviceStatus(), 2000);
+					this.#displayQRCode(response);
 				});
 			});
 	}
 
-	#displayQRCode(url) {
+	#displayQRCode(qrdata) {
+		this.#qr_expires_at_ms = qrdata.expires_at * 1000;
+		this.#refresh_interval_countdown = setInterval(() => this.#updateCountdownMessage(), 200);
+		this.#updateCountdownMessage();
+
 		const qr_code_div = this.#form_element.querySelector('.qr-code');
 
 		const size = qr_code_div.clientWidth;
 		new QRCode(qr_code_div, {
-			text: url,
+			text: qrdata.url,
 			width: size,
 			height: size,
 			correctLevel : QRCode.CorrectLevel.L,
@@ -104,8 +106,12 @@ window.user_device_create_popup = new class {
 			draw_integer: true
 		});
 
-		qr_code_div.dataset.ref = url;
+		qr_code_div.dataset.ref = qrdata.url;
 		qr_code_div.removeAttribute('title');
+
+		this.#device_uuid = qrdata.uuid;
+
+		this.#refresh_interval_device_status = setInterval(() => this.#checkDeviceStatus(), 2000);
 	}
 
 	#updateCountdownMessage() {
@@ -147,23 +153,7 @@ window.user_device_create_popup = new class {
 				}
 			})
 			.catch((exception) => {
-				if (this.#admin_mode) {
-					this.#ajaxExceptionHandler(exception)
-				}
-				else if (this.#overlay.$dialogue[0].isConnected) {
-					if (typeof exception === 'object' && 'error' in exception) {
-						if ('title' in exception.error) {
-							postMessageError(exception.error.title);
-						}
-
-						postMessageDetails('error', exception.error.messages);
-					}
-					else {
-						postMessageDetails('error', [<?= json_encode(_('Unexpected server error.')) ?>]);
-					}
-
-					overlayDialogueDestroy(this.#overlay.dialogueid);
-				}
+				this.#ajaxExceptionHandler(exception);
 			})
 			.finally(() => this.#overlay.unsetLoading());
 	}
@@ -184,6 +174,8 @@ window.user_device_create_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
+				this.#removePopupMessages();
 
 				if ('success' in response && this.#device_uuid) {
 					postMessageError(response.success.title);

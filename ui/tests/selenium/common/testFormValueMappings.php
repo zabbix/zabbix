@@ -148,7 +148,10 @@ class testFormValueMappings extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD);
 
-		$this->page->open('zabbix.php?action='.$source.'.list&filter_name=Clone Valuemap Test&filter_set=1')->waitUntilReady();
+		// Host and template lists use different filter field names.
+		$filter_field = ($source === 'host') ? 'filter_host' : 'filter_name';
+		$this->page->open('zabbix.php?action='.$source.'.list&'.$filter_field.'='.urlencode('Clone Valuemap Test').
+				'&filter_set=1')->waitUntilReady();
 
 		$this->query('link', 'Clone Valuemap Test')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Value mapping');
@@ -1017,7 +1020,10 @@ class testFormValueMappings extends CWebTest {
 		// Get name of host or template for the filter and link.
 		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($sourceid));
 
-		$this->page->open('zabbix.php?action='.$source.'.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+		// Host and template lists use different filter field names.
+		$filter_field = ($source === 'host') ? 'filter_host' : 'filter_name';
+		$this->page->open('zabbix.php?action='.$source.'.list&'.$filter_field.'='.urlencode($name).'&filter_set=1')
+				->waitUntilReady();
 		$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $name)->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();

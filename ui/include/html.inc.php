@@ -507,7 +507,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		// discovery rules
 		$lld_rules = new CSpan([
-			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
+			new CLink(_('Discovery rules'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'lldrule.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
@@ -539,13 +540,15 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			new CLink(
 				$db_discovery_rule['name'],
 				$db_lld_prototype_parents
-					? (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					? (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
 						->setArgument('context', $context)
-					: (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
+					: (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('context', $context)
 			)
@@ -557,7 +560,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			$parents_breadcrumbs_data = [];
 
 			foreach ($db_lld_prototype_parents as $parent) {
-				$parent_url = (new CUrl('host_discovery_prototypes.php'))
+				$parent_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent['itemid'])
 					->setArgument('context', $context)
 					->getUrl();
@@ -578,7 +582,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		$list->addItem(new CBreadcrumbs([
 			(new CSpan())->addItem(new CLink(_('Discovery list'),
-				(new CUrl('host_discovery.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -652,7 +657,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// Discovery prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Discovery prototypes'),
-				(new CUrl('host_discovery_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -1076,7 +1082,7 @@ function makeInformationList($info_icons) {
  * @param string     $description  Description of the maintenance.
  */
 function makeMaintenanceIcon($type, string $name, string $description): CButtonIcon {
-	$hint = $name.' ['.($type
+	$hint = $name.' ['.($type == MAINTENANCE_TYPE_NODATA
 		? _('Maintenance without data collection')
 		: _('Maintenance with data collection')).']';
 
@@ -1122,6 +1128,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 	$maintenance_names = [];
 	$username = '';
+	$ceprule_names = [];
 
 	foreach ($icon_data as $suppression) {
 		if (array_key_exists('maintenance_name', $suppression)) {
@@ -1130,9 +1137,13 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
+		elseif (array_key_exists('ceprule_name', $suppression)) {
+			$ceprule_names[] = $suppression['ceprule_name'];
+		}
 	}
 
 	$maintenances = implode(', ', $maintenance_names);
+	$ceprules = implode(', ', array_unique($ceprule_names));
 	$is_suppressed_by_maintenance = $maintenances !== '' && $username === '';
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
@@ -1140,10 +1151,11 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		->addClass($blink ? 'js-blink' : null)
 		->setAttribute('aria-label', $is_suppressed_by_maintenance
 			? _('Suppressed by maintenance')
-			: _('Manually suppressed')
+			: ($ceprules === '' ? _('Manually suppressed') : _('Suppressed by complex event processing'))
 		)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
+			($ceprules !== '' ? "\n"._s('Complex event processing: %1$s', $ceprules) : '').
 			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').
 			($maintenances !== '' ? "\n"._s('Maintenance: %1$s', $maintenances) : '')
 		);
