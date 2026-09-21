@@ -18,8 +18,8 @@ class CControllerApmTraceListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['traceid', 'spanid', 'service_name', 'span_count', 'error_count',
 		'span_name', 'span_kind', 'scope_name', 'scope_version', 'status_code', 'status_message', 'timestamp',
-		'trace_state', 'span_attributes', 'resource_attributes', 'duration', 'duration_time_units',
-		'duration_percentage'];
+		'timestamp_formatted', 'timestamp_ns_formatted', 'trace_state', 'span_attributes', 'resource_attributes',
+		'duration', 'duration_time_units', 'duration_percentage'];
 
 	protected array $filter = [];
 
@@ -143,11 +143,18 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['traceid', 'duration']);
+		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp_unix']);
+
+		$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
+
+		if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
+			$select_fields = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
+			$select_fields[] = 'timestamp';
+		}
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
-			'output' => array_diff($data_fields, ['duration_time_units', 'duration_percentage']),
+			'output' => $select_fields,
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
 			'min_duration' => $min_duration,
@@ -173,6 +180,27 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			foreach ($traces as &$trace) {
 				$trace['service_name'] = $trace['service_name'] ?: '['._('No root span found').']';
 				$trace['span_name'] = $trace['span_name'] ?: '['._('No root span found').']';
+
+				if (in_array('timestamp', $select_fields)) {
+					$today = strtotime('today');
+					$clock = floor($trace['timestamp'] / 1000000000);
+
+					if (in_array('timestamp_formatted', $data_fields)) {
+						$trace['timestamp_formatted'] = $clock >= $today
+							? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
+							: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
+					}
+
+					if (in_array('timestamp_ns_formatted', $data_fields)) {
+						$ns = str_pad((string)($trace['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+						$trace['timestamp_ns_formatted'] = $clock >= $today
+							? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+							: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+								['!' => $ns]
+							);
+					}
+				}
 
 				$trace['duration_time_units'] = $trace['duration']
 					? convertSecondsToTimeUnits($trace['duration'] * SEC_PER_NANOSEC, [

@@ -177,7 +177,7 @@
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
-						.setFields(['timestamp'])
+						.setFields(['timestamp_formatted'])
 						.setSortable(true)
 						.setRenderer('start_time')
 						.setWidth('auto'),
@@ -250,13 +250,13 @@
 					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('start_time', ({cell, cell_data}) => {
-					const [timestamp] = cell_data;
+					const [timestamp_formatted] = cell_data;
 
 					/** @type {HTMLDivElement} */
 					const wordbreak = document.createElement('div');
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
-					wordbreak.textContent = timestamp;
+					wordbreak.textContent = timestamp_formatted;
 
 					cell.appendChild(wordbreak);
 				})

@@ -72,15 +72,17 @@ class CControllerApmTraceListSplitView extends CController {
 			'sortorder' => ZBX_SORT_UP
 		]);
 
-		$trace_timestamp = explode('.', $trace['timestamp']);
-		$trace_start = (int) $trace_timestamp[1];
+		$trace_timestamp = (int) substr((string) $trace['timestamp'], -9);
+		$trace_start = $trace_timestamp;
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
+
+		$today = strtotime('today');
 
 		$trace_view_spans = [];
 		foreach ($spans as $i => $span) {
-			$span_timestamp = explode('.', $span['timestamp']);
+			$span_timestamp = (int) substr((string) $span['timestamp'], -9);
 
-			$span_start = ((int) $span_timestamp[1] - $trace_start) * SEC_PER_NANOSEC;
+			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
 
 			$span_events = array_map(static function (array $event) use ($trace_start) {
@@ -111,6 +113,16 @@ class CControllerApmTraceListSplitView extends CController {
 				])
 				: '0'._x('ns', 'nanosecond short');
 
+			$clock = floor($span['timestamp'] / 1000000000);
+
+			$ns = str_pad((string)($span['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+
+			$timestamp = $clock >= $today
+				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+					['!' => $ns]
+				);
+
 			$trace_view_spans[$i] = [
 				'index' => $i,
 				'id' => $span['spanid'],
@@ -120,7 +132,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'service_name' => $span['service_name'],
 				'scope_name' => $span['scope_name'],
 				'duration' => $span_duration,
-				'timestamp' => $span['timestamp'],
+				'timestamp' => $timestamp,
 				'start' => $span_start,
 				'end' => $span_end,
 				'count' => $span_count ?: null,

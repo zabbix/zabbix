@@ -198,6 +198,7 @@ class CApmTrace extends CApmGeneral {
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
 				$query->select(match($field) {
 					'TraceId' => 't.TraceId',
+					'Timestamp' => 'anyIf(toUnixTimestamp64Nano(t.Timestamp),t.ParentSpanId=\'\')',
 					'span_count' => 'count()',
 					'error_count' => 'countIf(t.StatusCode=\'Error\')',
 					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
