@@ -389,7 +389,7 @@ class testCepRule extends CAPITest {
 			],
 			'Sortorder is required' => [
 				'request' => [
-					'name' => 'ceprule',
+					'name' => 'ceprule'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "sortorder" is missing.'
 			],
