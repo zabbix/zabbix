@@ -253,24 +253,6 @@ class CControllerApmMetricListData extends CControllerDataTable {
 					$metric['histogram_buckets'] = null;
 				}
 
-				$clock = floor($metric['timestamp'] / 1000000000);
-
-				if (in_array('timestamp_formatted', $data_fields)) {
-					$metric['timestamp_formatted'] = $clock >= $today
-						? zbx_date2str(TIME_FORMAT_SECONDS, $clock)
-						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
-				}
-
-				if (in_array('timestamp_ns_formatted', $data_fields)) {
-					$ns = str_pad((string) ($metric['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
-
-					$metric['timestamp_ns_formatted'] = $clock >= $today
-						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
-						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-							['!' => $ns]
-						);
-				}
-
 				$metric['exemplars'] = $this->prepareExemplars($metric['exemplars'], $today);
 
 				unset($metric['start_time_unix'], $metric['time_unix']);
@@ -362,15 +344,13 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		$groups = [];
 
 		foreach ($exemplars as $i => $exemplar) {
-//			$clock = floor($exemplar['time_unix'] / 1000000000);
-//			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
-//			$time = $clock >= $today
-//				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
-//				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-//					['!' => $ns]
-//				);
-
-			$time = $exemplar['time_unix'];
+			$clock = floor($exemplar['time_unix'] / 1000000000);
+			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
+			$time = $clock >= $today
+				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+					['!' => $ns]
+				);
 
 			$group = [
 				'title' => _s('Exemplar %1$s', $i + 1),
