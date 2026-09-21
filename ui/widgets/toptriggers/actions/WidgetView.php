@@ -115,7 +115,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			foreach ($trigger['hosts'] as &$host) {
 				if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					if(array_key_exists($host['maintenanceid'],$maintenances)) {
+					if(array_key_exists($host['maintenanceid'], $maintenances)) {
 						$host['maintenance_name'] = $maintenances[$host['maintenanceid']]['name'];
 						$host['maintenance_description'] = $maintenances[$host['maintenanceid']]['description'];
 					}

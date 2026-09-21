@@ -199,7 +199,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					? _('Maintenance with data collection')
 					: _('Maintenance without data collection');
 
-				if (array_key_exists($host['maintenanceid'],$maintenances)) {
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
 					$host_maintenance['name'] = $maintenances[$host['maintenanceid']]['name'];
 					$host_maintenance['description'] = $maintenances[$host['maintenanceid']]['description'];
 				}
