@@ -1865,7 +1865,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[
 						self::qcol('SpanName'),
 						self::qcol('SpanAttributes', 'k1'),
-						self::qcol('SpanAttributes', '🙂🙃 ZaBbiX зАБбИкс āēīõšŗ'),
+						self::qcol('SpanAttributes', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
 						self::qcol('SpanAttributes', 'unset')
 					],
 					[
@@ -1875,7 +1875,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						CONDITION_EVAL_TYPE_EXPRESSION,
 						[
 							self::qcond('SpanAttributes', CONDITION_OPERATOR_EQUAL, 'v1', 'k1'),
-							self::qcond('SpanAttributes', CONDITION_OPERATOR_EQUAL, '  🙂🙃  ', '🙂🙃 ZaBbiX зАБбИкс āēīõšŗ')
+							self::qcond('SpanAttributes', CONDITION_OPERATOR_EQUAL, '  🙂🙃  ', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ')
 						],
 						"A and B"
 					)
@@ -1886,7 +1886,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						'columns' => [
 							'SpanName' => 'd',
 							'SpanAttributes.k1' => 'v1',
-							'SpanAttributes.🙂🙃 ZaBbiX зАБбИкс āēīõšŗ' => '  🙂🙃  ',
+							'SpanAttributes.  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ',
 							'SpanAttributes.unset' => '',
 							'cnt' => 1
 						]
@@ -1896,8 +1896,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					'traces' => [
 						self::tmplSimpleSpan($now, -100, 'a', []),
 						self::tmplSimpleSpan($now, -101, 'b', ['k1' => 'v1']),
-						self::tmplSimpleSpan($now, -102, 'c', ['🙂🙃 ZaBbiX зАБбИкс āēīõšŗ' => '  🙂🙃  ']),
-						self::tmplSimpleSpan($now, -103, 'd', ['k1' => 'v1', '🙂🙃 ZaBbiX зАБбИкс āēīõšŗ' => '  🙂🙃  '])
+						self::tmplSimpleSpan($now, -102, 'c', ['  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ']),
+						self::tmplSimpleSpan($now, -103, 'd', ['k1' => 'v1', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  '])
 					]
 				]
 			]

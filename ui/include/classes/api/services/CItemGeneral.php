@@ -320,13 +320,11 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
-					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit', 'query']));
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules(
-					$item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)
-						? ['query' => $item['query']] + $db_item
-						: $db_item
+					$item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? $item : $db_item
 				);
 			}
 
