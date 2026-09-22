@@ -5821,7 +5821,6 @@ section {
   border-left-color: #4f4f4f; }
 
 .trace-view {
-  --trace-tree-width: 294px;
   --trace-details-width: 258px;
   --trace-row-block-size: 52px;
   --trace-label-gap: 120px;
@@ -5918,9 +5917,7 @@ section {
     .trace-view .trace-scroll .trace-tree {
       display: grid;
       grid-template-rows: 38px minmax(0, 1fr);
-      inline-size: var(--trace-tree-width);
-      min-block-size: 100%;
-      border-inline-end: 1px solid var(--trace-border-color); }
+      min-block-size: 100%; }
       .trace-view .trace-scroll .trace-tree .trace-tree-header {
         grid-row: 1;
         display: flex;

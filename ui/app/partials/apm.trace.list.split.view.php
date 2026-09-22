@@ -44,19 +44,24 @@ $trace_view = (new CDiv())
 			)
 	)
 	->addItem(
-		(new CDiv())
+		(new CSplitView())
+			->setMinPosition('10%')
+			->setMaxPosition('90%')
+			->setPosition('294px')
 			->addClass('trace-scroll')
 			->setAttribute('data-trace-scroll', '')
 			->addItem(
-				(new CDiv())
+				(new CSplitViewPane())
+					->addClass('trace-tree')
+					->addItem([
+						(new CDiv('Span tree'))->addClass('trace-tree-header'),
+						(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
+					])
+			)
+			->addItem(
+				(new CSplitViewPane())
 					->addClass('trace-body')
 					->addItem([
-						(new CDiv())
-							->addClass('trace-tree')
-							->addItem([
-								(new CDiv('Span tree'))->addClass('trace-tree-header'),
-								(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
-							]),
 						(new CDiv())
 							->addClass('trace-time')
 							->addItem([
