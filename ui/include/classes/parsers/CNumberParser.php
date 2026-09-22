@@ -73,7 +73,7 @@ class CNumberParser extends CParser {
 		}
 
 		if ($this->options['with_size_suffix']) {
-			$this->suffixes .= ZBX_SIZE_SUFFIXES;
+			$this->suffixes .= str_replace('|', '', ZBX_SIZE_SUFFIXES);
 
 			$this->suffix_multipliers += $this->options['is_binary_size']
 				? ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY
