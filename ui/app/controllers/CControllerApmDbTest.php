@@ -47,6 +47,8 @@ class CControllerApmDbTest extends CController {
 
 	protected function doAction(): void {
 		$apm = $this->getInputAll() + [
+			'username' => '',
+			'password' => '',
 			'ssl_verify_peer' => APM_GLOBAL_DB_VERIFY_PEER_DISABLED,
 			'ssl_verify_host' => APM_GLOBAL_DB_VERIFY_HOST_DISABLED,
 			'ssl_cert_file' => '',
