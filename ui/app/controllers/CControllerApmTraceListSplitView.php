@@ -27,9 +27,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'traceid' => 'required|string',
-			'from' => 'required|string',
-			'to' => 'required|string'
+			'traceid' => 'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,9 +48,7 @@ class CControllerApmTraceListSplitView extends CController {
 	protected function doAction(): void {
 		$timeline = getTimeSelectorPeriod([
 			'profileIdx' => 'web.apm.trace.filter',
-			'profileIdx2' => 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			'profileIdx2' => 0
 		]);
 
 		$traceid = $this->getInput('traceid');
