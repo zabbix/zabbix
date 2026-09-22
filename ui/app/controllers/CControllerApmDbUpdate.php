@@ -31,7 +31,7 @@ class CControllerApmDbUpdate extends CController {
 			'status' => ['boolean', 'required',
 				'in' => [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED, APM_GLOBAL_DB_STATUS_CONFIGURED]],
 			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => [$status_configured],
-				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https']]]],
+				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https'], 'require_scheme' => true]]],
 			'authentication_type' => ['integer', 'required',
 				'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_NONE],
 				'when' => [$status_configured]

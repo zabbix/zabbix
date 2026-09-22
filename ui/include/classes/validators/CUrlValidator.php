@@ -34,7 +34,7 @@ class CUrlValidator extends CValidator {
 	 *   'schemes'            If not null, the URL scheme will be validated against the provided list.
 	 *                        The list is expected to contain schemes in lower case.
 	 *                        Scheme validation won't take place if the URL does not contain a scheme component.
-	 *   'required_scheme'    If true, the URL must contain scheme.
+	 *   'require_scheme'     If true, the URL must contain scheme.
 	 *
 	 * @var array
 	 */
@@ -44,7 +44,7 @@ class CUrlValidator extends CValidator {
 		'event_tags_macro' => false,
 		'manualinput_macro' => false,
 		'schemes' => null,
-		'required_scheme' => false
+		'require_scheme' => false
 	];
 
 	/**
@@ -144,7 +144,7 @@ class CUrlValidator extends CValidator {
 			return false;
 		}
 
-		if ($this->options['required_scheme'] && !array_key_exists('scheme', $url_parts)) {
+		if ($this->options['require_scheme'] && !array_key_exists('scheme', $url_parts)) {
 			$this->setError(_('URL scheme is required'));
 
 			return false;
