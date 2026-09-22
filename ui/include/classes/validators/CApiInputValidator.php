@@ -787,8 +787,9 @@ class CApiInputValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -802,9 +803,29 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
+		$is_macro = false;
+
+		if (is_string($data)
+				&& ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data)))) {
+			$is_macro = true;
+		}
+
+		if ((!is_int($data) && !is_string($data))
+				|| (!$is_macro && !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data)))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
+		}
+
+		$supports_macro = $flags & (API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO);
+
+		if ($supports_macro && array_key_exists('length', $rule) && mb_strlen(strval($data)) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($is_macro) {
+			return true;
 		}
 
 		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
@@ -816,9 +837,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (is_string($data)) {
-			$data = (int) $data;
-		}
+		$data = $supports_macro ? (string) $data : (int) $data;
 
 		return true;
 	}

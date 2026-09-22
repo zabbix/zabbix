@@ -45,6 +45,21 @@ class CLogHelper {
 	}
 
 	/**
+	 * Set log offset to the end of file.
+	 *
+	 * @param string $path    log file path
+	 */
+	public static function skipLog($path) {
+		if (($file = fopen($path, 'rb')) === false) {
+			throw new Exception('Failed to open log "'.$path.'".');
+		}
+
+		fseek($file, 0, SEEK_END);
+		self::$log_offsets[$path] = ftell($file);
+		fclose($file);
+	}
+
+	/**
 	 * Read content of the log.
 	 *
 	 * @param string  $path         log file path

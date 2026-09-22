@@ -176,11 +176,11 @@ static unsigned char	str_to_dc_flag(const char *str)
 	return 0;
 }
 
-static void	zbx_dummy_history_sync(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+static void	zbx_dummy_history_sync(const zbx_events_funcs_t *events_cbs, int mode,
 		zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
-	ZBX_UNUSED(rtc);
+	ZBX_UNUSED(mode);
 
 	memset(stats, 0, sizeof(zbx_history_sync_stats_t));
 }

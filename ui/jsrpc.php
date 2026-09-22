@@ -376,6 +376,7 @@ switch ($data['method']) {
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'proxy_groupids' => array_key_exists('without_proxy_group', $data) ? 0 : null,
 					'limit' => $limit
 				]);
 

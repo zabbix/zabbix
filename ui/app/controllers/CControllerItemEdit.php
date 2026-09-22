@@ -103,9 +103,12 @@ class CControllerItemEdit extends CControllerItem {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
 		$item = $this->hasInput('clone') ? $this->getClone($host) : $this->getItem($host);
 		$item['context'] = $this->getInput('context');
-		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
-			? $inherited_timeouts[$item['type']] : '';
+
+		$inherited = getInheritedTimeouts($host['proxyid']);
+		$item['timeout_inaccessible'] = $inherited['source'] === 'inaccessible';
+		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited['timeouts'])
+			? $inherited['timeouts'][$item['type']]
+			: '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];
@@ -181,7 +184,7 @@ class CControllerItemEdit extends CControllerItem {
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'executable_item_types' => checkNowAllowedTypes(),
-			'inherited_timeouts' => $inherited_timeouts,
+			'inherited_timeouts' => $inherited['timeouts'],
 			'interface_types' => itemTypeInterface(),
 			'inventory_fields' => $inventory_fields,
 			'value_type_keys' => $value_type_keys,

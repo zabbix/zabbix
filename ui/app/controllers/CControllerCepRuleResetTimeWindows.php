@@ -14,15 +14,18 @@
 **/
 
 
-class CControllerCorrelationDelete extends CController {
-
+class CControllerCepRuleResetTimeWindows extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
-			'correlationids' => 'required|array_db correlation.correlationid'
+			'cepruleid' => 'required|db cep_rule.cep_ruleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,19 +43,15 @@ class CControllerCorrelationDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
-	}
-
 	protected function doAction(): void {
-		$correlationids = $this->getInput('correlationids');
-		$deleted = count($correlationids);
+		$cep_ruleid = $this->getInput('cepruleid');
+
+		$result = API::CepRule()->resetTimeWindows(['cep_ruleid' => $cep_ruleid]);
+
 		$output = [];
 
-		$result = API::Correlation()->delete($correlationids);
-
 		if ($result) {
-			$output['success']['title'] = _n('Event correlation deleted', 'Event correlations deleted', $deleted);
+			$output['success']['title'] = _('Rule time windows are reset');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -60,18 +59,9 @@ class CControllerCorrelationDelete extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot delete event correlation', 'Cannot delete event correlations', $deleted),
+				'title' => _('Cannot reset rule time windows'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
-
-			$correlations = API::Correlation()->get([
-				'output' => [],
-				'correlationids' => $correlationids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$output['keepids'] = array_keys($correlations);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

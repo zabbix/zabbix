@@ -12,9 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxstr.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxhistory.h"
+#include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxcommon.h"
 #include "zbxrtc.h"
@@ -28,6 +29,7 @@
 #include "zbxnix.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 #include "zbxdb.h"
 #include "zbxprof.h"
 #ifdef HAVE_ARES_QUERY_CACHE
@@ -35,7 +37,7 @@
 #endif
 
 #ifdef HAVE_NETSNMP
-#include "zbxsnmp.h"
+#	include "zbxsnmp.h"
 #endif
 
 #ifdef HAVE_LIBXML2
@@ -113,11 +115,14 @@ typedef struct
 
 	const zbx_proc_startup_t	*runlevels;
 	zbx_supervisor_unit_set_t	unitsets[ZBX_PROCESS_TYPE_COUNT];
+
+	zbx_atomic_uint32_t		unit_exit_num;
 }
 zbx_supervisor_t;
 
 typedef struct
 {
+	zbx_atomic_uint32_t		*unit_exit_num;
 	zbx_supervisor_unit_args_t	*unit_args;
 	void				*(*unit_entry)(void *);
 }
@@ -171,6 +176,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_HISTSYNCER:
+			*runlevel = ZBX_RUNLEVEL_STARTUP;
 			break;
 
 		case ZBX_PROCESS_TYPE_DISCOVERER:
@@ -211,7 +217,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_TASKMANAGER:
-			*runlevel = ZBX_RUNLEVEL_TASKMANAGER;
+			*runlevel = ZBX_RUNLEVEL_POSTSYNC;
 			break;
 
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
@@ -251,7 +257,8 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
-			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
+			*owner = PROCESS_OWNER_SUPERVISOR;
+			*runlevel = ZBX_RUNLEVEL_POSTSYNC;
 			break;
 
 		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
@@ -299,6 +306,16 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			*runlevel = ZBX_RUNLEVEL_SUPERVISOR;
 			break;
 
+		case ZBX_PROCESS_TYPE_CEP_MANAGER:
+			*owner = PROCESS_OWNER_SUPERVISOR;
+			*runlevel = ZBX_RUNLEVEL_CEP;
+			break;
+
+		case ZBX_PROCESS_TYPE_CEP_WORKER:
+			*owner = PROCESS_OWNER_UNKNOWN;
+			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
+			break;
+
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown process type: %d", process_type);
 			zbx_exit(EXIT_FAILURE);
@@ -309,16 +326,18 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate total count of processes with direct ownership          *
+ * Purpose: prepare supervisor                                                *
  *                                                                            *
  * Parameters: config_forks - [IN] array of configured process counts         *
  *                                                                            *
- * Return value: total process count                                          *
+ * Return value: number of processes with direct ownership                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_supervisor_get_process_count(const int *config_forks)
+int	zbx_supervisor_prepare(const int *config_forks)
 {
 	int	process_count = 0;
+
+	zbx_supervisor_client_prepare(config_forks);
 
 	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
@@ -446,6 +465,7 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
 	zbx_vector_runlevel_sub_create(&sv->runlevel_subs);
 	sv->runlevel = 0;
 	sv->runlevels = runlevels;
+	atomic_store(&sv->unit_exit_num, 0);
 	memset(sv->states, 0, sizeof(sv->states));
 	memset(sv->unitsets, 0, sizeof(sv->unitsets));
 
@@ -682,7 +702,7 @@ static void	*supervisor_thread_entry(void *args)
 	void				*(*unit_entry)(void *) = thread_args->unit_entry;
 	sigjmp_buf			jmp_ret;
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, thread_args->unit_exit_num);
 
 	zbx_set_is_running(unit_is_running, thread_args->unit_args->runstate);
 	zbx_set_log_component(unit_args->name, unit_args->logger);
@@ -696,13 +716,16 @@ static void	*supervisor_thread_entry(void *args)
  *                                                                            *
  * Purpose: start a unit thread with specified entry function and arguments   *
  *                                                                            *
- * Parameters: unit         - [IN] supervisor unit to start                   *
- *             thread_entry - [IN] thread entry function                      *
- *             args         - [IN] thread arguments structure                 *
+ * Parameters: unit          - [IN] supervisor unit to start                  *
+ *             thread_entry  - [IN] thread entry function                     *
+ *             args          - [IN] thread arguments structure                *
+ *             shared        - [IN] data shared between units                 *
+ *             unit_exit_num - [IN/OUT] counter of exited (stopped/crashed)   *
+ *                                  units                                     *
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),
-		const zbx_thread_args_t *args)
+		const zbx_thread_args_t *args, zbx_supervisor_unit_shared_t *shared, zbx_atomic_uint32_t *unit_exit_num)
 {
 	int				err;
 	pthread_attr_t			attr;
@@ -713,6 +736,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	unit_args = (zbx_supervisor_unit_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_args_t));
 	unit_args->args = *args;
 	unit_args->logger = &unit->logger;
+	unit_args->shared = shared;
 	unit_args->runstate = &unit->runstate;
 	unit->runstate = UNIT_RUNNING;
 	zbx_snprintf(unit_args->name, sizeof(unit_args->name), "%s #%d",
@@ -720,6 +744,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 
 	thread_args->unit_args = unit_args;
 	thread_args->unit_entry = thread_entry;
+	thread_args->unit_exit_num = unit_exit_num;
 
 	zbx_pthread_init_attr(&attr);
 	if (0 != (err = pthread_create(&unit->handle, &attr, supervisor_thread_entry, (void *)thread_args)))
@@ -735,11 +760,12 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
  *                                                                            *
  * Parameters: sv            - [IN] supervisor instance                       *
  *             args          - [IN] supervisor thread arguments               *
+ *             shared        - [IN] data shared between units                 *
  *             runlevel_last - [IN] previous runlevel                         *
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_supervisor_args_t *args,
-		int runlevel_last)
+		zbx_supervisor_unit_shared_t *shared, int runlevel_last)
 {
 	zbx_thread_args_t	thread_args;
 
@@ -771,7 +797,8 @@ static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_superv
 			thread_args.info.server_num = info->index;
 			thread_args.args = args->unit_defs[info->type].args;
 
-			supervisor_unit_start(unit, args->unit_defs[info->type].entry, &thread_args);
+			supervisor_unit_start(unit, args->unit_defs[info->type].entry, &thread_args, shared,
+					&sv->unit_exit_num);
 		}
 	}
 }
@@ -967,6 +994,26 @@ static void	supervisor_handle_log(double time_now)
 	}
 }
 
+static int	supervisor_init_shared(zbx_supervisor_unit_shared_t *shared, char **error)
+{
+	char	*errmsg = NULL;
+
+	if (NULL == (shared->dbpool = zbx_dbconn_pool_create(&errmsg)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot create database connection pool: %s", errmsg);
+		zbx_free(errmsg);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static void	supervisor_clear_shared(zbx_supervisor_unit_shared_t *shared)
+{
+	if (NULL != shared->dbpool)
+		zbx_dbconn_pool_free(shared->dbpool);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: set run state for all units                                       *
@@ -1006,8 +1053,8 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
-	int				runlevel_last = 0;
-	zbx_dbconn_pool_t		*dbpool;
+	int				runlevel_last = 0, shutdown = 0;
+	zbx_supervisor_unit_shared_t	shared = {0};
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -1018,9 +1065,9 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 	zbx_supervisor_worklog_init();
 
-	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
+	if (SUCCEED != supervisor_init_shared(&shared, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create database connection pool: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
@@ -1093,7 +1140,8 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 					sypervisor_get_activities(client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
-					goto out;
+					shutdown = 1;
+					break;
 				default:
 					continue;
 			}
@@ -1104,9 +1152,12 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (0 != shutdown)
+			break;
+
 		if (runlevel_last != sv.runlevel)
 		{
-			supervisor_start_units(&sv, local_args, runlevel_last);
+			supervisor_start_units(&sv, local_args, &shared, runlevel_last);
 			runlevel_last = sv.runlevel;
 		}
 
@@ -1114,8 +1165,14 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 		zbx_prof_update(get_process_type_string(process_type), time_now);
 		supervisor_handle_log(time_now);
+
+		if (0 != atomic_load(&sv.unit_exit_num))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "a supervisor unit has exited, terminating");
+			zbx_set_exiting_with_fail();
+		}
 	}
-out:
+
 	if (ZBX_RUNLEVEL_DEFAULT != sv.runlevel || 0 != sv.states[sv.runlevel].pending_local_num ||
 		SUCCEED != ZBX_IS_NORMAL_EXIT())
 	{
@@ -1128,10 +1185,13 @@ out:
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
 
+	if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_history_destroy();
+
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
 
-	zbx_dbconn_pool_free(dbpool);
+	supervisor_clear_shared(&shared);
 
 	supervisor_clear_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_clear();
@@ -1140,3 +1200,4 @@ out:
 
 #undef DEFAULT_SLEEP_TIME
 }
+

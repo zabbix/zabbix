@@ -120,6 +120,14 @@ INSERT INTO triggers (triggerid, expression, description, comments, templateid) 
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99005, '{99734}=0', 'testInheritanceTrigger2', '', 99001);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99006, '{99735}=0', 'testInheritanceTrigger3', '', 99002);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (99007, '{99736}=0', 'testInheritanceTrigger4', '', 99003);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99000, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99001, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99002, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99003, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99004, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99005, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99006, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99007, 0, 0, 0, '');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99729, 99000, 15000, 'last', '$');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99730, 99001, 15000, 'last', '$');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (99731, 99002, 15000, 'last', '$');
@@ -257,6 +265,14 @@ INSERT INTO triggers (triggerid, expression, description, comments, flags, templ
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99013, '{99742}=0', 'testInheritanceTriggerPrototype2', '', 2, 99009);
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99014, '{99743}=0', 'testInheritanceTriggerPrototype3', '', 2, 99010);
 INSERT INTO triggers (triggerid, expression, description, comments, flags, templateid) VALUES (99015, '{99744}=0', 'testInheritanceTriggerPrototype4', '', 2, 99011);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99008, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99009, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99010, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99011, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99012, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99013, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99014, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99015, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99737, 15021, 99008, 'last', '$');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99738, 15021, 99009, 'last', '$');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99739, 15021, 99010, 'last', '$');
@@ -447,15 +463,19 @@ INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (991
 
 -- testFormTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (14000, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14000, 99102, 14000, 'last', '$,#1');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14001, '{14001}=0', 'testFormTrigger2', '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (14001, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14001, 99102, 14001, 'last', '$,#1');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14002, '{14002}=0', 'testFormTrigger3', '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (14002, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14002, 99102, 14002, 'last', '$,#1');
 
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (14003, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (14003, 99102, 14003, 'last', '$,#1');
 
 -- testFormGraph.LayoutCheck testFormGraph.SimpleUpdate
@@ -494,10 +514,14 @@ INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,
 INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (39505, 23804, 133800);
 
 -- testFormTriggerPrototype.SimpleUpdate
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99518,'{99947}=0','testFormTriggerPrototype1','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99519,'{99948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99520,'{99949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99521,'{99950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (99518,'{99947}=0','testFormTriggerPrototype1','',0,0,'',NULL,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (99519,'{99948}=0','testFormTriggerPrototype2','',0,0,'',NULL,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (99520,'{99949}=0','testFormTriggerPrototype3','',0,0,'',NULL,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (99521,'{99950}=0','testFormTriggerPrototype4','',0,0,'',NULL,0,2);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99518, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99519, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99520, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99521, 0, 0, 0, '');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99947,23804,99518,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99948,23804,99519,'last','$,#2');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99949,23804,99520,'last','$,#4');
@@ -594,16 +618,26 @@ INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_d
 INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (39509,400500,400470,'',0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (39510,400520,400460,'',0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,lldruleid,key_,lastcheck,ts_delete) VALUES (39512,400540,400470,'',0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100008,'{100008}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100009,'{100009}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',100008,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100010,'{100010}=0','Trigger ZBX6663 Second','',0,0,0,0,'','',100008,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100011,'{100011}=0','Trigger ZBX6663 First','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100012,'{100012}=0','Trigger ZBX6663','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100013,'{100013}=0','TriggerProto ZBX6663 TSecond','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100014,'{100014}=0','TriggerProto ZBX6663 Second','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100015,'{100015}=0','TriggerProto ZBX6663 Second','',0,0,0,0,'','',100014,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100016,'{100016}=0','TriggerProto ZBX6663 Second','',0,0,0,0,'','',100014,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100017,'{100017}=0','TriggerProto ZBX6663 HSecond','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100008,'{100008}=0','Trigger ZBX6663 Second','',0,0,'',NULL,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100009,'{100009}=0','Trigger ZBX6663 Second','',0,0,'',100008,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100010,'{100010}=0','Trigger ZBX6663 Second','',0,0,'',100008,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100011,'{100011}=0','Trigger ZBX6663 First','',0,0,'',NULL,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100012,'{100012}=0','Trigger ZBX6663','',0,0,'',NULL,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100013,'{100013}=0','TriggerProto ZBX6663 TSecond','',0,0,'',NULL,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100014,'{100014}=0','TriggerProto ZBX6663 Second','',0,0,'',NULL,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100015,'{100015}=0','TriggerProto ZBX6663 Second','',0,0,'',100014,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100016,'{100016}=0','TriggerProto ZBX6663 Second','',0,0,'',100014,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100017,'{100017}=0','TriggerProto ZBX6663 HSecond','',0,0,'',NULL,0,2);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100008, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100009, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100010, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100011, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100012, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100013, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100014, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100015, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100016, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100017, 0, 0, 0, '');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100008,400380,100008,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100009,400390,100009,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100010,400400,100010,'last','$,#1');
@@ -692,12 +726,16 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid) values (39514, 4
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400620,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'','30','','');
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400630,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'','30','','');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400630, 'Item-layout-test-002', 'ITEM-LAYOUT-TEST-002');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,'',NULL,0,2);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100022, 0, 0, 0, '');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100022,400600,100022,'last','$,#1');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (100023, '{100023}=0', 'Trigger-proto-layout-test-001', '', 2);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100023, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100023, 400610, 100023,'last','$,#1');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100024,'{100024}=0','Trigger-layout-test-001','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100025,'{100025}=0','Trigger-layout-test-002','',0,0,0,0,'','',NULL,0,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100024,'{100024}=0','Trigger-layout-test-001','',1,0,'',NULL,0,0);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100024, 0, 0, 0, '');
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100025,'{100025}=0','Trigger-layout-test-002','',0,0,'',NULL,0,0);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100025, 0, 0, 0, '');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100024,400630,100024,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100025,400620,100025,'last','$,#1');
 
@@ -707,7 +745,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4)
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400650,0,50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50021,'',0,'','30','','');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400650, 'Item-layout-test-zbx6840', 'ITEM-LAYOUT-TEST-ZBX6840');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100026,'{100026}=0 and {100027}=0','Trigger-map-test-zbx6840','',0,0,0,0,'','',NULL,0,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100026,'{100026}=0 and {100027}=0','Trigger-map-test-zbx6840','',0,0,'',NULL,0,0);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100026, 0, 0, 0, '');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100026,400650,100026,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100027,42237,100026,'last','$,#1');
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
@@ -806,7 +845,8 @@ INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expr
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (13, 105, 2, 1, 'expression 4 for clone', 3);
 
 -- Create two triggers with event
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger to check tag filter on problem page','{100185}>100','0','0','','3','','1','0','0','','','99250');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger to check tag filter on problem page','{100185}>100','0','0','','3','','1','0','0','','',99250);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99250, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100185','99250','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99250','98997');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('service','abcdef','99250','98998');
@@ -816,7 +856,8 @@ INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (90,92,'Service','ab
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (92,0,0,99250,1603456428,128786843,'Test trigger to check tag filter on problem page',3);
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (90,92,'Service','abc'),(91,92,'service','abcdef'),(92,92,'Database',''),(98,92,'Tag4',''),(99,92,'Tag5','5');
 
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger with tag','{100186}>100','0','0','','2','','1','0','0','','','99251');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger with tag','{100186}>100','0','0','','2','','1','0','0','','',99251);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99251, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100186','99251','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99251','99000');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (93,0,0,99251,1603466628,128786843,1,'Test trigger with tag',2);
@@ -912,7 +953,8 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO host_discovery (hostid, parent_hostid, lldruleid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
 
 -- testPageProblems_TagPriority
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','',99252);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99252, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100181','99252','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99252','99005');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99252','99006');
@@ -929,7 +971,8 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (101,96,'Beta','
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (102,96,'Alpha','a');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (103,96,'Gamma','g');
 
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Second test trigger with tag priority','{100182}>100','0','1','','2','','1','0','0','','','99253');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Second test trigger with tag priority','{100182}>100','0','1','','2','','1','0','0','','',99253);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99253, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100182','99253','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Zeta','z','99253','99009');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99253','99010');
@@ -946,7 +989,8 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (105,97,'Beta','
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (106,97,'Epsilon','e');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (107,97,'Eta','e');
 
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Third test trigger with tag priority','{100183}>100','0','1','','2','','1','0','0','','','99254');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Third test trigger with tag priority','{100183}>100','0','1','','2','','1','0','0','','',99254);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99254, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100183','99254','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Kappa','k','99254','99013');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Iota','i','99254','99014');
@@ -963,7 +1007,8 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (109,98,'Iota','
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (110,98,'Alpha','a');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (111,98,'Theta','t');
 
-INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Fourth test trigger with tag priority','{100184}>100','0','1','','2','','1','0','0','','','99255');
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Fourth test trigger with tag priority','{100184}>100','0','1','','2','','1','0','0','','',99255);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (99255, 0, 0, 0, '');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100184','99255','42253','avg','$,5m');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99255','99017');
 INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99255','99018');
@@ -987,7 +1032,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 50
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99087, 2, 99011, 'Trapper_for_suppression', '', 'trapper_sup', 30, NULL, '', '', '', '', '','');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99087, 'Trapper_for_suppression', 'TRAPPER_FOR_SUPPRESSION');
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger_for_suppression', '{100031}>0', 1, 3, 0, '1535012391', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100031, 'Trigger_for_suppression', '{100031}>0', 3, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100031, 1, 0, '1535012391', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '$,#1');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99004, 'SupTag','A', 100031);
 
@@ -1114,35 +1160,40 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) va
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99090, 2, 99050, 'Trapper', '', 'trap', 30, NULL, '', '', '', '', '','');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99090, 'Trapper', 'TRAPPER');
 
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 0, 1, 0, '0', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 1, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100060, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100060, 99090, 100060, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99030, 'TagA','A', 100060);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99031, 'TagB','b', 100060);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99032, 'TagD','d', 100060);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99033, 'TagG','g', 100060);
 
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100061, 'Second trigger for tag filtering', '{100061}>0', 0, 2, 0, '0', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100061, 'Second trigger for tag filtering', '{100061}>0', 2, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100061, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100061, 99090, 100061, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99034, 'TagB','b', 100061);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99035, 'TagE','e', 100061);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99036, 'TagE1','e', 100061);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99037, 'TagZ','z', 100061);
 
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100062, 'Third trigger for tag filtering', '{100062}>0', 0, 3, 0, '0', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100062, 'Third trigger for tag filtering', '{100062}>0', 3, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100062, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100062, 99090, 100062, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99038, 'TagA','a', 100062);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99039, 'TagI','i', 100062);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99040, 'TagK','k', 100062);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99041, 'TagT','t', 100062);
 
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100063, 'Fourth trigger for tag filtering', '{100063}>0', 0, 4, 0, '0', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100063, 'Fourth trigger for tag filtering', '{100063}>0', 4, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100063, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100063, 99090, 100063, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99042, 'TagD','d', 100063);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99043, 'TagE1','e', 100063);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99044, 'TagG','g', 100063);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99045, 'TagT','t', 100063);
 
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 5, 0, '0', '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 5, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100064, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
 
 -- testPageAvailabilityReport SLA reports
@@ -1158,6 +1209,9 @@ INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100001, '{16028}=0', 'A trigger', '');
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100002, '{16029}=0', 'B trigger', '');
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100003, '{16030}=0', 'C trigger', '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100001, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100002, 0, 0, 0, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100003, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 400670, 100001,'last','$,#1');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 400680, 100002,'last','$,#1');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 400690, 100003,'last','$,#1');
@@ -1166,7 +1220,8 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99061, 'Inheritance template for triggers filtering', 'Inheritance template for triggers filtering', 3, '', '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99913, 99061, 1);
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid,query_fields, params, posts, headers) VALUES (99092, 2, 99061, 'Inheritance item for triggers filtering', '', 'trap', NULL,'', '', '', '');
-INSERT INTO triggers (triggerid, description, expression, priority, state, comments) VALUES (100065, 'Inheritance trigger with tags', '{100065}>0',3, 1, '');
+INSERT INTO triggers (triggerid, description, expression, priority, comments) VALUES (100065, 'Inheritance trigger with tags', '{100065}>0',3, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100065, 0, 1, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100065, 99092, 100065, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99046, 'server','selenium', 100065);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99047, 'Street','dzelzavas', 100065);
@@ -1182,7 +1237,8 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid,qu
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99093, 'Inheritance item for triggers filtering', 'INHERITANCE ITEM FOR TRIGGERS FILTERING');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99094, 'Item for triggers filtering', 'ITEM FOR TRIGGERS FILTERING');
 
-INSERT INTO triggers (triggerid, description, expression, value, comments, templateid, state, error) VALUES (100066, 'Inheritance trigger with tags', '{100067}=0', 1,'', 100065, 1, 'selenium trigger cannot be evaluated for some reason');
+INSERT INTO triggers (triggerid, description, expression, comments, templateid) VALUES (100066, 'Inheritance trigger with tags', '{100067}=0', '', 100065);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100066, 1, 1, 0, 'selenium trigger cannot be evaluated for some reason');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (100067, 100066, 99093, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99048, 'server','selenium', 100066);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99049, 'Street','Dzelzavas', 100066);
@@ -1192,12 +1248,14 @@ INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (117, 9008, 'Stre
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (9008, 0, 0, 100066, 1535012391, 445429746, 'Inheritance trigger with tags', 3);
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (116, 9008, 'server', 'selenium');
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (117, 9008, 'Street', 'Dzelzavas');
-INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state) VALUES (100067, 'Trigger disabled with tags', '{100067}>0', 1, 0, 3, '', 0);
+INSERT INTO triggers (triggerid, description, expression, status, priority, comments) VALUES (100067, 'Trigger disabled with tags', '{100067}>0', 1, 3, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100067, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100068, 99094, 100067, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99050, 'Street','Dzelzavas', 100067);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99051, 'country','latvia', 100067);
 INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES (99000, 100066, 100067);
-INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state) VALUES (100070, 'Dependent trigger ONE', '{100067}>0', 0, 0, 4, '', 0);
+INSERT INTO triggers (triggerid, description, expression, status, priority, comments) VALUES (100070, 'Dependent trigger ONE', '{100067}>0', 0, 4, '');
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100070, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100071, 99094, 100070, 'last', '$');
 INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES (99001, 100070, 100067);
 
@@ -1207,9 +1265,11 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, lldruleid, lastcheck, ts_de
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99097, 2, 99062, 'Discovered item one', '', 'lld[one]', NULL, 4,'', '', '', '');
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99097, 'Discovered item one', 'DISCOVERED ITEM ONE');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) values (35086, 99097, 99096, 'lld[one]');
-INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags) VALUES (100068, 'Discovered trigger {#TEST}', '{100069}>0', 0, 0, 5, '', 0, 2);
+INSERT INTO triggers (triggerid, description, expression, status, priority, comments, flags) VALUES (100068, 'Discovered trigger {#TEST}', '{100069}>0', 0, 5, '', 2);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100068, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100069, 99096, 100068, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags) VALUES (100069, 'Discovered trigger one', '{100070}>0', 0, 0, 5, '', 0, 4);
+INSERT INTO triggers (triggerid, description, expression, status, priority, comments, flags) VALUES (100069, 'Discovered trigger one', '{100070}>0', 0, 5, '', 4);
+INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100069, 0, 0, 0, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100070, 99097, 100069, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 

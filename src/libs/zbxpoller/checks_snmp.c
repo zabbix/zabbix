@@ -32,6 +32,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxresolver.h"
 
 #include <event2/event.h>
 #include <event2/util.h>
@@ -41,6 +42,7 @@
 #include <net-snmp/library/large_fd_set.h>
 #include <net-snmp/library/snmpusm.h>
 #include "zbxself.h"
+
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
@@ -3802,8 +3804,8 @@ static void	async_check_snmp_init_context(zbx_snmp_context_t *snmp_context, void
 
 static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, struct event_base *base,
-		zbx_channel_t *channel, struct evdns_base *dnsbase, zbx_async_resolve_reverse_dns_t resolve_reverse_dns,
-		char *snmp_oid)
+		zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, char *snmp_oid)
 {
 #define ZBX_VECTOR_ARRAY_RESERVE	3
 	int			ret = SUCCEED, pdu_type, is_oid_plain = 0;
@@ -3911,7 +3913,7 @@ out:
 
 int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
-		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		struct event_base *base, zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	int 			ret;
@@ -3967,7 +3969,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
-		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		struct event_base *base, zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	int 			ret;

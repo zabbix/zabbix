@@ -752,8 +752,8 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Check that no maintenance object will be left without hosts and host groups as the result of the given host
-	 * groups deletion.
+	 * Check that no maintenance object will be left without host groups, hosts and triggers as the result of the
+	 * given host groups deletion.
 	 *
 	 * @param array $groupids
 	 *
@@ -775,6 +775,11 @@ class CHostGroup extends CApiService {
 					'SELECT NULL'.
 					' FROM maintenances_hosts mh'.
 					' WHERE mg.maintenanceid=mh.maintenanceid'.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenance_trigger mt'.
+					' WHERE mg.maintenanceid=mt.maintenanceid'.
 				')'
 		, 1));
 
@@ -785,10 +790,11 @@ class CHostGroup extends CApiService {
 				' WHERE mg.groupid=g.groupid'.
 					' AND '.dbConditionId('mg.maintenanceid', [$maintenance['maintenanceid']])
 			), 'name');
+			natsort($maintenance_groups);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-				'Cannot delete host group %1$s because maintenance "%2$s" must contain at least one host or host group.',
-				'Cannot delete host groups %1$s because maintenance "%2$s" must contain at least one host or host group.',
+				'Cannot delete host group %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
+				'Cannot delete host groups %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
 				'"'.implode('", "', $maintenance_groups).'"', $maintenance['name'], count($maintenance_groups)
 			));
 		}

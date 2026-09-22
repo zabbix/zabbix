@@ -24,26 +24,27 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$themes = CControllerUserUpdateGeneral::getAllowedThemes();
 
 		$fields = [
-			'userid' =>				'db users.userid',
-			'username' =>			'db users.username',
-			'name' =>				'db users.name',
-			'surname' =>			'db users.surname',
-			'user_groups' =>		'array_id',
-			'change_password' =>	'in 0,1',
-			'current_password' =>	'string',
-			'password1' =>			'string',
-			'password2' =>			'string',
-			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
-			'theme' =>				'db users.theme|in '.implode(',', $themes),
-			'autologin' =>			'db users.autologin|in 0,1',
-			'autologout' =>			'db users.autologout',
-			'refresh' =>			'db users.refresh',
-			'rows_per_page' =>		'db users.rows_per_page',
-			'url' =>				'db users.url',
-			'medias' =>				'array',
-			'roleid' =>				'id',
-			'form_refresh' =>		'int32'
+			'userid' =>							'db users.userid',
+			'username' =>						'db users.username',
+			'name' =>							'db users.name',
+			'surname' =>						'db users.surname',
+			'user_groups' =>					'array_id',
+			'change_password' =>				'in 0,1',
+			'current_password' =>				'string',
+			'password1' =>						'string',
+			'password2' =>						'string',
+			'lang' =>							'db users.lang|in '.implode(',', $locales),
+			'timezone' =>						'db users.timezone|in '.implode(',', array_keys($this->timezones)),
+			'theme' =>							'db users.theme|in '.implode(',', $themes),
+			'autologin' =>						'db users.autologin|in 0,1',
+			'autologout' =>						'db users.autologout',
+			'default_maintenance_period' =>		'db users.default_maintenance_period',
+			'refresh' =>						'db users.refresh',
+			'rows_per_page' =>					'db users.rows_per_page',
+			'url' =>							'db users.url',
+			'medias' =>							'array',
+			'roleid' =>							'id',
+			'form_refresh' =>					'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,8 +63,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
-				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
+				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout',
+					'default_maintenance_period', 'refresh', 'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
 				],
 				'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active',
 					'provisioned'
@@ -103,6 +104,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',
+			'default_maintenance_period' => $db_defaults['default_maintenance_period'],
 			'refresh' => $db_defaults['refresh'],
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
@@ -110,6 +112,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
+			'proxies_list' => CProxyHelper::getDefaultAccessHtml(PROXY_MODE_DENY),
+			'proxy_groups_list' => CProxyHelper::getDefaultAccessHtml(PROXY_MODE_DENY),
 			'user_type' => '',
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -133,6 +137,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['theme'] = $this->user['theme'];
 			$data['autologin'] = $this->user['autologin'];
 			$data['autologout'] = $this->user['autologout'];
+			$data['default_maintenance_period'] = $this->user['default_maintenance_period'];
 			$data['refresh'] = $this->user['refresh'];
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
@@ -156,7 +161,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['username', 'name', 'surname', 'change_password', 'password1', 'password2', 'lang',
-			'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
+			'timezone', 'theme', 'autologin', 'autologout', 'default_maintenance_period', 'refresh', 'rows_per_page',
+			'url', 'form_refresh', 'roleid'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
@@ -168,10 +174,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name', 'userdirectoryid'],
+				'output' => ['usrgrpid', 'name', 'userdirectoryid', 'proxy_mode', 'proxy_group_mode'],
+				'selectProxies' => ['proxyid', 'name'],
+				'selectProxyGroups' => ['proxy_groupid', 'name'],
 				'usrgrpids' => $user_groups
 			])
 			: [];
+
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
@@ -260,10 +269,26 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'grouped' => '1'
 				]
 			];
+			$data['proxies_list'] = CProxyHelper::getDefaultAccessHtml(PROXY_MODE_ALLOW);
+			$data['proxy_groups_list'] = CProxyHelper::getDefaultAccessHtml(PROXY_MODE_ALLOW);
 		}
 		else {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
+
+			$db_proxies = API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxy_groupids' => 0
+			]);
+			CArrayHelper::sort($db_proxies, ['name']);
+
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name']
+			]);
+			CArrayHelper::sort($db_proxy_groups, ['name']);
+
+			$data['proxies_list'] = CProxyHelper::getProxiesHtml($db_proxies, $data['groups']);
+			$data['proxy_groups_list'] = CProxyHelper::getProxyGroupsHtml($db_proxy_groups, $data['groups']);
 		}
 
 		$data['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
@@ -297,6 +322,16 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
+
+		$devices = CSettingsHelper::isMobileDevicesEnabled() && $data['userid'] !== null
+			? API::Device()->get([
+				'output' => ['uuid', 'name'],
+				'userids' => $data['userid'],
+				'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
+			])
+			: [];
+
+		$data['devices'] = array_combine(array_column($devices, 'uuid'), $devices);
 
 		$data['js_validation_rules'] = $data['userid'] === null
 			? (new CFormValidator(CControllerUserCreate::getValidationRules()))->getRules()
