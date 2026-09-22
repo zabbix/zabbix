@@ -129,7 +129,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		CProfile::update('web.apm.metric.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.log.filter',
+			'profileIdx' => 'web.apm.metric.filter',
 			'profileIdx2' => 0,
 			'from' => $this->filter['from'],
 			'to' => $this->filter['to']
