@@ -869,7 +869,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				foreach (['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_ca_location', 'ssl_ca_file']
 						as $ssl_key) {
 					if (!is_string($provider[$ssl_key])) {
-						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$field,
+						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$ssl_key,
 							_s('a string is expected')
 						));
 					}
