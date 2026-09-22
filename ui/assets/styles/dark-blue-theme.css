@@ -3591,10 +3591,10 @@ z-color-picker.has-error .color-picker-box {
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)):not(.green.link:not(:hover):not(:focus)),
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
-  color: #000000; }
+  color: #001833; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
-  color: #ffffff;
-  background-color: #003a7a; }
+  color: #e5f1ff;
+  background-color: #001833; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
@@ -3606,8 +3606,8 @@ z-color-picker.has-error .color-picker-box {
 .list-table.has-highlighted-rows .ok-ack-fg {
   color: #009900; }
 .list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
-  color: #000000;
-  border-bottom-color: #000000; }
+  color: #001833;
+  border-bottom-color: #001833; }
 .list-table.has-highlighted-rows .entity-count {
   border: 1px solid #001f42; }
 
@@ -9937,6 +9937,13 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #e99003; }
 
+.dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .overlay-dialogue .hintbox-wrap,
+.overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .z-select .focusable,
+z-select .focusable, .z-select .list,
+z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
+.import-compare .diff {
+  scrollbar-color: rgba(0, 79, 168, 0.85) rgba(0, 58, 122, 0.55); }
+
 .btn-grey:hover,
 .btn-grey-icon:hover {
   border-color: #0066d9; }
@@ -10158,6 +10165,9 @@ z-select .list,
   color: #7a858f;
   -webkit-text-fill-color: #7a858f; }
 
+.radio-card-list .radio-card:has(input[type="radio"]:checked) {
+  border-color: #3d98ff; }
+
 .menu-main .submenu,
 .menu-user .submenu {
   background: #001833; }
@@ -10166,21 +10176,55 @@ z-select .list,
   color: #3d98ff; }
 
 .list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg, .list-table.has-highlighted-rows tr:hover td.na-bg, .list-table.has-highlighted-rows tr:hover td.info-bg, .list-table.has-highlighted-rows tr:hover td.warning-bg, .list-table.has-highlighted-rows tr:hover td.average-bg, .list-table.has-highlighted-rows tr:hover td.high-bg, .list-table.has-highlighted-rows tr:hover td.disaster-bg {
-  color: #000000; }
+  color: #001833; }
 .list-table.compact-view tr[class*='flh-'] td, .list-table.has-highlighted-rows tr[class*='flh-'] td {
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
 .list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.has-highlighted-rows td.na-bg, .list-table.has-highlighted-rows td.info-bg, .list-table.has-highlighted-rows td.warning-bg, .list-table.has-highlighted-rows td.average-bg, .list-table.has-highlighted-rows td.high-bg, .list-table.has-highlighted-rows td.disaster-bg {
-  color: #000000;
+  color: #001833;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
-.list-table.has-highlighted-rows .problem-unack-fg,
-.list-table.has-highlighted-rows .problem-ack-fg {
-  color: #cc0000; }
-.list-table.has-highlighted-rows .ok-unack-fg,
-.list-table.has-highlighted-rows .ok-ack-fg {
-  color: #009900; }
+.list-table.has-highlighted-rows tr[class*='flh-']:not(.row-selected):not(:hover) .problem-unack-fg,
+.list-table.has-highlighted-rows tr[class*='flh-']:not(.row-selected):not(:hover) .problem-ack-fg,
+.list-table.has-highlighted-rows tr[class*='flh-']:not(.row-selected):not(:hover) .ok-unack-fg,
+.list-table.has-highlighted-rows tr[class*='flh-']:not(.row-selected):not(:hover) .ok-ack-fg {
+  color: #001833; }
 .list-table.has-highlighted-rows tr.row-selected .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:hover .link-alt:not(:hover):not(:focus), .list-table.has-highlighted-rows tr:not([class*='flh-']) .link-alt:not(:hover):not(:focus) {
   color: #e5f1ff;
   border-bottom-color: #e5f1ff; }
+
+.datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.na-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.info-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.warning-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.average-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.high-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.disaster-bg a.link-action {
+  color: #e5f1ff; }
+  .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.na-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.info-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.warning-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.average-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.high-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.disaster-bg a.link-action:hover {
+    color: #3d98ff; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data {
+  color: #001833; }
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data a {
+    color: #001833; }
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.na-bg, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.info-bg, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.warning-bg, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.average-bg, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.high-bg, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.disaster-bg {
+    color: #001833; }
+    .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.na-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.info-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.warning-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.average-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.high-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data.disaster-bg a.link-action {
+      color: #001833; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data .problem-unack-fg,
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data .problem-ack-fg,
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data .ok-unack-fg,
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data .ok-ack-fg {
+  color: #001833; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data .tag {
+  color: #e5f1ff;
+  background-color: #001833; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data a {
+  color: #e5f1ff; }
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data a:hover {
+    color: #3d98ff; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data a.link-alt {
+  color: #3d98ff; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data .timeline-date a {
+  color: #3d98ff; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.na-bg:not(.cell-bg), .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.info-bg:not(.cell-bg), .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.warning-bg:not(.cell-bg), .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.average-bg:not(.cell-bg), .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.high-bg:not(.cell-bg), .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.disaster-bg:not(.cell-bg) {
+  color: #e5f1ff; }
+.datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.na-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.info-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.warning-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.average-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.high-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.disaster-bg a.link-action {
+  color: #e5f1ff; }
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.na-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.info-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.warning-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.average-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.high-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data.disaster-bg a.link-action:hover {
+    color: #3d98ff; }
 
 .time-quick li a:focus, .time-quick li a.selected {
   color: #e5f1ff; }
