@@ -117,7 +117,7 @@ class CHtmlPage {
 				->addItem($this->kiosk_mode_controls)
 				->addItem(
 					get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-						->setAttribute('aria-label', _('Content controls'))
+						->setAttribute('aria-label', _('Exit full screen mode'))
 				);
 		}
 		elseif ($this->title !== '' || $this->doc_url !== '' || $this->controls !== null) {
