@@ -138,6 +138,7 @@ class CApmTrace extends CApmGeneral {
 			->select('ti.TraceId')
 			->where('ti.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
 			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']])
+			->where('ti.ParentSpanId=\'\'')
 			->group('ti.TraceId');
 
 		if ($options['traceids'] !== null) {
