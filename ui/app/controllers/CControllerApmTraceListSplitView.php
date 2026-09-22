@@ -134,7 +134,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$clock = floor($span['timestamp'] / 1000000000);
 
 			$timestamp = $clock >= $today
-				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $span_timestamp])
+				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $span_timestamp])
 				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
 					['!' => $span_timestamp]
 				);

@@ -190,7 +190,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 						$ns = str_pad((string) ($log['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
 
 						$log['timestamp_ns_formatted'] = $clock >= $today
-							? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s', 's.!']), $clock), ['!' => $ns])
+							? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
 							: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
 								['!' => $ns]
 							);
