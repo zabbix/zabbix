@@ -106,7 +106,7 @@ class CTimeUnitValidator extends CValidator {
 	private function getSecondsText(float $seconds): string {
 		$convert_options = ['with_year' => $this->with_year];
 
-		if ($seconds < 1) {
+		if ($seconds > 0 && $seconds < 1) {
 			return convertSecondsToTimeUnits($seconds);
 		}
 		elseif ($seconds >= 60) {
