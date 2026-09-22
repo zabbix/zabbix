@@ -117,7 +117,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 			$severity_numbers = [];
 
 			foreach ($this->filter['severities'] as $severity) {
-				$severity_numbers = array_merge($severity_numbers, range($severity * 4, $severity * 4 + 3));
+				$severity_numbers = array_merge($severity_numbers, range($severity * 4 + 1, $severity * 4 + 4));
 			}
 		}
 
