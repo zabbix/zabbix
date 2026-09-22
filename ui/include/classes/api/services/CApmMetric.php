@@ -23,7 +23,7 @@ class CApmMetric extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'type'						=> 'Type',
 		'resource_attributes'		=> 'ResourceAttributes',
 		'resource_schema_url'		=> 'ResourceSchemaUrl',
@@ -57,7 +57,7 @@ class CApmMetric extends CApmGeneral {
 		'negative_bucket_counts'	=> 'NegativeBucketCounts'
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Type'							=> 'type',
 		'ResourceAttributes'			=> 'resource_attributes',
 		'ResourceSchemaUrl'				=> 'resource_schema_url',
@@ -95,7 +95,7 @@ class CApmMetric extends CApmGeneral {
 		'NegativeBucketCounts'			=> 'negative_bucket_counts'
 	];
 
-	private const CLICKHOUSE_FIELDS_DEFAULTS = [
+	protected const CLICKHOUSE_FIELDS_DEFAULTS = [
 		'ResourceAttributes'			=> '[]',
 		'ResourceSchemaUrl'				=> '\'\'',
 		'ScopeName'						=> '\'\'',
@@ -188,14 +188,14 @@ class CApmMetric extends CApmGeneral {
 		return $this->getFromClickHouse($options);
 	}
 
-	private const CLICKHOUSE_METRICS_TABLES = [
+	protected const CLICKHOUSE_METRICS_TABLES = [
 		APM_METRIC_TYPE_GAUGE					=> ['table' => 'otel_metrics_gauge', 'table_alias' => 'mg'],
 		APM_METRIC_TYPE_SUM						=> ['table' => 'otel_metrics_sum', 'table_alias' => 'ms'],
 		APM_METRIC_TYPE_HISTOGRAM				=> ['table' => 'otel_metrics_histogram', 'table_alias' => 'mh'],
 		APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	=> ['table' => 'otel_metrics_exponential_histogram', 'table_alias' => 'mx']
 	];
 
-	private function getFromClickHouse(array $options): array|string {
+	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
 		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
@@ -287,7 +287,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($sub_queries as $sub_query) {
 			$query->linkQuery($sub_query);
-			$sub_queries_sql[] = $sub_query->getSQL();
+			$sub_queries_sql[] = $sub_query->getSql();
 		}
 
 		$query->from('('.implode(' UNION ALL ', $sub_queries_sql).')', 'u');

@@ -23,7 +23,7 @@ class CApmSpan extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'timestamp'				=> 'Timestamp',
 		'traceid'				=> 'TraceId',
 		'spanid'				=> 'SpanId',
@@ -43,7 +43,7 @@ class CApmSpan extends CApmGeneral {
 		'links'					=> ['Links.TraceId', 'Links.SpanId', 'Links.TraceState', 'Links.Attributes']
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Timestamp'				=> 'timestamp',
 		'TraceId'				=> 'traceid',
 		'SpanId'				=> 'spanid',

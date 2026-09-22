@@ -23,7 +23,7 @@ class CApmLog extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'timestamp'				=> 'Timestamp',
 		'traceid'				=> 'TraceId',
 		'spanid'				=> 'SpanId',
@@ -42,7 +42,7 @@ class CApmLog extends CApmGeneral {
 		'event_name'			=> 'EventName'
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Timestamp'				=> 'timestamp',
 		'TraceId'				=> 'traceid',
 		'SpanId'				=> 'spanid',
