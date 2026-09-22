@@ -86,6 +86,8 @@ struct zbx_history_manager
 	zbx_uint64_t				trends_flags;
 	zbx_uint64_t				housekeep_flags;
 	zbx_uint64_t				default_type_flags;
+
+	pthread_mutex_t				lock;
 };
 
 static zbx_history_manager_t	history_manager;
@@ -217,6 +219,8 @@ static void	history_manager_clear(zbx_history_manager_t *manager)
 	}
 	zbx_vector_history_registry_ptr_destroy(&manager->registry);
 
+	pthread_mutex_destroy(&manager->lock);
+
 	zbx_free(manager->providers);
 }
 
@@ -236,28 +240,40 @@ static void	history_manager_clear(zbx_history_manager_t *manager)
  *******************************************************************************/
 static zbx_history_provider_t	*history_manager_get_provider(zbx_history_manager_t *manager, int index, char **error)
 {
-	zbx_history_provider_t			*provider;
+	zbx_history_provider_t			*provider = NULL;
 	zbx_vector_history_provider_ptr_t	*providers = &manager->providers[index];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s opened:%d", __func__, manager->registry.values[index]->name,
-			providers->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s", __func__, manager->registry.values[index]->name);
 
-	if (0 == providers->values_num)
+	pthread_mutex_lock(&manager->lock);
+
+	if (0 != providers->values_num)
+	{
+		provider = providers->values[providers->values_num - 1];
+		providers->values_num--;
+	}
+
+	pthread_mutex_unlock(&manager->lock);
+
+	if (NULL == provider)
 	{
 		zbx_history_registry_t	*registry = manager->registry.values[index];
 
 		provider = history_provider_open(registry->name, registry->options.values, registry->options.values_num,
 				error);
 	}
-	else
-	{
-		provider = providers->values[providers->values_num - 1];
-		providers->values_num--;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return provider;
+}
+
+static void	history_manager_release_provider(zbx_history_manager_t *manager, int index,
+		zbx_history_provider_t *provider)
+{
+	pthread_mutex_lock(&manager->lock);
+	zbx_vector_history_provider_ptr_append(&manager->providers[index], provider);
+	pthread_mutex_unlock(&manager->lock);
 }
 
 static void	history_manager_map_value_types(zbx_history_manager_t *manager, int index, zbx_uint64_t type_mask)
@@ -355,10 +371,18 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		const char *config_ssl_key_location, char **error)
 {
 	zbx_vector_history_option_t	options;
-	int				ret = FAIL, index;
+	int				ret = FAIL, index, err;
 	zbx_uint64_t			value_type_mask = 0, mask;
+	pthread_mutex_t			lock;
+
+	if (0 != (err = pthread_mutex_init(&lock, NULL)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize history provider mutex: %s", zbx_strerror(err));
+		return FAIL;
+	}
 
 	memset(manager, 0, sizeof(zbx_history_manager_t));
+	manager->lock = lock;
 	zbx_vector_history_registry_ptr_create(&manager->registry);
 	zbx_vector_history_option_create(&options);
 
@@ -467,7 +491,6 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		if (NULL == (provider = history_provider_open(registry->name, registry->options.values,
 				registry->options.values_num, error)))
 		{
-			history_manager_clear(manager);
 			goto out;
 		}
 
@@ -510,6 +533,9 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 	ret = SUCCEED;
 out:
+	if (FAIL == ret)
+		history_manager_clear(manager);
+
 	history_options_clear(options.values, options.values_num);
 	zbx_vector_history_option_destroy(&options);
 
@@ -660,7 +686,7 @@ static void	history_session_clear(zbx_history_session_t *session)
 	{
 		if (NULL != session->providers[i])
 		{
-			zbx_vector_history_provider_ptr_append(&session->manager->providers[i], session->providers[i]);
+			history_manager_release_provider(session->manager, i, session->providers[i]);
 			session->providers[i] = NULL;
 		}
 	}

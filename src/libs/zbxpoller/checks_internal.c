@@ -15,11 +15,13 @@
 #include "checks_internal.h"
 #include "checks_java.h"
 
+#include "zbxmw.h"
 #include "zbxpoller.h"
 
 #include "zbxalgo.h"
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
+#include "zbxsupervisor_client.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
 #include "zbxself.h"
@@ -33,6 +35,7 @@
 #include "zbxinterface.h"
 #include "zbxtimekeeper.h"
 #include "zbxdb.h"
+#include "zbx_cep_client.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -177,61 +180,93 @@ static double	get_selfmon_stat(double busy, unsigned char state)
 
 typedef int (*zbx_get_usage_stats_cb_t)(zbx_vector_dbl_t*, int*, char**);
 
-static int	get_selfmon_stats_threads(unsigned char aggr_func, zbx_get_usage_stats_cb_t get_usage_stats_cb_func,
-		int proc_num, unsigned char state, double *value, char **error)
+static double	get_selfmon_stats_threads(unsigned char aggr_func, int proc_num, unsigned char state,
+		const zbx_vector_dbl_t *usage, int count)
+{
+	if (0 == usage->values_num || 0 == count)
+		return 0;
+
+	if (ZBX_SELFMON_AGGR_FUNC_ONE == aggr_func)
+		return  get_selfmon_stat(usage->values[proc_num - 1], state);
+
+	double	min, max, total;
+
+	min = max = total = usage->values[0];
+
+	for (int i = 1; i < count; i++)
+	{
+		if (usage->values[i] < min)
+			min = usage->values[i];
+
+		if (usage->values[i] > max)
+			max = usage->values[i];
+
+		total += usage->values[i];
+	}
+
+	switch (aggr_func)
+	{
+		case ZBX_SELFMON_AGGR_FUNC_AVG:
+			return get_selfmon_stat(total / count, state);
+		case ZBX_SELFMON_AGGR_FUNC_MIN:
+			return get_selfmon_stat(min, state);
+		case ZBX_SELFMON_AGGR_FUNC_MAX:
+			return get_selfmon_stat(max, state);
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unknown aggregation function");
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get aggregated statistics for a specific worker process type.     *
+ *                                                                            *
+ * Parameters: process_type - [IN]  worker process type                       *
+ *             aggr_func    - [IN]  aggregation function to apply             *
+ *             proc_num     - [IN]  worker process number                     *
+ *             state        - [IN]  process state                             *
+ *             result       - [OUT] container for the resulting value         *
+ *                                                                            *
+ * Return value: SUCCEED if the process type has been handled, otherwise FAIL *
+ *                                                                            *
+ * Comments: Returns an error message in 'result' if usage statistics cannot  *
+ *           be obtained for the specified process type.                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_worker_process_stats(unsigned char process_type, unsigned char aggr_func, int proc_num,
+		unsigned char state, AGENT_RESULT *result)
 {
 	zbx_vector_dbl_t	usage;
-	int			ret, count;
+	int			count, ret;
+	char			*error = NULL;
 
 	zbx_vector_dbl_create(&usage);
 
-	if (SUCCEED != (ret = get_usage_stats_cb_func(&usage, &count, error)))
-		goto out;
-
-	if (0 == usage.values_num)
+	switch (process_type)
 	{
-		*value = 0;
-		goto out;
+		case ZBX_PROCESS_TYPE_PREPROCESSOR:
+			ret = zbx_get_usage_stats_preprocessor(&usage, &count, &error);
+			break;
+		case ZBX_PROCESS_TYPE_DISCOVERER:
+			ret = zbx_get_usage_stats_discovery(&usage, &count, &error);
+			break;
+		case ZBX_PROCESS_TYPE_CEP_WORKER:
+			ret = zbx_mw_get_worker_load(ZBX_IPC_SERVICE_CEP, &usage, &count, &error);
+			break;
+		default:
+			return FAIL;
 	}
 
-	if (ZBX_SELFMON_AGGR_FUNC_ONE == aggr_func)
-	{
-		*value = get_selfmon_stat(usage.values[proc_num - 1], state);
-	}
+	if (FAIL == ret)
+		SET_MSG_RESULT(result, error);
 	else
-	{
-		double	min, max, total;
+		SET_DBL_RESULT(result, get_selfmon_stats_threads(aggr_func, proc_num, state, &usage, count));
 
-		min = max = total = usage.values[0];
-
-		for (int i = 1; i < usage.values_num; i++)
-		{
-			if (usage.values[i] < min)
-				min = usage.values[i];
-
-			if (usage.values[i] > max)
-				max = usage.values[i];
-
-			total += usage.values[i];
-		}
-
-		switch (aggr_func)
-		{
-			case ZBX_SELFMON_AGGR_FUNC_AVG:
-				*value = get_selfmon_stat(total / usage.values_num, state);
-				break;
-			case ZBX_SELFMON_AGGR_FUNC_MIN:
-				*value = get_selfmon_stat(min, state);
-				break;
-			case ZBX_SELFMON_AGGR_FUNC_MAX:
-				*value = get_selfmon_stat(max, state);
-				break;
-		}
-	}
-out:
 	zbx_vector_dbl_destroy(&usage);
 
-	return ret;
+	return SUCCEED;
 }
 
 /**********************************************************************************
@@ -245,7 +280,6 @@ out:
  *             config_startup_time       - [IN] program startup time              *
  *             config_java_gateway       - [IN]                                   *
  *             config_java_gateway_port  - [IN]                                   *
- *             get_config_forks          - [IN]                                   *
  *             get_value_internal_ext_cb - [IN]                                   *
  *             program_type              - [IN]                                   *
  *                                                                                *
@@ -255,8 +289,7 @@ out:
  **********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
-		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		unsigned char program_type)
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, unsigned char program_type)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -495,6 +528,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
+			case ZBX_PROCESS_TYPE_CEP_MANAGER:
+			case ZBX_PROCESS_TYPE_CEP_WORKER:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
@@ -510,7 +545,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			goto out;
 		}
 
-		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? get_config_forks(process_type) : 0;
+		process_forks = zbx_supervisor_get_process_count(process_type);
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";
@@ -529,7 +564,6 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		{
 			unsigned char	aggr_func, state;
 			unsigned short	process_num = 0;
-			char		*error = NULL;
 
 			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
 				aggr_func = ZBX_SELFMON_AGGR_FUNC_AVG;
@@ -568,25 +602,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 				goto out;
 			}
 
-			if (ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ||
-					ZBX_PROCESS_TYPE_DISCOVERER == process_type)
+			if (SUCCEED != get_worker_process_stats(process_type, aggr_func, process_num, state, result))
 			{
-				zbx_get_usage_stats_cb_t	get_usage_stats_cb_func;
-
-				get_usage_stats_cb_func = ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ?
-						zbx_get_usage_stats_preprocessor : zbx_get_usage_stats_discovery;
-
-				if (SUCCEED != get_selfmon_stats_threads(aggr_func, get_usage_stats_cb_func,
-						process_num, state, &value, &error))
-				{
-					SET_MSG_RESULT(result, error);
-					goto out;
-				}
-			}
-			else
 				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
-
-			SET_DBL_RESULT(result, value);
+				SET_DBL_RESULT(result, value);
+			}
 		}
 	}
 	else if (0 == strcmp(tmp, "wcache"))			/* zabbix[wcache,<cache>,<mode>] */

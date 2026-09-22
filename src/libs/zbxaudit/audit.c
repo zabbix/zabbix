@@ -499,11 +499,11 @@ int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode)
 			pvalue = (*audit_entry)->cuid;
 		}
 
-		name_esc = zbx_db_dyn_escape_string((*audit_entry)->name);
+		name_esc = zbx_dbconn_dyn_escape_string(db, (*audit_entry)->name);
 
 		zbx_json_reset(&details_json);
 		zbx_audit_details_to_json(&(*audit_entry)->details, &details_json);
-		details_esc = zbx_db_dyn_escape_string(details_json.buffer);
+		details_esc = zbx_dbconn_dyn_escape_string(db, details_json.buffer);
 
 		ret = zbx_dbconn_execute(db, "insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"

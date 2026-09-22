@@ -48,8 +48,17 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
 	protected function doAction(): void {
+		$devices = CSettingsHelper::isMobileDevicesEnabled()
+			? API::Device()->get([
+				'output' => ['uuid', 'name'],
+				'userids' => CWebUser::$data['userid'],
+				'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
+			])
+			: [];
+
 		$data = [
 			'medias' => $this->user['medias'],
+			'devices' => array_combine(array_column($devices, 'uuid'), $devices),
 			'userid' => CWebUser::$data['userid'],
 			'messages' => getMessageSettings(),
 			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,

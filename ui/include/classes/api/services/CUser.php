@@ -42,13 +42,13 @@ class CUser extends CApiService {
 	protected $sortColumns = ['userid', 'username'];
 
 	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout',
-		'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone',
-		'roleid', 'userdirectoryid', 'ts_provisioned', 'provisioned'
+		'lang', 'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock',
+		'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned', 'provisioned'
 	];
 
 	public const OWN_LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin',
-		'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page',
-		'timezone', 'roleid', 'provisioned'
+		'autologout', 'lang', 'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip',
+		'attempt_clock', 'rows_per_page', 'timezone', 'roleid', 'provisioned'
 	];
 
 	public const LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname'];
@@ -200,6 +200,12 @@ class CUser extends CApiService {
 
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
+			}
+
+			if (array_key_exists('default_maintenance_period', $options['filter'])
+					&& $options['filter']['default_maintenance_period'] !== null) {
+				$options['filter']['default_maintenance_period'] =
+					getTimeUnitFilters($options['filter']['default_maintenance_period']);
 			}
 
 			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
@@ -429,23 +435,24 @@ class CUser extends CApiService {
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username']], 'fields' => [
-			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
-			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
-			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'roleid' =>			['type' => API_ID],
-			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'username' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>						['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'passwd' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'url' =>						['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
+			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
+			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
+			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
+			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
+			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>					['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>						['type' => API_ID],
+			'usrgrps' =>					['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
+				'usrgrpid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>			['type' => API_ANY]
+			'medias' =>						['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -487,6 +494,8 @@ class CUser extends CApiService {
 		self::checkEmptyPassword($users, $db_user_groups);
 		self::checkMediaTypes($users, $db_mediatypes);
 		self::checkMediaRecipients($users, $db_mediatypes);
+
+		self::normalizeDefaultMaintenancePeriod($users);
 	}
 
 	private static function canEditMedia(array $users, bool $is_update = false): void {
@@ -543,25 +552,26 @@ class CUser extends CApiService {
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['username']], 'fields' => [
-			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
-			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'current_passwd' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
-			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'roleid' =>			['type' => API_ID],
-			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'userid' =>						['type' => API_ID, 'flags' => API_REQUIRED],
+			'username' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>						['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'current_passwd' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'passwd' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'url' =>						['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
+			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
+			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
+			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
+			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
+			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>					['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>						['type' => API_ID],
+			'usrgrps' =>					['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
+				'usrgrpid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>			['type' => API_ANY]
+			'medias' =>						['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -590,7 +600,8 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid', 'userdirectoryid'
+				'default_maintenance_period', 'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid',
+				'userdirectoryid'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -721,6 +732,8 @@ class CUser extends CApiService {
 		self::checkEmptyPassword($users, $db_user_groups, $db_users);
 		self::checkMediaTypes($users, $db_mediatypes);
 		self::checkMediaRecipients($users, $db_mediatypes);
+
+		self::normalizeDefaultMaintenancePeriod($users);
 	}
 
 	private static function getMediaValidationFields(bool $is_update = false): array {
@@ -1283,6 +1296,22 @@ class CUser extends CApiService {
 				}
 			}
 		}
+	}
+
+	private static function normalizeDefaultMaintenancePeriod(array &$users): void {
+		foreach ($users as &$user) {
+			if (!array_key_exists('default_maintenance_period', $user)) {
+				continue;
+			}
+
+			$period = timeUnitToSeconds($user['default_maintenance_period']);
+			$period_normalized = $period - $period % SEC_PER_MIN;
+
+			if ($period_normalized != $period) {
+				$user['default_maintenance_period'] = $period_normalized.'s';
+			}
+		}
+		unset($user);
 	}
 
 	/**
@@ -2066,7 +2095,7 @@ class CUser extends CApiService {
 				$devices[] = [
 					'deviceid' => $db_device['deviceid'],
 					'userid' => 0,
-					'status' => ZBX_DEVICE_STATUS_ORPHANED
+					'status' => ZBX_DEVICE_STATUS_UNASSIGNED
 				];
 			}
 
@@ -2470,9 +2499,9 @@ class CUser extends CApiService {
 	}
 
 	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
-		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid', 'ts_provisioned'
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+			'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock',
+			'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned'
 		];
 
 		if ($case_sensitive) {
@@ -3103,9 +3132,9 @@ class CUser extends CApiService {
 	}
 
 	private function getAuthenticationUserData(string $userid, ?array &$db_user, ?array &$group_status): void {
-		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid', 'ts_provisioned'
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+			'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip',
+			'attempt_clock', 'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned'
 		];
 
 		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);

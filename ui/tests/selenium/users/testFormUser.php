@@ -99,7 +99,7 @@ class testFormUser extends CWebTest {
 			[
 				[
 					'role' => '',
-					'required' => ['Username', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Password', 'Password (once again)', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => '',
 						'Name' => '',
@@ -129,7 +129,7 @@ class testFormUser extends CWebTest {
 				[
 					'user' => 'guest',
 					'role' => 'Guest role',
-					'required' => ['Username', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'guest',
 						'Name' => '',
@@ -155,7 +155,7 @@ class testFormUser extends CWebTest {
 				[
 					'user' => 'Admin',
 					'role' => 'Super admin role',
-					'required' => ['Username', 'Current password', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Current password', 'Password', 'Password (once again)', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'Admin',
 						'Name' => 'Zabbix',
