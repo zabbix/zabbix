@@ -81,7 +81,8 @@ class CNumberParser extends CParser {
 		}
 
 		if ($this->options['with_time_suffix']) {
-			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
+			$this->suffixes .= str_replace('|', '',
+				$this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES);
 			$this->suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
 		}
 
