@@ -274,7 +274,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	public function clearEnv(): void {
-		/* empty */
+		$this->deleteOTData();
 	}
 
 	public static function createHost(): void {

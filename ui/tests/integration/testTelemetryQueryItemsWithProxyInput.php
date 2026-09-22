@@ -74,7 +74,6 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 
 	public function clearEnv(): void {
 		CDataHelper::call('proxy.delete', [self::$proxyid]);
-
 		parent::clearEnv();
 	}
 
