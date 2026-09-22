@@ -70,6 +70,16 @@ class CControllerApmTraceListSplitView extends CController {
 			'sortorder' => ZBX_SORT_UP
 		]);
 
+		$span_counts = [];
+		foreach ($spans as $span) {
+			if (!$span['parent_spanid']) {
+				continue;
+			}
+
+			$span_counts[$span['parent_spanid']] ??= 0;
+			$span_counts[$span['parent_spanid']]++;
+		}
+
 		$trace_timestamp = (int) str_pad((string)($trace['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
 		$trace_start = $trace_timestamp;
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
@@ -98,13 +108,6 @@ class CControllerApmTraceListSplitView extends CController {
 				];
 			}, $span['events']);
 
-			$span_count = API::ApmSpan()->get([
-				'time_from' => $timeline['from_ts'],
-				'time_till' => $timeline['to_ts'],
-				'parent_spanids' => [$span['spanid']],
-				'countOutput' => true
-			]);
-
 			$span_duration = $span['duration']
 				? convertSecondsToTimeUnits($span['duration'] * SEC_PER_NANOSEC, [
 					'combine_last_subsecond_parts' => true
@@ -131,7 +134,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'timestamp' => $timestamp,
 				'start' => $span_start,
 				'end' => $span_end,
-				'count' => $span_count ?: null,
+				'count' => $span_counts[$span['spanid']] ?? null,
 				'events' => $span_events,
 				'resource_attributes' => $span['resource_attributes'],
 				'span_attributes' => $span['span_attributes']
