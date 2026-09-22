@@ -288,9 +288,7 @@ class testDashboardGraphWidget extends testWidgets {
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
 			if ($tab === 'Overrides') {
-				$button = $form->query('button:Add new override')->one()->click();
-				// Remove border radius from button element.
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+				$form->query('button:Add new override')->one()->click();
 			}
 
 			$this->page->removeFocus();

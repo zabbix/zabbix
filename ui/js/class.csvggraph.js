@@ -841,12 +841,12 @@
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false);
+				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false, hbox_footer);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
-				graph.data('hintbox', html);
+				graph.data('hintbox', hbox);
 				graph.data('hintbox_footer', hbox_footer);
 			}
 			else {

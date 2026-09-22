@@ -155,6 +155,7 @@ class testPageAdministrationProxies extends CWebTest {
 		// Fill filter form with data.
 		$form->fill(['Name' => 'proxy1']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$filter_result = [
