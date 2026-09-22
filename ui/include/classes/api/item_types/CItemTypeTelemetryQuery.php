@@ -24,7 +24,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query', 'delay', 'timeout'];
+	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query', 'timeout', 'delay'];
 
 	public const SIGNAL_TYPE_TRACES = 0;
 	public const SIGNAL_TYPE_METRICS = 1;
