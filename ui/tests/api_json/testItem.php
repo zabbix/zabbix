@@ -82,11 +82,35 @@ class testItem extends CAPITest {
 	}
 
 	/**
+	 * @dataProvider dataTelemetryQueryTypeChange
+	 */
+	public function testHostItemTelemetryQueryTypeChange(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:host_item_script'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
 	 * @dataProvider dataProviderTelemetryQueryUpdate
 	 */
 	public function testTemplateItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
 		$item += [
 			'itemid' => ':item:template_item_telemetry_query'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataTelemetryQueryTypeChange
+	 */
+	public function testTemplateItemTelemetryQueryTypeChange(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:template_item_script'
 		];
 		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
 

@@ -50,6 +50,14 @@ trait traitItemTelemetryQueryTests {
 									'conditions' => []
 								]
 							]
+						],
+						[
+							'name' => 'template script item',
+							'key_' => 'template_item_script',
+							'type' => ITEM_TYPE_SCRIPT,
+							'delay' => '1m',
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'params' => 'return "";'
 						]
 					]
 				]
@@ -75,6 +83,14 @@ trait traitItemTelemetryQueryTests {
 									'conditions' => []
 								]
 							]
+						],
+						[
+							'name' => 'host script item',
+							'key_' => 'host_item_script',
+							'type' => ITEM_TYPE_SCRIPT,
+							'delay' => '1m',
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'params' => 'return "";'
 						]
 					]
 				]
@@ -471,6 +487,24 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query": the parameter "filter" is missing.'
 		];
 
+		yield '"query.filter.eval_formula" readon-only when set fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'eval_formula' => 'A or A',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/query/filter": unexpected parameter "eval_formula".'
+		];
+
 		yield '"evaltype" not expression and not empty "query.filter.formula" fail' => [
 			[
 				'query' => [
@@ -773,6 +807,16 @@ trait traitItemTelemetryQueryTests {
 		];
 	}
 
+	public static function dataTelemetryQueryTypeChange() {
+		yield '"type" change to telemetry query without "query" fail' => [
+			[
+				'delay' => '11m',
+				'type' => ITEM_TYPE_TELEMETRY_QUERY
+			],
+			'Invalid parameter "/1": the parameter "query" is missing.'
+		];
+	}
+
 	public static function dataProviderItemPrototypeTelemetryQueryUpdate() {
 		yield 'lld macro for "time_shift", "lookback_limit" and "granularity"' => [
 			[
@@ -798,6 +842,14 @@ trait traitItemTelemetryQueryTests {
 	}
 
 	public static function dataProviderTelemetryQueryUpdate() {
+		yield '"granularity" greater than "lookback_limit" fail' => [
+			[
+				'granularity' => '1m',
+				'lookback_limit' => '1s'
+			],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
 		yield '"time_shift", "lookback_limit" and "granularity"' => [
 			[
 				'time_shift' => '2s',
