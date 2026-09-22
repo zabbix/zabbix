@@ -186,7 +186,31 @@
 					new CDataTableColumn('event_name', <?= json_encode(_('Event name')) ?>)
 						.setFields(['event_name'])
 						.setWidth('auto')
+						.setVisible(false),
+					new CDataTableColumn('log_attributes', <?= json_encode(_('Log attributes')); ?>)
+						.setFields(['attributes'])
 						.setVisible(false)
+						.setRenderer('attributes')
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setWidth('auto'),
+					new CDataTableColumn('resource_attributes', <?= json_encode(_('Resource attributes')); ?>)
+						.setFields(['resource_attributes'])
+						.setVisible(false)
+						.setRenderer('attributes')
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setWidth('auto'),
+					new CDataTableColumn('scope_attributes', <?= json_encode(_('Scope attributes')); ?>)
+						.setFields(['scope_attributes'])
+						.setVisible(false)
+						.setRenderer('attributes')
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setWidth('auto')
 				])
 				.setPage(page)
 				.setFilter({...filter, ...this.#time_selector})
@@ -211,6 +235,10 @@
 				.setCellRenderer('severity_text', ({cell, cell_data}) => {
 					const [severity_text, severity_number] = cell_data;
 
+					if (severity_text === '') {
+						return;
+					}
+
 					const severity_class = severity_number >= 1 && severity_number <= 24
 						? this.#severity_classes[Math.floor((severity_number - 1) / 4)]
 						: this.#severity_classes[0];
@@ -229,6 +257,62 @@
 					const [flags] = cell_data;
 
 					cell.textContent = this.#decodeFlags(flags);
+				})
+				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
+					const [attributes] = cell_data;
+
+					if (!attributes || attributes.length === 0) {
+						return;
+					}
+
+					const attribute_labels = [];
+
+					const tags_wrapper = document.createElement('div');
+					tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
+
+					const column_options = column.getColumnOptions();
+
+					let count = column_options.number_of_attributes;
+
+					for (const [attr_name, attr_value] of Object.entries(attributes)) {
+						const content = `${attr_name}: ${attr_value}`
+						const label = document.createElement('span');
+						label.classList.add(ZBX_STYLE_TAG);
+						label.textContent = content;
+						label.dataset.hintbox = '1';
+						label.dataset.hintboxStatic = '1';
+						label.dataset.hintboxHtml = content;
+						label.ariaExpanded = 'false';
+
+						attribute_labels.push(label);
+
+						if (count > 0) {
+							tags_wrapper.appendChild(label);
+
+							count--;
+						}
+					}
+
+					if (Object.keys(attributes).length > column_options.number_of_attributes) {
+						const more_attributes_hintbox = document.createElement('div');
+
+						for (const tag_label of attribute_labels) {
+							more_attributes_hintbox.appendChild(tag_label.cloneNode(true));
+						}
+
+						const more_attributes = document.createElement('button');
+						more_attributes.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
+						more_attributes.dataset.hintboxHtml = more_attributes_hintbox.innerHTML;
+						more_attributes.dataset.hintboxClass = `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`;
+						more_attributes.dataset.hintbox = '1';
+						more_attributes.dataset.hintboxStatic = '1';
+						more_attributes.ariaExpanded = 'false';
+						more_attributes.ariaLabel = t('Show all attributes');
+
+						tags_wrapper.appendChild(more_attributes);
+					}
+
+					cell.appendChild(tags_wrapper);
 				})
 				.setRowRenderer('log', ({columns, data_fields, row, row_data, row_index, response}) => {
 					row.dataset.rowIndex = row_index;
@@ -281,8 +365,8 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', () => {
-							if (row.hasAttribute('data-hintbox')) {
+						row.addEventListener('click', (e) => {
+							if (e.target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
