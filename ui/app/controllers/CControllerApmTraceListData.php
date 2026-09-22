@@ -178,8 +178,13 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$trace_max_duration = $traces ? max(array_column($traces, 'duration')) : 0;
 
 			foreach ($traces as &$trace) {
-				$trace['service_name'] = $trace['service_name'] ?: '['._('No root span found').']';
-				$trace['span_name'] = $trace['span_name'] ?: '['._('No root span found').']';
+				if (!array_key_exists('service_name', $trace) || !$trace['service_name']) {
+					$trace['service_name'] = '['._('No root span found').']';
+				}
+
+				if (!array_key_exists('span_name', $trace) || !$trace['span_name']) {
+					$trace['span_name'] = '['._('No root span found').']';
+				}
 
 				if (in_array('timestamp', $select_fields)) {
 					$today = strtotime('today');
