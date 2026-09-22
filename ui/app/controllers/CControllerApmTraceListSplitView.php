@@ -60,6 +60,23 @@ class CControllerApmTraceListSplitView extends CController {
 		]);
 		$trace = $traces[0] ?? null;
 
+		if (!$trace) {
+			$output = json_encode([
+				'trace_view_data' => [
+					'error' => [
+						'title' => _('Trace not found.')
+					]
+				]
+			]);
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => $output]))
+					->disableView()
+			);
+
+			return;
+		}
+
 		$spans = API::ApmSpan()->get([
 			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp', 'duration',
 				'events', 'resource_attributes', 'span_attributes'],
@@ -142,7 +159,7 @@ class CControllerApmTraceListSplitView extends CController {
 		}
 
 		$output = json_encode([
-			'trace_view' => (new CPartial('apm.trace.list.split.view'))->getOutput(),
+			'trace_view' => (new CPartial('apm.trace.list.split.view', ['trace' => $trace]))->getOutput(),
 			'trace_view_data' => [
 				'id' => $traceid,
 				'start' => 0,

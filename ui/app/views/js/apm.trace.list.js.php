@@ -469,15 +469,25 @@
 			const {trace_view, trace_view_data} = response;
 
 			const element = this.#side_drawer.getElement();
-			element.innerHTML = trace_view;
 
-			this.#bindSideDrawerEvents();
-			this.#datatable.unbindWrapperEvents();
+			if ('error' in trace_view_data) {
+				const $msg_box = makeMessageBox('bad', trace_view_data.error.messages ?? [],
+					trace_view_data.error.title);
 
-			this.#trace_view_page?.destroy();
-			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
+				element.innerHTML = '';
+				element.appendChild($msg_box[0]);
+			}
+			else {
+				element.innerHTML = trace_view;
 
-			this.#datatable.bindWrapperEvents();
+				this.#bindSideDrawerEvents();
+				this.#datatable.unbindWrapperEvents();
+
+				this.#trace_view_page?.destroy();
+				this.#trace_view_page = new TraceViewPage(element, trace_view_data);
+
+				this.#datatable.bindWrapperEvents();
+			}
 
 			this.#unscheduleRefresh();
 		}
