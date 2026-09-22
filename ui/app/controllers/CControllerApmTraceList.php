@@ -56,7 +56,8 @@ class CControllerApmTraceList extends CController {
 					'value' => ['string', 'required']
 				]]
 			],
-			'sort' => ['string', 'in' => ['timestamp']],
+			'sort' => ['string', 'in' => ['timestamp', 'traceid', 'spanid', 'trace_state', 'span_name', 'span_kind',
+				'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
 			'filter_set' => ['integer', 'in' => [1]],
