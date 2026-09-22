@@ -387,11 +387,7 @@
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_SELECT, () => {
-					this.#side_drawer?.close();
-
-					this.#scheduleRefresh();
-				})
+				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
 				.on(CPager.EVENT_STATE_CHANGE, e => {
 					const {page} = e.detail;
 

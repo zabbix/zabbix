@@ -358,8 +358,6 @@
 					this.#side_drawer_abort_controller?.abort();
 					this.#side_drawer_abort_controller = null;
 
-					this.#side_drawer?.close();
-
 					this.#scheduleRefresh();
 				})
 				.on(CPager.EVENT_STATE_CHANGE, e => {
