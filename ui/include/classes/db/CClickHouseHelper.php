@@ -111,7 +111,10 @@ final class CClickHouseHelper {
 					break;
 
 				case 'String':
-					$values_prepared = $values;
+					foreach ($values as $value) {
+						$values_prepared[] = (string) $value;
+					}
+
 					break;
 
 				default:
