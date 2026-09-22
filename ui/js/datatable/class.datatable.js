@@ -330,6 +330,9 @@ class CDataTable {
 	/** @type {number|null} */
 	#resize_debounce_timeout_id = null;
 
+	/** @type {HTMLDivElement|null} */
+	#ghost_row = null;
+
 	#events = {
 		[CDataTable.EVENT_INIT]: this.onInit,
 		[CDataTable.EVENT_RENDER]: this.onRender,
@@ -2280,12 +2283,13 @@ class CDataTable {
 	}
 
 	#cancelRequestAnimationFrame() {
-		if (this.#raf_id === null) {
-			return;
+		if (this.#raf_id !== null) {
+			cancelAnimationFrame(this.#raf_id);
+			this.#raf_id = null;
 		}
 
-		cancelAnimationFrame(this.#raf_id);
-		this.#raf_id = null;
+		this.#ghost_row?.remove();
+		this.#ghost_row = null;
 	}
 
 	#calculateColumnWidths() {
@@ -2297,18 +2301,18 @@ class CDataTable {
 			return;
 		}
 
-		const ghost_row = document.createElement('div');
-		ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
-		ghost_row.style.height = '0px';
-		ghost_row.style.visibility = 'hidden';
+		this.#ghost_row = document.createElement('div');
+		this.#ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
+		this.#ghost_row.style.height = '0px';
+		this.#ghost_row.style.visibility = 'hidden';
 
-		this.#body.appendChild(ghost_row);
+		this.#body.appendChild(this.#ghost_row);
 
 		for (const column of this.#visible_columns) {
 			const header_cell = column.getHeaderCell()?.target?.cloneNode(true);
 
-			if (header_cell) {
-				ghost_row.appendChild(header_cell);
+			if (header_cell instanceof Node) {
+				this.#ghost_row.appendChild(header_cell);
 			}
 		}
 
@@ -2331,8 +2335,10 @@ class CDataTable {
 				this.#calculateColumnWidth(column);
 			}
 
-			ghost_row.remove();
+			this.#ghost_row?.remove();
+			this.#ghost_row = null;
 
+			this.#raf_id = null;
 			this.#applyColumnWidths();
 		});
 	}
