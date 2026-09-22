@@ -66,9 +66,9 @@ $filter = (new CFilter())
 				)
 			])
 			->addItem([
-				(new CLabel(_('Operation name'), 'filter_operation_name')),
+				(new CLabel(_('Operation name'), 'filter_span_name')),
 				new CFormField(
-					(new CTextBox('filter_operation_name', $data['filter']['operation_name']))
+					(new CTextBox('filter_span_name', $data['filter']['span_name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])

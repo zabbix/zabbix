@@ -46,7 +46,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'traceid' => ['string'],
 			'spanid' => ['string'],
 			'service_name' => ['string'],
-			'operation_name' => ['string'],
+			'span_name' => ['string'],
 			'scope_name' => ['string'],
 			'min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
 			'max_duration' => ['string', 'use' => [CTimeUnitValidator::class]],

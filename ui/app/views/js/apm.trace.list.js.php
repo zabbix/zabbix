@@ -159,6 +159,7 @@
 					new CDataTableColumn('span_name', <?= json_encode(_('Operation name')); ?>)
 						.setFields(['span_name'])
 						.setRenderer('span_name')
+						.setSortField('timestamp')
 						.setWidth('auto'),
 					new CDataTableColumn('span_kind', <?= json_encode(_('Span kind')); ?>)
 						.setFields(['span_kind'])
@@ -236,9 +237,9 @@
 					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('span_name', ({cell, cell_data}) => {
-					const [operation_name] = cell_data;
+					const [span_name] = cell_data;
 
-					cell.appendChild(this.#prepareTextCell(operation_name, operation_name));
+					cell.appendChild(this.#prepareTextCell(span_name, span_name));
 				})
 				.setCellRenderer('start_time', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
