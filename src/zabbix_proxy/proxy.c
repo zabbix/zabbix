@@ -358,10 +358,7 @@ static int		config_proxy_memory_buffer_age	= 0;
 static const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= NULL,
 	.process_events_cb		= NULL,
-	.clean_events_cb		= NULL,
-	.reset_event_recovery_cb	= NULL,
-	.export_events_cb		= NULL,
-	.events_update_itservices_cb	= NULL
+	.clean_events_cb		= NULL
 };
 
 typedef struct
@@ -1838,7 +1835,7 @@ static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
 		if (NULL != args->rtc)
-			event_active(args->rtc->service.ev_timer, 0, 0);
+			zbx_ipc_service_alert(&args->rtc->service);
 	}
 }
 
@@ -1971,8 +1968,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
-	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_config_forks,
-			get_process_info_by_thread, &error))
+	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_process_info_by_thread, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
@@ -2070,7 +2066,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
-	zbx_threads_num = zbx_supervisor_get_process_count(config_forks);
+	zbx_threads_num = zbx_supervisor_prepare(config_forks);
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
 

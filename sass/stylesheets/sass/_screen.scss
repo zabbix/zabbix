@@ -124,6 +124,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/modal/host-wizard";
 @import "components/modal/user-device-init-view";
+@import "components/modal/cep-edit";
 
 .link-action {
 	@extend %link-action-style;
@@ -520,7 +521,7 @@ form {
 }
 
 .list-check-radio {
-	li {
+	> li {
 		display: block;
 		line-height: 24px;
 	}
@@ -2270,7 +2271,7 @@ svg {
 
 	.preprocessing-list-item {
 		.step-parameters {
-			align-items: baseline;
+			align-items: end;
 			line-height: 22px;
 		}
 	}
@@ -2956,10 +2957,22 @@ z-select {
 }
 
 // Users permissions tab.
+.rules-status-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
+}
+
 .rules-status-container {
 	.status-green,
-	.status-grey {
+	.status-grey,
+	.btn-plus-more {
 		margin: 3px 3px 3px 0;
+	}
+
+	.status-green,
+	.status-grey {
+		max-width: 100%;
+		@extend %overflow-ellipsis;
 	}
 }
 

@@ -128,6 +128,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "browser poller";
 		case ZBX_PROCESS_TYPE_SUPERVISOR:
 			return "supervisor";
+		case ZBX_PROCESS_TYPE_CEP_MANAGER:
+			return "event manager";
+		case ZBX_PROCESS_TYPE_CEP_WORKER:
+			return "event processor";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

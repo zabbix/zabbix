@@ -74,8 +74,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52
 -- role and role_rule
 INSERT INTO role (roleid, name, type) VALUES (5, 'User role with API access', 1);
 INSERT INTO role (roleid, name, type) VALUES (6, 'Admin role with API access', 2);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (36, 5, 0, 'api.access', 1);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (37, 6, 0, 'api.access', 1);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (44, 5, 0, 'api.access', 1);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (45, 6, 0, 'api.access', 1);
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');
@@ -328,6 +328,7 @@ INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (6100
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60002, 'maintenance_has_only_group', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60003, 'maintenance_has_group_and_host', '', 1539723600, 1539810000);
 INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60005, 'maintenance_two_groups', '', 1539723600, 1539810000);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60006, 'maintenance_two_triggers', '', 1539723600, 1539810000);
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2, 60003, 61003);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1, 60002, 62002);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2, 60003, 62003);
@@ -355,7 +356,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (400720, 2, 120004,' Item eth0', '', 'item[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34046, 400720, 400710, 'item[{#NAME}]');
-INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (300002,'{99001}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (300002,'{99001}>0','Trigger eth0', 2, 4, '');
+INSERT INTO trigger_rtdata (triggerid, value) VALUES (300002, 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99001, 400720, 300002, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (300002, 300001);
 
@@ -366,7 +368,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (400740, 18, 120004,' Item_child eth0', '', 'item_child[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4, 400720);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (34048, 400740, 400730, 'item[{#NAME}]');
-INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (300004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (300004,'{99003}>0','Trigger eth0', 2, 4, '');
+INSERT INTO trigger_rtdata (triggerid, value) VALUES (300004, 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 400740, 300004, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (300004, 300003);
 
@@ -458,6 +461,12 @@ insert into triggers (triggerid,expression,description,priority,comments) values
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135004,132000,134004,'now','$,0');
 insert into triggers (triggerid,expression,description,priority,comments) values (134005,'{135005}=0','triggerstester_t5',5,'');
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135005,132000,134005,'now','$,0');
+
+-- testMaintenance_Get
+INSERT INTO maintenance_trigger (maintenance_triggerid,maintenanceid,triggerid) VALUES (1,60006,134000);
+INSERT INTO maintenance_trigger (maintenance_triggerid,maintenanceid,triggerid) VALUES (2,60006,134001);
+INSERT INTO maintenance_eventname (maintenance_eventnameid,maintenanceid,value,operator) VALUES (1,60006,'Event1',2);
+INSERT INTO maintenance_eventname (maintenance_eventnameid,maintenanceid,value,operator) VALUES (2,60006,'Event2',3);
 
 insert into triggers (triggerid,expression,description,priority,flags,comments) values (134106,'{135106}=0','triggerstesterlld_t0',0,2,'');
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135106,132004,134106,'now','$,0');

@@ -81,7 +81,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 int	zbx_get_log_level_impl(void);
 
-void	zbx_set_log_level(int level);
+int	zbx_set_log_level(int level);
 
 const char	*zbx_get_log_component_name(void);
 
@@ -95,6 +95,7 @@ const char	*zabbix_get_log_level_string(void);
 
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+void	zbx_change_component_log_level_silent(zbx_log_component_t *component, int direction);
 #endif
 
 

@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxbincommon \
+	zbxcep_client \
 	zbxconnector \
 	zbxcommon \
 	zbxcomms \
@@ -54,6 +55,7 @@ DIST_SUBDIRS = \
 	zbxmedia \
 	zbxmodules \
 	zbxmutexs \
+	zbxmw \
 	zbxnix \
 	zbxnum \
 	zbxodbc \
@@ -109,6 +111,7 @@ SERVER_SUBDIRS = \
 	zbxdb \
 	zbxdiscovery \
 	zbxdiscoverer \
+	zbxcep_client \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -133,6 +136,7 @@ SERVER_SUBDIRS = \
 	zbxipcservice \
 	zbxkvs \
 	zbxmedia \
+	zbxmw \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
@@ -181,6 +185,7 @@ PROXY_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxbincommon \
+	zbxcep_client \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
@@ -208,6 +213,7 @@ PROXY_SUBDIRS = \
 	zbxip \
 	zbxipcservice \
 	zbxkvs \
+	zbxmw \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
