@@ -42,7 +42,7 @@ class CDataTable {
 	static EVENT_OPTIONS_POPUP_UPDATE = 'options:update';
 
 	static ZBX_STYLE_DATATABLE = 'datatable';
-	static ZBS_STYLE_DATATABLE_CUSTOMIZABLE = 'datatable-customizable';
+	static ZBX_STYLE_DATATABLE_CUSTOMIZABLE = 'datatable-customizable';
 	static ZBX_STYLE_RESIZING = 'datatable-resizing';
 	static ZBX_STYLE_SCROLLABLE = 'datatable-scrollable';
 	static ZBX_STYLE_BODY = 'datatable-body';
@@ -826,7 +826,7 @@ class CDataTable {
 		this.#element.classList.add(CDataTable.ZBX_STYLE_DATATABLE, CDataTable.ZBX_STYLE_SCROLLABLE);
 
 		if (this.isCustomizable()) {
-			this.#element.classList.add(CDataTable.ZBS_STYLE_DATATABLE_CUSTOMIZABLE);
+			this.#element.classList.add(CDataTable.ZBX_STYLE_DATATABLE_CUSTOMIZABLE);
 		}
 
 		this.#element.innerHTML = '';
