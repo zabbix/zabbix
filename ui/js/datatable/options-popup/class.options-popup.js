@@ -397,12 +397,18 @@ class CDataTableOptionsPopup {
 	 */
 	position() {
 		const wrapper = document.querySelector('.wrapper');
+		const wrapper_rect = wrapper.getBoundingClientRect();
 		const element_rect = this.getDataTable().getElement().getBoundingClientRect();
 		const handle_rect = this.#handle.getBoundingClientRect();
 		const popup_rect = this.#element.getBoundingClientRect();
 		const offset_top = wrapper.scrollTop + this.#datatable.getElement().getBoundingClientRect().top;
 
-		if (handle_rect.left + popup_rect.width > window.innerWidth) {
+		let right_container_edge = window.innerWidth;
+		if (wrapper.tagName.toLowerCase() === 'z-split-view-pane') {
+			right_container_edge = wrapper_rect.left + wrapper_rect.width;
+		}
+
+		if (handle_rect.left + popup_rect.width > right_container_edge) {
 			this.#element.style.right = `${element_rect.right - handle_rect.right - 1}px`;
 		}
 		else {
