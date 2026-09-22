@@ -38,7 +38,19 @@ class CControllerApmTraceListData extends CControllerDataTable {
 
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
-		return $validator->validate($this->filter) === CFormValidator::SUCCESS;
+		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => _('Invalid request')
+					]
+				])])
+			);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected static function getFilterValidationRules(): array {
