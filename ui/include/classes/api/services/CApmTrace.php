@@ -83,8 +83,6 @@ class CApmTrace extends CApmGeneral {
 			'time_from' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'traceids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'parent_spanids' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
