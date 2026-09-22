@@ -16,8 +16,8 @@
 
 class CTimeUnitValidator extends CValidator {
 
-	protected ?float $max = null;
-	protected ?float $min = null;
+	protected ?float $max = 0;
+	protected ?float $min = 0;
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 	protected bool $accept_zero = false;
