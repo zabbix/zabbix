@@ -112,7 +112,7 @@ class CControllerApmLogList extends CController {
 		];
 
 		foreach (['log', 'resource', 'scope'] as $type) {
-			$filter[$type.'_attributes_evaltype'] = CProfile::get('web.apm.log.filter_log_attributes_evaltype',
+			$filter[$type.'_attributes_evaltype'] = CProfile::get('web.apm.log.filter_'.$type.'_attributes_evaltype',
 				CONDITION_EVAL_TYPE_AND_OR
 			);
 
