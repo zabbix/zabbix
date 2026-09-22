@@ -254,7 +254,10 @@ static int	format_xpath_query_result_default(xmlXPathObject *xpathObj, xmlDoc *d
 		return format_xpath_obj_primitive(xpathObj, out, errmsg);
 
 	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "Failed to create buffer");
 		return FAIL;
+	}
 
 	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
@@ -296,7 +299,10 @@ static int	format_xpath_query_result_vector(xmlXPathObject *xpathObj, xmlDoc *do
 	}
 
 	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "Failed to create buffer");
 		goto out;
+	}
 
 	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
