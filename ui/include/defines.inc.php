@@ -1514,7 +1514,7 @@ define('ZBX_TIME_SUFFIX_MULTIPLIERS', [
 ]);
 
 // Size suffixes and multipliers.
-define('ZBX_SIZE_SUFFIXES', 'KMGT');
+define('ZBX_SIZE_SUFFIXES', 'K|M|G|T');
 define('ZBX_SIZE_SUFFIX_MULTIPLIERS', [
 	'K' => 1000,
 	'M' => 1000**2,
