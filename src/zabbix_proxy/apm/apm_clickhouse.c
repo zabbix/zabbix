@@ -334,12 +334,23 @@ void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
  ******************************************************************************/
 void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src)
 {
-	dst->url = zbx_strdup(NULL, src->url);
-	dst->database = zbx_strdup(NULL, src->database);
-	dst->username = zbx_strdup(NULL, src->username);
-	dst->password = zbx_strdup(NULL, src->password);
-	dst->source_ip = zbx_strdup(NULL, src->source_ip);
-	dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+	if (NULL != src->url)
+		dst->url = zbx_strdup(NULL, src->url);
+
+	if (NULL != src->database)
+		dst->database = zbx_strdup(NULL, src->database);
+
+	if (NULL != src->username)
+		dst->username = zbx_strdup(NULL, src->username);
+
+	if (NULL != src->password)
+		dst->password = zbx_strdup(NULL, src->password);
+
+	if (NULL != src->source_ip)
+		dst->source_ip = zbx_strdup(NULL, src->source_ip);
+
+	if (NULL != src->ssl_ca_location)
+		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
 }
 
 /******************************************************************************
