@@ -195,7 +195,6 @@ $html_page->show();
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
 		'metric_types' => CApmMetricHelper::getTypes(),
-		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],
 		'filter_validation_rules' => $data['filter_validation_rules'],

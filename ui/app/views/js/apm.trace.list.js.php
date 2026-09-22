@@ -22,7 +22,6 @@
 
 <script>
 	const view = new class {
-		#layout_mode = null;
 		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#time_selector = null;
@@ -57,7 +56,6 @@
 			default_sort_order,
 			filter,
 			filter_options,
-			layout_mode,
 			page,
 			refresh_interval,
 			filter_validation_rules,
@@ -67,7 +65,6 @@
 			user_configs,
 			side_drawer_position
 		}) {
-			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
 			this.#csrf_token = csrf_token;
 
@@ -146,9 +143,6 @@
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('trace_state', <?= json_encode(_('Trace state')); ?>)
-						.setColumnOptions({
-							number_of_attributes: 3
-						})
 						.setFields(['trace_state'])
 						.setVisible(false)
 						.setWidth('auto'),

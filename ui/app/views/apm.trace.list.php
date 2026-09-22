@@ -172,7 +172,6 @@ $html_page->show();
 		'filter' => $data['filter'],
 		'filter_options' => $data['filter_options'],
 		'filter_validation_rules' => $data['filter_validation_rules'],
-		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],
 		'sort_field' => $data['sort_field'],

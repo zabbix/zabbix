@@ -22,7 +22,6 @@
 
 <script>
 	const view = new class {
-		#layout_mode = null;
 		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#global_timerange = null;
@@ -54,7 +53,6 @@
 			default_sort_order,
 			filter,
 			filter_options,
-			layout_mode,
 			page,
 			refresh_interval,
 			filter_validation_rules,
@@ -65,7 +63,6 @@
 			side_drawer_position,
 			metric_types
 		}) {
-			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
 			this.#csrf_token = csrf_token;
 
