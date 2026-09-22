@@ -208,6 +208,8 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 
 	zbx_json_free(&json);
 
+	zabbix_log(LOG_LEVEL_TRACE, "posting otel data to clickhouse: %s", data);
+
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot post telemetry data: %s", curl_easy_strerror(err));
