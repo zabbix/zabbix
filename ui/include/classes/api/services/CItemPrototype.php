@@ -919,9 +919,7 @@ class CItemPrototype extends CItemGeneral {
 			'SELECT i.itemid,i.'.implode(',i.', $output).
 			' FROM items i'.
 			' JOIN item_discovery id ON i.itemid=id.itemid'.
-			' WHERE '.dbConditionInt('i.flags', [
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED
-				]).
+			' WHERE '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]).
 				' AND '.dbConditionId('id.lldruleid', $ruleids)
 		), 'itemid');
 
