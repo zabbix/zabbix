@@ -160,13 +160,13 @@
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
 						.setFields(['traceid'])
 						.setSortable(true)
-						.setRenderer('text_field')
+						.setRenderer('traceid')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')) ?>)
-						.setFields(['spanid'])
+						.setFields(['spanid', 'traceid'])
 						.setSortable(true)
-						.setRenderer('text_field')
+						.setRenderer('spanid')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('flags', <?= json_encode(_('Flags')) ?>)
@@ -237,6 +237,41 @@
 					const [data] = cell_data;
 
 					cell.appendChild(this.#prepareTextCell(data));
+				})
+				.setCellRenderer('traceid', ({cell, cell_data}) => {
+					const [traceid] = cell_data;
+
+					if (traceid === '') {
+						return;
+					}
+
+					const link = document.createElement('a');
+					link.href = zabbixUrl({
+						action: 'apm.trace.list',
+						filter_traceid: traceid,
+						filter_set: '1'
+					});
+					link.textContent = traceid;
+
+					cell.appendChild(link);
+				})
+				.setCellRenderer('spanid', ({cell, cell_data}) => {
+					const [spanid, traceid] = cell_data;
+
+					if (spanid === '') {
+						return;
+					}
+
+					const link = document.createElement('a');
+					link.href = zabbixUrl({
+						action: 'apm.trace.list',
+						filter_traceid: traceid,
+						filter_spanid: spanid,
+						filter_set: '1'
+					});
+					link.textContent = spanid;
+
+					cell.appendChild(link);
 				})
 				.setCellRenderer('timestamp', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
