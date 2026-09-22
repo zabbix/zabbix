@@ -30,6 +30,9 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.action.list.filter.active':
 				case 'web.actionlog.filter.active':
+				case 'web.apm.trace.filter.active':
+				case 'web.apm.metric.filter.active':
+				case 'web.apm.log.filter.active':
 				case 'web.apm.log.datatable':
 				case 'web.apm.log.side_drawer.position':
 				case 'web.apm.metric.datatable':
