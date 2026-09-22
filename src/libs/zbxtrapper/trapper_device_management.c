@@ -309,7 +309,7 @@ static zbx_device_ba_error_t	trapper_device_map_http_jsonrpc_error(zbx_http_json
 }
 
 static int	trapper_device_bridge_adapter_error_info(const struct zbx_json_parse *jp_error, char **reason,
-		char **domain)
+		char **domain, char **detailed_message)
 {
 	struct zbx_json_parse	jp_data, jp_details, jp_detail;
 	const char		*p = NULL;
@@ -342,8 +342,21 @@ static int	trapper_device_bridge_adapter_error_info(const struct zbx_json_parse 
 				SUCCEED == zbx_json_value_by_name_dyn(&jp_detail, "domain", &detail_domain,
 				&detail_domain_alloc, &domain_type) && ZBX_JSON_TYPE_STRING == domain_type)
 		{
+			char		*detail_message = NULL;
+			size_t		detail_message_alloc = 0;
+			zbx_json_type_t	message_type;
+
 			*reason = detail_reason;
 			*domain = detail_domain;
+
+			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_detail, "detailed_message", &detail_message,
+					&detail_message_alloc, &message_type) && ZBX_JSON_TYPE_STRING == message_type &&
+					'\0' != *detail_message)
+			{
+				*detailed_message = detail_message;
+			}
+			else
+				zbx_free(detail_message);
 
 			return SUCCEED;
 		}
@@ -452,21 +465,23 @@ static int	trapper_device_get_device_id(const struct zbx_json_parse *jp, const c
 static void	trapper_device_bridge_adapter_handle_error(const struct zbx_json_parse *jp_result, const char *request,
 		const char *body_data, char **error, char **reason, char **domain)
 {
-	char	code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN], *error_data = NULL;
+	char	code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN], *error_data = NULL,
+		*detailed_message = NULL;
 
 	if (SUCCEED == zbx_json_value_by_name(jp_result, "code", code, sizeof(code), NULL) &&
 			SUCCEED == zbx_json_value_by_name(jp_result, "message", message, sizeof(message), NULL))
 	{
-		error_data = zbx_json_raw_value_by_path_dyn(jp_result, "$.data");
+		(void)trapper_device_bridge_adapter_error_info(jp_result, reason, domain, &detailed_message);
 #ifdef ZBX_DEBUG
+		error_data = zbx_json_raw_value_by_path_dyn(jp_result, "$.data");
 		zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 				code, message, ZBX_NULL2EMPTY_STR(error_data));
 #else
-		zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s", code, message);
+		zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s, detailed_message: %s",
+				code, message, ZBX_NULL2EMPTY_STR(detailed_message));
 #endif
 		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
 				ZBX_DEVICE_BA_ERR_RETURNED_ERROR));
-		(void)trapper_device_bridge_adapter_error_info(jp_result, reason, domain);
 	}
 	else
 	{
@@ -477,6 +492,7 @@ static void	trapper_device_bridge_adapter_handle_error(const struct zbx_json_par
 	}
 
 	zbx_free(error_data);
+	zbx_free(detailed_message);
 }
 
 #endif
