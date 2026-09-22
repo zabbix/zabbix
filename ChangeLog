@@ -1,6 +1,10 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F.I...S. [ZBXNEXT-10353] implemented new event processing options (dpankins, gberzina, gcalenko, jfreibergs, talbergs, vmaksimovs, vmurzins, vso, wiper)
+.......PS. [ZBXNEXT-10745] improved preprocessing diagnostic output (jburlakovs)
+A.F.I...S. [ZBXNEXT-9185] implemented a permission-based visibility model for proxies and proxy groups, along with role-based restrictions for monitoring by server (aetatsu, katkuzmina, msnihach)
+A.F.....S. [ZBXNEXT-8339] manually suppress events of a trigger (ad-hoc maintenances) (aetatsu, aluchko, dpankins)
 A.F.I..... [ZBXNEXT-10334] prevented access to all API methods for users whose role has an empty allow list (agriscenko, askolmeisters)
 ...G...... [ZBXNEXT-10451] added Zabbix agent 2 pprof profiler (opucka)
 A.F....... [ZBXNEXT-9962] added support for enforcing the 'URL (after login)' page for users through user roles; refactored request helper into Frontend Action Validator; refactored MVC response classes (aluchko, dfofanovs, dpankins)
@@ -37,6 +41,7 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27672] fixed extra vertical spacing in Script form when flexible textarea is disabled (aluchko)
 ..F....... [ZBX-27793] fixed incorrect screen reader announcements for modal dialog windows (aluchko)
 .........T [ZBX-28099] fixed LLD Sessions discovery in Veeam Backup and Replication by HTTP template (egordymov)
 ..F....... [ZBX-27857] fixed svggraph widget legend min/max values for "all" approximation (kastafjevs)
@@ -2117,6 +2122,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.31
+
+7.0.31rc1 was released as 7.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.31rc1
