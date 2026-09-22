@@ -146,45 +146,57 @@
 						.setWidth('auto'),
 					new CDataTableColumn('body', <?= json_encode(_('Body')) ?>)
 						.setFields(['body'])
+						.setRenderer('text_field')
 						.setWidth('auto'),
 					new CDataTableColumn('severity_text', <?= json_encode(_('Severity text')) ?>)
 						.setFields(['severity_text', 'severity_number'])
+						.setSortable(true)
 						.setRenderer('severity_text')
 						.setWidth('auto'),
 					new CDataTableColumn('severity_number', <?= json_encode(_('Severity number')) ?>)
 						.setFields(['severity_number'])
+						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
 						.setFields(['traceid'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')) ?>)
 						.setFields(['spanid'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('flags', <?= json_encode(_('Flags')) ?>)
 						.setFields(['flags'])
+						.setSortable(true)
 						.setRenderer('flags')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')) ?>)
 						.setFields(['service_name'])
-						.setWidth('auto')
-						.setVisible(false),
-					new CDataTableColumn('body', <?= json_encode(_('Body')) ?>)
-						.setFields(['body'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')) ?>)
 						.setFields(['scope_name'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('scope_version', <?= json_encode(_('Scope version')) ?>)
 						.setFields(['scope_version'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('event_name', <?= json_encode(_('Event name')) ?>)
 						.setFields(['event_name'])
+						.setSortable(true)
+						.setRenderer('text_field')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('log_attributes', <?= json_encode(_('Log attributes')); ?>)
@@ -221,6 +233,11 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
+				.setCellRenderer('text_field', ({cell, cell_data}) => {
+					const [data] = cell_data;
+
+					cell.appendChild(this.#prepareTextCell(data));
+				})
 				.setCellRenderer('timestamp', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
 
@@ -624,6 +641,19 @@
 			if ('messages' in response) {
 				this.#addRefreshMessage(response.messages);
 			}
+		}
+
+		#prepareTextCell(value) {
+			const content = document.createElement('div');
+			content.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+			content.textContent = value;
+			content.title = value;
+
+			const flex_wrapper = document.createElement('div');
+			flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+			flex_wrapper.appendChild(content);
+
+			return flex_wrapper;
 		}
 	}
 </script>

@@ -56,7 +56,11 @@ class CControllerApmLogList extends CController {
 			'filter_scope_attributes' => $filter_attributes,
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
-			'sort' => ['string', 'in' => ['timestamp']],
+			'sort' => ['string',
+				'in' => ['timestamp', 'traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number',
+					'service_name', 'scope_name', 'scope_version', 'event_name'
+				]
+			],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
 			'filter_set' => ['integer', 'in' => [1]],
