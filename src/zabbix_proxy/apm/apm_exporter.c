@@ -43,12 +43,23 @@ static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_
 #if defined(HAVE_LIBCURL)
 	ZBX_UNUSED(error);
 
-	cfg->url = zbx_strdup(NULL, export_config->url);
-	cfg->database = zbx_strdup(NULL, export_config->db);
-	cfg->username = zbx_strdup(NULL, export_config->username);
-	cfg->password = zbx_strdup(NULL, export_config->password);
-	cfg->source_ip = zbx_strdup(NULL, export_config->source_ip);
-	cfg->ssl_ca_location = zbx_strdup(NULL, export_config->ssl_ca_location);
+	if (NULL != export_config->url)
+		cfg->url = zbx_strdup(NULL, export_config->url);
+
+	if (NULL != export_config->db)
+		cfg->database = zbx_strdup(NULL, export_config->db);
+
+	if (NULL != export_config->username)
+		cfg->username = zbx_strdup(NULL, export_config->username);
+
+	if (NULL != export_config->password)
+		cfg->password = zbx_strdup(NULL, export_config->password);
+
+	if (NULL != export_config->source_ip)
+		cfg->source_ip = zbx_strdup(NULL, export_config->source_ip);
+
+	if (NULL != export_config->ssl_ca_location)
+		cfg->ssl_ca_location = zbx_strdup(NULL, export_config->ssl_ca_location);
 
 	return SUCCEED;
 #else
