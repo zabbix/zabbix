@@ -463,18 +463,18 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					);
 				}
 
-				$valuemap = ($this->getInput('valuemapid', 0) == 0 || $result_preproc['result'] === null)
-					? []
-					: API::ValueMap()->get([
+				if ($this->getInput('valuemapid', 0) != 0 && $result_preproc['result'] !== null) {
+					$valuemap = API::ValueMap()->get([
 						'output' => [],
 						'selectMappings' => ['type', 'newvalue', 'value'],
 						'valuemapids' => $this->getInput('valuemapid')
 					])[0];
 
-				if ($valuemap) {
-					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
-						$result_preproc['result'], $valuemap
-					);
+					if ($valuemap) {
+						$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
+							$result_preproc['result'], $valuemap
+						);
+					}
 				}
 			}
 			elseif (array_key_exists('error', $result_preproc)) {
