@@ -43,8 +43,6 @@
 		#side_drawer_abort_controller = null;
 		/** @type {TraceViewPage|null} */
 		#trace_view_page = null;
-		/** @type {Object<string, any>} */
-		#trace_view_data = null;
 		/** @type {string|null} */
 		#selected_traceid = null;
 		/** @type {CDetailsPanel|null} */
@@ -513,7 +511,6 @@
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 			this.#selected_traceid = null;
-			this.#trace_view_data = null;
 
 			this.#scheduleRefresh();
 		}
