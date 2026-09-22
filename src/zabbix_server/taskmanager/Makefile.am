@@ -8,5 +8,5 @@ libzbxtaskmanager_server_a_SOURCES = \
 	taskmanager_server.h
 
 libzbxtaskmanager_server_a_CFLAGS = \
-	-I$(top_builddir)/src/zabbix_server/permissions \
+	-I$(top_srcdir)/src/zabbix_server/permissions \
 	$(TLS_CFLAGS)
