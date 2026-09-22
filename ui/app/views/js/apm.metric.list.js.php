@@ -347,15 +347,13 @@
 					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
-					const [span_attributes] = cell_data;
+					const [attributes] = cell_data;
 
-					console.log(span_attributes);
-
-					if (!span_attributes || span_attributes.length === 0) {
+					if (!attributes || attributes.length === 0) {
 						return;
 					}
 
-					const span_attribute_labels = [];
+					const attribute_labels = [];
 
 					const tags_wrapper = document.createElement('div');
 					tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
@@ -364,7 +362,7 @@
 
 					let count = column_options.number_of_attributes;
 
-					for (const [attr_name, attr_value] of Object.entries(span_attributes)) {
+					for (const [attr_name, attr_value] of Object.entries(attributes)) {
 						const content = `${attr_name}: ${attr_value}`
 						const span_attribute_label = document.createElement('span');
 						span_attribute_label.classList.add(ZBX_STYLE_TAG);
@@ -374,7 +372,7 @@
 						span_attribute_label.dataset.hintboxHtml = content;
 						span_attribute_label.ariaExpanded = 'false';
 
-						span_attribute_labels.push(span_attribute_label);
+						attribute_labels.push(span_attribute_label);
 
 						if (count > 0) {
 							tags_wrapper.appendChild(span_attribute_label);
@@ -383,10 +381,10 @@
 						}
 					}
 
-					if (Object.keys(span_attributes).length > column_options.number_of_attributes) {
+					if (Object.keys(attributes).length > column_options.number_of_attributes) {
 						const more_attributes_hintbox = document.createElement('div');
 
-						for (const tag_label of span_attribute_labels) {
+						for (const tag_label of attribute_labels) {
 							more_attributes_hintbox.appendChild(tag_label.cloneNode(true));
 						}
 
