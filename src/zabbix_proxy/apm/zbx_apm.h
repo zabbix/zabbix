@@ -24,6 +24,8 @@ typedef struct
 	const char		*ca_file;
 	const char		*cert_file;
 	const char		*key_file;
+	const char		*ca_location;
+	const char		*source_ip;
 }
 zbx_thread_apm_manager_args_t;
 

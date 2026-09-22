@@ -18,6 +18,7 @@
 #include "apm_dataset.h"
 #include "libs/zbxhistory/history_curl.h"
 #include "config.h"
+#include "zbxtelemetry.h"
 
 typedef struct
 {
@@ -25,6 +26,8 @@ typedef struct
 	char	*database;
 	char	*username;
 	char	*password;
+	char	*source_ip;
+	char	*ssl_ca_location;
 }
 zbx_apm_clickhouse_cfg_t;
 
@@ -41,5 +44,11 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn);
 int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 	zbx_apm_dataset_t *ds);
+
+void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg);
+void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src);
+
+int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, const zbx_apm_db_config_t *cfg_new);
+void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_db_config_t *src);
 
 #endif

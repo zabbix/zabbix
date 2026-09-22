@@ -61,6 +61,8 @@ typedef struct
 {
 	zbx_apm_exporter_cfg_t		cfg;
 
+	zbx_apm_db_config_t		cfg_global;
+
 	zbx_vector_apm_exporter_ptr_t	exporters;
 
 	pthread_mutex_t			lock;
@@ -69,6 +71,7 @@ zbx_apm_exporter_pool_t;
 
 zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, char **error);
 void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool);
+void	apm_exporter_pool_set_global_config(zbx_apm_exporter_pool_t *pool, zbx_apm_db_config_t *cfg);
 
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool);
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter);

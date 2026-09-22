@@ -1756,7 +1756,9 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 		.port = config_apm_port,
 		.ca_file = config_apm_ca_file,
 		.cert_file = config_apm_cert_file,
-		.key_file = config_apm_key_file
+		.key_file = config_apm_key_file,
+		.ca_location = config_ssl_ca_location,
+		.source_ip = zbx_config_source_ip
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){
