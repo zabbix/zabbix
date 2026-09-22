@@ -42,7 +42,8 @@
 		#details_panel = null;
 		/** @type {Map} */
 		#rows_data = new Map();
-		#selected_row_index = null;
+		/** @type {string|null} */
+		#selected_row_hash = null;
 		#metric_types = null;
 		#aggregation_temporality_labels = null;
 		#flags_labels = null;
@@ -266,7 +267,9 @@
 				.setStickyFooter(true)
 				.setStorageIdx(storage_idx)
 				.setRowRenderer('metric', ({columns, data_fields, row, row_data, row_index, response}) => {
-					row.dataset.rowIndex = row_index;
+					const row_hash = this.#hashRowData(row_data);
+
+					row.dataset.rowHash = row_hash;
 
 					const row_data_o = Object.create(null);
 
@@ -274,7 +277,7 @@
 						row_data_o[key] = row_data[index];
 					}
 
-					this.#rows_data.set(row_index, row_data_o);
+					this.#rows_data.set(row_hash, row_data_o);
 
 					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
 				})
@@ -430,9 +433,9 @@
 					const rows = datatable_element.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`);
 
 					for (const row of rows) {
-						const row_index = parseInt(row.getAttribute('data-row-index'));
+						const row_hash = row.dataset.rowHash;
 
-						if (row_index === this.#selected_row_index) {
+						if (row_hash === this.#selected_row_hash) {
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
@@ -441,7 +444,7 @@
 								return;
 							}
 
-							if (this.#selected_row_index === row_index) {
+							if (this.#selected_row_hash === row_hash) {
 								this.#side_drawer.close();
 
 								return;
@@ -452,9 +455,9 @@
 
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-							this.#selected_row_index = row_index;
+							this.#selected_row_hash = row_hash;
 
-							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_index));
+							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_hash));
 						});
 					}
 				})
@@ -539,7 +542,7 @@
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-			this.#selected_row_index = null;
+			this.#selected_row_hash = null;
 			this.#details_panel = null;
 
 			this.#scheduleRefresh();
@@ -869,6 +872,18 @@
 			};
 
 			return details;
+		}
+
+		#hashRowData(row_data) {
+			const row_data_str = JSON.stringify(row_data);
+
+			let hash = 5381;
+
+			for (let i = 0; i < row_data_str.length; i++) {
+				hash = ((hash << 5) + hash) + row_data_str.charCodeAt(i);
+			}
+
+			return (hash >>> 0).toString(16);
 		}
 	}
 </script>
