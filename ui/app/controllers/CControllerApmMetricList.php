@@ -22,7 +22,7 @@ class CControllerApmMetricList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
+		return $this->checkAccess(CRoleHelper::UI_APM_METRICS);
 	}
 
 	public static function getValidationRules(): array {
@@ -32,9 +32,7 @@ class CControllerApmMetricList extends CController {
 			'filter_scope_name' => ['string'],
 			'filter_types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
 				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]]],
-			'filter_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
-			'filter_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
-			],
+			'filter_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
 			'filter_attributes' => ['objects', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
@@ -228,8 +226,8 @@ class CControllerApmMetricList extends CController {
 		CProfile::update('web.apm.metric.filter_scope_name', $this->getInput('filter_scope_name', ''),
 			PROFILE_TYPE_STR
 		);
-		CProfile::update('web.apm.metric.filter_evaltype',
-			$this->getInput('filter_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+		CProfile::update('web.apm.metric.filter_attributes_evaltype',
+			$this->getInput('filter_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR
@@ -240,8 +238,8 @@ class CControllerApmMetricList extends CController {
 		CProfile::updateArray('web.apm.metric.filter_attributes.operator', array_column($filter_attributes, 'operator'),
 			PROFILE_TYPE_INT
 		);
-		CProfile::update('web.apm.metric.filter_resource_evaltype', $this->getInput('filter_resource_evaltype',
-			CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+		CProfile::update('web.apm.metric.filter_resource_attributes_evaltype',
+			$this->getInput('filter_resource_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_resource_attributes.key',
 			array_column($filter_resource_attributes, 'key'), PROFILE_TYPE_STR
@@ -252,8 +250,8 @@ class CControllerApmMetricList extends CController {
 		CProfile::updateArray('web.apm.metric.filter_resource_attributes.operator',
 			array_column($filter_resource_attributes, 'operator'), PROFILE_TYPE_INT
 		);
-		CProfile::update('web.apm.metric.filter_scope_evaltype',
-			$this->getInput('filter_scope_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+		CProfile::update('web.apm.metric.filter_scope_attributes_evaltype',
+			$this->getInput('filter_scope_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_scope_attributes.key',
 			array_column($filter_scope_attributes, 'key'), PROFILE_TYPE_STR
@@ -271,9 +269,9 @@ class CControllerApmMetricList extends CController {
 		CProfile::deleteIdx('web.apm.metric.filter_types');
 		CProfile::delete('web.apm.metric.filter_service_name');
 		CProfile::delete('web.apm.metric.filter_scope_name');
-		CProfile::delete('web.apm.metric.filter_evaltype');
-		CProfile::delete('web.apm.metric.filter_resource_evaltype');
-		CProfile::delete('web.apm.metric.filter_scope_evaltype');
+		CProfile::delete('web.apm.metric.filter_attributes_evaltype');
+		CProfile::delete('web.apm.metric.filter_resource_attributes_evaltype');
+		CProfile::delete('web.apm.metric.filter_scope_attributes_evaltype');
 		CProfile::deleteIdx('web.apm.metric.filter_attributes.key');
 		CProfile::deleteIdx('web.apm.metric.filter_attributes.value');
 		CProfile::deleteIdx('web.apm.metric.filter_attributes.operator');
