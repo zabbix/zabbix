@@ -26,56 +26,6 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter);
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize ClickHouse exporter configuration from provider        *
- *          options                                                           *
- *                                                                            *
- * Parameters: cfg           - [OUT] ClickHouse exporter configuration        *
- *             export_config - [IN] provider options                          *
- *             error         - [OUT] error message if a mandatory option is   *
- *                                  missing or curl support is unavailable    *
- *                                                                            *
- * Return value: SUCCEED on success, FAIL otherwise                           *
- *                                                                            *
- ******************************************************************************/
-static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
-		char **error)
-{
-#if defined(HAVE_LIBCURL)
-	ZBX_UNUSED(error);
-
-	if (NULL != export_config->url)
-		cfg->url = zbx_strdup(NULL, export_config->url);
-
-	if (NULL != export_config->db)
-		cfg->database = zbx_strdup(NULL, export_config->db);
-
-	if (NULL != export_config->username)
-		cfg->username = zbx_strdup(NULL, export_config->username);
-
-	if (NULL != export_config->password)
-		cfg->password = zbx_strdup(NULL, export_config->password);
-
-	if (NULL != export_config->source_ip)
-		cfg->source_ip = zbx_strdup(NULL, export_config->source_ip);
-
-	if (NULL != export_config->ssl_ca_location)
-		cfg->ssl_ca_location = zbx_strdup(NULL, export_config->ssl_ca_location);
-
-	return SUCCEED;
-#else
-	ZBX_UNUSED(cfg);
-	ZBX_UNUSED(options);
-	ZBX_UNUSED(options_num);
-
-	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
-			" This Zabbix server binary was compiled without curl");
-
-	return FAIL;
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: free resources allocated by exporter configuration                *
  *                                                                            *
  * Parameters: cfg - [IN] exporter configuration                              *

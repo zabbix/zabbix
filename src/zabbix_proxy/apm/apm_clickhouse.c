@@ -73,8 +73,9 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 		}
 	}
 
-	ret = zbx_http_prepare_ssl(conn->handle, NULL, NULL, NULL, 0, 0, cfg->source_ip, cfg->ssl_ca_location, NULL,
-			NULL, error);
+	ret = zbx_http_prepare_ssl(conn->handle, cfg->ssl_cert_file, cfg->ssl_key_file, cfg->ssl_key_password,
+			cfg->ssl_verify_peer, cfg->ssl_verify_host, cfg->source_ip, cfg->ssl_ca_location,
+			cfg->ssl_cert_location, cfg->ssl_key_location, error);
 out:
 	return ret;
 }
@@ -123,8 +124,8 @@ static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_
 			zbx_json_adduint64(json, NULL, value->ui64);
 			break;
 		case APM_COL_DATETIME64:
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64 "." ZBX_FS_UI64,
-					value->ui64 / 1000000000, value->ui64 % 1000000000);
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64 ".%09u",
+					value->ui64 / 1000000000, (unsigned int)(value->ui64 % 1000000000));
 			zbx_json_addstring(json, NULL, buffer, ZBX_JSON_TYPE_NUMBER);
 			break;
 		case APM_COL_INT32:
@@ -319,6 +320,77 @@ int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: initialize ClickHouse exporter configuration from provider        *
+ *          options                                                           *
+ *                                                                            *
+ * Parameters: cfg           - [OUT] ClickHouse exporter configuration        *
+ *             export_config - [IN] provider options                          *
+ *             error         - [OUT] error message if a mandatory option is   *
+ *                                  missing or curl support is unavailable    *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
+		char **error)
+{
+#if defined(HAVE_LIBCURL)
+	ZBX_UNUSED(error);
+
+	if (NULL != export_config->url)
+		cfg->url = zbx_strdup(NULL, export_config->url);
+
+	if (NULL != export_config->db)
+		cfg->database = zbx_strdup(NULL, export_config->db);
+
+	if (NULL != export_config->username)
+		cfg->username = zbx_strdup(NULL, export_config->username);
+
+	if (NULL != export_config->password)
+		cfg->password = zbx_strdup(NULL, export_config->password);
+
+	if (NULL != export_config->source_ip)
+		cfg->source_ip = zbx_strdup(NULL, export_config->source_ip);
+
+	if (NULL != export_config->vault_path)
+		cfg->vault_path = zbx_strdup(NULL, export_config->vault_path);
+
+	if (NULL != export_config->ssl_cert_file)
+		cfg->ssl_cert_file = zbx_strdup(NULL, export_config->ssl_cert_file);
+
+	if (NULL != export_config->ssl_key_file)
+		cfg->ssl_key_file = zbx_strdup(NULL, export_config->ssl_key_file);
+
+	if (NULL != export_config->ssl_key_password)
+		cfg->ssl_key_password = zbx_strdup(NULL, export_config->ssl_key_password);
+
+	cfg->ssl_verify_peer = export_config->ssl_verify_peer;
+	cfg->ssl_verify_host = export_config->ssl_verify_host;
+
+	if (NULL != export_config->ssl_ca_location)
+		cfg->ssl_ca_location = zbx_strdup(NULL, export_config->ssl_ca_location);
+
+	if (NULL != export_config->ssl_cert_location)
+		cfg->ssl_cert_location = zbx_strdup(NULL, export_config->ssl_cert_location);
+
+	if (NULL != export_config->ssl_key_location)
+		cfg->ssl_key_location = zbx_strdup(NULL, export_config->ssl_key_location);
+
+	return SUCCEED;
+#else
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
+
+	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
+			" This Zabbix server binary was compiled without curl");
+
+	return FAIL;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: free resources allocated by ClickHouse exporter configuration     *
  *                                                                            *
  ******************************************************************************/
@@ -329,7 +401,13 @@ void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 	zbx_free(cfg->username);
 	zbx_free(cfg->password);
 	zbx_free(cfg->source_ip);
+	zbx_free(cfg->vault_path);
+	zbx_free(cfg->ssl_cert_file);
+	zbx_free(cfg->ssl_key_file);
+	zbx_free(cfg->ssl_key_password);
 	zbx_free(cfg->ssl_ca_location);
+	zbx_free(cfg->ssl_cert_location);
+	zbx_free(cfg->ssl_key_location);
 }
 
 /******************************************************************************
@@ -357,8 +435,29 @@ void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickh
 	if (NULL != src->source_ip)
 		dst->source_ip = zbx_strdup(NULL, src->source_ip);
 
+	if (NULL != src->vault_path)
+		dst->vault_path = zbx_strdup(NULL, src->vault_path);
+
+	if (NULL != src->ssl_cert_file)
+		dst->ssl_cert_file = zbx_strdup(NULL, src->ssl_cert_file);
+
+	if (NULL != src->ssl_key_file)
+		dst->ssl_key_file = zbx_strdup(NULL, src->ssl_key_file);
+
+	if (NULL != src->ssl_key_password)
+		dst->ssl_key_password = zbx_strdup(NULL, src->ssl_key_password);
+
+	dst->ssl_verify_peer = src->ssl_verify_peer;
+	dst->ssl_verify_host = src->ssl_verify_host;
+
 	if (NULL != src->ssl_ca_location)
 		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+
+	if (NULL != src->ssl_cert_location)
+		dst->ssl_cert_location = zbx_strdup(NULL, src->ssl_cert_location);
+
+	if (NULL != src->ssl_key_location)
+		dst->ssl_key_location = zbx_strdup(NULL, src->ssl_key_location);
 }
 
 /******************************************************************************
