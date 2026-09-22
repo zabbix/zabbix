@@ -2297,21 +2297,18 @@ class CDataTable {
 			return;
 		}
 
-		let ghost_row = null;
+		const ghost_row = document.createElement('div');
+		ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
+		ghost_row.style.height = '0px';
+		ghost_row.style.visibility = 'hidden';
 
-		if (this.#has_data) {
-			ghost_row = document.createElement('div');
-			ghost_row.classList.add(CDataTable.ZBX_STYLE_ROW);
-			ghost_row.style.height = '0px';
-			ghost_row.style.visibility = 'hidden';
+		this.#body.appendChild(ghost_row);
 
-			this.#body.appendChild(ghost_row);
+		for (const column of this.#visible_columns) {
+			const header_cell = column.getHeaderCell()?.target?.cloneNode(true);
 
-			for (const column of this.#visible_columns) {
-				const header_cell = column.getHeaderCell()?.target?.cloneNode(true);
-				if (header_cell !== null) {
-					ghost_row.appendChild(header_cell);
-				}
+			if (header_cell) {
+				ghost_row.appendChild(header_cell);
 			}
 		}
 
@@ -2334,7 +2331,7 @@ class CDataTable {
 				this.#calculateColumnWidth(column);
 			}
 
-			ghost_row?.remove();
+			ghost_row.remove();
 
 			this.#applyColumnWidths();
 		});
