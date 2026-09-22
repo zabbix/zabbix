@@ -2241,7 +2241,8 @@ FIELD		|local_address		|t_varchar(255)	|''		|NOT NULL	|ZBX_PROXY
 FIELD		|local_port		|t_varchar(64)	|'10051'	|NOT NULL	|ZBX_PROXY
 FIELD		|proxy_groupid		|t_id		|		|NULL		|0	|1|proxy_group|	|RESTRICT
 FIELD		|timeout_browser	|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|timeout_telemetry_query	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_telemetry_query|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|apm			|t_text		|'{}'		|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|proxy_groupid
 CHANGELOG	|19
@@ -2475,4 +2476,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050185	|7050185
+ROW		|1		|7050187	|7050187
