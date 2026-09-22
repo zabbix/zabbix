@@ -133,13 +133,26 @@ class CApmTrace extends CApmGeneral {
 			$options['countOutput'] = true;
 		}
 
-		$inner_query = (new CClickHouseQuery())
-			->from('otel_traces', 'ti')
-			->select('ti.TraceId')
+		$use_span_filtering = $options['filter'] || $options['search']
+			|| ($options['resource_attributes'] !== null
+				&& array_filter($options['resource_attributes'],
+					static fn (array $attribute) => $attribute['key'] !== ''
+				)
+			)
+			|| ($options['span_attributes'] !== null
+				&& array_filter($options['span_attributes'],
+					static fn (array $attribute) => $attribute['key'] !== ''
+				)
+			);
+
+		$inner_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'ti', $db_schema, [
+			'sortfield' => !$use_span_filtering && !$options['countOutput'] ? $options['sortfield'] : [],
+			'sortorder' => !$use_span_filtering && !$options['countOutput'] ? $options['sortorder'] : []
+		]))
+			->select('DISTINCT ti.TraceId')
 			->where('ti.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
 			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']])
-			->where('ti.ParentSpanId=\'\'')
-			->group('ti.TraceId');
+			->where('ti.ParentSpanId=\'\'');
 
 		if ($options['traceids'] !== null) {
 			$inner_query->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
@@ -153,17 +166,15 @@ class CApmTrace extends CApmGeneral {
 			$inner_query->where('ti.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
 		}
 
-		if ($options['filter'] || $options['search']
-				|| $options['resource_attributes'] !== null || $options['span_attributes'] !== null) {
-			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema, [
-				'output' => ['TraceId'],
-				...array_intersect_key($options, array_flip([
-					'filter', 'search', 'searchByAny', 'startSearch', 'excludeSearch', 'searchWildcardsEnabled'
+		if ($use_span_filtering) {
+			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema,
+				array_intersect_key($options, array_flip(['filter', 'search', 'searchByAny', 'startSearch',
+					'excludeSearch', 'searchWildcardsEnabled', 'sortfield', 'sortorder'
 				]))
-			]))
+			))
 				->linkQuery($inner_query)
-				->where('to.TraceId IN ('.$inner_query->getSql().')')
-				->group('to.TraceId');
+				->select('DISTINCT to.TraceId')
+				->where('to.TraceId IN ('.$inner_query->getSql().')');
 
 			if ($options['resource_attributes'] !== null) {
 				CClickHouseHelper::addAttributeFilter($outer_query, 'to.ResourceAttributes',
@@ -209,8 +220,6 @@ class CApmTrace extends CApmGeneral {
 			foreach ($options['sortfield'] as $i => $field) {
 				$order_by = match($field) {
 					'TraceId' => 't.TraceId',
-					'span_count' => 't.span_count',
-					'error_count' => 't.error_count',
 					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
 				};
 
