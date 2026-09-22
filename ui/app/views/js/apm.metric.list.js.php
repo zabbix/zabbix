@@ -306,7 +306,7 @@
 						? data.sum
 						: data.value;
 
-					cell.appendChild(this.#prepareTextCell(value, value));
+					cell.appendChild(this.#prepareTextCell(value));
 				})
 				.setCellRenderer('count', ({row_index, cell}) => {
 					const data = this.#rows_data.get(row_index);
@@ -314,7 +314,7 @@
 						? data.count
 						: '';
 
-					cell.appendChild(this.#prepareTextCell(value, value ?? null));
+					cell.appendChild(this.#prepareTextCell(value));
 				})
 				.setCellRenderer('aggregation_temporality', ({row_index, cell}) => {
 					const data = this.#rows_data.get(row_index);
@@ -604,19 +604,11 @@
 			}
 		}
 
-		#prepareTextCell(value, hint = null) {
+		#prepareTextCell(value) {
 			const content = document.createElement('div');
 			content.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			content.textContent = value;
-
-			if (hint !== null) {
-				content.dataset.hintbox = '1';
-				content.dataset.hintboxStatic = '1';
-				content.dataset.hintboxHtml = value;
-			}
-			else {
-				content.title = value;
-			}
+			content.title = value;
 
 			const flex_wrapper = document.createElement('div');
 			flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
