@@ -169,10 +169,10 @@
 						.setRenderer('spanid')
 						.setWidth('auto')
 						.setVisible(false),
-					new CDataTableColumn('flags', <?= json_encode(_('Flags')) ?>)
-						.setFields(['flags'])
+					new CDataTableColumn('trace_flags', <?= json_encode(_('Flags')) ?>)
+						.setFields(['trace_flags'])
 						.setSortable(true)
-						.setRenderer('flags')
+						.setRenderer('trace_flags')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')) ?>)
@@ -305,10 +305,10 @@
 
 					cell.appendChild(container);
 				})
-				.setCellRenderer('flags', ({cell, cell_data}) => {
-					const [flags] = cell_data;
+				.setCellRenderer('trace_flags', ({cell, cell_data}) => {
+					const [trace_flags] = cell_data;
 
-					cell.textContent = this.#decodeFlags(flags);
+					cell.textContent = this.#decodeTraceFlags(trace_flags);
 				})
 				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
 					const [attributes] = cell_data;
@@ -512,7 +512,7 @@
 						},
 						{
 							name: <?= json_encode(_('Flags')) ?>,
-							value: this.#decodeFlags(row_data.flags)
+							value: this.#decodeTraceFlags(row_data.trace_flags)
 						},
 						{
 							name: <?= json_encode(_('Severity text')) ?>,
@@ -573,10 +573,10 @@
 			];
 		}
 
-		#decodeFlags(flags) {
+		#decodeTraceFlags(trace_flags) {
 			const flags_decoded = [];
 
-			if ((flags & 1) === 1) {
+			if ((trace_flags & 1) === 1) {
 				flags_decoded.push(<?= json_encode(_('Sampled')) ?>);
 			}
 
