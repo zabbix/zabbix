@@ -101,10 +101,8 @@ class CControllerUserDeviceDelete extends CController {
 			catch (Exception $e) {
 				error($e->getMessage());
 
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN &&
-						$e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
-					$only_local_device = true;
-				}
+				$only_local_device = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					&& $e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY;
 			}
 		}
 		else {
