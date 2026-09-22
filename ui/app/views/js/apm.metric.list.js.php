@@ -81,7 +81,7 @@
 
 			this.#flags_labels = {
 				[APM_METRIC_FLAG_NONE]: <?= json_encode(_('None')) ?>,
-				[APM_METRIC_FLAG_NO_RECODED_VALUE]: <?= json_encode(_('No recoded value')) ?>
+				[APM_METRIC_FLAG_NO_RECORDED_VALUE]: <?= json_encode(_('No recorded value')) ?>
 			};
 
 			this.#validateFormChanges();
@@ -325,7 +325,7 @@
 				.setCellRenderer('flags', ({row_index, cell}) => {
 					const data = this.#rows_data.get(row_index);
 					const value = data.flags & 1 !== 0
-						? this.#flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
+						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
 						: this.#flags_labels[APM_METRIC_FLAG_NONE];
 
 					cell.appendChild(this.#prepareTextCell(value));
@@ -714,7 +714,7 @@
 				{
 					name: <?= json_encode(_('Flags')) ?>,
 					value: data.flags & 1 !== 0
-						? this.#flags_labels[APM_METRIC_FLAG_NO_RECODED_VALUE]
+						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
 						: this.#flags_labels[APM_METRIC_FLAG_NONE]
 				}
 			];
