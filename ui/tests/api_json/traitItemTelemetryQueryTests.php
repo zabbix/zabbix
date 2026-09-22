@@ -338,6 +338,20 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"query.columns[].attribute_key" for non complex "query.columns[].column" fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'TraceId', 'attribute_key' => 'attr1']
+					],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
+		];
+
 		yield '"query.columns[].attribute_key" for complex "query.columns[].column"' => [
 			[
 				'query' => [

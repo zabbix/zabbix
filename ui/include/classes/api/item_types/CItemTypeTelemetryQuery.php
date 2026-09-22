@@ -222,7 +222,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @param string      $path   Path for validation message.
 	 * @param string|null $error  Error message when validation fails, set by reference.
 	 */
-	public static function validateColumns(array $item, string $path, ?string $error): bool {
+	public static function validateColumns(array $item, string $path, ?string &$error): bool {
 		$columns = match($item['query']['signal_type']) {
 			self::SIGNAL_TYPE_TRACES =>		self::TRACES_COLUMNS_COLUMN,
 			self::SIGNAL_TYPE_METRICS =>	self::METRICS_COLUMNS_COLUMN[$item['query']['metric_point_type']],
