@@ -81,7 +81,7 @@ class CDetailsPanel {
 		const close_button = document.createElement('button');
 		close_button.type = 'button';
 		close_button.classList.add('details-panel-close', ZBX_STYLE_BTN_ICON, ZBX_STYLE_BTN_MEDIUM, ZBX_ICON_REMOVE_SMALL);
-		close_button.setAttribute('aria-label', 'Close');
+		close_button.setAttribute('aria-label', t('Close'));
 
 		header.append(title, close_button);
 
