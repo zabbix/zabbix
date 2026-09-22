@@ -555,19 +555,19 @@
 					]
 				},
 				{
-					title: 'Log attributes',
+					title: <?= json_encode(_('Log attributes')) ?>,
 					items: Object.entries(row_data.log_attributes).map(
 						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
 					)
 				},
 				{
-					title: 'Resource attributes',
+					title: <?= json_encode(_('Resource attributes')) ?>,
 					items: Object.entries(row_data.resource_attributes).map(
 						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
 					)
 				},
 				{
-					title: 'Scope attributes',
+					title: <?= json_encode(_('Scope attributes')) ?>,
 					items: Object.entries(row_data.scope_attributes).map(
 						([name, value]) => Object.fromEntries([['name', name], ['value', value]])
 					)
