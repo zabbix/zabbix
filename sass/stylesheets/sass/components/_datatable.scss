@@ -628,6 +628,32 @@
 				flex-wrap: wrap;
 				column-gap: 5px;
 				min-height: 16px;
+
+				&.wrap {
+					flex-wrap: wrap;
+				}
+
+				& > .link-action {
+					@extend %overflow-ellipsis;
+				}
+
+				.flex-item {
+					display: flex;
+					min-width: 0;
+
+					& > .link-action {
+						@extend %overflow-ellipsis;
+					}
+
+					.wordbreak {
+						word-break: normal;
+						overflow-wrap: normal;
+					}
+				}
+
+				.separator {
+					flex-shrink: 0;
+				}
 			}
 
 			.tags-wrapper {
@@ -670,7 +696,7 @@
 				align-items: center;
 				flex-shrink: 0;
 				gap: 3px;
-				margin-top: 2px;
+				margin-left: 2px;
 
 				.symptoms-left {
 					min-width: 17px;

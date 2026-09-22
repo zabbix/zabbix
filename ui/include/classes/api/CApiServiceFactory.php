@@ -31,6 +31,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'authentication' => CAuthentication::class,
 		'autoregistration' => CAutoregistration::class,
 		'configuration' => CConfiguration::class,
+		'ceprule' => CCepRule::class,
 		'connector' => CConnector::class,
 		'correlation' => CCorrelation::class,
 		'dashboard' => CDashboard::class,

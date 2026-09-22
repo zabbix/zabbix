@@ -597,7 +597,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get raw counters for all processes/threads                        *
@@ -638,4 +637,19 @@ zbx_timekeeper_state_t	*zbx_timekeeper_get_counters(zbx_timekeeper_t *timekeeper
 		zbx_free(units);
 
 	return units;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset timekeeper unit at specified index                          *
+ *                                                                            *
+ * Parameters: timekeeper - [IN] timekeeper data                              *
+ *             index      - [IN] unit index to reset                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_timekeeper_reset(zbx_timekeeper_t *timekeeper, int index)
+{
+	timekeeper->sync->lock(timekeeper->sync->data);
+	memset(&timekeeper->units[index], 0, sizeof(zbx_timekeeper_unit_t));
+	timekeeper->sync->unlock(timekeeper->sync->data);
 }

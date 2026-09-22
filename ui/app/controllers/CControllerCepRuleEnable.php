@@ -14,15 +14,19 @@
 **/
 
 
-class CControllerCorrelationEnable extends CController {
-
+class CControllerCepRuleEnable extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
-			'correlationids' => 'required|array_db correlation.correlationid'
+			'cepruleids' => 'array_db cep_rule.cep_ruleid',
+			'correlationids' => 'array_db correlation.correlationid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,27 +44,38 @@ class CControllerCorrelationEnable extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
-	}
-
 	protected function doAction(): void {
+		$cepruleids = $this->getInput('cepruleids', []);
+		$correlationids = $this->getInput('correlationids', []);
+		$ceprules = [];
 		$correlations = [];
 
-		foreach ($this->getInput('correlationids') as $correlationid) {
+		foreach ($cepruleids as $cepruleid) {
+			$ceprules[] = [
+				'cep_ruleid' => $cepruleid,
+				'status' => CCepRuleHelper::STATUS_ENABLED
+			];
+		}
+
+		foreach ($correlationids as $correlationid) {
 			$correlations[] = [
 				'correlationid' => $correlationid,
 				'status' => ZBX_CORRELATION_ENABLED
 			];
 		}
 
-		$result = API::Correlation()->update($correlations);
+		$result_cep = !$ceprules || API::CepRule()->update($ceprules);
+		$result_correlation = !$correlations || API::Correlation()->update($correlations);
+
+		$result = $result_cep && $result_correlation;
 
 		$output = [];
-		$updated = count($correlations);
+		$updated = count($ceprules) + count($correlations);
 
 		if ($result) {
-			$output['success']['title'] = _n('Event correlation enabled', 'Event correlations enabled', $updated);
+			$output['success']['title'] = _n('Event processing rule enabled',
+				'Event processing rules enabled', $updated
+			);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -68,8 +83,24 @@ class CControllerCorrelationEnable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot enable event correlation', 'Cannot enable event correlations', $updated),
+				'title' => _n('Cannot enable event processing rule',
+					'Cannot enable event processing rules', $updated
+				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$keep_cepruleids = array_column(API::CepRule()->get([
+				'output' => ['cep_ruleid'],
+				'cep_ruleids' => $cepruleids
+			]), 'cep_ruleid');
+
+			$keep_correlationids = array_column(API::Correlation()->get([
+				'output' => ['correlationid'],
+				'correlationids' => $correlationids
+			]), 'correlationid');
+
+			$output['keepids'] = [...$keep_cepruleids,
+				...array_map(fn(string $correlationid) => "legacy-$correlationid", $keep_correlationids)
 			];
 		}
 

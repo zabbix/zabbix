@@ -473,6 +473,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
+		$monitored_by_server = $this->host['status'] != HOST_STATUS_TEMPLATE
+			&& $this->host['monitored_by'] == ZBX_MONITORED_BY_SERVER;
+
 		if (in_array($this->item_type, $this->items_support_proxy)) {
 			if (array_key_exists('proxyid', $data)) {
 				$proxyid = $data['proxyid'];
@@ -484,19 +487,50 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				$proxyid = 0;
 			}
 
-			if (array_key_exists('test_with', $data)) {
+			if ($monitored_by_server) {
+				$test_with = self::TEST_WITH_SERVER;
+			}
+			elseif (array_key_exists('test_with', $data)) {
 				$test_with = $data['test_with'];
 			}
 			else {
-				$test_with = $this->getInput('test_with', $proxyid == 0
+				$default_test_with = $proxyid == 0
+						&& CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 					? self::TEST_WITH_SERVER
-					: self::TEST_WITH_PROXY
-				);
+					: self::TEST_WITH_PROXY;
+
+				$test_with = $this->getInput('test_with', $default_test_with);
 			}
 		}
 		else {
 			$test_with = self::TEST_WITH_SERVER;
 			$proxyid = 0;
+		}
+
+		$ms_proxy = [];
+		$ms_proxy_inaccessible = false;
+
+		if ($proxyid != 0) {
+			$resolved_proxy = CProxyHelper::resolveProxyOption($proxyid);
+			$ms_proxy = [$resolved_proxy];
+			$ms_proxy_inaccessible = $resolved_proxy['inaccessible'];
+		}
+		elseif (array_key_exists('proxy_groupid', $this->host) && $this->host['proxy_groupid'] != 0) {
+			$accessible_proxy_group = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'proxy_groupids' => [$this->host['proxy_groupid']]
+			]);
+
+			if (!$accessible_proxy_group) {
+				$ms_proxy = [[
+					'id' => 0,
+					'name' => _('Inaccessible proxy'),
+					'inaccessible' => true
+				]];
+				$ms_proxy_inaccessible = true;
+
+				$test_with = $this->getInput('test_with', self::TEST_WITH_PROXY);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -522,13 +556,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
 			'test_with' => $test_with,
-			'ms_proxy' => $proxyid != 0
-				? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-					'output' => ['proxyid', 'name'],
-					'proxyids' => [$proxyid]
-				]), ['proxyid' => 'id'])
-				: [],
-			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
+			'ms_proxy' => $ms_proxy,
+			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible
+				&& !($monitored_by_server && !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)),
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']
 			),

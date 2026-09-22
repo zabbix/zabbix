@@ -14,15 +14,19 @@
 **/
 
 
-class CControllerCorrelationDisable extends CController {
-
+class CControllerCepRuleDelete extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
-			'correlationids' => 'required|array_db correlation.correlationid'
+			'cepruleids' => 'array_db cep_rule.cep_ruleid',
+			'correlationids' => 'array_db correlation.correlationid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,27 +44,22 @@ class CControllerCorrelationDisable extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
-	}
-
 	protected function doAction(): void {
-		$correlations = [];
+		$cepruleids = $this->getInput('cepruleids', []);
+		$correlationids = $this->getInput('correlationids', []);
 
-		foreach ($this->getInput('correlationids') as $correlationid) {
-			$correlations[] = [
-				'correlationid' => $correlationid,
-				'status' => ZBX_CORRELATION_DISABLED
-			];
-		}
-
-		$result = API::Correlation()->update($correlations);
-
+		$deleted = count($cepruleids) + count($correlationids);
 		$output = [];
-		$updated = count($correlations);
+
+		$result_cep = !$cepruleids || API::CepRule()->delete($cepruleids);
+		$result_correlation = !$correlationids || API::Correlation()->delete($correlationids);
+
+		$result = $result_cep && $result_correlation;
 
 		if ($result) {
-			$output['success']['title'] = _n('Event correlation disabled', 'Event correlations disabled', $updated);
+			$output['success']['title'] = _n('Event processing rule deleted',
+				'Event processing rules deleted', $deleted
+			);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -68,8 +67,24 @@ class CControllerCorrelationDisable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot disable event correlation', 'Cannot disable event correlations', $updated),
+				'title' => _n('Cannot delete event processing rule',
+					'Cannot delete event processing rules', $deleted
+				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$keep_cepruleids = array_column(API::CepRule()->get([
+				'output' => ['cep_ruleid'],
+				'cep_ruleids' => $cepruleids
+			]), 'cep_ruleid');
+
+			$keep_correlationids = array_column(API::Correlation()->get([
+				'output' => ['correlationid'],
+				'correlationids' => $correlationids
+			]), 'correlationid');
+
+			$output['keepids'] = [...$keep_cepruleids,
+				...array_map(fn(string $correlationid) => "legacy-$correlationid", $keep_correlationids)
 			];
 		}
 

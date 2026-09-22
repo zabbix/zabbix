@@ -160,6 +160,13 @@ class API {
 	}
 
 	/**
+	 * @return CCepRule
+	 */
+	public static function CepRule() {
+		return self::getApi('ceprule');
+	}
+
+	/**
 	 * @return CConfiguration
 	 */
 	public static function Configuration() {

@@ -13,6 +13,7 @@
 **/
 
 #include "history_option.h"
+#include "history.h"
 #include "zbxcommon.h"
 #include "zbxstr.h"
 #include "zbxhistory.h"

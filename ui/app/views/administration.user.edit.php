@@ -303,6 +303,13 @@ $default_url_label = array_key_exists('profile_redirect_url', $data) && $data['p
 	: null;
 
 $user_form_list
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
+		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
+			DB::getFieldLength('users', 'default_maintenance_period'))
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -418,10 +425,18 @@ if ($data['roleid']) {
 	}
 
 	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addRow((new CTag('h4', true, _('User group permissions')))->addClass('input-section-header'))
+		->addRow(_('Permissions'), (new CDiv($permissions_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow(_('Proxies'), (new CDiv($data['proxies_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		)
+		->addRow(_('Proxy groups'), (new CDiv($data['proxy_groups_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
 
@@ -590,29 +605,39 @@ if ($data['roleid']) {
 
 	// API section.
 
-	$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
+	$is_api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 	$permissions_form_list
-		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('rules-status-container')
+		->addRow(
+			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
+		)
+		->addRow(
+			(new CDiv(
+				$is_api_access_enabled
+					? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_STATUS_GREEN)
+					: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_STATUS_GREY)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
 		);
 
-	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
-
-	if ($api_methods) {
-		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
+	if ($is_api_access_enabled) {
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+		$is_api_allow_list = CRoleHelper::getRoleApiListMode($data['roleid']) == ZBX_ROLE_RULE_API_MODE_ALLOW;
 		$elements = [];
 
-		foreach ($api_methods as $api_method) {
-			$elements[] = (new CSpan($api_method))->addClass(
-				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
+		if ($api_methods) {
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))
+					->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
+			}
+		}
+		else {
+			$elements[] = (new CSpan(_('None')))
+				->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN);
 		}
 
-		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+		$permissions_form_list->addRow(
+			$is_api_allow_list ? _('Allowed methods') : _('Denied methods'),
 			(new CDiv($elements))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
