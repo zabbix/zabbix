@@ -540,11 +540,11 @@
 						},
 						{
 							name: <?= json_encode(_('Scope name')) ?>,
-							value: row_data.resource_name
+							value: row_data.scope_name
 						},
 						{
 							name: <?= json_encode(_('Scope version')) ?>,
-							value: row_data.resource_name
+							value: row_data.scope_version
 						},
 						{
 							name: <?= json_encode(_('Event name')) ?>,
