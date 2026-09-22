@@ -401,7 +401,8 @@ class CDataTableOptionsPopup {
 		const element_rect = this.getDataTable().getElement().getBoundingClientRect();
 		const handle_rect = this.#handle.getBoundingClientRect();
 		const popup_rect = this.#element.getBoundingClientRect();
-		const offset_top = wrapper.scrollTop + this.#datatable.getElement().getBoundingClientRect().top;
+
+		const datatable_rect = this.#datatable.getElement().getBoundingClientRect();
 
 		let right_container_edge = window.innerWidth;
 		if (wrapper.tagName.toLowerCase() === 'z-split-view-pane') {
@@ -416,7 +417,11 @@ class CDataTableOptionsPopup {
 		}
 
 		if (this.#datatable.isStickyHeader()) {
-			const top = handle_rect.height + (handle_rect.top == 0 ? wrapper.scrollTop - offset_top : 0) + 2;
+			const bottom_handle_edge = (handle_rect.bottom - wrapper_rect.top) + wrapper.scrollTop;
+
+			const top = wrapper.scrollTop > bottom_handle_edge
+				? 0
+				: bottom_handle_edge - wrapper.scrollTop - (datatable_rect.top - wrapper_rect.top) + 2;
 
 			this.#element.style.top = `${top}px`;
 		}
