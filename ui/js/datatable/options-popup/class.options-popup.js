@@ -405,7 +405,7 @@ class CDataTableOptionsPopup {
 		const datatable_rect = this.#datatable.getElement().getBoundingClientRect();
 
 		let right_container_edge = window.innerWidth;
-		if (wrapper.tagName.toLowerCase() === 'z-split-view-pane') {
+		if (wrapper instanceof ZSplitViewPane) {
 			right_container_edge = wrapper_rect.left + wrapper_rect.width;
 		}
 

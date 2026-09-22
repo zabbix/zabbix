@@ -76,17 +76,12 @@ $page_header
 		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
-	->addJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $data['user']['lang'])
-		->setArgument('showGuiMessaging', $show_gui_messaging)
-		->getUrl()
-	)
-	->addModuleJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $data['user']['lang'])
-		->setArgument('files', 'components')
-		->getUrl()
+	->addJsFile(
+		(new CUrl('jsLoader.php'))
+			->setArgument('ver', ZABBIX_VERSION)
+			->setArgument('lang', $data['user']['lang'])
+			->setArgument('showGuiMessaging', $show_gui_messaging)
+			->getUrl()
 	);
 
 foreach ($data['stylesheet']['files'] as $css_file) {
