@@ -27,7 +27,9 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'traceid' => 'required|string'
+			'traceid' => 'required|string',
+			'from' => 'required|string',
+			'to' => 'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
