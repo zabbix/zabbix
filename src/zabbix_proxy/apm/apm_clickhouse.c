@@ -109,6 +109,8 @@ void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_t *col,
 		const zbx_apm_value_t *value)
 {
+	char	buffer[ZBX_MAX_UINT64_LEN * 2];
+
 	switch (col->type)
 	{
 		case APM_COL_BOOL:
@@ -118,8 +120,12 @@ static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_
 		case APM_COL_UINT32:
 		case APM_COL_UINT64:
 		case APM_COL_DATETIME:
-		case APM_COL_DATETIME64:
 			zbx_json_adduint64(json, NULL, value->ui64);
+			break;
+		case APM_COL_DATETIME64:
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64 "." ZBX_FS_UI64,
+					value->ui64 / 1000000000, value->ui64 % 1000000000);
+			zbx_json_addstring(json, NULL, buffer, ZBX_JSON_TYPE_NUMBER);
 			break;
 		case APM_COL_INT32:
 			zbx_json_addint64(json, NULL, value->i32);

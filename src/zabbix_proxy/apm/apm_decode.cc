@@ -284,6 +284,26 @@ static inline zbx_uint64_t	unixnano_to_secs(uint64_t nano)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: convert a unix nanosecond timestamp to a "seconds.nanoseconds"    *
+ *          decimal string accepted by ClickHouse DateTime64 columns          *
+ *          regardless of their configured scale                             *
+ *                                                                            *
+ * Parameters: nano - [IN] timestamp in unix nanoseconds                      *
+ *                                                                            *
+ * Return value: decimal string in the form "<seconds>.<nanoseconds>"         *
+ *                                                                            *
+ ******************************************************************************/
+static std::string	unixnano_to_decimal_str(uint64_t nano)
+{
+	std::string	frac = std::to_string(nano % 1000000000ULL);
+
+	frac.insert(0, 9 - frac.length(), '0');
+
+	return std::to_string(nano / 1000000000ULL) + "." + frac;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: column value setter helpers used when filling dataset rows        *
  *                                                                            *
  * Comments: row - row being filled, idx - column index to set. SETS          *
@@ -752,7 +772,8 @@ static int	apm_traces_fill_events(zbx_apm_row_t &row, int idx,
 
 	for (const auto &e : events)
 	{
-		zbx_json_addstring(&jts, NULL, std::to_string(e.time_unix_nano()).c_str(), ZBX_JSON_TYPE_NUMBER);
+		zbx_json_addstring(&jts, NULL, unixnano_to_decimal_str(e.time_unix_nano()).c_str(),
+				ZBX_JSON_TYPE_NUMBER);
 		zbx_json_addstring(&jname, NULL, e.name().c_str(), ZBX_JSON_TYPE_STRING);
 
 		/* each element is itself a JSON object of that event's attributes */
