@@ -196,22 +196,18 @@ $page_header
 		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
-	->addJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $default_lang)
-		->getUrl()
+	->addJsFile(
+		(new CUrl('jsLoader.php'))
+			->setArgument('ver', ZABBIX_VERSION)
+			->setArgument('lang', $default_lang)
+			->getUrl()
 	)
-	->addModuleJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $default_lang)
-		->setArgument('files', 'components')
-		->getUrl()
-	)
-	->addJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $default_lang)
-		->setArgument('files', ['setup.js'])
-		->getUrl()
+	->addJsFile(
+		(new CUrl('jsLoader.php'))
+			->setArgument('ver', ZABBIX_VERSION)
+			->setArgument('lang', $default_lang)
+			->setArgument('files', ['setup.js'])
+			->getUrl()
 	)
 	->show();
 

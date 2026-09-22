@@ -106,15 +106,6 @@ class CHtmlPageHeader {
 		return $this;
 	}
 
-	/**
-	 * Add path to js file with type module file to render in page head.
-	 */
-	public function addModuleJsFile(string $js_file): self {
-		$this->js_module_files[$js_file] = $js_file;
-
-		return $this;
-	}
-
 	public function addJsTranslationStrings(array $translations_strings): self {
 		foreach ($translations_strings as $orig_string => $string) {
 			$this->addJavaScript('locale[\''.$orig_string.'\'] = '.json_encode($string, JSON_THROW_ON_ERROR).';');

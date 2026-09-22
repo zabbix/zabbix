@@ -175,13 +175,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 					->setArgument('lang', CWebUser::$data['lang'])
 					->setArgument('showGuiMessaging', ($is_standard_page && !CWebUser::isGuest()) ? 1 : null)
 					->getUrl()
-			)
-			->addModuleJsFile(
-				(new CUrl('jsLoader.php'))
-					->setArgument('ver', ZABBIX_VERSION)
-					->setArgument('lang', CWebUser::$data['lang'])
-					->setArgument('files', 'components')
-					->getUrl()
 			);
 
 		if (array_key_exists('scripts', $page) && $page['scripts']) {
