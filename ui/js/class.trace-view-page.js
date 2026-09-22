@@ -200,8 +200,6 @@ class TraceViewPage {
 
 		this.#normalizeSelectedRange();
 		this.#render();
-		this.#tree.expandToDepth(this.#spans.size);
-		this.#renderWaterfall();
 	}
 
 	#applyTimelineValue(value) {
@@ -293,6 +291,8 @@ class TraceViewPage {
 				meta: span.count ?? '',
 				span
 			}));
+
+		this.#tree.expandToDepth(this.#spans.size);
 	}
 
 	#renderTimeHeader() {
