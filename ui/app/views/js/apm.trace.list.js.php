@@ -272,9 +272,15 @@
 					let count = column_options.number_of_attributes;
 
 					for (const [attr_name, attr_value] of Object.entries(span_attributes)) {
+						const content = `${attr_name}: ${attr_value}`
+
 						const span_attribute_label = document.createElement('span');
 						span_attribute_label.classList.add(ZBX_STYLE_TAG);
-						span_attribute_label.textContent = `${attr_name}: ${attr_value}`;
+						span_attribute_label.textContent = content;
+						span_attribute_label.dataset.hintbox = '1';
+						span_attribute_label.dataset.hintboxStatic = '1';
+						span_attribute_label.dataset.hintboxHtml = content;
+						span_attribute_label.ariaExpanded = 'false';
 
 						span_attribute_labels.push(span_attribute_label);
 
