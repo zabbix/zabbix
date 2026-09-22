@@ -641,17 +641,17 @@ class TraceViewPage {
 			return this.#formatDuration(value);
 		}
 
-		const date = new Date(value);
-		const ms = String(date.getMilliseconds()).padStart(3, '0');
-		const seconds = String(date.getSeconds()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
-		const hours = String(date.getHours()).padStart(2, '0');
+		const total_seconds = Math.floor(value);
+		const ms = String(Math.floor((value % 1) * 1000)).padStart(3, '0');
+		const seconds = String(total_seconds % 60).padStart(2, '0');
+		const minutes = String(Math.floor(total_seconds / 60) % 60).padStart(2, '0');
+		const hours = String(Math.floor(total_seconds / 3600)).padStart(2, '0');
 
-		if (step < 1000) {
+		if (step < 1) {
 			return `${seconds}.${ms}s`;
 		}
 
-		if (step < 60000) {
+		if (step < 60) {
 			return `${hours}:${minutes}:${seconds}`;
 		}
 
