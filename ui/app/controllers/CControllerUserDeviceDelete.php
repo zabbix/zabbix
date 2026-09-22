@@ -96,7 +96,7 @@ class CControllerUserDeviceDelete extends CController {
 			}
 
 			try {
-				$result = API::Device()->offboard($data);
+				$result = API::getApiService('device')->offboard($data);
 			}
 			catch (Exception $e) {
 				error($e->getMessage());
