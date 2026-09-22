@@ -134,49 +134,59 @@
 				.setColumns([
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')); ?>)
 						.setFields(['traceid'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')); ?>)
 						.setFields(['spanid'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('trace_state', <?= json_encode(_('Trace state')); ?>)
 						.setFields(['trace_state'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name', 'span_count', 'error_count'])
 						.setRenderer('service_name')
+						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('span_name', <?= json_encode(_('Operation name')); ?>)
 						.setFields(['span_name'])
 						.setRenderer('span_name')
-						.setSortField('timestamp')
+						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('span_kind', <?= json_encode(_('Span kind')); ?>)
 						.setFields(['span_kind'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
 						.setFields(['scope_name'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('scope_version', <?= json_encode(_('Scope version')); ?>)
 						.setFields(['scope_version'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('status_code', <?= json_encode(_('Status code')); ?>)
 						.setFields(['status_code'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('status_message', <?= json_encode(_('Status message')); ?>)
 						.setFields(['status_message'])
+						.setSortable(true)
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
 						.setFields(['timestamp_formatted'])
 						.setSortable(true)
 						.setRenderer('start_time')
+						.setSortField('timestamp')
 						.setWidth('auto'),
 					new CDataTableColumn('span_attributes', <?= json_encode(_('Span attributes')); ?>)
 						.setColumnOptions({
@@ -196,6 +206,7 @@
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
+						.setSortable(true)
 						.setWidth('auto'),
 				])
 				.setPage(page)
@@ -210,7 +221,7 @@
 				.setCellRenderer('service_name', ({cell, cell_data}) => {
 					const [service_name, span_count, error_count] = cell_data;
 
-					const flex_wrapper = this.#prepareTextCell(service_name, service_name);
+					const flex_wrapper = this.#prepareTextCell(service_name);
 
 					const spans = document.createElement('div');
 					spans.classList.add(ZBX_STYLE_SPAN_COUNT);
@@ -231,7 +242,7 @@
 				.setCellRenderer('span_name', ({cell, cell_data}) => {
 					const [span_name] = cell_data;
 
-					cell.appendChild(this.#prepareTextCell(span_name, span_name));
+					cell.appendChild(this.#prepareTextCell(span_name));
 				})
 				.setCellRenderer('start_time', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
@@ -241,9 +252,7 @@
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
 					wordbreak.textContent = timestamp_formatted;
-					wordbreak.dataset.hintbox = '1';
-					wordbreak.dataset.hintboxStatic = '1';
-					wordbreak.dataset.hintboxHtml = timestamp_formatted;
+					wordbreak.title = timestamp_formatted;
 
 					cell.appendChild(wordbreak);
 				})
@@ -269,10 +278,10 @@
 						const span_attribute_label = document.createElement('span');
 						span_attribute_label.classList.add(ZBX_STYLE_TAG);
 						span_attribute_label.textContent = content;
-						span_attribute_label.dataset.hintbox = '1';
-						span_attribute_label.dataset.hintboxStatic = '1';
-						span_attribute_label.dataset.hintboxHtml = content;
-						span_attribute_label.ariaExpanded = 'false';
+						span_attribute_label.setAttribute('data-hintbox-html', content);
+						span_attribute_label.setAttribute('data-hintbox', '1');
+						span_attribute_label.setAttribute('data-hintbox-static', '1');
+						span_attribute_label.setAttribute('aria-expanded', 'false');
 
 						span_attribute_labels.push(span_attribute_label);
 
@@ -316,14 +325,12 @@
 					const overflow_ellipsis = document.createElement('div');
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					overflow_ellipsis.textContent = duration_time_units;
+					overflow_ellipsis.title = duration_time_units;
 
 					/** @type {HTMLDivElement} */
 					const time_units = document.createElement('div');
 					time_units.classList.add(ZBX_STYLE_DURATION_TIME_UNITS);
 					time_units.appendChild(overflow_ellipsis);
-					time_units.dataset.hintbox = '1';
-					time_units.dataset.hintboxStatic = '1';
-					time_units.dataset.hintboxHtml = duration_time_units;
 
 					const duration = document.createElement('div');
 					duration.classList.add(ZBX_STYLE_DURATION);
@@ -623,19 +630,11 @@
 			return groups;
 		}
 
-		#prepareTextCell(value, hint = null) {
+		#prepareTextCell(value) {
 			const content = document.createElement('div');
 			content.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			content.textContent = value;
-
-			if (hint !== null) {
-				content.dataset.hintbox = '1';
-				content.dataset.hintboxStatic = '1';
-				content.dataset.hintboxHtml = value;
-			}
-			else {
-				content.title = value;
-			}
+			content.title = value;
 
 			const flex_wrapper = document.createElement('div');
 			flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
