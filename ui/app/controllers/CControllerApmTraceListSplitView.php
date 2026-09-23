@@ -61,20 +61,7 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace = $traces[0] ?? null;
 
 		if (!$trace) {
-			$output = json_encode([
-				'trace_view_data' => [
-					'error' => [
-						'title' => _('Trace not found.')
-					]
-				]
-			]);
-
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => $output]))
-					->disableView()
-			);
-
-			return;
+			throw new Exception(_('Trace not found.'));
 		}
 
 		$spans = API::ApmSpan()->get([

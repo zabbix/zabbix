@@ -95,11 +95,18 @@ class CSideDrawer {
 
 		return promise_open
 			.then(response => {
-				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
+				if ('error' in response) {
+					this.#handleError(response.error);
 
-				this.#bindEvents();
+					return;
+				}
+
+				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
 			})
+			.catch(error => this.#handleError({title: error.name, messages: [error.message]}))
 			.finally(() => {
+				this.#bindEvents();
+
 				this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 			});
 	}
@@ -170,6 +177,13 @@ class CSideDrawer {
 		close_button?.removeEventListener('click', this.#onClose);
 
 		document.removeEventListener('keyup', this.#onKeyUp);
+	}
+
+	#handleError(error) {
+		const $msg_box = makeMessageBox('bad', error.messages ?? [], error.title ?? t('Unexpected server error.'));
+
+		this.#drawer_element.innerHTML = '';
+		this.#drawer_element.appendChild($msg_box[0]);
 	}
 
 	#onClose = () => {
