@@ -18,9 +18,9 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
 		'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description',
-		'metric_unit', 'attributes', 'start_time_unix', 'time_unix', 'value', 'flags', 'exemplars',
-		'aggregation_temporality', 'count', 'sum', 'min', 'max', 'histogram_buckets', 'start_time_formatted',
-		'start_time_ns_formatted', 'time_formatted', 'time_ns_formatted'
+		'metric_unit', 'attributes', 'value', 'flags', 'exemplars', 'aggregation_temporality', 'count', 'sum', 'min',
+		'max', 'histogram_buckets', 'start_time_formatted', 'start_time_ns_formatted', 'time_formatted',
+		'time_ns_formatted'
 	];
 
 	protected array $filter;
@@ -118,12 +118,11 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', 'metric_name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 
-		if ($sort_field === 'start_time_formatted') {
-			$sort_field = 'start_time_unix';
-		}
-		elseif ($sort_field === 'time_formatted') {
-			$sort_field = 'time_unix';
-		}
+		$sort_field = match ($sort_field) {
+			'start_time_formatted' => 'start_time_unix',
+			'time_formatted' => 'time_unix',
+			default => $sort_field
+		};
 
 		CProfile::update('web.apm.metric.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.apm.metric.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -156,9 +155,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 		$data_fields = $this->getDataFields(['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
 			'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name',
-			'metric_description', 'metric_unit', 'attributes', 'start_time_unix', 'time_unix', 'value', 'flags',
-			'exemplars', 'aggregation_temporality', 'count', 'sum', 'min', 'max', 'histogram_buckets',
-			'start_time_ns_formatted', 'time_ns_formatted'
+			'metric_description', 'metric_unit', 'attributes', 'value', 'flags', 'exemplars', 'aggregation_temporality',
+			'count', 'sum', 'min', 'max', 'histogram_buckets', 'start_time_ns_formatted', 'time_ns_formatted'
 		]);
 
 		$result = [
@@ -203,6 +201,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 			foreach ($metrics as $metric) {
 				$clock = floor($metric['start_time_unix'] / 1000000000);
+				$metric['start_time_ns_formatted'] = $this->formatTimeNs($metric['start_time_unix'], $today, $clock);
 
 				if (in_array('start_time_formatted', $data_fields)) {
 					$metric['start_time_formatted'] = $clock >= $today
@@ -210,17 +209,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
 				}
 
-				if (in_array('start_time_ns_formatted', $data_fields)) {
-					$ns = str_pad((string) ($metric['start_time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
-
-					$metric['start_time_ns_formatted'] = $clock >= $today
-						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
-						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-							['!' => $ns]
-						);
-				}
-
 				$clock = floor($metric['time_unix'] / 1000000000);
+				$metric['time_ns_formatted'] = $this->formatTimeNs($metric['time_unix'], $today, $clock);
 
 				if (in_array('time_formatted', $data_fields)) {
 					$metric['time_formatted'] = $clock >= $today
@@ -228,15 +218,12 @@ class CControllerApmMetricListData extends CControllerDataTable {
 						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock);
 				}
 
-				if (in_array('time_ns_formatted', $data_fields)) {
-					$ns = str_pad((string) ($metric['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
+				foreach ($metric['exemplars'] as &$exemplar) {
+					$exemplar['time_ns_formatted'] = $this->formatTimeNs($exemplar['time_unix'], $today);
 
-					$metric['time_ns_formatted'] = $clock >= $today
-						? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
-						: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-							['!' => $ns]
-						);
+					unset($exemplar['time_unix']);
 				}
+				unset($exemplar);
 
 				if ($metric['type'] == APM_METRIC_TYPE_HISTOGRAM) {
 					$metric['histogram_buckets'] = $this->prepareHistogramBuckets($metric['explicit_bounds'],
@@ -252,10 +239,6 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				else {
 					$metric['histogram_buckets'] = null;
 				}
-
-				$metric['exemplars'] = $this->prepareExemplars($metric['exemplars'], $today);
-
-				unset($metric['start_time_unix'], $metric['time_unix']);
 
 				$metric = array_intersect_key($metric, array_flip($data_fields));
 
@@ -340,23 +323,17 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		return $buckets;
 	}
 
-	private function prepareExemplars(array $exemplars, $today): array {
-		foreach ($exemplars as &$exemplar) {
-			$clock = floor($exemplar['time_unix'] / 1000000000);
-			$ns = str_pad((string) ($exemplar['time_unix'] % 1000000000), 9, '0', STR_PAD_LEFT);
-			$time = $clock >= $today
-				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
-				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-					['!' => $ns]
-				);
-
-			$exemplar['time_ns_formatted'] = $time;
-
-			unset($exemplar['time_unix']);
+	private function formatTimeNs($time_unix, $today, $clock = null): string {
+		if ($clock === null) {
+			$clock = floor($time_unix / 1000000000);
 		}
-		unset($exemplar);
 
-		return $exemplars;
+		$ns = str_pad((string) ($time_unix % 1000000000), 9, '0', STR_PAD_LEFT);
+		return $clock >= $today
+			? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
+			: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+				['!' => $ns]
+			);
 	}
 
 	protected function isDataSourceConfigured(): bool {
