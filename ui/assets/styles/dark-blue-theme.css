@@ -5867,6 +5867,7 @@ section {
     align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
+    overflow: hidden;
     min-inline-size: 0;
     block-size: 40px;
     padding-inline: 10px;
