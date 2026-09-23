@@ -203,8 +203,6 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 
 namespace
 {
-	constexpr const char *DEFAULT_APM_PORT = "4317";
-
 	/******************************************************************************
 	 *                                                                            *
 	 * Purpose: build a "host:port" listen address string, applying               *
@@ -218,11 +216,10 @@ namespace
 	 * Return value: listen address in "host:port" format                         *
 	 *                                                                            *
 	 ******************************************************************************/
-	std::string build_listen_address(const char *address, const char *port)
+	std::string build_listen_address(const char *address, int port)
 	{
 		std::string addr = (address != nullptr && address[0] != '\0') ? address : "0.0.0.0";
-		std::string prt = (port != nullptr && port[0] != '\0') ? port : DEFAULT_APM_PORT;
-		return addr + ":" + prt;
+		return addr + ":" + std::to_string(port);
 	}
 
 	/******************************************************************************
@@ -319,7 +316,7 @@ extern "C"
 	 * Return value: handle to the started server, or NULL on error               *
 	 *                                                                            *
 	 ******************************************************************************/
-	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
+	zbx_grpc_handle_t zbx_grpc_start(const char *address, int port, zbx_apm_queue_t *queue,
 			const zbx_apm_config_tls_t *tls, char **error)
 	{
 		try

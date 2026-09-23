@@ -20,7 +20,7 @@ typedef struct
 {
 	int			config_timeout;
 	zbx_apm_db_config_t	*export_config;
-	const char		*port;
+	int			port;
 	const char		*ca_file;
 	const char		*cert_file;
 	const char		*key_file;

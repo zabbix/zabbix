@@ -216,7 +216,7 @@ static void	apm_manager_process_finished(zbx_apm_manager_t *manager, zbx_vector_
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, const char *port,
+static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, int port,
 		const zbx_apm_config_tls_t *tls, char **error)
 {
 	if (NULL == (manager->grpc = zbx_grpc_start(sourceip, port, (zbx_apm_queue_t *)manager->base.queue, tls,

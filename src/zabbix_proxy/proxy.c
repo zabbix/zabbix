@@ -341,7 +341,7 @@ static char	*config_ssl_key_location = NULL;
 static char	*config_webdriver_url = NULL;
 
 static char	*config_apm_sourceip = NULL;
-static char	*config_apm_port = NULL;
+static int	config_apm_port = 4317;
 static char	*config_apm_ca_file = NULL;
 static char	*config_apm_cert_file = NULL;
 static char	*config_apm_key_file = NULL;
@@ -1170,8 +1170,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"APMListenIP",			&config_apm_sourceip,			ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
-		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			32767},
 		{"APMTLSCAFile",		&config_apm_ca_file,			ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"APMTLSCertFile",		&config_apm_cert_file,			ZBX_CFG_TYPE_STRING,
