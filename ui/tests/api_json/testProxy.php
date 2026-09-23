@@ -1239,8 +1239,8 @@ class testProxy extends CAPITest {
 			'Test proxy.get: "selectApm" for proxy with apm' => [
 				'request' => [
 					'output' => [],
-					"proxyids" => 'with_apm',
-					'selectApm' => 'extend'
+					'proxyids' => 'with_apm',
+					'selectApm' => API_OUTPUT_EXTEND
 				],
 				'expected_result' => [
 					[
@@ -1267,8 +1267,8 @@ class testProxy extends CAPITest {
 			'Test proxy.get: "selectApm" for proxy without apm' => [
 				'request' => [
 					'output' => [],
-					"proxyids" => 'without_apm',
-					'selectApm' => 'extend'
+					'proxyids' => 'without_apm',
+					'selectApm' => API_OUTPUT_EXTEND
 				],
 				'expected_result' => [
 					[
