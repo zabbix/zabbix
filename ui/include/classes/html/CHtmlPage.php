@@ -163,7 +163,6 @@ class CHtmlPage {
 				->addItem(
 					(new CSplitViewPane($this->side_drawer))->addClass('side-drawer')
 				)
-				->setMinPosition('768px')
 			: (new CDiv())
 				->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
 				->addClass($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE ? ZBX_STYLE_LAYOUT_KIOSKMODE : null)
