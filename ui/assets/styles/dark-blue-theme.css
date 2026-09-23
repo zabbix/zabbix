@@ -884,7 +884,6 @@ body {
   body > z-split-view {
     --min-content-size: 768px; }
     body > z-split-view .wrapper {
-      overflow-y: auto;
       overscroll-behavior-y: contain; }
     body > z-split-view .side-drawer {
       background-color: #001f42;
