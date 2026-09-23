@@ -477,14 +477,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					}
 				}
 			}
-			elseif (array_key_exists('error', $result_preproc)) {
-				$output['final'] = [
-					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
-						? _('Set error to')
-						: '',
-					'error' => $result_preproc['error']
-				];
-			}
 
 			if (array_key_exists('final', $output) && $output['final']['action'] !== '') {
 				$output['final']['action'] = (new CSpan($output['final']['action']))
