@@ -179,7 +179,11 @@ class testReportTest extends CIntegrationTest {
 		);
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->assertFalse($client->sendRequest($data, self::$sessions[$session]));
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "trapper got request 'report.test'", false, 10, 1);
+
+		if ($error !== 'Permission denied.') {
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got \'{"request":"report.test"', false, 10, 1);
+		}
+
 		$this->assertSame($error, $client->getError());
 
 		if (str_starts_with($error, 'No media configured')) {
