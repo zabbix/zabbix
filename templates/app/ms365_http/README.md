@@ -41,6 +41,7 @@ This template has been tested on:
 |{$MS365.COPILOT.USER.KEY.MATCHES}|<p>This macro is used in the Microsoft Copilot user discovery rule.</p>|`.*`|
 |{$MS365.COPILOT.USER.KEY.NOT.MATCHES}|<p>This macro is used in the Microsoft Copilot user discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$MS365.HTTP.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Microsoft 365 reports", e.g. {$HTTP.TLS.VERIFY:"Microsoft 365 reports"}.</p>|`full`|
 |{$MS365.API.VERSION}|<p>Microsoft Graph API version.</p>|`beta`|
 |{$MS365.API.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 

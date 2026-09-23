@@ -28,13 +28,15 @@ window.itemtestedit_view_popup = new class {
 	#form_element;
 	#rules_get_value;
 	#is_item_testable = false;
+	#can_select_server_for_test = false;
 	#show_prev = false;
 	#show_snmp_form = false;
 	#interface_address_enabled = false;
 	#interface_port_enabled = false;
+	#proxies_enabled = false;
 
 	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form, interface_address_enabled,
-			interface_port_enabled}) {
+			interface_port_enabled, can_select_server_for_test, proxies_enabled}) {
 		this.#overlay = overlays_stack.getById('item-test');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
@@ -42,10 +44,12 @@ window.itemtestedit_view_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#rules_get_value = rules_get_value;
 		this.#is_item_testable = is_item_testable;
+		this.#can_select_server_for_test = can_select_server_for_test;
 		this.#show_prev = show_prev;
 		this.#show_snmp_form = show_snmp_form;
 		this.#interface_address_enabled = interface_address_enabled;
 		this.#interface_port_enabled = interface_port_enabled;
+		this.#proxies_enabled = proxies_enabled;
 
 		this.#form.discoverAllFields();
 
@@ -92,6 +96,16 @@ window.itemtestedit_view_popup = new class {
 
 	#update() {
 		const get_value_checked = parseInt(this.#form.findFieldByName('get_value').getValue(), 10) == 1;
+
+		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
+			if (element.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?>) {
+				element.disabled = !get_value_checked || !this.#can_select_server_for_test;
+			}
+			else {
+				element.disabled = !get_value_checked;
+			}
+		}
+
 		const not_supported_field = this.#form.findFieldByName('not_supported');
 
 		if (not_supported_field !== null) {
@@ -107,14 +121,8 @@ window.itemtestedit_view_popup = new class {
 			return;
 		}
 
-		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
-			element.disabled = !get_value_checked;
-		}
-
 		this.#form_element.querySelector('.js-test-with-proxy').style
 			.display = this.#form.findFieldByName('test_with').getValue() == 0 ? 'none' : '';
-
-
 
 		const value_warning = this.#form_element.querySelector('#value_warning');
 		value_warning.style.display = !get_value_checked && value_warning.classList.contains('js-retrieved')
@@ -128,11 +136,7 @@ window.itemtestedit_view_popup = new class {
 			this.#form.findFieldByName('prev_time').getField().readOnly = get_value_checked;
 		}
 
-		const proxy_field = this.#form.findFieldByName('proxyid');
-
-		if (proxy_field !== null) {
-			$(proxy_field.getField()).multiSelect(get_value_checked ? 'enable' : 'disable');
-		}
+		this.#updateProxyField(get_value_checked);
 
 		const interface_address_field = this.#form.findFieldByName('interface[address]');
 
@@ -263,6 +267,7 @@ window.itemtestedit_view_popup = new class {
 		}
 
 		this.#form.unlock();
+		this.#updateProxyField(this.#form.findFieldByName('get_value').getField().checked);
 		this.#overlay.unsetLoading();
 	}
 
@@ -319,6 +324,26 @@ window.itemtestedit_view_popup = new class {
 					this.#processGetValueResult(response, fields.upd_last);
 				});
 			})
+	}
+
+	#updateProxyField(get_value_checked) {
+		const proxy_field = this.#form.findFieldByName('proxyid');
+
+		if (proxy_field === null) {
+			return;
+		}
+
+		const $proxy_multiselect = $(proxy_field.getField());
+
+		$proxy_multiselect.multiSelect(get_value_checked ? 'enable' : 'disable');
+
+		if (get_value_checked && !this.#proxies_enabled) {
+			const select_button = $proxy_multiselect.multiSelect('getSelectButton');
+
+			if (select_button !== null) {
+				select_button.disabled = true;
+			}
+		}
 	}
 
 	#submit() {

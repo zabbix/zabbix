@@ -50,11 +50,9 @@ struct zbx_db_result
 
 static const zbx_db_config_t	*db_config = NULL;
 
-static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+static ZBX_THREAD_LOCAL zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
-#if defined(HAVE_POSTGRESQL)
-static ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
-#elif defined(HAVE_SQLITE3)
+#if defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
@@ -100,8 +98,8 @@ int	dbconn_init(char **error)
 		}
 		else
 		{
-			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
-			zbx_dbconn_close(db);
+			dbconn_execute(db, "%s", zbx_dbschema_get_schema());
+			dbconn_close(db);
 		}
 
 		zbx_dbconn_free(db);
@@ -179,10 +177,10 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 	{
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
-	}
 
-	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
-		db_mask_printable_sql_values(sql_printable);
+		if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+			db_mask_printable_sql_values(sql_printable);
+	}
 
 	return *sql_printable;
 }
@@ -190,7 +188,7 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_errno, const char *db_error,
 		const char *context)
 {
-	char	*s;
+	char	*s, *sql_printable = NULL;
 
 	db->last_db_errcode = zbx_errno;
 
@@ -225,8 +223,8 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, db->last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
-					db->last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s [%s]", db_errno,
+					db->last_db_strerror, db_replace_nonprintable_chars(context, &sql_printable));
 			break;
 		case ERR_Z3009:
 			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
@@ -239,6 +237,7 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
+	zbx_free(sql_printable);
 }
 
 #if defined(HAVE_MYSQL)
@@ -670,7 +669,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = db_dyn_escape_string(db->config->dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
+		dbschema_esc = dbconn_dyn_escape_string(db, db->config->dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
 				ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = dbconn_execute(db, "set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
@@ -703,7 +702,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
-		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+		db->pg_escape_backslash = (0 == strcmp(row[0], "off"));
 
 	zbx_db_free_result(result);
 
@@ -821,12 +820,16 @@ void	dbconn_set_managed(zbx_dbconn_t *db, zbx_dbconn_type_t type)
 	db->managed = type;
 }
 
-int	db_is_escape_sequence(char c)
+int	dbconn_is_escape_sequence(const zbx_dbconn_t *db, char c)
 {
+#if !defined(HAVE_POSTGRESQL)
+	ZBX_UNUSED(db);
+#endif
+
 #if defined(HAVE_MYSQL)
 	if ('\'' == c || '\\' == c)
 #elif defined(HAVE_POSTGRESQL)
-	if ('\'' == c || ('\\' == c && 1 == ZBX_PG_ESCAPE_BACKSLASH))
+	if ('\'' == c || ('\\' == c && 1 == db->pg_escape_backslash))
 #else
 	if ('\'' == c)
 #endif
@@ -1506,7 +1509,9 @@ zbx_dbconn_t	*zbx_dbconn_create(void)
 	db->txn_end_error = ZBX_DB_OK;
 	db->connect_options = ZBX_DB_CONNECT_NORMAL;
 
-#if defined(HAVE_SQLITE3)
+#if defined(HAVE_POSTGRESQL)
+	db->pg_escape_backslash = 1;
+#elif defined(HAVE_SQLITE3)
 	db->sqlite_access = &db_sqlite_access;
 #endif
 	return db;
@@ -1534,7 +1539,7 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_open(zbx_dbconn_t *db)
+int	__zbx_attr_weak zbx_dbconn_open(zbx_dbconn_t *db)
 {
 	int	err;
 
@@ -1588,8 +1593,8 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1645,8 +1650,8 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
-		zbx_dbconn_close(db);
-		rc = zbx_dbconn_open(db);
+		dbconn_close(db);
+		rc = dbconn_open(db);
 	}
 	else
 	{
@@ -1695,8 +1700,8 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1747,8 +1752,8 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1799,8 +1804,8 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{
@@ -2177,14 +2182,14 @@ out:
  * Purpose: returns escaped DB schema name                                    *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_db_get_schema_esc(void)
+char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db)
 {
-	static char	*name;
+	static ZBX_THREAD_LOCAL char	*name;
 
 	if (NULL == name)
 	{
-		name = zbx_db_dyn_escape_string(NULL == db_config->dbschema ||
-				'\0' == *db_config->dbschema ? "public" : db_config->dbschema);
+		name = zbx_dbconn_dyn_escape_string(db, NULL == db->config->dbschema ||
+				'\0' == *db->config->dbschema ? "public" : db->config->dbschema);
 	}
 
 	return name;
@@ -2202,7 +2207,7 @@ int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name)
 	zbx_db_result_t	result;
 	int		ret;
 
-	table_name_esc = zbx_db_dyn_escape_string(table_name);
+	table_name_esc = zbx_dbconn_dyn_escape_string(db, table_name);
 
 #if defined(HAVE_MYSQL)
 	result = zbx_dbconn_select(db, "show tables like '%s'", table_name_esc);
@@ -2212,7 +2217,7 @@ int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name)
 			" from information_schema.tables"
 			" where table_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, zbx_dbconn_get_schema_esc(db));
 #elif defined(HAVE_SQLITE3)
 	result = zbx_dbconn_select(db,
 			"select 1"
@@ -2265,8 +2270,8 @@ int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char
 
 	zbx_db_free_result(result);
 #elif defined(HAVE_POSTGRESQL)
-	table_name_esc = zbx_db_dyn_escape_string(table_name);
-	field_name_esc = zbx_db_dyn_escape_string(field_name);
+	table_name_esc = zbx_dbconn_dyn_escape_string(db, table_name);
+	field_name_esc = zbx_dbconn_dyn_escape_string(db, field_name);
 
 	result = zbx_dbconn_select(db,
 			"select 1"
@@ -2274,7 +2279,7 @@ int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char
 			" where table_name='%s'"
 				" and column_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, field_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, field_name_esc, zbx_dbconn_get_schema_esc(db));
 
 	zbx_free(field_name_esc);
 	zbx_free(table_name_esc);
@@ -2283,7 +2288,7 @@ int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char
 
 	zbx_db_free_result(result);
 #elif defined(HAVE_SQLITE3)
-	table_name_esc = zbx_db_dyn_escape_string(table_name);
+	table_name_esc = zbx_dbconn_dyn_escape_string(db, table_name);
 
 	result = zbx_dbconn_select(db, "PRAGMA table_info('%s')", table_name_esc);
 
@@ -2315,8 +2320,8 @@ int	zbx_dbconn_trigger_exists(zbx_dbconn_t *db, const char *table_name, const ch
 	zbx_db_result_t	result;
 	int		ret;
 
-	table_name_esc = zbx_db_dyn_escape_string(table_name);
-	trigger_name_esc = zbx_db_dyn_escape_string(trigger_name);
+	table_name_esc = zbx_dbconn_dyn_escape_string(db, table_name);
+	trigger_name_esc = zbx_dbconn_dyn_escape_string(db, trigger_name);
 
 #if defined(HAVE_MYSQL)
 	result = zbx_dbconn_select(db,
@@ -2330,7 +2335,7 @@ int	zbx_dbconn_trigger_exists(zbx_dbconn_t *db, const char *table_name, const ch
 			" where event_object_table='%s'"
 			" and trigger_name='%s'"
 			" and trigger_schema='%s'",
-			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, trigger_name_esc, zbx_dbconn_get_schema_esc(db));
 #endif
 	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
 
@@ -2353,8 +2358,8 @@ int	zbx_dbconn_index_exists(zbx_dbconn_t *db, const char *table_name, const char
 	zbx_db_result_t	result;
 	int		ret;
 
-	table_name_esc = zbx_db_dyn_escape_string(table_name);
-	index_name_esc = zbx_db_dyn_escape_string(index_name);
+	table_name_esc = zbx_dbconn_dyn_escape_string(db, table_name);
+	index_name_esc = zbx_dbconn_dyn_escape_string(db, index_name);
 
 #if defined(HAVE_MYSQL)
 	result = zbx_dbconn_select(db,
@@ -2368,7 +2373,7 @@ int	zbx_dbconn_index_exists(zbx_dbconn_t *db, const char *table_name, const char
 			" where tablename='%s'"
 				" and indexname='%s'"
 				" and schemaname='%s'",
-			table_name_esc, index_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, index_name_esc, zbx_dbconn_get_schema_esc(db));
 #endif
 
 	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
@@ -2403,7 +2408,7 @@ int	zbx_dbconn_pk_exists(zbx_dbconn_t *db, const char *table_name)
 			" where table_name='%s'"
 				" and constraint_type='PRIMARY KEY'"
 				" and constraint_schema='%s'",
-			table_name, zbx_db_get_schema_esc());
+			table_name, zbx_dbconn_get_schema_esc(db));
 #endif
 	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
 
@@ -2456,8 +2461,8 @@ static int	dbconn_prepare_multiple_query_str(zbx_dbconn_t *db, const char *query
 			zbx_vector_str_append(&str_ids, zbx_dsprintf(NULL, ZBX_FS_UI64, ids->values[j]));
 
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
-		zbx_db_add_str_condition_alloc(sql, sql_alloc, sql_offset, field_name, (const char**)str_ids.values,
-				batch_size);
+		zbx_dbconn_add_str_condition_alloc(db, sql, sql_alloc, sql_offset, field_name,
+				(const char**)str_ids.values, batch_size);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
 		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
@@ -2599,8 +2604,9 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 			if (FAIL == (size = db_large_query_select_chunk(query, query->ids.str->values_num)))
 				return FAIL;
 
-			zbx_db_add_str_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
-					(const char * const *)&query->ids.str->values[query->offset], size);
+			zbx_dbconn_add_str_condition_alloc(query->db, query->sql, query->sql_alloc, query->sql_offset,
+					query->field, (const char * const *)&query->ids.str->values[query->offset],
+					size);
 			break;
 		case ZBX_DB_LARGE_QUERY:
 			if (NULL != query->result)

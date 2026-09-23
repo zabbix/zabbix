@@ -323,9 +323,9 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status',
-					'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-					'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
+				'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'proxy_groupid',
+					'status', 'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege',
+					'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
 				],
 				'selectInventory' => in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
 					? array_column(getHostInventories(), 'db_field')
@@ -338,8 +338,11 @@ abstract class CControllerPopupItemTest extends CController {
 				if ($hosts[0]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 					$hosts[0]['proxyid'] = $hosts[0]['assigned_proxyid'];
 				}
+				else {
+					$hosts[0]['proxy_groupid'] = 0;
+				}
 
-				unset($hosts[0]['monitored_by'], $hosts[0]['assigned_proxyid']);
+				unset($hosts[0]['assigned_proxyid']);
 			}
 			else {
 				$hosts = API::Template()->get([
@@ -347,6 +350,10 @@ abstract class CControllerPopupItemTest extends CController {
 					'templateids' => [$hostid],
 					'editable' => true
 				]);
+
+				if (!$hosts) {
+					return false;
+				}
 
 				$hosts[0] = CArrayHelper::renameKeys($hosts[0], ['templateid' => 'hostid']);
 			}
@@ -369,7 +376,22 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @return array
 	 */
 	protected function getItemTestProperties(array $input, bool $for_server = false): array {
+		if ($for_server && in_array($this->item_type, $this->items_support_proxy)
+				&& (!array_key_exists('timeout', $input) || $input['timeout'] === '')
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
+			$global_timeouts = getInheritedTimeouts('0');
+
+			if (array_key_exists($this->item_type, $global_timeouts['timeouts'])) {
+				$input['timeout'] = $global_timeouts['timeouts'][$this->item_type];
+			}
+		}
+
 		$data_host = [];
+
+		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE) {
+			$data_host['hostid'] = $this->host['hostid'];
+		}
+
 		$data_item = [
 			'value_type' => (int) $input['value_type']
 		];
@@ -442,7 +464,6 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_INTERNAL:
 				$data_item += ['key' => $input['key']];
-				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data_host += CArrayHelper::getByKeysStrict($this->host,
@@ -483,7 +504,6 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_IPMI:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'ipmi_sensor']);
 				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
-				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data_host += CArrayHelper::getByKeysStrict($this->host, ['ipmi_authtype', 'ipmi_privilege',
@@ -1157,10 +1177,6 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function prepareTestData(): array {
 		$data = $this->getItemTestProperties($this->getInputAll(), true);
 		$data['item'] = $this->resolveItemPropertyMacros($data['item']);
-
-		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
-			$data['host']['hostid'] = $this->getInput('hostid');
-		}
 
 		// Rename form fields according to API conventions.
 		$data['item'] = CArrayHelper::renameKeys($data['item'], [

@@ -60,6 +60,8 @@ class CIntegrationTest extends CAPITest {
 
 	private const STAT_LABELS = [
 		'call_data_present'	=> 'callUntilDataIsPresent',
+		'call_count_present'	=> 'callUntilCountIsPresent',
+		'test_item_callback'	=> 'callTestItemUntilCallback',
 		'wait_log_line'		=> 'waitForLogLineToBePresent',
 		'wait_send'		=> 'sendDataValues',
 		'reload_config_cache'	=> 'reloadConfigurationCache',
@@ -318,12 +320,19 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
-		if (is_dir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name)) {
-			$case_name = strtr(get_class($this).'_'.$this->getName(true), [' ' => '-']);
+		$all_dir = PHPUNIT_COMPONENT_DIR.'all/'.$case_name;
+
+		// Directories are kept between runs, so they must be created only if they do not exist yet.
+		if (!is_dir($all_dir)) {
+			mkdir($all_dir, 0775, true);
 		}
-		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
+
 		if ($this->hasFailed()) {
-			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+			$failed_dir = PHPUNIT_COMPONENT_DIR.'failed/'.$case_name;
+
+			if (!is_dir($failed_dir)) {
+				mkdir($failed_dir, 0775, true);
+			}
 		}
 
 		foreach (self::getComponents() as $component) {
@@ -527,14 +536,25 @@ class CIntegrationTest extends CAPITest {
 
 		$failed_pids = [];
 		$failed_kills = [];
+		$backtraces = [];
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-				if (!posix_kill($child_pid, SIGKILL)) {
-					$error_code = posix_get_last_error();
-					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
-				}
+				$bt_lines = [];
+				exec('gdb -batch -ex "set pagination 0" -ex "thread apply all bt" -p '.escapeshellarg($child_pid).' 2>&1', $bt_lines);
+				$backtraces[$child_pid] = implode("\n", $bt_lines);
 				$failed_pids[] = $child_pid;
+			}
+		}
+
+		if ($failed_pids) {
+			sleep(3);
+		}
+
+		foreach ($failed_pids as $child_pid) {
+			if (!posix_kill($child_pid, SIGKILL)) {
+				$error_code = posix_get_last_error();
+				$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
 			}
 		}
 
@@ -547,17 +567,39 @@ class CIntegrationTest extends CAPITest {
 			return;
 		}
 
-		$log = CLogHelper::readLog(self::getLogPath($component), false, true);
+		$log_path = self::getLogPath($component);
+		$log = CLogHelper::readLog($log_path, false, false);
+
+		$fatal_strings = ['child process exited', '=== Backtrace: ===', '====== Fatal information: ======'];
+		$fatal_offset = null;
+
+		foreach ($fatal_strings as $fatal_string) {
+			$offset = CLogHelper::getLineOffset($log, $fatal_string);
+			if ($offset !== null && ($fatal_offset === null || $offset < $fatal_offset)) {
+				$fatal_offset = $offset;
+			}
+		}
+
+		if ($fatal_offset !== null) {
+			$log = substr($log, $fatal_offset);
+		}
 		$failed_kills = $failed_kills
 			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
 			: '';
+
+		$bt_section = '';
+		foreach ($backtraces as $bt_pid => $bt) {
+			if ($bt !== '') {
+				$bt_section .= "\nBacktrace for PID ".$bt_pid.":\n".$bt."\n";
+			}
+		}
 
 		if (static::$trace_delays) {
 			self::recordDelay('shutdown', microtime(true) - $start);
 		}
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
-			implode(', ', $failed_pids).$failed_kills."\n".
+			implode(', ', $failed_pids).$failed_kills.$bt_section."\n".
 			'Log file contents: '."\n".$log."\n");
 	}
 
@@ -1109,9 +1151,8 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
-		$this->clearLog($component);
+		self::skipLog($component);
 
-		$line = '';
 		$this->reloadConfigurationCache($component, $delayOverride);
 
 		switch ($component) {
@@ -1177,6 +1218,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$last_response = null;
 		$callback_error = null;
 		$usleep_total = 0;
 		$start = microtime(true);
@@ -1185,6 +1227,7 @@ class CIntegrationTest extends CAPITest {
 			$callback_error = null;
 			try {
 				$response = $this->call($method, $params);
+				$last_response = $response;
 
 				if (is_array($response['result']) && count($response['result']) > 0
 					&& ($callback === null || ($result = call_user_func($callback, $response)) === true)) {
@@ -1223,6 +1266,7 @@ class CIntegrationTest extends CAPITest {
 
 		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
 				"\n".json_encode($params).
+				"\nLast response: ".json_encode($last_response).
 				($callback_error !== null ? "\nCallback error: ".$callback_error : '')
 		);
 	}
@@ -1236,10 +1280,11 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer  $iterations      iteration count
 	 * @param integer  $delay           iteration delay
 	 * @param callable $callback        Callback function to test if API response is valid.
+	 * @param callable $info_callback   optional callback returning extra diagnostics for the failure message
 	 *
 	 * @return array
 	 */
-	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null) {
+	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null, $info_callback = null) {
 		if ($iterations === null) {
 			$iterations = self::WAIT_ITERATIONS;
 		}
@@ -1251,10 +1296,15 @@ class CIntegrationTest extends CAPITest {
 		$count_params = array_merge($params, ['countOutput' => true]);
 		$exception = null;
 		$usleep_total = 0;
+		$last_count = null;
 		$start = microtime(true);
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $count_params);
+
+				if (isset($response['result'])) {
+					$last_count = $response['result'];
+				}
 
 				$callback_ok = ($callback === null || call_user_func($callback, $response) === true);
 
@@ -1287,10 +1337,95 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.') within '.
+		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.', '.
+				'last count '.($last_count === null ? 'unknown' : $last_count).') within '.
 				'specified interval. Params used:'."\n".json_encode($params);
 		if (isset($response)) {
 			$message .= "\nLast response:\n".json_encode($response);
+		}
+		if ($info_callback !== null) {
+			$message .= "\n".call_user_func($info_callback);
+		}
+		$this->fail($message);
+	}
+
+	/**
+	 * Test an item on the server repeatedly until the given callback accepts its result (@see testItem).
+	 *
+	 * The item is tested via the "item.test" request (@see CZabbixServer::testItem), which allows waiting on
+	 * values that are not exposed through the API (e.g. internal statistics such as zabbix["cep"]). The callback
+	 * receives the raw testItem response and decides whether the wait is satisfied - returning true stops the
+	 * loop. This keeps the comparison logic (equals, at-least, extract-from-JSON, ...) in the caller instead of
+	 * baking it into this helper.
+	 *
+	 * @param array    $item           item definition (key, type, value_type, ...)
+	 * @param callable $callback       predicate receiving the raw testItem response; return true when satisfied
+	 * @param array    $options        item.test options
+	 * @param integer  $timeout        overall timeout in milliseconds (the item is polled every 100 ms)
+	 * @param callable $info_callback  optional callback returning extra diagnostics for the failure message
+	 *
+	 * @return array  the testItem response that satisfied the callback
+	 */
+	public function callTestItemUntilCallback(array $item, callable $callback,
+			array $options = ['single' => false, 'state' => 0], $timeout = null, $info_callback = null) {
+		if ($timeout === null) {
+			$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 1000;
+		}
+
+		// The item.test request needs an authorized session; the host block is omitted as internal items
+		// (e.g. zabbix["cep"]) carry no host context - the server defaults maintenance to off/normal.
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+		$sid = CAPIHelper::getSessionId();
+
+		$data = [
+			'options' => $options,
+			'item' => $item
+		];
+
+		$client = $this->getClient(self::COMPONENT_SERVER);
+		$exception = null;
+		$last_result = null;
+		$start = microtime(true);
+		$deadline = $start + $timeout / 1000;
+		while (true) {
+			try {
+				$result = $client->testItem($data, $sid);
+				$last_result = $result;
+
+				if (call_user_func($callback, $result) === true) {
+					if (static::$trace_delays) {
+						self::recordDelay('test_item_callback', microtime(true) - $start);
+					}
+
+					return $result;
+				}
+			} catch (Exception $e) {
+				$exception = $e;
+			}
+
+			// Poll every 100 ms until the timeout is reached (do not sleep after the final attempt).
+			if (microtime(true) >= $deadline) {
+				break;
+			}
+
+			usleep(100000);
+		}
+
+		if (static::$trace_delays) {
+			self::recordDelay('test_item_callback', microtime(true) - $start);
+		}
+
+		if ($exception !== null) {
+			throw $exception;
+		}
+
+		$message = 'Item '.(isset($item['key']) ? $item['key'] : '').' tested on server'.
+				' did not satisfy the callback within '.$timeout.' ms.'.
+				"\nLast response: ".json_encode($last_result);
+		if ($info_callback !== null) {
+			$message .= call_user_func($info_callback);
 		}
 		$this->fail($message);
 	}
@@ -1347,6 +1482,15 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected static function clearLog($component) {
 		CLogHelper::clearLog(self::getLogPath($component));
+	}
+
+	/**
+	 * Set log offset to the end of file.
+	 *
+	 * @param string $component    name of the component
+	 */
+	protected static function skipLog($component) {
+		CLogHelper::skipLog(self::getLogPath($component));
 	}
 
 	/**
@@ -1417,7 +1561,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$error_msg = 'Failed to wait for '.$description.' to be present in '.$component.
-				'log file: '.self::getLogPath($component)."\n";
+				'log file: '.self::getLogPath($component).' at '.date('His')."\n";
 
 		$error_msg .= CLogHelper::readLog(self::getLogPath($component), false, true);
 

@@ -85,8 +85,6 @@ class TabIndicators {
 				return HOST_DISCOVERY_PROTOTYPE;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
-			case !!PROXY:
-				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -240,6 +238,8 @@ class TabIndicatorFactory {
 				return new TemplatePermissionsTabIndicatorItem;
 			case 'HostPermissions':
 				return new HostPermissionsTabIndicatorItem;
+			case 'ProxyAccessList':
+				return new ProxyAccessListTabIndicatorItem;
 			case 'PieDataset':
 				return new PieDatasetTabIndicatorItem;
 			case 'PieDisplayOptions':
@@ -833,6 +833,54 @@ class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
 			input.addEventListener('click', () => {
 				this.addAttributes();
 			});
+		}
+	}
+}
+
+class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
+
+	static PROXY_MODE_ALLOW = 1;
+	static PROXY_GROUP_MODE_ALLOW = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const proxy_mode = document.querySelector('[name="proxy_mode"]:checked');
+
+		if (proxy_mode !== null && proxy_mode.value != ProxyAccessListTabIndicatorItem.PROXY_MODE_ALLOW) {
+			return true;
+		}
+
+		const proxy_group_mode = document.querySelector('[name="proxy_group_mode"]:checked');
+
+		if (proxy_group_mode !== null
+				&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_ALLOW) {
+			return true;
+		}
+
+		return document
+			.querySelectorAll('#proxyids_ .multiselect-list li, #proxy_groupids_ .multiselect-list li')
+			.length > 0;
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('[name="proxy_mode"], [name="proxy_group_mode"]')) {
+			input.addEventListener('change', () => this.addAttributes());
+		}
+
+		for (const id of ['proxyids_', 'proxy_groupids_']) {
+			const target_node = document.getElementById(id);
+
+			if (target_node !== null) {
+				const observer = new MutationObserver(() => this.addAttributes());
+
+				observer.observe(target_node, {
+					childList: true,
+					subtree: true
+				});
+			}
 		}
 	}
 }

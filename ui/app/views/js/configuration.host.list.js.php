@@ -286,8 +286,7 @@
 						.setRenderer('status')
 						.setSortable(true),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
-						.setFields(['availability', 'active_available'])
-						.setRenderer('availability'),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumn('encryption', <?= json_encode(_('Agent encryption')); ?>)
 						.setFields(['tls_accept', 'tls_connect'])
 						.setRenderer('encryption'),
@@ -410,9 +409,10 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
-								? <?= json_encode(_('Maintenance without data collection')); ?>
-								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
+							let hint = `${escapeHtml(maintenance.name)} [${
+								maintenance.type == MAINTENANCE_TYPE_NODATA
+									? <?= json_encode(_('Maintenance without data collection')); ?>
+									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + escapeHtml(maintenance.description);
@@ -582,7 +582,7 @@
 
 					const overflow_ellipsis = document.createElement('span');
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.innerHTML = host_port;
+					overflow_ellipsis.textContent = host_port;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
@@ -645,11 +645,6 @@
 						cell.appendChild(description_icon);
 					}
 				})
-				.setCellRenderer('availability', ({cell_data, cell}) => {
-					const [availability] = cell_data;
-
-					cell.innerHTML = availability;
-				})
 				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
 					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
 						assigned_proxy] = cell_data;
@@ -665,7 +660,7 @@
 					proxy_url.searchParams.set('popup', 'proxy.edit');
 
 					if (monitored_by == ZBX_MONITORED_BY_PROXY) {
-						if (can_edit_proxies) {
+						if (can_edit_proxies && !proxy.inaccessible) {
 							proxy_url.searchParams.set('proxyid', proxyid);
 
 							const proxy_link = document.createElement('a');
@@ -681,7 +676,7 @@
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
-						if (can_edit_proxy_groups) {
+						if (can_edit_proxy_groups && !proxy_group.inaccessible) {
 							const proxy_group_url = new URL('zabbix.php', location.href);
 							proxy_group_url.searchParams.set('action', 'popup');
 							proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
@@ -699,10 +694,10 @@
 							cell.innerHTML = escapeHtml(proxy_group.name);
 						}
 
-						if (assigned_proxyid != 0) {
+						if (assigned_proxyid != 0 && !proxy_group.inaccessible) {
 							cell.innerHTML += NAME_DELIMITER;
 
-							if (can_edit_proxies) {
+							if (can_edit_proxies && !assigned_proxy.inaccessible) {
 								proxy_url.searchParams.set('proxyid', assigned_proxyid);
 
 								const proxy_link = document.createElement('a');

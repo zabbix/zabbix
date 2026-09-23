@@ -13,6 +13,7 @@
 **/
 
 #include "webdriver.h"
+#include "browser_perf.h"
 #include "zbxjson.h"
 
 #ifdef HAVE_LIBCURL

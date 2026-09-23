@@ -171,7 +171,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Data collection',
-					'page' => 'Event correlation'
+					'page' => 'Event processing'
 				]
 			],
 			[

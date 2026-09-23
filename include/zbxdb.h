@@ -91,6 +91,12 @@ zbx_db_config_t;
 #endif
 
 #ifdef HAVE_MYSQL
+#	define ZBX_SQL_FORCE_PK		" force index (primary)"
+#else
+#	define ZBX_SQL_FORCE_PK		""
+#endif
+
+#ifdef HAVE_MYSQL
 #	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else
 #	define	ZBX_SQL_STRCMP			"%s'%s'"
@@ -114,6 +120,12 @@ zbx_db_config_t;
 			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
+
+#define ZBX_DBROW2STR(str, row)				\
+	if (NULL == str || 0 != strcmp(str, row))	\
+	{						\
+		str = zbx_strdup(str, row);		\
+	}
 
 #ifdef HAVE_MYSQL
 #	define ZBX_SQL_SORT_ASC(field)	field " asc"
@@ -163,7 +175,7 @@ typedef enum
 zbx_escape_sequence_t;
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-char		*zbx_db_dyn_escape_like_pattern(const char *src);
+char		*zbx_dbconn_dyn_escape_like_pattern(const zbx_dbconn_t *db, const char *src);
 
 size_t		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
@@ -339,6 +351,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db);
 int	zbx_dbconn_end(zbx_dbconn_t *db, int ret);
 
 zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, int num);
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
@@ -354,6 +367,7 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
 int	zbx_db_insert_get_row_count(zbx_db_insert_t *self);
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -367,6 +381,8 @@ int	zbx_dbconn_lock_record(zbx_dbconn_t *db, const char *table, zbx_uint64_t id,
 		zbx_uint64_t add_id);
 int	zbx_dbconn_lock_records(zbx_dbconn_t *db, const char *table, const zbx_vector_uint64_t *ids);
 int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids);
 
 int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char program_type);
 void	zbx_db_config_validate(zbx_db_config_t *config);
@@ -395,14 +411,15 @@ int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const
 int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
 		const zbx_vector_uint64_t *ids);
 
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
-char	*zbx_db_dyn_escape_string(const char *src);
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+char	*zbx_dbconn_dyn_escape_field(const zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *src);
+char	*zbx_dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src);
+char	*zbx_dbconn_dyn_escape_string_len(const zbx_dbconn_t *db, const char *src, size_t length);
 
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num);
+void	zbx_dbconn_add_str_condition_alloc(const zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *fieldname, const char * const *values, const int num);
 
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
 const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
@@ -417,7 +434,7 @@ int	zbx_db_get_row_num(zbx_db_result_t result);
 int	zbx_db_is_null(const char *field);
 
 #if defined(HAVE_POSTGRESQL)
-char	*zbx_db_get_schema_esc(void);
+char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db);
 #endif
 
 int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -475,9 +492,6 @@ void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *d
 zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
-
-/* connection pool */
-typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
 
 typedef struct
 {
@@ -560,6 +574,16 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
+char	*zbx_db_dyn_escape_like_pattern(const char *src);
+char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
+char	*zbx_db_dyn_escape_string(const char *src);
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char * const *values, const int num);
+#if defined(HAVE_POSTGRESQL)
+char	*zbx_db_get_schema_esc(void);
+#endif
+
 /* type of value in settings table */
 #define ZBX_SETTING_TYPE_STR			1
 #define ZBX_SETTING_TYPE_INT			2
@@ -582,11 +606,19 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
+zbx_dbconn_t	*zbx_db_dbconn(void);
+
+void	zbx_db_unstash_connection(zbx_dbconn_t *db);
+void	zbx_db_stash_connection(zbx_dbconn_t *db);
+
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"
 #define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
 #define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
 #define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #endif
 

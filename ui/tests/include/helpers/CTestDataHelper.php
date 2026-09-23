@@ -33,7 +33,8 @@ class CTestDataHelper {
 	 */
 	public static function createObjects(array $objects): void {
 		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'media_type'
+			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts', 'drules', 'actions', 'media_type',
+			'ceprules'
 		], []);
 
 		try {
@@ -51,6 +52,7 @@ class CTestDataHelper {
 			self::createDrules($objects['drules']);
 			self::createActions($objects['actions']);
 			self::createMediatypes($objects['media_type']);
+			self::createCepRules($objects['ceprules']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -997,6 +999,22 @@ class CTestDataHelper {
 		self::convertPropertyReference($mediatypes, 'mediatypeid');
 	}
 
+	public static function createCepRules(array $ceprules): void {
+		if (!$ceprules) {
+			return;
+		}
+
+		$result = CDataHelper::call('ceprule.create', $ceprules);
+
+		foreach ($ceprules as $ceprule) {
+			self::$objectids['ceprule'][$ceprule['name']] = array_shift($result['cep_ruleids']);
+		}
+	}
+
+	public static function convertCepRuleReferences(array &$ceprules): void {
+		self::convertPropertyReference($ceprules, 'cep_ruleid');
+	}
+
 	/**
 	 * Check for, and replace a reference ID in the given object property with the corresponding object's record ID.
 	 *
@@ -1209,6 +1227,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('media_type', self::$objectids)) {
 			CDataHelper::call('mediatype.delete', array_values(self::$objectids['media_type']));
+		}
+
+		if (array_key_exists('ceprule', self::$objectids)) {
+			CDataHelper::call('ceprule.delete', array_values(self::$objectids['ceprule']));
 		}
 
 		self::$objectids = [];

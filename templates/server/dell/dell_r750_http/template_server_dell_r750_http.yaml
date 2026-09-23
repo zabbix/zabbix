@@ -34,7 +34,7 @@ zabbix_export:
         > NOTE! If you are experiencing timeouts on some of the items that are executing requests, adjust the `{$DELL.HTTP.REQUEST.TIMEOUT}` macro accordingly.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -45,6 +45,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
             		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -55,7 +80,9 @@ zabbix_export:
             
             function Dell(service, action, params) {
             	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.tls.checkURL(params['url']);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.executeRequest = function (apiPath) {
             		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -182,6 +209,8 @@ zabbix_export:
               value: '{$DELL.HTTP.RETURN.CODE.OK}'
             - name: password
               value: '{$DELL.HTTP.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
             - name: url
               value: '{$DELL.HTTP.API.URL}'
             - name: user
@@ -197,6 +226,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
             		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -207,7 +261,9 @@ zabbix_export:
             
             function Dell(service, action, params) {
             	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.tls.checkURL(params['url']);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.executeRequest = function (apiPath) {
             		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -320,6 +376,8 @@ zabbix_export:
               value: '{$DELL.HTTP.RETURN.CODE.OK}'
             - name: password
               value: '{$DELL.HTTP.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
             - name: url
               value: '{$DELL.HTTP.API.URL}'
             - name: user
@@ -413,6 +471,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
             		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -423,7 +506,9 @@ zabbix_export:
             
             function Dell(service, action, params) {
             	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.tls.checkURL(params['url']);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.executeRequest = function (apiPath) {
             		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -532,6 +617,8 @@ zabbix_export:
               value: '{$DELL.HTTP.RETURN.CODE.OK}'
             - name: password
               value: '{$DELL.HTTP.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
             - name: url
               value: '{$DELL.HTTP.API.URL}'
             - name: user
@@ -546,6 +633,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
             		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -556,7 +668,9 @@ zabbix_export:
             
             function Dell(service, action, params) {
             	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.tls.checkURL(params['url']);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.executeRequest = function (apiPath) {
             		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -748,6 +862,8 @@ zabbix_export:
               value: '{$DELL.HTTP.RETURN.CODE.OK}'
             - name: password
               value: '{$DELL.HTTP.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
             - name: url
               value: '{$DELL.HTTP.API.URL}'
             - name: user
@@ -816,6 +932,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
             		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -826,7 +967,9 @@ zabbix_export:
             
             function Dell(service, action, params) {
             	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
+            	this.tls = new CTlsConfig(params.tls_verify);
+            	this.tls.checkURL(params['url']);
+            	this.request = new HttpRequest(this.tls.options);
             
             	this.executeRequest = function (apiPath) {
             		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -937,6 +1080,8 @@ zabbix_export:
               value: '{$DELL.HTTP.RETURN.CODE.OK}'
             - name: password
               value: '{$DELL.HTTP.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
             - name: url
               value: '{$DELL.HTTP.API.URL}'
             - name: user
@@ -1408,6 +1553,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(requiredParams, allParams) {
                 	requiredParams.forEach(function (field) {
                 		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -1418,7 +1588,9 @@ zabbix_export:
                 
                 function Dell(service, action, params) {
                 	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.tls.checkURL(params['url']);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.executeRequest = function (apiPath) {
                 		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -1517,6 +1689,8 @@ zabbix_export:
                   value: '{$DELL.HTTP.API.PASSWORD}'
                 - name: path
                   value: '{#ODATA}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
                 - name: url
                   value: '{$DELL.HTTP.API.URL}'
                 - name: user
@@ -1668,7 +1842,7 @@ zabbix_export:
                 - uuid: 14f89419376e4a9f87bb8a8fdce08c4d
                   expression: '{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1 and (last(/DELL PowerEdge R750 by HTTP/dell.server.net.if.status[{#IFNAME}],)=2 and last(/DELL PowerEdge R750 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R750 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/DELL PowerEdge R750 by HTTP/dell.server.net.if.status[{#IFNAME}],)=1 or {$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/DELL PowerEdge R750 by HTTP/dell.server.net.if.status[{#IFNAME}],)=3 or {$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Dell R750: Interface [{#IFNAME}]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1676,7 +1850,7 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is Down (2).
                     2. `{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Down (2).
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces).
                     
                     WARNING: if closed manually - it will not fire again on the next poll because of `.diff`.
                   manual_close: 'YES'
@@ -1733,6 +1907,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(requiredParams, allParams) {
                 	requiredParams.forEach(function (field) {
                 		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -1743,7 +1942,9 @@ zabbix_export:
                 
                 function Dell(service, action, params) {
                 	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.tls.checkURL(params['url']);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.executeRequest = function (apiPath) {
                 		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -1846,6 +2047,8 @@ zabbix_export:
                   value: '{$DELL.HTTP.API.PASSWORD}'
                 - name: path
                   value: '{#ODATA}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
                 - name: url
                   value: '{$DELL.HTTP.API.URL}'
                 - name: user
@@ -2345,6 +2548,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 function validateZabbixParams(requiredParams, allParams) {
                 	requiredParams.forEach(function (field) {
                 		if (typeof allParams !== 'object' || typeof allParams[field] === 'undefined' || allParams[field] === '') {
@@ -2355,7 +2583,9 @@ zabbix_export:
                 
                 function Dell(service, action, params) {
                 	this.zabbixLogPrefix = '[ DELL ] [ ' + service + ' ] [ ' + action + ' ]';
-                	this.request = new HttpRequest();
+                	this.tls = new CTlsConfig(params.tls_verify);
+                	this.tls.checkURL(params['url']);
+                	this.request = new HttpRequest(this.tls.options);
                 
                 	this.executeRequest = function (apiPath) {
                 		this.request.addHeader('Authorization: Basic ' + btoa(params['user'] + ':' + params['password']));
@@ -2462,6 +2692,8 @@ zabbix_export:
                   value: '{$DELL.HTTP.API.PASSWORD}'
                 - name: path
                   value: '{#ODATA}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"DELL PowerEdge"}'
                 - name: url
                   value: '{$DELL.HTTP.API.URL}'
                 - name: user
@@ -2756,7 +2988,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "high" severity event about CPU utilization.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'CPU usage high (%)'
             description: 'Sets the percentage threshold for creating a "high" severity event about CPU utilization. In the range from 0 to 100 inclusive.'
@@ -2766,7 +2998,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "warning" severity event about CPU utilization.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'CPU usage warning (%)'
             description: 'Sets the percentage threshold for creating a "warning" severity event about CPU utilization. In the range from 0 to 100 inclusive.'
@@ -2776,7 +3008,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces that have the context macro equal to "1".'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'Link status trigger enabled'
             description: 'Link status trigger will be fired only for interfaces that have the context macro equal to "1".'
@@ -2786,7 +3018,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "high" severity event about IO utilization.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'IO usage high (%)'
             description: 'Sets the percentage threshold for creating a "high" severity event about IO utilization. In the range from 0 to 100 inclusive.'
@@ -2796,7 +3028,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "warning" severity event about IO utilization.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'IO usage warning (%)'
             description: 'Sets the percentage threshold for creating a "warning" severity event about IO utilization. In the range from 0 to 100 inclusive.'
@@ -2806,7 +3038,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "high" severity event about memory utilization.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Memory usage high (%)'
             description: 'Sets the percentage threshold for creating a "high" severity event about memory utilization. In the range from 0 to 100 inclusive.'
@@ -2816,7 +3048,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "warning" severity event about memory utilization.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Memory usage warning (%)'
             description: 'Sets the percentage threshold for creating a "warning" severity event about memory utilization. In the range from 0 to 100 inclusive.'
@@ -2834,7 +3066,7 @@ zabbix_export:
           description: 'Set the timeout for HTTP requests.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'HTTP timeout'
             description: 'Set the timeout for HTTP requests.'
@@ -2843,7 +3075,7 @@ zabbix_export:
           description: 'Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'HTTP OK code'
             description: 'Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.'
@@ -2853,7 +3085,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "high" severity event about SYS utilization.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'SYS usage high (%)'
             description: 'Sets the percentage threshold for creating a "high" severity event about SYS utilization. In the range from 0 to 100 inclusive.'
@@ -2863,11 +3095,27 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "warning" severity event about SYS utilization.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'SYS usage warning (%)'
             description: 'Sets the percentage threshold for creating a "warning" severity event about SYS utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "DELL PowerEdge", e.g. {$HTTP.TLS.VERIFY:"DELL PowerEdge"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: b96317122fe34f54b173083884d0db24
           name: Overview

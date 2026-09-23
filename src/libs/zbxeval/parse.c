@@ -71,7 +71,7 @@ static void	eval_update_const_variable(zbx_eval_context_t *ctx, zbx_eval_token_t
 				return;
 		}
 
-		token->opt = ctx->const_index++;
+		token->opt = ++ctx->const_index;
 	}
 }
 
@@ -295,9 +295,6 @@ out:
 		return FAIL;
 	}
 
-	if (ZBX_EVAL_TOKEN_VAR_NUM == type || ZBX_EVAL_TOKEN_VAR_USERMACRO == type)
-		eval_update_const_variable(ctx, token);
-
 	token->type = type;
 	token->loc.l = pos;
 	token->loc.r = offset - 1;
@@ -410,7 +407,6 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 			token->type = ZBX_EVAL_TOKEN_VAR_STR;
 			token->loc.l = pos;
 			token->loc.r = ptr - ctx->expression;
-			eval_update_const_variable(ctx, token);
 			return SUCCEED;
 		}
 
@@ -470,7 +466,6 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 	token->loc.l = pos;
 	token->loc.r = pos + len - 1;
-	eval_update_const_variable(ctx, token);
 
 	return SUCCEED;
 }
@@ -1153,6 +1148,13 @@ static int	eval_append_operand(zbx_eval_context_t *ctx, zbx_eval_token_t *token,
 					" \"%s\"", ctx->expression + prop->loc.l);
 			return FAIL;
 		}
+	}
+
+
+	if (ZBX_EVAL_TOKEN_VAR_NUM == token->type || ZBX_EVAL_TOKEN_VAR_STR == token->type ||
+			ZBX_EVAL_TOKEN_VAR_USERMACRO == token->type)
+	{
+		eval_update_const_variable(ctx, token);
 	}
 
 	zbx_vector_eval_token_append_ptr(&ctx->stack, token);

@@ -26,7 +26,7 @@ zabbix_export:
         4. Set your FlashArray (Purity//FA) graphical user interface URL as the `Web interface URL` host wizard configuration field value.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -99,6 +99,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -106,7 +131,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	storage_array = {},
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -114,6 +140,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	request.addHeader('Accept: application/json');
                   	response = request.get(url);
@@ -474,12 +501,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	cookies = [],
             	error_msg = '';
             
             function getToken(url, data) {
+            	tls.checkURL(url);
             	var token = null;
             	var response = request.post(url, JSON.stringify(data));
             	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -505,6 +559,7 @@ zabbix_export:
             };
             
             function createSession(url, data) {
+            	tls.checkURL(url);
             	var cookies = [];
             	response = request.post(url, JSON.stringify(data));
             	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -598,6 +653,8 @@ zabbix_export:
               value: '{$PURE.FLASHARRAY.HTTP_PROXY}'
             - name: password
               value: '{$PURE.FLASHARRAY.API.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}'
             - name: token
               value: '{$PURE.FLASHARRAY.API.TOKEN}'
             - name: url
@@ -676,6 +733,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -683,7 +765,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	certs = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -691,6 +774,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -793,6 +877,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -800,7 +909,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	drives = [],
                   	hardware = [],
                   	controllers = [],
@@ -810,6 +920,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -945,6 +1056,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -952,7 +1088,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	hosts = {},
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -960,6 +1097,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	request.addHeader('Accept: application/json');
                   	response = request.get(url);
@@ -1085,6 +1223,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -1092,7 +1255,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	interfaces = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -1100,6 +1264,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	request.addHeader('Accept: application/json');
                   	response = request.get(url);
@@ -1253,6 +1418,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -1260,7 +1450,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	pods = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -1268,6 +1459,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -1408,6 +1600,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -1415,7 +1632,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	volumes = {},
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -1423,6 +1641,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url, cookie) {
+                  	tls.checkURL(url);
                   	request.addHeader('Cookie: ' + cookie);
                   	request.addHeader('Accept: application/json');
                   	response = request.get(url);
@@ -3352,6 +3571,22 @@ zabbix_export:
         - tag: target
           value: pure-storage
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v1", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.'
+          config:
+            type: LIST
+            priority: '31'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$PURE.FLASHARRAY.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Pure Storage FlashArray Web interface password.'
@@ -4451,7 +4686,7 @@ zabbix_export:
         4. Set your FlashArray (Purity//FA) graphical user interface URL as the `Web interface URL` host wizard configuration field value.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -4518,6 +4753,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -4525,7 +4785,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	alerts = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -4533,6 +4794,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -4695,6 +4957,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -4702,7 +4989,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	storage_array = {},
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -4710,6 +4998,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5070,12 +5359,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	token = '',
             	error_msg = '';
             
             function login(url) {
+            	tls.checkURL(url);
             	var token = '';
             	response = request.post(url);
             	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -5150,6 +5466,8 @@ zabbix_export:
           parameters:
             - name: http_proxy
               value: '{$PURE.FLASHARRAY.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}'
             - name: token
               value: '{$PURE.FLASHARRAY.API.TOKEN}'
             - name: url
@@ -5226,6 +5544,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5233,7 +5576,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	certs = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -5241,6 +5585,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5342,6 +5687,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5349,7 +5719,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	drives = [],
                   	hardware = [],
                   	controllers = [],
@@ -5359,6 +5730,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5489,6 +5861,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5496,7 +5893,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	hosts = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -5504,6 +5902,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5615,6 +6014,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5622,7 +6046,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	interfaces = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -5630,6 +6055,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5772,6 +6198,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5779,7 +6230,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	pods = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -5787,6 +6239,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -5919,6 +6372,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -5926,7 +6404,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	support_data = {},
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -5934,6 +6413,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -6038,6 +6518,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   try {
                   	var creds = JSON.parse(value);
                   }
@@ -6045,7 +6550,8 @@ zabbix_export:
                   	throw 'Failed to parse authentication data from input value.';
                   }
                   
-                  var request = new HttpRequest(),
+                  var tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	request = new HttpRequest(tls.options),
                   	volumes = [],
                   	error_msg = '',
                   	url = '{$PURE.FLASHARRAY.API.URL}',
@@ -6053,6 +6559,7 @@ zabbix_export:
                   	http_proxy = '{$PURE.FLASHARRAY.HTTP_PROXY}';
                   
                   function getHttpData(url) {
+                  	tls.checkURL(url);
                   	response = request.get(url);
                   	Zabbix.log(4, '[ Pure Storage API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -8063,6 +8570,22 @@ zabbix_export:
         - tag: target
           value: pure-storage
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v2", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.'
+          config:
+            type: LIST
+            priority: '29'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$PURE.FLASHARRAY.API.TOKEN}'
           type: SECRET_TEXT
           description: 'Pure Storage FlashArray API token.'

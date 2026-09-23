@@ -421,6 +421,28 @@ class testHousekeepingConfSync extends CIntegrationTest {
 					'hk_trends' => '5d'
 				]
 			]],
+			'third update' => [[
+				'update' => [
+					'hk_events_mode' => 1,
+					'hk_events_trigger' => '64d',
+					'hk_events_internal' => '33d',
+					'hk_events_discovery' => '35d',
+					'hk_events_autoreg' => '150d',
+					'hk_events_service' => '220d',
+					'hk_services_mode' => 1,
+					'hk_services' => '230d',
+					'hk_sessions_mode' => 1,
+					'hk_sessions' => '164d',
+					'hk_audit_mode' => 1,
+					'hk_audit' => '52d',
+					'hk_history_mode' => 1,
+					'hk_history_global' => 1,
+					'hk_history' => '0d',
+					'hk_trends_mode' => 1,
+					'hk_trends_global' => 1,
+					'hk_trends' => '0d'
+				]
+			]],
 			'disabled modes' => [[
 				'update' => [
 					'hk_events_mode' => 0,

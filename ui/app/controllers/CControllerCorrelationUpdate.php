@@ -21,6 +21,10 @@ class CControllerCorrelationUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	public static function getValidationRules(): array {
 		$api_uniq = [
 			['correlation.get', ['name' => '{name}'], 'correlationid']
@@ -129,10 +133,6 @@ class CControllerCorrelationUpdate extends CController {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
 	}
 
 	protected function doAction(): void {

@@ -31,7 +31,7 @@ class CUserGroup extends CApiService {
 	protected $sortColumns = ['usrgrpid', 'name'];
 
 	public const OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid',
-		'mfa_status', 'mfaid'
+		'mfa_status', 'mfaid', 'proxy_mode', 'proxy_group_mode'
 	];
 
 	public const LIMITED_OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'mfa_status'];
@@ -98,15 +98,31 @@ class CUserGroup extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// filter
-			'mfaids' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-									['else' => true, 'type' => API_UNEXPECTED]
+			'mfaids' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'filter' =>			['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields($this->tableName, $usrgrps_output_fields)],
-			'search' =>			['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields($this->tableName, $usrgrps_output_fields)],
+			'proxyids' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'proxy_groupids' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'filter' =>				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields($this->tableName, $usrgrps_output_fields)],
+			'search' =>				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields($this->tableName, $usrgrps_output_fields)],
 			// output
-			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', $usrgrps_output_fields), 'default' => API_OUTPUT_EXTEND],
-			'selectUsers' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $user_output_fields), 'default' => null]
+			'output' =>				['type' => API_OUTPUT, 'in' => implode(',', $usrgrps_output_fields), 'default' => API_OUTPUT_EXTEND],
+			'selectUsers' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $user_output_fields), 'default' => null],
+			'selectProxies' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CProxy::OUTPUT_FIELDS), 'default' => null],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'selectProxyGroups' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CProxyGroup::OUTPUT_FIELDS), 'default' => null],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -144,6 +160,18 @@ class CUserGroup extends CApiService {
 
 			$sqlParts['join']['ug'] = ['table' => 'users_groups', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
+		}
+
+		// proxyids
+		if (array_key_exists('proxyids', $options) && $options['proxyids'] !== null) {
+			$sqlParts['join']['up'] = ['table' => 'usrgrp_proxy', 'using' => 'usrgrpid'];
+			$sqlParts['where'][] = dbConditionInt('up.proxyid', $options['proxyids']);
+		}
+
+		// proxy_groupids
+		if (array_key_exists('proxy_groupids', $options) && $options['proxy_groupids'] !== null) {
+			$sqlParts['join']['ugp'] = ['table' => 'usrgrp_proxy_group', 'using' => 'usrgrpid'];
+			$sqlParts['where'][] = dbConditionInt('ugp.proxy_groupid', $options['proxy_groupids']);
 		}
 
 		if (array_key_exists('mfaids', $options) && $options['mfaids'] !== null) {
@@ -235,6 +263,8 @@ class CUserGroup extends CApiService {
 		self::updateRights($usrgrps);
 		self::updateTagFilters($usrgrps);
 		self::updateUsers($usrgrps);
+		self::updateProxies($usrgrps);
+		self::updateProxyGroups($usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
@@ -276,7 +306,15 @@ class CUserGroup extends CApiService {
 			]],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
+			]],
+			'proxies' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxyid']], 'fields' => [
+				'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
+				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_DENY, PROXY_MODE_ALLOW])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_DENY, PROXY_GROUP_MODE_ALLOW])]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -288,6 +326,8 @@ class CUserGroup extends CApiService {
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
+		$this->checkProxies($usrgrps);
+		$this->checkProxyGroups($usrgrps);
 		self::checkUserDirectories($usrgrps);
 		self::checkMfaIds($usrgrps);
 	}
@@ -377,7 +417,15 @@ class CUserGroup extends CApiService {
 			]],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
+			]],
+			'proxies' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxyid']], 'fields' => [
+				'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
+				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_DENY, PROXY_MODE_ALLOW])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_DENY, PROXY_GROUP_MODE_ALLOW])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -409,6 +457,8 @@ class CUserGroup extends CApiService {
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
+		$this->checkProxies($usrgrps);
+		$this->checkProxyGroups($usrgrps);
 		self::checkUserDirectories($usrgrps);
 		self::checkMfaIds($usrgrps, $db_usrgrps);
 	}
@@ -596,6 +646,89 @@ class CUserGroup extends CApiService {
 		}
 	}
 
+	private function checkProxies(array $usrgrps): void {
+		$proxy_indexes = [];
+
+		foreach ($usrgrps as $i1 => $usrgrp) {
+			if (!array_key_exists('proxies', $usrgrp)) {
+				continue;
+			}
+
+			foreach ($usrgrp['proxies'] as $i2 => $proxy) {
+				if (!array_key_exists($proxy['proxyid'], $proxy_indexes)) {
+					$proxy_indexes[$proxy['proxyid']][$i1] = $i2;
+				}
+			}
+		}
+
+		if (!$proxy_indexes) {
+			return;
+		}
+
+		$db_proxies = API::Proxy()->get([
+			'output' => ['proxyid', 'proxy_groupid'],
+			'proxyids' => array_keys($proxy_indexes),
+			'preservekeys' => true
+		]);
+
+		foreach ($proxy_indexes as $proxyid => $indexes) {
+			$i1 = key($indexes);
+			$i2 = reset($indexes);
+
+			if (!array_key_exists($proxyid, $db_proxies)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/proxies/'.($i2 + 1).'/proxyid',
+					_('object does not exist, or you have no permissions to it')
+				));
+			}
+
+			if ($db_proxies[$proxyid]['proxy_groupid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/proxies/'.($i2 + 1).'/proxyid',
+					_('access to this proxy is managed by its proxy group')
+				));
+			}
+		}
+	}
+
+	private function checkProxyGroups(array $usrgrps): void {
+		$proxy_groups_indexes = [];
+
+		foreach ($usrgrps as $i1 => $usrgrp) {
+			if (!array_key_exists('proxy_groups', $usrgrp)) {
+				continue;
+			}
+
+			foreach ($usrgrp['proxy_groups'] as $i2 => $proxy_group) {
+				if (!array_key_exists($proxy_group['proxy_groupid'], $proxy_groups_indexes)) {
+					$proxy_groups_indexes[$proxy_group['proxy_groupid']][$i1] = $i2;
+				}
+			}
+		}
+
+		if (!$proxy_groups_indexes) {
+			return;
+		}
+
+		$db_proxy_groups = API::ProxyGroup()->get([
+			'output' => ['proxy_groupid'],
+			'proxy_groupids' => array_keys($proxy_groups_indexes),
+			'preservekeys' => true
+		]);
+
+		foreach ($proxy_groups_indexes as $proxy_groupid => $indexes) {
+			if (!array_key_exists($proxy_groupid, $db_proxy_groups)) {
+				$i1 = key($indexes);
+				$i2 = reset($indexes);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/proxy_groups/'.($i2 + 1).'/proxy_groupid',
+					_('object does not exist, or you have no permissions to it')
+				));
+			}
+		}
+	}
+
 	/**
 	 * Auxiliary function for checkOneself().
 	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
@@ -694,6 +827,8 @@ class CUserGroup extends CApiService {
 			DB::update('usrgrp', $upd_usrgrps);
 		}
 
+		self::updateProxies($usrgrps, $db_usrgrps);
+		self::updateProxyGroups($usrgrps, $db_usrgrps);
 		self::updateRights($usrgrps, $db_usrgrps);
 		self::updateTagFilters($usrgrps, $db_usrgrps);
 		self::updateUsers($usrgrps, $db_usrgrps);
@@ -1171,6 +1306,121 @@ class CUserGroup extends CApiService {
 		}
 	}
 
+	private static function updateProxies(array &$usrgrps, ?array $db_usrgrps = null): void {
+		$ins_changed_proxies = [];
+		$del_changed_proxies = [];
+
+		foreach ($usrgrps as &$usrgrp) {
+			if (!array_key_exists('proxies', $usrgrp)) {
+				continue;
+			}
+
+			$db_proxies = $db_usrgrps !== null
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'], null, 'proxyid')
+				: [];
+
+			foreach ($usrgrp['proxies'] as &$proxy) {
+				if (array_key_exists($proxy['proxyid'], $db_proxies)) {
+					$proxy['usrgrp_proxyid'] = $db_proxies[$proxy['proxyid']]['usrgrp_proxyid'];
+					unset($db_proxies[$proxy['proxyid']]);
+				}
+				else {
+					$ins_changed_proxies[] = [
+						'usrgrpid' => $usrgrp['usrgrpid'],
+						'proxyid' => $proxy['proxyid']
+					];
+				}
+			}
+			unset($proxy);
+
+			if ($db_proxies) {
+				$del_changed_proxies = array_merge($del_changed_proxies, array_column($db_proxies, 'usrgrp_proxyid'));
+			}
+		}
+		unset($usrgrp);
+
+		if ($del_changed_proxies) {
+			DB::delete('usrgrp_proxy', ['usrgrp_proxyid' => $del_changed_proxies]);
+		}
+
+		if ($ins_changed_proxies) {
+			$groupids = DB::insert('usrgrp_proxy', $ins_changed_proxies);
+		}
+
+		foreach ($usrgrps as &$usrgrp) {
+			if (!array_key_exists('proxies', $usrgrp)) {
+				continue;
+			}
+
+			foreach ($usrgrp['proxies'] as &$proxy) {
+				if (!array_key_exists('usrgrp_proxyid', $proxy)) {
+					$proxy['usrgrp_proxyid'] = array_shift($groupids);
+				}
+			}
+			unset($proxy);
+		}
+		unset($usrgrp);
+	}
+
+	private static function updateProxyGroups(array &$usrgrps, ?array $db_usrgrps = null): void {
+		$ins_changed_proxy_groups = [];
+		$del_changed_proxy_groups = [];
+
+		foreach ($usrgrps as &$usrgrp) {
+			if (!array_key_exists('proxy_groups', $usrgrp)) {
+				continue;
+			}
+
+			$db_proxy_groups = $db_usrgrps !== null
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'], null, 'proxy_groupid')
+				: [];
+
+			foreach ($usrgrp['proxy_groups'] as &$proxy_groups) {
+				if (array_key_exists($proxy_groups['proxy_groupid'], $db_proxy_groups)) {
+					$proxy_groups['usrgrp_proxy_groupid'] =
+						$db_proxy_groups[$proxy_groups['proxy_groupid']]['usrgrp_proxy_groupid'];
+					unset($db_proxy_groups[$proxy_groups['proxy_groupid']]);
+				}
+				else {
+					$ins_changed_proxy_groups[] = [
+						'usrgrpid' => $usrgrp['usrgrpid'],
+						'proxy_groupid' => $proxy_groups['proxy_groupid']
+					];
+				}
+			}
+			unset($proxy_groups);
+
+			if ($db_proxy_groups) {
+				$del_changed_proxy_groups = array_merge(
+					$del_changed_proxy_groups, array_column($db_proxy_groups, 'usrgrp_proxy_groupid')
+				);
+			}
+		}
+		unset($usrgrp);
+
+		if ($del_changed_proxy_groups) {
+			DB::delete('usrgrp_proxy_group', ['usrgrp_proxy_groupid' => $del_changed_proxy_groups]);
+		}
+
+		if ($ins_changed_proxy_groups) {
+			$groupids = DB::insert('usrgrp_proxy_group', $ins_changed_proxy_groups);
+		}
+
+		foreach ($usrgrps as &$usrgrp) {
+			if (!array_key_exists('proxy_groups', $usrgrp)) {
+				continue;
+			}
+
+			foreach ($usrgrp['proxy_groups'] as &$proxy_groups) {
+				if (!array_key_exists('usrgrp_proxy_groupid', $proxy_groups)) {
+					$proxy_groups['usrgrp_proxy_groupid'] = array_shift($groupids);
+				}
+			}
+			unset($proxy_groups);
+		}
+		unset($usrgrp);
+	}
+
 	/**
 	 * @param array $usrgrpids
 	 *
@@ -1361,6 +1611,8 @@ class CUserGroup extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedUsers($options, $result);
+		$this->addRelatedProxies($options, $result);
+		$this->addRelatedProxyGroups($options, $result);
 
 		self::addRelatedHostGroupRights($options, $result);
 		self::addRelatedTemplateGroupRights($options, $result);
@@ -1424,6 +1676,46 @@ class CUserGroup extends CApiService {
 		$result = $relation_map->mapMany($result, $db_users, 'users');
 	}
 
+	private function addRelatedProxies(array $options, array &$result): void {
+		if (!array_key_exists('selectProxies', $options) || $options['selectProxies'] === null) {
+			return;
+		}
+
+		$db_proxies = [];
+		$relation_map = $this->createRelationMap($result, 'usrgrpid', 'proxyid', 'usrgrp_proxy');
+		$related_ids = $relation_map->getRelatedIds();
+
+		if ($related_ids) {
+			$db_proxies = API::Proxy()->get([
+				'output' => $options['selectProxies'],
+				'proxyids' => $related_ids,
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relation_map->mapMany($result, $db_proxies, 'proxies');
+	}
+
+	private function addRelatedProxyGroups(array $options, array &$result): void {
+		if (!array_key_exists('selectProxyGroups', $options) || $options['selectProxyGroups'] === null) {
+			return;
+		}
+
+		$db_proxy_groups = [];
+		$relation_map = $this->createRelationMap($result, 'usrgrpid', 'proxy_groupid', 'usrgrp_proxy_group');
+		$related_ids = $relation_map->getRelatedIds();
+
+		if ($related_ids) {
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => $options['selectProxyGroups'],
+				'proxy_groupids' => $related_ids,
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relation_map->mapMany($result, $db_proxy_groups, 'proxy_groups');
+	}
+
 	private static function addRelatedHostGroupRights(array $options, array &$result): void {
 		if ($options['selectHostGroupRights'] === null || $options['selectHostGroupRights'] === API_OUTPUT_COUNT) {
 			return;
@@ -1485,14 +1777,10 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	/**
-	 * Add the existing rights, tag_filters and userids to $db_usrgrps whether these are affected by the update.
-	 *
-	 * @param array $usrgrps
-	 * @param array $db_usrgrps
-	 */
 	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
-		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => []];
+		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => [],
+			'proxies' => [], 'proxy_groups' => []
+		];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('hostgroup_rights', $usrgrp)) {
@@ -1513,6 +1801,16 @@ class CUserGroup extends CApiService {
 			if (array_key_exists('users', $usrgrp)) {
 				$usrgrpids['users'][] = $usrgrp['usrgrpid'];
 				$db_usrgrps[$usrgrp['usrgrpid']]['users'] = [];
+			}
+
+			if (array_key_exists('proxies', $usrgrp)) {
+				$usrgrpids['proxies'][] = $usrgrp['usrgrpid'];
+				$db_usrgrps[$usrgrp['usrgrpid']]['proxies'] = [];
+			}
+
+			if (array_key_exists('proxy_groups', $usrgrp)) {
+				$usrgrpids['proxy_groups'][] = $usrgrp['usrgrpid'];
+				$db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'] = [];
 			}
 		}
 
@@ -1570,6 +1868,32 @@ class CUserGroup extends CApiService {
 			while ($db_user = DBfetch($db_users)) {
 				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] =
 					array_diff_key($db_user, array_flip(['usrgrpid']));
+			}
+		}
+
+		if ($usrgrpids['proxies']) {
+			$options = [
+				'output' => ['usrgrp_proxyid', 'usrgrpid', 'proxyid'],
+				'filter' => ['usrgrpid' => $usrgrpids['proxies']]
+			];
+			$db_proxies = DBselect(DB::makeSql('usrgrp_proxy', $options));
+
+			while ($db_proxy = DBfetch($db_proxies)) {
+				$db_usrgrps[$db_proxy['usrgrpid']]['proxies'][$db_proxy['usrgrp_proxyid']] =
+					array_diff_key($db_proxy, array_flip(['usrgrpid']));
+			}
+		}
+
+		if ($usrgrpids['proxy_groups']) {
+			$options = [
+				'output' => ['usrgrp_proxy_groupid', 'usrgrpid', 'proxy_groupid'],
+				'filter' => ['usrgrpid' => $usrgrpids['proxy_groups']]
+			];
+			$db_proxy_groups = DBselect(DB::makeSql('usrgrp_proxy_group', $options));
+
+			while ($db_proxy_group = DBfetch($db_proxy_groups)) {
+				$db_usrgrps[$db_proxy_group['usrgrpid']]['proxy_groups'][$db_proxy_group['usrgrp_proxy_groupid']] =
+					array_diff_key($db_proxy_group, array_flip(['usrgrpid']));
 			}
 		}
 	}

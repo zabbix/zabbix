@@ -51,6 +51,7 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware FQDN", e.g. {$HTTP.TLS.VERIFY:"VMware FQDN"}.</p>|`full`|
 |{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 |{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`FALSE`|

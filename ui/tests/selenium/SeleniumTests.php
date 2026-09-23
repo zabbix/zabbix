@@ -231,7 +231,7 @@ require_once __DIR__.'/problems/testPageProblems.php';
 require_once __DIR__.'/proxies/testFormAdministrationProxies.php';
 require_once __DIR__.'/proxies/testPageAdministrationProxies.php';
 
-// Proxy Groups.
+// Proxy groups.
 require_once __DIR__.'/proxyGroups/testFormAdministrationProxyGroups.php';
 require_once __DIR__.'/proxyGroups/testPageAdministrationProxyGroups.php';
 
