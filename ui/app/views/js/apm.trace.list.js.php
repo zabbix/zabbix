@@ -386,7 +386,9 @@
 						row.addEventListener('click', e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
-							if (target.hasAttribute('data-hintbox')) {
+							const selection = window.getSelection();
+
+							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
 								return;
 							}
 

@@ -415,8 +415,12 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', (e) => {
-							if (e.target.hasAttribute('data-hintbox')) {
+						row.addEventListener('click', e => {
+							/** @type {HTMLElement} */
+							const target = e.target;
+							const selection = window.getSelection();
+
+							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
 								return;
 							}
 
