@@ -209,7 +209,7 @@ $html_page = (new CHtmlPage())
 			->setMaxPosition('90%')
 			->setPosition($data['side_drawer_position'])
 	)
-	->setSideDrawer($side_drawer)
+	->setSideDrawer($side_drawer, true)
 	->addItem([$filter, $form]);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

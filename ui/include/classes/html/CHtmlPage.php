@@ -42,6 +42,8 @@ class CHtmlPage {
 	private ?CSplitView $split_view = null;
 	private array $side_drawer = [];
 
+	private bool $side_drawer_closed = false;
+
 	/**
 	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE).
 	 */
@@ -95,8 +97,10 @@ class CHtmlPage {
 		return $this;
 	}
 
-	public function setSideDrawer($items): self {
+	public function setSideDrawer($items, bool $closed = false): self {
 		$this->side_drawer[] = $items;
+
+		$this->side_drawer_closed = $closed;
 
 		return $this;
 	}
@@ -161,7 +165,9 @@ class CHtmlPage {
 						->addClass($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE ? ZBX_STYLE_LAYOUT_KIOSKMODE : null)
 				)
 				->addItem(
-					(new CSplitViewPane($this->side_drawer))->addClass('side-drawer')
+					(new CSplitViewPane($this->side_drawer))
+						->addClass('side-drawer')
+						->addClass($this->side_drawer_closed ? 'closed' : null)
 				)
 			: (new CDiv())
 				->addClass(ZBX_STYLE_LAYOUT_WRAPPER)

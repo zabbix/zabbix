@@ -85,6 +85,15 @@
 				[APM_METRIC_FLAG_NO_RECORDED_VALUE]: <?= json_encode(_('No recorded value')) ?>
 			};
 
+			this.#side_drawer = new CSideDrawer({
+				position: this.#side_drawer_position,
+				position_min: '10%',
+				position_max: '90%'
+			});
+			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
+			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
+			this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));
+
 			this.#validateFormChanges();
 
 			this.#initEvents(filter_options);
@@ -515,20 +524,6 @@
 		}
 
 		#openSideDrawer(data) {
-			if (this.#side_drawer === null) {
-				const container = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
-
-				this.#side_drawer = new CSideDrawer(container, {
-					content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER,
-					position: this.#side_drawer_position,
-					position_min: '10%',
-					position_max: '90%'
-				});
-				this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
-				this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
-				this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));
-			}
-
 			this.#side_drawer.open(Promise.resolve(data));
 		}
 

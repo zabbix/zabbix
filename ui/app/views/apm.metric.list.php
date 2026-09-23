@@ -146,7 +146,8 @@ $html_page = (new CHtmlPage())
 			->setMaxPosition('90%')
 			->setPosition($data['side_drawer_position'])
 	)
-	->addItem([$filter, $form]);
+	->addItem([$filter, $form])
+	->setSideDrawer('', true);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
