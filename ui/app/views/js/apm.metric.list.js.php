@@ -533,9 +533,18 @@
 		}
 
 		#onSideDrawerOpen = e => {
-			const element = this.#side_drawer.getElement();
+			if (this.#details_panel !== null) {
+				this.#details_panel.destroy();
+				this.#details_panel = null;
+			}
 
-			this.#details_panel = new CDetailsPanel(element, this.#prepareDetailsData(e.detail.response));
+			this.#details_panel = new CDetailsPanel(this.#side_drawer.getElement(),
+				this.#prepareDetailsData(e.detail.response)
+			);
+
+			this.#details_panel.get().addEventListener('close', () => {
+				this.#side_drawer.close();
+			});
 
 			this.#unscheduleRefresh();
 		}
@@ -547,6 +556,8 @@
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 			this.#selected_row_hash = null;
+
+			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
 			this.#scheduleRefresh();

@@ -24,11 +24,13 @@ class CDetailsPanel {
 	/** @type {object} */
 	#data;
 
-	constructor(element, data) {
+	constructor(container, data) {
 		this.#data = this.#normalizeData(data);
 
-		this.#element = element;
+		this.#element = document.createElement('div');
 		this.#element.className = 'details-panel';
+
+		container.append(this.#element);
 
 		this.#groups = document.createElement('div');
 		this.#groups.className = 'details-panel-groups';
@@ -198,6 +200,10 @@ class CDetailsPanel {
 			bubbles: true,
 			detail
 		}));
+	}
+
+	get() {
+		return this.#element;
 	}
 
 	destroy() {

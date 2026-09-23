@@ -51,6 +51,8 @@
 		#rows_data = new Map();
 		/** @type {string|null} */
 		#selected_row_hash = null;
+		/** @type {CDetailsPanel|null} */
+		#details_panel = null;
 
 		init({
 			csrf_token,
@@ -468,9 +470,18 @@
 		}
 
 		#onSideDrawerOpen = e => {
-			new CDetailsPanel(this.#side_drawer.getElement(), {
+			if (this.#details_panel !== null) {
+				this.#details_panel.destroy();
+				this.#details_panel = null;
+			}
+
+			this.#details_panel = new CDetailsPanel(this.#side_drawer.getElement(), {
 				title: <?= json_encode(_('Log details')) ?>,
 				groups: this.#createDetailGroups(e.detail.response)
+			});
+
+			this.#details_panel.get().addEventListener('close', () => {
+				this.#side_drawer.close();
 			});
 
 			this.#unscheduleRefresh();
@@ -478,6 +489,9 @@
 
 		#onSideDrawerClose = () => {
 			this.#selected_row_hash = null;
+
+			this.#details_panel?.destroy();
+			this.#details_panel = null;
 
 			const datatable_element = this.#datatable.getElement();
 
