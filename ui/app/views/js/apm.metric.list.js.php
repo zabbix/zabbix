@@ -46,7 +46,6 @@
 		#selected_row_hash = null;
 		#metric_types = null;
 		#aggregation_temporality_labels = null;
-		#flags_labels = null;
 
 		init({
 			csrf_token,
@@ -78,11 +77,6 @@
 				[APM_METRIC_AGGREGATION_TEMPORALITY_UNSPECIFIED]: <?= json_encode(_('Unspecified')) ?>,
 				[APM_METRIC_AGGREGATION_TEMPORALITY_DELTA]: <?= json_encode(_('Delta')) ?>,
 				[APM_METRIC_AGGREGATION_TEMPORALITY_CUMULATIVE]: <?= json_encode(_('Cumulative')) ?>
-			};
-
-			this.#flags_labels = {
-				[APM_METRIC_FLAG_NONE]: <?= json_encode(_('None')) ?>,
-				[APM_METRIC_FLAG_NO_RECORDED_VALUE]: <?= json_encode(_('No recorded value')) ?>
 			};
 
 			this.#side_drawer = new CSideDrawer();
@@ -332,9 +326,7 @@
 				})
 				.setCellRenderer('flags', ({cell, cell_data}) => {
 					const [flags] = cell_data;
-					const value = flags & 1 !== 0
-						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
-						: this.#flags_labels[APM_METRIC_FLAG_NONE];
+					const value = this.#decodeFlags(flags);
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
@@ -704,6 +696,16 @@
 			return groups;
 		}
 
+		#decodeFlags(flags) {
+			const flags_decoded = [];
+
+			if ((flags & 1) === 1) {
+				flags_decoded.push(<?= json_encode(_('No recorded value')) ?>);
+			}
+
+			return flags_decoded.join(', ');
+		}
+
 		#prepareDetailsData(data) {
 			const type = data.type;
 
@@ -722,9 +724,7 @@
 				},
 				{
 					name: <?= json_encode(_('Flags')) ?>,
-					value: data.flags & 1 !== 0
-						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
-						: this.#flags_labels[APM_METRIC_FLAG_NONE]
+					value: this.#decodeFlags(data.flags)
 				}
 			];
 
