@@ -2593,16 +2593,6 @@ class CDataTable {
 		this.#options_popup?.resize();
 	}
 
-	bindWrapperEvents() {
-		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
-		wrapper?.addEventListener('scroll', this.onWrapperScroll);
-	}
-
-	unbindWrapperEvents() {
-		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
-		wrapper?.removeEventListener('scroll', this.onWrapperScroll);
-	}
-
 	#bindEvents() {
 		for (const [name, callback] of Object.entries(this.#events)) {
 			this.on(name, callback);
@@ -2614,7 +2604,7 @@ class CDataTable {
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
 
-		this.bindWrapperEvents();
+		this.#bindWrapperEvents();
 
 		if (this.#tabfilter_item._parent) {
 			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
@@ -2633,6 +2623,11 @@ class CDataTable {
 		this.#resize_observer.observe(this.#element);
 	}
 
+	#bindWrapperEvents() {
+		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+		wrapper?.addEventListener('scroll', this.onWrapperScroll);
+	}
+
 	#unbindEvents() {
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
@@ -2647,7 +2642,7 @@ class CDataTable {
 				.off(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
 
-		this.unbindWrapperEvents();
+		this.#unbindWrapperEvents();
 
 		if (this.#tabfilter_item._parent) {
 			this.#tabfilter_item._parent.off(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
@@ -2664,6 +2659,11 @@ class CDataTable {
 
 		this.#resize_observer?.disconnect();
 		this.#resize_observer = null;
+	}
+
+	#unbindWrapperEvents() {
+		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+		wrapper?.removeEventListener('scroll', this.onWrapperScroll);
 	}
 
 	onTabfilterNewItem = e => {

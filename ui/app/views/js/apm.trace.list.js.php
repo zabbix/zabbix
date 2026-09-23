@@ -455,15 +455,16 @@
 			element.innerHTML = trace_view;
 
 			this.#bindSideDrawerEvents();
-			this.#datatable.unbindWrapperEvents();
 
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
 			this.#trace_view_page?.destroy();
-			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
 
-			this.#datatable.bindWrapperEvents();
+			const trace_view_element = element.querySelector('.trace-view');
+			if (trace_view_element !== null) {
+				this.#trace_view_page = new TraceViewPage(trace_view_element, trace_view_data);
+			}
 
 			this.#unscheduleRefresh();
 		}
@@ -489,8 +490,6 @@
 		}
 
 		#onSideDrawerBeforeClose = () => {
-			this.#datatable.unbindWrapperEvents();
-
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
@@ -502,7 +501,6 @@
 			const datatable_element = this.#datatable.getElement();
 
 			this.#unbindSideDrawerEvents();
-			this.#datatable.bindWrapperEvents();
 
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);

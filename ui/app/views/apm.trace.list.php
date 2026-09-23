@@ -140,60 +140,7 @@ $form = (new CForm())
 
 $side_drawer = (new CDiv())
 	->setId('trace_view')
-	->addClass('trace-view')
-	->addItem(
-		(new CDiv())
-			->addClass('trace-view-header')
-			->addItem([
-				(new CDiv())->setAttribute('data-trace-id', ''),
-				(new CButtonIcon(ZBX_ICON_CLOSE))
-					->addClass('trace-view-close-button')
-					->addClass('js-close-button')
-			])
-	)
-	->addItem(
-		(new CTag('z-timeline-range-slider', true))
-			->addClass('trace-timeline')
-			->setAttribute('data-trace-timeline', '')
-			->setAttribute('scale', '')
-			->addItem(
-				(new CSvg())
-					->addClass('trace-overview')
-					->setAttribute('data-trace-overview', '')
-			)
-	)
-	->addItem(
-		(new CSplitView())
-			->setMinPosition('10%')
-			->setMaxPosition('90%')
-			->setPosition('294px')
-			->addClass('trace-scroll')
-			->setAttribute('data-trace-scroll', '')
-			->addItem(
-				(new CSplitViewPane())
-					->addClass('trace-tree')
-					->addItem([
-						(new CDiv('Span tree'))->addClass('trace-tree-header'),
-						(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
-					])
-			)
-			->addItem(
-				(new CSplitViewPane())
-					->addClass('trace-body')
-					->addItem([
-						(new CDiv())
-							->addClass('trace-time')
-							->addItem([
-								(new CDiv())->addClass('trace-time-header')
-									->setAttribute('data-trace-time-header', ''),
-								(new CDiv())
-									->addClass('trace-waterfall')
-									->setAttribute('data-trace-waterfall', '')
-							]),
-						(new CDiv())->addClass('trace-details')->setAttribute('data-trace-details', '')
-					])
-			)
-	);
+	->addClass('trace-view');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Traces'))
@@ -207,7 +154,8 @@ $html_page = (new CHtmlPage())
 		(new CSplitView())
 			->setMinPosition('10%')
 			->setMaxPosition('90%')
-			->setPosition($data['side_drawer_position'])
+			->setFixed(CSplitView::PANE_FIXED_START)
+			->setFixedSize($data['side_drawer_position'])
 	)
 	->setSideDrawer($side_drawer, true)
 	->addItem([$filter, $form]);
