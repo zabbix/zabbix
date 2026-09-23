@@ -151,6 +151,12 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	)
+	->setSplitView(
+		(new CSplitView())
+			->setAttribute('min', '10%')
+			->setAttribute('max', '90%')
+			->setAttribute('position', $data['side_drawer_position'])
+	)
 	->addItem([$filter, $form]);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

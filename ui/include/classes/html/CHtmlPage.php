@@ -39,6 +39,7 @@ class CHtmlPage {
 	 */
 	private ?CList $navigation = null;
 
+	private ?CSplitView $split_view = null;
 	private array $side_drawer = [];
 
 	/**
@@ -84,6 +85,12 @@ class CHtmlPage {
 
 	public function setNavigation(?CList $navigation): self {
 		$this->navigation = $navigation;
+
+		return $this;
+	}
+
+	public function setSplitView(?CSplitView $split_view): self {
+		$this->split_view = $split_view;
 
 		return $this;
 	}
@@ -147,7 +154,7 @@ class CHtmlPage {
 		];
 
 		$output[] = $this->side_drawer
-			? (new CSplitView())
+			? ($this->split_view ?: new CSplitView())
 				->addItem(
 					(new CSplitViewPane($content))
 						->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
