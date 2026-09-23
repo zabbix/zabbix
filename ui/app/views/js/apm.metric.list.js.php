@@ -170,68 +170,68 @@
 				.setColumns([
 					new CDataTableColumn('metric_name', <?= json_encode(_('Metric name')); ?>)
 						.setFields(['metric_name'])
-						.setRenderer(['text_field'])
+						.setRenderer('text_field')
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type'])
 						.setSortable(true)
-						.setRenderer(['type'])
+						.setRenderer('type')
 						.setWidth('auto'),
 					new CDataTableColumn('metric_unit', <?= json_encode(_('Unit')); ?>)
 						.setFields(['metric_unit'])
 						.setSortable(true)
-						.setRenderer(['text_field'])
+						.setRenderer('text_field')
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name'])
 						.setSortable(true)
-						.setRenderer(['text_field'])
+						.setRenderer('text_field')
 						.setWidth('auto'),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
 						.setFields(['scope_name'])
 						.setSortable(true)
-						.setRenderer(['text_field'])
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time_formatted', <?= json_encode(_('Start time')); ?>)
 						.setFields(['start_time_formatted'])
 						.setSortable(true)
-						.setRenderer(['time_formatted'])
+						.setRenderer('time_formatted')
 						.setWidth('auto'),
 					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
 						.setFields(['value'])
-						.setRenderer(['value'])
+						.setRenderer('value')
 						.setWidth('auto'),
 					new CDataTableColumn('count', <?= json_encode(_('Count')); ?>)
 						.setFields(['count'])
-						.setRenderer(['count'])
+						.setRenderer('count')
 						.setWidth('auto'),
 				new CDataTableColumn('time_formatted', <?= json_encode(_('Time')); ?>)
 						.setFields(['time_formatted'])
 						.setSortable(true)
 						.setVisible(false)
-						.setRenderer(['time_formatted'])
+						.setRenderer('time_formatted')
 						.setWidth('auto'),
 					new CDataTableColumn('flags', <?= json_encode(_('Flags')); ?>)
 						.setFields(['flags'])
 						.setVisible(false)
-						.setRenderer(['flags'])
+						.setRenderer('flags')
 						.setWidth('auto'),
 					new CDataTableColumn('aggregation_temporality', <?= json_encode(_('Aggregation temporality')); ?>)
 						.setFields(['aggregation_temporality'])
 						.setVisible(false)
-						.setRenderer(['aggregation_temporality'])
+						.setRenderer('aggregation_temporality')
 						.setWidth('auto'),
 					new CDataTableColumn('metric_description', <?= json_encode(_('Metric description')); ?>)
 						.setFields(['metric_description'])
 						.setVisible(false)
-						.setRenderer(['metric_description'])
+						.setRenderer('metric_description')
 						.setWidth('auto'),
 					new CDataTableColumn('attributes', <?= json_encode(_('Attributes')); ?>)
 						.setFields(['attributes'])
 						.setVisible(false)
-						.setRenderer(['attributes'])
+						.setRenderer('attributes')
 						.setColumnOptions({
 							number_of_attributes: 3
 						})
@@ -239,7 +239,7 @@
 					new CDataTableColumn('resource_attributes', <?= json_encode(_('Resource attributes')); ?>)
 						.setFields(['resource_attributes'])
 						.setVisible(false)
-						.setRenderer(['attributes'])
+						.setRenderer('attributes')
 						.setColumnOptions({
 							number_of_attributes: 3
 						})
@@ -247,7 +247,7 @@
 					new CDataTableColumn('scope_attributes', <?= json_encode(_('Scope attributes')); ?>)
 						.setFields(['scope_attributes'])
 						.setVisible(false)
-						.setRenderer(['attributes'])
+						.setRenderer('attributes')
 						.setColumnOptions({
 							number_of_attributes: 3
 						})
