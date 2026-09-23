@@ -460,6 +460,9 @@
 			this.#bindSideDrawerEvents();
 			this.#datatable.unbindWrapperEvents();
 
+			this.#details_panel?.destroy();
+			this.#details_panel = null;
+
 			this.#trace_view_page?.destroy();
 			this.#trace_view_page = new TraceViewPage(element, trace_view_data);
 
