@@ -407,7 +407,7 @@ static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* bridge adapter config */
-static int	config_enable_mobile_devices		= 0;
+static int	config_enable_mobile_devices		= 1;
 static char	*config_bridge_adapter_url = NULL;
 static char	*config_bridge_adapter_connect_to = NULL;
 static char	*config_bridge_adapter_curl_connect_to = NULL;
