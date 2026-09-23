@@ -1823,11 +1823,12 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
-				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
+				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null,i.query,i.time_shift,"
+				"i.lookback_limit,i.granularity"
 			" from items i"
 			" left join item_rtdata ir on i.itemid=ir.itemid");
 
-	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 54, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -4294,12 +4295,13 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"pr.lastaccess,p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
 				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
 				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
-				"p.proxy_groupid,p.local_address,p.local_port,p.timeout_browser"
+				"p.proxy_groupid,p.local_address,p.local_port,p.timeout_browser,"
+				"p.timeout_telemetry_query"
 			" from proxy p"
 			" left join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 27, NULL);
+	dbsync_prepare(sync, 28, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

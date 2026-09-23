@@ -71,6 +71,15 @@ typedef struct
 }
 zbx_cfg_custom_parameter_parser_t;
 
+typedef struct
+{
+	char	*name;
+	char	*value;
+}
+zbx_config_option_t;
+
+ZBX_VECTOR_DECL(config_option, zbx_config_option_t)
+
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 void	zbx_cfg_set_process_num(int num);
 
@@ -89,5 +98,13 @@ typedef int	(*add_serveractive_host_f)(const zbx_vector_addr_ptr_t *addrs, zbx_v
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
 		add_serveractive_host_f add_serveractive_host_cb, zbx_vector_str_t *hostnames, void *data,
 		char **error);
+
+zbx_config_option_t	zbx_config_option_str(const char *name, const char *value);
+zbx_config_option_t	zbx_config_option_int(const char *name, int value);
+const char		*zbx_config_option_value(const zbx_config_option_t *options, int options_num, const char *name);
+
+ssize_t	zbx_config_option_parse_param(const char *text);
+int	zbx_config_option_parse_options(const char *text, zbx_vector_config_option_t *options, char **error);
+void	zbx_config_option_clear_options(zbx_config_option_t *options, int options_num);
 
 #endif

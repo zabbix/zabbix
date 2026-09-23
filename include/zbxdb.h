@@ -220,6 +220,16 @@ typedef enum
 }
 zbx_db_ext_err_code_t;
 
+/*****************************************************************************
+*                                                                            *
+* Version format for PostgreSQL, MySQL and MariaDB: MMmmuu                   *
+*          M = major version part                                            *
+*          m = minor version part                                            *
+*          u = patch version part                                            *
+*                                                                            *
+* Example: if the original DB version was 1.2.34 then 10234 is set           *
+*                                                                            *
+******************************************************************************/
 struct zbx_db_version_info_t
 {
 	/* information about database server */
@@ -260,6 +270,10 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+
+#if defined(HAVE_MYSQL)
+	int			mariadb_fork;
+#endif
 };
 
 typedef enum
@@ -276,13 +290,13 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
-#elif defined(HAVE_MYSQL)
-int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
 void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info);
+
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DB_TIMESTAMP()	"unix_timestamp()"
@@ -326,6 +340,7 @@ void	zbx_init_library_db(zbx_db_config_t *config);
 void	zbx_deinit_library_db(zbx_db_config_t *config);
 
 zbx_dbconn_t	*zbx_dbconn_create(void);
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config);
 void	zbx_dbconn_free(zbx_dbconn_t *db);
 
 int	zbx_dbconn_set_connect_options(zbx_dbconn_t *db, int options);

@@ -1081,6 +1081,38 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 	return p;
 }
 
+const char	*zbx_json_pair_next_dyn(const struct zbx_json_parse *jp, const char *p, char **name, size_t *name_alloc)
+{
+	size_t	len;
+
+	if (NULL == (p = zbx_json_next(jp, p)))
+		return NULL;
+
+	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
+		return NULL;
+
+	if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
+		return NULL;
+
+	if (*name_alloc <= len)
+	{
+		*name_alloc = len + 1;
+		*name = (char *)zbx_realloc(*name, *name_alloc);
+	}
+
+	if (NULL == (p = json_copy_string(p, *name, *name_alloc)))
+		return NULL;
+
+	SKIP_WHITESPACE(p);
+
+	if (':' != *p++)
+		return NULL;
+
+	SKIP_WHITESPACE(p);
+
+	return p;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: find pair by name and return pointer to value                     *

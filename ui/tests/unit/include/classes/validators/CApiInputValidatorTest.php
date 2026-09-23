@@ -1813,6 +1813,18 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/output/2": a floating point value is expected.'
 			],
 			[
+				['type' => API_FLOATS, 'in' => '1.5:3.0'],
+				[1.5, 2.7],
+				'/output',
+				[1.5, 2.7]
+			],
+			[
+				['type' => API_FLOATS, 'in' => '1.5:3.0'],
+				[1.5, '2.7', 3.1],
+				'/output',
+				'Invalid parameter "/output/3": value must be within the range of 1.5-3.0.'
+			],
+			[
 				['type' => API_ID],
 				0,
 				'/1/id',

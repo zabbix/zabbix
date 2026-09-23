@@ -371,6 +371,17 @@ $timeouts_tab = (new CFormGrid())
 				->setReadonly($custom_timeouts_disabled)
 				->setAriaRequired()
 		)
+	])
+	->addItem([
+		(new CLabel(_('Telemetry query'), 'timeout_telemetry_query'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_telemetry_query', $data['form']['timeout_telemetry_query'], false,
+				DB::getFieldLength('proxy', 'timeout_telemetry_query')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setReadonly($custom_timeouts_disabled)
+				->setAriaRequired()
+		)
 	]);
 
 $tabs = (new CTabView(['id' => 'proxy-tabs']))

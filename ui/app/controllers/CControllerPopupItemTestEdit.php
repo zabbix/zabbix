@@ -42,7 +42,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
 			'itemid'				=> 'db items.itemid',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY, ITEM_TYPE_NESTED]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
@@ -73,6 +73,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'valuemapid'			=> 'int32',
+			'signal_type'			=> 'int32',
+			'metric_point_type'		=> 'int32',
+			'columns'				=> 'array',
+			'aggregated_columns'	=> 'array',
+			'conditions'			=> 'array',
+			'evaltype'				=> 'int32',
+			'formula'				=> 'string',
+			'time_shift'			=> 'string',
+			'lookback_limit'		=> 'string',
+			'granularity'			=> 'string',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1'
 		];
@@ -106,7 +116,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 			]],
 			'key' => ['db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []], 'when' => [
 				['type', 'in' => self::$item_types_has_key_mandatory]
@@ -114,6 +124,88 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'params_f' => ['db items.params', 'required', 'not_empty',
 				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
+			],
+			'signal_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'metric_point_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
+				],
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
+					['signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]]
+				]
+			],
+			'columns' => ['objects', 'required', 'uniq' => ['column', 'attribute_key'],
+				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
+				'fields' => [
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'aggregated_columns' => ['objects', 'required', 'not_empty', 'uniq' => ['alias'],
+				'messages' => [
+					'required' => _('At least one aggregated column must be specified.'),
+					'not_empty' => _('At least one aggregated column must be specified.'),
+					'uniq' => _('Alias is not unique.')
+				],
+				'fields' => [
+					'function' => ['integer', 'required',
+						'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+							AGGREGATE_PERCENTILE
+						]
+					],
+					'column' => CTelemetryHelper::getColumnValidationRules(
+						CTelemetryHelper::SECTION_AGGREGATED_COLUMNS
+					),
+					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
+					],
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
+				'fields' => [
+					'formulaid' => ['string', 'required', 'not_empty'],
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					],
+					'operator' => [
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
+							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						],
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+								CONDITION_OPERATOR_NOT_LIKE
+							],
+							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						]
+					],
+					'value' => [
+						['string', 'required', 'length' => 255,
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
+						],
+						['string', 'required', 'length' => 255, 'not_empty',
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+						]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules($allow_lld_macro)
 		]];
@@ -131,6 +223,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
+
+				return false;
+			}
+		}
+
+		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
+			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+
+			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
+				error($error);
 
 				return false;
 			}

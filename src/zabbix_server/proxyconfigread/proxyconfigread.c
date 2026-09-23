@@ -463,6 +463,10 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 				{
 					timeout_value = timeouts.browser;
 				}
+				else if (0 == strcmp(item_type, "telemetry_query"))
+				{
+					timeout_value = timeouts.telemetry;
+				}
 				else
 				{
 					*error = zbx_dsprintf(*error, "unknown item type timeout field \"%s\"",
