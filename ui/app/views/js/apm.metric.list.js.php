@@ -320,12 +320,14 @@
 					cell.appendChild(this.#prepareTextCell(value));
 				})
 				.setCellRenderer('aggregation_temporality', ({cell, cell_data}) => {
-					const value = this.#aggregation_temporality_labels[cell_data];
+					const [aggregation_temporality] = cell_data;
+					const value = this.#aggregation_temporality_labels[aggregation_temporality];
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
 				.setCellRenderer('flags', ({cell, cell_data}) => {
-					const value = cell_data & 1 !== 0
+					const [flags] = cell_data;
+					const value = flags & 1 !== 0
 						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
 						: this.#flags_labels[APM_METRIC_FLAG_NONE];
 
