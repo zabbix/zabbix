@@ -100,7 +100,7 @@ class ApmDbClickHouse {
 				}
 
 				if ($http_error) {
-					throw new DBException(_('Database error occurred. '), DB::DBEXECUTE_ERROR);
+					throw new DBException(_('Database error occurred.'), DB::DBEXECUTE_ERROR);
 				}
 
 				if ($http_response_validated) {
