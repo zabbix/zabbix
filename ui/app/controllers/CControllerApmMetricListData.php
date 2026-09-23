@@ -18,8 +18,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
 		'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description',
-		'metric_unit', 'attributes', 'value', 'flags', 'exemplars', 'aggregation_temporality', 'count', 'sum', 'min',
-		'max', 'histogram_buckets', 'start_time_formatted', 'start_time_ns_formatted', 'time_formatted',
+		'metric_unit', 'attributes', 'value', 'flags', 'exemplars', 'aggregation_temporality','is_monotonic', 'count',
+		'sum', 'min', 'max', 'histogram_buckets', 'start_time_formatted', 'start_time_ns_formatted', 'time_formatted',
 		'time_ns_formatted'
 	];
 
@@ -156,7 +156,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		$data_fields = $this->getDataFields(['type', 'resource_attributes', 'resource_schema_url', 'scope_name',
 			'scope_version', 'scope_attributes', 'scope_schema_url', 'service_name', 'metric_name',
 			'metric_description', 'metric_unit', 'attributes', 'value', 'flags', 'exemplars', 'aggregation_temporality',
-			'count', 'sum', 'min', 'max', 'histogram_buckets', 'start_time_ns_formatted', 'time_ns_formatted'
+			'is_monotonic', 'count', 'sum', 'min', 'max', 'histogram_buckets', 'start_time_ns_formatted',
+			'time_ns_formatted'
 		]);
 
 		$result = [
