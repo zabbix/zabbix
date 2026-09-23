@@ -60,9 +60,12 @@ class CControllerApmDbTest extends CController {
 		$output = [];
 
 		try {
-			if (!array_key_exists('password', $apm)) {
-				$apm_global_db = CSettingsHelper::getApmGlobalDb();
+			$apm_global_db = CSettingsHelper::getApmGlobalDb();
 
+			if ($apm_global_db['url'] !== '' && $apm['url'] !== $apm_global_db['url']) {
+				$apm['password'] = '';
+			}
+			else if (!array_key_exists('password', $apm)) {
 				$apm['password'] = $apm_global_db['password'];
 			}
 
