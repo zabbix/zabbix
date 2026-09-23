@@ -35,6 +35,9 @@ class CSideDrawer {
 	/** @type {HTMLElement} */
 	#original_container_element;
 
+	/** @type {AbortController|null} */
+	#abort_controller = null;
+
 	constructor(container, {
 		split_view_class = 'split-view',
 		content_pane_class = 'content',
@@ -88,7 +91,10 @@ class CSideDrawer {
 	/**
 	 * @returns {Promise<any>}
 	 */
-	open(promise_open) {
+	open(promise_open, abort_controller = null) {
+		this.#abort_controller?.abort();
+		this.#abort_controller = abort_controller;
+
 		this.#mount();
 
 		this.#drawer_element.classList.add(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
@@ -103,12 +109,22 @@ class CSideDrawer {
 
 				this.dispatchEvent(CSideDrawer.EVENT_OPEN, {response});
 			})
-			.catch(error => this.#handleError({title: error.name, messages: [error.message]}))
+			.catch(error => {
+				if ((abort_controller?.signal.aborted ?? false) || error.name === 'TypeError') {
+					return;
+				}
+
+				this.#handleError({title: error.name, messages: [error.message]});
+			})
 			.finally(() => {
 				this.#bindEvents();
 
 				this.#drawer_element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
-			});
+
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
+		});
 	}
 
 	/**

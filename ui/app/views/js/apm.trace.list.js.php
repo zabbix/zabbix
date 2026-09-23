@@ -435,33 +435,19 @@
 				this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));
 			}
 
-			const side_drawer_abort_controller = new AbortController();
-
 			this.#side_drawer_abort_controller?.abort();
-			this.#side_drawer_abort_controller = side_drawer_abort_controller;
+			this.#side_drawer_abort_controller = new AbortController();
 
-			this.#side_drawer
-				.open(
-					fetch(zabbixUrl({action: 'apm.trace.list.split.view'}), {
-						method: 'POST',
-						headers: {'Content-Type': 'application/json'},
-						body: JSON.stringify({traceid}),
-						signal: this.#side_drawer_abort_controller.signal
-					})
-						.then(response => response.json())
-				)
-				.catch(error => {
-					if (this.#side_drawer_abort_controller.signal.aborted || error.name === 'TypeError') {
-						return;
-					}
-
-					throw error;
+			this.#side_drawer.open(
+				fetch(zabbixUrl({action: 'apm.trace.list.split.view'}), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({traceid}),
+					signal: this.#side_drawer_abort_controller.signal
 				})
-				.finally(() => {
-					if (this.#side_drawer_abort_controller === side_drawer_abort_controller) {
-						this.#side_drawer_abort_controller = null;
-					}
-				});
+					.then(response => response.json()),
+				this.#side_drawer_abort_controller
+			);
 		}
 
 		#onSideDrawerOpen = e => {
