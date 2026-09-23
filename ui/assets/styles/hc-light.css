@@ -3182,6 +3182,9 @@ button {
 
 .filter-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 10px 0;
   margin-bottom: 8px;
   background-color: #ffffff;
