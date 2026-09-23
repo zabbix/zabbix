@@ -35,6 +35,9 @@ class CSideDrawer {
 	/** @type {HTMLElement} */
 	#original_container_element;
 
+	/** @type {number} */
+	#scroll_top = 0;
+
 	/** @type {AbortController|null} */
 	#abort_controller = null;
 
@@ -48,6 +51,7 @@ class CSideDrawer {
 	} = {}) {
 		this.#target_container_element = container;
 		this.#original_container_element = container.cloneNode();
+		this.#scroll_top = container.scrollTop;
 
 		this.#split_view_element = document.querySelector(`z-split-view.${split_view_class}`);
 		if (this.#split_view_element === null) {
@@ -167,6 +171,8 @@ class CSideDrawer {
 		this.#content_pane_element.append(...this.#target_container_element.childNodes);
 
 		this.#target_container_element.replaceWith(this.#split_view_element);
+
+		this.#content_pane_element.scrollTo({top: this.#scroll_top});
 	}
 
 	#unmount() {
