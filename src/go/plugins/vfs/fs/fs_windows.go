@@ -211,18 +211,18 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 	return data, nil
 }
 
-func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
+func (p *Plugin) getFsInfoShort(mountpoint string) ([]*FsInfoNew, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
 	}
 
-	data = make([]*FsInfoNew, 0)
+	data := make([]*FsInfoNew, 0)
 	for _, path := range paths {
 		if !matchMountpoint(path, mountpoint) {
 			continue
 		}
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
+		if fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path); fsErr == nil {
 			data = append(data, &FsInfoNew{
 				FsName:     &fsname,
 				FsType:     &fstype,
@@ -230,19 +230,22 @@ func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, err error
 				DriveLabel: &drivelabel,
 			})
 		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
 		}
 	}
-	return
+
+	return data, nil
 }
 
-func (p *Plugin) getMountedFilesystems() (data []*FsInfo, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
+func (p *Plugin) getMountedFilesystems() ([]*FsInfo, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
 	}
+
+	data := make([]*FsInfo, 0, len(paths))
 	for _, path := range paths {
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
+		if fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path); fsErr == nil {
 			data = append(data, &FsInfo{
 				FsName:     &fsname,
 				FsType:     &fstype,
@@ -250,10 +253,11 @@ func (p *Plugin) getMountedFilesystems() (data []*FsInfo, err error) {
 				DriveLabel: &drivelabel,
 			})
 		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
 		}
 	}
-	return
+
+	return data, nil
 }
 
 func getFsInode(string) (*FsStats, error) {
