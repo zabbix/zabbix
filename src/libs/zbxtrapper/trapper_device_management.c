@@ -375,13 +375,13 @@ static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_
 		switch (error)
 		{
 			case ZBX_DEVICE_BA_ERR_NOT_CONFIGURED:
-				return "Cannot initialize mobile device, bridge-adapter is not configured.";
+				return "Cannot add device: bridge adapter is not configured.";
 			case ZBX_DEVICE_BA_ERR_CONNECT:
-				return "Cannot initialize mobile device, cannot connect to bridge-adapter.";
+				return "Cannot add device: cannot connect to bridge adapter.";
 			case ZBX_DEVICE_BA_ERR_INVALID_RESPONSE:
-				return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
+				return "Cannot add device: bridge adapter returned an invalid response.";
 			case ZBX_DEVICE_BA_ERR_RETURNED_ERROR:
-				return "Cannot initialize mobile device, bridge-adapter returned an error.";
+				return "Cannot add device: bridge adapter returned an error.";
 		}
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_OFFBOARD))
@@ -389,20 +389,20 @@ static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_
 		switch (error)
 		{
 			case ZBX_DEVICE_BA_ERR_NOT_CONFIGURED:
-				return "Cannot remove mobile device, bridge-adapter is not configured.";
+				return "Cannot remove device: bridge adapter is not configured.";
 			case ZBX_DEVICE_BA_ERR_CONNECT:
-				return "Cannot remove mobile device, cannot connect to bridge-adapter.";
+				return "Cannot remove device: cannot connect to bridge adapter.";
 			case ZBX_DEVICE_BA_ERR_INVALID_RESPONSE:
-				return "Cannot remove mobile device, bridge-adapter returned an invalid response.";
+				return "Cannot remove device: bridge adapter returned an invalid response.";
 			case ZBX_DEVICE_BA_ERR_RETURNED_ERROR:
-				return "Cannot remove mobile device, bridge-adapter returned an error.";
+				return "Cannot remove device: bridge adapter returned an error.";
 		}
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected bridge-adapter error mapping: request:\"%s\" error:%d", request,
 			(int)error);
 
-	return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
+	return "Cannot add device: bridge adapter returned an invalid response.";
 }
 
 static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *config_comms,

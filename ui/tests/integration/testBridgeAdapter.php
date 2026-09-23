@@ -38,31 +38,31 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const REAL_NOTIFY_SUBJECT = 'Bridge adapter real notification';
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
 	private const MEDIA_SEVERITY_ALL = 63;
-	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver notification, device id is not known.';
+	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot send notification to device: unknown device.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
-		'Cannot deliver notification, target device is not in Active state.';
+		'Cannot send notification to device: device must have "Active" status.';
 	private const PUSH_TEST_ERROR_DEVICE_NOT_FOUND = 'Cannot find enabled device for push media type test.';
 	private const PUSH_ERROR_NOT_CONFIGURED =
-		'Cannot deliver mobile device notification, bridge-adapter is not configured.';
+		'Cannot send notification to device: bridge adapter is not configured.';
 	private const PUSH_ERROR_CANNOT_CONNECT =
-		'Cannot deliver mobile device notification, cannot connect to bridge-adapter.';
+		'Cannot send notification to device: cannot connect to bridge adapter.';
 	private const PUSH_ERROR_INVALID_RESPONSE =
-		'Cannot deliver mobile device notification, bridge-adapter returned an invalid response.';
+		'Cannot send notification to device: bridge adapter returned an invalid response.';
 	private const PUSH_ERROR_RETURNED_ERROR =
-		'Cannot deliver mobile device notification, bridge-adapter returned an error.';
+		'Cannot send notification to device: bridge adapter returned an error.';
 	private const DEVICE_INIT_ERROR_NOT_CONFIGURED =
-		'Cannot initialize mobile device, bridge-adapter is not configured.';
+		'Cannot add device: bridge adapter is not configured.';
 	private const DEVICE_INIT_ERROR_INVALID_RESPONSE =
-		'Cannot initialize mobile device, bridge-adapter returned an invalid response.';
+		'Cannot add device: bridge adapter returned an invalid response.';
 	private const DEVICE_INIT_ERROR_RETURNED_ERROR =
-		'Cannot initialize mobile device, bridge-adapter returned an error.';
+		'Cannot add device: bridge adapter returned an error.';
 	private const DEVICE_INIT_ERROR_DEVICE_LIMIT_EXCEEDED =
 		'Cannot add device because the device limit has been reached. Please remove redundant devices, or '.
 		'contact your system administrator.';
 	private const DEVICE_OFFBOARD_ERROR_NOT_CONFIGURED =
-		'Cannot remove mobile device, bridge-adapter is not configured.';
+		'Cannot remove device: bridge adapter is not configured.';
 	private const DEVICE_OFFBOARD_ERROR_INVALID_RESPONSE =
-		'Cannot remove mobile device, bridge-adapter returned an invalid response.';
+		'Cannot remove device: bridge adapter returned an invalid response.';
 	private const DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND =
 		'Cannot unlink device. Please contact your system administrator.';
 	private const ERROR_MOBILE_DEVICES_DISABLED = 'Mobile devices are disabled.';
