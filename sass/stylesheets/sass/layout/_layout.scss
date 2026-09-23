@@ -16,19 +16,26 @@ body {
 	> z-split-view {
 		--min-content-size: 768px;
 
-		&:not([vertical]) {
-			.wrapper {
-				overflow-y: auto;
-				overscroll-behavior-y: contain;
-			}
+		.wrapper {
+			overflow-y: auto;
+			overscroll-behavior-y: contain;
+		}
 
-			.side-drawer {
-				background-color: $ui-bg-color;
-				overflow-y: auto;
-				overscroll-behavior-y: contain;
-				position: sticky;
-				inset-block-start: 0;
-				z-index: 999;
+		.side-drawer {
+			background-color: $ui-bg-color;
+			overflow-y: auto;
+			overscroll-behavior-y: contain;
+			position: sticky;
+			inset-block-start: 0;
+			z-index: 999;
+		}
+
+		&:has(.side-drawer.closed) {
+			grid-template-columns: none;
+
+			.side-drawer,
+			> z-split-view-handle {
+				display: none;
 			}
 		}
 	}

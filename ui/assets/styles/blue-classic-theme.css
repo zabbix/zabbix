@@ -883,16 +883,21 @@ body {
   overflow: hidden; }
   body > z-split-view {
     --min-content-size: 768px; }
-    body > z-split-view:not([vertical]) .wrapper {
+    body > z-split-view .wrapper {
       overflow-y: auto;
       overscroll-behavior-y: contain; }
-    body > z-split-view:not([vertical]) .side-drawer {
+    body > z-split-view .side-drawer {
       background-color: #ffffff;
       overflow-y: auto;
       overscroll-behavior-y: contain;
       position: sticky;
       inset-block-start: 0;
       z-index: 999; }
+    body > z-split-view:has(.side-drawer.closed) {
+      grid-template-columns: none; }
+      body > z-split-view:has(.side-drawer.closed) .side-drawer,
+      body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
+        display: none; }
   body > z-split-view,
   body > .wrapper {
     grid-area: content;
