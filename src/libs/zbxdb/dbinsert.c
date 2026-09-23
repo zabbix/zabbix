@@ -42,7 +42,6 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_BLOB:
@@ -237,7 +236,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 		{
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -296,7 +294,6 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 		{
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -462,7 +459,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 		switch (field->type)
 		{
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -504,7 +500,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_JSON:

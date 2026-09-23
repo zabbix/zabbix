@@ -714,7 +714,6 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
-		case ZBX_TYPE_SHORTTEXT:
 			return 65535u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
