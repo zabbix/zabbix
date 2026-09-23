@@ -359,7 +359,7 @@
 						more_attributes.dataset.hintbox = '1';
 						more_attributes.dataset.hintboxStatic = '1';
 						more_attributes.ariaExpanded = 'false';
-						more_attributes.ariaLabel = t('Show all attributes');
+						more_attributes.ariaLabel = <?= json_encode(_('Show all attributes')) ?>;
 
 						tags_wrapper.appendChild(more_attributes);
 					}

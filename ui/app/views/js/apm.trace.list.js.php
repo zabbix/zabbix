@@ -307,7 +307,7 @@
 						more_attributes.setAttribute('data-hintbox', '1');
 						more_attributes.setAttribute('data-hintbox-static', '1');
 						more_attributes.setAttribute('aria-expanded', 'false');
-						more_attributes.setAttribute('aria-label', t('Show all span attributes'));
+						more_attributes.setAttribute('aria-label', <?= json_encode(_('Show all attributes')) ?>);
 
 						tags_wrapper.appendChild(more_attributes);
 					}

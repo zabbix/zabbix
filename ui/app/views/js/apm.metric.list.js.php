@@ -303,31 +303,29 @@
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
-				.setCellRenderer('value', ({row_index, cell}) => {
-					const data = this.#rows_data.get(row_index);
+				.setCellRenderer('value', ({row, cell}) => {
+					const data = this.#rows_data.get(row.dataset.rowHash);
 					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
 						? data.sum
 						: data.value;
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
-				.setCellRenderer('count', ({row_index, cell}) => {
-					const data = this.#rows_data.get(row_index);
+				.setCellRenderer('count', ({row, cell}) => {
+					const data = this.#rows_data.get(row.dataset.rowHash);
 					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
 						? data.count
 						: '';
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
-				.setCellRenderer('aggregation_temporality', ({row_index, cell}) => {
-					const data = this.#rows_data.get(row_index);
-					const value = this.#aggregation_temporality_labels[data.aggregation_temporality];
+				.setCellRenderer('aggregation_temporality', ({cell, cell_data}) => {
+					const value = this.#aggregation_temporality_labels[cell_data];
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
-				.setCellRenderer('flags', ({row_index, cell}) => {
-					const data = this.#rows_data.get(row_index);
-					const value = data.flags & 1 !== 0
+				.setCellRenderer('flags', ({cell, cell_data}) => {
+					const value = cell_data & 1 !== 0
 						? this.#flags_labels[APM_METRIC_FLAG_NO_RECORDED_VALUE]
 						: this.#flags_labels[APM_METRIC_FLAG_NONE];
 
@@ -395,7 +393,7 @@
 						more_attributes.dataset.hintbox = '1';
 						more_attributes.dataset.hintboxStatic = '1';
 						more_attributes.ariaExpanded = 'false';
-						more_attributes.ariaLabel = t('Show all attributes');
+						more_attributes.ariaLabel = <?= json_encode(_('Show all attributes')) ?>;
 
 						tags_wrapper.appendChild(more_attributes);
 					}
