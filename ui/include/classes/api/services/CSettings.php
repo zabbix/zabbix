@@ -453,8 +453,7 @@ class CSettings extends CApiService {
 
 		$url_scheme = parse_url($apm_global_db['url'], PHP_URL_SCHEME);
 
-		$is_url_scheme_https = is_string($url_scheme)
-			&& strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
+		$is_url_scheme_https = strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'username' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
