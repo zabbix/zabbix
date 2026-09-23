@@ -367,7 +367,9 @@ class CDataTable {
 			default: ({column, cell}) => {
 				if (column.isSortable()) {
 					const sort_field = column.getSortField() || column.getId();
-					const sort_order = this.#sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP;
+					const sort_order = this.#sort_field === sort_field
+						? this.#sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP
+						: ZBX_SORT_UP;
 
 					const label = document.createElement('span');
 					label.classList.add('name');
