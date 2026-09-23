@@ -137,7 +137,7 @@ class CControllerApmLogList extends CController {
 				'timeselector' => getTimeSelectorPeriod($timeselector_options)
 			],
 			'filter_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
-			'active_tab' => CProfile::get('web.apm.log.filter.active', 2),
+			'active_tab' => CProfile::get('web.apm.log.filter.active', 1),
 			'page' => $this->getInput('page', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'sort_field' => $sort_field,
