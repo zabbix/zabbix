@@ -56,8 +56,8 @@ class CSplitView extends CTag {
 		return $this;
 	}
 
-	public function setFixedSize(string $fixed_pane): self {
-		$this->setAttribute('fixed-size', $fixed_pane);
+	public function setFixedSize(string $fixed_size): self {
+		$this->setAttribute('fixed-size', $fixed_size);
 
 		return $this;
 	}

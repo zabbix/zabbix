@@ -77,11 +77,7 @@
 			this.#apply_filter_button = this.#filter_form_element?.querySelector('[name="filter_set"]');
 			this.#side_drawer_position = side_drawer_position;
 
-			this.#side_drawer = new CSideDrawer({
-				position: this.#side_drawer_position,
-				position_min: '10%',
-				position_max: '90%'
-			});
+			this.#side_drawer = new CSideDrawer();
 			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
 			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
 			this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));

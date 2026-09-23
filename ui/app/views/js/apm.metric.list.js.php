@@ -85,11 +85,7 @@
 				[APM_METRIC_FLAG_NO_RECORDED_VALUE]: <?= json_encode(_('No recorded value')) ?>
 			};
 
-			this.#side_drawer = new CSideDrawer({
-				position: this.#side_drawer_position,
-				position_min: '10%',
-				position_max: '90%'
-			});
+			this.#side_drawer = new CSideDrawer();
 			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, e => this.#onSideDrawerOpen(e));
 			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, e => this.#onSideDrawerClose(e));
 			this.#side_drawer.on(CSideDrawer.EVENT_POSITION, e => this.#onSideDrawerPosition(e));

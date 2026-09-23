@@ -32,26 +32,8 @@ class CSideDrawer {
 	/** @type {AbortController|null} */
 	#abort_controller = null;
 
-	constructor({
-		position = null,
-		position_min = null,
-		position_max = null
-	} = {}) {
+	constructor() {
 		this.#split_view_element = document.querySelector(`z-split-view`);
-
-		for (const [attribute, value] of
-				Object.entries({'fixed-size': position, min: position_min, max: position_max})) {
-			if (value !== null) {
-				this.#split_view_element.setAttribute(attribute, value);
-			}
-		}
-
-		this.#split_view_element.addEventListener('split-end', () => {
-			this.dispatchEvent(CSideDrawer.EVENT_POSITION, {
-				position: this.#split_view_element.getAttribute('fixed-size')
-			});
-		});
-
 		this.#content_pane_element = document.querySelector(`z-split-view-pane.wrapper`);
 		this.#drawer_element = document.querySelector(`z-split-view-pane.side-drawer`);
 		this.#drawer_element.classList.add('closed');
@@ -137,6 +119,8 @@ class CSideDrawer {
 		close_button?.addEventListener('click', this.#onClose);
 
 		document.addEventListener('keyup', this.#onKeyUp);
+
+		this.#split_view_element.addEventListener('split-end', this.#handlePositionChange);
 	}
 
 	#unbindEvents() {
@@ -144,6 +128,14 @@ class CSideDrawer {
 		close_button?.removeEventListener('click', this.#onClose);
 
 		document.removeEventListener('keyup', this.#onKeyUp);
+
+		this.#split_view_element.removeEventListener('split-end', this.#handlePositionChange);
+	}
+
+	#handlePositionChange = () => {
+		this.dispatchEvent(CSideDrawer.EVENT_POSITION, {
+			position: this.#split_view_element.getAttribute('fixed-size')
+		});
 	}
 
 	#handleError(error) {
