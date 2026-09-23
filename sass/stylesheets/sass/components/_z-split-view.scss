@@ -6,11 +6,18 @@ z-split-view {
 	--split-view-handle-size: 56px;
 	--split-view-handle-hit-area-size: 16px;
 
-	--split-view-handle-current-position: clamp(
-		var(--split-view-handle-min-position, 0%),
-		var(--split-view-handle-position, 50%),
-		var(--split-view-handle-max-position, 100%)
+	--split-view-current-size: clamp(
+		var(--split-view-min-size, 0%),
+		var(--split-view-fixed-size, 50%),
+		var(--split-view-max-size, 100%)
 	);
+
+	// Default: fixed="end".
+	--split-view-handle-position: calc(100% - var(--split-view-current-size));
+
+	&[fixed='start'] {
+		--split-view-handle-position: var(--split-view-current-size);
+	}
 
 	position: relative;
 	display: grid;
@@ -67,7 +74,7 @@ z-split-view {
 	}
 
 	&:not([vertical]) {
-		grid-template-columns: minmax(0, var(--split-view-handle-current-position)) minmax(0, 1fr);
+		grid-template-columns: minmax(0, var(--split-view-handle-position)) minmax(0, 1fr);
 
 		& > z-split-view-pane:nth-of-type(1) {
 			grid-column: 1;
@@ -87,7 +94,7 @@ z-split-view {
 			z-index: 999;
 
 			.z-split-view-handle-control {
-				inset-inline-start: var(--split-view-handle-current-position);
+				inset-inline-start: var(--split-view-handle-position);
 				inline-size: var(--split-view-handle-hit-area-size);
 				transform: translateX(-50%);
 				cursor: col-resize;
@@ -108,7 +115,7 @@ z-split-view {
 
 	&[vertical] {
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: minmax(0, var(--split-view-handle-current-position)) minmax(0, 1fr);
+		grid-template-rows: minmax(0, var(--split-view-handle-position)) minmax(0, 1fr);
 		inset-inline-start: 0;
 		block-size: 100%;
 		overflow-y: hidden;
@@ -135,7 +142,7 @@ z-split-view {
 			inline-size: 0;
 
 			.z-split-view-handle-control {
-				inset-block-start: var(--split-view-handle-current-position);
+				inset-block-start: var(--split-view-handle-position);
 				block-size: var(--split-view-handle-hit-area-size);
 				transform: translateY(-50%);
 				cursor: row-resize;
