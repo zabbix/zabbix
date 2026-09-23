@@ -10,6 +10,7 @@
 	position: relative;
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius);
+	container-type: inline-size;
 
 	&::before {
 		content: '';
@@ -409,8 +410,7 @@
 		grid-column: 1 / -1;
 		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
-		height: var(--datatable-row-height);
-		padding: 0 8px;
+		padding: 3px 8px;
 		color: $font-alt-color;
 		background-color: $ui-bg-color;
 		border-top: 1px solid $ui-border-color;
@@ -423,6 +423,10 @@
 		&.pager {
 			border: solid $ui-border-color;
 			border-width: 1px 0 0;
+
+			a {
+				box-sizing: border-box;
+			}
 
 			.selected-item-count {
 				justify-self: start;
@@ -846,6 +850,17 @@
 		padding: 100px 0;
 		background-color: $ui-bg-color;
 		border-top: none;
+	}
+
+	@container (max-width: 950px) {
+		.datatable-footer {
+			grid-template-columns: 1fr max-content;
+
+			&.pager .table-stats {
+				grid-column: 1 / -1;
+				grid-row: 2;
+			}
+		}
 	}
 }
 
