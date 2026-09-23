@@ -99,6 +99,14 @@
 #define ZBX_ITEM_DESCRIPTION_LEN		65535
 #define ZBX_ITEM_POSTS_LEN			65535
 #define ZBX_ITEM_HEADERS_LEN			65535
+#define ZBX_ITEM_QUERY_LEN			65535
+#define ZBX_ITEM_QUERY_LEN_MAX			(ZBX_ITEM_QUERY_LEN + 1)
+#define ZBX_ITEM_TIME_SHIFT_LEN			255
+#define ZBX_ITEM_TIME_SHIFT_LEN_MAX		(ZBX_ITEM_TIME_SHIFT_LEN + 1)
+#define ZBX_ITEM_LOOKBACK_LIMIT_LEN		255
+#define ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX		(ZBX_ITEM_LOOKBACK_LIMIT_LEN + 1)
+#define ZBX_ITEM_GRANULARITY_LEN		255
+#define ZBX_ITEM_GRANULARITY_LEN_MAX		(ZBX_ITEM_GRANULARITY_LEN + 1)
 #define ZBX_ITEM_PARAMETER_NAME_LEN		255
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255
@@ -794,7 +802,6 @@ int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_uns
 		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
-void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 void	zbx_db_flush_version_requirements(const char *version);
 
 #define ZBX_PROXY_DATA_DONE	0

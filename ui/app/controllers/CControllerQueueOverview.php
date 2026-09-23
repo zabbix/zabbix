@@ -64,7 +64,8 @@ class CControllerQueueOverview extends CController {
 				ITEM_TYPE_JMX,
 				ITEM_TYPE_CALCULATED,
 				ITEM_TYPE_SCRIPT,
-				ITEM_TYPE_BROWSER
+				ITEM_TYPE_BROWSER,
+				ITEM_TYPE_TELEMETRY_QUERY
 			];
 		}
 

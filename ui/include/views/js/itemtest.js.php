@@ -258,6 +258,23 @@
 					timeout
 				};
 				break;
+
+			case <?= ITEM_TYPE_TELEMETRY_QUERY ?>:
+				properties = {
+					key: form_data['key'].trim(),
+					timeout,
+					signal_type: form_data['signal_type'],
+					metric_point_type: form_data['metric_point_type'],
+					columns: form_data['columns'] || [],
+					aggregated_columns: form_data['aggregated_columns'] || [],
+					conditions: form_data['conditions'] || [],
+					evaltype: form_data['evaltype'],
+					formula: form_data['formula'],
+					time_shift: form_data['time_shift'],
+					lookback_limit: form_data['lookback_limit'],
+					granularity: form_data['granularity']
+				};
+				break;
 		}
 
 		// Common properties.

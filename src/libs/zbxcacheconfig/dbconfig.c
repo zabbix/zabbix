@@ -169,6 +169,7 @@ ZBX_PTR_VECTOR_IMPL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_tri
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
+ZBX_VECTOR_IMPL(dc_cached_data, zbx_dc_cached_data_t)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
@@ -517,6 +518,11 @@ unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned c
 				break;
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_TELEMETRY_QUERY;
 		case ITEM_TYPE_ZABBIX:
 			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_AGENT_POLLER))
 				break;
@@ -1383,6 +1389,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->item_timeouts.telnet);
 	dc_strpool_release(proxy->item_timeouts.script);
 	dc_strpool_release(proxy->item_timeouts.browser);
+	dc_strpool_release(proxy->item_timeouts.telemetry);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	dc_strpool_release(proxy->tls_issuer);
@@ -2749,6 +2756,9 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 		case ITEM_TYPE_HTTPAGENT:
 			global_timeout = config->config->item_timeouts.http;
 			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			global_timeout = config->config->item_timeouts.telemetry;
+			break;
 		default:
 			global_timeout = "";
 			break;
@@ -2910,6 +2920,14 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 			__config_shmem_free_func(item->itemtype.browseritem);
 			break;
 		case ITEM_TYPE_NESTED_LLD:
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			dc_strpool_release(item->itemtype.tqitem->query);
+			dc_strpool_release(item->itemtype.tqitem->time_shift);
+			dc_strpool_release(item->itemtype.tqitem->lookback_limit);
+			dc_strpool_release(item->itemtype.tqitem->granularity);
+
+			__config_shmem_free_func(item->itemtype.tqitem);
 			break;
 	}
 }
@@ -3167,6 +3185,22 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			}
 			break;
 		case ITEM_TYPE_NESTED_LLD:
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			if (0 == found)
+			{
+				item->itemtype.tqitem = (ZBX_DC_TQITEM *)__config_shmem_malloc_func(NULL,
+						sizeof(ZBX_DC_TQITEM));
+
+				item->itemtype.tqitem->lasttimestamp = 0;
+				item->itemtype.tqitem->min_free_ts.sec = 0;
+				item->itemtype.tqitem->min_free_ts.ns = 0;
+			}
+
+			dc_strpool_replace(found, &item->itemtype.tqitem->query, row[50]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->time_shift, row[51]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->lookback_limit, row[52]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->granularity, row[53]);
 			break;
 	}
 
@@ -7294,6 +7328,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->item_timeouts.telnet, row[20]);
 		dc_strpool_replace(found, &proxy->item_timeouts.script, row[21]);
 		dc_strpool_replace(found, &proxy->item_timeouts.browser, row[26]);
+		dc_strpool_replace(found, &proxy->item_timeouts.telemetry, row[27]);
 
 		if (PROXY_OPERATING_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
@@ -9534,6 +9569,13 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->username = NULL;
 			dst_item->password = NULL;
 			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
+			zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
+			zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
+			zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
+			dst_item->telemetry_query = NULL;
+			break;
 		case ITEM_TYPE_SCRIPT:
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.scriptitem->script);
 
@@ -9690,7 +9732,6 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 		dst_item->snmp_max_repetitions = 0;
-		dst_item->timeout = 0;
 	}
 
 	dst_item->snmp_community = NULL;
@@ -9749,7 +9790,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
 	dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
 
-	dst_item->timeout = 0;
 	dst_item->url = NULL;
 	dst_item->query_fields = NULL;
 	dst_item->status_codes = NULL;
@@ -9759,6 +9799,45 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	dst_item->ssl_key_password = NULL;
 	dst_item->username = NULL;
 	dst_item->password = NULL;
+}
+
+static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, const ZBX_DC_ITEM *src_item,
+		const ZBX_DC_HOST *src_host)
+{
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->lastlogsize = src_item->lastlogsize;
+
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
+	zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
+	zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
+	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
+	dst_item->telemetry_query = NULL;
+	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
+	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -9793,6 +9872,9 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 			case ITEM_TYPE_CALCULATED:
 				zbx_free(items[i].params);
 				zbx_free(items[i].formula_bin);
+				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				zbx_free(items[i].query);
 				break;
 		}
 
@@ -11525,6 +11607,9 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			item_size = sizeof(zbx_dc_httpagent_item_t);
 			break;
+		case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+			item_size = sizeof(zbx_dc_telemetry_query_item_t);
+			break;
 		default:
 			item_size = sizeof(zbx_dc_item_t);
 	}
@@ -11538,6 +11623,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			max_items = ZBX_MAX_PINGER_ITEMS;
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
+		case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
 		case ZBX_POLLER_TYPE_AGENT:
 		case ZBX_POLLER_TYPE_SNMP:
 			if (0 == (max_items = config_max_concurrent_checks - processing))
@@ -11666,6 +11752,9 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			case ZBX_POLLER_TYPE_HTTPAGENT:
 				DCget_httpagent_item(&items->httpagent_items[num], dc_item, dc_host);
 				break;
+			case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+				DCget_telemetry_query_item(&items->telemetry_query_items[num], dc_item, dc_host);
+				break;
 			default:
 				DCget_host(&items->dc_items[num].host, dc_host);
 				DCget_item(&items->dc_items[num], dc_item);
@@ -11675,10 +11764,21 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 	}
 
 	UNLOCK_CACHE;
+
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
+}
+
+int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
+{
+	return (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type ? SUCCEED : FAIL);
+}
+
+void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data)
+{
+	memset(cached_data, 0, sizeof(zbx_dc_cached_data_t));
 }
 
 #ifdef HAVE_OPENIPMI
@@ -11890,7 +11990,19 @@ unlock:
 	return items_num;
 }
 
-static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num)
+static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, const zbx_dc_cached_data_t *cached_data)
+{
+	if (ITEM_TYPE_TELEMETRY_QUERY == dc_item->type)
+	{
+		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP))
+			dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
+		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS))
+			dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
+	}
+}
+
+static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num)
 {
 	size_t			i;
 	ZBX_DC_ITEM		*dc_item;
@@ -11922,6 +12034,9 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
+		if (NULL != cached_datas)
+			dc_set_cached_data(dc_item, &cached_datas[i]);
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -11949,17 +12064,17 @@ void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, co
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, NULL, num);
 
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
-		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
+void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num, unsigned char poller_type, int *nextcheck)
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, cached_datas, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
 
 	UNLOCK_CACHE;
@@ -15545,6 +15660,7 @@ void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeo
 		zbx_strscpy(timeouts->telnet, timeouts_src->telnet);
 		zbx_strscpy(timeouts->script, timeouts_src->script);
 		zbx_strscpy(timeouts->browser, timeouts_src->browser);
+		zbx_strscpy(timeouts->telemetry, timeouts_src->telemetry);
 	}
 
 	UNLOCK_CACHE;
@@ -15586,6 +15702,7 @@ static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_j
 	proxy_discovery_add_item_type_timeout("telnet_agent", json, timeouts->telnet, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("script", json, timeouts->script, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("browser", json, timeouts->browser, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("telemetry_query", json, timeouts->telemetry, proxy->proxyid);
 
 	zbx_json_close(json);
 }

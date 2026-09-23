@@ -19,6 +19,8 @@
 #include "zbxcomms.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
+#include "zbxtelemetry.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
@@ -39,7 +41,8 @@
 #define	ZBX_POLLER_TYPE_SNMP		9
 #define ZBX_POLLER_TYPE_INTERNAL	10
 #define ZBX_POLLER_TYPE_BROWSER		11
-#define	ZBX_POLLER_TYPE_COUNT		12	/* number of poller types */
+#define ZBX_POLLER_TYPE_TELEMETRY_QUERY	12
+#define	ZBX_POLLER_TYPE_COUNT		13	/* number of poller types */
 
 typedef enum
 {
@@ -206,6 +209,14 @@ typedef struct
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	char			*query;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
+	zbx_tq_query_t		*telemetry_query;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -290,15 +301,56 @@ typedef struct
 }
 zbx_dc_httpagent_item_t;
 
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	char			host_host[ZBX_HOSTNAME_BUF_LEN];
+	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key_orig, *key;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	char			*query;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
+	zbx_tq_query_t		*telemetry_query;
+	time_t			lasttimestamp;
+	zbx_timespec_t		min_free_ts;
+	unsigned char		preprocessing;
+}
+zbx_dc_telemetry_query_item_t;
+
 typedef union
 {
-	zbx_dc_agent_item_t	*agent_items;
-	zbx_dc_snmp_item_t	*snmp_items;
-	zbx_dc_httpagent_item_t *httpagent_items;
-	zbx_dc_item_t		*dc_items;
-	void			*any;
+	zbx_dc_agent_item_t		*agent_items;
+	zbx_dc_snmp_item_t		*snmp_items;
+	zbx_dc_httpagent_item_t		*httpagent_items;
+	zbx_dc_telemetry_query_item_t	*telemetry_query_items;
+	zbx_dc_item_t			*dc_items;
+	void				*any;
 }
 zbx_dc_poller_item_t;
+
+#define ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP	__UINT64_C(0x0001)
+#define ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS		__UINT64_C(0x0002)
+
+typedef struct
+{
+	zbx_uint64_t	upd_flags;
+	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
+}
+zbx_dc_cached_data_t;
+
+ZBX_VECTOR_DECL(dc_cached_data, zbx_dc_cached_data_t)
 
 typedef struct
 {
@@ -1008,6 +1060,9 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
+int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
+void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);
+
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
@@ -1021,8 +1076,8 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
-void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
-		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num, unsigned char poller_type, int *nextcheck);
 #ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 #endif
@@ -1515,6 +1570,7 @@ typedef struct
 	const char	*telnet;
 	const char	*script;
 	const char	*browser;
+	const char	*telemetry;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1533,6 +1589,7 @@ typedef struct
 	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	browser[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	telemetry[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 
