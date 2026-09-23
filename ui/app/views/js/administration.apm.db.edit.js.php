@@ -274,7 +274,7 @@ const view = new class {
 					addMessage(makeMessageBox('good', response.success.messages ?? [],
 						response.success.title));
 				}
-			});
+			}, AbortSignal.timeout(5000));
 		});
 	}
 
@@ -304,14 +304,15 @@ const view = new class {
 		});
 	}
 
-	#postAction(action, values, callback) {
+	#postAction(action, values, callback, abort_signal = undefined) {
 		const url = new URL('zabbix.php', location.href);
 		url.searchParams.set('action', action);
 
 		fetch(url.toString(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(values)
+			body: JSON.stringify(values),
+			signal: abort_signal
 		})
 		.then(response => response.json())
 		.then(response => {
@@ -327,16 +328,27 @@ const view = new class {
 
 			callback(response);
 		})
-		.catch(exception => this.#handleFormError(exception))
+		.catch(error => {
+			if (error?.name === 'TimeoutError') {
+				const $msg_box = makeMessageBox('bad',
+					[<?= json_encode(_('Could not connect to APM data source.')) ?>]);
+
+				addMessage($msg_box[0]);
+
+				return;
+			}
+
+			this.#handleFormError(error);
+		})
 		.finally(() => this.#unsetLoadingStatus());
 	}
 
-	#handleFormError(exception) {
+	#handleFormError(error) {
 		let title, messages;
 
-		if (typeof exception === 'object' && 'error' in exception) {
-			title = exception.error.title;
-			messages = exception.error.messages;
+		if (typeof error === 'object' && 'error' in error) {
+			title = error.error.title;
+			messages = error.error.messages;
 		}
 		else {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
