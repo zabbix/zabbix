@@ -228,6 +228,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
+		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
+			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+
+			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
+				error($error);
+
+				return false;
+			}
+		}
+
 		/*
 		* Either the item must be testable or at least one preprocessing test must be passed ("Test" button should
 		* be disabled otherwise).
