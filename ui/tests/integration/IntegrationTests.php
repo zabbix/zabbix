@@ -34,12 +34,16 @@ require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testVfsFsGet.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+require_once dirname(__FILE__).'/testTriggerCEP.php';
+require_once dirname(__FILE__).'/testTriggerCEPAtScale.php';
+require_once dirname(__FILE__).'/testTriggerCEPRestart.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
@@ -79,6 +83,7 @@ require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+/* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
 
 use PHPUnit\Framework\TestSuite;
 
@@ -102,6 +107,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
+		$suite->addTestSuite('testVfsFsGet');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
 		$suite->addTestSuite('testTagInheritance');
@@ -147,14 +153,18 @@ class IntegrationTests {
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testHousekeepingConfSync');
-		$suite->addTestSuite('testLLDHistorySyncAtScale');
-		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
-		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
 		$suite->addTestSuite('testScheduledReports');
+		$suite->addTestSuite('testTriggerCEP');
+		$suite->addTestSuite('testTriggerCEPRestart');
+		$suite->addTestSuite('testLLDHistorySyncAtScale');
+		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
+		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
+		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		/* $suite->addTestSuite('testTelemetryQueryItems'); */
 		return $suite;
 	}
 }

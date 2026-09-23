@@ -44,7 +44,7 @@ class CControllerCorrelationEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES)) {
 			return false;
 		}
 
@@ -108,7 +108,6 @@ class CControllerCorrelationEdit extends CController {
 				->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
-
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));

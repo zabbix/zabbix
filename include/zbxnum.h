@@ -26,6 +26,9 @@
 #define zbx_is_uint64(str, value) \
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
+#define zbx_is_uint63(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0x7FFFFFFFFFFFFFFF))
+
 #define zbx_is_uint64_n(str, n, value) \
 	zbx_is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 

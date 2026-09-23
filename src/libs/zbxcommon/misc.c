@@ -21,6 +21,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxstr.h"
@@ -30,12 +31,14 @@ static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout o
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 
-static ZBX_THREAD_LOCAL void	(*zbx_exit_impl)(int) ZBX_NORETURN = exit;
-static ZBX_THREAD_LOCAL void	(*zbx_exit_immediate_impl)(int) ZBX_NORETURN = _exit;
+static ZBX_THREAD_LOCAL void	(*zbx_exit_impl)(int) = exit;
+static ZBX_THREAD_LOCAL void	(*zbx_exit_immediate_impl)(int) = _exit;
+static ZBX_THREAD_LOCAL zbx_atomic_uint32_t	*zbx_exit_num;
 
-void	zbx_set_exit(zbx_exit_cb_t exit_cb)
+void	zbx_set_exit(zbx_exit_cb_t exit_cb, zbx_atomic_uint32_t *exit_num)
 {
 	zbx_exit_impl = exit_cb;
+	zbx_exit_num = exit_num;
 }
 
 void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb)
@@ -46,11 +49,22 @@ void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb)
 void	zbx_exit(int ret)
 {
 	zbx_exit_impl(ret);
+	abort();
 }
 
 void	zbx_exit_immediate(int ret)
 {
 	zbx_exit_immediate_impl(ret);
+	abort();
+}
+
+void	zbx_exit_from_thread(int ret)
+{
+#if defined(HAVE_STDATOMIC_H)
+	if (NULL != zbx_exit_num)
+		atomic_fetch_add(zbx_exit_num, 1);
+#endif
+	pthread_exit((void *)(zbx_int64_t)ret);
 }
 
 #endif

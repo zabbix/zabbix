@@ -22,6 +22,12 @@ libzbxcacheconfig_a_SOURCES = \
 	proxy_group.c \
 	proxy_group.h \
 	dbconfig_atomic.c \
+	dbconfig_local.c \
+	dbconfig_local.h \
+	dbconfig_correlation.c \
+	dbconfig_correlation.h \
+	dbconfig_cep.c \
+	dbconfig_cep.h \
 	macrotags.c
 
 libzbxcacheconfig_a_CFLAGS = \

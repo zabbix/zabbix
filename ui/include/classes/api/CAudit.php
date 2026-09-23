@@ -88,6 +88,7 @@ class CAudit {
 	public const RESOURCE_PROXY_GROUP = 55;
 	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
 	public const RESOURCE_DEVICE = 57;
+	public const RESOURCE_CEP_RULE = 58;
 
 	/**
 	 * Audit details actions.
@@ -114,6 +115,7 @@ class CAudit {
 	private const TABLE_NAMES = [
 		self::RESOURCE_ACTION => 'actions',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_CEP_RULE => 'cep_rule',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
@@ -167,6 +169,7 @@ class CAudit {
 	private const FIELD_NAMES = [
 		self::RESOURCE_ACTION => 'name',
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_CEP_RULE => 'name',
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
@@ -212,6 +215,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CEP_RULE => 'ceprule',
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
@@ -420,6 +424,12 @@ class CAudit {
 		'action.update_operations.opcommand' => 'opcommand',
 		'action.update_operations.opcommand_grp' => 'opcommand_grp',
 		'action.update_operations.opcommand_hst' => 'opcommand_hst',
+		'ceprule.filter' => 'cep_rule',
+		'ceprule.filter.conditions' => 'cep_condition',
+		'ceprule.operations' => 'cep_operation',
+		'ceprule.operations.filter' => 'cep_operation',
+		'ceprule.operations.filter.conditions' => 'cep_operation_condition',
+		'ceprule.window' => 'cep_rule_window',
 		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
@@ -483,6 +493,8 @@ class CAudit {
 		'itemprototype.tags' => 'item_tag',
 		'maintenance.groups' => 'maintenances_groups',
 		'maintenance.hosts' => 'maintenances_hosts',
+		'maintenance.triggers' => 'maintenance_trigger',
+		'maintenance.event_names' => 'maintenance_eventname',
 		'maintenance.tags' => 'maintenance_tag',
 		'maintenance.timeperiods' => 'timeperiods',
 		'mediatype.message_templates' => 'media_type_message',
@@ -518,7 +530,19 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups'
+		'usergroup.users' => 'users_groups',
+		'usergroup.proxies' => 'usrgrp_proxy',
+		'usergroup.proxy_groups' => 'usrgrp_proxy_group'
+	];
+
+	/**
+	 * List of field names having indexed array of scalar values as value.
+	 *
+	 * @var array
+	 */
+	private const SCALAR_VALUE_LIST_FIELD = [
+		'item.query.aggregated_columns.parameters',
+		'itemprototype.query.aggregated_columns.parameters'
 	];
 
 	/**
@@ -548,6 +572,9 @@ class CAudit {
 		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
 		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
 		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
+		'ceprule.filter.conditions' => 'cep_conditionid',
+		'ceprule.operations' => 'cep_operationid',
+		'ceprule.operations.filter.conditions' => 'cep_operation_conditionid',
 		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
@@ -592,13 +619,21 @@ class CAudit {
 		'item.preprocessing' => 'item_preprocid',
 		'item.tags' => 'itemtagid',
 		'item.query_fields' => 'sortorder',
+		'item.query.columns' => null,
+		'item.query.aggregated_columns' => null,
+		'item.query.filter.conditions' => null,
 		'itemprototype.headers' => 'sortorder',
 		'itemprototype.parameters' => 'item_parameterid',
 		'itemprototype.preprocessing' => 'item_preprocid',
 		'itemprototype.tags' => 'itemtagid',
 		'itemprototype.query_fields' => 'sortorder',
+		'itemprototype.query.columns' => null,
+		'itemprototype.query.aggregated_columns' => null,
+		'itemprototype.query.filter.conditions' => null,
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
+		'maintenance.triggers' => 'maintenance_triggerid',
+		'maintenance.event_names' => 'maintenance_eventnameid',
 		'maintenance.tags' => 'maintenancetagid',
 		'maintenance.timeperiods' => 'timeperiodid',
 		'mediatype.message_templates' => 'mediatype_messageid',
@@ -634,7 +669,9 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
-		'usergroup.users' => 'id'
+		'usergroup.users' => 'id',
+		'usergroup.proxies' => 'proxyid',
+		'usergroup.proxy_groups' => 'proxy_groupid'
 	];
 
 	/**
@@ -843,9 +880,16 @@ class CAudit {
 			}
 
 			if (is_array($db_value) && $db_value) {
-				ctype_digit((string) key($db_value))
-					? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
-					: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+				$abstract_path = $path.'.'.$field;
+
+				if (array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES)) {
+					ctype_digit((string) key($db_value))
+						? self::intersectNestedObjects($abstract_path, $db_value, $object[$field])
+						: self::intersectObjectFields($abstract_path, $db_value, $object[$field]);
+				}
+				elseif (in_array($abstract_path, self::SCALAR_VALUE_LIST_FIELD, true)) {
+					self::intersectObjectFields($abstract_path, $db_value, $object[$field]);
+				}
 			}
 		}
 		unset($db_value);
@@ -957,9 +1001,8 @@ class CAudit {
 
 		if ($is_nested_object_field) {
 			$abstract_path = self::getAbstractPath($path);
-			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
-			if ($is_array_of_objects) {
+			if (array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES)) {
 				$objects = $object;
 				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
 
@@ -969,6 +1012,13 @@ class CAudit {
 						: $path.'['.$object[$id_field_name].']';
 
 					$result += self::convertKeysToPaths($path_to_object, $object);
+				}
+
+				return $result;
+			}
+			elseif (in_array($abstract_path, self::SCALAR_VALUE_LIST_FIELD, true)) {
+				foreach ($object as $i => $value) {
+					$result[$path.'['.$i.']'] = $value;
 				}
 
 				return $result;
@@ -1087,7 +1137,9 @@ class CAudit {
 				continue;
 			}
 
-			$object_path = self::getLastObjectPath($path);
+			$object_path = in_array(self::getAbstractPath($path), self::SCALAR_VALUE_LIST_FIELD, true)
+				? $path
+				: self::getLastObjectPath($path);
 
 			if (!in_array($object_path, $paths)) {
 				$paths[] = $object_path;

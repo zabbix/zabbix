@@ -77,10 +77,10 @@ void	zbx_audit_trigger_create_entry(int audit_context_mode, int audit_action, zb
 }
 
 void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t triggerid, zbx_uint64_t templateid,
-		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
-		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url,
-		const char *url_name, int flags, unsigned char correlation_mode, const char *correlation_tag,
-		unsigned char manual_close, const char *opdata, unsigned char discover, const char *event_name)
+		unsigned char recovery_mode, unsigned char status, unsigned char type, unsigned char priority,
+		const char *comments, const char *url, const char *url_name, int flags, unsigned char correlation_mode,
+		const char *correlation_tag, unsigned char manual_close, const char *opdata, unsigned char discover,
+		const char *event_name)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_event_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_opdata[AUDIT_DETAILS_KEY_LEN], audit_key_comments[AUDIT_DETAILS_KEY_LEN],
@@ -132,13 +132,11 @@ void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t
 	ADD_STR(comments, AUDIT_TABLE_NAME, "comments")
 	ADD_INT(flags, AUDIT_TABLE_NAME, "flags")
 	ADD_INT(priority, AUDIT_TABLE_NAME, "priority")
-	ADD_UINT64(state, AUDIT_TABLE_NAME, "state")
 	ADD_INT(status, AUDIT_TABLE_NAME, "status")
 	ADD_UINT64(templateid, AUDIT_TABLE_NAME, "templateid")
 	ADD_INT(type, AUDIT_TABLE_NAME, "type")
 	ADD_STR(url, AUDIT_TABLE_NAME, "url")
 	ADD_STR(url_name, AUDIT_TABLE_NAME, "url_name")
-	ADD_UINT64(value, AUDIT_TABLE_NAME, "value")
 	ADD_INT(recovery_mode, AUDIT_TABLE_NAME, "recovery_mode")
 	ADD_INT(correlation_mode, AUDIT_TABLE_NAME, "correlation_mode")
 	ADD_STR(correlation_tag, AUDIT_TABLE_NAME, "correlation_tag")

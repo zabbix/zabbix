@@ -38,9 +38,16 @@ zbx_supervisor_runstate_t;
 
 typedef struct
 {
+	zbx_dbconn_pool_t	*dbpool;
+}
+zbx_supervisor_unit_shared_t;
+
+typedef struct
+{
 	zbx_thread_args_t			args;
 	zbx_log_component_t			*logger;
 	_Atomic zbx_supervisor_runstate_t	*runstate;
+	zbx_supervisor_unit_shared_t		*shared;
 	char					name[ZBX_MAX_PROCNAME_LEN + 1];
 }
 zbx_supervisor_unit_args_t;
@@ -56,12 +63,13 @@ zbx_supervisor_client_t;
 
 int	zbx_supervisor_client_init(zbx_supervisor_client_t *svc, char **error);
 void	zbx_supervisor_client_clear(zbx_supervisor_client_t *svc);
+void	zbx_supervisor_client_prepare(const int *forks);
 int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char **error);
+int	zbx_supervisor_get_process_count(int process_type);
 
 void	zbx_supervisor_worklog_init(void);
 void	zbx_supervisor_worklog_clear(void);
 void	zbx_supervisor_update_activity(const char *fmt, ...);
 char	*zbx_supervisor_get_activities(void);
-
 
 #endif
