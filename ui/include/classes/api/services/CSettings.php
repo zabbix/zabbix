@@ -426,7 +426,7 @@ class CSettings extends CApiService {
 		$url_api_required = $apm_global_db['status'] != $db_apm_global_db['status'] ? API_REQUIRED : 0;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'url' =>					['type' => API_URL, 'flags' => $url_api_required | API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => self::APM_GLOBAL_DB_SCHEMA['url']['length']],
+			'url' =>					['type' => API_URL, 'flags' => $url_api_required | API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'require_scheme' => true, 'length' => self::APM_GLOBAL_DB_SCHEMA['url']['length']],
 			'authentication_type' =>	['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_NONE])],
 			'db' =>						['type' => API_STRING_UTF8, 'length' => self::APM_GLOBAL_DB_SCHEMA['db']['length']]
 		]];
