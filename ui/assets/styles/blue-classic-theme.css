@@ -890,7 +890,8 @@ body {
       overflow-y: auto;
       overscroll-behavior-y: contain;
       position: sticky;
-      inset-block-start: 0; }
+      inset-block-start: 0;
+      z-index: 998; }
     body > z-split-view:has(.side-drawer.closed) {
       grid-template-columns: none; }
       body > z-split-view:has(.side-drawer.closed) .side-drawer,
