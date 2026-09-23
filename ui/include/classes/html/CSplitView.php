@@ -16,9 +16,6 @@
 
 class CSplitView extends CTag {
 
-	const PANE_FIXED_START = 'start';
-	const PANE_FIXED_END = 'end';
-
 	public function __construct($items = null) {
 		parent::__construct('z-split-view', true);
 		parent::addItem($items);
@@ -26,7 +23,7 @@ class CSplitView extends CTag {
 
 	public function addItem($value): self {
 		if ($value !== null) {
-			$this->items[] = $value instanceof CSplitViewPane ? $value : new CSplitViewPane($value);
+			parent::addItem($value instanceof CSplitViewPane ? $value : new CSplitViewPane($value));
 		}
 
 		return $this;
