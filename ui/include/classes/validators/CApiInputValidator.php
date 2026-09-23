@@ -2690,6 +2690,10 @@ class CApiInputValidator {
 			$options['schemes'] = CSettingsHelper::getAllowedUriSchemes();
 		}
 
+		if (array_key_exists('require_scheme', $rule)) {
+			$options['require_scheme'] = $rule['require_scheme'];
+		}
+
 		$validator = new CUrlValidator($options);
 
 		if (!$validator->validate($data)) {

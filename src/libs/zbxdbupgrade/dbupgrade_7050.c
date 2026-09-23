@@ -2125,6 +2125,15 @@ static int	DBpatch_7050186(void)
 
 static int	DBpatch_7050187(void)
 {
+#ifdef HAVE_MYSQL
+	if (ZBX_DB_OK > zbx_db_execute("update proxy set apm='{}'"))
+		return FAIL;
+#endif
+	return SUCCEED;
+}
+
+static int	DBpatch_7050188(void)
+{
 	return zbx_db_settings_set_value(ZBX_SETTINGS_APM, "{}", ZBX_SETTING_TYPE_STR);
 }
 
@@ -2322,5 +2331,6 @@ DBPATCH_ADD(7050184, 0, 1)
 DBPATCH_ADD(7050185, 0, 1)
 DBPATCH_ADD(7050186, 0, 1)
 DBPATCH_ADD(7050187, 0, 1)
+DBPATCH_ADD(7050188, 0, 1)
 
 DBPATCH_END()

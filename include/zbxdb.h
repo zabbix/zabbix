@@ -371,8 +371,11 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t * const *fields, int fields_num);
-void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args);
+void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		va_list args);
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...);
+void	zbx_dbconn_prepare_insert_table(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		...);
 void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
 int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
@@ -560,6 +563,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t **fields, int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_prepare_table(zbx_db_insert_t *self, const zbx_db_table_t *db_table, ...);
 int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 const char	*zbx_db_last_strerr(void);
 zbx_err_codes_t	zbx_db_last_errcode(void);

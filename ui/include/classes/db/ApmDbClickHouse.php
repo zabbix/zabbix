@@ -16,11 +16,6 @@
 
 class ApmDbClickHouse {
 
-	/**
-	 * The maximum number of seconds to allow cURL functions to execute.
-	 */
-	private const TIMEOUT = 5;
-
 	private static array $instances = [];
 
 	private array $config;
@@ -100,7 +95,7 @@ class ApmDbClickHouse {
 				}
 
 				if ($http_error) {
-					throw new DBException(_('Database error occurred. '), DB::DBEXECUTE_ERROR);
+					throw new DBException(_('Database error occurred.'), DB::DBEXECUTE_ERROR);
 				}
 
 				if ($http_response_validated) {
@@ -163,8 +158,7 @@ class ApmDbClickHouse {
 			CURLOPT_SHARE => $this->curl_share,
 			CURLOPT_SSL_VERIFYPEER => $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
-			CURLOPT_HTTPHEADER => $http_headers,
-			CURLOPT_TIMEOUT => self::TIMEOUT
+			CURLOPT_HTTPHEADER => $http_headers
 		];
 
 		if ($params) {
