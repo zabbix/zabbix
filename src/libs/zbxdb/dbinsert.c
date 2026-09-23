@@ -42,6 +42,7 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_BLOB:
@@ -129,28 +130,23 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args)
+void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		va_list args)
 {
 	zbx_vector_const_db_field_ptr_t	fields;
 	char				*field;
-	const zbx_db_table_t		*ptable;
 	const zbx_db_field_t		*pfield;
 
-	/* find the table and fields in database schema */
-	if (NULL == (ptable = zbx_db_get_table(table)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		zbx_exit(EXIT_FAILURE);
-	}
+	/* find fields in database schema */
 
 	zbx_vector_const_db_field_ptr_create(&fields);
 
 	while (NULL != (field = va_arg(args, char *)))
 	{
-		if (NULL == (pfield = zbx_db_get_field(ptable, field)))
+		if (NULL == (pfield = zbx_db_get_field(db_table, field)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot locate table \"%s\" field \"%s\" in database schema",
-					table, field);
+					db_table, field);
 			THIS_SHOULD_NEVER_HAPPEN;
 			zbx_exit(EXIT_FAILURE);
 		}
@@ -158,7 +154,7 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 		zbx_vector_const_db_field_ptr_append(&fields, pfield);
 	}
 
-	zbx_dbconn_prepare_insert_dyn(db, db_insert, ptable, (const zbx_db_field_t * const *)fields.values,
+	zbx_dbconn_prepare_insert_dyn(db, db_insert, db_table, (const zbx_db_field_t * const *)fields.values,
 			fields.values_num);
 
 	zbx_vector_const_db_field_ptr_destroy(&fields);
@@ -172,11 +168,34 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...)
 {
 	va_list	args;
+	const zbx_db_table_t	*db_table;
+
+	if (NULL == (db_table = zbx_db_get_table(table)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_exit(EXIT_FAILURE);
+	}
 
 	va_start(args, table);
-	zbx_dbconn_prepare_vinsert(db, db_insert, table, args);
+	zbx_dbconn_prepare_vinsert(db, db_insert, db_table, args);
 	va_end(args);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_prepare_insert_table(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		...)
+{
+	va_list	args;
+
+	va_start(args, db_table);
+	zbx_dbconn_prepare_vinsert(db, db_insert, db_table, args);
+	va_end(args);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -218,6 +237,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 		{
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -276,6 +296,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 		{
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -441,6 +462,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 		switch (field->type)
 		{
 			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -482,6 +504,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
+				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_JSON:
