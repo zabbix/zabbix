@@ -456,6 +456,7 @@ void	*zbx_apm_manager_thread(void *args)
 	zbx_apm_config_t			apm_config = {0};
 	zbx_apm_config_tls_t			apm_config_tls, *tls;
 	zbx_apm_db_config_t			apm_global = {0};
+	zbx_uint32_t				rtc_manager_msgs[] = {ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 
 	apm_args = (const zbx_thread_apm_manager_args_t *)unit_args->args.args;
 
@@ -486,6 +487,9 @@ void	*zbx_apm_manager_thread(void *args)
 
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_APM_MANAGER, 0, rtc_manager_msgs, ARRSIZE(rtc_manager_msgs),
+			apm_args->config_timeout, ZBX_IPC_SERVICE_APM);
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
