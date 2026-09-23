@@ -142,9 +142,9 @@ $html_page = (new CHtmlPage())
 	)
 	->setSplitView(
 		(new CSplitView())
-			->setAttribute('min', '10%')
-			->setAttribute('max', '90%')
-			->setAttribute('position', $data['side_drawer_position'])
+			->setMinPosition('10%')
+			->setMaxPosition('90%')
+			->setPosition($data['side_drawer_position'])
 	)
 	->addItem([$filter, $form]);
 
