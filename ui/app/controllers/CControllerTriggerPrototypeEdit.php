@@ -27,6 +27,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$rules = ['object', 'fields' => [
+			'triggerid' => ['db triggers.triggerid', 'required'],
+			'parent_discoveryid' => ['db triggers.triggerid'],
 			'context' => ['string', 'required', 'in' => ['host', 'template']],
 			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
 			'form_refresh' => ['integer', 'in' => [0, 1]]
