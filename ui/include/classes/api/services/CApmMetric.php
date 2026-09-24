@@ -214,11 +214,15 @@ class CApmMetric extends CApmGeneral {
 			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
 			: self::CLICKHOUSE_METRICS_TABLES;
 
+		$sub_query_options = $options['countOutput']
+			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'offset']))
+			: array_diff_key($options, array_flip(['output', 'offset']));
+
 		$sub_queries = [];
 
 		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
 			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
-				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
+				$sub_query_options
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
 					'time_from' => $options['time_from']
@@ -322,7 +326,13 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($count, $options['limit']);
+				}
+
+				return $real_count_output ? (string) $count : array_fill(0, $count, []);
 			}
 
 			$db_metrics[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
