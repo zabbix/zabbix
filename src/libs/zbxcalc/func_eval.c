@@ -3068,17 +3068,17 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		goto out;
 	}
 
-	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
-	{
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
-	}
-
 	if (SUCCEED != zbx_jsonpath_compile(pattern, &jsonpath))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid jsonpath expression: %s", zbx_json_strerror());
 		*error = zbx_strdup(*error, "invalid jsonpath expression");
 		goto out;
+	}
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto clear_jsonpath;
 	}
 
 	result = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
@@ -3118,12 +3118,12 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		zbx_jsonobj_clear(&obj);
 	}
 
-	zbx_jsonpath_clear(&jsonpath);
-
 	zbx_variant_set_vector(value, result);
 	result = NULL;
 
 	ret = SUCCEED;
+clear_jsonpath:
+	zbx_jsonpath_clear(&jsonpath);
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 	zbx_vector_str_clear_ext(&matches, zbx_str_free);
