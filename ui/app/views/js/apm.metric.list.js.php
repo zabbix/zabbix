@@ -646,7 +646,7 @@
 							action,
 							...(filter === 'traceid'
 									? { filter_traceid: exemplar.traceid }
-									: { filter_spanid: exemplar.spanid }
+									: { filter_traceid: exemplar.traceid, filter_spanid: exemplar.spanid }
 							),
 							from: exemplar.time_from,
 							to: exemplar.time_to,
@@ -654,16 +654,6 @@
 						});
 					}
 				}
-
-				const traceid_div = document.createElement('div');
-				traceid_div.append(exemplar.traceid, ' ', links['apm.log.list'].traceid, ' ',
-					links['apm.trace.list'].traceid
-				);
-
-				const spanid_div = document.createElement('div');
-				spanid_div.append(exemplar.spanid, ' ', links['apm.log.list'].spanid, ' ',
-					links['apm.trace.list'].spanid
-				);
 
 				const group = {
 					title: sprintf(<?= json_encode(_('Exemplar  %1$s')) ?>, i + 1),
@@ -675,17 +665,33 @@
 						{
 							name: <?= json_encode(_('Value')) ?>,
 							value: exemplar.value
-						},
-						{
-							name: <?= json_encode(_('Trace ID')) ?>,
-							value: traceid_div
-						},
-						{
-							name: <?= json_encode(_('Span ID')) ?>,
-							value: spanid_div
 						}
 					]
 				};
+
+				if (exemplar.traceid) {
+					const traceid_div = document.createElement('div');
+					traceid_div.append(exemplar.traceid, ' ', links['apm.log.list'].traceid, ' ',
+						links['apm.trace.list'].traceid
+					);
+
+					group.items.push({
+						name: <?= json_encode(_('Trace ID')) ?>,
+						value: traceid_div
+					});
+				}
+
+				if (exemplar.spanid) {
+					const spanid_div = document.createElement('div');
+					spanid_div.append(exemplar.spanid, ' ', links['apm.log.list'].spanid, ' ',
+						links['apm.trace.list'].spanid
+					);
+
+					group.items.push({
+						name: <?= json_encode(_('Span ID')) ?>,
+						value: spanid_div
+					});
+				}
 
 				Object.entries(exemplar.filtered_attributes).forEach(([key, value]) => {
 					group.items.push({
