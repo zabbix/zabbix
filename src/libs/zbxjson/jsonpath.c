@@ -2901,19 +2901,15 @@ static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx)
 typedef int	(*jsonpath_format_query_result_func_t)(const zbx_vector_jsonobj_ref_t *objects, int definite_path,
 		void *output);
 
-static int	jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path,
-		jsonpath_format_query_result_func_t query_result_format_func, void *output)
+static int	jsonobj_query_ext_precompiled(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
+		zbx_jsonpath_t *jsonpath, jsonpath_format_query_result_func_t query_result_format_func, void *output)
 {
 	zbx_jsonpath_context_t	ctx;
-	zbx_jsonpath_t		jsonpath;
 	int			ret = SUCCEED;
-
-	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
-		return FAIL;
 
 	ctx.found = 0;
 	ctx.root = obj;
-	ctx.path = &jsonpath;
+	ctx.path = jsonpath;
 	zbx_vector_jsonobj_ref_create(&ctx.objects);
 	ctx.index = index;
 
@@ -2932,15 +2928,15 @@ static int	jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *ind
 	if (SUCCEED == ret)
 	{
 		zbx_vector_jsonobj_ref_t	out;
-		int				definite_path = jsonpath.definite, path_depth;
+		int				definite_path = jsonpath->definite, path_depth;
 
 		zbx_vector_jsonobj_ref_create(&out);
 
-		path_depth = jsonpath.segments_num;
-		while (0 < path_depth && ZBX_JSONPATH_SEGMENT_FUNCTION == jsonpath.segments[path_depth - 1].type)
+		path_depth = jsonpath->segments_num;
+		while (0 < path_depth && ZBX_JSONPATH_SEGMENT_FUNCTION == jsonpath->segments[path_depth - 1].type)
 			path_depth--;
 
-		if (path_depth < jsonpath.segments_num)
+		if (path_depth < jsonpath->segments_num)
 		{
 			if (SUCCEED == (ret = jsonpath_apply_functions(&ctx, path_depth, &definite_path, &out)))
 				ret = query_result_format_func(&out, definite_path, output);
@@ -2953,6 +2949,21 @@ static int	jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *ind
 	}
 
 	jsonpath_ctx_clear(&ctx);
+
+	return ret;
+}
+
+static int	jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path,
+		jsonpath_format_query_result_func_t query_result_format_func, void *output)
+{
+	int		ret;
+	zbx_jsonpath_t	jsonpath;
+
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+		return FAIL;
+
+	ret = jsonobj_query_ext_precompiled(obj, index, &jsonpath, query_result_format_func, output);
+
 	zbx_jsonpath_clear(&jsonpath);
 
 	return ret;
@@ -2967,6 +2978,19 @@ int	zbx_jsonobj_query_ext_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_inde
 int	zbx_jsonobj_query_vector_str(const zbx_jsonobj_t *obj, const char *path, zbx_vector_str_t *output)
 {
 	return zbx_jsonobj_query_ext_vector_str(obj, NULL, path, output);
+}
+
+int	zbx_jsonobj_query_ext_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
+		zbx_jsonpath_t *jsonpath, zbx_vector_str_t *output)
+{
+	return jsonobj_query_ext_precompiled(obj, index, jsonpath, jsonpath_format_query_result_vector_str,
+			(void *)output);
+}
+
+int	zbx_jsonobj_query_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_t *jsonpath,
+		zbx_vector_str_t *output)
+{
+	return zbx_jsonobj_query_ext_precompiled_vector_str(obj, NULL, jsonpath, output);
 }
 
 /******************************************************************************
