@@ -542,6 +542,15 @@ window.ceprule_edit_popup = new class {
 			trigger_element
 		});
 
+		overlay.$dialogue.$head.$close_button.show();
+		overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+			for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
+				form.dispatchEvent(new CustomEvent('form.destroyed'));
+			}
+		});
+		overlay.recoverFocus();
+		overlay.containFocus();
+
 		ceprule_condition_edit_popup.init({rules: this.#condition_rules, condition, overlay});
 	}
 
@@ -630,6 +639,15 @@ window.ceprule_edit_popup = new class {
 			dialogueid: 'ceprule.operation.edit',
 			trigger_element
 		});
+
+		overlay.$dialogue.$head.$close_button.show();
+		overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+			for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
+				form.dispatchEvent(new CustomEvent('form.destroyed'));
+			}
+		});
+		overlay.recoverFocus();
+		overlay.containFocus();
 
 		ceprule_operation_edit_popup.init({rules: this.#operation_rules, operation, overlay,
 			window_type: this.form.findFieldByName('window_type').getValue(),

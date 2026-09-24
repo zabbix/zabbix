@@ -159,6 +159,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"timeout_snmp_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_ssh_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_telnet_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
+	{"timeout_telemetry_query",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_zabbix_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"device_link_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"60s"},
 	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,	"http,https,ftp,file,mailto,tel,ssh"},
@@ -856,6 +857,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 			revision);
 	store_str_setting(values, "timeout_telnet_agent", found, defaults_log_level,
 			&config->config->item_timeouts.telnet, revision);
+	store_str_setting(values, "timeout_telemetry_query", found, defaults_log_level,
+			&config->config->item_timeouts.telemetry, revision);
 	store_str_setting(values, "timeout_zabbix_agent", found, defaults_log_level,
 			&config->config->item_timeouts.agent, revision);
 

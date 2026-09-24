@@ -274,6 +274,8 @@ final class CRouter {
 		'popup.condition.check'						=> [CControllerActionConditionCheck::class,						ZBX_LAYOUT_JSON,		null],
 		'popup.condition.edit'						=> [CControllerPopupActionConditionEdit::class,					ZBX_LAYOUT_JSON,		'popup.condition.edit'],
 		'popup.condition.operations'				=> [CControllerPopupConditionOperations::class,					ZBX_LAYOUT_JSON,		'popup.condition.edit'],
+		'popup.telemetry.aggregatedcolumn.edit'		=> [CControllerPopupTelemetryAggregatedColumnEdit::class,		ZBX_LAYOUT_JSON,		'popup.telemetry.aggregatedcolumn.edit'],
+		'popup.telemetry.condition.edit'			=> [CControllerPopupTelemetryConditionEdit::class,				ZBX_LAYOUT_JSON,		'popup.telemetry.condition.edit'],
 		'popup.dashboard.share.edit'				=> [CControllerPopupDashboardShareEdit::class,					ZBX_LAYOUT_JSON,		'popup.dashboard.share.edit'],
 		'popup.generic'								=> [CControllerPopupGeneric::class,								ZBX_LAYOUT_JSON,		'popup.generic'],
 		'popup.import'								=> [CControllerPopupImport::class,								ZBX_LAYOUT_JSON,		'popup.import'],
