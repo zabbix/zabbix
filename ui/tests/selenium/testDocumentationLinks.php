@@ -1602,8 +1602,8 @@ class testDocumentationLinks extends CWebTest {
 			// #155 Event correlation list view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/correlation'
+					'url' => 'zabbix.php?action=ceprule.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/ceprules'
 				]
 			],
 			// #156 Create event correlation form view.
@@ -1616,7 +1616,7 @@ class testDocumentationLinks extends CWebTest {
 			// #157 Edit event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
+					'url' => 'zabbix.php?action=ceprule.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',

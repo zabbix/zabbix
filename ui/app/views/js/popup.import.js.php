@@ -132,7 +132,7 @@ window.popup_import = new class {
 				_('Any existing host entities not present in the import file will be deleted. Click OK to proceed.')
 			) ?>;
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			content: document.createElement('span').innerText = message,
 			buttons: [
 				{
@@ -161,6 +161,9 @@ window.popup_import = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: (compare_overlay || this.#overlay).$btn_submit
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#openImportComparePopup() {
@@ -177,7 +180,7 @@ window.popup_import = new class {
 					throw {error: response.error};
 				}
 
-				overlayDialogue({
+				const overlay = overlayDialogue({
 					title: response.header,
 					class: response.no_changes ? '' : 'modal-popup modal-popup-fullscreen',
 					content: response.body,
@@ -189,6 +192,9 @@ window.popup_import = new class {
 					position: response.no_changes ? Overlay.prototype.POSITION_CENTER : undefined,
 					trigger_element: this.#overlay.$btn_submit
 				});
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
 			})
 			.catch((exception) => {
 				document.getElementById('import_file').value = '';
@@ -274,7 +280,7 @@ window.popup_import = new class {
 
 	#updateWarning(obj, content) {
 		if (obj.checked) {
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				content: document.createElement('span').innerText = content,
 				buttons: [
 					{
@@ -295,6 +301,9 @@ window.popup_import = new class {
 				position: Overlay.prototype.POSITION_CENTER,
 				trigger_element: obj
 			});
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$head.$close_button.show();
 		}
 	}
 

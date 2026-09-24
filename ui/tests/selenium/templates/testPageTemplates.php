@@ -92,7 +92,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
-		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
+		$sqlTriggers = 'select triggerid,expression,description,url,status,priority,comments,templateid,type,flags'.
+				' from triggers order by triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('zabbix.php?action=template.list');
@@ -471,10 +472,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Template for');
-		$filter->submit();
 		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
+		$filter->submit();
+		$table->waitUntilReloaded();
 
-		$table_rows_count = $table->getRows()->count();
+		$table_rows_count = $table->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

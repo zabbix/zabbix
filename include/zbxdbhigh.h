@@ -99,6 +99,14 @@
 #define ZBX_ITEM_DESCRIPTION_LEN		65535
 #define ZBX_ITEM_POSTS_LEN			65535
 #define ZBX_ITEM_HEADERS_LEN			65535
+#define ZBX_ITEM_QUERY_LEN			65535
+#define ZBX_ITEM_QUERY_LEN_MAX			(ZBX_ITEM_QUERY_LEN + 1)
+#define ZBX_ITEM_TIME_SHIFT_LEN			255
+#define ZBX_ITEM_TIME_SHIFT_LEN_MAX		(ZBX_ITEM_TIME_SHIFT_LEN + 1)
+#define ZBX_ITEM_LOOKBACK_LIMIT_LEN		255
+#define ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX		(ZBX_ITEM_LOOKBACK_LIMIT_LEN + 1)
+#define ZBX_ITEM_GRANULARITY_LEN		255
+#define ZBX_ITEM_GRANULARITY_LEN_MAX		(ZBX_ITEM_GRANULARITY_LEN + 1)
 #define ZBX_ITEM_PARAMETER_NAME_LEN		255
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255
@@ -125,6 +133,8 @@
 #define ZBX_DSERVICE_VALUE_LEN			255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
+#define ZBX_EVENT_NAME_LEN			2048
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -145,26 +155,37 @@ zbx_db_dhost;
 
 typedef struct
 {
-	zbx_uint64_t	triggerid;
-	char		*description;
-	char		*expression;
-	char		*recovery_expression;
-	char		*url;
-	char		*url_name;
-	char		*comments;
-	char		*correlation_tag;
-	char		*opdata;
-	char		*event_name;
-	unsigned char	value;
-	unsigned char	priority;
-	unsigned char	type;
-	unsigned char	recovery_mode;
-	unsigned char	correlation_mode;
+	zbx_uint64_t		triggerid;
+	char			*description;
+	char			*expression;
+	char			*recovery_expression;
+	char			*url;
+	char			*url_name;
+	char			*comments;
+	char			*correlation_tag;
+	char			*opdata;
+	char			*event_name;
+	unsigned char		value;
+	unsigned char		priority;
+	unsigned char		type;
+	unsigned char		recovery_mode;
+	unsigned char		correlation_mode;
+	zbx_vector_uint64_t	dep_triggerids;
 
 	/* temporary trigger cache for related data */
-	void		*cache;
+	void			*cache;
 }
 zbx_db_trigger;
+
+typedef struct
+{
+	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
+	int		until;
+}
+zbx_db_event_suppress_t;
+
+ZBX_VECTOR_LITE_DECL(db_event_suppress, zbx_db_event_suppress_t)
 
 typedef struct
 {
@@ -181,7 +202,7 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_vector_db_event_suppress_t	*suppress;
 
 	zbx_vector_tags_ptr_t	tags;
 
@@ -198,6 +219,15 @@ typedef struct
 zbx_db_event;
 
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+typedef struct
+{
+	zbx_db_event		*event;
+	zbx_vector_uint64_t	p_eventids;
+}
+zbx_db_event_recovery_t;
+
+ZBX_VECTOR_DECL(db_event_recovery, zbx_db_event_recovery_t)
 
 /* data structures used to create new and recover existing escalations */
 typedef struct
@@ -478,30 +508,18 @@ zbx_connector_filter_t;
 ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* events callbacks */
-typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+typedef void	(*zbx_add_event_func_t)(zbx_db_event *event);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
-		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
+typedef int	(*zbx_process_events_func_t)(void);
 typedef void	(*zbx_clean_events_func_t)(void);
-typedef void	(*zbx_reset_event_recovery_func_t)(void);
-typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset);
-typedef void	(*zbx_events_update_itservices_func_t)(void);
 
 typedef struct
 {
 	zbx_add_event_func_t			add_event_cb;
 	zbx_process_events_func_t		process_events_cb;
 	zbx_clean_events_func_t			clean_events_cb;
-	zbx_reset_event_recovery_func_t		reset_event_recovery_cb;
-	zbx_export_events_func_t		export_events_cb;
-	zbx_events_update_itservices_func_t	events_update_itservices_cb;
-} zbx_events_funcs_t;
+}
+zbx_events_funcs_t;
 
 /* events callbacks end */
 
@@ -542,22 +560,29 @@ int	zbx_db_get_database_type(void);
 
 typedef struct
 {
-	zbx_uint64_t		eventid;
-	int			clock;
-	int			ns;
-	int			value;
-	int			severity;
-	int			mtime;
-	zbx_vector_tags_ptr_t	tags;
-
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_uint64_t			eventid;
+	int				clock;
+	int				ns;
+	int				value;
+	int				severity;
+	int				mtime;
+	zbx_vector_tags_ptr_t		tags;
 }
 zbx_event_t;
 
 ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
+typedef enum
+{
+	ZBX_AUTH_LOOKUP_GENERIC = 0,
+	ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD
+}
+zbx_auth_lookup_mode_t;
+
 int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+int	zbx_db_get_user_by_offboard_token(const char *formatted_auth_token_hash, const char *device_uuid,
+		zbx_user_t *user);
 void	zbx_user_init(zbx_user_t *user);
 void	zbx_user_free(zbx_user_t *user);
 
@@ -777,7 +802,6 @@ int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_uns
 		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
-void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 void	zbx_db_flush_version_requirements(const char *version);
 
 #define ZBX_PROXY_DATA_DONE	0
@@ -824,6 +848,14 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
 #define ZBX_CONDITION_TYPE_PROXY_GROUP			29
+#define ZBX_CONDITION_TYPE_EVENT_OPEN			30
+#define ZBX_CONDITION_TYPE_EVENT_FIRST			31
+#define ZBX_CONDITION_TYPE_EVENT_LAST			32
+#define ZBX_CONDITION_TYPE_EVENT_SYMPTOM		33
+#define ZBX_CONDITION_TYPE_EVENT_COPIED			34
+#define ZBX_CONDITION_TYPE_EVENT_SUPPRESSED		35
+#define ZBX_CONDITION_TYPE_HOST_VISIBLE_NAME		36
+#define ZBX_CONDITION_TYPE_HOST_GROUP_NAME		37
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1
@@ -873,6 +905,29 @@ const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rows
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
+zbx_db_event	*zbx_create_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+	int clock, int ns, int value);
+zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size);
+
+typedef struct
+{
+	zbx_uint64_t		eventid;
+	int			source;
+	zbx_vector_tag_t	tags;
+}
+zbx_event_tags_t;
+
+ZBX_VECTOR_DECL(event_tags, zbx_event_tags_t)
+ZBX_PTR_VECTOR_DECL(event_tags_ptr, zbx_event_tags_t *)
+
+void	zbx_db_write_tags(zbx_dbconn_t *db, const zbx_vector_event_tags_ptr_t *etags, const char *table,
+		const char *field, const char *tag_table, const char *tag_key, zbx_vector_uint64_t *eventids);
+void	zbx_db_validate_tags(zbx_dbconn_t *db, zbx_vector_event_tags_ptr_t *event_tags);
+
+
+void	zbx_event_tags_clear(zbx_event_tags_t *event_tags);
+int	zbx_event_tags_compare(const void *d1, const void *d2);
 
 int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 

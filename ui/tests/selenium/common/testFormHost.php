@@ -2171,7 +2171,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
 					'error' => 'Cannot delete host "Host for suppression" because maintenance "Maintenance for suppression test"'.
-							' must contain at least one host or host group.'
+							' must contain at least one host group, host or trigger.'
 				]
 			]
 		];

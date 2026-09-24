@@ -159,6 +159,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"timeout_snmp_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_ssh_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_telnet_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
+	{"timeout_telemetry_query",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_zabbix_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"device_link_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"60s"},
 	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,	"http,https,ftp,file,mailto,tel,ssh"},
@@ -219,13 +220,13 @@ int	zbx_dbsync_compare_settings(zbx_dbsync_t *sync)
 
 	zbx_dcsync_sql_start(sync);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name, type, value_str, value_int, value_usrgrpid, "
-			"value_hostgroupid, value_userdirectoryid, value_mfaid from settings where");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name,type,value_str,value_int,value_usrgrpid,"
+			"value_hostgroupid,value_userdirectoryid,value_mfaid from settings where");
 
-	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char * const*)names.values,
-			names.values_num);
+	zbx_dbconn_add_str_condition_alloc(sync->db, &sql, &sql_alloc, &sql_offset, "name",
+			(const char * const*)names.values, names.values_num);
 
-	if (NULL == (result = zbx_db_select(sql)))
+	if (NULL == (result = zbx_dbconn_select(sync->db, sql)))
 	{
 		goto ret;
 	}
@@ -856,6 +857,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 			revision);
 	store_str_setting(values, "timeout_telnet_agent", found, defaults_log_level,
 			&config->config->item_timeouts.telnet, revision);
+	store_str_setting(values, "timeout_telemetry_query", found, defaults_log_level,
+			&config->config->item_timeouts.telemetry, revision);
 	store_str_setting(values, "timeout_zabbix_agent", found, defaults_log_level,
 			&config->config->item_timeouts.agent, revision);
 

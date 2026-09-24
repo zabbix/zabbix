@@ -17,6 +17,7 @@
 
 #include "async_manager.h"
 #include "zbxpoller.h"
+#include "zbxcacheconfig.h"
 
 #include "zbxalgo.h"
 
@@ -40,6 +41,7 @@ typedef struct
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
+	zbx_vector_dc_cached_data_t	cached_datas;
 	unsigned char			check_queue;
 
 	pthread_mutex_t			lock;

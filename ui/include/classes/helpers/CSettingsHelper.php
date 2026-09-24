@@ -44,6 +44,7 @@ class CSettingsHelper {
 	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
 	public const TIMEOUT_SCRIPT = 'timeout_script';
 	public const TIMEOUT_BROWSER = 'timeout_browser';
+	public const TIMEOUT_TELEMETRY_QUERY = 'timeout_telemetry_query';
 	public const SOCKET_TIMEOUT = 'socket_timeout';
 	public const CONNECT_TIMEOUT = 'connect_timeout';
 	public const MEDIA_TYPE_TEST_TIMEOUT = 'media_type_test_timeout';
@@ -137,8 +138,9 @@ class CSettingsHelper {
 					// Timeouts.
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-					'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
-					'script_timeout', 'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
+					'timeout_script', 'timeout_browser', 'timeout_telemetry_query', 'socket_timeout', 'connect_timeout',
+					'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'report_test_timeout',
+					'device_link_timeout',
 
 					// Trigger displaying options.
 					'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',

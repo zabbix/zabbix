@@ -43,6 +43,7 @@ const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_NO_INDENT = 'no-indent';
 const ZBX_STYLE_WORDBREAK = 'wordbreak';
+const ZBX_STYLE_SEPARATOR = 'separator';
 
 const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
 
@@ -365,3 +366,8 @@ const EVENT_CONTEXT_OVERLAY = 'overlay';
 const EVENT_UNMOUNT = 'unmount';
 
 const VALIDATE_USE_CHUNK_SIZE = 500;
+
+const ZBX_TIME_SUFFIXES = 'smhdw';
+const ZBX_TIME_SUFFIXES_WITH_YEAR = 'smhdwMy';
+
+const ZBX_TIME_SUFFIX_MULTIPLIERS = {s: 1, m: 60, h: 3600, d: 86400, w: 604800, M: 2592000, y: 31536000};

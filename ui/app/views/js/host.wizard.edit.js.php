@@ -585,6 +585,10 @@ window.host_wizard_edit = new class {
 
 			this.#setValueByName(this.#data, detail.options.name, value?.isNew ? null : value);
 			this.#setValueByName(this.#data, detail.options.newItemName, value?.isNew ? value : null);
+
+			if (this.#data.host) {
+				this.#removeMessageBoxes();
+			}
 		});
 
 		if (this.#data.host !== null) {

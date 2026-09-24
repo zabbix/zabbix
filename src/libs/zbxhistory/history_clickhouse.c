@@ -182,7 +182,7 @@ static void	history_clickhouse_release_conn(zbx_clickhouse_data_t *data, zbx_cli
  *     options_num - [IN] number of configuration options                     *
  *                                                                            *
  ******************************************************************************/
-static void	history_clickhouse_validate_options(const zbx_history_option_t *options, int options_num)
+static void	history_clickhouse_validate_options(const zbx_config_option_t *options, int options_num)
 {
 	const char	*supported_options = ""
 				HISTORY_PROVIDER_OPTION_NAME ","
@@ -226,7 +226,7 @@ static void	history_clickhouse_validate_options(const zbx_history_option_t *opti
  * Return value: pointer to created data structure or NULL if failed          *
  *                                                                            *
  ******************************************************************************/
-static void	*history_clickhouse_create_data(const zbx_history_option_t *options, int options_num, char **error)
+static void	*history_clickhouse_create_data(const zbx_config_option_t *options, int options_num, char **error)
 {
 	zbx_clickhouse_data_t	*data;
 	const char		*url, *username, *password, *db, *value;
@@ -237,20 +237,20 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 		return NULL;
 	}
 
-	if (NULL == (url = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
+	if (NULL == (url = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
 		*error = zbx_dsprintf(NULL, "missing \"%s\" option", HISTORY_PROVIDER_OPTION_URL);
 		return NULL;
 	}
 
-	if (NULL == (db = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_DB)))
+	if (NULL == (db = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_DB)))
 	{
 		*error = zbx_dsprintf(NULL, "missing \"%s\" option", HISTORY_PROVIDER_OPTION_DB);
 		return NULL;
 	}
 
-	username = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_USERNAME);
-	password = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PASSWORD);
+	username = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_USERNAME);
+	password = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PASSWORD);
 
 	if (NULL == username && NULL != password)
 	{
@@ -270,24 +270,27 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	data->username = username;
 	data->password = password;
 
-	data->ssl_cert_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_FILE);
-	data->ssl_key_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_FILE);
-	data->ssl_key_password = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD);
-	data->ssl_ca_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION);
-	data->ssl_cert_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION);
-	data->ssl_key_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION);
+	data->ssl_cert_file = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_FILE);
+	data->ssl_key_file = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_FILE);
+	data->ssl_key_password = zbx_config_option_value(options, options_num,
+			HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD);
+	data->ssl_ca_location = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION);
+	data->ssl_cert_location = zbx_config_option_value(options, options_num,
+			HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION);
+	data->ssl_key_location = zbx_config_option_value(options, options_num,
+			HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION);
 
-	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_PEER)))
+	if (NULL != (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_PEER)))
 		data->ssl_verify_peer = atoi(value);
 	else
 		data->ssl_verify_peer = 1;
 
-	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST)))
+	if (NULL != (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST)))
 		data->ssl_verify_host = atoi(value);
 	else
 		data->ssl_verify_host = 1;
 
-	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
+	if (NULL != (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
 		data->log_slow_queries = atoi(value);
 
 	zbx_vector_clickhouse_conn_ptr_create(&data->conns);
@@ -358,7 +361,7 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 	/* either username and password both have been set or both are NULL */
 	if (NULL != d->username)
 	{
-		if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL,
+		if (SUCCEED != zbx_http_prepare_auth(conn->handle, HTTPTEST_AUTH_BASIC, d->username, d->password, NULL,
 				error))
 		{
 			goto fail;
@@ -1702,7 +1705,7 @@ out:
  * Return value: pointer to history provider or NULL if failed                *
  *                                                                            *
  ******************************************************************************/
-zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*history_clickhouse_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	zbx_history_provider_t	*provider;
 	void			*data;
@@ -1731,7 +1734,7 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *opti
 	return provider;
 }
 #else
-zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*history_clickhouse_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	ZBX_UNUSED(options);
 	ZBX_UNUSED(options_num);
