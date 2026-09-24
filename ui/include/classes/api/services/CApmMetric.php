@@ -215,8 +215,8 @@ class CApmMetric extends CApmGeneral {
 			: self::CLICKHOUSE_METRICS_TABLES;
 
 		$sub_query_options = $options['countOutput']
-			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'offset']))
-			: array_diff_key($options, array_flip(['output', 'offset']));
+			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
+			: array_diff_key($options, array_flip(['output', 'limit', 'offset']));
 
 		$sub_queries = [];
 
@@ -229,7 +229,8 @@ class CApmMetric extends CApmGeneral {
 				])
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => $options['time_till']
-				]);
+				])
+				->limit(($options['limit'] ?? 0) + $options['offset']);
 
 			if ($options['with_flags_on'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
