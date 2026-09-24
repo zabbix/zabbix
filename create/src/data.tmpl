@@ -24,9 +24,9 @@ FIELDS|ugsetid|hash                                                            |
 ROW   |1      |b21d61561974b06cbeb97a71ca880e92f0fc06d49ac3246280afb88dfa6050a6|
 
 TABLE |users
-FIELDS|userid|username|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|
-ROW   |1     |Admin   |Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |
-ROW   |2     |guest   |      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |50           |4     |
+FIELDS|userid|username|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|default_maintenance_period|
+ROW   |1     |Admin   |Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |1h                        |
+ROW   |2     |guest   |      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |50           |4     |1h                        |
 
 TABLE |hstgrp
 FIELDS|groupid|name                        |flags|uuid                            |type|
@@ -1009,13 +1009,13 @@ ROW   |635                |104        |0          |1       |[RESOLVED] {HOST.NAM
 ROW   |636                |104        |0          |2       |[UPDATED] {HOST.NAME} - {EVENT.NAME}                                             |{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on {{EVENT.UPDATE.TIMESTAMP}.fmttime("%x %X")}&eol;{EVENT.UPDATE.MESSAGE}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 TABLE |usrgrp
-FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|mfa_status|mfaid|
-ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |0         |NULL |
-ROW   |8       |Guests                   |0         |0           |0         |NULL           |0         |NULL |
-ROW   |9       |Disabled                 |0         |1           |0         |NULL           |0         |NULL |
-ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |0         |NULL |
-ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |0         |NULL |
-ROW   |13      |Internal                 |1         |0           |0         |NULL           |0         |NULL |
+FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|mfa_status|mfaid|proxy_mode|proxy_group_mode|
+ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |0         |NULL |1         |1               |
+ROW   |8       |Guests                   |0         |0           |0         |NULL           |0         |NULL |1         |1               |
+ROW   |9       |Disabled                 |0         |1           |0         |NULL           |0         |NULL |1         |1               |
+ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |0         |NULL |1         |1               |
+ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |0         |NULL |1         |1               |
+ROW   |13      |Internal                 |1         |0           |0         |NULL           |0         |NULL |1         |1               |
 
 TABLE |users_groups
 FIELDS|id  |usrgrpid|userid|
@@ -1338,4 +1338,61 @@ ROW   |validate_uri_schemes        |2   |                                  |1   
 ROW   |vault_provider              |2   |                                  |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |work_period                 |1   |1-5,09:00-18:00                   |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |x_frame_options             |1   |SAMEORIGIN                        |0        |NULL          |NULL             |NULL                 |NULL       |
+
+TABLE |cep_rule
+FIELDS|cep_ruleid|name                                                          |description                                                                                                               |evaltype|formula|status|stop|sortorder|
+ROW   |1         |Close problems older than 2 weeks                             |Close events which are older than 14 days for data-center 'North'                                                         |0       |       |1     |1   |1        |
+ROW   |2         |Deduplicate repeating events by keeping only the cause problem|Reduce weekly problem noise by discarding repetitive events and increase counter 'repetition count' for the cause event.  |0       |       |1     |1   |1        |
+ROW   |3         |Detect physical security incident based on event pattern match|Rise a problem with name 'Engine issue' when there are 3 engine start events.  Time between events is less than 7 seconds.|0       |       |1     |1   |1        |
+ROW   |4         |Detect missing 'communication' events                         |Rise a problem "Risk detected: Communication down" when there is no events for 5 minutes for selected event conditions    |0       |       |1     |1   |1        |
+ROW   |5         |Increase event severity and normalize tags                    |Increase event severity for 'Payments' events and add tag 'env:prod' if this tag does not exist                           |0       |       |1     |1   |1        |
+ROW   |6         |Reduce problem noise by grouping events                       |Reduce problem noise by keeping only one problem per host. After 3 days close all symptoms and increase cause severity.   |1       |       |1     |1   |1        |
+
+TABLE |cep_rule_rtdata
+FIELDS|cep_ruleid|
+ROW   |1         |
+ROW   |2         |
+ROW   |3         |
+ROW   |4         |
+ROW   |5         |
+ROW   |6         |
+
+TABLE |cep_condition
+FIELDS|cep_conditionid|cep_ruleid|type|operator|event_name|tag |tag_value|host_name|host_group_name|time_period|severity|
+ROW   |1              |1         |26  |0       |          |dc  |north    |         |               |           |0       |
+ROW   |2              |2         |26  |0       |          |net |infra    |         |               |           |0       |
+ROW   |3              |3         |37  |0       |          |    |         |         |west           |           |0       |
+ROW   |4              |4         |37  |0       |          |    |         |         |remote         |           |0       |
+ROW   |5              |5         |37  |0       |          |    |         |         |payments       |           |0       |
+ROW   |6              |6         |26  |0       |          |net |infra    |         |               |           |0       |
+ROW   |7              |6         |37  |0       |          |    |         |         |network        |           |0       |
+
+TABLE |cep_rule_window
+FIELDS|cep_ruleid|type|duration|capacity|script                                                                                                                                                                                                                                                                                                                                                                                                                           |group_by_host_group|group_by_host|group_by_tags|tags|event_count_tag |
+ROW   |1         |1   |14d     |0       |                                                                                                                                                                                                                                                                                                                                                                                                                                 |0                  |0            |0            |    |                |
+ROW   |2         |2   |1w      |0       |                                                                                                                                                                                                                                                                                                                                                                                                                                 |0                  |0            |0            |    |repetition count|
+ROW   |3         |4   |1m      |0       |var events = cep_get_events().filter(function (e) {&bsn;    return e.name.indexOf('engine start') !== -1;&bsn;});&bsn;&bsn;if (events.length < 3) {&bsn;    return false;&bsn;}&bsn;&bsn;events.sort(function (a, b) { return a.clock - b.clock; });&bsn;&bsn;for (var i = 1; i < events.length; i++) {&bsn;    if (events[i].clock - events[i - 1].clock >= 7) {&bsn;        return false;&bsn;    }&bsn;}&bsn;&bsn;return true;|0                  |0            |0            |    |                |
+ROW   |4         |4   |1h      |0       |var events = cep_get_events();&bsn;&bsn;if (events.length < 2) {&bsn;    return false;&bsn;}&bsn;&bsn;events.sort(function (a, b) { return a.clock - b.clock; });&bsn;&bsn;for (var i = 1; i < events.length; i++) {&bsn;    if (events[i].clock - events[i - 1].clock >= 300) {&bsn;        return true;&bsn;    }&bsn;}&bsn;&bsn;return false;                                                                                 |0                  |0            |0            |    |                |
+ROW   |6         |2   |3d      |0       |                                                                                                                                                                                                                                                                                                                                                                                                                                 |0                  |1            |0            |    |                |
+
+TABLE |cep_operation
+FIELDS|cep_operationid|cep_ruleid|execute_when|type|evaltype|formula|event_name                       |tag |new_tag|tag_value|severity|suppress_duration|sortorder|
+ROW   |1              |1         |2           |2   |0       |       |                                 |    |       |         |0       |0                |1        |
+ROW   |2              |2         |0           |3   |0       |       |                                 |    |       |         |0       |0                |1        |
+ROW   |3              |3         |0           |1   |0       |       |Engine issue                     |    |       |         |0       |0                |1        |
+ROW   |4              |3         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |
+ROW   |5              |4         |0           |1   |0       |       |Risk detected: Communication down|    |       |         |0       |0                |1        |
+ROW   |6              |4         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |
+ROW   |7              |5         |0           |12  |0       |       |                                 |env |       |prod     |0       |0                |1        |
+ROW   |8              |5         |0           |5   |0       |       |                                 |    |       |         |0       |0                |2        |
+ROW   |9              |6         |3           |2   |0       |       |                                 |    |       |         |0       |0                |1        |
+ROW   |10             |6         |3           |5   |0       |       |                                 |    |       |         |0       |0                |2        |
+
+TABLE |cep_operation_condition
+FIELDS|cep_operation_conditionid|cep_operationid|type|operator|tag |tag_value|
+ROW   |1                        |2              |33  |10      |    |         |
+ROW   |2                        |3              |34  |10      |    |         |
+ROW   |3                        |5              |34  |10      |    |         |
+ROW   |4                        |9              |33  |10      |    |         |
+ROW   |5                        |10             |33  |11      |    |         |
 

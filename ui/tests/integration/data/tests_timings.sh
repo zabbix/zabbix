@@ -4,6 +4,7 @@ declare -A BASELINE_TIMES=(
   [Integration]=4561
   [testTriggerCEPRestart]=1800
   [testTriggerCEP]=900
+  [testVfsFsGet]=730
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
