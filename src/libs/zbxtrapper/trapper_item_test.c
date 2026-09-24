@@ -139,17 +139,6 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, zbx_db_get_field(table, fieldname)->default_value);
 }
 
-static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const zbx_db_table_t *table,
-		const char *fieldname, int *num)
-{
-	char	tmp[ZBX_MAX_UINT64_LEN + 1];
-
-	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
-		*num = atoi(tmp);
-	else
-		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
-}
-
 static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
 {
 	unsigned char	proc_type, snmp_oid_type = 0;
