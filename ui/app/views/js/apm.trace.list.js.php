@@ -224,6 +224,15 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
+				.setRowRenderer('trace', ({columns, data_fields, row, row_data, row_index, response}) => {
+					const traceid = data_fields.indexOf('traceid');
+					const timestamp = data_fields.indexOf('timestamp');
+
+					row.setAttribute('data-traceid', row_data[traceid] ?? '');
+					row.setAttribute('data-timestamp', Math.floor((row_data[timestamp] ?? Date.now()) / 1000000000));
+
+					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
+				})
 				.setCellRenderer('service_name', ({cell, cell_data}) => {
 					const [service_name, span_count, error_count] = cell_data;
 
@@ -345,13 +354,6 @@
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_COMPACT);
 					cell.appendChild(duration);
 				})
-				.setRowRenderer('trace', ({columns, data_fields, row, row_data, row_index, response}) => {
-					const traceid = data_fields.indexOf('traceid');
-
-					row.setAttribute('data-traceid', row_data[traceid] ?? null);
-
-					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
-				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
 
@@ -384,6 +386,9 @@
 
 					for (const row of rows) {
 						const traceid = row.getAttribute('data-traceid');
+						if (!traceid) {
+							continue;
+						}
 
 						if (this.#selected_traceid === traceid) {
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
@@ -408,7 +413,7 @@
 								this.#selected_traceid = traceid;
 								row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-								this.#openSideDrawer(traceid);
+								this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
 							}
 							else {
 								this.#selected_traceid = null;
@@ -427,7 +432,7 @@
 				.init(user_configs);
 		}
 
-		#openSideDrawer(traceid) {
+		#openSideDrawer(traceid, timestamp) {
 			this.#side_drawer_abort_controller?.abort();
 			this.#side_drawer_abort_controller = new AbortController();
 
@@ -435,7 +440,7 @@
 				fetch(zabbixUrl({action: 'apm.trace.list.split.view'}), {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify({traceid}),
+					body: JSON.stringify({traceid, timestamp}),
 					signal: this.#side_drawer_abort_controller.signal
 				})
 					.then(response => response.json()),

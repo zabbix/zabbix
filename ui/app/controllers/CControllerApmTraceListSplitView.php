@@ -18,6 +18,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
@@ -25,12 +26,15 @@ class CControllerApmTraceListSplitView extends CController {
 		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'traceid' => 'required|string'
-		];
+	protected static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'traceid' => ['string', 'required'],
+			'timestamp' => ['integer', 'required']
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(
@@ -46,16 +50,13 @@ class CControllerApmTraceListSplitView extends CController {
 	}
 
 	protected function doAction(): void {
-		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => 'web.apm.trace.filter',
-			'profileIdx2' => 0
-		]);
-
 		$traceid = $this->getInput('traceid');
+		$time_from = $this->getInput('timestamp') - 1;
+		$time_to = $this->getInput('timestamp') + 1;
 
 		$traces = API::ApmTrace()->get([
-			'time_from' => $timeline['from_ts'],
-			'time_till' => $timeline['to_ts'],
+			'time_from' => $time_from,
+			'time_till' => $time_to,
 			'traceids' => [$traceid]
 		]);
 		$trace = $traces[0] ?? null;
@@ -67,8 +68,8 @@ class CControllerApmTraceListSplitView extends CController {
 		$spans = API::ApmSpan()->get([
 			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp', 'duration',
 				'events', 'resource_attributes', 'span_attributes'],
-			'time_from' => $timeline['from_ts'],
-			'time_till' => $timeline['to_ts'],
+			'time_from' => $time_from,
+			'time_till' => $time_to,
 			'traceids' => [$traceid],
 			'sortfield' => 'timestamp',
 			'sortorder' => ZBX_SORT_UP

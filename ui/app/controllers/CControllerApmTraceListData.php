@@ -155,7 +155,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['traceid', 'duration']);
+		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp']);
 
 		$limit = (int)CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
@@ -179,8 +179,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
 
 			if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
-				$select_fields   = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
-				$select_fields[] = 'timestamp';
+				$select_fields = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
 			}
 
 			$traces = API::ApmTrace()->get([
