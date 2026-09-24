@@ -157,16 +157,9 @@ class CControllerApmTraceListData extends CControllerDataTable {
 
 		$data_fields = $this->getDataFields(['traceid', 'duration']);
 
-		$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
-
-		if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
-			$select_fields = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
-			$select_fields[] = 'timestamp';
-		}
-
-		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$limit = (int)CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
-			'output' => $select_fields,
+			'output' => ['traceid'],
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
 			'min_duration' => $min_duration,
@@ -181,6 +174,24 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'sortorder' => $sort_order,
 			'limit' => $limit
 		]);
+
+		if ($traces) {
+			$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
+
+			if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
+				$select_fields   = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
+				$select_fields[] = 'timestamp';
+			}
+
+			$traces = API::ApmTrace()->get([
+				'output'    => $select_fields,
+				'time_from' => $timeline['from_ts'],
+				'time_till' => $timeline['to_ts'],
+				'traceids'  => array_column($traces, 'traceid'),
+				'sortfield' => $sort_field,
+				'sortorder' => $sort_order
+			]);
+		}
 
 		$rows = [];
 
