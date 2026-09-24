@@ -568,6 +568,9 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 //	\'username\' => \'zabbix\',
 //	\'password\' => \'zabbix\'
 //];
+// Uncomment to set the desired default values for all global APM data source configuration providers.
+//$APM_CA_LOCATION = \'\';
+//$APM_CA_FILE = \'\';
 ';
 	}
 
