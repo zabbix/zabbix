@@ -266,10 +266,10 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asGridForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
-			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Retries', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Retries', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
 		];
@@ -287,7 +287,7 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' => 10,
+					'Max repetition count' => 255,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -704,7 +704,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -753,7 +753,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
@@ -1422,7 +1422,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1443,7 +1443,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
