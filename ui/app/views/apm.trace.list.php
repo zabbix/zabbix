@@ -138,10 +138,6 @@ $form = (new CForm())
 		(new CDataTable())->setId('datatable-traces')
 	);
 
-$side_drawer = (new CDiv())
-	->setId('trace_view')
-	->addClass('trace-view');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Traces'))
 	->setWebLayoutMode($web_layout_mode)
@@ -157,7 +153,7 @@ $html_page = (new CHtmlPage())
 			->setFixed(CSplitView::PANE_FIXED_END)
 			->setFixedSize($data['side_drawer_position'])
 	)
-	->setSideDrawer($side_drawer, true)
+	->setSideDrawer('', true)
 	->addItem([$filter, $form]);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
