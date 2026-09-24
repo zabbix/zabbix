@@ -181,6 +181,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			],
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
+			'limit' => (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
 		$num_rows = (int) API::ApmMetric()->get($options + [
@@ -188,12 +189,11 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		]);
 
 		if ($num_rows > 0) {
-			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
+			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1));
 
 			$metrics = API::ApmMetric()->get($options + [
 				'output' => $output,
-				'offset' => $offset,
-				'limit' => $limit
+				'offset' => ($this->paging['page'] - 1) * CWebUser::$data['rows_per_page']
 			]);
 
 			$result['rows'] = [];

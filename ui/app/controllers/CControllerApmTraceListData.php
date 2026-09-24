@@ -196,7 +196,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		$rows = [];
 
 		if ($traces) {
-			$this->paging = $this->paginate($traces, $page, $sort_order);
+			$this->paging = $this->paginate($traces, $page);
 
 			$trace_max_duration = max(array_column($traces, 'duration'));
 

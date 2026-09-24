@@ -128,7 +128,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		$this->paging = $this->paginate($hosts, $page, $sort_order);
+		$this->paging = $this->paginate($hosts, $page);
 
 		$hostids = array_column($hosts, 'hostid');
 		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
