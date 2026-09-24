@@ -158,8 +158,8 @@ $html_page = (new CHtmlPage())
 			->setFixed(CSplitView::PANE_FIXED_END)
 			->setFixedSize($data['side_drawer_position'])
 	)
-	->addItem([$filter, $form])
-	->setSideDrawer('', true);
+	->setSideDrawer('', true)
+	->addItem([$filter, $form]);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
