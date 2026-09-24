@@ -159,7 +159,6 @@
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name', 'span_count', 'error_count'])
 						.setRenderer('service_name')
-						.setRenderer('text_field')
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('span_name', <?= json_encode(_('Operation name')); ?>)
