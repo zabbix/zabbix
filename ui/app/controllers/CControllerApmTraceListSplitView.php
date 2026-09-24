@@ -98,7 +98,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
 
-			$span_events = array_map(static function (array $event) use ($trace_start) {
+			$span_events = array_map(function (array $event) use ($trace_start) {
 				$event_timestamp = $this->formatNs($event['timestamp']);
 				$event_time = ($event_timestamp - $trace_start) * SEC_PER_NANOSEC;
 				$event_duration = $event_time
