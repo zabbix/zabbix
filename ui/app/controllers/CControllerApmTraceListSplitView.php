@@ -85,7 +85,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_counts[$span['parent_spanid']]++;
 		}
 
-		$trace_timestamp = (int) str_pad((string)($trace['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+		$trace_timestamp = $this->formatNs($trace['timestamp']);
 		$trace_start = $trace_timestamp;
 		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
 
@@ -93,13 +93,13 @@ class CControllerApmTraceListSplitView extends CController {
 
 		$trace_view_spans = [];
 		foreach ($spans as $i => $span) {
-			$span_timestamp = (int) str_pad((string)($span['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+			$span_timestamp = $this->formatNs($span['timestamp']);
 
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
 
 			$span_events = array_map(static function (array $event) use ($trace_start) {
-				$event_timestamp = (int) str_pad((string)($event['timestamp'] % 1000000000), 9, '0', STR_PAD_LEFT);
+				$event_timestamp = $this->formatNs($event['timestamp']);
 				$event_time = ($event_timestamp - $trace_start) * SEC_PER_NANOSEC;
 				$event_duration = $event_time
 					? convertSecondsToTimeUnits($event_time, ['combine_last_subsecond_parts' => true])
@@ -119,14 +119,6 @@ class CControllerApmTraceListSplitView extends CController {
 				])
 				: '0'._x('ns', 'nanosecond short');
 
-			$clock = floor($span['timestamp'] / 1000000000);
-
-			$timestamp = $clock >= $today
-				? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $span_timestamp])
-				: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
-					['!' => $span_timestamp]
-				);
-
 			$trace_view_spans[$i] = [
 				'index' => $i,
 				'id' => $span['spanid'],
@@ -136,7 +128,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'service_name' => $span['service_name'],
 				'scope_name' => $span['scope_name'],
 				'duration' => $span_duration,
-				'timestamp' => $timestamp,
+				'timestamp' => $this->formatTimeNs($span['timestamp'], $today),
 				'start' => $span_start,
 				'end' => $span_end,
 				'count' => $span_counts[$span['spanid']] ?? null,
@@ -162,5 +154,23 @@ class CControllerApmTraceListSplitView extends CController {
 			(new CControllerResponseData(['main_block' => $output]))
 				->disableView()
 		);
+	}
+
+	private function formatTimeNs($time_unix, $today, $clock = null): string {
+		if ($clock === null) {
+			$clock = floor($time_unix / 1000000000);
+		}
+
+		$ns = $this->formatNs($time_unix);
+
+		return $clock >= $today
+			? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
+			: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
+				['!' => $ns]
+			);
+	}
+
+	private function formatNs($ns): int {
+		return (int) str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
 	}
 }
