@@ -135,6 +135,11 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static array $severity_actionids = [];
 	private static array $auth_scheme_test_tokenids = [];
 	private static array $bearer_auth_test_tokenids = [];
+	private array $non_trigger_actionids = [];
+	private array $non_trigger_mediatypeids = [];
+	private ?array $non_trigger_templates = null;
+	private ?array $non_trigger_medias = null;
+	private ?string $non_trigger_host = null;
 
 	public function serverConfigurationProvider(): array {
 		if (self::detectTLSLibrary() === 'none') {
@@ -2591,6 +2596,217 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertSame(0, CDBHelper::getCount(
 			'SELECT NULL FROM dpop_jti_cache WHERE jti='.zbx_dbstr(self::HOUSEKEEPER_TEST_JTI)
 		));
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushCustomMessage(): void {
+		$this->checkNonTriggerNotification('push', false, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableCustomMessage(): void {
+		$this->checkNonTriggerNotification('all', false, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushDefaultMessage(): void {
+		$this->checkNonTriggerNotification('push', true, true);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableDefaultMessage(): void {
+		$this->checkNonTriggerNotification('all', true, true);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushMissingTemplate(): void {
+		$this->checkNonTriggerNotification('push', true, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableMissingTemplate(): void {
+		$this->checkNonTriggerNotification('all', true, false);
+	}
+
+	private function checkNonTriggerNotification(string $target, bool $default_message,
+			bool $with_template): void {
+		$host = 'bridge_adapter_autoreg_'.bin2hex(random_bytes(8));
+		$this->non_trigger_host = $host;
+		$response = $this->call('mediatype.get', [
+			'mediatypeids' => [self::$push_mediatypeid],
+			'output' => ['mediatypeid'],
+			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message']
+		]);
+		$this->non_trigger_templates = $response['result'][0]['message_templates'];
+		$templates = array_values(array_filter($this->non_trigger_templates,
+			static fn(array $template): bool => (int) $template['eventsource'] !== EVENT_SOURCE_AUTOREGISTRATION
+		));
+		if ($with_template) {
+			$templates[] = [
+				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+				'recovery' => ACTION_OPERATION,
+				'subject' => 'Non-trigger push notification',
+				'message' => 'Non-trigger push notification body'
+			];
+		}
+		$this->call('mediatype.update', [
+			'mediatypeid' => self::$push_mediatypeid,
+			'message_templates' => $templates
+		]);
+
+		$response = $this->call('mediatype.create', [
+			'name' => $host,
+			'type' => MEDIA_TYPE_EXEC,
+			'exec_path' => 'unused_non_trigger_control',
+			'status' => MEDIA_TYPE_STATUS_DISABLED
+		]);
+		$this->non_trigger_mediatypeids = $response['result']['mediatypeids'];
+		$control_mediatypeid = $this->non_trigger_mediatypeids[0];
+		$response = $this->call('user.get', [
+			'userids' => [1],
+			'output' => ['userid'],
+			'selectMedias' => ['mediatypeid', 'sendto', 'active', 'severity', 'period']
+		]);
+		$this->non_trigger_medias = $response['result'][0]['medias'];
+		$medias = $this->non_trigger_medias;
+		$medias[] = [
+			'mediatypeid' => $control_mediatypeid,
+			'sendto' => ['non-trigger-control'],
+			'active' => MEDIA_STATUS_ACTIVE,
+			'severity' => self::MEDIA_SEVERITY_ALL,
+			'period' => '1-7,00:00-24:00'
+		];
+		$this->call('user.update', ['userid' => 1, 'medias' => $medias]);
+
+		$operations = [];
+		$opmessage = [
+			'default_msg' => (int) $default_message,
+			'mediatypeid' => $target === 'push' ? self::$push_mediatypeid : 0
+		];
+		if (!$default_message) {
+			$opmessage += [
+				'subject' => 'Non-trigger push notification',
+				'message' => 'Non-trigger push notification body'
+			];
+		}
+		$operations[] = [
+			'operationtype' => OPERATION_TYPE_MESSAGE,
+			'opmessage' => $opmessage,
+			'opmessage_usr' => [['userid' => 1]]
+		];
+
+		$operations[] = [
+			'operationtype' => OPERATION_TYPE_MESSAGE,
+			'opmessage' => [
+				'default_msg' => 0,
+				'mediatypeid' => $control_mediatypeid,
+				'subject' => 'Escalation processed',
+				'message' => 'Control operation'
+			],
+			'opmessage_usr' => [['userid' => 1]]
+		];
+		$response = $this->call('action.create', [
+			'name' => $host,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [[
+					'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
+					'operator' => CONDITION_OPERATOR_LIKE,
+					'value' => $host
+				]]
+			],
+			'operations' => $operations
+		]);
+		$actionids = $response['result']['actionids'];
+		$this->non_trigger_actionids = $actionids;
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->getClient(self::COMPONENT_SERVER)->getActiveChecks($host);
+		$this->callUntilDataIsPresent('alert.get', [
+			'output' => ['alertid'],
+			'actionids' => $actionids,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'eventobject' => EVENT_OBJECT_AUTOREGHOST,
+			'filter' => ['mediatypeid' => $control_mediatypeid],
+			'search' => ['subject' => 'Escalation processed']
+		], 30, 1, static function (array $response) use ($actionids): bool {
+			return DB::select('escalations', [
+				'output' => ['escalationid'],
+				'filter' => ['actionid' => $actionids]
+			]) === [];
+		});
+
+		$response = $this->call('alert.get', [
+			'output' => ['status', 'error'],
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'eventobject' => EVENT_OBJECT_AUTOREGHOST,
+			'actionids' => $actionids,
+			'filter' => ['mediatypeid' => self::$push_mediatypeid]
+		]);
+		$push_alerts = $response['result'];
+		$notify_requests = array_values(array_filter($this->readAdapterRequests(),
+			static fn(array $request): bool => $request['method'] === 'device.notify'
+		));
+		$this->assertSame([], $notify_requests, 'Non-trigger actions must not send device.notify.');
+
+		if ($target === 'push') {
+			$this->assertNotEmpty($push_alerts, 'Explicit Push must produce a failed Action Log entry.');
+			foreach ($push_alerts as $alert) {
+				$this->assertSame(ALERT_STATUS_FAILED, (int) $alert['status']);
+				$this->assertSame('Cannot send notification to device: '.
+					'push notifications are supported only for trigger actions.', $alert['error']);
+			}
+		}
+		else {
+			$this->assertSame([], $push_alerts, 'All available must skip Push without an Action Log entry.');
+		}
+	}
+
+	public function clearNonTriggerNotificationData(): void {
+		if ($this->non_trigger_actionids) {
+			$this->call('action.delete', $this->non_trigger_actionids);
+			$this->non_trigger_actionids = [];
+		}
+		if ($this->non_trigger_medias !== null) {
+			$this->call('user.update', ['userid' => 1, 'medias' => $this->non_trigger_medias]);
+			$this->non_trigger_medias = null;
+		}
+		if ($this->non_trigger_mediatypeids) {
+			$this->call('mediatype.delete', $this->non_trigger_mediatypeids);
+			$this->non_trigger_mediatypeids = [];
+		}
+		if ($this->non_trigger_templates !== null) {
+			$this->call('mediatype.update', [
+				'mediatypeid' => self::$push_mediatypeid,
+				'message_templates' => $this->non_trigger_templates
+			]);
+			$this->non_trigger_templates = null;
+		}
+		if ($this->non_trigger_host !== null) {
+			DB::delete('autoreg_host', ['host' => $this->non_trigger_host]);
+			$this->non_trigger_host = null;
+		}
+		self::stopBridgeAdapterMock();
 	}
 
 }
