@@ -29,7 +29,7 @@ class CPagerHelper {
 	 *
 	 * @param int     $page        page to display
 	 * @param array   $rows        data rows
-	 * @param string  $sort_order  this parameter is deprecated
+	 * @param string  $sort_order  data sort order: ZBX_SORT_UP or ZBX_SORT_DOWN
 	 * @param CUrl    $url         data list URL
 	 *
 	 * @return CTag  paging line
@@ -41,10 +41,12 @@ class CPagerHelper {
 			$data['limit_exceeded'], $data['rows_per_page']
 		);
 
-		$offset = ($data['page'] - 1) * $data['rows_per_page'];
+		$start = ($data['page'] - 1) * $data['rows_per_page'];
+		$end = min($data['num_rows'], $start + $data['rows_per_page']);
+		$offset = ($sort_order == ZBX_SORT_DOWN) ? $data['offset_down'] : $data['offset_up'];
 
 		// Trim given rows for the current page.
-		$rows = array_slice($rows, $offset, $data['rows_per_page'], true);
+		$rows = array_slice($rows, $start + $offset, $end - $start, true);
 
 		return $paging;
 	}
@@ -97,9 +99,11 @@ class CPagerHelper {
 	protected static function prepareData($page, $num_rows) {
 		$rows_per_page = CWebUser::$data['rows_per_page'];
 
-		$limit_exceeded = $num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$offset_down = 0;
+		$limit_exceeded = ($num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 
 		if ($limit_exceeded) {
+			$offset_down = $num_rows - CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 			$num_rows = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		}
 
@@ -110,6 +114,8 @@ class CPagerHelper {
 			'page' => $page,
 			'num_rows' => $num_rows,
 			'num_pages' => $num_pages,
+			'offset_up' => 0,
+			'offset_down' => $offset_down,
 			'rows_per_page' => $rows_per_page,
 			'limit_exceeded' => $limit_exceeded
 		];

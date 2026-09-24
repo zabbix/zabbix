@@ -90,7 +90,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		order_result($templates, $sort_field, $sort_order);
 
-		$this->paging = $this->paginate($templates, $page);
+		$this->paging = $this->paginate($templates, $page, $sort_order);
 
 		$templates = API::Template()->get([
 			'output' => $data_fields,

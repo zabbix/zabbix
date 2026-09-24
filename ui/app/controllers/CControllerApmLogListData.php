@@ -151,8 +151,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 				'scope_name' => $this->filter['scope_name'] !== '' ? $this->filter['scope_name'] : null
 			],
 			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
-			'limit' => (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+			'sortorder' => $sort_order
 		];
 
 		$num_rows = (int) API::ApmLog()->get($options + [
@@ -160,7 +159,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 		]);
 
 		if ($num_rows > 0) {
-			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1));
+			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
 
 			$select_fields = $data_fields;
 
@@ -171,7 +170,8 @@ class CControllerApmLogListData extends CControllerDataTable {
 
 			$logs = API::ApmLog()->get($options + [
 				'output' => $select_fields,
-				'offset' => ($this->paging['page'] - 1) * CWebUser::$data['rows_per_page']
+				'offset' => $offset,
+				'limit' => $limit
 			]);
 
 			if (in_array('timestamp', $select_fields)) {

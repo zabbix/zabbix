@@ -605,7 +605,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
 
 		if ($export == null) {
-			$this->paging = $this->paginate($data['problems'], $page);
+			$this->paging = $this->paginate($data['problems'], $page, ZBX_SORT_UP);
 		}
 
 		$data = CScreenProblem::makeData($data, $filter, $options, true);

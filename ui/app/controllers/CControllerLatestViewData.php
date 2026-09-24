@@ -103,7 +103,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$subfilters = CControllerLatest::getSubfilters($subfilters_fields, $data);
 		$data['items'] = CControllerLatest::applySubfilters($data['items']);
 
-		$this->paging = $this->paginate($data['items'], $page);
+		$this->paging = $this->paginate($data['items'], $page, $sort_order);
 
 		if ($filter['state'] != -1) {
 			$subfilters['state'] = [];

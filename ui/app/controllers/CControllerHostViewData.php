@@ -87,7 +87,7 @@ class CControllerHostViewData extends CControllerDataTable {
 		array_map([$view_curl, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
 
 		// Split the result array and create paging.
-		$this->paging = $this->paginate($hosts, $page);
+		$this->paging = $this->paginate($hosts, $page, $sort_order);
 
 		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
