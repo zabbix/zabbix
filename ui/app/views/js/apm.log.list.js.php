@@ -259,8 +259,15 @@
 						filter_set: '1'
 					});
 					link.textContent = traceid;
+					link.title = traceid;
+					link.ariaLabel = traceid;
+					link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
-					cell.appendChild(link);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(link);
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('spanid', ({cell, cell_data}) => {
 					const [spanid, traceid] = cell_data;
@@ -277,8 +284,15 @@
 						filter_set: '1'
 					});
 					link.textContent = spanid;
+					link.title = spanid;
+					link.ariaLabel = spanid;
+					link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
-					cell.appendChild(link);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(link);
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('timestamp', ({cell, cell_data}) => {
 					const [timestamp_formatted] = cell_data;
