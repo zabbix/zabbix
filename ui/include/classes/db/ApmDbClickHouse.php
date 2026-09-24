@@ -168,16 +168,11 @@ class ApmDbClickHouse {
 			$curl_options[CURLOPT_POSTFIELDS] = $sql;
 		}
 
-		if ($this->config['username'] !== '') {
-			if ($this->config['password'] !== '') {
-				$curl_options += [
-					CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-					CURLOPT_USERPWD  => $this->config['username'] . ':' . $this->config['password']
-				];
-			}
-			else {
-				$curl_options[CURLOPT_URL] .= '?' . http_build_query(['user' => $this->config['username']]);
-			}
+		if ($this->config['username'] !== '' && $this->config['password'] !== '') {
+			$curl_options += [
+				CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+				CURLOPT_USERPWD  => $this->config['username'].':'.$this->config['password']
+			];
 		}
 
 		if ($this->config['ssl_ca_file'] !== '') {
@@ -204,11 +199,17 @@ class ApmDbClickHouse {
 	}
 
 	private function buildUrl(): string {
-		if ($this->config['db'] === '') {
-			return $this->config['url'];
+		$url = new CUrl($this->config['url']);
+
+		if ($this->config['db'] !== '') {
+			$url->setArgument('database', $this->config['db']);
 		}
 
-		return (new CUrl($this->config['url']))->setArgument('database', $this->config['db'])->getUrl();
+		if ($this->config['username'] !== '' && $this->config['password'] === '') {
+			$url->setArgument('user', $this->config['username']);
+		}
+
+		return $url->getUrl();
 	}
 
 	/**
