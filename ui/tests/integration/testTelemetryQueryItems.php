@@ -45,7 +45,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
+				'DebugLevel' => 5,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
