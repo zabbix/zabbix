@@ -228,12 +228,12 @@ class CControllerApmMetricListData extends CControllerDataTable {
 					$exemplar['time_from'] = (new DateTimeImmutable('@'.$clock))
 						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
 						->modify('last hour')
-						->format('Y-m-d H:i:s');
+						->format(ZBX_FULL_DATE_TIME);
 
 					$exemplar['time_to'] = (new DateTimeImmutable('@'.$clock))
 						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
 						->modify('next hour')
-						->format('Y-m-d H:i:s');
+						->format(ZBX_FULL_DATE_TIME);
 
 					unset($exemplar['time_unix']);
 				}
