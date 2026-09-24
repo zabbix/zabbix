@@ -251,5 +251,12 @@ void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 	zbx_free(poller_item->results);
 	zbx_free(poller_item->errcodes);
 	zbx_free(poller_item->items.any);
+
+	if (NULL != poller_item->apm_db_config)
+	{
+		zbx_apm_db_config_clear(poller_item->apm_db_config);
+		zbx_free(poller_item->apm_db_config);
+	}
+
 	zbx_free(poller_item);
 }

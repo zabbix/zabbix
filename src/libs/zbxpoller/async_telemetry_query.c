@@ -114,15 +114,13 @@ fail:
 }
 
 static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, time_t now, time_t lasttimestamp,
-		AGENT_RESULT *result, zbx_poller_config_t *poller_config)
+		AGENT_RESULT *result, zbx_poller_config_t *poller_config, const zbx_apm_db_config_t *apm_db_config)
 {
 	int		ret = NOTSUPPORTED;
 	char		*send_error = NULL;
 	zbx_tq_query_t	*query;
 	char		*url;
 	unsigned char	post_type, output_format;
-
-	const zbx_apm_db_config_t	*apm_db_config = poller_config->apm_db_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s'", __func__, item->itemid, item->key);
 
@@ -158,7 +156,7 @@ out:
 #endif
 
 int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_RESULT *result,
-		zbx_poller_config_t *poller_config)
+		zbx_poller_config_t *poller_config, const zbx_apm_db_config_t *apm_db_config)
 {
 	int	ret;
 	time_t	now, lasttimestamp;
@@ -180,17 +178,17 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 			"%s(): lasttimestamp: " ZBX_FS_TIME_T ", lastlogsize: " ZBX_FS_UI64 ", max: " ZBX_FS_TIME_T,
 			__func__, (zbx_fs_time_t)item->lasttimestamp, item->lastlogsize, (zbx_fs_time_t)lasttimestamp);
 
-	if (0 == poller_config->apm_db_config->have_local_config)
+	if (0 == apm_db_config->status)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "APM database is not configured"));
 		ret = NOTSUPPORTED;
 		goto out;
 	}
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == poller_config->apm_db_config->db_type)
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
-		ret = async_check_telemetry_query_http(item, now, lasttimestamp, result, poller_config);
+		ret = async_check_telemetry_query_http(item, now, lasttimestamp, result, poller_config, apm_db_config);
 #else
 		ZBX_UNUSED(poller_config);
 		ZBX_UNUSED(now);

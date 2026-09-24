@@ -36,6 +36,11 @@ final class CSettingsSchema {
 		'alert_usrgrpid' => [
 			'column' => 'value_usrgrpid'
 		],
+		'apm_global_db' => [
+			'column' => 'value_str',
+			'default' => '{}',
+			'length' => 65535
+		],
 		'auditlog_enabled' => [
 			'column' => 'value_int',
 			'default' => 1

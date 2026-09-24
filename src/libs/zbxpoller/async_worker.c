@@ -17,6 +17,7 @@
 #include "async_manager.h"
 
 #include "zbxalgo.h"
+#include "zbxtelemetry.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
@@ -31,13 +32,16 @@
 #define ASYNC_WORKER_INIT_THREAD	0x01
 
 static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processing_num,
-		unsigned char poller_type, int config_timeout, zbx_uint64_t processing_limit)
+		unsigned char poller_type, int config_timeout, zbx_uint64_t processing_limit,
+		const zbx_apm_db_config_t *config_apm_db_config, const char *config_source_ip,
+		const char *config_ssl_ca_location)
 {
 	zbx_poller_item_t	*poller_item;
 
 	poller_item = zbx_malloc(NULL, sizeof(zbx_poller_item_t));
 	poller_item->items.any = NULL;
 	poller_item->poller_type = poller_type;
+	poller_item->apm_db_config = NULL;
 
 	poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout, processing_num,
 			processing_limit, &poller_item->items);
@@ -46,6 +50,13 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 	{
 		poller_item->results = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(AGENT_RESULT));
 		poller_item->errcodes = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(int));
+
+		if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
+		{
+			poller_item->apm_db_config = zbx_malloc(NULL, sizeof(zbx_apm_db_config_t));
+			zbx_dc_config_get_apm_db_config(poller_item->apm_db_config, config_apm_db_config,
+					config_source_ip, config_ssl_ca_location);
+		}
 
 		switch (poller_type)
 		{
@@ -182,6 +193,10 @@ static void	*async_worker_entry(void *args)
 				config_unreachable_delay = queue->config_unreachable_delay;
 	const int		have_cached_data = zbx_dc_config_poller_type_has_cached_data(poller_type);
 
+	const zbx_apm_db_config_t	*config_apm_db_config = queue->config_apm_db_config;
+	const char			*config_source_ip = queue->config_source_ip;
+	const char			*config_ssl_ca_location = queue->config_ssl_ca_location;
+
 	if (SUCCEED == have_cached_data)
 		zbx_vector_dc_cached_data_create(&cached_datas);
 
@@ -262,7 +277,8 @@ static void	*async_worker_entry(void *args)
 		if (1 == check_queue)
 		{
 			poller_item = dc_config_async_get_poller_items(processing_num, poller_type, config_timeout,
-					processing_limit);
+					processing_limit, config_apm_db_config, config_source_ip,
+					config_ssl_ca_location);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:" ZBX_FS_UI64,
 					processing_num, queue_poller_items_values_num);
