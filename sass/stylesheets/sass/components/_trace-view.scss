@@ -67,7 +67,6 @@
 		align-items: center;
 		transform: translateX(-50%);
 		white-space: nowrap;
-		font-size: 11px;
 		line-height: 1;
 
 		&::before {
@@ -86,6 +85,8 @@
 			position: absolute;
 			inset-inline-start: 50%;
 			transform: translateX(-50%);
+			font-size: 11px;
+			font-variant-numeric: tabular-nums;
 		}
 
 		&:first-child {

@@ -5917,7 +5917,6 @@ section {
     align-items: center;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 11px;
     line-height: 1; }
     .trace-view .trace-time-tick::before {
       content: '';
@@ -5932,7 +5931,9 @@ section {
     .trace-view .trace-time-tick > span {
       position: absolute;
       inset-inline-start: 50%;
-      transform: translateX(-50%); }
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums; }
     .trace-view .trace-time-tick:first-child {
       transform: none; }
       .trace-view .trace-time-tick:first-child > span {
@@ -6669,6 +6670,9 @@ z-timeline-range-slider {
   z-timeline-range-slider .z-timeline-range-slider-tick {
     color: var(--timeline-range-slider-label-color);
     white-space: nowrap; }
+    z-timeline-range-slider .z-timeline-range-slider-tick > span {
+      font-size: 11px;
+      font-variant-numeric: tabular-nums; }
 
 .widget-field-sparkline {
   display: grid;

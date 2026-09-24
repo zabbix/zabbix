@@ -15,6 +15,9 @@
 
 class ZTimelineRangeSlider extends HTMLElement {
 
+	static SCALE_LABEL_GAP = 90;
+	static SCALE_OFFSET = 11;
+
 	/** @type {ResizeObserver | null} */
 	#resize_observer = null;
 
@@ -75,25 +78,25 @@ class ZTimelineRangeSlider extends HTMLElement {
 		super();
 
 		this.#track = document.createElement('div');
-		this.#track.className = 'z-timeline-range-slider-track';
+		this.#track.classList.add('z-timeline-range-slider-track');
 
 		this.#selection_layer = document.createElement('div');
-		this.#selection_layer.className = 'z-timeline-range-slider-selection-layer';
+		this.#selection_layer.classList.add('z-timeline-range-slider-selection-layer');
 
 		this.#selection = document.createElement('div');
-		this.#selection.className = 'z-timeline-range-slider-selection';
+		this.#selection.classList.add('z-timeline-range-slider-selection');
 		this.#selection.dataset.action = 'move';
 
 		this.#handle_start = document.createElement('div');
-		this.#handle_start.className = 'z-timeline-range-slider-handle z-timeline-range-slider-handle-start';
+		this.#handle_start.classList.add('z-timeline-range-slider-handle', 'z-timeline-range-slider-handle-start');
 		this.#handle_start.dataset.action = 'resize-start';
 
 		this.#handle_end = document.createElement('div');
-		this.#handle_end.className = 'z-timeline-range-slider-handle z-timeline-range-slider-handle-end';
+		this.#handle_end.classList.add('z-timeline-range-slider-handle', 'z-timeline-range-slider-handle-end');
 		this.#handle_end.dataset.action = 'resize-end';
 
 		this.#scale = document.createElement('div');
-		this.#scale.className = 'z-timeline-range-slider-scale';
+		this.#scale.classList.add('z-timeline-range-slider-scale');
 
 		this.#selection_layer.append(this.#selection, this.#handle_start, this.#handle_end);
 	}
@@ -374,104 +377,121 @@ class ZTimelineRangeSlider extends HTMLElement {
 		this.#renderScale();
 	}
 
+	#getTicks() {
+		const width = this.getBoundingClientRect().width;
+		const range = this.#end - this.#start;
+
+		if (width <= ZTimelineRangeSlider.SCALE_LABEL_GAP || range <= 0) {
+			return [];
+		}
+
+		const label_gap = this.#getPixelCustomProperty('--timeline-range-slider-label-gap',
+			ZTimelineRangeSlider.SCALE_LABEL_GAP);
+		const num_segments = Math.max(1, Math.floor(width / label_gap));
+		const step = range / num_segments;
+
+		const padding_ratio = ZTimelineRangeSlider.SCALE_OFFSET / width;
+		const span_ratio = 1 - 2 * padding_ratio;
+
+		const ticks = [];
+
+		for (let i = 0; i <= num_segments; i++) {
+			const ratio = i / num_segments;
+			const value = this.#start + range * ratio;
+
+			let position;
+			if (i === 0) {
+				position = `${ZTimelineRangeSlider.SCALE_OFFSET}px`;
+			}
+			else if (i === num_segments) {
+				position = `calc(100% - ${ZTimelineRangeSlider.SCALE_OFFSET}px)`;
+			}
+			else {
+				position = `${(padding_ratio + ratio * span_ratio) * 100}%`;
+			}
+
+			ticks.push({value, step, ratio, position});
+		}
+
+		return ticks;
+	}
+
 	#renderScale() {
 		if (!this.#shouldRenderScale()) {
 			this.#scale.replaceChildren();
 			return;
 		}
 
-		const rect = this.getBoundingClientRect();
+		const ticks = this.#getTicks();
 
-		if (rect.width <= 0) {
+		if (ticks.length === 0) {
 			this.#scale.replaceChildren();
+
 			return;
 		}
 
 		const range = this.#end - this.#start;
-		const label_gap = this.#getPixelCustomProperty('--timeline-range-slider-label-gap', 90);
-		const tick_step = this.#getTickStep(range, rect.width, label_gap);
-		const first_tick = Math.ceil(this.#start / tick_step) * tick_step;
-		const ticks = [];
-
-		for (let value = first_tick; value <= this.#end + tick_step; value += tick_step) {
-			const ratio = (value - this.#start) / range;
-			const tick = document.createElement('div');
+		const elements = ticks.map(tick => {
 			const label = document.createElement('span');
+			label.textContent = this.#formatTime(tick.value, tick.step, range);
 
-			tick.className = 'z-timeline-range-slider-tick';
-			tick.style.setProperty('--tick-position', `${ratio * 100}%`);
+			const element = document.createElement('div');
+			element.classList.add('z-timeline-range-slider-tick');
+			element.style.setProperty('--tick-position', tick.position);
+			element.appendChild(label);
 
-			label.textContent = this.#formatTickLabel(value, tick_step, range);
+			return element;
+		});
 
-			tick.appendChild(label);
-			ticks.push(tick);
-		}
-
-		this.#scale.replaceChildren(...ticks);
+		this.#scale.replaceChildren(...elements);
 	}
 
 	#shouldRenderScale() {
 		return !this.#has_content || this.hasAttribute('scale');
 	}
 
-	#getTickStep(range, width, label_gap) {
-		const target_count = Math.max(2, Math.floor(width / label_gap));
-		const target_step = range / target_count;
-
-		const steps = [
-			1e-9, 2e-9, 5e-9, 1e-8, 2e-8, 5e-8, 1e-7, 2e-7, 5e-7,
-			1e-6, 2e-6, 5e-6, 1e-5, 1.5e-5, 3e-5, 6e-5, 1.2e-4,
-			3e-4, 6e-4, 9e-4, 1.8e-3, 3.6e-3, 7.2e-3, 1.08e-2,
-			2.16e-2, 4.32e-2, 8.64e-2, 1.728e-1, 6.048e-1,
-			1.2096, 2.592, 7.776, 15.552, 31.536
-		];
-
-		return steps.find(step => step >= target_step) || steps[steps.length - 1];
-	}
-
-	#formatTickLabel(value, tick_step, range) {
-		const date = new Date(value);
-		const ms = String(date.getMilliseconds()).padStart(3, '0');
-		const seconds = String(date.getSeconds()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
-		const hours = String(date.getHours()).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const year = String(date.getFullYear());
-
-		if (range <= 10) {
-			return this.#formatDuration(value);
+	#formatTime(value) {
+		if (value <= 0) {
+			return '0s';
 		}
 
-		if (range < 1000 || tick_step < 1000) {
-			return `${seconds}.${ms}s`;
-		}
-
-		if (range < 60000 || tick_step < 60000) {
-			return `${hours}:${minutes}:${seconds}`;
-		}
-
-		if (range < 86400000 || tick_step < 86400000) {
-			return `${hours}:${minutes}`;
-		}
-
-		if (range < 31536000000) {
-			return `${day}.${month} ${hours}:${minutes}`;
-		}
-
-		return `${year}-${month}-${day}`;
-	}
-
-	#formatDuration(value) {
 		if (value < 1e-6) {
 			return `${Math.round(value * 1e9)}ns`;
 		}
 
 		if (value < 1e-3) {
-			return `${Math.round(value * 1e6)}µs`;
+			return `${+(value * 1e6).toFixed(1)}µs`;
 		}
 
-		return `${Math.round(value * 1e6) / 1000}ms`;
+		if (value < 1) {
+			return `${+(value * 1e3).toFixed(1)}ms`;
+		}
+
+		if (value < 60) {
+			return `${+value.toFixed(1)}s`;
+		}
+
+		if (value < 3600) {
+			const mins = Math.floor(value / 60);
+			const secs = Math.round(value % 60);
+
+			if (secs === 0 || secs === 60) {
+				const final_mins = secs === 60 ? mins + 1 : mins;
+
+				return `${final_mins}m`;
+			}
+
+			return `${mins}m ${secs}s`;
+		}
+
+		const hours = Math.floor(value / 3600);
+		const mins = Math.round((value % 3600) / 60);
+
+		if (mins === 0) {
+			return `${hours}h`;
+		}
+
+		return `${hours}h ${mins}m`;
 	}
 
 	#getPixelCustomProperty(name, fallback) {

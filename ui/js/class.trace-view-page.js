@@ -15,6 +15,9 @@
 
 class TraceViewPage {
 
+	static SCALE_LABEL_GAP = 120;
+	static SCALE_OFFSET = 11;
+
 	/** @type {HTMLElement} */
 	#container;
 
@@ -72,7 +75,8 @@ class TraceViewPage {
 		this.#waterfall = container.querySelector('[data-trace-waterfall]');
 
 		this.#tooltip = document.createElement('div');
-		this.#tooltip.className = 'trace-tooltip';
+		this.#tooltip.classList.add('trace-tooltip');
+
 		document.body.appendChild(this.#tooltip);
 
 		this.#addEventListeners();
@@ -300,25 +304,14 @@ class TraceViewPage {
 		const elements = [];
 
 		for (const tick of ticks) {
-			let position;
-			if (tick.ratio === 0) {
-				position = `11px`;
-			}
-			else if (tick.ratio === 1) {
-				position = `calc(100% - 11px)`;
-			}
-			else {
-				position = `${tick.ratio * 100}%`;
-			}
+			const label = document.createElement('span');
+			label.textContent = this.#formatTime(tick.value);
 
 			const tick_element = document.createElement('div');
-			const label = document.createElement('span');
-
-			tick_element.className = 'trace-time-tick';
-			tick_element.style.setProperty('--trace-tick-position', position);
-
-			label.textContent = this.#formatTime(tick.value, tick.step);
+			tick_element.classList.add('trace-time-tick');
+			tick_element.style.setProperty('--trace-tick-position', tick.position);
 			tick_element.appendChild(label);
+
 			elements.push(tick_element);
 		}
 
@@ -339,20 +332,10 @@ class TraceViewPage {
 		this.#waterfall.replaceChildren(...elements);
 
 		for (const tick of ticks) {
-			let position;
-			if (tick.ratio === 0) {
-				position = `11px`;
-			}
-			else if (tick.ratio === 1) {
-				position = `calc(100% - 11px)`;
-			}
-			else {
-				position = `${tick.ratio * 100}%`;
-			}
-
 			const line = document.createElement('div');
-			line.className = 'trace-grid-line';
-			line.style.setProperty('--trace-grid-line-position', position);
+			line.classList.add('trace-grid-line');
+			line.style.setProperty('--trace-grid-line-position', tick.position);
+
 			this.#waterfall.appendChild(line);
 		}
 	}
@@ -361,29 +344,27 @@ class TraceViewPage {
 		const span = row.item.span;
 		const row_element = document.createElement('div');
 
-		row_element.className = 'trace-waterfall-row';
+		row_element.classList.add('trace-waterfall-row');
 		row_element.dataset.spanId = span.id;
 
 		if (this.#spanIntersectsSelectedRange(span)) {
-			const bar = document.createElement('div');
 			const label = document.createElement('span');
+			label.classList.add('trace-span-label');
+			label.textContent = this.#formatTime(Number(span.end) - Number(span.start));
 
-			bar.className = 'trace-span-bar';
+			const bar = document.createElement('div');
+			bar.classList.add('trace-span-bar');
 			bar.style.setProperty('--trace-span-start', `${this.#getClampedStartRatio(span) * 100}%`);
 			bar.style.setProperty('--trace-span-width', `${this.#getClampedWidthRatio(span) * 100}%`);
 			bar.style.setProperty('--trace-span-color', span.color || this.#getColor(span.index || 0));
-
-			label.className = 'trace-span-label';
-			label.textContent = this.#formatDuration(Number(span.end) - Number(span.start));
-
 			bar.appendChild(label);
+
 			row_element.appendChild(bar);
 		}
 
 		for (const group of this.#getMarkerGroups(span.events)) {
 			const marker = document.createElement('span');
-
-			marker.className = 'trace-event-marker';
+			marker.classList.add('trace-event-marker');
 			marker.style.setProperty('--trace-event-position', `${group.ratio * 100}%`);
 
 			if (group.events.length > 1) {
@@ -391,6 +372,7 @@ class TraceViewPage {
 			}
 
 			this.#marker_events.set(marker, group.events);
+
 			row_element.appendChild(marker);
 		}
 
@@ -451,54 +433,36 @@ class TraceViewPage {
 		const width = this.#time_header.getBoundingClientRect().width;
 		const range = this.#selected_end - this.#selected_start;
 
-		if (width <= 0 || range <= 0) {
+		if (width <= TraceViewPage.SCALE_LABEL_GAP || range <= 0) {
 			return [];
 		}
 
-		const label_gap = this.#getPixelCustomProperty('--trace-label-gap', 120);
-		const step = this.#getTickStep(range, width, label_gap);
-		const first_tick = Math.ceil(this.#selected_start / step) * step;
+		const label_gap = this.#getPixelCustomProperty('--trace-label-gap', TraceViewPage.SCALE_LABEL_GAP);
+		const num_segments = Math.max(1, Math.floor(width / label_gap));
+		const step = range / num_segments;
+		const padding_ratio = TraceViewPage.SCALE_OFFSET / width;
+		const span_ratio = 1 - 2 * padding_ratio;
+
 		const ticks = [];
+		for (let i = 0; i <= num_segments; i++) {
+			const ratio = i / num_segments;
+			const value = this.#selected_start + range * ratio;
 
-		for (let value = first_tick; value <= this.#selected_end; value += step) {
-			ticks.push({
-				value,
-				step,
-				ratio: this.#valueToRatio(value, this.#selected_start, this.#selected_end)
-			});
-		}
+			let position;
+			if (i === 0) {
+				position = `${TraceViewPage.SCALE_OFFSET}px`;
+			}
+			else if (i === num_segments) {
+				position = `calc(100% - ${TraceViewPage.SCALE_OFFSET}px)`;
+			}
+			else {
+				position = `${(padding_ratio + ratio * span_ratio) * 100}%`;
+			}
 
-		if (ticks.length === 0 || ticks[0].value !== this.#selected_start) {
-			ticks.unshift({
-				value: this.#selected_start,
-				step,
-				ratio: 0
-			});
-		}
-
-		if (ticks[ticks.length - 1].value !== this.#selected_end) {
-			ticks.push({
-				value: this.#selected_end,
-				step,
-				ratio: 1
-			});
+			ticks.push({value, step, ratio, position});
 		}
 
 		return ticks;
-	}
-
-	#getTickStep(range, width, label_gap) {
-		const target_count = Math.max(2, Math.floor(width / label_gap));
-		const target_step = range / target_count;
-		const steps = [
-			1e-9, 2e-9, 5e-9, 1e-8, 2e-8, 5e-8, 1e-7, 2e-7, 5e-7,
-			1e-6, 2e-6, 5e-6, 1e-5, 1.5e-5, 3e-5, 6e-5, 1.2e-4,
-			3e-4, 6e-4, 9e-4, 1.8e-3, 3.6e-3, 7.2e-3, 1.08e-2,
-			2.16e-2, 4.32e-2, 8.64e-2, 1.728e-1, 6.048e-1,
-			1.2096, 2.592, 7.776, 15.552, 31.536
-		];
-
-		return steps.find(step => step >= target_step) || steps[steps.length - 1];
 	}
 
 	#showTooltip(anchor, events) {
@@ -526,22 +490,21 @@ class TraceViewPage {
 	}
 
 	#createTooltipItem(event) {
-		const item = document.createElement('div');
-		item.className = 'trace-tooltip-item';
-
 		const title = document.createElement('div');
-		title.className = 'trace-tooltip-title';
+		title.classList.add('trace-tooltip-title');
 		title.textContent = event.title || event.name || event.type || 'Event';
 
 		const time = document.createElement('div');
-		time.className = 'trace-tooltip-time';
+		time.classList.add('trace-tooltip-time');
 		time.textContent = this.#formatDuration(Number(event.time));
 
+		const item = document.createElement('div');
+		item.classList.add('trace-tooltip-item');
 		item.append(title, time);
 
 		if (event.attributes) {
 			const attributes = document.createElement('div');
-			attributes.className = 'trace-tooltip-attributes';
+			attributes.classList.add('trace-tooltip-attributes');
 
 			for (const [name, value] of Object.entries(event.attributes)) {
 				const attribute_name = document.createElement('span');
@@ -551,7 +514,7 @@ class TraceViewPage {
 				attribute_value.textContent = String(value);
 
 				const attribute = document.createElement('div');
-				attribute.className = 'trace-tooltip-attribute';
+				attribute.classList.add('trace-tooltip-attribute');
 				attribute.append(attribute_name, attribute_value);
 
 				attributes.appendChild(attribute);
@@ -634,28 +597,48 @@ class TraceViewPage {
 		return Number.isFinite(end) ? end : 1000;
 	}
 
-	#formatTime(value, step) {
-		const duration = this.#end - this.#start;
-
-		if (duration <= 10) {
-			return this.#formatDuration(value);
+	#formatTime(value) {
+		if (value <= 0) {
+			return '0s';
 		}
 
-		const total_seconds = Math.floor(value);
-		const ms = String(Math.floor((value % 1) * 1000)).padStart(3, '0');
-		const seconds = String(total_seconds % 60).padStart(2, '0');
-		const minutes = String(Math.floor(total_seconds / 60) % 60).padStart(2, '0');
-		const hours = String(Math.floor(total_seconds / 3600)).padStart(2, '0');
-
-		if (step < 1) {
-			return `${seconds}.${ms}s`;
+		if (value < 1e-6) {
+			return `${Math.round(value * 1e9)}ns`;
 		}
 
-		if (step < 60) {
-			return `${hours}:${minutes}:${seconds}`;
+		if (value < 1e-3) {
+			return `${+(value * 1e6).toFixed(1)}µs`;
 		}
 
-		return `${hours}:${minutes}`;
+		if (value < 1) {
+			return `${+(value * 1e3).toFixed(1)}ms`;
+		}
+
+		if (value < 60) {
+			return `${+value.toFixed(1)}s`;
+		}
+
+		if (value < 3600) {
+			const mins = Math.floor(value / 60);
+			const secs = Math.round(value % 60);
+
+			if (secs === 0 || secs === 60) {
+				const final_mins = secs === 60 ? mins + 1 : mins;
+
+				return `${final_mins}m`;
+			}
+
+			return `${mins}m ${secs}s`;
+		}
+
+		const hours = Math.floor(value / 3600);
+		const mins = Math.round((value % 3600) / 60);
+
+		if (mins === 0) {
+			return `${hours}h`;
+		}
+
+		return `${hours}h ${mins}m`;
 	}
 
 	#formatDuration(value) {

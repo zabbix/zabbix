@@ -108,5 +108,10 @@ z-timeline-range-slider {
 	.z-timeline-range-slider-tick {
 		color: var(--timeline-range-slider-label-color);
 		white-space: nowrap;
+
+		> span {
+			font-size: 11px;
+			font-variant-numeric: tabular-nums;
+		}
 	}
 }
