@@ -695,7 +695,7 @@ func newManager() (*Manager, error) {
 
 //nolint:paralleltest
 func TestTaskCreate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -745,7 +745,7 @@ func TestTaskCreate(t *testing.T) {
 }
 
 func TestTaskUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -813,7 +813,7 @@ func TestTaskUpdate(t *testing.T) {
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -867,7 +867,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 }
 
 func TestTaskDelete(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -933,7 +933,7 @@ func TestTaskDelete(t *testing.T) {
 }
 
 func TestSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -985,7 +985,7 @@ func TestSchedule(t *testing.T) {
 }
 
 func TestScheduleCapacity(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1040,7 +1040,7 @@ func TestScheduleCapacity(t *testing.T) {
 }
 
 func TestScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1109,7 +1109,7 @@ func TestScheduleUpdate(t *testing.T) {
 }
 
 func TestCollectorSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1156,7 +1156,7 @@ func TestCollectorSchedule(t *testing.T) {
 }
 
 func TestCollectorScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1231,7 +1231,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 }
 
 func TestRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1354,7 +1354,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*Request) {
 }
 
 func TestWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1450,7 +1450,7 @@ func TestWatcher(t *testing.T) {
 }
 
 func TestCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1503,7 +1503,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1600,7 +1600,7 @@ func TestRunnerWatcher(t *testing.T) {
 }
 
 func TestMultiCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1664,7 +1664,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestMultiRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1742,7 +1742,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 }
 
 func TestPassiveRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1821,7 +1821,7 @@ type configuratorOption struct {
 }
 
 func TestConfigurator(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.Open(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	var opt1, opt2, opt3 configuratorOption
 	_ = conf.UnmarshalStrict([]byte("Delay=5"), &opt1)
