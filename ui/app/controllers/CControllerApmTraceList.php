@@ -148,6 +148,14 @@ class CControllerApmTraceList extends CController {
 			'span_attributes' => $filter_span_attributes
 		];
 
+		$has_filter = $this->hasInput('filter_set') && array_filter($filter,
+			static fn ($value) => (is_array($value) && $value) || (is_string($value) && $value !== '')
+		);
+
+		if ($has_filter) {
+			CProfile::update('web.apm.trace.filter.active', 2, PROFILE_TYPE_INT);
+		}
+
 		$data = [
 			'action' => $this->getAction(),
 			'default_sort_field' => 'timestamp',

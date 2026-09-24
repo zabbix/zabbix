@@ -427,6 +427,10 @@
 							const target = e.target;
 							const selection = window.getSelection();
 
+							if (target.tagName === 'A') {
+								return;
+							}
+
 							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
 								return;
 							}
