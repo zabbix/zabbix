@@ -198,6 +198,20 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
+	 * The promise that resolves when the current column resize operation is completed.
+	 *
+	 * @type {Promise|null}
+	 */
+	#resize_promise = null;
+
+	/**
+	 * The function used to resolve the current column resize promise.
+	 *
+	 * @type {Function|null}
+	 */
+	#resolve_resize = null;
+
+	/**
 	 * The reference to the custom scrollbar track element.
 	 *
 	 * @type {HTMLElement|null}
@@ -1315,9 +1329,15 @@ class CDataTable {
 	}
 
 	getData(params = {}) {
-		params = this.#getDataProviderParams({check_changes: false, force_load: false, ...params});
+		const get_data = () => {
+			params = this.#getDataProviderParams({check_changes: false, force_load: false, ...params});
 
-		return this.#data_provider.getData(params);
+			return this.#data_provider.getData(params);
+		};
+
+		return this.#resize_promise !== null
+			? this.#resize_promise.then(get_data)
+			: get_data();
 	}
 
 	onInit(e) {
@@ -1420,6 +1440,10 @@ class CDataTable {
 	}
 
 	onColumnResizeStart(e) {
+		this.#resize_promise = new Promise((resolve) => {
+			this.#resolve_resize = resolve;
+		});
+
 		const {x, column_index, id} = e.detail;
 
 		this.#resize_click_count++;
@@ -1471,6 +1495,10 @@ class CDataTable {
 		document.body.classList.remove(CDataTable.ZBX_STYLE_RESIZING);
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
+
+		this.#resolve_resize?.();
+		this.#resolve_resize = null;
+		this.#resize_promise = null;
 	}
 
 	onDataSort(e) {
