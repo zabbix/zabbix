@@ -28,9 +28,9 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
 class testTelemetryQueryItems extends CIntegrationTest {
 	/* CLICKHOUSE_* constants must not contain \ or " (must not require escaping) */
 	const CLICKHOUSE_URL = 'http://127.0.0.1:8123';
-	const CLICKHOUSE_USERNAME = 'otel';
-	const CLICKHOUSE_PASSWORD = 'otelpass';
-	const CLICKHOUSE_DB = 'otel';
+	const CLICKHOUSE_USERNAME = 'zb';
+	const CLICKHOUSE_PASSWORD = '2b';
+	const CLICKHOUSE_DB = 'zabbix';
 
 	const COLLECTOR_ADDRESS = 'localhost:4317';
 	const PROTO_DIR = PHPUNIT_BASEDIR . '/src/zabbix_proxy/apm/';

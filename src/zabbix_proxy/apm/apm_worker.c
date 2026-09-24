@@ -58,9 +58,11 @@ zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters, zbx_apm_
  ******************************************************************************/
 static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_commit_t *task)
 {
+#define APM_MAX_RETRY_DELAY	10
+
 	zbx_apm_dataset_t	ds;
 	zbx_vector_tag_t	*attrs;
-	int			ret;
+	int			ret, retries = 0;
 
 	apm_dataset_init(&ds);
 
@@ -92,7 +94,24 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	do
 	{
+		if (1 < retries)
+		{
+			int	delay;
+
+			if (5 < retries)
+				delay = APM_MAX_RETRY_DELAY;
+			else
+				delay = 1 << (retries - 2);
+
+			zabbix_log(LOG_LEVEL_WARNING, "ClickHouse database is down, retrying in %d seconds",
+					delay);
+
+			for (int i = 0; i < delay && SUCCEED == zbx_mw_worker_is_running(&worker->base); i++)
+				sleep(1);
+		}
+
 		ret = apm_exporter_commit(exporter, &ds);
+		retries++;
 	}
 	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
 
@@ -103,6 +122,8 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 	apm_exporter_release(worker->exporters, exporter);
 
 	apm_dataset_destroy(&ds);
+
+#undef APM_MAX_RETRY_DELAY
 }
 
 /******************************************************************************
