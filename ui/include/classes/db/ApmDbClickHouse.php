@@ -145,20 +145,14 @@ class ApmDbClickHouse {
 	}
 
 	private function configureCurl(CurlHandle $curl, string $sql, array $params): void {
-		$http_headers = ['X-ClickHouse-Format: JSONEachRow'];
-
-		if ($this->config['db'] !== '') {
-			$http_headers[] = 'X-ClickHouse-Database: '.$this->config['db'];
-		}
-
 		$curl_options = [
 			CURLOPT_POST => true,
-			CURLOPT_URL => $this->config['url'],
+			CURLOPT_URL => $this->buildUrl(),
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_SHARE => $this->curl_share,
 			CURLOPT_SSL_VERIFYPEER => $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
-			CURLOPT_HTTPHEADER => $http_headers
+			CURLOPT_HTTPHEADER => ['X-ClickHouse-Format: JSONEachRow']
 		];
 
 		if ($params) {
@@ -207,6 +201,14 @@ class ApmDbClickHouse {
 		}
 
 		curl_setopt_array($curl, $curl_options);
+	}
+
+	private function buildUrl(): string {
+		if ($this->config['db'] === '') {
+			return $this->config['url'];
+		}
+
+		return (new CUrl($this->config['url']))->setArgument('database', $this->config['db'])->getUrl();
 	}
 
 	/**
