@@ -5971,22 +5971,10 @@ section {
       text-align: center; }
 
 .trace-tooltip {
-  position: fixed;
-  z-index: 10000;
-  display: none;
-  box-sizing: border-box;
   min-inline-size: 242px;
   max-inline-size: 500px;
-  padding: 8px;
-  border: 1px solid #9f9f9f;
-  border-radius: 3px;
-  background: #ffffff;
-  box-shadow: 0 4px 16px rgb(0 0 0 / .18);
-  color: #000000;
-  font-size: 12px;
-  pointer-events: none; }
-  .trace-tooltip[data-visible] {
-    display: block; }
+  padding-right: 8px;
+  padding-left: 8px; }
   .trace-tooltip .trace-tooltip-item + .trace-tooltip-item {
     margin-block-start: 8px;
     padding-block-start: 8px;

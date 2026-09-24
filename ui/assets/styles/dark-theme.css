@@ -6069,22 +6069,10 @@ section {
       text-align: center; }
 
 .trace-tooltip {
-  position: fixed;
-  z-index: 10000;
-  display: none;
-  box-sizing: border-box;
   min-inline-size: 242px;
   max-inline-size: 500px;
-  padding: 8px;
-  border: 1px solid #303030;
-  border-radius: 3px;
-  background: #2b2b2b;
-  box-shadow: 0 4px 16px rgb(0 0 0 / .18);
-  color: #f2f2f2;
-  font-size: 12px;
-  pointer-events: none; }
-  .trace-tooltip[data-visible] {
-    display: block; }
+  padding-right: 8px;
+  padding-left: 8px; }
   .trace-tooltip .trace-tooltip-item + .trace-tooltip-item {
     margin-block-start: 8px;
     padding-block-start: 8px;

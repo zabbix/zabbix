@@ -36,9 +36,6 @@ class TraceViewPage {
 	/** @type {HTMLElement} */
 	#waterfall;
 
-	/** @type {HTMLElement} */
-	#tooltip;
-
 	/** @type {ResizeObserver | null} */
 	#resize_observer = null;
 
@@ -47,9 +44,6 @@ class TraceViewPage {
 
 	/** @type {Map<string, object>} */
 	#spans = new Map();
-
-	/** @type {Map<HTMLElement, object[]>} */
-	#marker_events = new Map();
 
 	/** @type {object | null} */
 	#trace = null;
@@ -74,11 +68,6 @@ class TraceViewPage {
 		this.#time_header = container.querySelector('[data-trace-time-header]');
 		this.#waterfall = container.querySelector('[data-trace-waterfall]');
 
-		this.#tooltip = document.createElement('div');
-		this.#tooltip.classList.add('trace-tooltip');
-
-		document.body.appendChild(this.#tooltip);
-
 		this.#addEventListeners();
 
 		this.#resize_observer = new ResizeObserver(() => this.#scheduleRender());
@@ -98,8 +87,6 @@ class TraceViewPage {
 			cancelAnimationFrame(this.#animation_frame_id);
 			this.#animation_frame_id = null;
 		}
-
-		this.#tooltip.remove();
 	}
 
 	#addEventListeners() {
@@ -107,9 +94,6 @@ class TraceViewPage {
 		this.#timeline.addEventListener('change', this.#onTimelineChange);
 		this.#tree.addEventListener('toggle', this.#onTreeToggle);
 		this.#tree.addEventListener('select', this.#onTreeSelect);
-		this.#waterfall.addEventListener('pointerover', this.#onWaterfallPointerOver);
-		this.#waterfall.addEventListener('pointerout', this.#onWaterfallPointerOut);
-		this.#container.querySelector('[data-trace-scroll]').addEventListener('scroll', this.#onScroll);
 	}
 
 	#removeEventListeners() {
@@ -117,9 +101,6 @@ class TraceViewPage {
 		this.#timeline.removeEventListener('change', this.#onTimelineChange);
 		this.#tree.removeEventListener('toggle', this.#onTreeToggle);
 		this.#tree.removeEventListener('select', this.#onTreeSelect);
-		this.#waterfall.removeEventListener('pointerover', this.#onWaterfallPointerOver);
-		this.#waterfall.removeEventListener('pointerout', this.#onWaterfallPointerOut);
-		this.#container.querySelector('[data-trace-scroll]').removeEventListener('scroll', this.#onScroll);
 	}
 
 	#onTimelineInput = event => {
@@ -139,42 +120,6 @@ class TraceViewPage {
 			bubbles: true,
 			detail: event.detail
 		}));
-	};
-
-	#onWaterfallPointerOver = event => {
-		const marker = event.target instanceof Element
-			? event.target.closest('.trace-event-marker')
-			: null;
-
-		if (marker === null || !this.#waterfall.contains(marker)) {
-			return;
-		}
-
-		const events = this.#marker_events.get(marker) || [];
-
-		if (events.length > 0) {
-			this.#showTooltip(marker, events);
-		}
-	};
-
-	#onWaterfallPointerOut = event => {
-		const marker = event.target instanceof Element
-			? event.target.closest('.trace-event-marker')
-			: null;
-
-		if (marker === null) {
-			return;
-		}
-
-		if (event.relatedTarget instanceof Node && marker.contains(event.relatedTarget)) {
-			return;
-		}
-
-		this.#hideTooltip();
-	};
-
-	#onScroll = () => {
-		this.#hideTooltip();
 	};
 
 	setTrace(trace) {
@@ -323,8 +268,6 @@ class TraceViewPage {
 		const rows = this.#tree.visibleItems;
 		const elements = [];
 
-		this.#marker_events.clear();
-
 		for (const row of rows) {
 			elements.push(this.#createWaterfallRow(row));
 		}
@@ -371,7 +314,12 @@ class TraceViewPage {
 				marker.dataset.count = String(group.events.length);
 			}
 
-			this.#marker_events.set(marker, group.events);
+			marker.dataset.hintbox = '1';
+			marker.dataset.hintboxStatic = '1';
+			marker.dataset.hintboxHtml = group.events.map(event => this.#createTooltipItem(event).outerHTML).join('');
+			marker.dataset.hintboxClass = 'trace-tooltip';
+			marker.dataset.hintboxPositionFixed = '1';
+			marker.dataset.hintboxDelay = '0';
 
 			row_element.appendChild(marker);
 		}
@@ -463,30 +411,6 @@ class TraceViewPage {
 		}
 
 		return ticks;
-	}
-
-	#showTooltip(anchor, events) {
-		this.#tooltip.replaceChildren(...events.map(event => this.#createTooltipItem(event)));
-		this.#tooltip.toggleAttribute('data-visible', true);
-
-		const anchor_rect = anchor.getBoundingClientRect();
-		const tooltip_rect = this.#tooltip.getBoundingClientRect();
-
-		let left = anchor_rect.left + anchor_rect.width / 2 - tooltip_rect.width / 2;
-		let top = anchor_rect.bottom + 8;
-
-		left = Math.max(8, Math.min(left, window.innerWidth - tooltip_rect.width - 8));
-
-		if (top + tooltip_rect.height > window.innerHeight - 8) {
-			top = anchor_rect.top - tooltip_rect.height - 8;
-		}
-
-		this.#tooltip.style.left = `${left}px`;
-		this.#tooltip.style.top = `${Math.max(8, top)}px`;
-	}
-
-	#hideTooltip() {
-		this.#tooltip.toggleAttribute('data-visible', false);
 	}
 
 	#createTooltipItem(event) {

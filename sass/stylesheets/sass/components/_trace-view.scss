@@ -266,24 +266,10 @@
 }
 
 .trace-tooltip {
-	position: fixed;
-	z-index: 10000;
-	display: none;
-	box-sizing: border-box;
 	min-inline-size: 242px;
 	max-inline-size: 500px;
-	padding: 8px;
-	border: 1px solid #{$ui-border-color};
-	border-radius: 3px;
-	background: #{$ui-bg-color};
-	box-shadow: 0 4px 16px #{"rgb(0 0 0 / .18)"};
-	color: #{$font-color};
-	font-size: 12px;
-	pointer-events: none;
-
-	&[data-visible] {
-		display: block;
-	}
+	padding-right: 8px;
+	padding-left: 8px;
 
 	.trace-tooltip-item + .trace-tooltip-item {
 		margin-block-start: 8px;
