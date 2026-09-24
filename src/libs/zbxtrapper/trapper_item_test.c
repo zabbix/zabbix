@@ -628,7 +628,6 @@ out:
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
 	zbx_free(item.query);
-	zbx_free(item.snmp_max_repetitions);
 	for (int i = 0; i < item.script_params.values_num; i++)
 	{
 		zbx_free(item.script_params.values[i].first);
