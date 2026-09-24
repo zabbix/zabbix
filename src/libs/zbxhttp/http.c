@@ -19,7 +19,6 @@
 #include "zbxhttp.h"
 
 #include "zbxnum.h"
-#include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
@@ -994,7 +993,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		const char *config_ssl_key_location, char **error)
 {
 	CURLcode		err;
-	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
+	char			*url_buffer = NULL, *headers_ptr, *line;
 	int			ret = NOTSUPPORTED, found = FAIL;
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
@@ -1109,7 +1108,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 	if (SUCCEED != zbx_curl_setopt_https(context->easyhandle, error))
 		goto clean;
 
-	zbx_snprintf(url_buffer, sizeof(url_buffer),"%s%s", url, query_fields);
+	url_buffer = zbx_dsprintf(NULL,"%s%s", url, query_fields);
 	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_URL, url_buffer)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));
@@ -1130,6 +1129,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 
 	ret = SUCCEED;
 clean:
+	zbx_free(url_buffer);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
