@@ -15,9 +15,8 @@
 #ifndef ZABBIX_HISTORY_OPTION_H
 #define ZABBIX_HISTORY_OPTION_H
 
-#include "history.h"
 #include "zbxtypes.h"
-#include "zbxalgo.h"
+#include "zbxcfg.h"
 
 #define HISTORY_PROVIDER_SQL		"sql"	/* default provider */
 #define HISTORY_PROVIDER_ELASTICSEARCH	"elasticsearch"
@@ -42,27 +41,20 @@
 #define HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION	"ssl_cert_location"
 #define HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION	"ssl_key_location"
 
-ZBX_VECTOR_DECL(history_option, zbx_history_option_t)
+const char	*zbx_history_option_value_type_str(unsigned char value_type);
+int		zbx_history_option_value_type_from_str(const char *value_type_str);
 
-const char	*history_option_value_type_str(unsigned char value_type);
-int		history_option_value_type_from_str(const char *value_type_str);
-
-zbx_history_option_t	history_option_str(const char *name, const char *value);
-zbx_history_option_t	history_option_int(const char *name, int value);
-const char	*history_option_value(const zbx_history_option_t *options, int options_num, const char *name);
-
-int	history_provider_parse_options(const char *conf, char **name, zbx_vector_history_option_t *options,
+int	history_provider_parse_options(const char *conf, char **name, zbx_vector_config_option_t *options,
 		char **error);
-void	history_options_clear(zbx_history_option_t *options, int options_num);
-zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int options_num);
-zbx_uint64_t	history_options_precache(const zbx_history_option_t *options, int options_num);
-zbx_history_option_t	history_option_types(zbx_uint64_t mask);
+zbx_uint64_t	history_options_type_mask(const zbx_config_option_t *options, int options_num);
+zbx_uint64_t	history_options_precache(const zbx_config_option_t *options, int options_num);
+zbx_config_option_t	history_option_types(zbx_uint64_t mask);
 
-int	history_options_validate_common_settings(const zbx_history_option_t *options, int options_num, char **error);
+int	history_options_validate_common_settings(const zbx_config_option_t *options, int options_num, char **error);
 
-int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
+int	history_options_add_common_params(zbx_vector_config_option_t *options, const char *config_source_ip,
 		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
 
-void	history_log_options(zbx_history_option_t *options, int options_num);
+void	history_log_options(zbx_config_option_t *options, int options_num);
 #endif

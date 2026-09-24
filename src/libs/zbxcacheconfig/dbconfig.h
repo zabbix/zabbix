@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbx_trigger_constants.h"
@@ -244,6 +245,17 @@ typedef struct
 }
 ZBX_DC_BROWSERITEM;
 
+typedef struct
+{
+	const char	*query;
+	const char	*time_shift;
+	const char	*lookback_limit;
+	const char	*granularity;
+	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
+}
+ZBX_DC_TQITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -259,6 +271,7 @@ typedef union
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_BROWSERITEM	*browseritem;
+	ZBX_DC_TQITEM		*tqitem;
 }
 ZBX_DC_ITEMTYPE;
 

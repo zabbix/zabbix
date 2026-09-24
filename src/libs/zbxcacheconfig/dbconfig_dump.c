@@ -94,6 +94,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:%s", config->config->item_timeouts.telnet);
 	zabbix_log(LOG_LEVEL_TRACE, "  script:%s", config->config->item_timeouts.script);
 	zabbix_log(LOG_LEVEL_TRACE, "  browser:%s", config->config->item_timeouts.browser);
+	zabbix_log(LOG_LEVEL_TRACE, "  telemetry:%s", config->config->item_timeouts.telemetry);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -552,6 +553,13 @@ static void	DCdump_browseritem(const ZBX_DC_BROWSERITEM *browseritem)
 	}
 }
 
+static void	DCdump_tqitem(const ZBX_DC_TQITEM *tqitem)
+{
+	zabbix_log(LOG_LEVEL_TRACE,
+			"  telemetry_query:[query:'%s' time_shift:'%s' lookback_limit:'%s' granularity:'%s']",
+			tqitem->query, tqitem->time_shift, tqitem->lookback_limit, tqitem->granularity);
+}
+
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:[username:'%s' password:'%s' params:'%s']",
@@ -736,6 +744,9 @@ static void	DCdump_items(void)
 				DCdump_browseritem(item->itemtype.browseritem);
 				break;
 			case ITEM_TYPE_NESTED_LLD:
+				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				DCdump_tqitem(item->itemtype.tqitem);
 				break;
 		}
 

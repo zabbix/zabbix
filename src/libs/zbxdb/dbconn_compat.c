@@ -867,6 +867,7 @@ void	zbx_db_unstash_connection(zbx_dbconn_t *db)
 
 	dbconn = NULL;
 }
+
 char	*zbx_db_dyn_escape_like_pattern(const char *src)
 {
 	if (NULL == dbconn)

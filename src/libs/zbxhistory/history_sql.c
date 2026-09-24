@@ -846,7 +846,7 @@ static int	history_sql_get_info(void *data, zbx_history_provider_info_t *info, c
  *     options_num - [IN] number of configuration options                     *
  *                                                                            *
  ******************************************************************************/
-static void	history_sql_validate_options(const zbx_history_option_t *options, int options_num)
+static void	history_sql_validate_options(const zbx_config_option_t *options, int options_num)
 {
 	const char	*supported_options = ""
 				HISTORY_PROVIDER_OPTION_NAME ","
@@ -884,7 +884,7 @@ static void	history_sql_validate_options(const zbx_history_option_t *options, in
  *     error       - [OUT] unused                                             *
  *                                                                            *
  ******************************************************************************/
-zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*history_sql_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	zbx_history_provider_t	*provider;
 

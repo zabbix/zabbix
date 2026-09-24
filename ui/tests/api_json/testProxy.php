@@ -182,7 +182,8 @@ class testProxy extends CAPITest {
 				'timeout_ssh_agent' => '10s',
 				'timeout_telnet_agent' => '10s',
 				'timeout_script' => '10s',
-				'timeout_browser' => '10s'
+				'timeout_browser' => '10s',
+				'timeout_telemetry_query' => '10s'
 			],
 			'version_undefined' => [
 				'name' => 'API test proxy - version undefined',
@@ -213,7 +214,8 @@ class testProxy extends CAPITest {
 				'timeout_ssh_agent' => '10s',
 				'timeout_telnet_agent' => '10s',
 				'timeout_script' => '10s',
-				'timeout_browser' => '10s'
+				'timeout_browser' => '10s',
+				'timeout_telemetry_query' => '10s'
 			],
 			'state_unknown' => [
 				'name' => 'API test proxy - state unknown',
@@ -610,7 +612,7 @@ class testProxy extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "timeout_telemetry_query", "lastaccess", "version", "compatibility", "state".'
 			],
 
 			// Check write-only fields are not returned.
@@ -619,14 +621,14 @@ class testProxy extends CAPITest {
 					'output' => ['tls_psk_identity']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "timeout_telemetry_query", "lastaccess", "version", "compatibility", "state".'
 			],
 			'Test proxy.get: write-only field "tls_psk"' => [
 				'request' => [
 					'output' => ['tls_psk']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "timeout_telemetry_query", "lastaccess", "version", "compatibility", "state".'
 			],
 
 			// Check "selectAssignedHosts" option.
@@ -3542,7 +3544,8 @@ class testProxy extends CAPITest {
 					'timeout_ssh_agent' => '{$TIMEOUT.SSH.AGENT}',
 					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
 					'timeout_script' => '{$TIMEOUT.SCRIPT}',
-					'timeout_browser' => '{$TIMEOUT.BROWSER}'
+					'timeout_browser' => '{$TIMEOUT.BROWSER}',
+					'timeout_telemetry_query' => '{$TIMEOUT.TELEMETRY}'
 				],
 				'expected_error' => null
 			]
@@ -4181,7 +4184,8 @@ class testProxy extends CAPITest {
 					'timeout_ssh_agent' => '4s',
 					'timeout_telnet_agent' => '4s',
 					'timeout_script' => '4s',
-					'timeout_browser' => '61s'
+					'timeout_browser' => '61s',
+					'timeout_telemetry_query' => '7s'
 				],
 				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
 			],
@@ -4198,7 +4202,8 @@ class testProxy extends CAPITest {
 					'timeout_ssh_agent' => '4s',
 					'timeout_telnet_agent' => '4s',
 					'timeout_script' => '4s',
-					'timeout_browser' => '61s'
+					'timeout_browser' => '61s',
+					'timeout_telemetry_query' => '7s'
 				],
 				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
 			],
@@ -5300,7 +5305,8 @@ class testProxy extends CAPITest {
 					'timeout_ssh_agent' => '10s',
 					'timeout_telnet_agent' => '10s',
 					'timeout_script' => '10s',
-					'timeout_browser' => '10s'
+					'timeout_browser' => '10s',
+					'timeout_telemetry_query' => '10s'
 				],
 				'expected_error' => null
 			],
@@ -5398,7 +5404,7 @@ class testProxy extends CAPITest {
 			$db_defaults = DB::getDefaults('proxy');
 			$timeout_fields = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query'
 			];
 
 			// Compare records from DB before and after API call.
@@ -5774,8 +5780,8 @@ class testProxy extends CAPITest {
 				'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility',
-				'state'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query', 'lastaccess',
+				'version', 'compatibility', 'state'
 			],
 			'selectHosts' => ['hostid'],
 			'proxyids' => $proxyids,

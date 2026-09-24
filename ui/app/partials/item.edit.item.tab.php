@@ -131,7 +131,7 @@ $formgrid = (new CFormGrid())
 		]))->setId('js-item-url-field')
 	])
 	->addItem([
-		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
+		(new CLabel(_('Query fields'), 'query-fields-table'))->setId('js-item-query-fields-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
@@ -650,6 +650,233 @@ $formgrid
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
+		(new CLabel(_('Category'), 'label-signal-type'))->setId('js-item-signal-type-label'),
+		(new CFormField(
+			(new CSelect('signal_type'))
+				->setId('signal_type')
+				->setFocusableElementId('label-signal-type')
+				->setValue($item['signal_type'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES => _('Traces'),
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS => _('Metrics'),
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS => _('Logs')
+				]))
+				->setReadonly($readonly)
+		))->setId('js-item-signal-type-field')
+	])
+	->addItem([
+		(new CLabel(_('Metric points'), 'metric_point_type'))->setId('js-item-metric-point-type-label'),
+		(new CFormField(
+			(new CRadioButtonList('metric_point_type', (int) $item['metric_point_type']))
+				->addValue(_('Sum'), CItemTypeTelemetryQuery::METRICS_POINT_SUM)
+				->addValue(_('Gauge'), CItemTypeTelemetryQuery::METRICS_POINT_GAUGE)
+				->addValue(_('Histogram'), CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM)
+				->addValue(_('Exponential histogram'), CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM)
+				->setModern()
+				->setReadonly($readonly)
+		))->setId('js-item-metric-point-type-field')
+	])
+	->addItem([
+		(new CLabel(_('Columns'), 'columns-table'))->setId('js-item-columns-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('columns-table')
+					->setHeader([
+						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
+						(new CColHeader())->setWidth('35%'),
+						(new CColHeader(_('Action')))->setWidth('22%')
+					])
+					->setFooter(new CRow(
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('element-table-add')->setEnabled(!$readonly)
+						))->setColSpan(4)
+					)),
+				new CTemplateTag('column-row-tmpl', [
+					(new CRow([
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CSelect('columns[#{rowNum}][column]'))
+							->addClass('js-column')
+							->setValue('#{column}')
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('data-changed', '')
+							->setErrorLabel(_('Name'))
+							->setErrorContainer('columns_#{rowNum}_error_container')
+							->setReadonly($readonly),
+						(new CTextBox('columns[#{rowNum}][attribute_key]', '#{attribute_key}', $readonly))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('placeholder', _('Key name'))
+							->setAttribute('data-notrim', '')
+							->setAttribute('data-changed', '')
+							->setErrorLabel(_('Key name'))
+							->setErrorContainer('columns_#{rowNum}_error_container')
+							->addClass('js-attribute-key'),
+						new CCol(
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')->setEnabled(!$readonly)
+						)
+					]))->addClass('form_row'),
+					(new CRow([
+						new CCol(),
+						(new CCol())
+							->setId('columns_#{rowNum}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
+							->setColSpan(3)
+					]))->addClass('error-container-row')
+				])
+			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'columns')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-columns-field')
+	])
+	->addItem([
+		(new CLabel(_('Aggregated columns'), 'aggregated-columns-table'))
+			->setAsteriskMark()
+			->setId('js-item-aggregated-columns-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('aggregated-columns-table')
+					->setHeader([
+						(new CColHeader(_('Function')))->setWidth('20%'),
+						(new CColHeader(_('Alias')))->setWidth('58%'),
+						(new CColHeader(_('Actions')))->setWidth('22%')
+					])
+					->setFooter(new CRow(
+						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-aggregated-column')
+							->setEnabled(!$readonly)
+						))->setColSpan(3)
+					)),
+				new CTemplateTag('aggregated-column-row-tmpl', [
+					(new CRow([
+						[
+							(new CInput('hidden', 'aggregated_columns[#{row_index}][column]', '#{column}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
+								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
+							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
+							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
+							(new CInput('hidden', 'aggregated_columns[#{row_index}][alias]', '#{alias}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
+								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
+							'#{function_label}'
+						],
+						(new CCol('#{alias}'))->addClass(ZBX_STYLE_WORDWRAP),
+						(new CCol(new CHorList([
+							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
+							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
+						])))
+					]))->setAttribute('data-row_index', '#{row_index}'),
+					(new CRow([
+						(new CCol())
+							->setId('aggregated_columns_#{row_index}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
+							->setColSpan(3)
+					]))->addClass('error-container-row')
+				])
+			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'aggregated_columns')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-aggregated-columns-field')
+	])
+	->addItem([
+		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('js-item-evaltype-label'),
+		(new CFormField([
+			(new CDiv(
+				(new CSelect('evaltype'))
+					->setId('evaltype')
+					->setFocusableElementId('label-evaltype')
+					->setValue((int) $item['evaltype'])
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					]))
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->setReadonly($readonly)
+			))->addClass(ZBX_STYLE_CELL),
+			(new CDiv([
+				(new CSpan(''))->setId('expression'),
+				(new CTextBox('formula', $item['formula'], $readonly))
+					->setId('formula')
+					->addStyle('width: 100%;')
+					->setAttribute('placeholder', 'A or (B and C) ...')
+			]))
+				->addClass(ZBX_STYLE_CELL)
+				->addClass(ZBX_STYLE_CELL_EXPRESSION)
+				->addStyle('width: 100%;')
+		]))
+			->setId('js-item-evaltype-field')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	])
+	->addItem([
+		(new CLabel(_('Conditions'), 'conditions-table'))->setId('js-item-conditions-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('conditions-table')
+					->setHeader([
+						(new CColHeader(_('Label')))->setWidth('20%'),
+						(new CColHeader(_('Name')))->setWidth('58%'),
+						(new CColHeader(_('Actions')))->setWidth('22%')
+					])
+					->setFooter(new CRow(
+						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
+							->setEnabled(!$readonly)
+						))->setColSpan(3)
+					)),
+				new CTemplateTag('condition-row-tmpl', [
+					(new CRow([
+						[
+							(new CInput('hidden', 'conditions[#{row_index}][formulaid]', '#{formulaid}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
+								->setErrorContainer('conditions_#{row_index}_error_container'),
+							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-changed', '')
+								->setErrorContainer('conditions_#{row_index}_error_container'),
+							(new CInput('hidden', 'conditions[#{row_index}][attribute_key]', '#{attribute_key}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
+							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
+							(new CInput('hidden', 'conditions[#{row_index}][value]', '#{value}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-notrim', '')
+								->setAttribute('data-changed', ''),
+							'#{formulaid}'
+						],
+						(new CCol([
+							'#{column}', ' ', new CTag('em', true, '#{attribute_key_name}'), ' ',
+							'#{operator_name}', ' ', new CTag('em', true, '#{value_name}')
+						]))->addClass(ZBX_STYLE_WORDWRAP),
+						(new CCol(new CHorList([
+							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
+							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
+						])))
+					]))->setAttribute('data-row_index', '#{row_index}'),
+					(new CRow([
+						(new CCol())
+							->setId('conditions_#{row_index}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
+							->setColSpan(3)
+					]))->addClass('error-container-row')
+				])
+			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'conditions')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-conditions-field')
+	])
+	->addItem([
 		(new CLabel(_('Units'), 'units'))->setId('js-item-units-label'),
 		(new CFormField(
 			(new CTextBox('units', $item['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -683,6 +910,49 @@ $formgrid
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-flex-intervals-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Time shift'),
+			makeHelpIcon(_('Shift the processing window back by a fixed amount.'))
+		], 'time_shift'))->setAsteriskMark()->setId('js-item-time-shift-label'),
+		(new CFormField(
+			(new CTextBox('time_shift', $item['time_shift'], $item['discovered']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-time-shift-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Lookback limit'),
+			makeHelpIcon(
+				_('Limit processing window historical lookup when previous item updates are missing or too old.')
+			)
+		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
+		(new CFormField([
+			(new CTextBox('lookback_limit', $item['lookback_limit'], $item['discovered']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data gaps are possible.')))
+				->addClass('js-lookback-limit-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-lookback-limit-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Granularity'),
+			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.'))
+		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
+		(new CFormField([
+			(new CTextBox('granularity', $item['granularity'], $item['discovered']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired(),
+			' ',
+			(new CSpan(_('Data will likely overlap.')))
+				->addClass('js-granularity-warning')
+				->addStyle('display: none;')
+		]))->setId('js-item-granularity-field')
 	]);
 
 /**

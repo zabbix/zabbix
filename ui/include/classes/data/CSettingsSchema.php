@@ -552,6 +552,11 @@ final class CSettingsSchema {
 			'default' => '3s',
 			'length' => 255
 		],
+		'timeout_telemetry_query' => [
+			'column' => 'value_str',
+			'default' => '3s',
+			'length' => 255
+		],
 		'uri_valid_schemes' => [
 			'column' => 'value_str',
 			'default' => 'http,https,ftp,file,mailto,tel,ssh',
