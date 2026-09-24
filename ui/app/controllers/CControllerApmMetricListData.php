@@ -222,7 +222,18 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				}
 
 				foreach ($metric['exemplars'] as &$exemplar) {
-					$exemplar['time_ns_formatted'] = $this->formatTimeNs($exemplar['time_unix'], $today);
+					$clock = floor($exemplar['time_unix'] / 1000000000);
+					$exemplar['time_ns_formatted'] = $this->formatTimeNs($exemplar['time_unix'], $today, $clock);
+
+					$exemplar['time_from'] = (new DateTimeImmutable('@'.$clock))
+						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
+						->modify('last hour')
+						->format('Y-m-d H:i:s');
+
+					$exemplar['time_to'] = (new DateTimeImmutable('@'.$clock))
+						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
+						->modify('next hour')
+						->format('Y-m-d H:i:s');
 
 					unset($exemplar['time_unix']);
 				}
@@ -326,12 +337,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		return $buckets;
 	}
 
-	private function formatTimeNs($time_unix, $today, $clock = null): string {
-		if ($clock === null) {
-			$clock = floor($time_unix / 1000000000);
-		}
-
-		$ns = str_pad((string) ($time_unix % 1000000000), 9, '0', STR_PAD_LEFT);
+	private function formatTimeNs($time, $today, $clock): string {
+		$ns = str_pad((string) ($time % 1000000000), 9, '0', STR_PAD_LEFT);
 		return $clock >= $today
 			? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
 			: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),

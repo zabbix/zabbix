@@ -618,7 +618,7 @@
 			return flex_wrapper;
 		}
 
-		#createLink(name, url_params) {
+		#createExemplarLink(name, url_params) {
 			const link = document.createElement('a');
 			link.href = zabbixUrl(url_params);
 			link.ariaLabel = name;
@@ -631,35 +631,39 @@
 			const groups = [];
 
 			exemplars.forEach((exemplar, i) => {
-				const traceid_traces_link = this.#createLink(<?= json_encode(_('Traces')) ?>, {
-					action: 'apm.trace.list',
-					filter_traceid: exemplar.traceid,
-					filter_set: 1
-				});
+				const links = {
+					'apm.trace.list': {traceid: null, spanid: null},
+					'apm.log.list': {traceid: null, spanid: null}
+				};
 
-				const spanid_traces_link = this.#createLink(<?= json_encode(_('Traces')) ?>, {
-					action: 'apm.trace.list',
-					filter_spanid: exemplar.spanid,
-					filter_set: 1
-				});
+				for (const action of ['apm.trace.list', 'apm.log.list']) {
+					const label = action === 'apm.trace.list'
+						? <?= json_encode(_('Traces')) ?>
+						: <?= json_encode(_('Logs')) ?>;
 
-				const traceid_logs_link =  this.#createLink(<?= json_encode(_('Logs')) ?>, {
-					action: 'apm.log.list',
-					filter_traceid: exemplar.traceid,
-					filter_set: 1
-				});
-
-				const spanid_logs_link =  this.#createLink(<?= json_encode(_('Logs')) ?>, {
-					action: 'apm.log.list',
-					filter_spanid: exemplar.spanid,
-					filter_set: 1
-				});
+					for (const filter of ['traceid', 'spanid']) {
+						links[action][filter] = this.#createExemplarLink(label, {
+							action,
+							...(filter === 'traceid'
+									? { filter_traceid: exemplar.traceid }
+									: { filter_spanid: exemplar.spanid }
+							),
+							from: exemplar.time_from,
+							to: exemplar.time_to,
+							filter_set: 1
+						});
+					}
+				}
 
 				const traceid_div = document.createElement('div');
-				traceid_div.append(exemplar.traceid, ' ', traceid_logs_link, ' ', traceid_traces_link);
+				traceid_div.append(exemplar.traceid, ' ', links['apm.log.list'].traceid, ' ',
+					links['apm.trace.list'].traceid
+				);
 
 				const spanid_div = document.createElement('div');
-				spanid_div.append(exemplar.spanid, ' ', spanid_logs_link, ' ', spanid_traces_link);
+				spanid_div.append(exemplar.spanid, ' ', links['apm.log.list'].spanid, ' ',
+					links['apm.trace.list'].spanid
+				);
 
 				const group = {
 					title: sprintf(<?= json_encode(_('Exemplar  %1$s')) ?>, i + 1),
