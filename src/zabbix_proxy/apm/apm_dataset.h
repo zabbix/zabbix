@@ -38,23 +38,24 @@ ZBX_VECTOR_LITE_DECL(apm_row, zbx_apm_row_t)
 
 typedef enum
 {
-	APM_COL_STRING,		/* String, LowCardinality(String) */
+	APM_COL_STRING,			/* String, LowCardinality(String) */
 	APM_COL_BOOL,			/* Boolean (IsMonotonic) */
 	APM_COL_UINT8,			/* TraceFlags, SeverityNumber */
-	APM_COL_UINT32,		/* Flags, ScopeDroppedAttrCount */
+	APM_COL_UINT32,			/* Flags, ScopeDroppedAttrCount */
 	APM_COL_INT32,			/* AggregationTemporality, Scale, Positive/NegativeOffset */
-	APM_COL_UINT64,		/* Count, ZeroCount, Duration */
+	APM_COL_UINT64,			/* Count, ZeroCount, Duration */
 	APM_COL_FLOAT64,		/* Value, Sum, Min, Max */
-	APM_COL_DATETIME,		/* DateTime, seconds (metrics StartTimeUnix/TimeUnix) */
-	APM_COL_DATETIME64,		/* DateTime64(9), nanos (logs/traces Timestamp) */
+	APM_COL_DATETIME,		/* DateTime, seconds (currently unused) */
+	APM_COL_DATETIME64,		/* DateTime64(9), nanos (metrics StartTimeUnix/TimeUnix, */
+					/* logs/traces Timestamp) */
 	APM_COL_MAP,			/* Map(String, String) -- JSON object */
 
 	/* parallel-array columns (Nested groups and plain arrays) */
 	APM_COL_ARRAY_STRING,		/* Exemplars.SpanId/TraceId, Events.Name, Links.* */
 	APM_COL_ARRAY_UINT64,		/* BucketCounts, Positive/NegativeBucketCounts */
 	APM_COL_ARRAY_FLOAT64,		/* ExplicitBounds, Exemplars.Value, ValueAtQuantiles.* */
-	APM_COL_ARRAY_DATETIME,	/* Exemplars.TimeUnix */
-	APM_COL_ARRAY_DATETIME64,	/* Events.Timestamp */
+	APM_COL_ARRAY_DATETIME,		/* DateTime, seconds (currently unused) */
+	APM_COL_ARRAY_DATETIME64,	/* DateTime64(9), nanos (Exemplars.TimeUnix, Events.Timestamp) */
 	APM_COL_ARRAY_MAP		/* Exemplars.FilteredAttributes, Events/Links.Attributes */
 }
 zbx_apm_col_type_t;

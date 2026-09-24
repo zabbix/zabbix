@@ -32,12 +32,12 @@ static const zbx_apm_col_t	apm_col_metrics_gauge[] = {
 	{APM_COL_STRING},		/* MetricDescription */
 	{APM_COL_STRING},		/* MetricUnit */
 	{APM_COL_MAP},			/* Attributes */
-	{APM_COL_DATETIME},		/* StartTimeUnix */
-	{APM_COL_DATETIME},		/* TimeUnix */
+	{APM_COL_DATETIME64},		/* StartTimeUnix */
+	{APM_COL_DATETIME64},		/* TimeUnix */
 	{APM_COL_FLOAT64},		/* Value */
 	{APM_COL_UINT32},		/* Flags */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
-	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
+	{APM_COL_ARRAY_DATETIME64},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
 	{APM_COL_ARRAY_STRING}		/* Exemplars.TraceId */
@@ -56,12 +56,12 @@ static const zbx_apm_col_t	apm_col_metrics_sum[] = {
 	{APM_COL_STRING},		/* MetricDescription */
 	{APM_COL_STRING},		/* MetricUnit */
 	{APM_COL_MAP},			/* Attributes */
-	{APM_COL_DATETIME},		/* StartTimeUnix */
-	{APM_COL_DATETIME},		/* TimeUnix */
+	{APM_COL_DATETIME64},		/* StartTimeUnix */
+	{APM_COL_DATETIME64},		/* TimeUnix */
 	{APM_COL_FLOAT64},		/* Value */
 	{APM_COL_UINT32},		/* Flags */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
-	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
+	{APM_COL_ARRAY_DATETIME64},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
@@ -82,14 +82,14 @@ static const zbx_apm_col_t	apm_col_metrics_histogram[] = {
 	{APM_COL_STRING},		/* MetricDescription */
 	{APM_COL_STRING},		/* MetricUnit */
 	{APM_COL_MAP},			/* Attributes */
-	{APM_COL_DATETIME},		/* StartTimeUnix */
-	{APM_COL_DATETIME},		/* TimeUnix */
+	{APM_COL_DATETIME64},		/* StartTimeUnix */
+	{APM_COL_DATETIME64},		/* TimeUnix */
 	{APM_COL_UINT64},		/* Count */
 	{APM_COL_FLOAT64},		/* Sum */
 	{APM_COL_ARRAY_UINT64},		/* BucketCounts */
 	{APM_COL_ARRAY_FLOAT64},	/* ExplicitBounds */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
-	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
+	{APM_COL_ARRAY_DATETIME64},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
@@ -112,8 +112,8 @@ static const zbx_apm_col_t	apm_col_metrics_exponential_histogram[] = {
 	{APM_COL_STRING},		/* MetricDescription */
 	{APM_COL_STRING},		/* MetricUnit */
 	{APM_COL_MAP},			/* Attributes */
-	{APM_COL_DATETIME},		/* StartTimeUnix */
-	{APM_COL_DATETIME},		/* TimeUnix */
+	{APM_COL_DATETIME64},		/* StartTimeUnix */
+	{APM_COL_DATETIME64},		/* TimeUnix */
 	{APM_COL_UINT64},		/* Count */
 	{APM_COL_FLOAT64},		/* Sum */
 	{APM_COL_INT32},		/* Scale */
@@ -123,7 +123,7 @@ static const zbx_apm_col_t	apm_col_metrics_exponential_histogram[] = {
 	{APM_COL_INT32},		/* NegativeOffset */
 	{APM_COL_ARRAY_UINT64},		/* NegativeBucketCounts */
 	{APM_COL_ARRAY_MAP},		/* Exemplars.FilteredAttributes */
-	{APM_COL_ARRAY_DATETIME},	/* Exemplars.TimeUnix */
+	{APM_COL_ARRAY_DATETIME64},	/* Exemplars.TimeUnix */
 	{APM_COL_ARRAY_FLOAT64},	/* Exemplars.Value */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.SpanId */
 	{APM_COL_ARRAY_STRING},		/* Exemplars.TraceId */
@@ -146,8 +146,8 @@ static const zbx_apm_col_t	apm_col_metrics_summary[] = {
 	{APM_COL_STRING},		/* MetricDescription */
 	{APM_COL_STRING},		/* MetricUnit */
 	{APM_COL_MAP},			/* Attributes */
-	{APM_COL_DATETIME},		/* StartTimeUnix */
-	{APM_COL_DATETIME},		/* TimeUnix */
+	{APM_COL_DATETIME64},		/* StartTimeUnix */
+	{APM_COL_DATETIME64},		/* TimeUnix */
 	{APM_COL_UINT64},		/* Count */
 	{APM_COL_FLOAT64},		/* Sum */
 	{APM_COL_ARRAY_FLOAT64},	/* ValueAtQuantiles.Quantile */
@@ -260,6 +260,8 @@ void	apm_rowset_clear(zbx_apm_rowset_t *rs)
 
 		zbx_free(rs->rows.values[i].cols);
 	}
+
+	zbx_vector_apm_row_clear(&rs->rows);
 }
 
 /******************************************************************************

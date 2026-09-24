@@ -268,18 +268,25 @@ static char	*num_array_to_json(const Repeated &arr)
 
 	return out;
 }
+
 /******************************************************************************
  *                                                                            *
- * Purpose: convert a unix nanosecond timestamp to whole seconds              *
+ * Purpose: convert a unix nanosecond timestamp to a "seconds.nanoseconds"    *
+ *          decimal string accepted by ClickHouse DateTime64 columns          *
+ *          regardless of their configured scale                             *
  *                                                                            *
  * Parameters: nano - [IN] timestamp in unix nanoseconds                      *
  *                                                                            *
- * Return value: timestamp in unix seconds                                    *
+ * Return value: decimal string in the form "<seconds>.<nanoseconds>"         *
  *                                                                            *
  ******************************************************************************/
-static inline zbx_uint64_t	unixnano_to_secs(uint64_t nano)
+static std::string	unixnano_to_decimal_str(uint64_t nano)
 {
-	return (zbx_uint64_t)(nano / 1000000000ULL);
+	std::string	frac = std::to_string(nano % 1000000000ULL);
+
+	frac.insert(0, 9 - frac.length(), '0');
+
+	return std::to_string(nano / 1000000000ULL) + "." + frac;
 }
 
 /******************************************************************************
@@ -372,8 +379,8 @@ static int	metrics_fill_common(zbx_apm_row_t &row,
 	SETS(row, 9, metric.description());				/* MetricDescription */
 	SETS(row, 10, metric.unit());					/* MetricUnit */
 	SETC(row, 11, attrs_to_json(dp_attrs));				/* Attributes */
-	SETU(row, 12, unixnano_to_secs(start_nano));			/* StartTimeUnix */
-	SETU(row, 13, unixnano_to_secs(time_nano));			/* TimeUnix */
+	SETU(row, 12, start_nano);					/* StartTimeUnix, DateTime64(9) */
+	SETU(row, 13, time_nano);					/* TimeUnix, DateTime64(9) */
 
 	return 14;
 }
@@ -414,7 +421,8 @@ static int	metrics_fill_exemplars(zbx_apm_row_t &row, int i,
 		}
 		zbx_json_close(&jattr);
 
-		zbx_json_adduint64(&jtime, NULL, unixnano_to_secs(ex.time_unix_nano()));
+		zbx_json_addstring(&jtime, NULL, unixnano_to_decimal_str(ex.time_unix_nano()).c_str(),
+				ZBX_JSON_TYPE_NUMBER);
 		zbx_json_adddouble(&jval, NULL, Ex::kAsDouble == ex.value_case() ?
 				ex.as_double() : (double)ex.as_int());
 		zbx_json_addstring(&jspan, NULL, bytes_to_hex(ex.span_id()).c_str(), ZBX_JSON_TYPE_STRING);
@@ -752,7 +760,8 @@ static int	apm_traces_fill_events(zbx_apm_row_t &row, int idx,
 
 	for (const auto &e : events)
 	{
-		zbx_json_addstring(&jts, NULL, std::to_string(e.time_unix_nano()).c_str(), ZBX_JSON_TYPE_NUMBER);
+		zbx_json_addstring(&jts, NULL, unixnano_to_decimal_str(e.time_unix_nano()).c_str(),
+				ZBX_JSON_TYPE_NUMBER);
 		zbx_json_addstring(&jname, NULL, e.name().c_str(), ZBX_JSON_TYPE_STRING);
 
 		/* each element is itself a JSON object of that event's attributes */

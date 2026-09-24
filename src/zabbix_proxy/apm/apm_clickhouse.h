@@ -18,13 +18,24 @@
 #include "apm_dataset.h"
 #include "libs/zbxhistory/history_curl.h"
 #include "config.h"
+#include "zbxtelemetry.h"
 
 typedef struct
 {
-	char	*url;
-	char	*database;
-	char	*username;
-	char	*password;
+	char		*url;
+	char		*database;
+	char		*username;
+	char		*password;
+	char		*source_ip;
+	char		*vault_path;
+	char		*ssl_cert_file;
+	char		*ssl_key_file;
+	char		*ssl_key_password;
+	unsigned char	ssl_verify_peer;
+	unsigned char	ssl_verify_host;
+	char		*ssl_ca_location;
+	char		*ssl_cert_location;
+	char		*ssl_key_location;
 }
 zbx_apm_clickhouse_cfg_t;
 
@@ -41,5 +52,13 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn);
 int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
 	zbx_apm_dataset_t *ds);
+
+int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
+		char **error);
+void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg);
+void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src);
+
+int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, const zbx_apm_db_config_t *cfg_new);
+void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_db_config_t *src);
 
 #endif

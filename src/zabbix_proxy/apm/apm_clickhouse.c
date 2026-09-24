@@ -17,6 +17,7 @@
 #include "apm_exporter.h"
 #include "libs/zbxhistory/history_curl.h"
 #include "zbxcommon.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxcurl.h"
 #include "zbxhttp.h"
@@ -72,7 +73,9 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 		}
 	}
 
-	ret = zbx_http_prepare_ssl(conn->handle, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, error);
+	ret = zbx_http_prepare_ssl(conn->handle, cfg->ssl_cert_file, cfg->ssl_key_file, cfg->ssl_key_password,
+			cfg->ssl_verify_peer, cfg->ssl_verify_host, cfg->source_ip, cfg->ssl_ca_location,
+			cfg->ssl_cert_location, cfg->ssl_key_location, error);
 out:
 	return ret;
 }
@@ -107,6 +110,8 @@ void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_t *col,
 		const zbx_apm_value_t *value)
 {
+	char	buffer[ZBX_MAX_UINT64_LEN * 2];
+
 	switch (col->type)
 	{
 		case APM_COL_BOOL:
@@ -116,8 +121,12 @@ static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_
 		case APM_COL_UINT32:
 		case APM_COL_UINT64:
 		case APM_COL_DATETIME:
-		case APM_COL_DATETIME64:
 			zbx_json_adduint64(json, NULL, value->ui64);
+			break;
+		case APM_COL_DATETIME64:
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64 ".%09u",
+					value->ui64 / 1000000000, (unsigned int)(value->ui64 % 1000000000));
+			zbx_json_addstring(json, NULL, buffer, ZBX_JSON_TYPE_NUMBER);
 			break;
 		case APM_COL_INT32:
 			zbx_json_addint64(json, NULL, value->i32);
@@ -205,6 +214,8 @@ static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_ap
 	}
 
 	zbx_json_free(&json);
+
+	zabbix_log(LOG_LEVEL_TRACE, "posting otel data to clickhouse: %s", data);
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
@@ -306,4 +317,208 @@ int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_c
 	return FAIL;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize ClickHouse exporter configuration from provider        *
+ *          options                                                           *
+ *                                                                            *
+ * Parameters: cfg           - [OUT] ClickHouse exporter configuration        *
+ *             export_config - [IN] provider options                          *
+ *             error         - [OUT] error message if a mandatory option is   *
+ *                                  missing or curl support is unavailable    *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
+		char **error)
+{
+#if defined(HAVE_LIBCURL)
+	ZBX_UNUSED(error);
+
+	if (NULL != export_config->url)
+		cfg->url = zbx_strdup(NULL, export_config->url);
+
+	if (NULL != export_config->db)
+		cfg->database = zbx_strdup(NULL, export_config->db);
+
+	if (NULL != export_config->username)
+		cfg->username = zbx_strdup(NULL, export_config->username);
+
+	if (NULL != export_config->password)
+		cfg->password = zbx_strdup(NULL, export_config->password);
+
+	if (NULL != export_config->source_ip)
+		cfg->source_ip = zbx_strdup(NULL, export_config->source_ip);
+
+	if (NULL != export_config->vault_path)
+		cfg->vault_path = zbx_strdup(NULL, export_config->vault_path);
+
+	if (NULL != export_config->ssl_cert_file)
+		cfg->ssl_cert_file = zbx_strdup(NULL, export_config->ssl_cert_file);
+
+	if (NULL != export_config->ssl_key_file)
+		cfg->ssl_key_file = zbx_strdup(NULL, export_config->ssl_key_file);
+
+	if (NULL != export_config->ssl_key_password)
+		cfg->ssl_key_password = zbx_strdup(NULL, export_config->ssl_key_password);
+
+	cfg->ssl_verify_peer = export_config->ssl_verify_peer;
+	cfg->ssl_verify_host = export_config->ssl_verify_host;
+
+	if (NULL != export_config->ssl_ca_location)
+		cfg->ssl_ca_location = zbx_strdup(NULL, export_config->ssl_ca_location);
+
+	if (NULL != export_config->ssl_cert_location)
+		cfg->ssl_cert_location = zbx_strdup(NULL, export_config->ssl_cert_location);
+
+	if (NULL != export_config->ssl_key_location)
+		cfg->ssl_key_location = zbx_strdup(NULL, export_config->ssl_key_location);
+
+	return SUCCEED;
+#else
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
+
+	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
+			" This Zabbix server binary was compiled without curl");
+
+	return FAIL;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by ClickHouse exporter configuration     *
+ *                                                                            *
+ ******************************************************************************/
+void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
+{
+	zbx_free(cfg->url);
+	zbx_free(cfg->database);
+	zbx_free(cfg->username);
+	zbx_free(cfg->password);
+	zbx_free(cfg->source_ip);
+	zbx_free(cfg->vault_path);
+	zbx_free(cfg->ssl_cert_file);
+	zbx_free(cfg->ssl_key_file);
+	zbx_free(cfg->ssl_key_password);
+	zbx_free(cfg->ssl_ca_location);
+	zbx_free(cfg->ssl_cert_location);
+	zbx_free(cfg->ssl_key_location);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy ClickHouse exporter configuration                            *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination configuration                          *
+ *             src - [IN] source configuration                                *
+ *                                                                            *
+ ******************************************************************************/
+void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src)
+{
+	if (NULL != src->url)
+		dst->url = zbx_strdup(NULL, src->url);
+
+	if (NULL != src->database)
+		dst->database = zbx_strdup(NULL, src->database);
+
+	if (NULL != src->username)
+		dst->username = zbx_strdup(NULL, src->username);
+
+	if (NULL != src->password)
+		dst->password = zbx_strdup(NULL, src->password);
+
+	if (NULL != src->source_ip)
+		dst->source_ip = zbx_strdup(NULL, src->source_ip);
+
+	if (NULL != src->vault_path)
+		dst->vault_path = zbx_strdup(NULL, src->vault_path);
+
+	if (NULL != src->ssl_cert_file)
+		dst->ssl_cert_file = zbx_strdup(NULL, src->ssl_cert_file);
+
+	if (NULL != src->ssl_key_file)
+		dst->ssl_key_file = zbx_strdup(NULL, src->ssl_key_file);
+
+	if (NULL != src->ssl_key_password)
+		dst->ssl_key_password = zbx_strdup(NULL, src->ssl_key_password);
+
+	dst->ssl_verify_peer = src->ssl_verify_peer;
+	dst->ssl_verify_host = src->ssl_verify_host;
+
+	if (NULL != src->ssl_ca_location)
+		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+
+	if (NULL != src->ssl_cert_location)
+		dst->ssl_cert_location = zbx_strdup(NULL, src->ssl_cert_location);
+
+	if (NULL != src->ssl_key_location)
+		dst->ssl_key_location = zbx_strdup(NULL, src->ssl_key_location);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether new apm clickhouse config matches current config    *
+ *                                                                            *
+ * Parameters: cfg_now - [IN] current apm clickhouse config                   *
+ *             cfg_new - [IN] new config to compare against current           *
+ *                                                                            *
+ * Return value: SUCCEED - configs match, FAIL - configs differ               *
+ *                                                                            *
+ ******************************************************************************/
+int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, const zbx_apm_db_config_t *cfg_new)
+{
+	if (0 != zbx_strcmp_null(cfg_now->url, cfg_new->url))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg_now->database,  cfg_new->db))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg_now->username,  cfg_new->username))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg_now->password,  cfg_new->password))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg_now->source_ip,  cfg_new->source_ip))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg_now->ssl_ca_location,  cfg_new->ssl_ca_location))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: copy global APM configuration into ClickHouse config               *
+ *                                                                             *
+ * Parameters: dst - [OUT] destination config to populate                      *
+ *             src - [IN] source config to copy from                           *
+ *                                                                             *
+ ******************************************************************************/
+void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_db_config_t *src)
+{
+	if (NULL != src->url)
+		dst->url = zbx_strdup(NULL, src->url);
+
+	if (NULL != src->db)
+		dst->database = zbx_strdup(NULL, src->db);
+
+	if (NULL != src->username)
+		dst->username = zbx_strdup(NULL, src->username);
+
+	if (NULL != src->password)
+		dst->password = zbx_strdup(NULL, src->password);
+
+	if (NULL != src->source_ip)
+		dst->source_ip = zbx_strdup(NULL, src->source_ip);
+
+	if (NULL != src->ssl_ca_location)
+		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+}
 

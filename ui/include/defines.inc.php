@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050177);
+define('ZABBIX_DB_VERSION',		7050188);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -216,6 +216,15 @@ define('PASSWD_CHECK_SIMPLE', 0x08);
 
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+
+define('APM_GLOBAL_DB_STATUS_NOT_CONFIGURED',	0);
+define('APM_GLOBAL_DB_STATUS_CONFIGURED',		1);
+define('APM_GLOBAL_DB_AUTHTYPE_PASSWORD',		0);
+define('APM_GLOBAL_DB_AUTHTYPE_NONE',			1);
+define('APM_GLOBAL_DB_VERIFY_PEER_DISABLED',	0);
+define('APM_GLOBAL_DB_VERIFY_PEER_ENABLED',		1);
+define('APM_GLOBAL_DB_VERIFY_HOST_DISABLED',	0);
+define('APM_GLOBAL_DB_VERIFY_HOST_ENABLED',		1);
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
@@ -661,6 +670,7 @@ define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
 define('ITEM_TYPE_BROWSER',			22);
 define('ITEM_TYPE_NESTED',			23);
+define('ITEM_TYPE_TELEMETRY_QUERY',	24);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -1296,20 +1306,32 @@ define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
 
+// APM resource attribute constants.
+define('APM_ATTRIBUTE_EVAL_TYPE_AND_OR',	0);
+define('APM_ATTRIBUTE_EVAL_TYPE_OR',		2);
+
+define('APM_ATTRIBUTE_OPERATOR_LIKE',		0);
+define('APM_ATTRIBUTE_OPERATOR_EQUAL',		1);
+define('APM_ATTRIBUTE_OPERATOR_NOT_LIKE',	2);
+define('APM_ATTRIBUTE_OPERATOR_NOT_EQUAL',	3);
+define('APM_ATTRIBUTE_OPERATOR_EXISTS',		4);
+define('APM_ATTRIBUTE_OPERATOR_NOT_EXISTS',	5);
+
 define('GRAPH_FILTER_ALL',		0);
 define('GRAPH_FILTER_HOST',		1);
 define('GRAPH_FILTER_SIMPLE',	2);
 
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
-define('AGGREGATE_NONE',	0);
-define('AGGREGATE_MIN',		1);
-define('AGGREGATE_MAX',		2);
-define('AGGREGATE_AVG',		3);
-define('AGGREGATE_COUNT',	4);
-define('AGGREGATE_SUM',		5);
-define('AGGREGATE_FIRST',	6);
-define('AGGREGATE_LAST',	7);
+define('AGGREGATE_NONE',		0);
+define('AGGREGATE_MIN',			1);
+define('AGGREGATE_MAX',			2);
+define('AGGREGATE_AVG',			3);
+define('AGGREGATE_COUNT',		4);
+define('AGGREGATE_SUM',			5);
+define('AGGREGATE_FIRST',		6);
+define('AGGREGATE_LAST',		7);
+define('AGGREGATE_PERCENTILE',	8);
 
 define('APPROXIMATION_MIN',	1);
 define('APPROXIMATION_AVG',	2);
@@ -2557,6 +2579,11 @@ define('ZBX_DEVICE_STATUS_UNASSIGNED',	2);
 
 define('MOBILE_KEY_SCOPE_IDENTITY',		0);
 define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
+
+define('APM_METRIC_TYPE_GAUGE',					0);
+define('APM_METRIC_TYPE_SUM',					1);
+define('APM_METRIC_TYPE_HISTOGRAM',				2);
+define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

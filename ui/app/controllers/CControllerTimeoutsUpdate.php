@@ -53,6 +53,9 @@ class CControllerTimeoutsUpdate extends CController {
 			'timeout_browser' => ['setting timeout_browser', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
+			'timeout_telemetry_query' => ['setting timeout_telemetry_query', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
+			],
 			'socket_timeout' => ['setting socket_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			],

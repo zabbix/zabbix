@@ -24,7 +24,7 @@ extern "C" {
 
 typedef void * zbx_grpc_handle_t;
 
-zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
+zbx_grpc_handle_t	zbx_grpc_start(const char *address, int port, zbx_apm_queue_t *queue,
 		const zbx_apm_config_tls_t *tls, char **error);
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
 void	zbx_grpc_shutdown(void);

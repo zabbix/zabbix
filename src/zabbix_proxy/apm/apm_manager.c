@@ -22,6 +22,7 @@
 #include "zbx_apm.h"
 #include "zbx_apm_client.h"
 #include "zbxcommon.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
@@ -35,6 +36,7 @@
 #include "zbxrtc.h"
 #include "zbxself.h"
 #include "zbxsupervisor_client.h"
+#include "zbxstr.h"
 
 #define APM_WORKERS_MIN		1
 #define APM_WORKERS_MAX		100
@@ -101,18 +103,18 @@ static void	apm_manager_free(zbx_apm_manager_t *manager)
  *                                                                            *
  * Purpose: create and initialize APM manager                                 *
  *                                                                            *
- * Parameters: info        - [IN] process info                                *
- *             workers_num - [IN] number of active worker threads             *
- *             quota       - [IN] initial ingestion quota, messages per       *
+ * Parameters: info          - [IN] process info                              *
+ *             workers_num   - [IN] number of active worker threads           *
+ *             quota         - [IN] initial ingestion quota, messages per     *
  *                                 second                                     *
- *             options     - [IN] TelemetryProvider configuration options     *
- *             error       - [OUT] error message if the operation fails       *
+ *             export_config - [IN] TelemetryProvider configuration options   *
+ *             error         - [OUT] error message if the operation fails     *
  *                                                                            *
  * Return value: created manager, or NULL on error                            *
  *                                                                            *
  ******************************************************************************/
 static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int workers_num, zbx_uint64_t quota,
-		const char *options, char **error)
+		zbx_apm_db_config_t *export_config, char **error)
 {
 #define APM_COMMIT_LIMIT	10
 	zbx_apm_manager_t	*manager;
@@ -125,7 +127,7 @@ static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int 
 	workers = (zbx_apm_worker_t **)zbx_calloc(NULL, (size_t)APM_WORKERS_MAX, sizeof(zbx_apm_worker_t *));
 	queue = apm_queue_create(quota);
 
-	if (SUCCEED != apm_exporter_cfg_init(&cfg, options, error))
+	if (SUCCEED != apm_exporter_cfg_init(&cfg, export_config, error))
 		goto out;
 
 	if (NULL == (manager->exporters = apm_exporter_pool_create(&cfg, error)))
@@ -214,7 +216,7 @@ static void	apm_manager_process_finished(zbx_apm_manager_t *manager, zbx_vector_
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, const char *port,
+static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, int port,
 		const zbx_apm_config_tls_t *tls, char **error)
 {
 	if (NULL == (manager->grpc = zbx_grpc_start(sourceip, port, (zbx_apm_queue_t *)manager->base.queue, tls,
@@ -333,6 +335,100 @@ static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check whether new apm db config matches current config            *
+ *                                                                            *
+ * Parameters: c1 - [IN] current apm db config                                *
+ *             c2 - [IN] new config to compare against current                *
+ *                                                                            *
+ * Return value: SUCCEED - configs match, FAIL - configs differ               *
+ *                                                                            *
+ ******************************************************************************/
+static int	apm_manager_compare_config(const zbx_apm_db_config_t *c1, const zbx_apm_db_config_t *c2)
+{
+	if (c1->status != c2->status)
+		return FAIL;
+
+	if (c1->db_type != c2->db_type)
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->url, c2->url))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->username, c2->username))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->password, c2->password))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->db, c2->db))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->source_ip, c2->source_ip))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->vault_path, c2->vault_path))
+		return FAIL;
+
+	if (c1->ssl_verify_peer != c2->ssl_verify_peer || c1->ssl_verify_host != c2->ssl_verify_host)
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_cert_file, c2->ssl_cert_file))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_key_file, c2->ssl_key_file))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_key_password, c2->ssl_key_password))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_ca_location, c2->ssl_ca_location))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_cert_location, c2->ssl_cert_location))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(c1->ssl_key_location, c2->ssl_key_location))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch global apm db config and apply it if it has changed         *
+ *                                                                            *
+ * Parameters: manager                 - [IN/OUT] apm manager                 *
+ *             cfg_now                 - [IN/OUT] current apm db config       *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssl_ca_location  - [IN]                                 *
+ *                                                                            *
+ * Return value: APM_STATUS_ENABLED or APM_STATUS_DISABLED based on the       *
+ *               resulting config status                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	apm_manager_update_global_config(zbx_apm_manager_t *manager, zbx_apm_db_config_t *cfg_now,
+		const char *config_source_ip, const char *config_ssl_ca_location)
+{
+	zbx_apm_db_config_t	cfg_new;
+
+	zbx_dc_config_get_apm_db_config(&cfg_new, NULL, config_source_ip, config_ssl_ca_location);
+
+	if (SUCCEED == apm_manager_compare_config(cfg_now, &cfg_new))
+	{
+		zbx_apm_db_config_clear(&cfg_new);
+	}
+	else
+	{
+		zbx_apm_db_config_clear(cfg_now);
+		*cfg_now = cfg_new;
+		apm_exporter_pool_set_global_config(manager->exporters, cfg_now);
+	}
+
+	return (0 == cfg_now->status ? APM_STATUS_DISABLED : APM_STATUS_ENABLED);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: entry point of APM manager process                                *
  *                                                                            *
  ******************************************************************************/
@@ -353,12 +449,14 @@ void	*zbx_apm_manager_thread(void *args)
 	double					time_stat, time_idle = 0, time_config = 0;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0, workers_num, apm_status = APM_STATUS_DISABLED;
+	int					shutdown = 0, workers_num, apm_enabled = APM_STATUS_DISABLED;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_uint64_t				cfg_revision = 0, quota, accepted_num = 0, dropped_num = 0;
 	char					*proxy_apm_config = NULL;
 	zbx_apm_config_t			apm_config = {0};
 	zbx_apm_config_tls_t			apm_config_tls, *tls;
+	zbx_apm_db_config_t			apm_global = {0};
+	zbx_uint32_t				rtc_manager_msgs[] = {ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 
 	apm_args = (const zbx_thread_apm_manager_args_t *)unit_args->args.args;
 
@@ -376,10 +474,10 @@ void	*zbx_apm_manager_thread(void *args)
 	quota = apm_config.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (APM_STATUS_ENABLED != apm_config.status ? 1 : APM_WORKERS_DEFAULT);
+	workers_num = (APM_STATUS_ENABLED != apm_config.enabled ? 1 : APM_WORKERS_DEFAULT);
 
 	if (NULL == (manager = apm_manager_create(info, workers_num, apm_config.quota,
-			apm_args->exporter_options, &error)))
+			apm_args->export_config, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
@@ -389,6 +487,9 @@ void	*zbx_apm_manager_thread(void *args)
 
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_APM_MANAGER, 0, rtc_manager_msgs, ARRSIZE(rtc_manager_msgs),
+			apm_args->config_timeout, ZBX_IPC_SERVICE_APM);
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
@@ -429,15 +530,16 @@ void	*zbx_apm_manager_thread(void *args)
 
 			if (SUCCEED == apm_manager_global_config_active(manager))
 			{
-				/* TODO: override apm_config.status when global confg is active and disabled */
+				apm_config.enabled = apm_manager_update_global_config(manager, &apm_global,
+						apm_args->source_ip, apm_args->ca_location);
 			}
 
-			if (apm_status != apm_config.status)
+			if (apm_enabled != apm_config.enabled)
 			{
-				if (APM_STATUS_ENABLED == apm_config.status)
+				if (APM_STATUS_ENABLED == apm_config.enabled)
 				{
-					if (FAIL == apm_manager_activate(manager, apm_args->sourceip, apm_args->port,
-							tls, &error))
+					if (FAIL == apm_manager_activate(manager, apm_args->export_config->source_ip,
+							apm_args->port, tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
 								" %s", error);
@@ -449,7 +551,7 @@ void	*zbx_apm_manager_thread(void *args)
 				{
 					apm_manager_deactivate(manager);
 				}
-				apm_status = apm_config.status;
+				apm_enabled = apm_config.enabled;
 			}
 
 			if (quota != apm_config.quota)
@@ -462,6 +564,8 @@ void	*zbx_apm_manager_thread(void *args)
 						ZBX_FS_UI64, quota, apm_config.quota);
 				quota = apm_config.quota;
 			}
+
+			time_config = time_start;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
@@ -524,8 +628,10 @@ void	*zbx_apm_manager_thread(void *args)
 
 	apm_manager_free(manager);
 
+	zbx_apm_db_config_clear(apm_args->export_config);
 	zbx_free(proxy_apm_config);
 	apm_config_clear(&apm_config);
+	zbx_apm_db_config_clear(&apm_global);
 	zbx_dc_config_local_release();
 	zbx_free(args);
 

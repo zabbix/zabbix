@@ -1216,7 +1216,8 @@ ROW   |43         |4     |1   |profile.redirect.url          |0        |        
 TABLE |settings
 FIELDS|name                        |type|value_str                         |value_int|value_usrgrpid|value_hostgroupid|value_userdirectoryid|value_mfaid|
 ROW   |alert_usrgrpid              |3   |                                  |0        |7             |NULL             |NULL                 |NULL       |
-ROW   |apm                         |1   |                                  |0        |NULL          |NULL             |NULL                 |NULL       |
+ROW   |apm                         |1   |{}                                |0        |NULL          |NULL             |NULL                 |NULL       |
+ROW   |apm_global_db               |1   |{}                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |auditlog_enabled            |2   |                                  |1        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |auditlog_mode               |2   |                                  |1        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |authentication_type         |2   |                                  |0        |NULL          |NULL             |NULL                 |NULL       |
@@ -1328,6 +1329,7 @@ ROW   |timeout_script              |1   |3s                                |0   
 ROW   |timeout_simple_check        |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |timeout_snmp_agent          |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |timeout_ssh_agent           |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
+ROW   |timeout_telemetry_query     |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |timeout_telnet_agent        |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |timeout_zabbix_agent        |1   |3s                                |0        |NULL          |NULL             |NULL                 |NULL       |
 ROW   |uri_valid_schemes           |1   |http,https,ftp,file,mailto,tel,ssh|0        |NULL          |NULL             |NULL                 |NULL       |

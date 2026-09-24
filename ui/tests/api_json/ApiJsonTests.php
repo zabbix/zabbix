@@ -74,6 +74,7 @@ require_once dirname(__FILE__).'/testScimServiceProviderConfig.php';
 require_once dirname(__FILE__).'/testScimUser.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testServices.php';
+require_once __DIR__.'/testSettings.php';
 require_once dirname(__FILE__).'/testSla.php';
 require_once dirname(__FILE__).'/testTagFiltering.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
@@ -157,6 +158,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testScimUser');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testServices');
+		$suite->addTestSuite('testSettings');
 		$suite->addTestSuite('testSla');
 		$suite->addTestSuite('testTagFiltering');
 		$suite->addTestSuite('testTaskCreate');

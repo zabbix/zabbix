@@ -82,6 +82,8 @@ require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+/* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
+/* require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php'; */
 
 use PHPUnit\Framework\TestSuite;
 
@@ -161,6 +163,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		/* $suite->addTestSuite('testTelemetryQueryItems'); */
+		/* $suite->addTestSuite('testTelemetryQueryItemsWithProxyInput'); */
 		return $suite;
 	}
 }

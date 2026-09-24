@@ -76,6 +76,7 @@
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
 #include "zbxcurl.h"
+#include "zbxtelemetry.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -134,13 +135,13 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, browser poller, configuration syncer,",
-	"                                 data sender, discovery manager, history syncer,",
+	"                                 (apm manager, apm worker, availability manager, browser poller,",
+	"                                 configuration syncer, data sender, discovery manager, history syncer,",
 	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker,",
 	"                                 self-monitoring, snmp trapper, supervisor, task manager, trapper,",
-	"                                 unreachable poller, vmware collector)",
+	"                                 unreachable poller, vmware collector, telemetry query poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
@@ -152,7 +153,7 @@ static const char	*help_message[] = {
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                 http agent poller, snmp poller, preprocessing manager,",
 	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
-	"                                 vmware collector)",
+	"                                 vmware collector, telemetry query poller)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
 	"        scope                    Profiling scope",
@@ -261,6 +262,7 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_SUPERVISOR */
 	0, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	0, /* ZBX_PROCESS_TYPE_CEP_WORKER */
+	1, /* ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER */
 	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
 	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
@@ -327,6 +329,9 @@ static char	*config_load_module_path	= NULL;
 static char	**config_load_module		= NULL;
 static char	*config_user			= NULL;
 
+static char			**config_telemetry_providers = NULL;
+static zbx_apm_db_config_t	config_apm_db_config;
+
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
@@ -335,11 +340,8 @@ static char	*config_ssl_key_location = NULL;
 /* browser item */
 static char	*config_webdriver_url = NULL;
 
-/* open telemetry */
-static char	*config_telemetry_provider = NULL;
-
 static char	*config_apm_sourceip = NULL;
-static char	*config_apm_port = NULL;
+static int	config_apm_port = 4317;
 static char	*config_apm_ca_file = NULL;
 static char	*config_apm_cert_file = NULL;
 static char	*config_apm_key_file = NULL;
@@ -511,6 +513,12 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER;
+		*local_process_num = local_server_num - server_count +
+				config_forks[ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER];
 	}
 	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_AGENT_POLLER]))
 	{
@@ -1135,6 +1143,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartHTTPAgentPollers",	&config_forks[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartTelemetryQueryPollers",	&config_forks[ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER],
+											ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"StartAgentPollers",		&config_forks[ZBX_PROCESS_TYPE_AGENT_POLLER],
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
@@ -1155,12 +1166,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
-		{"TelemetryProvider",		&config_telemetry_provider,		ZBX_CFG_TYPE_STRING,
-					ZBX_CONF_PARM_OPT,	0,			0},
+		{"TelemetryProvider",			&config_telemetry_providers,	ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"APMListenIP",			&config_apm_sourceip,			ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
-		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			32767},
 		{"APMTLSCAFile",		&config_apm_ca_file,			ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"APMTLSCertFile",		&config_apm_cert_file,			ZBX_CFG_TYPE_STRING,
@@ -1174,6 +1185,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&config_load_module);
+	zbx_strarr_init(&config_telemetry_providers);
 
 	zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE,
 			ZBX_CFG_ENVVAR_USE);
@@ -1215,6 +1227,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&config_load_module);
+	zbx_strarr_free(&config_telemetry_providers);
 }
 
 static void	zbx_on_exit(int ret, void *on_exit_args)
@@ -1556,7 +1569,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_externalscripts = config_externalscripts,
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_proxy,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url
+			.config_webdriver_url = config_webdriver_url,
+			.config_apm_db_config = &config_apm_db_config
 		};
 
 	zbx_thread_proxyconfig_args		proxyconfig_args =
@@ -1604,7 +1618,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_externalscripts = config_externalscripts,
 			.config_enable_global_scripts = zbx_config_enable_remote_commands,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url
+			.config_webdriver_url = config_webdriver_url,
+			.config_apm_db_config = &config_apm_db_config
 		};
 
 	zbx_thread_httppoller_args		httppoller_args =
@@ -1654,6 +1669,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_proxy,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
+			.config_apm_db_config = &config_apm_db_config,
 			.trapper_process_request_func_cb = trapper_process_request_proxy,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_proxy
 		};
@@ -1736,12 +1752,13 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	zbx_thread_apm_manager_args_t	apm_args =
 	{
 		.config_timeout = zbx_config_timeout,
-		.exporter_options = config_telemetry_provider,
-		.sourceip = config_apm_sourceip,
+		.export_config = &config_apm_db_config,
 		.port = config_apm_port,
 		.ca_file = config_apm_ca_file,
 		.cert_file = config_apm_cert_file,
-		.key_file = config_apm_key_file
+		.key_file = config_apm_key_file,
+		.ca_location = config_ssl_ca_location,
+		.source_ip = zbx_config_source_ip
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){
@@ -1852,6 +1869,11 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_TELEMETRY_QUERY;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2027,8 +2049,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zbx_free_config();
-
 	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_process_info_by_thread, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
@@ -2124,6 +2144,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
+
+	if (SUCCEED != zbx_apm_db_config_init_local_config(&config_apm_db_config, config_telemetry_providers,
+			zbx_config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&zbx_config_vault, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize APM database configuration: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free_config();
 
 	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
@@ -2301,6 +2332,8 @@ out:
 	zbx_log_exit_signal();
 
 	zbx_rtc_shutdown_subs(&rtc);
+
+	zbx_apm_db_config_clear(&config_apm_db_config);
 
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
