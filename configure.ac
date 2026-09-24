@@ -1511,6 +1511,16 @@ if test "x$ipv6" = "xyes"; then
 	have_ipv6="yes"
 fi
 
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+	dnl Check for zlib, used by communications
+	ZLIB_CHECK_CONFIG([no])
+	if test "x$found_zlib" != "xyes"; then
+		AC_MSG_ERROR([Unable to use zlib (zlib check failed)])
+	fi
+
+	AC_SUBST(ZLIB_CFLAGS)
+fi
+
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 
@@ -1731,14 +1741,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 
 	AC_SUBST(OPENIPMI_CFLAGS)
-
-	dnl Check for zlib, used by Zabbix server-proxy communications
-	ZLIB_CHECK_CONFIG([no])
-	if test "x$found_zlib" != "xyes"; then
-		AC_MSG_ERROR([Unable to use zlib (zlib check failed)])
-	fi
-
-	AC_SUBST(ZLIB_CFLAGS)
 
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
