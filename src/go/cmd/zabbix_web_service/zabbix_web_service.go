@@ -178,7 +178,14 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, options.LogFile, options.LogFileSize); err != nil {
+	logOptions := log.NewOptions().
+		WithLogType(logType).
+		WithLevel(logLevel).
+		WithFilename(options.LogFile).
+		WithSyslogName("zabbix_web_service").
+		WithFileSize(options.LogFileSize)
+
+	if err := log.Open(logOptions); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
