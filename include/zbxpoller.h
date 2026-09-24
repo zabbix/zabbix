@@ -51,7 +51,6 @@ typedef struct
 	int				config_unreachable_period;
 	int				config_unreachable_delay;
 	int				config_max_concurrent_checks_per_poller;
-	const zbx_apm_db_config_t	*apm_db_config;
 	zbx_get_config_forks_f		get_config_forks;
 	const char			*config_java_gateway;
 	int				config_java_gateway_port;
@@ -59,6 +58,7 @@ typedef struct
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
 	const char			*config_ssh_key_location;
 	const char			*config_webdriver_url;
+	const zbx_apm_db_config_t	*config_apm_db_config;
 }
 zbx_thread_poller_args;
 
@@ -181,7 +181,6 @@ typedef struct
 	const char			*config_ssl_key_location;
 	struct event			*async_wake_timer;
 	struct event			*async_timer;
-	const zbx_apm_db_config_t	*apm_db_config;
 #ifdef HAVE_ARES
 	struct event		*async_timeout_timer;
 #endif

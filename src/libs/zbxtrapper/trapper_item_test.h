@@ -26,6 +26,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, const zbx_apm_db_config_t *apm_db_config);
+		const char *config_frontend_allowed_ip, const zbx_apm_db_config_t *config_apm_db_config);
 
 #endif
