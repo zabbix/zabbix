@@ -154,12 +154,14 @@ class CControllerApmLogListData extends CControllerDataTable {
 			'sortorder' => $sort_order
 		];
 
+		$search_limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$num_rows = (int) API::ApmLog()->get($options + [
-			'countOutput' => true
+			'countOutput' => true,
+			'limit' => $search_limit
 		]);
 
 		if ($num_rows > 0) {
-			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), $sort_order, $offset, $limit);
+			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), null, $offset, $limit);
 
 			$select_fields = $data_fields;
 
