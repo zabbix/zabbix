@@ -141,21 +141,25 @@
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')); ?>)
 						.setFields(['traceid'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')); ?>)
 						.setFields(['spanid'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('trace_state', <?= json_encode(_('Trace state')); ?>)
 						.setFields(['trace_state'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
 						.setFields(['service_name', 'span_count', 'error_count'])
 						.setRenderer('service_name')
+						.setRenderer('text_field')
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('span_name', <?= json_encode(_('Operation name')); ?>)
@@ -166,26 +170,31 @@
 					new CDataTableColumn('span_kind', <?= json_encode(_('Span kind')); ?>)
 						.setFields(['span_kind'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('scope_name', <?= json_encode(_('Scope name')); ?>)
 						.setFields(['scope_name'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('scope_version', <?= json_encode(_('Scope version')); ?>)
 						.setFields(['scope_version'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('status_code', <?= json_encode(_('Status code')); ?>)
 						.setFields(['status_code'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('status_message', <?= json_encode(_('Status message')); ?>)
 						.setFields(['status_message'])
 						.setSortable(true)
+						.setRenderer('text_field')
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
@@ -213,7 +222,7 @@
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
 						.setSortable(true)
-						.setWidth('auto'),
+						.setWidth('auto')
 				])
 				.setPage(page)
 				.setFilter({...filter, ...this.#time_selector})
@@ -232,6 +241,11 @@
 					row.setAttribute('data-timestamp', Math.floor((row_data[timestamp] ?? Date.now()) / 1000000000));
 
 					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
+				})
+				.setCellRenderer('text_field', ({cell, cell_data}) => {
+					const [data] = cell_data;
+
+					cell.appendChild(this.#prepareTextCell(data));
 				})
 				.setCellRenderer('service_name', ({cell, cell_data}) => {
 					const [service_name, span_count, error_count] = cell_data;
