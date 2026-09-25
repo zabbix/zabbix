@@ -5101,33 +5101,33 @@ section {
   border-color: #d23d3d; }
 
 .status-amp-severity-trace {
-  color: #e5f1ff;
-  background-color: #97AAB3;
+  color: #2a353a;
+  background-color: #97aab3;
   border-color: #7F9199; }
 
 .status-amp-severity-debug {
-  color: #e5f1ff;
-  background-color: #7499FF;
+  color: #00268e;
+  background-color: #7499ff;
   border-color: #6383D6; }
 
 .status-amp-severity-info {
-  color: #e5f1ff;
-  background-color: #FFC859;
+  color: #734d00;
+  background-color: #ffc859;
   border-color: #CBA34E; }
 
 .status-amp-severity-warn {
-  color: #e5f1ff;
-  background-color: #FFA059;
+  color: #733100;
+  background-color: #ffa059;
   border-color: #D28951; }
 
 .status-amp-severity-error {
-  color: #e5f1ff;
-  background-color: #E97659;
+  color: #52190b;
+  background-color: #e97659;
   border-color: #C06751; }
 
 .status-amp-severity-fatal {
-  color: #e5f1ff;
-  background-color: #E45959;
+  color: #4b0c0c;
+  background-color: #e45959;
   border-color: #BC5051; }
 
 .subfilter-option-grid {
