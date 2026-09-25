@@ -31,13 +31,15 @@
  ******************************************************************************/
 int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
 {
+#define APM_STATS_TIMEOUT	1
+
 	zbx_ipc_socket_t	socket;
 	char			*errmsg = NULL;
 	int			ret = FAIL;
 	zbx_ipc_message_t	response = {0};
 	unsigned char		*ptr;
 
-	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_APM, SEC_PER_MIN, &errmsg))
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_APM, APM_STATS_TIMEOUT, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot connect to APM service: %s", errmsg);
 		zbx_free(errmsg);
@@ -74,6 +76,8 @@ out:
 	zbx_ipc_socket_close(&socket);
 
 	return ret;
+
+#undef APM_STATS_TIMEOUT
 }
 
 /******************************************************************************
