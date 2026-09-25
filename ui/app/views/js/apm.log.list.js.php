@@ -354,7 +354,7 @@
 						label.textContent = content;
 						label.dataset.hintbox = '1';
 						label.dataset.hintboxStatic = '1';
-						label.dataset.hintboxHtml = content;
+						label.dataset.hintboxHtml = escapeHtml(content);
 						label.ariaExpanded = 'false';
 
 						attribute_labels.push(label);

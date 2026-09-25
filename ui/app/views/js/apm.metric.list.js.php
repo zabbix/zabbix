@@ -366,7 +366,7 @@
 						span_attribute_label.textContent = content;
 						span_attribute_label.dataset.hintbox = '1';
 						span_attribute_label.dataset.hintboxStatic = '1';
-						span_attribute_label.dataset.hintboxHtml = content;
+						span_attribute_label.dataset.hintboxHtml = escapeHtml(content);
 						span_attribute_label.ariaExpanded = 'false';
 
 						attribute_labels.push(span_attribute_label);

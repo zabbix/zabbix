@@ -306,7 +306,7 @@
 						const span_attribute_label = document.createElement('span');
 						span_attribute_label.classList.add(ZBX_STYLE_TAG);
 						span_attribute_label.textContent = content;
-						span_attribute_label.setAttribute('data-hintbox-html', content);
+						span_attribute_label.setAttribute('data-hintbox-html', escapeHtml(content));
 						span_attribute_label.setAttribute('data-hintbox', '1');
 						span_attribute_label.setAttribute('data-hintbox-static', '1');
 						span_attribute_label.setAttribute('aria-expanded', 'false');
