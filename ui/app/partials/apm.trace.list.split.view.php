@@ -26,7 +26,9 @@ $trace_view = (new CDiv())
 		(new CDiv())
 			->addClass('trace-view-header')
 			->addItem([
-				(new CDiv())->setAttribute('data-trace-id', ''),
+				(new CDiv())
+					->setAttribute('data-trace-id', '')
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 				(new CButtonIcon(ZBX_ICON_CLOSE))
 					->addClass('trace-view-close-button')
 					->addClass('js-close-button')
