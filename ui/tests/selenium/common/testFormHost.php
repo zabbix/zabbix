@@ -855,7 +855,8 @@ class testFormHost extends CWebTest {
 							'type' => 'SNMP',
 							'SNMP version' => 'SNMPv2',
 							'SNMP community' => '{$SNMP_TEST}',
-							'Max repetition count' => '20'
+							'Max repetition count' => '20',
+							'Retries' => '19'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -922,6 +923,7 @@ class testFormHost extends CWebTest {
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '15',
+							'Retries' => '10',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -964,6 +966,46 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'Default' => true
 						]
+					]
+				]
+			],
+			// #30 SNMP too high retries count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #31 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
 					]
 				]
 			]
@@ -1472,6 +1514,48 @@ class testFormHost extends CWebTest {
 					],
 					'inline_errors' => [
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #25 SNMP too high value in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #26 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
 					]
 				]
 			]
