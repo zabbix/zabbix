@@ -247,10 +247,11 @@ class TraceViewPage {
 	#renderTimeHeader() {
 		const ticks = this.#getTicks();
 		const elements = [];
+		const range = this.#selected_end - this.#selected_start;
 
 		for (const tick of ticks) {
 			const label = document.createElement('span');
-			label.textContent = this.#formatTime(tick.value);
+			label.textContent = this.#formatTime(tick.value, tick.unit, range);
 
 			const tick_element = document.createElement('div');
 			tick_element.classList.add('trace-time-tick');
@@ -291,9 +292,11 @@ class TraceViewPage {
 		row_element.dataset.spanId = span.id;
 
 		if (this.#spanIntersectsSelectedRange(span)) {
+			const value = Number(span.end) - Number(span.start);
+
 			const label = document.createElement('span');
 			label.classList.add('trace-span-label');
-			label.textContent = this.#formatTime(Number(span.end) - Number(span.start));
+			label.textContent = this.#formatTime(value, this.#getTimeUnit(value));
 
 			const bar = document.createElement('div');
 			bar.classList.add('trace-span-bar');
@@ -377,6 +380,34 @@ class TraceViewPage {
 		}));
 	}
 
+	#getTimeUnit(value) {
+		if (value < 1e-6) {
+			return 'ns';
+		}
+
+		if (value < 1e-3) {
+			return 'µs';
+		}
+
+		if (value < 1) {
+			return 'ms';
+		}
+
+		if (value < 60) {
+			return 's';
+		}
+
+		if (value < 3600) {
+			return 'm';
+		}
+
+		if (value < 86400) {
+			return 'h';
+		}
+
+		return 'd';
+	}
+
 	#getTicks() {
 		const width = this.#time_header.getBoundingClientRect().width;
 		const range = this.#selected_end - this.#selected_start;
@@ -407,7 +438,13 @@ class TraceViewPage {
 				position = `${(padding_ratio + ratio * span_ratio) * 100}%`;
 			}
 
-			ticks.push({value, step, ratio, position});
+			const unit = this.#getTimeUnit(value);
+
+			if (i === 1) {
+				ticks[0].unit = unit;
+			}
+
+			ticks.push({value, step, ratio, position, unit});
 		}
 
 		return ticks;
@@ -521,50 +558,88 @@ class TraceViewPage {
 		return Number.isFinite(end) ? end : 1000;
 	}
 
-	#formatTime(value) {
+	#formatTime(value, unit, range = 0) {
 		if (value <= 0) {
-			return '0s';
+			return `0${unit}`;
 		}
 
-		if (value < 1e-6) {
-			return `${Math.round(value * 1e9)}ns`;
-		}
+		switch (unit) {
+			case 'ns': {
+				const precision = this.#getPrecision(range * 1e9);
 
-		if (value < 1e-3) {
-			return `${+(value * 1e6).toFixed(1)}µs`;
-		}
-
-		if (value < 1) {
-			return `${+(value * 1e3).toFixed(1)}ms`;
-		}
-
-		if (value < 60) {
-			return `${+value.toFixed(1)}s`;
-		}
-
-		if (value < 3600) {
-			const mins = Math.floor(value / 60);
-			const secs = Math.round(value % 60);
-
-			if (secs === 0 || secs === 60) {
-				const final_mins = secs === 60 ? mins + 1 : mins;
-
-				return `${final_mins}m`;
+				return `${+(value * 1e9).toFixed(precision)}ns`;
 			}
 
-			return `${mins}m ${secs}s`;
+			case 'µs': {
+				const precision = this.#getPrecision(range * 1e6);
+
+				return `${+(value * 1e6).toFixed(precision)}µs`;
+			}
+
+			case 'ms': {
+				const precision = this.#getPrecision(range * 1e3);
+
+				return `${+(value * 1e3).toFixed(precision)}ms`;
+			}
+
+			case 's': {
+				const precision = this.#getPrecision(range);
+
+				return `${+value.toFixed(precision)}s`;
+			}
+
+			case 'm': {
+				const mins = Math.floor(value / 60);
+				const secs = Math.round(value % 60);
+
+				if (secs === 0 || secs === 60) {
+					const final_mins = secs === 60 ? mins + 1 : mins;
+
+					return `${final_mins}m`;
+				}
+
+				return `${mins}m ${secs}s`;
+			}
+
+			case 'h': {
+				const hours = Math.floor(value / 3600);
+				const mins = Math.round((value % 3600) / 60);
+
+				if (mins === 0) {
+					return `${hours}h`;
+				}
+
+				return `${hours}h ${mins}m`;
+			}
+
+			case 'd': {
+				const days = Math.floor(value / 86400);
+				const hours = Math.round((value % 86400) / 3600);
+
+				if (hours === 0 || hours === 24) {
+					const final_days = hours === 24 ? days + 1 : days;
+
+					return `${final_days}d`;
+				}
+
+				return `${days}d ${hours}h`;
+			}
 		}
-
-		const hours = Math.floor(value / 3600);
-		const mins = Math.round((value % 3600) / 60);
-
-		if (mins === 0) {
-			return `${hours}h`;
-		}
-
-		return `${hours}h ${mins}m`;
 	}
 
+	#getPrecision(scaled_range) {
+		if (scaled_range <= 0) {
+			return 1;
+		}
+
+		const log = Math.log10(scaled_range);
+
+		if (log < 0) {
+			return Math.min(3, Math.max(1, Math.ceil(-log) + 1));
+		}
+
+		return 1;
+	}
 	#formatDuration(value) {
 		if (value < 1e-6) {
 			return `${Math.round(value * 1e9)}ns`;

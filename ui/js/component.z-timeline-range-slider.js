@@ -377,6 +377,34 @@ class ZTimelineRangeSlider extends HTMLElement {
 		this.#renderScale();
 	}
 
+	#getTimeUnit(value) {
+		if (value < 1e-6) {
+			return 'ns';
+		}
+
+		if (value < 1e-3) {
+			return 'µs';
+		}
+
+		if (value < 1) {
+			return 'ms';
+		}
+
+		if (value < 60) {
+			return 's';
+		}
+
+		if (value < 3600) {
+			return 'm';
+		}
+
+		if (value < 86400) {
+			return 'h';
+		}
+
+		return 'd';
+	}
+
 	#getTicks() {
 		const width = this.getBoundingClientRect().width;
 		const range = this.#end - this.#start;
@@ -410,7 +438,13 @@ class ZTimelineRangeSlider extends HTMLElement {
 				position = `${(padding_ratio + ratio * span_ratio) * 100}%`;
 			}
 
-			ticks.push({value, step, ratio, position});
+			const unit = this.#getTimeUnit(value);
+
+			if (i === 1) {
+				ticks[0].unit = unit;
+			}
+
+			ticks.push({value, step, ratio, position, unit});
 		}
 
 		return ticks;
@@ -430,10 +464,9 @@ class ZTimelineRangeSlider extends HTMLElement {
 			return;
 		}
 
-		const range = this.#end - this.#start;
 		const elements = ticks.map(tick => {
 			const label = document.createElement('span');
-			label.textContent = this.#formatTime(tick.value, tick.step, range);
+			label.textContent = this.#formatTime(tick.value, tick.unit);
 
 			const element = document.createElement('div');
 			element.classList.add('z-timeline-range-slider-tick');
@@ -450,48 +483,59 @@ class ZTimelineRangeSlider extends HTMLElement {
 		return !this.#has_content || this.hasAttribute('scale');
 	}
 
-	#formatTime(value) {
+	#formatTime(value, unit) {
 		if (value <= 0) {
-			return '0s';
+			return `0${unit}`;
 		}
 
-		if (value < 1e-6) {
-			return `${Math.round(value * 1e9)}ns`;
-		}
+		switch (unit) {
+			case 'ns':
+				return `${Math.round(value * 1e9)}ns`;
 
-		if (value < 1e-3) {
-			return `${+(value * 1e6).toFixed(1)}µs`;
-		}
+			case 'µs':
+				return `${+(value * 1e6).toFixed(1)}µs`;
 
-		if (value < 1) {
-			return `${+(value * 1e3).toFixed(1)}ms`;
-		}
+			case 'ms':
+				return `${+(value * 1e3).toFixed(1)}ms`;
 
-		if (value < 60) {
-			return `${+value.toFixed(1)}s`;
-		}
+			case 's':
+				return `${+value.toFixed(1)}s`;
 
-		if (value < 3600) {
-			const mins = Math.floor(value / 60);
-			const secs = Math.round(value % 60);
+			case 'm': {
+				const mins = Math.floor(value / 60);
+				const secs = Math.round(value % 60);
 
-			if (secs === 0 || secs === 60) {
-				const final_mins = secs === 60 ? mins + 1 : mins;
+				if (secs === 0 || secs === 60) {
+					const final_mins = secs === 60 ? mins + 1 : mins;
 
-				return `${final_mins}m`;
+					return `${final_mins}m`;
+				}
+
+				return `${mins}m ${secs}s`;
 			}
 
-			return `${mins}m ${secs}s`;
+			case 'h': {
+				const hours = Math.floor(value / 3600);
+				const mins = Math.round((value % 3600) / 60);
+
+				if (mins === 0) {
+					return `${hours}h`;
+				}
+
+				return `${hours}h ${mins}m`;
+			}
 		}
 
-		const hours = Math.floor(value / 3600);
-		const mins = Math.round((value % 3600) / 60);
+		const days = Math.floor(value / 86400);
+		const hours = Math.round((value % 86400) / 3600);
 
-		if (mins === 0) {
-			return `${hours}h`;
+		if (hours === 0 || hours === 24) {
+			const final_days = hours === 24 ? days + 1 : days;
+
+			return `${final_days}d`;
 		}
 
-		return `${hours}h ${mins}m`;
+		return `${days}d ${hours}h`;
 	}
 
 	#getPixelCustomProperty(name, fallback) {
