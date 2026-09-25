@@ -106,3 +106,51 @@
 	background-color: $status-red-bg-color;
 	border-color: $status-red-border-color;
 }
+
+.status-amp-severity-trace {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-trace-bg-color;
+	border-color: $status-apm-severity-trace-border-color;
+}
+
+.status-amp-severity-debug {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-debug-bg-color;
+	border-color: $status-apm-severity-debug-border-color;
+}
+
+.status-amp-severity-info {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-info-bg-color;
+	border-color: $status-apm-severity-info-border-color;
+}
+
+.status-amp-severity-warn {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-warn-bg-color;
+	border-color: $status-apm-severity-warn-border-color;
+}
+
+.status-amp-severity-error {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-error-bg-color;
+	border-color: $status-apm-severity-error-border-color;
+}
+
+.status-amp-severity-fatal {
+	@extend %status;
+
+	color: $font-color;
+	background-color: $status-apm-severity-fatal-bg-color;
+	border-color: $status-apm-severity-fatal-border-color;
+}

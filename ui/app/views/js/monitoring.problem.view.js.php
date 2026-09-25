@@ -18,10 +18,11 @@
  * @var CView $this
  */
 ?>
+
 <script>
 	const view = new class {
 		#layout_mode = null;
-		#refresh_interval = null;
+		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#filter_defaults = null;
 		#filter = null;
@@ -85,11 +86,12 @@
 		#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order, sort_field,
 				sort_order, storage_idx, user_configs, severities}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'problem.view.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'problem.view.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			if (!filter.filter_custom_time) {
 				filter.from = this.#global_timerange.from;
@@ -340,7 +342,7 @@
 						const td = document.createElement('div');
 						td.classList.add('timeline-td');
 
-						cell.classList.add('cell-timeline');
+						cell.classList.add('datatable-cell-timeline');
 						cell.append(axis, td);
 					}
 				})
@@ -367,7 +369,7 @@
 						const td = document.createElement('div');
 						td.classList.add('timeline-td');
 
-						cell.classList.add('cell-timeline');
+						cell.classList.add('datatable-cell-timeline');
 						cell.append(axis, td);
 					}
 				})
@@ -845,20 +847,18 @@
 		}
 
 		#removeRefreshMessage() {
-			if (this.#refresh_message_box !== null) {
-				this.#refresh_message_box.remove();
-				this.#refresh_message_box = null;
-			}
+			this.#refresh_message_box?.remove();
+			this.#refresh_message_box = null;
 		}
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 
@@ -892,13 +892,13 @@
 					check_changes: false,
 					force_load: true,
 					loading_fadein,
-					onSuccess: response => this.#onDataDone(response),
+					onSuccess: response => this.#onSuccess(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
 		#refreshCounters(response) {
-			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.#layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 				return;
 			}
 
@@ -908,14 +908,16 @@
 		}
 
 		#scheduleRefresh() {
-			if (this.#refresh_interval == 0) {
+			if (this.#refresh_interval === 0) {
 				return;
 			}
 
-			const loading_fadein = true;
-
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
+
+			this.#refresh_interval_id = setInterval(
+				() => this.#refresh({loading_fadein: true}),
+				this.#refresh_interval
+			);
 		}
 
 		#unscheduleRefresh() {
@@ -941,7 +943,7 @@
 			}
 		}
 
-		#onDataDone(response) {
+		#onSuccess(response) {
 			this.#removeRefreshMessage();
 
 			if ('messages' in response) {

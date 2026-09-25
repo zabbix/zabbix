@@ -23,7 +23,7 @@ class CApmMetric extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'type'						=> 'Type',
 		'resource_attributes'		=> 'ResourceAttributes',
 		'resource_schema_url'		=> 'ResourceSchemaUrl',
@@ -57,7 +57,7 @@ class CApmMetric extends CApmGeneral {
 		'negative_bucket_counts'	=> 'NegativeBucketCounts'
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Type'							=> 'type',
 		'ResourceAttributes'			=> 'resource_attributes',
 		'ResourceSchemaUrl'				=> 'resource_schema_url',
@@ -95,7 +95,7 @@ class CApmMetric extends CApmGeneral {
 		'NegativeBucketCounts'			=> 'negative_bucket_counts'
 	];
 
-	private const CLICKHOUSE_FIELDS_DEFAULTS = [
+	protected const CLICKHOUSE_FIELDS_DEFAULTS = [
 		'ResourceAttributes'			=> '[]',
 		'ResourceSchemaUrl'				=> '\'\'',
 		'ScopeName'						=> '\'\'',
@@ -107,8 +107,8 @@ class CApmMetric extends CApmGeneral {
 		'MetricDescription'				=> '\'\'',
 		'MetricUnit'					=> '\'\'',
 		'Attributes'					=> '[]',
-		'StartTimeUnix'					=> '1970-01-01 00:00:00.000000000',
-		'TimeUnix'						=> '1970-01-01 00:00:00.000000000',
+		'StartTimeUnix'					=> '0',
+		'TimeUnix'						=> '0',
 		'Value'							=> '0',
 		'Flags'							=> '0',
 		'Exemplars.FilteredAttributes'	=> '[]',
@@ -149,35 +149,36 @@ class CApmMetric extends CApmGeneral {
 			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
 			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
 			'attributes' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit']],
+			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'flags']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
-			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'time_unix']), 'uniq' => true, 'default' => []],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'start_time_unix', 'time_unix']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
-			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -187,38 +188,49 @@ class CApmMetric extends CApmGeneral {
 		return $this->getFromClickHouse($options);
 	}
 
-	private const CLICKHOUSE_METRICS_TABLES = [
+	protected const CLICKHOUSE_METRICS_TABLES = [
 		APM_METRIC_TYPE_GAUGE					=> ['table' => 'otel_metrics_gauge', 'table_alias' => 'mg'],
 		APM_METRIC_TYPE_SUM						=> ['table' => 'otel_metrics_sum', 'table_alias' => 'ms'],
 		APM_METRIC_TYPE_HISTOGRAM				=> ['table' => 'otel_metrics_histogram', 'table_alias' => 'mh'],
 		APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	=> ['table' => 'otel_metrics_exponential_histogram', 'table_alias' => 'mx']
 	];
 
-	private function getFromClickHouse(array $options): array|string {
+	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
-		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
 		if ($options['types'] !== null && !$options['types']) {
 			return $options['countOutput'] ? '0' : [];
+		}
+
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
 		}
 
 		$select_tables = $options['types'] !== null
 			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
 			: self::CLICKHOUSE_METRICS_TABLES;
 
+		$sub_query_options = $options['countOutput']
+			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
+			: array_diff_key($options, array_flip(['output', 'limit', 'offset']));
+
 		$sub_queries = [];
 
 		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
 			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
-				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit']))
+				$sub_query_options
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
 					'time_from' => $options['time_from']
 				])
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => $options['time_till']
-				]);
+				])
+				->limit(($options['limit'] ?? 0) + $options['offset']);
 
 			if ($options['with_flags_on'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
@@ -251,16 +263,19 @@ class CApmMetric extends CApmGeneral {
 			}
 
 			if (!$options['countOutput']) {
-				// Type inclusion is mandatory for sorting capability.
-				$sub_query->select($type, 'Type');
+				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']));
 
-				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
+				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $select_fields) as $field) {
 					if ($field === 'Type') {
+						$sub_query->select($type, 'Type');
+
 						continue;
 					}
 
 					if (array_key_exists($field, $db_schema[$table])) {
-						$sub_query->select($table_alias.'.'.$field);
+						CClickHouseHelper::selectForType($sub_query, $db_schema[$table][$field]['type'], $field,
+							$table_alias
+						);
 					}
 					else {
 						$sub_query->select(self::CLICKHOUSE_FIELDS_DEFAULTS[$field], $field);
@@ -277,7 +292,7 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($sub_queries as $sub_query) {
 			$query->linkQuery($sub_query);
-			$sub_queries_sql[] = $sub_query->getSQL();
+			$sub_queries_sql[] = $sub_query->getSql();
 		}
 
 		$query->from('('.implode(' UNION ALL ', $sub_queries_sql).')', 'u');
@@ -301,7 +316,9 @@ class CApmMetric extends CApmGeneral {
 				$query->order('u.'.$field, $sort_order);
 			}
 
-			$query->limit($options['limit']);
+			$query
+				->limit($options['limit'])
+				->offset($options['offset']);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
@@ -310,10 +327,16 @@ class CApmMetric extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($count, $options['limit']);
+				}
+
+				return $real_count_output ? (string) $count : array_fill(0, $count, []);
 			}
 
-			$db_metrics[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
+			$db_metrics[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
 		}
 
 		return $db_metrics;

@@ -39,6 +39,11 @@ class CHtmlPage {
 	 */
 	private ?CList $navigation = null;
 
+	private ?CSplitView $split_view = null;
+	private array $side_drawer = [];
+
+	private bool $side_drawer_closed = false;
+
 	/**
 	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE).
 	 */
@@ -86,6 +91,20 @@ class CHtmlPage {
 		return $this;
 	}
 
+	public function setSplitView(?CSplitView $split_view): self {
+		$this->split_view = $split_view;
+
+		return $this;
+	}
+
+	public function setSideDrawer($items, bool $closed = false): self {
+		$this->side_drawer[] = $items;
+
+		$this->side_drawer_closed = $closed;
+
+		return $this;
+	}
+
 	public function addItem($value): self {
 		if ($value !== null) {
 			$this->items[] = $value;
@@ -101,36 +120,61 @@ class CHtmlPage {
 	}
 
 	private function toString() {
-		$items = [];
+		$output = [];
 
 		if ($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
-			$this->addItem(
-				(new CList())
-					->addClass(self::ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS)
-					->addItem($this->kiosk_mode_controls)
-					->addItem(
-						get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-							->setAttribute('aria-label', _('Exit full screen mode'))
-					)
-			);
+			$output[] = (new CList())
+				->addClass(self::ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS)
+				->addItem($this->kiosk_mode_controls)
+				->addItem(
+					get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
+						->setAttribute('aria-label', _('Exit full screen mode'))
+				);
 		}
 		elseif ($this->title !== '' || $this->doc_url !== '' || $this->controls !== null) {
-			$items[] = $this->createTopHeader();
+			$output[] = $this->createTopHeader();
 		}
 
-		$items[] = get_prepared_messages([
+		$navigation = $this->navigation !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL
+			? (new CDiv($this->navigation))->addClass(self::ZBX_STYLE_HEADER_NAVIGATION)
+			: null;
+
+		$messages = get_prepared_messages([
 			'with_auth_warning' => true,
 			'with_session_messages' => true,
 			'with_current_messages' => true
 		]);
 
-		$navigation = ($this->navigation !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL)
-			? (new CDiv($this->navigation))->addClass(self::ZBX_STYLE_HEADER_NAVIGATION)
-			: null;
+		$content = [
+			$messages,
+			new CTag('main', true, [$navigation, $this->items]),
+			new CPartial('layout.htmlpage.footer', [
+				'user' => [
+					'username' => CWebUser::$data['username'],
+					'debug_mode' => CWebUser::$data['debug_mode']
+				],
+				'web_layout_mode' => $this->web_layout_mode
+			])
+		];
 
-		$items[] = new CTag('main', true, [$navigation, $this->items]);
+		$output[] = $this->side_drawer
+			? ($this->split_view ?: new CSplitView())
+				->addItem(
+					(new CSplitViewPane($content))
+						->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+						->addClass($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE ? ZBX_STYLE_LAYOUT_KIOSKMODE : null)
+				)
+				->addItem(
+					(new CSplitViewPane($this->side_drawer))
+						->addClass('side-drawer')
+						->addClass($this->side_drawer_closed ? 'closed' : null)
+				)
+			: (new CDiv())
+				->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+				->addClass($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE ? ZBX_STYLE_LAYOUT_KIOSKMODE : null)
+				->addItem($content);
 
-		return unpack_object($items);
+		return unpack_object($output);
 	}
 
 	private function createTopHeader(): CTag {
@@ -182,6 +226,29 @@ class CHtmlPage {
 			$divs[] = (new CDiv($this->controls))->addClass(self::ZBX_STYLE_HEADER_CONTROLS);
 		}
 
-		return (new CTag('header', true, $divs))->addClass(self::ZBX_STYLE_HEADER_TITLE);
+		return (new CTag('header', true, [
+			$this->createBanner(),
+			(new CDiv($divs))->addClass(self::ZBX_STYLE_HEADER_TITLE)
+		]));
+	}
+
+	private function createBanner(): ?CPartial {
+		global $ZBX_FEATURE_FLAGS;
+
+		if (!$ZBX_FEATURE_FLAGS['banners_enabled'] || $this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+			return null;
+		}
+
+		$data = [
+			'user' => [
+				'lang' => CWebUser::$data['lang']
+			]
+		];
+
+		$active_banner = CBannerHelper::getActiveBanner($data);
+
+		return $active_banner
+			? new CPartial('layout.htmlpage.banner', $data + ['banner' => $active_banner])
+			: null;
 	}
 }
