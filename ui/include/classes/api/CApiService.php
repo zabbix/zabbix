@@ -644,6 +644,7 @@ class CApiService {
 	 * Returns the requested groupBy fields that are allowed for the API service.
 	 *
 	 * @param array $options
+	 *
 	 * @return array
 	 */
 	private function getGroupByFields(array $options): array {
