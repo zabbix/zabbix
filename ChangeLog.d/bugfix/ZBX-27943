@@ -1,1 +1,0 @@
-...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)

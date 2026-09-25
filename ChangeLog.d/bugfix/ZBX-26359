@@ -1,1 +1,0 @@
-...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
