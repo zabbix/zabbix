@@ -19,6 +19,7 @@
 
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxtelemetry.h"
 
 typedef void (*zbx_async_notify_cb_t)(void *data);
 
@@ -29,6 +30,7 @@ typedef struct
 	AGENT_RESULT		*results;
 	int			*errcodes;
 	int			num;
+	zbx_apm_db_config_t	*apm_db_config;
 }
 zbx_poller_item_t;
 
