@@ -10185,6 +10185,9 @@ svg {
 #preprocessing-test-form .item-test-result {
   display: inline-flex; }
 
+#proxy-form .form-field-apm-attributes {
+  width: 100%; }
+
 #token_form .btn-grey-icon {
   margin-left: 5px; }
 

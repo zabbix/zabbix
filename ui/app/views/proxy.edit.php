@@ -299,7 +299,9 @@ $apm_tab = (new CFormGrid())
 					SIGNAL_TYPE_METRICS => _('Metrics'),
 					SIGNAL_TYPE_LOGS => _('Logs')
 				]
-			])))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			])))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addClass('form-field-apm-attributes')
 		))->addClass('js-apm-attributes')
 	]);
 
