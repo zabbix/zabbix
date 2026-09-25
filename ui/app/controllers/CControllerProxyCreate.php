@@ -127,7 +127,8 @@ class CControllerProxyCreate extends CController {
 						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
 					]
 				],
-				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
+				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
 			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
