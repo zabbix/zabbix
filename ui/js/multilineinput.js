@@ -18,7 +18,7 @@
 
 	function updateProperties(obj, $elm) {
 		obj.$hidden.prop('disabled', obj.options.disabled ? true : null);
-		obj.$input.attr('title', obj.options.disabled ? '' : obj.options.hint);
+		obj.$preview.attr('title', obj.options.disabled ? '' : obj.options.hint);
 		obj.$button
 			.prop('disabled', obj.options.disabled ? true : null)
 			.prop('title', obj.options.disabled ? '' : obj.options.hint);
@@ -225,11 +225,10 @@
 					name: $this.data('name')
 				});
 
-				obj.$input = $('<span>', {
+				obj.$preview = $('<span>', {
 					class: 'multilineinput-preview',
 					title: obj.options.hint
 				})
-					.attr('tabindex', -1)
 					.attr('data-placeholder', obj.options.placeholder)
 					.toggleClass('monospace-font', obj.options.monospace_font)
 					.on('mousedown', obj, openModal);
@@ -245,7 +244,7 @@
 
 				$this
 					.data('multilineInput', obj)
-					.append(obj.$hidden, obj.$input, obj.$button)
+					.append(obj.$hidden, obj.$preview, obj.$button)
 					.on('disable enable', obj, setDisabled)
 					.on('readonly readwrite', obj, setReadOnly)
 					.trigger(obj.options.disabled ? 'disable' : 'enable');
@@ -273,7 +272,7 @@
 					var preview = value_lines.length > 1
 						? value_lines[0] + String.fromCharCode(8230) // U+2026 Horizontal ellipsis character.
 						: value_lines[0];
-					obj.$input
+					obj.$preview
 						.text(preview)
 						.toggleClass('multilineinput-preview-placeholder', preview === '');
 					$this.trigger('change');
