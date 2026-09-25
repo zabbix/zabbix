@@ -224,16 +224,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				foreach ($metric['exemplars'] as &$exemplar) {
 					$clock = floor($exemplar['time_unix'] / 1000000000);
 					$exemplar['time_ns_formatted'] = $this->formatTimeNs($exemplar['time_unix'], $today, $clock);
-
-					$exemplar['time_from'] = (new DateTimeImmutable('@'.$clock))
-						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
-						->modify('last hour')
-						->format(ZBX_FULL_DATE_TIME);
-
-					$exemplar['time_to'] = (new DateTimeImmutable('@'.$clock))
-						->setTimezone(new DateTimeZone(CTimezoneHelper::getSystemTimezone()))
-						->modify('next hour')
-						->format(ZBX_FULL_DATE_TIME);
+					$exemplar['time_from'] = zbx_date2str(ZBX_FULL_DATE_TIME, $clock - SEC_PER_MIN * 30);
+					$exemplar['time_to'] = zbx_date2str(ZBX_FULL_DATE_TIME, $clock + SEC_PER_MIN * 30);
 
 					unset($exemplar['time_unix']);
 				}
