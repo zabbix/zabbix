@@ -271,7 +271,8 @@ $apm_tab = (new CFormGrid())
 			(new CDiv())
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 				->addClass('js-apm-quota-mode-custom'),
-			(new CTextBox('max_messages_per_second', $data['form']['max_messages_per_second'], false, 10))
+			(new CNumericBox('max_messages_per_second', $data['form']['max_messages_per_second'], 10, false, false,
+					false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->addClass('js-apm-quota-mode-custom')
 		]))
