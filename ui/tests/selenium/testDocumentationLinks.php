@@ -1602,8 +1602,8 @@ class testDocumentationLinks extends CWebTest {
 			// #155 Event correlation list view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/correlation'
+					'url' => 'zabbix.php?action=ceprule.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/ceprules'
 				]
 			],
 			// #156 Create event correlation form view.
@@ -1616,7 +1616,7 @@ class testDocumentationLinks extends CWebTest {
 			// #157 Edit event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
+					'url' => 'zabbix.php?action=ceprule.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -2630,7 +2630,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
 			],
-			// #249 Start creating Item Card widget.
+			// #250 Start creating Item Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2646,6 +2646,13 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Item card',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
+				]
+			],
+			// #251 Administration -> Data source -> APM view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.db.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
 				]
 			]
 		];

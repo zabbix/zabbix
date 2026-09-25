@@ -134,11 +134,13 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Create problems and events.
 		$time = time();
-		foreach (CDataHelper::getIds('description') as $name => $id) {
+		$triggerids = CDataHelper::getIds('description');
+		foreach ($triggerids as $name => $id) {
 			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.zbx_dbstr('Trigger for char'));
+		DBexecute('UPDATE triggers SET manual_close=1 WHERE triggerid='.zbx_dbstr($triggerids['Trigger for char']));
+		DBexecute('UPDATE trigger_rtdata SET value=1 WHERE triggerid='.zbx_dbstr($triggerids['Trigger for char']));
 
 		$eventids = [];
 		foreach (['Trigger for text', 'Trigger for unsigned', 'Trigger for icon test'] as $event_name) {

@@ -52,7 +52,10 @@ abstract class CItemType {
 		'snmp_oid',
 
 		// SSH item type specific fields.
-		'publickey', 'privatekey'
+		'publickey', 'privatekey',
+
+		// Telemetry query
+		'time_shift', 'lookback_limit', 'granularity', 'query'
 	];
 
 	/**
@@ -507,7 +510,13 @@ abstract class CItemType {
 
 			// SSH item type specific fields.
 			'publickey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')],
-			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
+			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')],
+
+			// Telemetry query item.
+			'time_shift' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'time_shift')],
+			'lookback_limit' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'lookback_limit')],
+			'granularity' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'granularity')],
+			'query' =>				['type' => API_OBJECTS, 'length' => 0]
 		];
 	}
 }

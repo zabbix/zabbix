@@ -226,12 +226,19 @@ var LldRuleEditLldRuleTab = class {
 		}
 
 		const custom_timeout = this.#container.querySelector(['[name="custom_timeout"]:checked']).value;
-		const inherited_hidden = custom_timeout == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED; ?>
+		const inherited_hidden = custom_timeout == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED; ?>;
+		const timeout_inaccessible = this.#container.querySelector('#js-item-timeout-inaccessible');
 
-		this.#container.querySelector('[name="inherited_timeout"]').classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', inherited_hidden);
 		this.#container.querySelector('[name="timeout"]').classList
-			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !inherited_hidden);
+			.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
+
+		if (timeout_inaccessible !== null) {
+			timeout_inaccessible.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
+		else {
+			this.#container.querySelector('[name="inherited_timeout"]').classList
+				.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		}
 	}
 
 	#updateSortOrder(table, name_field) {

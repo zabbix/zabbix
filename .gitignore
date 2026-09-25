@@ -140,6 +140,7 @@ tests/zabbix_server/**/grouped-libs-generated.mk
 tests/libs/zbxalgo/queue
 tests/libs/zbxalgo/zbx_binary_heap_direct
 tests/libs/zbxalgo/zbx_binary_heap
+tests/libs/zbxalgo/zbx_channel
 tests/libs/zbxalgo/zbx_compare_tags_natural
 tests/libs/zbxalgo/zbx_list
 tests/libs/zbxalgo/zbx_mode_code
@@ -410,3 +411,4 @@ ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
 ui/tests/.phpunit.result.cache
+.cache

@@ -13,6 +13,12 @@ endif
 
 zabbix_agentd_SOURCES = zabbix_agentd.c
 
+if HAVE_ARES
+RESOLVER_LIB = $(top_builddir)/src/libs/zbxresolver/libzbxresolver.a
+else
+RESOLVER_LIB =
+endif
+
 zabbix_agentd_LDADD = \
 	active_checks/libzbxactive_checks.a \
 	listener/libzbxlistener.a \
@@ -37,7 +43,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
+	$(RESOLVER_LIB) \
 	$(top_builddir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \

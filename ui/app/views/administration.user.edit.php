@@ -425,10 +425,18 @@ if ($data['roleid']) {
 	}
 
 	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addRow((new CTag('h4', true, _('User group permissions')))->addClass('input-section-header'))
+		->addRow(_('Permissions'), (new CDiv($permissions_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow(_('Proxies'), (new CDiv($data['proxies_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		)
+		->addRow(_('Proxy groups'), (new CDiv($data['proxy_groups_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
 

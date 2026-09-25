@@ -216,6 +216,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_AUTH_TOKEN => _('API token'),
 			CAudit::RESOURCE_AUTHENTICATION => _('Authentication'),
 			CAudit::RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+			CAudit::RESOURCE_CEP_RULE => _('Complex event processing rule'),
 			CAudit::RESOURCE_CONNECTOR => _('Connector'),
 			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
 			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),

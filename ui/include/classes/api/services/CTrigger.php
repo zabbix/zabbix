@@ -276,12 +276,14 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if ($options['lastChangeSince'] !== null) {
-			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.zbx_dbstr($options['lastChangeSince']);
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['where']['lastchangesince'] = 'tr.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if ($options['lastChangeTill'] !== null) {
-			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.zbx_dbstr($options['lastChangeTill']);
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['where']['lastchangetill'] = 'tr.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
 		// withUnacknowledgedEvents
@@ -354,6 +356,13 @@ class CTrigger extends CTriggerGeneral {
 
 		// search
 		if (is_array($options['search'])) {
+			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
+				$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+				zbx_db_search('trigger_rtdata tr', ['search' => ['error' => $options['search']['error']]] + $options,
+					$sqlParts
+				);
+			}
+
 			zbx_db_search('triggers t', $options, $sqlParts);
 		}
 
@@ -388,6 +397,19 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
+
+			$rt_filter = [];
+
+			foreach (['value', 'state', 'lastchange', 'error'] as $field) {
+				if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
+					$rt_filter[$field] = $options['filter'][$field];
+				}
+			}
+
+			if ($rt_filter) {
+				$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+				$this->dbFilter('trigger_rtdata tr', ['filter' => $rt_filter] + $options, $sqlParts);
+			}
 		}
 
 		// group
@@ -409,11 +431,13 @@ class CTrigger extends CTriggerGeneral {
 
 		// only_true
 		if ($options['only_true'] !== null) {
-			$sqlParts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
-				' OR ((t.value='.TRIGGER_VALUE_FALSE.')'.
-					' AND (t.lastchange>'.
-					(time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD))).
-				'))'.
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+
+			$ok_period_start_time = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
+			$sqlParts['where']['ot'] = '(tr.value='.TRIGGER_VALUE_TRUE.
+				' OR (tr.value='.TRIGGER_VALUE_FALSE.
+					' AND tr.lastchange>'.$ok_period_start_time.
+				')'.
 			')';
 		}
 
@@ -510,7 +534,7 @@ class CTrigger extends CTriggerGeneral {
 			$result = array_values($result);
 		}
 
-		$result = $this->unsetExtraFields($result, ['state', 'expression'], $options['output']);
+		$result = $this->unsetExtraFields($result, ['expression'], $options['output']);
 
 		// Triggers share table with trigger prototypes. Therefore remove trigger unrelated fields.
 		if ($this->outputIsRequested('discover', $options['output'])) {
@@ -545,6 +569,28 @@ class CTrigger extends CTriggerGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+	}
+
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput']) {
+			if ($options['expandDescription'] !== null || $options['expandComment'] !== null) {
+				$sql_parts = $this->addQuerySelect('t.expression', $sql_parts);
+			}
+
+			foreach (['value', 'state', 'lastchange', 'error'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sql_parts = $this->addQuerySelect(
+						dbConditionCoalesce('tr.'.$field, DB::getDefault('trigger_rtdata', $field), $field), $sql_parts
+					);
+
+					$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+				}
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	/**
@@ -659,7 +705,10 @@ class CTrigger extends CTriggerGeneral {
 		$hostids = [];
 
 		foreach ($triggers as $trigger) {
-			if (array_key_exists('hosts', $db_triggers[$trigger['triggerid']])) {
+			$db_trigger = $db_triggers[$trigger['triggerid']];
+
+			if ($trigger['expression'] !== $db_trigger['expression']
+					|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']) {
 				$triggerids[$trigger['triggerid']] = true;
 				$hostids += $db_triggers[$trigger['triggerid']]['hosts'];
 			}
@@ -732,16 +781,6 @@ class CTrigger extends CTriggerGeneral {
 		 *  - The template of the trigger-up is linked to all child templates of the new trigger's template.
 		 */
 		self::checkDependenciesOfTemplateTriggers($trigger_dependencies, $trigger_hosts);
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
-			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
-		}
-
-		return $sqlParts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -898,6 +937,10 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
+		elseif ($sortfield === 'lastchange') {
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['order'][] = 'tr.lastchange '.$sortorder;
+		}
 		else {
 			$sqlParts = parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 		}
@@ -934,10 +977,11 @@ class CTrigger extends CTriggerGeneral {
 			do {
 				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
-					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
-					' FROM trigger_depends d,triggers t'.
-					' WHERE d.triggerid_up=t.triggerid'.
-					' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
+					'SELECT d.triggerid_down,d.triggerid_up,'.
+						dbConditionCoalesce('tr.value', DB::getDefault('trigger_rtdata', 'value'), 'value').
+					' FROM trigger_depends d'.
+					' LEFT JOIN trigger_rtdata tr ON tr.triggerid=d.triggerid_up'.
+					' WHERE '.dbConditionId('d.triggerid_down', $triggerIds)
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.

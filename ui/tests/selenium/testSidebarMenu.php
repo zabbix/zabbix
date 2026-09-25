@@ -171,7 +171,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Data collection',
-					'page' => 'Event correlation'
+					'page' => 'Event processing'
 				]
 			],
 			[
@@ -235,6 +235,16 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'Users',
 					'page' => 'Authentication'
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'Data source',
+					'third_level' =>
+					[
+						"APM"
+					]
 				]
 			],
 			[
