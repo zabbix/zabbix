@@ -1,6 +1,11 @@
 Changes for 8.0.0rc1
 
 New features:
+.........T [ZBXNEXT-10550] added OpenTelemetry templates for Proxmox, Envoy proxy, OpenRouter and Overview (abakaldin, abrosimovs, egordymov)
+A.F....PS. [ZBXNEXT-10680] implemented APM global data source (gklavins, mkorotkov, wczerneha)
+...G...... [ZBXNEXT-10438] added mode and mountpoint parameters to vfs.fs.get for Zabbix agents (vsmelovs)
+A.F.I..PS. [ZBXNEXT-10249] added Telemetry query item type and APM data store configuration via Zabbix server/proxy config file (gcalenko, kastafjevs, mkorotkov)
+.........T [ZBXNEXT-10808] added template changes for global multicloud cost dashboard (smansurovs)
 A.F.I...S. [ZBXNEXT-10353] implemented new event processing options (dpankins, gberzina, gcalenko, jfreibergs, talbergs, vmaksimovs, vmurzins, vso, wiper)
 .......PS. [ZBXNEXT-10745] improved preprocessing diagnostic output (jburlakovs)
 A.F.I...S. [ZBXNEXT-9185] implemented a permission-based visibility model for proxies and proxy groups, along with role-based restrictions for monitoring by server (aetatsu, katkuzmina, msnihach)
@@ -41,6 +46,15 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
+...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
+.........T [ZBX-28146] fixed naming in Veeam Backup & Replication by HTTP template (egordymov)
+..F....... [ZBX-27833] fixed the display of configuration errors in setup (gklavins)
+..F....... [ZBX-28006] fixed cannot read on a missing field value in item preprocessing test (uolekss)
+..F....... [ZBX-27979] fixed horizontal scrollbar in datatables not appearing in Safari (kastafjevs)
+........S. [ZBX-26836] fixed crash in connector manager during Zabbix server shutdown (ademidovs)
 ..F....... [ZBX-27672] fixed extra vertical spacing in Script form when flexible textarea is disabled (aluchko)
 ..F....... [ZBX-27793] fixed incorrect screen reader announcements for modal dialog windows (aluchko)
 .........T [ZBX-28099] fixed LLD Sessions discovery in Veeam Backup and Replication by HTTP template (egordymov)
@@ -534,6 +548,13 @@ Changes for 7.4.16rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
+...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
+........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
+.........T [ZBX-28146] fixed naming in Veeam Backup & Replication by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.15
@@ -2141,6 +2162,12 @@ Changes for 7.0.32rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
+...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
+........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.31
