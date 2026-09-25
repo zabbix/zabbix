@@ -21,6 +21,7 @@
 #include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxtelemetry.h"
 
 int	zbx_audit_item_resource_is_only_item(int resource_type)
 {
@@ -191,6 +192,9 @@ PREPARE_AUDIT_ITEM_UPDATE(verify_peer,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(verify_host,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(allow_traps,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(time_shift,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(lookback_limit,	const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(granularity,		const char*,	string)
 PREPARE_AUDIT_ITEM_UPDATE(key_,			const char*,	string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE
@@ -1325,6 +1329,487 @@ out:
 }
 
 #undef ZBX_NULL2EMPTY_STRTOK_R_VALUE
+
+static const char	*audit_item_query_key(const char *a, const char *b, char *buf, size_t buf_size)
+{
+	zbx_snprintf(buf, buf_size, "%s.%s", a, b);
+	return buf;
+}
+
+typedef void (*audit_item_query_add_string_cb_t)(const char *key, const char *value, void *ctx);
+typedef void (*audit_item_query_add_int_cb_t)(const char *key, int value, void *ctx);
+
+static void	audit_item_add_query_column(const char *prefix_col, const zbx_tq_column_t *col,
+		audit_item_query_add_string_cb_t add_string_cb, void *ctx)
+{
+#define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	add_string_cb(prefix_col, "Added", ctx);
+	add_string_cb(KEY(prefix_col, ZBX_TQ_QUERY_TAG_COLUMN), col->column, ctx);
+	add_string_cb(KEY(prefix_col, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY), col->attribute_key, ctx);
+#undef KEY
+}
+
+static void	audit_item_add_query_aggr_column(const char *prefix_aggr_col,
+		const zbx_tq_aggr_column_t *aggr_col, audit_item_query_add_string_cb_t add_string_cb,
+		audit_item_query_add_int_cb_t add_int_cb, void *ctx)
+{
+#define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	add_string_cb(prefix_aggr_col, "Added", ctx);
+	add_string_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_COLUMN), aggr_col->column, ctx);
+	add_int_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_FUNCTION), (int)aggr_col->function, ctx);
+
+	for (int j = 0; j < aggr_col->parameters.values_num; j++)
+	{
+		char	prefix_param[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]",
+				prefix_aggr_col, ZBX_TQ_QUERY_TAG_PARAMETERS, j);
+
+		add_string_cb(prefix_param, aggr_col->parameters.values[j], ctx);
+	}
+
+	add_string_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_ALIAS), aggr_col->alias, ctx);
+#undef KEY
+}
+
+static void	audit_item_add_query_condition(const char *prefix_cond, const zbx_tq_condition_t *cond,
+		audit_item_query_add_string_cb_t add_string_cb, audit_item_query_add_int_cb_t add_int_cb, void *ctx)
+{
+#define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	add_string_cb(prefix_cond, "Added", ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_COLUMN), cond->column, ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY), cond->attribute_key, ctx);
+	add_int_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_OPERATOR), (int)cond->operator, ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_VALUE), cond->value, ctx);
+#undef KEY
+}
+
+static void	audit_item_add_query(const char *prop, const zbx_tq_query_t *query,
+		audit_item_query_add_string_cb_t add_string_cb, audit_item_query_add_int_cb_t add_int_cb, void *ctx)
+{
+#define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
+	char	key[AUDIT_DETAILS_KEY_LEN];
+
+	add_string_cb(prop, "Added", ctx);
+
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE), (int)query->signal_type, ctx);
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE), (int)query->metric_point_type, ctx);
+
+	for (int i = 0; i < query->columns.values_num; i++)
+	{
+		char	prefix_col[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_COLUMNS, i);
+		audit_item_add_query_column(prefix_col, &query->columns.values[i], add_string_cb, ctx);
+	}
+
+	for (int i = 0; i < query->aggregated_columns.values_num; i++)
+	{
+		char				prefix_aggr_col[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS, i);
+		audit_item_add_query_aggr_column(prefix_aggr_col, &query->aggregated_columns.values[i],
+				add_string_cb, add_int_cb, ctx);
+	}
+
+	add_string_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER), "Added", ctx);
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_EVALTYPE), (int)query->evaltype, ctx);
+	add_string_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_FORMULA), query->formula, ctx);
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		char				prefix_cond[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_FILTER, ZBX_TQ_QUERY_TAG_CONDITIONS, i);
+		audit_item_add_query_condition(prefix_cond, &query->conditions.values[i],
+				add_string_cb, add_int_cb, ctx);
+	}
+#undef KEY
+}
+
+static void	audit_item_update_json_query_add_string_cb(const char *key, const char *value, void *ctx)
+{
+	zbx_uint64_t	itemid = *(zbx_uint64_t *)ctx;
+
+	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, key, value, NULL, NULL);
+}
+
+static void	audit_item_update_json_query_add_int_cb(const char *key, int value, void *ctx)
+{
+	zbx_uint64_t	itemid = *(zbx_uint64_t *)ctx;
+
+	zbx_audit_update_json_append_int(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, key, value, NULL, NULL);
+}
+
+void	zbx_audit_item_update_json_add_query(int audit_context_mode, zbx_uint64_t itemid, int flags, const char *val)
+{
+	zbx_tq_query_t	query;
+	char		prop[AUDIT_DETAILS_KEY_LEN];
+	char		error[MAX_STRING_LEN];
+
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val, 0))
+		return;
+
+	if (SUCCEED != zbx_tq_parse_query(&query, val, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query for itemid: " ZBX_FS_UI64 ", error: %s", itemid, error);
+
+		return;
+	}
+
+	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
+
+	audit_item_add_query(prop, &query, audit_item_update_json_query_add_string_cb,
+			audit_item_update_json_query_add_int_cb, &itemid);
+
+	zbx_tq_query_clean(&query);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: itemid    - [IN]                                               *
+ *             key       - [IN]                                               *
+ *             value_old - [IN]                                               *
+ *             value_new - [IN]                                               *
+ *             changed   - [OUT] gets set to SUCCEED if value_old and         *
+ *                               value_new are not equal and changed is not   *
+ *                               a NULL pointer, otherwise changed is not     *
+ *                               used                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	audit_item_update_json_update_query_update_string(zbx_uint64_t itemid, const char *key,
+		const char *value_old, const char *value_new, int *changed)
+{
+	if (0 != strcmp(value_old, value_new))
+	{
+		zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, key, value_old, value_new);
+
+		if (NULL != changed)
+			*changed = SUCCEED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: itemid    - [IN]                                               *
+ *             key       - [IN]                                               *
+ *             value_old - [IN]                                               *
+ *             value_new - [IN]                                               *
+ *             changed   - [OUT] gets set to SUCCEED if value_old and         *
+ *                               value_new are not equal and changed is not   *
+ *                               a NULL pointer, otherwise changed is not     *
+ *                               used                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	audit_item_update_json_update_query_update_int(zbx_uint64_t itemid, const char *key, int value_old,
+		int value_new, int *changed)
+{
+	if (value_old != value_new)
+	{
+		zbx_audit_update_json_update_int(itemid, AUDIT_ITEM_ID, key, value_old, value_new);
+
+		if (NULL != changed)
+			*changed = SUCCEED;
+	}
+}
+
+void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_t itemid, int flags,
+		const char *val_old, const char *val_new)
+{
+#define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
+#define UPD_STR(__key, __value_old, __value_new, __changed) \
+		audit_item_update_json_update_query_update_string(itemid, __key, __value_old, __value_new, __changed)
+#define UPD_INT(__key, __value_old, __value_new, __changed) \
+		audit_item_update_json_update_query_update_int(itemid, __key, __value_old, __value_new, __changed)
+
+	zbx_tq_query_t	query_old, query_new;
+	char		prop[AUDIT_DETAILS_KEY_LEN];
+	char		key[AUDIT_DETAILS_KEY_LEN];
+	char		error[MAX_STRING_LEN];
+	int		filter_changed = FAIL;
+
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
+
+	if (0 == strcmp(val_old, val_new))
+		return;
+
+	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val_old, 0))
+	{
+		zbx_audit_item_update_json_add_query(audit_context_mode, itemid, flags, val_new);
+		return;
+	}
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val_new, 0))
+	{
+		zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prop);
+		return;
+	}
+
+	if (SUCCEED != zbx_tq_parse_query(&query_old, val_old, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse old query for itemid: " ZBX_FS_UI64 ", error: %s", itemid,
+				error);
+
+		return;
+	}
+
+	if (SUCCEED != zbx_tq_parse_query(&query_new, val_new, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse new query for itemid: " ZBX_FS_UI64 ", error: %s", itemid,
+				error);
+
+		zbx_tq_query_clean(&query_old);
+		return;
+	}
+
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE),
+			(int)query_old.signal_type, (int)query_new.signal_type, NULL);
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE),
+			(int)query_old.metric_point_type, (int)query_new.metric_point_type, NULL);
+
+	for (int i = 0; i < query_old.columns.values_num || i < query_new.columns.values_num; i++)
+	{
+		const zbx_tq_column_t	*col_old = NULL, *col_new = NULL;
+		char			prefix_col[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.%s[%d]", prop, ZBX_TQ_QUERY_TAG_COLUMNS, i);
+
+		if (i < query_old.columns.values_num)
+			col_old = &query_old.columns.values[i];
+
+		if (i < query_new.columns.values_num)
+			col_new = &query_new.columns.values[i];
+
+		if (NULL != col_old && NULL != col_new)
+		{
+			int	col_changed = FAIL;
+
+			UPD_STR(KEY(prefix_col, ZBX_TQ_QUERY_TAG_COLUMN),
+					col_old->column, col_new->column, &col_changed);
+			UPD_STR(KEY(prefix_col, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY),
+					col_old->attribute_key, col_new->attribute_key, &col_changed);
+
+			if (SUCCEED == col_changed)
+			{
+				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+						prefix_col, "Updated", NULL, NULL);
+			}
+		}
+		else if (NULL == col_old)
+		{
+			audit_item_add_query_column(prefix_col, col_new,
+					audit_item_update_json_query_add_string_cb, &itemid);
+		}
+		else /* NULL == col_new */
+		{
+			zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prefix_col);
+		}
+	}
+
+	for (int i = 0; i < query_old.aggregated_columns.values_num || i < query_new.aggregated_columns.values_num; i++)
+	{
+		const zbx_tq_aggr_column_t	*aggr_col_old = NULL, *aggr_col_new = NULL;
+		char				prefix_aggr_col[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.%s[%d]", prop,
+				ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS, i);
+
+		if (i < query_old.aggregated_columns.values_num)
+			aggr_col_old = &query_old.aggregated_columns.values[i];
+
+		if (i < query_new.aggregated_columns.values_num)
+			aggr_col_new = &query_new.aggregated_columns.values[i];
+
+		if (NULL != aggr_col_old && NULL != aggr_col_new)
+		{
+			int	aggr_col_changed = FAIL;
+
+			UPD_STR(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_COLUMN), aggr_col_old->column,
+					aggr_col_new->column, &aggr_col_changed);
+			UPD_INT(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_FUNCTION), (int)aggr_col_old->function,
+					(int)aggr_col_new->function, &aggr_col_changed);
+
+			if (aggr_col_old->parameters.values_num != aggr_col_new->parameters.values_num)
+				aggr_col_changed = SUCCEED;
+
+			for (int j = 0; j < aggr_col_old->parameters.values_num ||
+					j < aggr_col_new->parameters.values_num; j++)
+			{
+				const char	*param_old = NULL, *param_new = NULL;
+				char		key_param[AUDIT_DETAILS_KEY_LEN];
+
+				if (j < aggr_col_old->parameters.values_num)
+					param_old = aggr_col_old->parameters.values[j];
+
+				if (j < aggr_col_new->parameters.values_num)
+					param_new = aggr_col_new->parameters.values[j];
+
+				zbx_snprintf(key_param, sizeof(key_param), "%s.%s[%d]", prefix_aggr_col,
+						ZBX_TQ_QUERY_TAG_PARAMETERS, j);
+
+				if (NULL != param_old && NULL != param_new)
+				{
+					int	param_changed = FAIL;
+
+					UPD_STR(key_param, param_old, param_new, &param_changed);
+
+					if (SUCCEED == param_changed)
+						aggr_col_changed = SUCCEED;
+				}
+				else if (NULL == param_old)
+				{
+					zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
+							AUDIT_DETAILS_ACTION_ADD, key_param, param_new, NULL, NULL);
+					aggr_col_changed = SUCCEED;
+				}
+				else /* NULL == param_new */
+				{
+					zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE,
+							key_param);
+					aggr_col_changed = SUCCEED;
+				}
+			}
+
+			UPD_STR(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_ALIAS), aggr_col_old->alias, aggr_col_new->alias,
+					&aggr_col_changed);
+
+			if (SUCCEED == aggr_col_changed)
+			{
+				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+						prefix_aggr_col, "Updated", NULL, NULL);
+			}
+		}
+		else if (NULL == aggr_col_old)
+		{
+			audit_item_add_query_aggr_column(prefix_aggr_col, aggr_col_new,
+					audit_item_update_json_query_add_string_cb,
+					audit_item_update_json_query_add_int_cb, &itemid);
+		}
+		else /* NULL == aggr_col_new */
+		{
+			zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE,
+					prefix_aggr_col);
+		}
+	}
+
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_EVALTYPE),
+			(int)query_old.evaltype, (int)query_new.evaltype, &filter_changed);
+	UPD_STR(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_FORMULA),
+			query_old.formula, query_new.formula, &filter_changed);
+
+	if (query_old.conditions.values_num != query_new.conditions.values_num)
+		filter_changed = SUCCEED;
+
+	for (int i = 0; i < query_old.conditions.values_num || i < query_new.conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond_old = NULL, *cond_new = NULL;
+		char				prefix_cond[AUDIT_DETAILS_KEY_LEN];
+
+		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.%s.%s[%d]", prop, ZBX_TQ_QUERY_TAG_FILTER,
+				ZBX_TQ_QUERY_TAG_CONDITIONS, i);
+
+		if (i < query_old.conditions.values_num)
+			cond_old = &query_old.conditions.values[i];
+
+		if (i < query_new.conditions.values_num)
+			cond_new = &query_new.conditions.values[i];
+
+		if (NULL != cond_old && NULL != cond_new)
+		{
+			int	cond_changed = FAIL;
+
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_COLUMN),
+					cond_old->column, cond_new->column, &cond_changed);
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY),
+					cond_old->attribute_key, cond_new->attribute_key, &cond_changed);
+			UPD_INT(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_OPERATOR),
+					(int)cond_old->operator, (int)cond_new->operator, &cond_changed);
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_VALUE),
+					cond_old->value, cond_new->value, &cond_changed);
+
+			if (SUCCEED == cond_changed)
+			{
+				zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+						prefix_cond, "Updated", NULL, NULL);
+				filter_changed = SUCCEED;
+			}
+		}
+		else if (NULL == cond_old)
+		{
+			audit_item_add_query_condition(prefix_cond, cond_new,
+					audit_item_update_json_query_add_string_cb,
+					audit_item_update_json_query_add_int_cb, &itemid);
+		}
+		else /* NULL == cond_new */
+		{
+			zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prefix_cond);
+		}
+	}
+
+	if (SUCCEED == filter_changed)
+	{
+		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+						KEY(prop, ZBX_TQ_QUERY_TAG_FILTER), "Updated", NULL, NULL);
+	}
+
+	zbx_tq_query_clean(&query_old);
+	zbx_tq_query_clean(&query_new);
+#undef KEY
+#undef UPD_STR
+#undef UPD_INT
+}
+
+static void	audit_entry_update_json_query_add_string_cb(const char *key, const char *value, void *ctx)
+{
+	zbx_audit_entry_t	*audit_entry = (zbx_audit_entry_t *)ctx;
+
+	zbx_audit_entry_add_string(audit_entry, NULL, NULL, key, value);
+}
+
+static void	audit_entry_update_json_query_add_int_cb(const char *key, int value, void *ctx)
+{
+	zbx_audit_entry_t	*audit_entry = (zbx_audit_entry_t *)ctx;
+
+	zbx_audit_entry_add_int(audit_entry, NULL, NULL, key, value);
+}
+
+void	zbx_audit_entry_update_json_add_query(zbx_audit_entry_t *audit_entry, const char *val)
+{
+	zbx_tq_query_t	query;
+	char		error[MAX_STRING_LEN];
+
+	if (NULL == audit_entry)
+		return;
+
+	if (SUCCEED == audit_field_value_matches_db_default("items", "query", val, 0))
+		return;
+
+	if (SUCCEED != zbx_tq_parse_query(&query, val, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse query for itemid: " ZBX_FS_UI64 ", error: %s", audit_entry->id,
+				error);
+
+		return;
+	}
+
+	audit_item_add_query("query", &query, audit_entry_update_json_query_add_string_cb,
+			audit_entry_update_json_query_add_int_cb, audit_entry);
+
+	zbx_tq_query_clean(&query);
+}
 
 /******************************************************************************
  *                                                                            *

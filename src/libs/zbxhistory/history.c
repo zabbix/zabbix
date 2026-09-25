@@ -28,6 +28,7 @@
 #include "zbxprof.h"
 #include "zbxvariant.h"
 #include "zbxjson.h"
+#include "zbxcfg.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
@@ -50,7 +51,7 @@ ZBX_VECTOR_IMPL(history_provider_info, zbx_history_provider_info_t)
 typedef struct
 {
 	char				*name;
-	zbx_vector_history_option_t	options;
+	zbx_vector_config_option_t	options;
 	zbx_uint64_t			traits;
 }
 zbx_history_registry_t;
@@ -134,7 +135,7 @@ static void	history_provider_free(zbx_history_provider_t *provider)
  * Return value: Opened history provider or NULL on error                      *
  *                                                                             *
  ******************************************************************************/
-static zbx_history_provider_t	*history_provider_open(const char *name, zbx_history_option_t *options,
+static zbx_history_provider_t	*history_provider_open(const char *name, zbx_config_option_t *options,
 		int options_num, char **error)
 {
 	zbx_history_provider_t	*provider = NULL;
@@ -170,7 +171,7 @@ static zbx_history_provider_t	*history_provider_open(const char *name, zbx_histo
  *                                                                             *
  *******************************************************************************/
 static int	history_manager_register_provider(zbx_history_manager_t *manager, const char *name,
-		zbx_vector_history_option_t *options)
+		zbx_vector_config_option_t *options)
 {
 	zbx_history_registry_t	*registry;
 
@@ -184,9 +185,9 @@ static int	history_manager_register_provider(zbx_history_manager_t *manager, con
 		history_log_options(options->values, options->values_num);
 	}
 
-	zbx_vector_history_option_create(&registry->options);
-	zbx_vector_history_option_append_array(&registry->options, options->values, options->values_num);
-	zbx_vector_history_option_clear(options);
+	zbx_vector_config_option_create(&registry->options);
+	zbx_vector_config_option_append_array(&registry->options, options->values, options->values_num);
+	zbx_vector_config_option_clear(options);
 
 	zbx_vector_history_registry_ptr_append(&manager->registry, registry);
 
@@ -212,7 +213,7 @@ static void	history_manager_clear(zbx_history_manager_t *manager)
 			zbx_free(registry->options.values[j].name);
 			zbx_free(registry->options.values[j].value);
 		}
-		zbx_vector_history_option_destroy(&registry->options);
+		zbx_vector_config_option_destroy(&registry->options);
 
 		zbx_free(registry->name);
 		zbx_free(registry);
@@ -303,17 +304,17 @@ static void	history_manager_registry_update_types(zbx_history_manager_t *manager
 
 	for (int i = 0; i < registry->options.values_num; i++)
 	{
-		zbx_history_option_t	*option = &registry->options.values[i];
+		zbx_config_option_t	*option = &registry->options.values[i];
 
 		if (0 == strcmp(option->name, HISTORY_PROVIDER_OPTION_VALUE_TYPES))
 		{
-			history_options_clear(option, 1);
-			zbx_vector_history_option_remove_noorder(&registry->options, i);
+			zbx_config_option_clear_options(option, 1);
+			zbx_vector_config_option_remove_noorder(&registry->options, i);
 			break;
 		}
 	}
 
-	zbx_vector_history_option_append(&registry->options, history_option_types(type_mask));
+	zbx_vector_config_option_append(&registry->options, history_option_types(type_mask));
 }
 
 /******************************************************************************
@@ -370,7 +371,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error)
 {
-	zbx_vector_history_option_t	options;
+	zbx_vector_config_option_t	options;
 	int				ret = FAIL, index, err;
 	zbx_uint64_t			value_type_mask = 0, mask;
 	pthread_mutex_t			lock;
@@ -384,22 +385,23 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 	memset(manager, 0, sizeof(zbx_history_manager_t));
 	manager->lock = lock;
 	zbx_vector_history_registry_ptr_create(&manager->registry);
-	zbx_vector_history_option_create(&options);
+	zbx_vector_config_option_create(&options);
 
 	/* register elasticsearch history provider using deprecated configuration parameters */
 	if (NULL != config_history_storage_url && NULL != config_history_storage_opts)
 	{
-		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_URL,
+		zbx_vector_config_option_append(&options, zbx_config_option_str(HISTORY_PROVIDER_OPTION_URL,
 				config_history_storage_url));
-		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_VALUE_TYPES,
+		zbx_vector_config_option_append(&options, zbx_config_option_str(HISTORY_PROVIDER_OPTION_VALUE_TYPES,
 				config_history_storage_opts));
-		zbx_vector_history_option_append(&options, history_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
+		zbx_vector_config_option_append(&options,
+				zbx_config_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
 				config_log_slow_queries));
 
 		if (1 == config_history_storage_pipelines)
 		{
-			zbx_vector_history_option_append(&options,
-					history_option_int(HISTORY_PROVIDER_OPTION_DATE_INDEX,
+			zbx_vector_config_option_append(&options,
+					zbx_config_option_int(HISTORY_PROVIDER_OPTION_DATE_INDEX,
 							config_history_storage_pipelines));
 		}
 
@@ -409,7 +411,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		index = history_manager_register_provider(manager, HISTORY_PROVIDER_ELASTICSEARCH, &options);
 		history_manager_map_value_types(manager, index, mask);
 
-		zbx_vector_history_option_clear(&options);
+		zbx_vector_config_option_clear(&options);
 	}
 
 	if (NULL != providers)
@@ -458,7 +460,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			history_manager_map_value_types(manager, index, mask);
 
 			zbx_free(name);
-			zbx_vector_history_option_clear(&options);
+			zbx_vector_config_option_clear(&options);
 		}
 	}
 
@@ -536,8 +538,8 @@ out:
 	if (FAIL == ret)
 		history_manager_clear(manager);
 
-	history_options_clear(options.values, options.values_num);
-	zbx_vector_history_option_destroy(&options);
+	zbx_config_option_clear_options(options.values, options.values_num);
+	zbx_vector_config_option_destroy(&options);
 
 	return ret;
 }
@@ -1442,7 +1444,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 
 			zbx_json_addobject(json, NULL);
 
-			zbx_json_addstring(json, "type", history_option_value_type_str(type_info->value_type),
+			zbx_json_addstring(json, "type", zbx_history_option_value_type_str(type_info->value_type),
 					ZBX_JSON_TYPE_STRING);
 
 			if (0 != type_info->ttl)
@@ -1667,7 +1669,7 @@ const char	*history_value_type_desc(unsigned char value_type)
  ******************************************************************************/
 int	zbx_history_value_type_from_str(const char *value_type_str)
 {
-	return history_option_value_type_from_str(value_type_str);
+	return zbx_history_option_value_type_from_str(value_type_str);
 }
 
 /******************************************************************************

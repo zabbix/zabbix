@@ -23,19 +23,18 @@ $this->includeJsFile('administration.apm.db.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('APM'))
-	->setTitleSubmenu(getAdministrationDataSourceSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_DATA_SOURCE_APM_EDIT));
 
 $apm_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel([
 			_('Enable global data source'),
-			makeHelpIcon(_('The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overriden in the respective configuration files.'))
+			makeHelpIcon(_('The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overridden in the respective configuration files.'))
 		], 'status')),
 		new CFormField(
 			(new CCheckBox('status'))
 				->setUncheckedValue(APM_GLOBAL_DB_STATUS_NOT_CONFIGURED)
-				->setChecked($data['values']['status'] === APM_GLOBAL_DB_STATUS_CONFIGURED),
+				->setChecked($data['values']['status'] == APM_GLOBAL_DB_STATUS_CONFIGURED),
 		)
 	])
 	->addItem([
@@ -102,7 +101,10 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CCheckBox('ssl_verify_peer'))
 				->setUncheckedValue(APM_GLOBAL_DB_VERIFY_PEER_DISABLED)
-				->setChecked($data['values']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED),
+				->setChecked(
+					array_key_exists('ssl_verify_peer', $data['values'])
+						&& $data['values']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED
+				),
 		))->addClass('js-ssl-verify-peer')
 	])
 	->addItem([
@@ -111,14 +113,24 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CCheckBox('ssl_verify_host'))
 				->setUncheckedValue(APM_GLOBAL_DB_VERIFY_HOST_DISABLED)
-				->setChecked($data['values']['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED),
+				->setChecked(
+					array_key_exists('ssl_verify_host', $data['values'])
+						&& $data['values']['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED
+				),
 		))->addClass('js-ssl-verify-host')
 	]);
 
 $apm_view = (new CTabView())
 	->addTab('apm', _('APM'), $apm_tab)
 	->setFooter(makeFormFooter(
-		(new CSubmit('', _('Update')))->addClass('js-submit')
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
+		[
+			(new CButton('', _('Test')))
+				->setAttribute('hidden', '')
+				->setEnabled(false)
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-test')
+		]
 	));
 
 $form = (new CForm())

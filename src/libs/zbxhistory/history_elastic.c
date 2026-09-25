@@ -1731,12 +1731,12 @@ out:
  * Return value: elasticsearch history provider or NULL on failure            *
  *                                                                            *
  ******************************************************************************/
-static void	*history_elastic_create_data(const zbx_history_option_t *options, int options_num, char **error)
+static void	*history_elastic_create_data(const zbx_config_option_t *options, int options_num, char **error)
 {
 	zbx_history_elastic_data_t	*data;
 	const char			*value;
 
-	if (NULL == (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
+	if (NULL == (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
 		*error = zbx_strdup(*error, "missing \"url\" option for Elasticsearch history backend");
 		return NULL;
@@ -1748,10 +1748,10 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 	data->base_url = zbx_strdup(NULL, value);
 	zbx_rtrim(data->base_url, "/");
 
-	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_DATE_INDEX)))
+	if (NULL != (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_DATE_INDEX)))
 		data->pipelines = (unsigned char)atoi(value);
 
-	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
+	if (NULL != (value = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
 		data->log_slow_queries = atoi(value);
 
 	zbx_vector_elastic_conn_ptr_create(&data->conns);
@@ -1788,7 +1788,7 @@ static void	history_elastic_close(void *data)
  *     options_num - [IN] number of configuration options                     *
  *                                                                            *
  ******************************************************************************/
-static void	history_elastic_validate_options(const zbx_history_option_t *options, int options_num)
+static void	history_elastic_validate_options(const zbx_config_option_t *options, int options_num)
 {
 	const char	*supported_options = ""
 				HISTORY_PROVIDER_OPTION_NAME ","
@@ -1830,7 +1830,7 @@ static void	history_elastic_validate_options(const zbx_history_option_t *options
  * Return value: history provider or NULL if initialization fails             *
  *                                                                            *
  ******************************************************************************/
-zbx_history_provider_t	*history_elastic_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*history_elastic_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	zbx_history_provider_t	*provider;
 	void			*data;
@@ -1859,7 +1859,7 @@ zbx_history_provider_t	*history_elastic_open(const zbx_history_option_t *options
 }
 
 #else
-zbx_history_provider_t *history_elastic_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t *history_elastic_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	ZBX_UNUSED(options);
 	ZBX_UNUSED(options_num);

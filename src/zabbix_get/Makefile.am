@@ -5,9 +5,15 @@ bin_PROGRAMS = zabbix_get
 zabbix_get_SOURCES = \
 	zabbix_get.c
 
+if HAVE_ARES
+RESOLVER_LIB = $(top_builddir)/src/libs/zbxresolver/libzbxresolver.a
+else
+RESOLVER_LIB =
+endif
+
 zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
+	$(RESOLVER_LIB) \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \

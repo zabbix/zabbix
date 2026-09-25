@@ -1954,6 +1954,8 @@ if test "x$want_ares" = "xyes"; then
 	fi
 	have_ares="yes"
 fi
+AM_CONDITIONAL(HAVE_ARES, [test "x$have_ares" = "xyes"])
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
 
@@ -2285,6 +2287,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxhttppoller/Makefile
+	src/libs/zbxtelemetry/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile

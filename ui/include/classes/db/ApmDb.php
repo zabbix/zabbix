@@ -19,15 +19,6 @@ class ApmDb {
 	private const PROVIDER_ZABBIX = 'zabbix';
 	private const PROVIDER_CLICKHOUSE = 'clickhouse';
 
-	private const CONFIG_DEFAULTS = [
-		'vault_path' => '',
-		'ssl_cert_file' => '',
-		'ssl_key_file' => '',
-		'ssl_key_password' => '',
-		'ssl_ca_file' => '',
-		'ssl_ca_location' => ''
-	];
-
 	private static ?self $instance = null;
 
 	private string $provider;
@@ -63,14 +54,14 @@ class ApmDb {
 		global $TELEMETRY_PROVIDERS;
 
 		if ($TELEMETRY_PROVIDERS) {
-			$this->initFromConfig();
+			$this->initWithConfigFile();
 		}
 		else {
-			$this->initFromSettings();
+			$this->initWithApmGlobal();
 		}
 	}
 
-	private function initFromConfig(): void {
+	private function initWithConfigFile(): void {
 		global $TELEMETRY_PROVIDERS;
 
 		$provider_config = $TELEMETRY_PROVIDERS[0];
@@ -82,27 +73,21 @@ class ApmDb {
 
 			case self::PROVIDER_CLICKHOUSE:
 				$this->provider = self::PROVIDER_CLICKHOUSE;
-				$this->config = self::resolveConfig($provider_config);
+				$this->config = self::resolveConfigFileConfiguration($provider_config);
 				break;
 		}
 	}
 
-	private function initFromSettings(): void {
+	private function initWithApmGlobal(): void {
 		$this->provider = self::PROVIDER_CLICKHOUSE;
-		$this->config = self::resolveConfig(CSettingsHelper::getPublic(CSettingsHelper::APM_GLOBAL_DB));
+		$this->config = self::resolveApmGlobalConfiguration(CSettingsHelper::getApmGlobalDb());
 	}
 
 	/**
 	 * @throws DBException|JsonException
 	 */
-	private static function resolveConfig(array $config): array {
+	private static function resolveConfigFileConfiguration(array $config): array {
 		global $DB, $APM_CA_FILE, $APM_CA_LOCATION;
-
-		if (array_key_exists('status', $config) && $config['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
-			throw new DBException(_('APM DB is not configured.'), DB::INIT_ERROR);
-		}
-
-		$config += self::CONFIG_DEFAULTS;
 
 		if ($config['vault_path'] !== '') {
 			if ($DB['VAULT'] === '') {
@@ -129,11 +114,33 @@ class ApmDb {
 			$config['password'] = $credentials['password'];
 		}
 
-		if ($config['ssl_verify_peer'] && $config['ssl_ca_file'] === '' && $config['ssl_ca_location'] === '') {
+		if ($config['ssl_verify_peer'] === true && $config['ssl_ca_file'] === '' && $config['ssl_ca_location'] === '') {
 			$config['ssl_ca_file'] = $APM_CA_FILE;
 			$config['ssl_ca_location'] = $APM_CA_LOCATION;
 		}
 
-		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
+		return array_diff_key($config, array_flip(['vault_path', 'provider']));
+	}
+
+	/**
+	 * @throws DBException
+	 */
+	private static function resolveApmGlobalConfiguration(array $config): array {
+		if ($config['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
+			throw new DBException(_('APM DB is not configured.'), DB::INIT_ERROR);
+		}
+
+		$config['ssl_verify_peer'] = $config['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
+		$config['ssl_verify_host'] = $config['ssl_verify_host'] == APM_GLOBAL_DB_VERIFY_HOST_ENABLED;
+
+		$config += [
+			'ssl_cert_file' => '',
+			'ssl_key_file' => '',
+			'ssl_key_password' => '',
+			'ssl_ca_file' => '',
+			'ssl_ca_location' => ''
+		];
+
+		return array_diff_key($config, array_flip(['status', 'authentication_type']));
 	}
 }
