@@ -236,6 +236,8 @@ $toc-title-bg-color: #003a7a;
 // Datatable.
 $datatable-resizer-border-color: #0066d9;
 $datatable-scrollbar-thumb-bg-color: #004fa8;
+$datatable-sticky-hover-bg-color: mix(opacify($ui-hover-bg-color, 1), $ui-bg-color, alpha($ui-hover-bg-color) * 100%);
+$datatable-sticky-selected-bg-color: mix(opacify($lighter-yellow, 1), $ui-bg-color, alpha($lighter-yellow) * 100%);
 // Important! @import string should come after variables
 @import 'screen';
 
@@ -281,10 +283,22 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 }
 
 .datatable {
-	.datatable-body .row.row-selected {
-		.row-spacer,
-		.cell:not(.cell-bg) {
-			border-bottom-color: #003a7a;
+	.datatable-body .row {
+		&:not(.row-selected):not(.row-disabled):hover {
+			.cell.cell-data.cell-sticky:not(.cell-bg) {
+				background-color: $datatable-sticky-hover-bg-color;
+			}
+		}
+
+		&.row-selected {
+			.row-spacer,
+			.cell:not(.cell-bg) {
+				border-bottom-color: #003a7a;
+			}
+
+			.cell.cell-sticky:not(.cell-bg) {
+				background-color: $datatable-sticky-selected-bg-color;
+			}
 		}
 	}
 

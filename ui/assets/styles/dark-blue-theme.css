@@ -9968,9 +9968,13 @@ z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboa
 .btn-time-zoomout {
   color: #3d98ff; }
 
+.datatable .datatable-body .row:not(.row-selected):not(.row-disabled):hover .cell.cell-data.cell-sticky:not(.cell-bg) {
+  background-color: #002856; }
 .datatable .datatable-body .row.row-selected .row-spacer,
 .datatable .datatable-body .row.row-selected .cell:not(.cell-bg) {
   border-bottom-color: #003a7a; }
+.datatable .datatable-body .row.row-selected .cell.cell-sticky:not(.cell-bg) {
+  background-color: #002d5e; }
 .datatable .datatable-header .datatable-options-link, .datatable .datatable-header .datatable-options-link:hover, .datatable .datatable-header .datatable-options-link:focus, .datatable .datatable-header .datatable-options-link.datatable-options-link-opened {
   color: #0066d9; }
 .datatable .datatable-header .datatable-options-button {
