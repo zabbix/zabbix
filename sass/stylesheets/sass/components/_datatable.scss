@@ -583,6 +583,7 @@
 
 		&.cell-data {
 			align-items: flex-start;
+			word-break: break-word;
 			overflow: hidden;
 
 			&.cell-sticky:not(.cell-bg-hover) {

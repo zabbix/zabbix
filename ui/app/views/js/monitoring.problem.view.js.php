@@ -382,6 +382,16 @@
 						cell.textContent = severity_data.label;
 					}
 				})
+				.setCellRenderer('custom_text', ({column_index, cell_data, cell}) => {
+					const [custom_text] = cell_data;
+					const compact_view = this.#datatable.getOption('compact_view');
+
+					cell.textContent = custom_text[column_index];
+
+					if (compact_view.checked) {
+						cell.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					}
+				})
 				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [hosts] = cell_data;
 

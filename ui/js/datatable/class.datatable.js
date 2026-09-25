@@ -1868,6 +1868,7 @@ class CDataTable {
 			this.#cell_renderers[renderer].call(this, {
 				datatable: this,
 				column,
+				column_index: column.getColumnIndex(),
 				row,
 				row_index,
 				cell_data: cell_data || [],
