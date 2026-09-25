@@ -1,0 +1,47 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "argv": ["smartctl", "-a", "-d", "scsi", "/dev/sda", "-j"],
+    "exit_status": 128
+  },
+  "device": {
+    "name": "/dev/sda",
+    "info_name": "/dev/sda",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "scsi_vendor": "VENDOR",
+  "scsi_product": "TEST_SAS_DISK",
+  "scsi_model_name": "VENDOR TEST_SAS_DISK",
+  "serial_number": "TEST-SCSI-0001",
+  "rotation_rate": 7200,
+  "smart_support": {
+    "available": true,
+    "enabled": true
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 33,
+    "drive_trip": 85
+  },
+  "power_on_time": {
+    "hours": 1000,
+    "minutes": 0
+  },
+  "scsi_self_test_0": {
+    "code": {
+      "value": 1,
+      "string": "Background short"
+    },
+    "result": {
+      "value": 7,
+      "string": "Failed in segment"
+    },
+    "failed_segment": {
+      "value": 3
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      3
+    ],
+    "svn_revision": "5338",
+    "platform_info": "x86_64-w64-mingw32-generic",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "/dev/csmi0,0",
+      "-j"
+    ],
+    "exit_status": 0
+  },
+  "local_time": {
+    "time_t": 0,
+    "asctime": "Thu Jan  1 00:00:00 1970 UTC"
+  },
+  "device": {
+    "name": "/dev/csmi0,0",
+    "info_name": "/dev/csmi0,0",
+    "type": "ata",
+    "protocol": "ATA"
+  },
+  "model_family": "Generic Enterprise SSD",
+  "model_name": "TEST_CSMI_SSD",
+  "serial_number": "TEST-CSMI-SSD-0001",
+  "firmware_version": "0001",
+  "user_capacity": {
+    "blocks": 250000000,
+    "bytes": 128000000000
+  },
+  "logical_block_size": 512,
+  "rotation_rate": 0,
+  "smart_support": {
+    "available": true,
+    "enabled": true
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "ata_smart_attributes": {
+    "revision": 1,
+    "table": [
+      {
+        "id": 5,
+        "name": "Reallocated_Sector_Ct",
+        "value": 100,
+        "worst": 100,
+        "thresh": 0,
+        "when_failed": "",
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      },
+      {
+        "id": 9,
+        "name": "Power_On_Hours",
+        "value": 100,
+        "worst": 100,
+        "thresh": 0,
+        "when_failed": "",
+        "raw": {
+          "value": 1000,
+          "string": "1000"
+        }
+      },
+      {
+        "id": 170,
+        "name": "Available_Reservd_Space",
+        "value": 100,
+        "worst": 100,
+        "thresh": 10,
+        "when_failed": "",
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      }
+    ]
+  }
+}

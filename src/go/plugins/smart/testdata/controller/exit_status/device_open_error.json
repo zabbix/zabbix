@@ -1,0 +1,18 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "argv": ["smartctl", "-a", "-d", "scsi", "/dev/sda", "-j"],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/sda failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  },
+  "local_time": {
+    "time_t": 0,
+    "asctime": "Thu Jan  1 00:00:00 1970 UTC"
+  }
+}

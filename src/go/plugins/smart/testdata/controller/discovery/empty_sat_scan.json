@@ -1,0 +1,11 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "pre_release": false,
+    "platform_info": "x86_64-w64-mingw32-generic",
+    "argv": ["smartctl", "--scan", "-d", "sat", "-j"],
+    "exit_status": 0
+  },
+  "devices": []
+}

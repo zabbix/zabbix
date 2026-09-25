@@ -274,8 +274,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function render(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		// host groups multiselect
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -413,10 +413,10 @@ if (array_key_exists('render_html', $data)) {
 		this.resetUnsavedState();
 	}
 
-	function expand(data, container) {
+	function expand(data) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 	}
 
 	function select(data, container) {
@@ -428,7 +428,7 @@ if (array_key_exists('render_html', $data)) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
-		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+		expand.call(ev.detail, ev.detail._data);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function (ev) {
 		select.call(ev.detail, ev.detail._data, ev.detail._content_container);
