@@ -484,9 +484,9 @@ class CCepRuleHelper {
 	public static function getWindowLabelStrings(): array {
 		return [
 			self::WINDOW_NONE => _('None'),
-			self::WINDOW_SIMPLE => _('Simple'),
+			self::WINDOW_SIMPLE => _('Simple (multiple)'),
+			self::WINDOW_TAG_MATCH => _('Simple (once)'),
 			self::WINDOW_CAUSE_SYMPTOM => _('Cause and symptoms grouping'),
-			self::WINDOW_TAG_MATCH => _('Tag correlation'),
 			self::WINDOW_PATTERN_MATCH => _('Pattern match')
 		];
 	}
