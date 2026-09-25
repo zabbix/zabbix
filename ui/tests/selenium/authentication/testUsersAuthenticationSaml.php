@@ -197,6 +197,13 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'Encrypt' => ['Name ID', 'Assertions']
 		];
 
+		// Unchecks all checkboxes.
+		foreach ($checkbox_groups as $group => $checkboxes) {
+			foreach ($checkboxes as $label) {
+				$saml_form->getField($group)->uncheck($label);
+			}
+		}
+
 		foreach ($checkbox_groups as $group => $checkboxes) {
 			foreach ($checkboxes as $label) {
 				$saml_form->getField($group)->check($label);
