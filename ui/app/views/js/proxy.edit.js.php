@@ -186,11 +186,11 @@ window.proxy_edit_popup = new class {
 			field?.toggleAttribute('hidden', !data_collection_status);
 		}
 
-		this.form.findFieldByName('max_messages_per_second')?.getField()
-			?.toggleAttribute('disabled', !data_collection_status);
-
 		const fields = this.getAllValues();
 		const quota_mode_unlimited = fields.quota_mode === PROXY_APM_QUOTA_MODE_UNLIMITED;
+
+		const max_messages_per_second = this.form.findFieldByName('max_messages_per_second')?.getField();
+		max_messages_per_second?.toggleAttribute('disabled', quota_mode_unlimited);
 
 		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode-custom')) {
 			field?.toggleAttribute('hidden', quota_mode_unlimited);
@@ -270,13 +270,6 @@ window.proxy_edit_popup = new class {
 					delete fields[field];
 				}
 			}
-		}
-		else if ('quota_mode' in fields) {
-			if (fields.quota_mode === PROXY_APM_QUOTA_MODE_UNLIMITED) {
-				fields.max_messages_per_second = 0;
-			}
-
-			delete fields.quota_mode;
 		}
 
 		const curl = new Curl('zabbix.php');

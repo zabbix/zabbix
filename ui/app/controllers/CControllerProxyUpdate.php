@@ -111,8 +111,12 @@ class CControllerProxyUpdate extends CController {
 			'data_collection_status' => ['required', 'boolean',
 				'in' => [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED]
 			],
-			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
+			'quota_mode' => ['required', 'integer',
+				'in' => [PROXY_APM_QUOTA_MODE_UNLIMITED, PROXY_APM_QUOTA_MODE_CUSTOM],
 				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
+			],
+			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
+				'when' => [['quota_mode', 'in' => [PROXY_APM_QUOTA_MODE_CUSTOM]]]
 			],
 			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
 				'fields' => [
