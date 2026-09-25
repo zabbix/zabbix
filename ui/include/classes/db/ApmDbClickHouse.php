@@ -145,20 +145,14 @@ class ApmDbClickHouse {
 	}
 
 	private function configureCurl(CurlHandle $curl, string $sql, array $params): void {
-		$http_headers = ['X-ClickHouse-Format: JSONEachRow'];
-
-		if ($this->config['db'] !== '') {
-			$http_headers[] = 'X-ClickHouse-Database: '.$this->config['db'];
-		}
-
 		$curl_options = [
 			CURLOPT_POST => true,
-			CURLOPT_URL => $this->config['url'],
+			CURLOPT_URL => $this->buildUrl(),
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_SHARE => $this->curl_share,
 			CURLOPT_SSL_VERIFYPEER => $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
-			CURLOPT_HTTPHEADER => $http_headers
+			CURLOPT_HTTPHEADER => ['X-ClickHouse-Format: JSONEachRow']
 		];
 
 		if ($params) {
@@ -174,16 +168,11 @@ class ApmDbClickHouse {
 			$curl_options[CURLOPT_POSTFIELDS] = $sql;
 		}
 
-		if ($this->config['username'] !== '') {
-			if ($this->config['password'] !== '') {
-				$curl_options += [
-					CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-					CURLOPT_USERPWD  => $this->config['username'] . ':' . $this->config['password']
-				];
-			}
-			else {
-				$curl_options[CURLOPT_URL] .= '?' . http_build_query(['user' => $this->config['username']]);
-			}
+		if ($this->config['username'] !== '' && $this->config['password'] !== '') {
+			$curl_options += [
+				CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+				CURLOPT_USERPWD  => $this->config['username'].':'.$this->config['password']
+			];
 		}
 
 		if ($this->config['ssl_ca_file'] !== '') {
@@ -207,6 +196,20 @@ class ApmDbClickHouse {
 		}
 
 		curl_setopt_array($curl, $curl_options);
+	}
+
+	private function buildUrl(): string {
+		$url = new CUrl($this->config['url']);
+
+		if ($this->config['db'] !== '') {
+			$url->setArgument('database', $this->config['db']);
+		}
+
+		if ($this->config['username'] !== '' && $this->config['password'] === '') {
+			$url->setArgument('user', $this->config['username']);
+		}
+
+		return $url->getUrl();
 	}
 
 	/**

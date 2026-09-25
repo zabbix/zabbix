@@ -1,7 +1,7 @@
 :root {
 	--datatable-row-height: 31px;
 	--datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
-	--datatable-scrollbar-height: 11px;
+	--datatable-scrollbar-height: 15px;
 }
 
 .datatable {
@@ -369,11 +369,25 @@
 		background-color: $ui-bg-color;
 		border-top: 1px solid $ui-border-color;
 		box-sizing: border-box;
-		scrollbar-width: thin;
-		scrollbar-color: $datatable-scrollbar-thumb-bg-color $ui-bg-color;
 
-		::-webkit-scrollbar {
-			height: var(--datatable-scrollbar-height);
+		@supports #{'not selector(::-webkit-scrollbar)'} {
+			scrollbar-width: thin;
+			scrollbar-color: $datatable-scrollbar-thumb-bg-color $ui-bg-color;
+		}
+
+		&::-webkit-scrollbar {
+			height: calc(var(--datatable-scrollbar-height) - 2px);
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: $ui-bg-color;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: $datatable-scrollbar-thumb-bg-color;
+			background-clip: content-box;
+			border: 3px solid transparent;
+			border-radius: calc(var(--button-border-radius) + 3px);
 		}
 
 		.datatable-scrollbar-inner {

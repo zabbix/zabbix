@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #define ZBX_DBVERSION_UNDEFINED			0
 

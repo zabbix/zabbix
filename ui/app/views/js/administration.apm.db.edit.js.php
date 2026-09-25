@@ -90,7 +90,9 @@ const view = new class {
 				const configured_authtype_password = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
 					&& initial_values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
 
-				this.#password_cleared = this.#password_input.value.length > 0 || configured_authtype_password;
+				if (configured_authtype_password) {
+					this.#password_cleared = true;
+				}
 
 				this.#password_input.value = '';
 			}
@@ -110,6 +112,7 @@ const view = new class {
 		});
 
 		this.#password_input?.addEventListener('input', () => {
+			this.#password_changed = true;
 			this.#password_cleared = false;
 
 			this.#updateForm({initial_values});

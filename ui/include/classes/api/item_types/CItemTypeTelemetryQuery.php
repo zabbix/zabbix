@@ -24,7 +24,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query'];
+	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query', 'timeout', 'delay'];
 
 	public const SIGNAL_TYPE_TRACES = 0;
 	public const SIGNAL_TYPE_METRICS = 1;
@@ -137,7 +137,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
-			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($item)],
+			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
@@ -154,7 +154,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
-			'query' =>			['type' => API_OBJECT, 'fields' => self::getQueryFieldValidationRules($db_item)],
+			'query' =>			['type' => API_OBJECT, 'flags' => $db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? 0 : API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
@@ -215,9 +215,33 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
+	 * Validate "query.columns":
+	 * - "column" contains value allowed by "query.signal_type", "query.metric_point_type"
+	 *
+	 * @param array       $item   Telemetry item to validate.
+	 * @param string      $path   Path for validation message.
+	 * @param string|null $error  Error message when validation fails, set by reference.
+	 */
+	public static function validateColumns(array $item, string $path, ?string &$error): bool {
+		$columns = match($item['query']['signal_type']) {
+			self::SIGNAL_TYPE_TRACES =>		self::TRACES_COLUMNS_COLUMN,
+			self::SIGNAL_TYPE_METRICS =>	self::METRICS_COLUMNS_COLUMN[$item['query']['metric_point_type']],
+			self::SIGNAL_TYPE_LOGS =>		self::LOGS_COLUMNS_COLUMN
+		};
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)]
+		]];
+
+		return CApiInputValidator::validate($api_input_rules, $item['query']['columns'],
+			$path.'/query/columns', $error
+		);
+	}
+
+	/**
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
+	 * - "column" contains value allowed by "query.signal_type", "query.metric_point_type"
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path for validation message.
@@ -250,12 +274,27 @@ class CItemTypeTelemetryQuery extends CItemType {
 			}
 		}
 
-		return true;
+		$columns = match($item['query']['signal_type']) {
+			self::SIGNAL_TYPE_TRACES =>		self::TRACES_AGGREGATED_COLUMN,
+			self::SIGNAL_TYPE_METRICS =>	self::METRICS_AGGREGATED_COLUMN[$item['query']['metric_point_type']],
+			self::SIGNAL_TYPE_LOGS =>		self::LOGS_AGGREGATED_COLUMN
+		};
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'column' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])], 'type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
+								['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
+			]]
+		]];
+
+		return CApiInputValidator::validate($api_input_rules, $item['query']['aggregated_columns'],
+			$path.'/query/aggregated_columns', $error
+		);
 	}
 
 	/**
 	 * Validate "query.filter":
 	 * - for "evaltype" CONDITION_EVAL_TYPE_EXPRESSION each "formulaid" should be in use by "formula" field
+	 * - "filter.conditions[].column" contains value allowed by "query.signal_type", "query.metric_point_type"
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path in validation message.
@@ -288,7 +327,18 @@ class CItemTypeTelemetryQuery extends CItemType {
 			}
 		}
 
-		return true;
+		$columns = match($item['query']['signal_type']) {
+			self::SIGNAL_TYPE_TRACES =>		self::TRACES_CONDITIONS_COLUMN,
+			self::SIGNAL_TYPE_METRICS =>	self::METRICS_CONDITIONS_COLUMN[$item['query']['metric_point_type']],
+			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
+		};
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)]
+		]];
+
+		return CApiInputValidator::validate($api_input_rules, $item['query']['filter']['conditions'],
+			$path.'/query/filter/conditions', $error
+		);
 	}
 
 	/**
@@ -423,36 +473,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 		return $query;
 	}
 
-	private static function getQueryFieldValidationRules(array $item): array {
-		switch ($item['query']['signal_type'] ?? self::SIGNAL_TYPE_TRACES) {
-			case self::SIGNAL_TYPE_TRACES:
-				$columns_column = self::TRACES_COLUMNS_COLUMN;
-				$aggregated_column = self::TRACES_AGGREGATED_COLUMN;
-				$condition_column = self::TRACES_CONDITIONS_COLUMN;
-				break;
-
-			case self::SIGNAL_TYPE_METRICS:
-				$point_type = $item['query']['metric_point_type'] ?? self::METRICS_POINT_SUM;
-				$columns_column = self::METRICS_COLUMNS_COLUMN[$point_type] ?? [];
-				$aggregated_column = self::METRICS_AGGREGATED_COLUMN[$point_type] ?? [];
-				$condition_column = self::METRICS_CONDITIONS_COLUMN[$point_type] ?? [];
-				break;
-
-			case self::SIGNAL_TYPE_LOGS:
-				$columns_column = self::LOGS_COLUMNS_COLUMN;
-				$aggregated_column = self::LOGS_AGGREGATED_COLUMN;
-				$condition_column = self::LOGS_CONDITIONS_COLUMN;
-				break;
-
-			default:
-				$columns_column = [];
-				$aggregated_column = [];
-				$condition_column = [];
-				break;
-		}
-
+	private static function getQueryFieldValidationRules(): array {
 		$condition_fields = [
-			'column' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $condition_column)],
+			'column' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'attribute_key' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
@@ -475,7 +498,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 											['else' => true, 'type' => API_INT32, 'in' => self::METRICS_POINT_SUM, 'default' => self::METRICS_POINT_SUM]
 			]],
 			'columns' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [
-				'column' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
+				'column' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'attribute_key' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
@@ -484,7 +507,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'aggregated_columns' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
 				'function' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 				'column' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
+												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'parameters' =>				['type' => API_MULTIPLE, 'rules' => [

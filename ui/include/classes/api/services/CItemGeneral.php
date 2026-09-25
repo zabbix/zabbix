@@ -320,12 +320,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
-					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit', 'query']));
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
 				}
 
-				$api_input_rules['fields'] += $item_type::getUpdateValidationRules(
-					$item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? $item : $db_item
-				);
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
 			}
 
 			$api_input_rules['fields'] += CItemType::getDefaultValidationRules();
@@ -407,7 +405,8 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('query', $item)) {
-					if (!$item_type::validateAggregatedColumns($item, $path, $error)
+					if (!$item_type::validateColumns($item, $path, $error)
+							|| !$item_type::validateAggregatedColumns($item, $path, $error)
 							|| !$item_type::validateFilter($item, $path, $error)
 							|| !$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);

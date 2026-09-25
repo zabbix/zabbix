@@ -453,8 +453,7 @@ class CSettings extends CApiService {
 
 		$url_scheme = parse_url($apm_global_db['url'], PHP_URL_SCHEME);
 
-		$is_url_scheme_https = is_string($url_scheme)
-			&& strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
+		$is_url_scheme_https = strcasecmp($url_scheme, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS) == 0;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'username' =>			$apm_global_db['authentication_type'] == APM_GLOBAL_DB_AUTHTYPE_PASSWORD
@@ -487,10 +486,6 @@ class CSettings extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $apm_global_db, '/apm_global_db', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$apm_global_db += $apm_global_db['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED
-			? ['ssl_verify_host' => $db_apm_global_db['ssl_verify_host']]
-			: ['ssl_verify_host' => $apm_global_db_default['ssl_verify_host']];
 	}
 
 	private static function validateNotConfiguredApmGlobalDb(array &$apm_global_db):void {
@@ -539,6 +534,10 @@ class CSettings extends CApiService {
 			$settings['apm_global_db'] +=
 				array_intersect_key($apm_global_db_defaults, array_flip(['username', 'password']));
 		}
+
+		$settings['apm_global_db'] += $settings['apm_global_db']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED
+			? ['ssl_verify_host' => $db_settings['apm_global_db']['ssl_verify_host']]
+			: ['ssl_verify_host' => $apm_global_db_defaults['ssl_verify_host']];
 
 		$apm_global_db = json_encode(array_merge($db_settings['apm_global_db'], $settings['apm_global_db']),
 			JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES

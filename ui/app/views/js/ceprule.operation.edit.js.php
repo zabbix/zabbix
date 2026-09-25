@@ -454,6 +454,15 @@ window.ceprule_operation_edit_popup = new class {
 			trigger_element
 		});
 
+		overlay.$dialogue.$head.$close_button.show();
+		overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+			for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
+				form.dispatchEvent(new CustomEvent('form.destroyed'));
+			}
+		});
+		overlay.recoverFocus();
+		overlay.containFocus();
+
 		const rules = this.#operation_conditon_rules;
 
 		ceprule_operation_condition_edit_popup.init({rules, condition, overlay, execute_when, used_property_types});
