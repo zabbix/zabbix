@@ -36,10 +36,10 @@ zbx_add_post_js($tags->getPostJS());
 	->addItem((new CLabel(_('Time window'), 'ceprule-window-type'))
 		->addItem(makeHelpIcon([
 			_("None - there will be no time window specific processing.").PHP_EOL,
-			_("Simple - set up time window based event eviction operations.").PHP_EOL,
-			_("Cause and symptom grouping - first event from the window (fixed) will be treated as cause other symptoms.").PHP_EOL,
-			_("Tag correlation - map past and current window events using tags.").PHP_EOL,
-			_("Pattern match - execute JavaScript to identify event patterns.")
+			_("Simple (multiple) - sets up sliding time window based event eviction operations.").PHP_EOL,
+			_("Simple (once) - same as 'Simple (multiple)', but runs only once to process past and current window events.").PHP_EOL,
+			_("Cause and symptom grouping - first event from the fixed time window will be treated as cause other symptoms.").PHP_EOL,
+			_("Event pattern match - executes JavaScript to identify event patterns in sliding time window.")
 		]))
 	)
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
