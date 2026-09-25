@@ -478,14 +478,13 @@ class CIntegrationTest extends CAPITest {
 	 * Checks absence of pid file after kill.
 	 *
 	 * @param string $component    component name
-	 *
 	 */
-	private static function checkPidKilled($component) {
+	private static function waitComponentStopped($component) {
 		$usleep_total = 0;
 
 		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
 			if (!file_exists(self::getPidPath($component))) {
-				return true;
+				return;
 			}
 
 			if ($usleep_total < 1000000) {
@@ -497,43 +496,34 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
-
-		return false;
 	}
 
 	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component
-	 * @param array  $child_pids
+	 * @param array  $pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component, array $child_pids) {
+	protected static function waitForShutdown($component, array $pids) {
 		$start = microtime(true);
-		if (!self::checkPidKilled($component)) {
-			$pid = @file_get_contents(self::getPidPath($component));
-
-			if ($pid !== false && is_numeric($pid)) {
-				$child_pids[] = $pid;
-			}
-		}
+		self::waitComponentStopped($component);
 
 		$failed_pids = [];
 		$failed_kills = [];
 
-		foreach ($child_pids as $child_pid) {
-			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-				if (!posix_kill($child_pid, SIGKILL)) {
+		foreach ($pids as $pid) {
+			if (ctype_digit($pid) && posix_kill($pid, 0)) {
+				if (!posix_kill($pid, SIGKILL)) {
 					$error_code = posix_get_last_error();
-					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
+					$failed_kills[] = ' - '.$pid.' ('.$error_code.') '.posix_strerror($error_code);
 				}
-				$failed_pids[] = $child_pid;
+				$failed_pids[] = $pid;
 			}
 		}
 
 		if (!$failed_pids) {
-
 			if (static::$trace_delays) {
 				self::recordDelay('shutdown', microtime(true) - $start);
 			}
@@ -764,18 +754,19 @@ class CIntegrationTest extends CAPITest {
 	protected static function stopComponent($component) {
 		self::validateComponent($component);
 
-		$child_pids = [];
+		$pids = [];
 		$pid = @file_get_contents(self::getPidPath($component));
 
 		if ($pid !== false && is_numeric($pid)) {
 			$output = shell_exec('pgrep -P '.$pid);
 			if ($output !== false && $output !== null) {
-				$child_pids = explode("\n", trim($output));
+				$pids = explode("\n", trim($output));
 			}
+			$pids[] = $pid;
 
 			posix_kill($pid, SIGTERM);
 		}
-		self::waitForShutdown($component, $child_pids);
+		self::waitForShutdown($component, $pids);
 	}
 
 	/**
