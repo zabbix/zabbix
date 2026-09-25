@@ -185,7 +185,8 @@ func main() {
 		WithSyslogName("zabbix_web_service").
 		WithFileSize(options.LogFileSize)
 
-	if err := log.Open(logOptions); err != nil {
+	err := log.Open(logOptions)
+	if err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
@@ -194,7 +195,7 @@ func main() {
 
 	log.Infof("starting Zabbix web service")
 
-	err := run(ctx)
+	err = run(ctx)
 	if err != nil {
 		fatalExit("failed to start", err)
 	}
