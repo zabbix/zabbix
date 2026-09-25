@@ -372,11 +372,11 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Checks absence of pid file after kill.
 	 *
-	 * @param string $component    component name
+	 * @param string $parent_pid
 	 */
-	private static function waitComponentStopped($component) {
+	private static function waitComponentStopped($parent_pid) {
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			if (!file_exists(self::getPidPath($component))) {
+			if (!posix_kill($parent_pid, 0)) {
 				return;
 			}
 
@@ -388,23 +388,24 @@ class CIntegrationTest extends CAPITest {
 	 * Wait for component to stop.
 	 *
 	 * @param string $component
-	 * @param array  $pids
+	 * @param string $parent_pid
+	 * @param array  $child_pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component, array $pids) {
-		self::waitComponentStopped($component);
+	protected static function waitForShutdown(string $component, string $parent_pid, array $child_pids) {
+		self::waitComponentStopped($parent_pid);
 
 		$failed_pids = [];
 		$failed_kills = [];
 
-		foreach ($pids as $pid) {
-			if (ctype_digit($pid) && posix_kill($pid, 0)) {
-				if (!posix_kill($pid, SIGKILL)) {
+		foreach ($child_pids as $child_pid) {
+			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+				if (!posix_kill($child_pid, SIGKILL)) {
 					$error_code = posix_get_last_error();
-					$failed_kills[] = ' - '.$pid.' ('.$error_code.') '.posix_strerror($error_code);
+					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
 				}
-				$failed_pids[] = $pid;
+				$failed_pids[] = $child_pid;
 			}
 		}
 
@@ -607,19 +608,19 @@ class CIntegrationTest extends CAPITest {
 	protected static function stopComponent($component) {
 		self::validateComponent($component);
 
-		$pids = [];
-		$pid = @file_get_contents(self::getPidPath($component));
+		$child_pids = [];
+		$parent_pid = @file_get_contents(self::getPidPath($component));
 
-		if ($pid !== false && is_numeric($pid)) {
-			$output = shell_exec('pgrep -P '.$pid);
+		if ($parent_pid !== false && is_numeric($parent_pid)) {
+			$output = shell_exec('pgrep -P '.$parent_pid);
 			if ($output !== false && $output !== null) {
-				$pids = explode("\n", trim($output));
+				$child_pids = explode("\n", trim($output));
 			}
-			$pids[] = $pid;
 
-			posix_kill($pid, SIGTERM);
+			posix_kill($parent_pid, SIGTERM);
+
+			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
-		self::waitForShutdown($component, $pids);
 	}
 
 	/**
