@@ -32,7 +32,7 @@ zabbix_export:
         2. Set the user name and password in host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       discovery_rules:
@@ -1812,11 +1812,13 @@ zabbix_export:
             label: 'Thread pools filter (exclude)'
             description: 'Filter to exclude discovered thread pools.'
         - macro: '{$GRIDGAIN.PASSWORD}'
-          value: '<secret>'
+          type: SECRET_TEXT
+          description: 'GridGain JMX password.'
           config:
             type: TEXT
             priority: '1'
             label: Password
+            description: 'GridGain JMX password.'
         - macro: '{$GRIDGAIN.PME.DURATION.MAX.HIGH}'
           value: '60000'
           description: 'The maximum PME duration in ms for high trigger expression.'
@@ -1859,10 +1861,12 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$GRIDGAIN.USER}'
           value: zabbix
+          description: 'GridGain JMX user.'
           config:
             type: TEXT
             priority: '2'
             label: Username
+            description: 'GridGain JMX user.'
       dashboards:
         - uuid: 407c505abde6457b88154f6d566190d8
           name: 'GridGain: Overview'

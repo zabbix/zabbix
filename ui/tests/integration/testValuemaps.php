@@ -66,6 +66,7 @@ class testValuemaps extends CIntegrationTest {
 			'key_' => self::ITEM_NAME,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'preprocessing' => [
 				[
 					'type' => ZBX_PREPROC_TRIM,

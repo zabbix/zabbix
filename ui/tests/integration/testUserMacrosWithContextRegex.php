@@ -183,21 +183,24 @@ class testUserMacrosWithContextRegex extends CIntegrationTest {
 				'name' => self::TRAPPER_ITEM_NAME_H,
 				'key_' => self::TRAPPER_ITEM_KEY_H,
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'hostid' => self::$templateId,
 				'name' => self::TRAPPER_ITEM_NAME_T1,
 				'key_' => self::TRAPPER_ITEM_KEY_T1,
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'hostid' => self::$hostId,
 				'name' => self::TRAPPER_ITEM_NAME_G,
 				'key_' => self::TRAPPER_ITEM_KEY_G,
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			// agent items
 			[

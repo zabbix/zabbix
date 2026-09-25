@@ -42,13 +42,13 @@ class CUser extends CApiService {
 	protected $sortColumns = ['userid', 'username'];
 
 	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout',
-		'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone',
-		'roleid', 'userdirectoryid', 'ts_provisioned', 'provisioned'
+		'lang', 'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock',
+		'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned', 'provisioned'
 	];
 
 	public const OWN_LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin',
-		'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page',
-		'timezone', 'roleid', 'provisioned'
+		'autologout', 'lang', 'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip',
+		'attempt_clock', 'rows_per_page', 'timezone', 'roleid', 'provisioned'
 	];
 
 	public const LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname'];
@@ -106,6 +106,7 @@ class CUser extends CApiService {
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'mediaids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'mediatypeids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'current' =>				['type' => API_BOOLEAN, 'default' => false],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -185,6 +186,10 @@ class CUser extends CApiService {
 			}
 		}
 
+		if ($options['current']) {
+			$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+		}
+
 		if ($options['filter'] !== null) {
 			if (array_key_exists('userid', $options['filter']) && $options['filter']['userid'] !== null
 					&& !$options['searchByAny']) {
@@ -195,6 +200,12 @@ class CUser extends CApiService {
 
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
+			}
+
+			if (array_key_exists('default_maintenance_period', $options['filter'])
+					&& $options['filter']['default_maintenance_period'] !== null) {
+				$options['filter']['default_maintenance_period'] =
+					getTimeUnitFilters($options['filter']['default_maintenance_period']);
 			}
 
 			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
@@ -424,23 +435,24 @@ class CUser extends CApiService {
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username']], 'fields' => [
-			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
-			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
-			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'roleid' =>			['type' => API_ID],
-			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'username' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>						['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'passwd' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'url' =>						['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
+			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
+			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
+			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
+			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
+			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>					['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>						['type' => API_ID],
+			'usrgrps' =>					['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
+				'usrgrpid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>			['type' => API_ANY]
+			'medias' =>						['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -476,11 +488,14 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users);
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
+		self::checkRedirectUrlEnforce($users);
 
 		self::checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
 		self::checkMediaTypes($users, $db_mediatypes);
 		self::checkMediaRecipients($users, $db_mediatypes);
+
+		self::normalizeDefaultMaintenancePeriod($users);
 	}
 
 	private static function canEditMedia(array $users, bool $is_update = false): void {
@@ -537,25 +552,26 @@ class CUser extends CApiService {
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['username']], 'fields' => [
-			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
-			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'current_passwd' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
-			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
-			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'roleid' =>			['type' => API_ID],
-			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'userid' =>						['type' => API_ID, 'flags' => API_REQUIRED],
+			'username' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>						['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'current_passwd' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'passwd' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
+			'url' =>						['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('users', 'url')],
+			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
+			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
+			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
+			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
+			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>					['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>						['type' => API_ID],
+			'usrgrps' =>					['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
+				'usrgrpid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>			['type' => API_ANY]
+			'medias' =>						['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -584,7 +600,8 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid', 'userdirectoryid'
+				'default_maintenance_period', 'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid',
+				'userdirectoryid'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -698,6 +715,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users, $db_users);
 		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
+		self::checkRedirectUrlEnforce($users, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
 
@@ -714,6 +732,8 @@ class CUser extends CApiService {
 		self::checkEmptyPassword($users, $db_user_groups, $db_users);
 		self::checkMediaTypes($users, $db_mediatypes);
 		self::checkMediaRecipients($users, $db_mediatypes);
+
+		self::normalizeDefaultMaintenancePeriod($users);
 	}
 
 	private static function getMediaValidationFields(bool $is_update = false): array {
@@ -1217,6 +1237,7 @@ class CUser extends CApiService {
 		}
 
 		$email_validator = new CEmailValidator();
+		$push_notification_recipient_validator = new CPushNotificationRecipientValidator();
 		$length = DB::getFieldLength('media', 'sendto');
 
 		foreach ($users as $i1 => $user) {
@@ -1229,36 +1250,68 @@ class CUser extends CApiService {
 					continue;
 				}
 
-				if ($db_media_types[$media['mediatypeid']]['type'] != MEDIA_TYPE_EMAIL && count($media['sendto']) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('a character string is expected')
-					));
-				}
+				$type = $db_media_types[$media['mediatypeid']]['type'];
+				$base_path = '/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto';
 
-				if ($db_media_types[$media['mediatypeid']]['type'] == MEDIA_TYPE_EMAIL) {
-					foreach ($media['sendto'] as $i3 => $email) {
-						if ($email === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1), _('cannot be empty')
-							));
+				if ($type == MEDIA_TYPE_EMAIL || $type == MEDIA_TYPE_PUSH) {
+					foreach ($media['sendto'] as $i3 => $sendto) {
+						$path = $base_path.'/'.($i3 + 1);
+
+						if ($sendto === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
+							);
 						}
 
-						if (!$email_validator->validate($email)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1),
-								_('an email address is expected')
-							));
+						if ($type == MEDIA_TYPE_EMAIL) {
+							if (!$email_validator->validate($sendto)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', $path, _('an email address is expected'))
+								);
+							}
+
+							continue;
+						}
+
+						// MEDIA_TYPE_PUSH
+						if (!$push_notification_recipient_validator->validate($sendto)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', $path,
+									$push_notification_recipient_validator->getError()
+								)
+							);
 						}
 					}
 				}
+				elseif (count($media['sendto']) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $base_path, _('a character string is expected'))
+					);
+				}
 
 				if (mb_strlen(implode("\n", $media['sendto'])) > $length) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('value is too long')
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $base_path, _('value is too long'))
+					);
 				}
 			}
 		}
+	}
+
+	private static function normalizeDefaultMaintenancePeriod(array &$users): void {
+		foreach ($users as &$user) {
+			if (!array_key_exists('default_maintenance_period', $user)) {
+				continue;
+			}
+
+			$period = timeUnitToSeconds($user['default_maintenance_period']);
+			$period_normalized = $period - $period % SEC_PER_MIN;
+
+			if ($period_normalized != $period) {
+				$user['default_maintenance_period'] = $period_normalized.'s';
+			}
+		}
+		unset($user);
 	}
 
 	/**
@@ -1360,6 +1413,33 @@ class CUser extends CApiService {
 			}
 		}
 		unset($user);
+	}
+
+	/**
+	 * @param array      $users
+	 * @param array|null $db_users
+	 */
+	private static function checkRedirectUrlEnforce(array $users, ?array $db_users = null): void {
+		foreach ($users as $i => $user) {
+			if (!array_key_exists('url', $user)) {
+				continue;
+			}
+
+			$roleid = null;
+
+			if (array_key_exists('roleid', $user)) {
+				$roleid = $user['roleid'];
+			}
+			elseif ($db_users !== null) {
+				$roleid = $db_users[$user['userid']]['roleid'];
+			}
+
+			if ($roleid !== null && CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $roleid)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/url',
+					_s('you do not have permission to update the parameter while redirect url is enforced by role rule')
+				));
+			}
+		}
 	}
 
 	/**
@@ -1650,13 +1730,14 @@ class CUser extends CApiService {
 	private static function createUserUgSets(array $ugsets): void {
 		$ins_user_ugsets = [];
 
-		$options = [
-			'output' => ['ugsetid', 'hash'],
-			'filter' => ['hash' => array_keys($ugsets)]
-		];
-		$result = DBselect(DB::makeSql('ugset', $options));
+		$resource = DBselect(
+			'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+			' FROM ugset us'.
+			' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+			' GROUP BY us.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($ugsets[$row['hash']]['userids'] as $userid) {
 				$ins_user_ugsets[] = [
 					'userid' => $userid,
@@ -1687,8 +1768,7 @@ class CUser extends CApiService {
 		$ins_user_ugsets = [];
 		$upd_user_ugsets = [];
 
-		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
-		$db_ugsetids = array_flip($db_user_ugsetids);
+		$db_userids = self::getDbUserIdsWithUgsets($ugsets);
 
 		$empty_ugset_hash = self::getUgSetHash([]);
 
@@ -1698,19 +1778,20 @@ class CUser extends CApiService {
 		}
 
 		if ($ugsets) {
-			$options = [
-				'output' => ['ugsetid', 'hash'],
-				'filter' => ['hash' => array_keys($ugsets)]
-			];
-			$result = DBselect(DB::makeSql('ugset', $options));
+			$result = DBselect(
+				'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+				' FROM ugset us'.
+				' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+				' GROUP BY us.hash'
+			);
 
 			while ($row = DBfetch($result)) {
 				$upd_userids = [];
 
 				foreach ($ugsets[$row['hash']]['userids'] as $userid) {
-					if (array_key_exists($userid, $db_user_ugsetids)) {
+					if (array_key_exists($userid, $db_userids)) {
 						$upd_userids[] = $userid;
-						unset($db_user_ugsetids[$userid]);
+						unset($db_userids[$userid]);
 					}
 					else {
 						$ins_user_ugsets[] = [
@@ -1725,10 +1806,6 @@ class CUser extends CApiService {
 						'values' => ['ugsetid' => $row['ugsetid']],
 						'where' => ['userid' => $upd_userids]
 					];
-
-					if (array_key_exists($row['ugsetid'], $db_ugsetids)) {
-						unset($db_ugsetids[$row['ugsetid']]);
-					}
 				}
 
 				unset($ugsets[$row['hash']]);
@@ -1741,9 +1818,9 @@ class CUser extends CApiService {
 					$upd_userids = [];
 
 					foreach ($ugset['userids'] as $userid) {
-						if (array_key_exists($userid, $db_user_ugsetids)) {
+						if (array_key_exists($userid, $db_userids)) {
 							$upd_userids[] = $userid;
-							unset($db_user_ugsetids[$userid]);
+							unset($db_userids[$userid]);
 						}
 						else {
 							$ins_user_ugsets[] = [
@@ -1770,32 +1847,20 @@ class CUser extends CApiService {
 				DB::insert('user_ugset', $ins_user_ugsets, false);
 			}
 		}
-
-		if ($db_ugsetids) {
-			self::deleteUnusedUgSets(array_keys($db_ugsetids));
-		}
 	}
 
-	private static function getDbUserUgSetIds(array $ugsets): array {
+	private static function getDbUserIdsWithUgsets(array $ugsets): array {
 		$userids = [];
 
 		foreach ($ugsets as $ugset) {
 			$userids = array_merge($userids, $ugset['userids']);
 		}
 
-		$options = [
-			'output' => ['userid', 'ugsetid'],
-			'userids' => $userids
-		];
-		$result = DBselect(DB::makeSql('user_ugset', $options));
-
-		$db_user_ugsetids = [];
-
-		while ($row = DBfetch($result)) {
-			$db_user_ugsetids[$row['userid']] = $row['ugsetid'];
-		}
-
-		return $db_user_ugsetids;
+		return DB::select('user_ugset', [
+			'output' => [],
+			'userids' => $userids,
+			'preservekeys' => true
+		]);
 	}
 
 	private static function createUgSets(array &$ugsets): void {
@@ -1929,20 +1994,6 @@ class CUser extends CApiService {
 		return $hgset_groupids;
 	}
 
-	private static function deleteUnusedUgSets(array $db_ugsetids): void {
-		$del_ugsetids = DBfetchColumn(DBselect(
-			'SELECT u.ugsetid'.
-			' FROM ugset u'.
-			' LEFT JOIN user_ugset uu ON u.ugsetid=uu.ugsetid'.
-			' WHERE '.dbConditionId('u.ugsetid', $db_ugsetids).
-				' AND uu.userid IS NULL'
-		), 'ugsetid');
-
-		if ($del_ugsetids) {
-			DB::delete('ugset', ['ugsetid' => $del_ugsetids]);
-		}
-	}
-
 	/**
 	 * @param array      $users
 	 * @param null|array $db_users
@@ -2022,7 +2073,6 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		self::deleteUgSets($db_users);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -2032,36 +2082,51 @@ class CUser extends CApiService {
 			'where' => ['userid' => $userids]
 		]);
 
-		$tokenids = DB::select('token', [
-			'output' => [],
+		$db_devices = DB::select('device', [
+			'output' => ['deviceid', 'userid', 'name', 'status'],
 			'filter' => ['userid' => $userids],
 			'preservekeys' => true
 		]);
-		CToken::deleteForce(array_keys($tokenids));
+
+		if ($db_devices) {
+			$devices = [];
+
+			foreach ($db_devices as $db_device) {
+				$devices[] = [
+					'deviceid' => $db_device['deviceid'],
+					'userid' => 0,
+					'status' => ZBX_DEVICE_STATUS_UNASSIGNED
+				];
+			}
+
+			CDevice::updateForce($devices, $db_devices);
+
+			$db_deviceids = array_keys($db_devices);
+
+			DB::delete('device_enrollment_token', ['deviceid' => $db_deviceids]);
+			DB::delete('device_key', ['deviceid' => $db_deviceids]);
+			DB::delete('token_device', ['deviceid' => $db_deviceids]);
+			DB::delete('token', [
+				'auth_scheme' => ZBX_AUTH_SCHEME_DPOP,
+				'userid' => $userids
+			]);
+		}
+
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'name'],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+
+		if ($db_tokens) {
+			CToken::deleteForce($db_tokens);
+		}
 
 		DB::delete('users', ['userid' => $userids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
-	}
-
-	private static function deleteUgSets(array $db_users): void {
-		$ugsets = [];
-		$ugset_hash = self::getUgSetHash([]);
-
-		foreach ($db_users as $db_user) {
-			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
-					&& $db_user['usrgrps']) {
-				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
-				$ugsets[$ugset_hash]['usrgrpids'] = [];
-				$ugsets[$ugset_hash]['userids'][] = $db_user['userid'];
-			}
-		}
-
-		if ($ugsets) {
-			self::updateUserUgSets($ugsets);
-		}
 	}
 
 	/**
@@ -2079,7 +2144,6 @@ class CUser extends CApiService {
 		$db_users = $this->get([
 			'output' => ['userid', 'username', 'roleid'],
 			'selectRole' => ['type'],
-			'selectUsrgrps' => ['usrgrpid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
@@ -2435,24 +2499,25 @@ class CUser extends CApiService {
 	}
 
 	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
-		$db_users = [];
-
-		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid', 'ts_provisioned'
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+			'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock',
+			'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned'
 		];
 
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
-				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username)).
+				' FOR UPDATE'
 			));
 		}
 
@@ -2936,34 +3001,11 @@ class CUser extends CApiService {
 			$userid = $db_session['userid'];
 		}
 		else {
-			$db_token = self::tokenAuthentication($session['token'], $time);
+			$db_token = self::tokenAuthentication($session['token'], ZBX_AUTH_SCHEME_BEARER, $time);
 			$userid = $db_token['userid'];
 		}
 
-		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid', 'ts_provisioned'
-		];
-
-		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
-
-		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
-
-		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
-				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
-				&& !$this->provisionLdapUser($db_user)) {
-			[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
-
-			self::addUserGroupFields($db_user, $group_status, $group_auth_type);
-		}
-
-		$db_user['auth_type'] =
-			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
-				? $group_auth_type
-				: ZBX_AUTH_LDAP;
-
-		self::addAdditionalFields($db_user);
-		self::setTimezone($db_user['timezone']);
+		$this->getAuthenticationUserData($userid, $db_user, $group_status);
 
 		if ($session['sessionid'] !== null) {
 			$autologout = timeUnitToSeconds($db_user['autologout']);
@@ -3014,19 +3056,116 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Authenticates user based on API token.
+	 * Checks if user is authenticated by API DPoP token.
 	 *
-	 * @param string $auth_token API token.
-	 * @param int    $time       Current time unix timestamp.
+	 * @param array  $params
+	 * @param string $params[]['token']                 API DPoP token to be checked.
+	 * @param string $params[]['signature']             DPoP header to be checked.
+	 * @param bool   $params[]['requested_api_method']  The API method that was called.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	private static function tokenAuthentication(string $auth_token, int $time): array {
+	public function checkAuthenticationDpop(array $params): array {
+		$time = time();
+
+		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);
+
+		$db_device = DBfetch(DBselect(
+			'SELECT d.deviceid,d.uuid'.
+			' FROM token_device td'.
+			' JOIN device d ON td.deviceid=d.deviceid'.
+				' AND '.dbConditionInt('d.status', [ZBX_DEVICE_STATUS_ACTIVATED]).
+			' WHERE '.dbConditionId('td.tokenid', [$db_token['tokenid']])
+		));
+
+		if (!$db_device) {
+			self::exception(
+				ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Device inactive.'
+			);
+		}
+
+		$resource = DBselect(
+			'SELECT dk.scope,dk.kid,dk.key_'.
+			' FROM device_key dk'.
+			' WHERE '.dbConditionId('dk.deviceid', [$db_device['deviceid']]).
+				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]).
+			' ORDER BY dk.device_keyid DESC'
+		);
+
+		$keys_per_scope = [];
+
+		while ($db_device_key = DBfetch($resource)) {
+			$keys_per_scope[$db_device_key['scope']][$db_device_key['kid']] = $db_device_key['key_'];
+		}
+
+		CApiDpopHelper::verifyDpopSignature($params['signature'],
+			$keys_per_scope[MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
+			$time
+		);
+
+		$this->getAuthenticationUserData($db_token['userid'], $db_user, $group_status);
+
+		if ($group_status == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'User group is disabled.');
+		}
+
+		$mobile_encryption_kid = array_key_first($keys_per_scope[MOBILE_KEY_SCOPE_ENCRYPTION]);
+		$mobile_encryption_key = $keys_per_scope[MOBILE_KEY_SCOPE_ENCRYPTION][$mobile_encryption_kid];
+
+		self::$userData = $db_user + [
+			'token' => $params['token'],
+			'uuid' => $db_device['uuid'],
+			'kid' => $mobile_encryption_kid,
+			'key' => $mobile_encryption_key
+		];
+
+		DB::update('token', [
+			'values' => ['lastaccess' => $time],
+			'where' => ['tokenid' => $db_token['tokenid']]
+		]);
+
+		unset($db_user['ugsetid']);
+
+		return $db_user;
+	}
+
+	private function getAuthenticationUserData(string $userid, ?array &$db_user, ?array &$group_status): void {
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+			'default_maintenance_period', 'refresh', 'theme', 'attempt_failed', 'attempt_ip',
+			'attempt_clock', 'rows_per_page', 'timezone', 'roleid', 'userdirectoryid', 'ts_provisioned'
+		];
+
+		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
+
+		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
+
+		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
+				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
+				&& !$this->provisionLdapUser($db_user)) {
+			[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
+
+			self::addUserGroupFields($db_user, $group_status, $group_auth_type);
+		}
+
+		$db_user['auth_type'] =
+			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
+				? $group_auth_type
+				: ZBX_AUTH_LDAP;
+
+		self::addAdditionalFields($db_user);
+		self::setTimezone($db_user['timezone']);
+	}
+
+	private static function tokenAuthentication(string $auth_token, int $auth_scheme, int $time): array {
 		$db_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
-			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+			'filter' => [
+				'token' => CApiTokenHelper::hashToken($auth_token),
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'auth_scheme' => $auth_scheme
+			]
 		]);
 
 		if (!$db_tokens) {
@@ -3034,7 +3173,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$db_token = $db_tokens[0];
+		$db_token = reset($db_tokens);
 
 		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
@@ -3398,19 +3537,19 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 
-		// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
+		// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL and MEDIA_TYPE_PUSH is returned as array.
 		if ($this->outputIsRequested('sendto', $options['selectMedias']) && $db_medias) {
-			$db_email_medias = DB::select('media_type', [
+			$db_mediatypes = DB::select('media_type', [
 				'output' => [],
 				'filter' => [
 					'mediatypeid' => array_unique(array_column($db_medias, 'mediatypeid')),
-					'type' => MEDIA_TYPE_EMAIL
+					'type' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_PUSH]
 				],
 				'preservekeys' => true
 			]);
 
 			foreach ($db_medias as &$db_media) {
-				if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
+				if (array_key_exists($db_media['mediatypeid'], $db_mediatypes)) {
 					$db_media['sendto'] = explode("\n", $db_media['sendto']);
 				}
 			}
@@ -3588,13 +3727,15 @@ class CUser extends CApiService {
 			return $medias;
 		}
 
-		$email_mediatypeids = [];
+		$db_mediatypes = [];
 		$mediatypeids = array_unique(array_column($medias, 'mediatypeid'));
 
 		if ($mediatypeids) {
-			$email_mediatypeids = DB::select('media_type', [
-				'output' => [],
-				'filter' => ['type' => MEDIA_TYPE_EMAIL],
+			$db_mediatypes = DB::select('media_type', [
+				'output' => ['type'],
+				'filter' => [
+					'type' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_PUSH]
+				],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => true
 			]);
@@ -3603,16 +3744,21 @@ class CUser extends CApiService {
 		$user_medias = [];
 
 		$email_validator = new CEmailValidator();
+		$sendto_validators = [
+			MEDIA_TYPE_EMAIL => fn($value) => $email_validator->validate($value),
+			MEDIA_TYPE_PUSH => static fn($value): bool => $value === '*'
+		];
 		$max_length = DB::getFieldLength('media', 'sendto');
 		$fields = array_flip(['mediatypeid', 'sendto', 'active', 'severity', 'period', 'userdirectory_mediaid']);
 
 		foreach ($medias as $media) {
 			$sendto = array_filter($media['sendto'], 'strlen');
 
-			if (array_key_exists($media['mediatypeid'], $email_mediatypeids)) {
-				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
+			if (array_key_exists($media['mediatypeid'], $db_mediatypes)) {
+				$type = $db_mediatypes[$media['mediatypeid']]['type'];
+				$sendto = array_filter($sendto, $sendto_validators[$type]);
 
-				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
+				while ($sendto && mb_strlen(implode("\n", $sendto)) > $max_length) {
 					array_pop($sendto);
 				}
 			}
@@ -3962,5 +4108,143 @@ class CUser extends CApiService {
 		}
 
 		return ['userids' => $userids];
+	}
+
+	public static function provisionPushMedia(string $userid, string $uuid): void {
+		$db_media_types = DB::select('media_type', [
+			'output' => ['name', 'status'],
+			'filter' => [
+				'type' => [MEDIA_TYPE_PUSH]
+			],
+			'preservekeys' => true
+		]);
+
+		if (!$db_media_types) {
+			return;
+		}
+
+		CArrayHelper::sort($db_media_types, [
+			['field' => 'status', 'order' => ZBX_SORT_UP],
+			['field' => 'name', 'order' => ZBX_SORT_UP]
+		]);
+
+		$preferred_mediatypeid = array_key_first($db_media_types);
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'roleid', 'username'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$db_user_medias = DB::select('media', [
+			'output' => ['mediaid', 'mediatypeid', 'sendto'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$users = [];
+
+		foreach ($db_users as &$db_user) {
+			$user = $db_user;
+
+			$db_user['medias'] = $db_user_medias;
+			$user['medias'] = array_values($db_user_medias);
+
+			$sendto_all = true;
+
+			foreach ($user['medias'] as &$media) {
+				$media['sendto'] = explode("\n", $media['sendto']);
+
+				if (bccomp($media['mediatypeid'], $preferred_mediatypeid) == 0) {
+					if (in_array('*', $media['sendto'])) {
+						return;
+					}
+
+					$sendto_all = false;
+				}
+			}
+			unset($media);
+
+			$user['medias'][] = [
+				'mediatypeid' => $preferred_mediatypeid,
+				'sendto' => $sendto_all ? ['*'] : [$uuid],
+				'active' => MEDIA_STATUS_ACTIVE
+			];
+
+			$users[] = $user;
+		}
+		unset($db_user, $user);
+
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
+
+		self::updateForce($users, $db_users);
+	}
+
+	public static function deprovisionPushMedia(string $userid, string $uuid): void {
+		$db_user_medias = DB::select('media', [
+			'output' => ['mediaid', 'mediatypeid', 'sendto'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$db_user_media_types = DB::select('media_type', [
+			'output' => [],
+			'filter' => [
+				'mediatypeid' => array_column($db_user_medias, 'mediatypeid'),
+				'type' => MEDIA_TYPE_PUSH
+			],
+			'preservekeys' => true
+		]);
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'roleid', 'username'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$db_devices_count = DB::select('device', [
+			'countOutput' => true,
+			'filter' => ['userid' => $userid, 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
+		]);
+
+		$users = [];
+		$media_keys_to_unset = [];
+
+		foreach ($db_users as &$db_user) {
+			$user = $db_user;
+			$user['medias'] = array_values($db_user_medias);
+
+			foreach ($user['medias'] as $key => &$user_media) {
+				$user_media['sendto'] = explode("\n", $user_media['sendto']);
+
+				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)) {
+					if ($db_devices_count == 1) {
+						$media_keys_to_unset[$key] = true;
+
+						continue;
+					}
+
+					$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
+
+					if (!$user_media['sendto']) {
+						$media_keys_to_unset[$key] = true;
+					}
+				}
+			}
+			unset($user_media);
+
+			$user['medias'] = array_diff_key($user['medias'], $media_keys_to_unset);
+
+			$users[] = $user;
+
+			$db_user['medias'] = $db_user_medias;
+		}
+		unset($db_user);
+
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
+
+		self::updateForce($users, $db_users);
 	}
 }

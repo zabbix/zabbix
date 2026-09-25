@@ -19,6 +19,7 @@
 #include "zbxfile.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxregexp.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"
@@ -38,6 +39,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 		int noexit, zbx_vector_str_t *env_vars);
 
 ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
+ZBX_VECTOR_IMPL(config_option, zbx_config_option_t)
 
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 {
@@ -926,4 +928,415 @@ fail:
 	zbx_vector_addr_ptr_destroy(&addrs);
 
 	return ret;
+}
+
+static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsigned short *port, char **error)
+{
+	char	*parsed = NULL, *host_start, *port_start, *host_tmp = NULL, *host_validate = NULL;
+	size_t	host_alloc = 0, host_offset = 0;
+	unsigned short	host_port;
+	int	ret = FAIL;
+
+	if (SUCCEED != zbx_iregexp_sub(url,
+			"^(https?)://(\\[[^]]+\\]|[^:/?#]+)(?::([0-9]+))?/rpc$",
+			"\\1\n\\2\n\\3", &parsed) || NULL == parsed)
+	{
+		goto fail;
+	}
+
+	if (0 == zbx_strncasecmp(parsed, "http\n", ZBX_CONST_STRLEN("http\n")))
+	{
+		*port = 80;
+		host_start = parsed + ZBX_CONST_STRLEN("http\n");
+	}
+	else if (0 == zbx_strncasecmp(parsed, "https\n", ZBX_CONST_STRLEN("https\n")))
+	{
+		*port = 443;
+		host_start = parsed + ZBX_CONST_STRLEN("https\n");
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
+	}
+
+	if (NULL == (port_start = strchr(host_start, '\n')))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
+	}
+
+	zbx_strncpy_alloc(host, &host_alloc, &host_offset, host_start, (size_t)(port_start - host_start));
+	port_start++;
+
+	host_tmp = zbx_strdup(NULL, *host);
+
+	if (SUCCEED != zbx_parse_serveractive_element(host_tmp, &host_validate, &host_port, 0))
+		goto fail;
+
+	if (FAIL == zbx_is_supported_ip(host_validate) &&
+			FAIL == zbx_is_rfc_extended_hostname(host_validate))
+		goto fail;
+
+	if ('\0' != *port_start && (SUCCEED != zbx_is_ushort(port_start, port) || 0 == *port))
+		goto fail;
+
+	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "invalid \"BridgeAdapterURL\" configuration parameter: %s", url);
+
+out:
+	zbx_free(parsed);
+	zbx_free(host_tmp);
+	zbx_free(host_validate);
+
+	return ret;
+}
+
+static int	bridge_adapter_validate_connect_to(const char *connect_to, char **error)
+{
+	char		*connect_to_tmp = NULL, *host = NULL;
+	unsigned short	port = 0;
+	int		ret = FAIL;
+
+	connect_to_tmp = zbx_strdup(NULL, connect_to);
+
+	if (SUCCEED != zbx_parse_serveractive_element(connect_to_tmp, &host, &port, 0) || 0 == port ||
+			(FAIL == zbx_is_supported_ip(host) && FAIL == zbx_is_rfc_extended_hostname(host)))
+	{
+		goto fail;
+	}
+
+	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "\"BridgeAdapterConnectTo\" must be in \"host:port\" format: %s",
+			connect_to);
+
+out:
+	zbx_free(connect_to_tmp);
+	zbx_free(host);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates BridgeAdapterURL configuration parameter                *
+ *                                                                            *
+ * Parameters: url   - [IN] BridgeAdapterURL value, must not be NULL          *
+ *             error - [OUT] error message, must not be NULL                  *
+ *                                                                            *
+ * Return value: SUCCEED - valid configuration parameter value                *
+ *               FAIL    - invalid configuration parameter value              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error)
+{
+	char		*host = NULL;
+	unsigned short	port;
+	int		ret;
+
+	ret = bridge_adapter_parse_url_hostport(url, &host, &port, error);
+
+	zbx_free(host);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepares CURLOPT_CONNECT_TO value that redirects the              *
+ *          BridgeAdapterURL host:port to BridgeAdapterConnectTo              *
+ *                                                                            *
+ * Parameters: url             - [IN] BridgeAdapterURL value, must not be     *
+ *                                    NULL                                    *
+ *             connect_to      - [IN] BridgeAdapterConnectTo value            *
+ *             curl_connect_to - [OUT] allocated "host:port:connect-to"       *
+ *                                     string in curl CONNECT_TO format       *
+ *             error           - [OUT] error message, must not be NULL        *
+ *                                                                            *
+ * Return value: SUCCEED - value prepared successfully                        *
+ *               FAIL    - url or connect_to is invalid                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *connect_to, char **curl_connect_to,
+		char **error)
+{
+	char			*url_host = NULL;
+	size_t			curl_connect_to_alloc = 0, curl_connect_to_offset = 0;
+	unsigned short		url_port;
+	int			ret = FAIL;
+
+	if (SUCCEED != bridge_adapter_parse_url_hostport(url, &url_host, &url_port, error))
+		goto out;
+
+	if (SUCCEED != bridge_adapter_validate_connect_to(connect_to, error))
+		goto out;
+
+	zbx_snprintf_alloc(curl_connect_to, &curl_connect_to_alloc, &curl_connect_to_offset, "%s:%hu:%s",
+			url_host, url_port, connect_to);
+
+	ret = SUCCEED;
+out:
+	zbx_free(url_host);
+
+	return ret;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: create a config option with name and string value                  *
+ *                                                                             *
+ * Parameters: name  - [IN] option name                                        *
+ *             value - [IN] option value                                       *
+ *                                                                             *
+ * Return value: The created option.                                           *
+ *                                                                             *
+ *******************************************************************************/
+zbx_config_option_t	zbx_config_option_str(const char *name, const char *value)
+{
+	zbx_config_option_t	option;
+
+	option.name = zbx_strdup(NULL, name);
+	option.value = zbx_strdup(NULL, value);
+
+	return option;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: create a config option with name and integer value                 *
+ *                                                                             *
+ * Parameters: name  - [IN] option name                                        *
+ *             value - [IN] option value                                       *
+ *                                                                             *
+ * Return value: The created option.                                           *
+ *                                                                             *
+ *******************************************************************************/
+zbx_config_option_t	zbx_config_option_int(const char *name, int value)
+{
+	zbx_config_option_t	option;
+
+	option.name = zbx_strdup(NULL, name);
+	option.value = zbx_dsprintf(NULL, "%d", value);
+
+	return option;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieve specified option value                                    *
+ *                                                                             *
+ * Parameters: options     - [IN] array of config options                      *
+ *             options_num - [IN] number of options in the array               *
+ *             name        - [IN] name of the option to retrieve               *
+ *                                                                             *
+ * Return value: The value of the specified option or NULL if not found        *
+ *                                                                             *
+ *******************************************************************************/
+const char	*zbx_config_option_value(const zbx_config_option_t *options, int options_num, const char *name)
+{
+	for (int i = 0; i < options_num; i++)
+	{
+		if (0 == strcmp(options[i].name, name))
+			return options[i].value;
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse a parameter from the given text                             *
+ *                                                                            *
+ * Parameters: text - [IN] string to parse                                    *
+ *                                                                            *
+ * Return value: number of characters in the parsed parameter                 *
+ *                                                                            *
+ * Comments: Only alphanumeric, _, -, . characters are accepted               *
+ *                                                                            *
+ ******************************************************************************/
+ssize_t	zbx_config_option_parse_param(const char *text)
+{
+	const char	*ptr;
+
+	for (ptr = text; '\0' != *ptr; ptr++)
+	{
+		if (0 == isalnum((int)*ptr) && '_' != *ptr && '-' != *ptr && '.' != *ptr)
+			break;
+	}
+
+	return ptr - text;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse unquoted value from given text                              *
+ *                                                                            *
+ * Parameters: text - [IN] string to parse                                    *
+ *                                                                            *
+ * Return value: number of characters in the parsed value                     *
+ *                                                                            *
+ * Comments: parsing stops at control characters or delimiters (', ", space)  *
+ *                                                                            *
+ ******************************************************************************/
+static ssize_t	config_option_parse_value(const char *text)
+{
+	const char	*ptr;
+	const char	*delims = "'\" ,";
+
+	for (ptr = text; '\0' != *ptr; ptr++)
+	{
+		if (0 != iscntrl((int)*ptr) || NULL != strchr(delims, *ptr))
+			break;
+	}
+
+	return ptr - text;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse quoted value from given text                                *
+ *                                                                            *
+ * Parameters: text - [IN] string to parse                                    *
+ *                                                                            *
+ * Return value: number of characters in the parsed value including quotes    *
+ *               FAIL if parsing fails                                        *
+ *                                                                            *
+ ******************************************************************************/
+static ssize_t	config_option_parse_quoted_value(const char *text)
+{
+	const char	*ptr;
+
+	for (ptr = text + 1; '\0' != *ptr; ptr++)
+	{
+		if ('\\' == *ptr)
+		{
+			if ('"' == *(ptr + 1) || '\\' == *(ptr + 1))
+				ptr++;
+			else
+				return FAIL;
+		}
+		else if ('"' == *ptr)
+			return ptr - text + 1;
+	}
+
+	return FAIL;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: parse config options from a string                                 *
+ *                                                                             *
+ * Parameters: text    - [IN] string containing options in "key=value" format  *
+ *             options - [OUT] vector to store parsed options                  *
+ *             error   - [OUT] error message                                   *
+ *                                                                             *
+ * Return value: SUCCEED - options were parsed successfully                    *
+ *               FAIL    - otherwise                                           *
+ *                                                                             *
+ *                                                                             *
+ * Comments: Options are expected to be in the format:                         *
+ *           "key1=value1,key2=value2,..."                                     *
+ *           Spaces around commas are ignored.                                 *
+ *                                                                             *
+ ******************************************************************************/
+int	zbx_config_option_parse_options(const char *text, zbx_vector_config_option_t *options, char **error)
+{
+	int	ret = FAIL;
+
+	for (const char *ptr = text;;)
+	{
+		ssize_t			key_len, value_len;
+		const char		*key;
+		zbx_config_option_t	option;
+
+		key_len = zbx_config_option_parse_param(ptr);
+		if (0 == key_len || '\0' == ptr[key_len])
+		{
+			*error = zbx_dsprintf(NULL, "invalid option starting with \"%s\"", ptr);
+			goto out;
+		}
+
+		key = ptr;
+		ptr += key_len;
+		while (' ' == *ptr)
+			ptr++;
+
+		if ('=' != *ptr)
+		{
+			*error = zbx_dsprintf(NULL, "invalid option starting with \"%s\"", key);
+			goto out;
+		}
+
+		while (' ' == *++ptr)
+			;
+
+		if ('"' != *ptr)
+			value_len = config_option_parse_value(ptr);
+		else
+			value_len = config_option_parse_quoted_value(ptr);
+
+		if (FAIL == value_len)
+		{
+			*error = zbx_dsprintf(NULL, "invalid option value starting with \"%s\"", ptr);
+			goto out;
+		}
+
+		if (FAIL == zbx_str_extract(key, key_len, &option.name))
+		{
+			*error = zbx_dsprintf(NULL, "invalid option name starting with \"%s\"", key);
+			goto out;
+		}
+
+		if (FAIL == zbx_str_extract(ptr, value_len, &option.value))
+		{
+			zbx_free(option.name);
+			*error = zbx_dsprintf(NULL, "invalid option value starting with \"%s\"", ptr);
+			goto out;
+		}
+
+		zbx_vector_config_option_append(options, option);
+
+		ptr += value_len;
+		while (' ' == *ptr)
+			ptr++;
+
+		if ('\0' == *ptr)
+			break;
+
+		if (',' != *ptr)
+		{
+			*error = zbx_dsprintf(NULL, "invalid option name starting with \"%s\"", ptr);
+			goto out;
+		}
+
+		ptr++;
+
+		while (' ' == *ptr)
+			ptr++;
+	}
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		zbx_config_option_clear_options(options->values, options->values_num);
+		zbx_vector_config_option_clear(options);
+	}
+
+	return ret;
+}
+
+void	zbx_config_option_clear_options(zbx_config_option_t *options, int options_num)
+{
+	for (int i = 0; i < options_num; i++)
+	{
+		zbx_free(options[i].name);
+		zbx_free(options[i].value);
+	}
 }

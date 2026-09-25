@@ -1,0 +1,27 @@
+.inline-list {
+	display: inline-flex;
+	gap: 6px;
+
+	.checkbox-radio {
+		position: initial;
+		margin: 4px 4px 4px 0;
+		vertical-align: top;
+
+		& + label {
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+			margin: 4px 4px 4px -20px;
+			vertical-align: top;
+
+			span {
+				margin: 0;
+			}
+		}
+	}
+
+	input[type="text"] {
+		padding: 4px 5px;
+		line-height: 14px;
+	}
+}

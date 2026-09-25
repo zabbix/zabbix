@@ -16,80 +16,84 @@
 
 class CControllerScheduledReportCreate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'userid' =>			'required|db report.userid',
-			'name' =>			'required|db report.name|not_empty',
-			'dashboardid' =>	'required|db report.dashboardid',
-			'period' =>			'db report.period|in '.implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]),
-			'cycle' =>			'db report.cycle|in '.implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]),
-			'weekdays' =>		'array',
-			'hours' =>			'int32|ge 0|le 23',
-			'minutes' =>		'int32|ge 0|le 59',
-			'active_since' =>	'string',
-			'active_till' =>	'string',
-			'subject' =>		'string',
-			'message' =>		'string',
-			'subscriptions' =>	'array',
-			'description' =>	'db report.description',
-			'status' =>			'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
-			'form_refresh' =>	'int32'
-		];
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
 
-		$ret = $this->validateInput($fields);
-		$result = $this->getValidationResult();
-
-		if ($ret && !$this->validateWeekdays()) {
-			$result = self::VALIDATION_ERROR;
-			$ret = false;
-		}
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($result) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot create scheduled report'));
-					$this->setResponse($response);
-					break;
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create scheduled report'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
 	}
 
-	/**
-	 * Validate days of the week.
-	 *
-	 * @return bool
-	 */
-	private function validateWeekdays(): bool {
-		$cycle = $this->getInput('cycle', ZBX_REPORT_CYCLE_DAILY);
-		$weekdays = array_sum($this->getInput('weekdays', []));
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['report.get', ['name' => '{name}']]
+		];
 
-		if ($cycle == ZBX_REPORT_CYCLE_WEEKLY && $weekdays == 0) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Repeat on'),
-				_('at least one day of the week must be selected'))
-			);
-
-			return false;
-		}
-
-		return true;
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'userid' => ['db report.userid', 'required'],
+			'name' => ['db report.name', 'required', 'not_empty'],
+			'dashboardid' => ['db report.dashboardid', 'required'],
+			'period' => ['db report.period', 'required', 'in' => [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]],
+			'cycle' => ['db report.cycle', 'required', 'in' => [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]],
+			'weekdays' => ['array', 'required', 'not_empty', 'field' => ['integer'],
+				'when' => ['cycle', 'in' => [ZBX_REPORT_CYCLE_WEEKLY]],
+				'messages' => [
+					'type' => _s('Incorrect value for field "%1$s": %2$s.', _('Repeat on'), _('at least one day of the week must be selected')),
+					'not_empty' => _s('Incorrect value for field "%1$s": %2$s.', _('Repeat on'), _('at least one day of the week must be selected'))
+				]
+			],
+			'hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
+			'minutes' => ['integer', 'required', 'min' => 0, 'max' => 59],
+			'active_since' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'regex' => '/^(\\d\\d\\d\\d-\\d\\d-\\d\\d)?$/',
+				'messages' => ['regex' => _('Invalid date.')]
+			],
+			'active_till' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'regex' => '/^(\\d\\d\\d\\d-\\d\\d-\\d\\d)?$/',
+				'messages' => ['regex' => _('Invalid date.')]
+			],
+			'subject' => ['string'],
+			'message' => ['string'],
+			'subscriptions' => ['objects', 'required', 'not_empty', 'fields' => [
+				'recipient_type' => ['integer', 'required', 'in' => [ZBX_REPORT_RECIPIENT_TYPE_USER, ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP]],
+				'recipientid' => [
+					['db users.userid', 'required', 'when' => ['recipient_type', 'in' => [ZBX_REPORT_RECIPIENT_TYPE_USER]]],
+					['db usrgrp.usrgrpid', 'required', 'when' => ['recipient_type', 'in' => [ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP]]]
+				],
+				'creatorid' => ['db users.userid', 'required'],
+				'exclude' => ['integer', 'required',
+					'in' => [ZBX_REPORT_EXCLUDE_USER_FALSE, ZBX_REPORT_EXCLUDE_USER_TRUE],
+					'when' => ['recipient_type', 'in' => [ZBX_REPORT_RECIPIENT_TYPE_USER]]
+				]
+			]],
+			'description' => ['db report.description'],
+			'status' => ['db report.status', 'in' => [ZBX_REPORT_STATUS_DISABLED, ZBX_REPORT_STATUS_ENABLED]]
+		]];
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
 			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$report = [];
 
 		$this->getInputs($report, ['userid', 'name', 'dashboardid', 'period', 'cycle', 'subject', 'message',
@@ -130,23 +134,22 @@ class CControllerScheduledReportCreate extends CController {
 
 		$result = API::Report()->create($report);
 
+		$output = [];
+
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'scheduledreport.list')
-					->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Scheduled report added'));
+			$output['success']['title'] = _('Scheduled report added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add scheduled report'));
+			$output['error'] = [
+				'title' => _('Cannot add scheduled report'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

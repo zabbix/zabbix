@@ -38,7 +38,6 @@ $form_grid = (new CFormGrid())
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
-						->setAttribute('autofocus', 'autofocus')
 				)
 			])
 			->addItem([
@@ -131,6 +130,16 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem([
+				(new CLabel(_('Telemetry query'), 'timeout_telemetry_query'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('timeout_telemetry_query', $data['timeout_telemetry_query'], false,
+						CSettingsSchema::getFieldLength('timeout_telemetry_query')
+					))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				)
+			])
 	)
 	->addItem(
 		(new CFormFieldset(_('Network timeouts for UI')))
@@ -194,6 +203,19 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem(array_key_exists('device_link_timeout', $data)
+				? [
+					(new CLabel(_('Device link'), 'device_link_timeout'))->setAsteriskMark(),
+					new CFormField(
+						(new CTextBox('device_link_timeout', $data['device_link_timeout'], false,
+							CSettingsSchema::getFieldLength('device_link_timeout')
+						))
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							->setAriaRequired()
+					)
+				]
+				: null
+			)
 	)
 	->addItem(
 		new CFormActions(

@@ -15,9 +15,12 @@
 #include "anomalystl.h"
 #include "eval.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxnum.h"
 #include "zbxeval.h"
 #include "zbxalgo.h"
+#include "zbxhistory.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)

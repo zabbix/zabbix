@@ -154,6 +154,16 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 	switch ($column['display']) {
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as $threshold) {
+					if ($value < $threshold['threshold']) {
+						break;
+					}
+
+					$color = $threshold['color'];
+				}
+			}
+
 			$style = $color !== '' ? 'background-color: #'.$color : null;
 			$value_cell->addStyle($style);
 

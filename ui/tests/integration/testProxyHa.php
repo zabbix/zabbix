@@ -651,7 +651,8 @@ HEREDOC;
 				'key_' => 'trap',
 				'type' => ITEM_TYPE_TRAPPER,
 				'hostid' => $hostid_trapper,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -674,12 +675,14 @@ HEREDOC;
 		$pg_logline = 'proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
-		$this->sendSenderValue('host3', 'trap', 333);
+		$ts = time();
+		$this->sendSenderValue('host3', 'trap', 333, null, null, $ts);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'history' => ITEM_VALUE_TYPE_UINT64,
 			'itemids' => [$itemid],
+			'time_from' => $ts,
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'limit' => 1
@@ -709,12 +712,13 @@ HEREDOC;
 		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 120, 1, true);
 
-		$this->sendSenderValue('host3', 'trap', 1000, self::COMPONENT_PROXY);
+		$this->sendSenderValue('host3', 'trap', 1000, self::COMPONENT_PROXY, null, $ts + 1);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'history' => ITEM_VALUE_TYPE_UINT64,
-			'itemids' => [$itemid]
+			'itemids' => [$itemid],
+			'time_from' => $ts
 		], 60, 2);
 
 		$this->assertCount(2, $response['result'], json_encode($response['result']));

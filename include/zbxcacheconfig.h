@@ -19,10 +19,11 @@
 #include "zbxcomms.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
+#include "zbxtelemetry.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
-#include "zbxtagfilter.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
 #include "zbxtypes_ext.h"
@@ -40,7 +41,8 @@
 #define	ZBX_POLLER_TYPE_SNMP		9
 #define ZBX_POLLER_TYPE_INTERNAL	10
 #define ZBX_POLLER_TYPE_BROWSER		11
-#define	ZBX_POLLER_TYPE_COUNT		12	/* number of poller types */
+#define ZBX_POLLER_TYPE_TELEMETRY_QUERY	12
+#define	ZBX_POLLER_TYPE_COUNT		13	/* number of poller types */
 
 typedef enum
 {
@@ -207,6 +209,14 @@ typedef struct
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	char			*query;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
+	zbx_tq_query_t		*telemetry_query;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -291,15 +301,56 @@ typedef struct
 }
 zbx_dc_httpagent_item_t;
 
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	char			host_host[ZBX_HOSTNAME_BUF_LEN];
+	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key_orig, *key;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	char			*query;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
+	zbx_tq_query_t		*telemetry_query;
+	time_t			lasttimestamp;
+	zbx_timespec_t		min_free_ts;
+	unsigned char		preprocessing;
+}
+zbx_dc_telemetry_query_item_t;
+
 typedef union
 {
-	zbx_dc_agent_item_t	*agent_items;
-	zbx_dc_snmp_item_t	*snmp_items;
-	zbx_dc_httpagent_item_t *httpagent_items;
-	zbx_dc_item_t		*dc_items;
-	void			*any;
+	zbx_dc_agent_item_t		*agent_items;
+	zbx_dc_snmp_item_t		*snmp_items;
+	zbx_dc_httpagent_item_t		*httpagent_items;
+	zbx_dc_telemetry_query_item_t	*telemetry_query_items;
+	zbx_dc_item_t			*dc_items;
+	void				*any;
 }
 zbx_dc_poller_item_t;
+
+#define ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP	__UINT64_C(0x0001)
+#define ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS		__UINT64_C(0x0002)
+
+typedef struct
+{
+	zbx_uint64_t	upd_flags;
+	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
+}
+zbx_dc_cached_data_t;
+
+ZBX_VECTOR_DECL(dc_cached_data, zbx_dc_cached_data_t)
 
 typedef struct
 {
@@ -426,7 +477,6 @@ typedef struct _DC_TRIGGER
 	unsigned char		*expression_bin;
 	unsigned char		*recovery_expression_bin;
 	zbx_timespec_t		timespec;
-	int			lastchange;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -441,6 +491,7 @@ typedef struct _DC_TRIGGER
 
 	zbx_vector_tags_ptr_t	tags;
 	zbx_vector_uint64_t	itemids;
+	zbx_vector_uint64_t	dep_triggerids;
 
 	zbx_eval_context_t	*eval_ctx;
 	zbx_eval_context_t	*eval_ctx_r;
@@ -559,6 +610,10 @@ typedef struct
 	int	trends_global;
 	int	history_mode;
 	int	history_global;
+
+	/* History overrides by external database settings, like ClickHouse table TTL. */
+	/* Overrides all history housekeeping settings for a value type if not 0.      */
+	int	history_override[ITEM_VALUE_TYPE_COUNT];
 }
 zbx_config_hk_t;
 
@@ -585,6 +640,7 @@ typedef struct
 	int		auditlog_enabled;
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
+	int		enable_mobile_devices;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -609,6 +665,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
 #define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
+#define ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES		__UINT64_C(0x0000000000004000)
 
 typedef struct
 {
@@ -663,20 +720,18 @@ typedef struct
 	zbx_uint64_t			corr_conditionid;
 	int				type;
 	zbx_corr_condition_data_t	data;
+	zbx_atomic_uint32_t		refcount;
 }
 zbx_corr_condition_t;
 
 ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
 
-typedef struct
-{
-	unsigned char	type;
-}
-zbx_corr_operation_t;
+#define ZBX_CORR_OPERATION_CLOSE_OLD	0
+#define ZBX_CORR_OPERATION_CLOSE_NEW	1
 
-ZBX_PTR_VECTOR_DECL(corr_operation_ptr, zbx_corr_operation_t *)
-
-void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation);
+#define CORRELATION_OP_NONE		0
+#define CORRELATION_OP_CLOSE_NEW	0x01U
+#define CORRELATION_OP_CLOSE_OLD	0x02U
 
 typedef struct
 {
@@ -684,27 +739,15 @@ typedef struct
 	char				*name;
 	char				*formula;
 	unsigned char			evaltype;
+	zbx_uint32_t			operations;	/* bitmask of CORRELATION_OP_ defines */
+
+	zbx_atomic_uint32_t		refcount;
 
 	zbx_vector_corr_condition_ptr_t	conditions;
-	zbx_vector_corr_operation_ptr_t	operations;
 }
 zbx_correlation_t;
 
 ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
-
-int	zbx_correlation_compare_func(const void *d1, const void *d2);
-
-typedef struct
-{
-	zbx_vector_correlation_ptr_t	correlations;
-	zbx_hashset_t			conditions;
-
-	/* Configuration synchronization timestamp of the rules. */
-	/* Update the cache if this timestamp is less than the   */
-	/* current configuration synchronization timestamp.      */
-	int			sync_ts;
-}
-zbx_correlation_rules_t;
 
 /* item queue data */
 typedef struct
@@ -887,12 +930,12 @@ zbx_synced_new_config_t;
 typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
 typedef struct zbx_um_cache zbx_um_cache_t;
 
-zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location);
+		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
@@ -909,28 +952,6 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 
 int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 
-/* zbx_dc_get_history_log_value() */
-#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
-#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
-#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
-#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
-#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
-#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
-#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
-#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
-
-typedef enum
-{
-	ZBX_VALUE_PROPERTY_VALUE,
-	ZBX_VALUE_PROPERTY_TIME,
-	ZBX_VALUE_PROPERTY_DATE,
-	ZBX_VALUE_PROPERTY_AGE,
-	ZBX_VALUE_PROPERTY_TIMESTAMP
-}
-zbx_expr_db_item_value_property_t;
-
-int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
-		const char *tz);
 int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to);
 
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
@@ -1039,6 +1060,12 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
+void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location);
+
+int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
+void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);
+
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
@@ -1052,15 +1079,15 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
-void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
-		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num, unsigned char poller_type, int *nextcheck);
 #ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 #endif
 
-int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
+void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids);
 
-void	zbx_dc_config_triggers_apply_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff);
+void	zbx_dc_config_triggers_apply_changes(zbx_trigger_diff_t **trigger_diffs, int diffs_num);
 void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values);
@@ -1154,7 +1181,11 @@ void	zbx_dc_get_expressions_by_name(zbx_vector_expression_t *expressions, const 
 int	zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	zbx_dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+zbx_uint64_t	zbx_dc_get_hostid_by_functionid(zbx_uint64_t functionid);
 void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *names);
+void	zbx_dc_get_hostgroup_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *groups);
+zbx_uint64_t	zbx_dc_get_hostgroupid_by_functionid(zbx_uint64_t functionid);
 
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
@@ -1186,11 +1217,6 @@ int	zbx_dc_get_interfaces_availability(zbx_vector_availability_ptr_t *interfaces
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
 
 void	zbx_set_availability_diff_ts(int ts);
-
-void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
@@ -1234,8 +1260,6 @@ zbx_trigger_dep_t;
 ZBX_PTR_VECTOR_DECL(trigger_dep_ptr, zbx_trigger_dep_t *)
 
 int	zbx_trigger_dep_compare_func(const void *d1, const void *d2);
-
-void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_trigger_dep_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
 
@@ -1308,6 +1332,7 @@ typedef struct
 	zbx_uint64_t			eventid;		/* [IN] eventid */
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
+	char				*event_name;		/* [IN] event/problem name */
 	zbx_vector_uint64_t		hostids;		/* [-] associated hostids */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
 	zbx_vector_tags_ptr_t		tags;			/* [IN] event tags */
@@ -1417,6 +1442,7 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
 zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid);
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
@@ -1440,15 +1466,6 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
 
-/* maintenance tag operators */
-#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
-#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
-
-/* maintenance tag evaluation types */
-/* SYNC WITH PHP!                   */
-#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
-#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
-
 /* special item key used for ICMP pings */
 #define ZBX_SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */
@@ -1458,6 +1475,8 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP pings with retry options */
 #define ZBX_SERVER_ICMPPINGRETRY_KEY	"icmppingretry"
 
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule);
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq);
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
@@ -1522,7 +1541,7 @@ zbx_maintenance_type_t;
 
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type);
 
 /* vps tracker */
 typedef struct
@@ -1554,6 +1573,7 @@ typedef struct
 	const char	*telnet;
 	const char	*script;
 	const char	*browser;
+	const char	*telemetry;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1572,11 +1592,49 @@ typedef struct
 	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	browser[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	telemetry[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
 char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
+
+/* APM */
+#define ZBX_SETTINGS_APM		"apm"
+
+#define ZBX_APM_GLOBAL_DB_TAG_STATUS			"status"
+#define ZBX_APM_GLOBAL_DB_TAG_URL			"url"
+#define ZBX_APM_GLOBAL_DB_TAG_AUTHENTICATION_TYPE	"authentication_type"
+#define ZBX_APM_GLOBAL_DB_TAG_USERNAME			"username"
+#define ZBX_APM_GLOBAL_DB_TAG_PASSWORD			"password"
+#define ZBX_APM_GLOBAL_DB_TAG_DB			"db"
+#define ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_PEER		"ssl_verify_peer"
+#define ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST		"ssl_verify_host"
+
+#define ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED		0
+#define ZBX_APM_GLOBAL_DB_STATUS_CONFIGURED		1
+
+#define ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_USR_PWD	0
+#define ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_NONE	1
+
+#define ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_DISABLED	0
+#define ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_ENABLED	1
+
+#define ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_DISABLED	0
+#define ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_ENABLED	1
+
+typedef struct
+{
+	int		status;
+	const char	*url;
+	int		authentication_type;
+	const char	*username;
+	const char	*password;
+	const char	*db;
+	int		ssl_verify_peer;
+	int		ssl_verify_host;
+}
+zbx_config_apm_global_db_t;
 
 /* proxy group manager local cache support */
 
@@ -1673,17 +1731,14 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_comms_redirect_t *redirect);
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect);
+int	zbx_dc_config_get_item_format(zbx_uint64_t itemid,  unsigned char *value_type, zbx_uint64_t *valuemapid,
+		char *units, size_t units_alloc);
 
 int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
 void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
 void	zbx_dc_set_proxy_lastonline(int lastonline);
 zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
 zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
-
-void	zbx_dc_set_itservices_num(int num);
-int	zbx_dc_get_itservices_num(void);
 
 int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
@@ -1720,4 +1775,229 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
 zbx_uint64_t	zbx_dc_config_get_config_revision(void);
+
+void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers);
+
+/* local configuration cache initialization, must be called by configuration syncers */
+void	zbx_dc_config_local_init(void);
+void	zbx_dc_config_local_acquire(void);
+void	zbx_dc_config_local_release(void);
+
+/* local configuration cache API - must be used only by thread based components hosted by supervisor */
+
+void	zbx_dc_local_set_itservices_num(int num);
+int	zbx_dc_local_get_itservices_num(void);
+
+
+typedef struct zbx_correlation_config_handle *	zbx_correlation_config_handle_t;
+
+zbx_correlation_config_handle_t	zbx_correlation_config_open(void);
+void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
+
+zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
+
+/* CEP */
+
+#define ZBX_CEP_WINDOW_SIMPLE		1
+#define ZBX_CEP_WINDOW_CAUSAL		2
+#define ZBX_CEP_WINDOW_CORRELATION	3
+#define ZBX_CEP_WINDOW_PATTERN		4
+
+#define ZBX_CEP_OP_SET_NAME		1
+#define ZBX_CEP_OP_CLOSE		2
+#define ZBX_CEP_OP_DISCARD		3
+#define ZBX_CEP_OP_SET_SEVERITY		4
+#define ZBX_CEP_OP_INCREASE_SEVERITY	5
+#define ZBX_CEP_OP_DECREASE_SEVERITY	6
+#define ZBX_CEP_OP_SUPPRESS		7
+#define ZBX_CEP_OP_UNSUPPRESS		8
+#define ZBX_CEP_OP_COPY_FIRST		9
+#define ZBX_CEP_OP_COPY_LAST		10
+#define ZBX_CEP_OP_ADD_TAG		11
+#define ZBX_CEP_OP_SET_TAG		12
+#define ZBX_CEP_OP_SET_TAG_VALUE	13
+#define ZBX_CEP_OP_INCREASE_TAG_VALUE	14
+#define ZBX_CEP_OP_DECREASE_TAG_VALUE	15
+#define ZBX_CEP_OP_RENAME_TAG		16
+#define ZBX_CEP_OP_REMOVE_TAG		17
+#define ZBX_CEP_OP_CLOSE_WINDOW		18
+#define ZBX_CEP_OP_SET_CAUSE		19
+
+#define ZBX_CEP_WHEN_EVENT_OCCURRED	0
+#define ZBX_CEP_WHEN_EVENT_ADDED	1
+#define ZBX_CEP_WHEN_EVENT_EVICTED	2
+#define ZBX_CEP_WHEN_WINDOW_CLOSED	3
+#define ZBX_CEP_WHEN_PATTERN_MATCH	4
+
+typedef struct
+{
+	char	*name;
+}
+zbx_cep_args_name_t;
+
+typedef struct
+{
+	char	*tag;
+}
+zbx_cep_args_tag_name_t;
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_cep_args_tag_value_t;
+
+typedef struct
+{
+	char	*old_tag;
+	char	*new_tag;
+}
+zbx_cep_args_tag_pair_t;
+
+typedef struct
+{
+	int	level;
+}
+zbx_cep_args_severity_t;
+
+typedef struct
+{
+	int	duration;
+}
+zbx_cep_args_suppress_t;
+
+typedef struct
+{
+	char	*period;
+}
+zbx_cep_args_time_period_t;
+
+typedef union
+{
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+}
+zbx_cep_op_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			cep_op_conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_op_condition_args_t	args;
+}
+zbx_cep_op_condition_t;
+
+ZBX_VECTOR_DECL(cep_op_condition, zbx_cep_op_condition_t)
+
+typedef union
+{
+	zbx_cep_args_name_t		set_name;
+	zbx_cep_args_severity_t		set_severity;
+	zbx_cep_args_tag_value_t	add_tag;
+	zbx_cep_args_tag_value_t	set_tag;
+	zbx_cep_args_tag_value_t	set_tag_value;
+	zbx_cep_args_tag_name_t		increase_tag_value;
+	zbx_cep_args_tag_name_t		decrease_tag_value;
+	zbx_cep_args_tag_name_t		remove_tag;
+	zbx_cep_args_tag_pair_t		rename_tag;
+	zbx_cep_args_suppress_t		suppress;
+}
+zbx_cep_op_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			operationid;
+	int				type;
+	int				execute_when;
+	int				evaltype;
+	int				sortorder;
+	zbx_cep_op_args_t		args;
+	zbx_vector_cep_op_condition_t	conditions;
+	char				*formula;
+}
+zbx_cep_operation_t;
+
+ZBX_VECTOR_DECL(cep_operation, zbx_cep_operation_t)
+
+/* keep union names in sync with CEP condition defines */
+typedef union
+{
+	zbx_cep_args_name_t		event_name;
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+	zbx_cep_args_severity_t		severity;
+	zbx_cep_args_name_t		host;
+	zbx_cep_args_name_t		host_group;
+	zbx_cep_args_time_period_t	time_period;
+}
+zbx_cep_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_condition_args_t	args;
+}
+zbx_cep_condition_t;
+
+ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
+
+typedef struct
+{
+	int		type;
+	zbx_uint32_t	group_by;
+	char		*duration;
+	char		*capacity;
+	char		*event_count_tag;
+	char		*script;
+	char		*group_tag;
+}
+zbx_cep_rule_window_t;
+
+typedef struct
+{
+	zbx_uint64_t		ruleid;
+	char			*name;
+	char			*formula;
+	int			evaltype;
+	int			status;
+	int			stop;
+	int			sortorder;
+
+	zbx_cep_rule_window_t	*window;
+
+	zbx_vector_cep_condition_t	conditions;
+	zbx_vector_cep_operation_t	operations;
+
+	zbx_uint64_t		revision;
+	zbx_atomic_uint32_t	refcount;
+}
+zbx_cep_rule_t;
+
+typedef struct zbx_cep_config_handle *zbx_cep_config_handle_t;
+
+ZBX_PTR_VECTOR_DECL(cep_rule_ptr, zbx_cep_rule_t *)
+
+zbx_cep_config_handle_t	zbx_cep_config_open(void);
+void	zbx_cep_config_close(zbx_cep_config_handle_t handle);
+const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle);
+zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid);
+void	zbx_cep_rule_release(zbx_cep_rule_t *rule);
+
+#define ZBX_CEP_GROUP_BY_NONE		0x00
+#define ZBX_CEP_GROUP_BY_HOSTGROUP	0x01
+#define ZBX_CEP_GROUP_BY_HOST		0x02
+#define ZBX_CEP_GROUP_BY_TAG		0x04
+
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
+
+int	zbx_macro_event_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 #endif

@@ -48,7 +48,8 @@ class TabIndicators {
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const GRAPH = document.querySelector('form.dashboard-widget-svggraph');
 		const HOST = document.querySelector('#host-form');
-		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
+		const HOST_DISCOVERY = document.querySelector('#lldrule-form');
+		const HOST_DISCOVERY_PROTOTYPE = document.querySelector('#lldrule-prototype-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
@@ -80,10 +81,10 @@ class TabIndicators {
 				return HOST;
 			case !!HOST_DISCOVERY:
 				return HOST_DISCOVERY;
+			case !!HOST_DISCOVERY_PROTOTYPE:
+				return HOST_DISCOVERY_PROTOTYPE;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
-			case !!PROXY:
-				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -237,6 +238,8 @@ class TabIndicatorFactory {
 				return new TemplatePermissionsTabIndicatorItem;
 			case 'HostPermissions':
 				return new HostPermissionsTabIndicatorItem;
+			case 'ProxyAccessList':
+				return new ProxyAccessListTabIndicatorItem;
 			case 'PieDataset':
 				return new PieDatasetTabIndicatorItem;
 			case 'PieDisplayOptions':
@@ -834,6 +837,54 @@ class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
+class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
+
+	static PROXY_MODE_ALLOW = 1;
+	static PROXY_GROUP_MODE_ALLOW = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const proxy_mode = document.querySelector('[name="proxy_mode"]:checked');
+
+		if (proxy_mode !== null && proxy_mode.value != ProxyAccessListTabIndicatorItem.PROXY_MODE_ALLOW) {
+			return true;
+		}
+
+		const proxy_group_mode = document.querySelector('[name="proxy_group_mode"]:checked');
+
+		if (proxy_group_mode !== null
+				&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_ALLOW) {
+			return true;
+		}
+
+		return document
+			.querySelectorAll('#proxyids_ .multiselect-list li, #proxy_groupids_ .multiselect-list li')
+			.length > 0;
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('[name="proxy_mode"], [name="proxy_group_mode"]')) {
+			input.addEventListener('change', () => this.addAttributes());
+		}
+
+		for (const id of ['proxyids_', 'proxy_groupids_']) {
+			const target_node = document.getElementById(id);
+
+			if (target_node !== null) {
+				const observer = new MutationObserver(() => this.addAttributes());
+
+				observer.observe(target_node, {
+					childList: true,
+					subtree: true
+				});
+			}
+		}
+	}
+}
+
 class DependencyTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
@@ -901,10 +952,9 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const form_rows = [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.macro')]
-			.filter(el => el.value !== '');
-
-		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
+		return [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
+			.filter(el => el.value !== '')
+			.length;
 	}
 
 	initObserver() {

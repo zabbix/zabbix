@@ -35,7 +35,7 @@ zabbix_export:
          - for an enterprise projects: api.example.com (where you replace example.com with the domain Travis CI is running on)
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -534,29 +534,30 @@ zabbix_export:
           value: travis
       macros:
         - macro: '{$TRAVIS.API.TOKEN}'
-          description: 'Travis API Token'
+          type: SECRET_TEXT
+          description: 'Travis API Token.'
           config:
             type: TEXT
             priority: '1'
             label: Token
-            description: 'Travis API Token'
+            description: 'Travis API Token.'
             required: 'YES'
         - macro: '{$TRAVIS.API.URL}'
           value: api.travis-ci.com
-          description: 'Travis API URL'
+          description: 'Travis API URL.'
           config:
             type: TEXT
             priority: '2'
             label: Address
-            description: 'Travis API URL'
+            description: 'Travis API URL.'
             required: 'YES'
         - macro: '{$TRAVIS.BUILDS.SUCCESS.PERCENT}'
           value: '80'
-          description: 'Percent of successful builds in the repo (for trigger expression)'
+          description: 'Percent of successful builds in the repo (for trigger expression).'
           config:
             type: TEXT
             priority: '3'
             section_name: Thresholds
             label: 'Successful builds'
-            description: 'Percent of successful builds in the repo (for trigger expression) In the range from 0 to 100 inclusive.'
+            description: 'Percent of successful builds in the repo (for trigger expression). In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'

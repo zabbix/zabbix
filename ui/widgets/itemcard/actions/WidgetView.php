@@ -185,7 +185,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
-			$this->prepareItemHistoryAndTrends($item);
+			[
+				'history' => $item['history'],
+				'keep_history' => $keep_history,
+				'history_has_errors' => $item['history_has_errors'],
+				'trends' => $item['trends'],
+				'keep_trends' => $keep_trends,
+				'trends_has_errors' => $item['trends_has_errors']
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
+
+			// A strict comparison with zero is required here because the $keep_* variables may have a null value.
+			$item['show_link'] = $keep_history !== 0 || $keep_trends !== 0;
 		}
 
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -248,12 +258,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$db_items_values = API::Trend()->get([
 				'output' => ['value_avg', 'clock'],
-				'history' => $item['value_type'],
 				'itemids' => $item['itemid'],
 				'time_from' => $history_period,
 				'time_till' => time(),
-				'sortfield' => ['clock', 'ns'],
-				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => 1
 			]);
 
@@ -373,55 +380,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$item['delay_has_errors'] = true;
-		}
-	}
-
-	protected function prepareItemHistoryAndTrends(array &$item): void {
-		$simple_interval_parser = new CSimpleIntervalParser();
-
-		$item['history_has_errors'] = false;
-		$item['trends_has_errors'] = false;
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
-
-			$item['history'] = $hk_history;
-			$item['keep_history'] = timeUnitToSeconds($hk_history);
-		}
-		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-			$item['keep_history'] = timeUnitToSeconds($item['history']);
-		}
-		else {
-			$item['keep_history'] = 0;
-			$item['history_has_errors'] = true;
-		}
-
-		if ($item['history'] == 0) {
-			$item['history'] = '';
-		}
-
-		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				$hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
-
-				$item['trends'] = $hk_trends;
-				$item['keep_trends'] = timeUnitToSeconds($hk_trends);
-			}
-			elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-				$item['keep_trends'] = timeUnitToSeconds($item['trends']);
-			}
-			else {
-				$item['keep_trends'] = 0;
-				$item['trends_has_errors'] = true;
-			}
-
-			if ($item['trends'] == 0) {
-				$item['trends'] = '';
-			}
-		}
-		else {
-			$item['trends'] = '';
-			$item['keep_trends'] = 0;
 		}
 	}
 

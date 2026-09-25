@@ -30,6 +30,8 @@ if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
 }
 
+$can_select_server_for_discovery_by = CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+
 // Create form grid.
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -45,8 +47,9 @@ $form_grid = (new CFormGrid())
 		new CLabel(_('Discovery by'), 'discovery_by'),
 		new CFormField(
 			(new CRadioButtonList('discovery_by', $data['discovery_by']))
-				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER)
+				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER, disabled: !$can_select_server_for_discovery_by)
 				->addValue(_('Proxy'), ZBX_DISCOVERY_BY_PROXY)
+				->setReadonly(!$data['user']['can_edit_discovery_by'])
 				->setModern()
 		)
 	])
@@ -105,22 +108,26 @@ $form_grid = (new CFormGrid())
 
 $form_grid->addItem([
 	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
-	(new CFormField(
-		(new CTable())
-			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Type'), _('Actions')])
-			->addItem(
-				(new CTag('tfoot', true))
-					->addItem(
-						(new CCol(
-							(new CButtonLink(_('Add')))->addClass('js-check-add')
-						))->setColSpan(2)
-					)
-			)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('dcheckList')
+	(new CDiv(
+		(new CFormField(
+			(new CTable())
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('Type'), _('Actions')])
+				->addItem(
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CButtonLink(_('Add')))->addClass('js-check-add')
+							))->setColSpan(2)
+						)
+				)
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->setId('dcheckList')
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'dchecks')
+	))->addClass('form-field')
 ]);
 
 // Append uniqueness criteria to form list.
@@ -138,8 +145,9 @@ $form_grid->addItem([
 
 $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 	(new CListItem([
-		(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
+		(new CInput('radio', 'uniqueness_criteria', '_#{dcheckid}'))
 			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setAttribute('data-id', '#{dcheckid}')
 			->setId('uniqueness_criteria_#{dcheckid}'),
 		(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
 	]))->setId('uniqueness_criteria_row_#{dcheckid}')
@@ -218,6 +226,7 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 	]))
 		->setId('dcheckRow_#{dcheckid}')
 		->setAttribute('dcheckRow', '#{dcheckid}')
+		->setAttribute('data-dcheckid', '#{dcheckid}')
 );
 
 $form
@@ -225,56 +234,27 @@ $form
 	->addItem($check_template_default)
 	->addItem($uniqueness_template)
 	->addItem($host_source_template)
-	->addItem($name_source_template)
-	->addItem(
-		(new CScriptTag('
-			drule_edit_popup.init('.json_encode([
-				'druleid' => $data['drule']['druleid'],
-				'dchecks' => array_values($data['drule']['dchecks']),
-				'drule' => $data['drule']
-			], JSON_THROW_ON_ERROR).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($name_source_template);
 
 if ($data['drule']['druleid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'drule_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'drule_edit_popup.clone('.json_encode([
-					'title' => _('New discovery rule'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'drule_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete discovery rule?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'drule_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -282,10 +262,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'drule_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -296,7 +275,14 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('configuration.discovery.edit.js.php'),
+		$this->readJsFile('configuration.discovery.edit.js.php').
+		'drule_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'dchecks' => array_values($data['drule']['dchecks']),
+			'drule' => $data['drule'],
+			'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
+		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
 

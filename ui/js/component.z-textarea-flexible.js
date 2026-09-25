@@ -202,8 +202,8 @@ class ZTextareaFlexible extends HTMLElement {
 			const paddingTop = parseFloat(styles.paddingTop) || 0;
 			const paddingBottom = parseFloat(styles.paddingBottom) || 0;
 			const lineHeight = parseFloat(styles.lineHeight);
-			const baseHeight = lineHeight + paddingTop + paddingBottom + parseInt(styles.borderWidth) * 2;
-			const scrollHeight = this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2;
+			const baseHeight = lineHeight + paddingTop + paddingBottom + Math.round(parseFloat(styles.borderWidth)) * 2;
+			const scrollHeight = this.#textarea.scrollHeight + Math.round(parseFloat(styles.borderWidth)) * 2;
 
 			this.#textarea.style.height = `${Math.max(baseHeight, scrollHeight)}px`;
 			this.#is_resize_locked = false;

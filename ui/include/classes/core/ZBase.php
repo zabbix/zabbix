@@ -186,6 +186,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->authenticateUser();
 
@@ -194,8 +195,7 @@ class ZBase {
 				$this->initComponents();
 				$this->initModuleManager();
 
-				/** @var CRouter $router */
-				$router = $this->component_registry->get('router');
+				$router = CRouter::getInstance();
 				$router->addActions($this->module_manager->getActions());
 
 				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
@@ -225,13 +225,14 @@ class ZBase {
 
 				CProfiler::getInstance()->start();
 
-				$this->processRequest($router);
+				$this->processRequest();
 				break;
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
@@ -246,25 +247,37 @@ class ZBase {
 					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
-					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
-						echo (new CView('general.warning', [
-							'header' => _('Vault connection failed.'),
-							'messages' => [$e->getMessage()],
-							'theme' => ZBX_DEFAULT_THEME
-						]))->getOutput();
+					switch ($e->getCode()) {
+						case CConfigFile::CONFIG_VAULT_ERROR:
+							echo (new CView('general.warning', [
+								'header' => _('Vault connection failed.'),
+								'messages' => [$e->getMessage()],
+								'theme' => ZBX_DEFAULT_THEME
+							]))->getOutput();
 
-						session_write_close();
-						exit;
-					}
-					else {
-						$session = new CCookieSession();
-						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+							session_write_close();
+							exit;
 
-						if (!$session->session_start($sessionid)) {
-							throw new Exception(_('Session initialization error.'));
-						}
+						case CConfigFile::CONFIG_ERROR:
+							echo (new CView('general.warning', [
+								'header' => 'Configuration file error',
+								'messages' => [$e->getMessage()],
+								'theme' => ZBX_DEFAULT_THEME
+							]))->getOutput();
 
-						CSessionHelper::set('sessionid', $sessionid);
+							session_write_close();
+							exit;
+
+						default:
+							$session = new CCookieSession();
+							$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+							if (!$session->session_start($sessionid)) {
+								throw new Exception(_('Session initialization error.'));
+							}
+
+							CSessionHelper::set('sessionid', $sessionid);
+							break;
 					}
 				}
 				break;
@@ -308,6 +321,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/api/helpers',
 			$this->root_dir.'/include/classes/api/item_types',
 			$this->root_dir.'/include/classes/api/managers',
+			$this->root_dir.'/include/classes/api/managers/history',
 			$this->root_dir.'/include/classes/api/clients',
 			$this->root_dir.'/include/classes/api/wrappers',
 			$this->root_dir.'/include/classes/core',
@@ -375,6 +389,7 @@ class ZBase {
 			'blue-theme' => _('Blue'),
 			'blue-classic-theme' => _('Blue (classic)'),
 			'dark-theme' => _('Dark'),
+			'dark-blue-theme' => _('Dark blue'),
 			'dark-classic-theme' => _('Dark (classic)'),
 			'hc-light' => _('High-contrast light'),
 			'hc-dark' => _('High-contrast dark')
@@ -383,7 +398,7 @@ class ZBase {
 
 	public static function getColorScheme(string $theme): string {
 		return match ($theme) {
-			'dark-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
+			'dark-theme', 'dark-blue-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
 			default => ZBX_COLOR_SCHEME_LIGHT
 		};
 	}
@@ -448,7 +463,8 @@ class ZBase {
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
 					$this->config['DB']['VAULT_PREFIX'], $this->config['DB']['VAULT_DB_PATH'],
-					$this->config['DB']['VAULT_TOKEN']
+					$this->config['DB']['VAULT_TOKEN'], $this->config['DB']['VAULT_APP_ROLE_ID'],
+					$this->config['DB']['VAULT_APP_SECRET_ID']
 				);
 				break;
 		}
@@ -499,6 +515,42 @@ class ZBase {
 
 			throw new DBException($error, DB::INIT_ERROR);
 		}
+	}
+
+	/**
+	 * Initialize HistoryManager instance.
+	 */
+	protected function initHistoryManager(): void {
+		global $HISTORY_PROVIDERS;
+
+		$storages = CSettingsHelper::getDbVersionStatus();
+		$history_manager = Manager::History();
+		$value_type_ttl = [];
+
+		foreach ($storages as $storage) {
+			if (!array_key_exists('provider', $storage)) {
+				if (array_key_exists('history_pk', $storage) && $storage['history_pk'] == 1) {
+					$history_manager->setPrimaryKeysEnabled();
+				}
+
+				continue;
+			}
+
+			if (!array_key_exists('value_types', $storage)) {
+				continue;
+			}
+
+			foreach ($storage['value_types'] as $storage_value_type) {
+				if (!array_key_exists('ttl', $storage_value_type)) {
+					continue;
+				}
+
+				$value_type = array_search($storage_value_type['type'], CConfigFile::VALUE_TYPE_CONFIG_NAME);
+				$value_type_ttl[$value_type] = $storage_value_type['ttl'];
+			}
+		}
+
+		$history_manager->setStorageProviders($HISTORY_PROVIDERS, $value_type_ttl);
 	}
 
 	/**
@@ -586,10 +638,10 @@ class ZBase {
 
 	/**
 	 * Process request and generate response.
-	 *
-	 * @param CRouter $router  CRouter class instance.
 	 */
-	private function processRequest(CRouter $router): void {
+	private function processRequest(): void {
+		$router = CRouter::getInstance();
+
 		$action_name = $router->getAction();
 		$action_class = $router->getController();
 
@@ -653,41 +705,24 @@ class ZBase {
 			$action->run();
 
 			if (!($action instanceof CLegacyAction)) {
-				$this->processResponseFinal($router, $action);
+				$this->processResponseFinal($action);
 			}
 		}
 		catch (CAccessDeniedException $e) {
-			$this->denyPageAccess($router);
+			$this->denyPageAccess();
 		}
 		catch (Exception $e) {
-			self::terminateWithError($router, $e->getMessage());
+			self::terminateWithError($e->getMessage());
 		}
 	}
 
-	private function processResponseFinal(CRouter $router, CAction $action): void {
+	private function processResponseFinal(CAction $action): void {
+		$router = CRouter::getInstance();
 		$response = $action->getResponse();
 
 		// Controller returned redirect to another page?
 		if ($response instanceof CControllerResponseRedirect) {
-			header('Content-Type: text/html; charset=UTF-8');
-
 			filter_messages();
-
-			$response->redirect();
-		}
-		// Controller returned fatal error?
-		elseif ($response instanceof CControllerResponseFatal) {
-			header('Content-Type: text/html; charset=UTF-8');
-
-			filter_messages();
-
-			CMessageHelper::addError('Controller: '.$router->getAction());
-			ksort($_REQUEST);
-			foreach ($_REQUEST as $key => $value) {
-				if ($key !== CSRF_TOKEN_NAME) {
-					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
-				}
-			}
 
 			$response->redirect();
 		}
@@ -699,8 +734,11 @@ class ZBase {
 
 			$layout_data_defaults = [
 				'page' => [
-					'title' => $response->getTitle(),
-					'file' => $response->getFileName()
+					'title' => $response->getTitle()
+				],
+				'file' => [
+					'name' => $response->getFileName(),
+					'mime_type' => $response->getFileMimeType()
 				],
 				'controller' => [
 					'action' => $router->getAction()
@@ -750,7 +788,7 @@ class ZBase {
 		exit();
 	}
 
-	private static function denyPageAccess(CRouter $router): void {
+	private static function denyPageAccess(): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
 			->removeArgument(CSRF_TOKEN_NAME)
 			->toString();
@@ -800,10 +838,10 @@ class ZBase {
 				->onClick('document.location = this.dataset.homeUrl;');
 		}
 
-		switch ($router->getLayout()) {
-			case 'layout.json':
-			case 'layout.widget':
-				echo (new CView('layout.json', [
+		switch (CRouter::getInstance()->getLayout()) {
+			case ZBX_LAYOUT_JSON:
+			case ZBX_LAYOUT_WIDGET:
+				echo (new CView(ZBX_LAYOUT_JSON, [
 					'main_block' => json_encode([
 						'error' => [
 							'title' => $view['header'],
@@ -822,31 +860,31 @@ class ZBase {
 		exit();
 	}
 
-	private static function terminateWithError(CRouter $router, string $error): void {
-		switch ($router->getLayout()) {
-			case 'layout.json':
-			case 'layout.widget':
-				$layout = 'layout.json';
+	private static function terminateWithError(string $error): void {
+		switch (CRouter::getInstance()->getLayout()) {
+			case ZBX_LAYOUT_JSON:
+			case ZBX_LAYOUT_WIDGET:
+				$layout = ZBX_LAYOUT_JSON;
 				break;
 
 			case null:
 				if ((array_key_exists('CONTENT_TYPE', $_SERVER) && $_SERVER['CONTENT_TYPE'] === 'application/json')
 						|| (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
 							&& strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest') == 0)) {
-					$layout = 'layout.json';
+					$layout = ZBX_LAYOUT_JSON;
 				}
 				else {
-					$layout = 'general.warning';
+					$layout = null;
 				}
 				break;
 
 			default:
-				$layout = 'general.warning';
+				$layout = null;
 		}
 
 		switch ($layout) {
-			case 'layout.json':
-				echo (new CView('layout.json', [
+			case ZBX_LAYOUT_JSON:
+				echo (new CView(ZBX_LAYOUT_JSON, [
 					'main_block' => json_encode([
 						'error' => [
 							'title' => $error
@@ -884,8 +922,6 @@ class ZBase {
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
 	private function initComponents(): void {
-		$this->component_registry->register('router', new CRouter());
-
 		if (CWebUser::isLoggedIn()) {
 			$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
 			$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());

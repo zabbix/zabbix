@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @configurationDataProvider serverConfigurationProvider
  * @backup history, autoreg_host
  */
-class testLldLinking extends CIntegrationTest {
+class testLLDLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES_TEST_1 = 2;
 	const NUMBER_OF_TEMPLATES_TEST_2 = 1;
 	const TEMPLATE_NAME_PRE = 'TEMPLATE_NAME';
@@ -185,7 +185,7 @@ class testLldLinking extends CIntegrationTest {
 		}
 	}
 
-	private function setupAutoregToLinkTemplates($templateNumber, $LLDParametrs) {
+	private function setupAutoregToLinkTemplates($templateNumber, $lldparameters) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -222,7 +222,7 @@ class testLldLinking extends CIntegrationTest {
 
 		for ($i = 0; $i < $templateNumber; $i++) {
 			$params = array_merge(
-				$LLDParametrs,
+				$lldparameters,
 				['hostid' => self::$templateids[$i]]
 			);
 			$response = $this->call('discoveryrule.create', $params);

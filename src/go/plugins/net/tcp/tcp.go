@@ -17,6 +17,7 @@ package tcpudp
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -27,7 +28,9 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap"
+	"golang.zabbix.com/agent2/pkg/inet"
 	"golang.zabbix.com/agent2/pkg/web"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -75,6 +78,13 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		err = errors.New(errorTooManyParams)
 		return
 	}
+
+	if len(params) >= 1 && params[0] != "" {
+		if net.ParseIP(params[0]) == nil && !inet.IsRFCExtendedHostName(params[0]) {
+			return 0, errs.New(errorInvalidFirstParam)
+		}
+	}
+
 	if len(params) < 2 || len(params[1]) == 0 {
 		err = errors.New(errorInvalidSecondParam)
 		return
@@ -95,9 +105,20 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	if _, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Second); err != nil {
+	dialer := net.Dialer{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	conn, err := dialer.DialContext(context.Background(), "tcp", address)
+	if err != nil {
 		return 0, nil
 	}
+
+	closeErr := conn.Close()
+	if closeErr != nil {
+		log.Debugf("failed to close net tcp port check connection: %s", closeErr)
+	}
+
 	return 1, nil
 }
 
@@ -509,6 +530,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
+		}
+
+		if len(params) >= 2 && params[1] != "" {
+			if net.ParseIP(params[1]) == nil && !inet.IsRFCExtendedHostName(params[1]) {
+				return nil, errs.New(errorInvalidSecondParam)
+			}
 		}
 
 		if len(params) == 3 && len(params[2]) != 0 {

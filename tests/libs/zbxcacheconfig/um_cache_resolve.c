@@ -48,7 +48,7 @@ void	zbx_mock_test_entry(void **state)
 	char			*value = NULL;
 	zbx_vector_uint64_t	hostids;
 	int			ret;
-	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	double			um_cache_dup_sec = 0;
 	zbx_int64_t		um_cache_dup_size = 0;
 
@@ -61,9 +61,9 @@ void	zbx_mock_test_entry(void **state)
 	um_mock_cache_init(&mock_cache0, -1);
 	um_mock_cache_init(&mock_cache, zbx_mock_get_parameter_handle("in.config"));
 
-	zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE, NULL);
+	zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE, NULL);
+	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE, NULL);
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 

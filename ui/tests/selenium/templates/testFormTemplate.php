@@ -113,7 +113,10 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates');
+		$table = $this->query('id:datatable-templates')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
@@ -285,7 +288,7 @@ class testFormTemplate extends CLegacyWebTest {
 	public function filterAndOpenTemplate($name) {
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded()->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();

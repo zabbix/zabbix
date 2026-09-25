@@ -99,7 +99,7 @@ class testFormUser extends CWebTest {
 			[
 				[
 					'role' => '',
-					'required' => ['Username', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Password', 'Password (once again)', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => '',
 						'Name' => '',
@@ -129,7 +129,7 @@ class testFormUser extends CWebTest {
 				[
 					'user' => 'guest',
 					'role' => 'Guest role',
-					'required' => ['Username', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'guest',
 						'Name' => '',
@@ -155,7 +155,7 @@ class testFormUser extends CWebTest {
 				[
 					'user' => 'Admin',
 					'role' => 'Super admin role',
-					'required' => ['Username', 'Current password', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Current password', 'Password', 'Password (once again)', 'Default maintenance period', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'Admin',
 						'Name' => 'Zabbix',
@@ -633,7 +633,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -650,7 +650,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -806,8 +806,9 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
+					]
 				]
 			],
 			// #25 Incorrect URL protocol.
@@ -822,8 +823,9 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
+					]
 				]
 			],
 			// #26 Creating user by specifying only mandatory parameters.
@@ -854,7 +856,7 @@ class testFormUser extends CWebTest {
 						'Auto-login' => false,
 						'Refresh' => '0',
 						'Rows per page' => '999999',
-						'URL (after login)' => 'https://zabbix.com'
+						'URL (after login)' => 'zabbix.php?action=host.list'
 					],
 					'role' => 'Admin role',
 					'check_form' => true
@@ -1257,7 +1259,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1269,7 +1271,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1378,8 +1380,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'javascript:alert(123);'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
+					]
 				]
 			],
 			// #26 Incorrect URL protocol.
@@ -1389,8 +1392,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
+					]
 				]
 			],
 			// #27 Updating LDAP user with empty password fields.

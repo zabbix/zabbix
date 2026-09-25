@@ -28,7 +28,11 @@ class Widget extends CWidget {
 		return [
 			'class.widget.js' => [
 				'Actions' => _('Actions'),
-				'Download image' => _('Download image')
+				'Download image' => _('Download image'),
+				'Unexpected server error.' => _('Unexpected server error.')
+			],
+			'class.csvggraph.js' => [
+				'S_MINUTE_SHORT' => _x('m', 'minute short')
 			]
 		];
 	}

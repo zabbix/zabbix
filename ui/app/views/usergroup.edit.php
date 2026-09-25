@@ -306,6 +306,65 @@ $host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template
 
 $host_permissions_form_grid->addItem($host_permissions_row_template);
 
+$proxy_access_list_form_grid = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Proxies')),
+		new CFormField(
+			(new CRadioButtonList('proxy_mode', (int) $data['proxy_mode']))
+				->addValue(_('Allow list'), PROXY_MODE_ALLOW)
+				->addValue(_('Deny list'), PROXY_MODE_DENY)
+				->setModern()
+		)
+	])
+	->addItem(
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxyids[]',
+				'object_name' => 'proxies',
+				'data' => $data['ms_proxy'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxyids_',
+						'without_proxy_group' => '1',
+						'disable_selected' => true
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	)
+	->addItem([
+		new CLabel(_('Proxy groups')),
+		new CFormField(
+			(new CRadioButtonList('proxy_group_mode', (int) $data['proxy_group_mode']))
+				->addValue(_('Allow list'), PROXY_GROUP_MODE_ALLOW)
+				->addValue(_('Deny list'), PROXY_GROUP_MODE_DENY)
+				->setModern()
+		)
+	])
+	->addItem(
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxy_groupids[]',
+				'object_name' => 'proxy_groups',
+				'data' => $data['ms_proxy_group'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupids_',
+						'disable_selected' => true
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	);
+
 $tag_filter_form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Permissions')),
@@ -329,6 +388,9 @@ $tabs = (new CTabView())
 	)
 	->addTab('host_permissions_tab', _('Host permissions'), $host_permissions_form_grid,
 		TAB_INDICATOR_HOST_PERMISSIONS
+	)
+	->addTab('proxy_access_list_tab', _('Proxy access list'), $proxy_access_list_form_grid,
+		TAB_INDICATOR_PROXY_ACCESS_LIST
 	)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER)
 	->setSelected(0);

@@ -26,7 +26,7 @@ zbx_metric_t	*get_parameters_specific(void)
 	{
 		{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"c:,free"},
 		{"vfs.fs.discovery",	0,		vfs_fs_discovery,	NULL},
-		{"vfs.fs.get",		0,		vfs_fs_get,		NULL},
+		{"vfs.fs.get",		CF_HAVEPARAMS,	vfs_fs_get,		NULL},
 
 		{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
 

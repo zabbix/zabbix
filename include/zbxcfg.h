@@ -40,6 +40,7 @@
 #define	ZBX_CFG_ENVVAR_USE	0
 #define	ZBX_CFG_ENVVAR_IGNORE	1
 
+#define ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
@@ -70,6 +71,15 @@ typedef struct
 }
 zbx_cfg_custom_parameter_parser_t;
 
+typedef struct
+{
+	char	*name;
+	char	*value;
+}
+zbx_config_option_t;
+
+ZBX_VECTOR_DECL(config_option, zbx_config_option_t)
+
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 void	zbx_cfg_set_process_num(int num);
 
@@ -80,10 +90,21 @@ int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, 
 
 int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
+int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error);
+int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *connect_to, char **curl_connect_to,
+		char **error);
 
 typedef int	(*add_serveractive_host_f)(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
 		add_serveractive_host_f add_serveractive_host_cb, zbx_vector_str_t *hostnames, void *data,
 		char **error);
+
+zbx_config_option_t	zbx_config_option_str(const char *name, const char *value);
+zbx_config_option_t	zbx_config_option_int(const char *name, int value);
+const char		*zbx_config_option_value(const zbx_config_option_t *options, int options_num, const char *name);
+
+ssize_t	zbx_config_option_parse_param(const char *text);
+int	zbx_config_option_parse_options(const char *text, zbx_vector_config_option_t *options, char **error);
+void	zbx_config_option_clear_options(zbx_config_option_t *options, int options_num);
 
 #endif

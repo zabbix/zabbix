@@ -13,6 +13,7 @@
 **/
 
 #include "nodecommand.h"
+#include "trapper.h"
 
 #include "zbxtrapper.h"
 
@@ -418,6 +419,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
 		}
+
+		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+		{
+			zbx_uint64_t	proxyid;
+
+			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
+				host.proxyid = proxyid;
+			else
+				host.proxyid = 0;
+		}
 	}
 	else /* eventid */
 	{
@@ -491,6 +502,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			goto fail;
 		}
+	}
+
+	if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by && 0 == host.proxyid &&
+			ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on &&
+			ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+	{
+		zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		goto fail;
 	}
 
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
@@ -677,61 +697,6 @@ fail:
 	return ret;
 }
 
-/* user role permissions */
-typedef enum
-{
-	ROLE_PERM_DENY = 0,
-	ROLE_PERM_ALLOW = 1,
-}
-zbx_user_role_permission_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Checks if the user has specific or default access for             *
- *          administration actions.                                           *
- *                                                                            *
- * Return value:  SUCCEED - access is granted                                 *
- *                FAIL    - access is denied                                  *
- *                                                                            *
- ******************************************************************************/
-static int	check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			role_rule_default);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(role_rule_default, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: processes command received from frontend                          *
@@ -769,7 +734,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
-	if (SUCCEED != check_user_administration_actions_permissions(&user,
+	if (SUCCEED != zbx_db_user_has_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
 	{
@@ -838,7 +803,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		}
 	}
 
-	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
+	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
 	/* which do not pass our current IPv6 address validation. In the future, when we   */
 	/* fix our IPv6 address validation we could consider adding it here.               */
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))

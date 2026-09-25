@@ -287,6 +287,10 @@ $status-red-border-color: darken(desaturate($alt-red, 10%), 9%);
 $status-yellow-bg-color: darken(desaturate($alt-yellow, 9%), 18%);
 $status-yellow-border-color: darken(desaturate($alt-yellow, 9%), 20%);
 
+$btn-plus-more: #1f2c33 !default;
+$btn-plus-more-bg-color: $white !default;
+$btn-plus-more-border-color: #acbbc2 !default;
+
 // Multiselect.
 $multiselect-selected-bg-color: #93a5af !default;
 $multiselect-disabled-bg-color: $disabled-bg-color;
@@ -352,3 +356,14 @@ $geomap-marker-selected-stroke: #ced7db !default;
 
 // Timeline.
 $timeline-color: #aad7f0;
+
+// Datatable.
+$datatable-overlay-color: rgba(#fff, .4) !default;
+$datatable-resizer-border-color: #0275b8 !default;
+$datatable-scrollbar-thumb-bg-color: #c2c2c2 !default;
+
+// Banners.
+$banner-bg-color: #3e47ce !default;
+$banner-color: $white !default;
+$banner-link-color: $white !default;
+$banner-icon-color: $white !default;

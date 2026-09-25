@@ -50,7 +50,6 @@ $html_page = (new CHtmlPage())
 					new CFormField(
 						(new CTextBox('filter_username', $data['filter']['username']))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-							->setAttribute('autofocus', 'autofocus')
 					)
 				])
 				->addItem([
@@ -117,25 +116,34 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'user.list')
 	->getUrl();
 
+$headers = [
+	(new CColHeader(
+		(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
+	make_sorting_header(_('Username'), 'username', $data['sort'], $data['sortorder'], $url),
+	make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
+	make_sorting_header(_('Last name'), 'surname', $data['sort'], $data['sortorder'], $url),
+	make_sorting_header(_('User role'), 'role_name', $data['sort'], $data['sortorder'], $url),
+	_('Groups'),
+	_('Is online?'),
+	_('Login'),
+	_('Frontend access'),
+	_('API access')
+];
+
+if (CSettingsHelper::isMobileDevicesEnabled()) {
+	$headers[] = _('Devices');
+}
+
+$headers = array_merge($headers, [
+	_('Debug mode'),
+	_('Status'),
+	make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url),
+	_('Info')
+]);
+
 $table = (new CTableInfo())
-	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Username'), 'username', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Last name'), 'surname', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('User role'), 'role_name', $data['sort'], $data['sortorder'], $url),
-		_('Groups'),
-		_('Is online?'),
-		_('Login'),
-		_('Frontend access'),
-		_('API access'),
-		_('Debug mode'),
-		_('Status'),
-		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url),
-		_('Info')
-	])
+	->setHeader($headers)
 	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('user');
@@ -251,24 +259,32 @@ foreach ($data['users'] as $user) {
 		else {
 			$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
 			$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+			$is_api_allow_list = CRoleHelper::getRoleApiListMode($user['roleid']) == ZBX_ROLE_RULE_API_MODE_ALLOW;
+			$hint_api_methods = [];
 
 			if ($api_methods) {
-				$hint_api_methods = [];
-				$status_class = CRoleHelper::checkAccess('api.mode', $user['roleid'])
-					? ZBX_STYLE_STATUS_GREEN
-					: ZBX_STYLE_STATUS_GREY;
-
 				foreach ($api_methods as $api_method) {
-					$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+					$hint_api_methods[] = (new CSpan($api_method))
+						->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
 				}
-
-				$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
 			}
+			else {
+				$hint_api_methods[] = (new CSpan(_('None')))
+					->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$api_access->setHint(new CDiv([
+				(new CDiv(
+					$is_api_allow_list ? _('Allowed methods') : _('Denied methods')
+				))->addClass('rules-status-title'),
+				(new CDiv($hint_api_methods))
+					->addClass('rules-status-container')
+					->addClass(ZBX_STYLE_HINTBOX_WRAP)
+			]));
 		}
 	}
 
-	// Append user to table.
-	$table->addRow([
+	$row = [
 		$checkbox,
 		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
@@ -278,7 +294,16 @@ foreach ($data['users'] as $user) {
 		$online,
 		$blocked,
 		$gui_access,
-		$api_access,
+		$api_access
+	];
+
+	if (CSettingsHelper::isMobileDevicesEnabled()) {
+		$row[] = CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $user['roleid'])
+			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+	}
+
+	$row = array_merge($row, [
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
@@ -288,6 +313,9 @@ foreach ($data['users'] as $user) {
 		$provisioned,
 		$info
 	]);
+
+	// Append user to table.
+	$table->addRow($row);
 }
 
 // Append table to form.

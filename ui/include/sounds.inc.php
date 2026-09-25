@@ -90,7 +90,7 @@ function updateMessageSettings($messages) {
 	}
 	if (isset($messages['triggers.severities'])) {
 		$selected = array_filter($messages['triggers.severities'], function($v) {
-			return $v == 1;
+			return $v == TRIGGER_SEVERITY_ON;
 		});
 		$messages['triggers.severities'] = json_encode(array_keys($selected));
 	}

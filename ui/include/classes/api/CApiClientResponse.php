@@ -46,4 +46,26 @@ class CApiClientResponse {
 	 * @var	array
 	 */
 	public $debug;
+
+	public function setErrorByException(Exception $e, bool $is_debug = false): void {
+		if ($e instanceof APIException) {
+			$this->errorCode = $e->getCode();
+		}
+		elseif ($e instanceof DBException) {
+			$this->errorCode = ZBX_API_ERROR_DB;
+		}
+		else {
+			$this->errorCode = ZBX_API_ERROR_INTERNAL;
+		}
+
+		$this->errorMessage = $e->getMessage();
+
+		if ($is_debug) {
+			$this->debug = $e->getTrace();
+
+			if ($e instanceof APIException) {
+				$this->errorMessage = $e->getDebugMessage();
+			}
+		}
+	}
 }

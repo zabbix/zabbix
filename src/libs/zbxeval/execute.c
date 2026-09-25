@@ -775,8 +775,8 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 				zbx_variant_clear(&input_vector->values[i]);
 				zbx_variant_copy(&input_vector->values[i], &value_dbl);
 			}
-			else if (SUCCEED != zbx_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT,
-					error))
+			else if (SUCCEED != zbx_eval_variant_to_value_type(&input_vector->values[i],
+					ITEM_VALUE_TYPE_FLOAT, error))
 			{
 				*error = zbx_strdup(*error, "input data is not numeric");
 				return FAIL;
@@ -1419,7 +1419,7 @@ static int	eval_validate_statistical_function_args(const zbx_eval_context_t *ctx
 
 	for (i = 0; i < input_vector->values_num; i++)
 	{
-		if (SUCCEED != zbx_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT, error))
+		if (SUCCEED != zbx_eval_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT, error))
 		{
 			*error = zbx_strdup(*error, "input data is not numeric");
 			return FAIL;
@@ -1885,12 +1885,20 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (0 != (len_utf8 = zbx_strlen_utf8(str->data.str)))
+	if (0 != num->data.ui64 && 0 != (len_utf8 = zbx_strlen_utf8(str->data.str)))
 	{
-		if (num->data.ui64 * len_utf8 >= MAX_STRING_LEN)
+		if (num->data.ui64 > (MAX_STRING_LEN - 1) / len_utf8)
 		{
+			zbx_uint64_t	total_print_len;
+
+			if (num->data.ui64 < UINT64_MAX / len_utf8)
+				total_print_len = num->data.ui64 * len_utf8;
+			else
+				total_print_len = UINT64_MAX;
+
 			*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
-					MAX_STRING_LEN, num->data.ui64 * len_utf8);
+					MAX_STRING_LEN - 1, total_print_len);
+
 			return FAIL;
 		}
 
@@ -3200,6 +3208,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 	char			*errmsg = NULL;
 
 	zbx_vector_var_create(&output);
+	zbx_vector_var_reserve(&output, 3);
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{

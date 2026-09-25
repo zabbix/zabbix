@@ -292,7 +292,24 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
+$is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
+
+$default_url_label = array_key_exists('profile_redirect_url', $data) && $data['profile_redirect_url'] !== ''
+	? (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	: null;
+
 $user_form_list
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
+		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
+			DB::getFieldLength('users', 'default_maintenance_period'))
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -304,9 +321,14 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextAreaFlexible('url', $data['url']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('users', 'url'))
+		[
+			(new CTextAreaFlexible('url', $data['url']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('users', 'url'))
+				->setEnabled(!$is_disabled)
+				->setSingleline($is_disabled),
+			$default_url_label
+		]
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -403,10 +425,18 @@ if ($data['roleid']) {
 	}
 
 	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addRow((new CTag('h4', true, _('User group permissions')))->addClass('input-section-header'))
+		->addRow(_('Permissions'), (new CDiv($permissions_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow(_('Proxies'), (new CDiv($data['proxies_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		)
+		->addRow(_('Proxy groups'), (new CDiv($data['proxy_groups_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
 
@@ -431,6 +461,20 @@ if ($data['roleid']) {
 			);
 		}
 	}
+
+	// User settings section.
+
+	$permissions_form_list
+		->addRow((new CTag('h4', true, _('User profile settings')))->addClass('input-section-header'))
+		->addRow(
+			(new CDiv(
+				(new CSpan(_('Redirect URL after login')))->addClass(
+					$data['profile_redirect_enforce'] ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+		);
 
 	// Services section.
 
@@ -530,58 +574,70 @@ if ($data['roleid']) {
 
 	// Modules section.
 
-	$permissions_form_list->addRow(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	);
+	if ($data['modules_config_enabled']) {
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		);
 
-	if (!$data['modules']) {
-		$permissions_form_list->addRow(italic(_('No enabled modules found.')));
-	}
-	else {
-		$elements = [];
-
-		foreach ($data['modules'] as $moduleid => $module_name) {
-			$elements[] = (new CSpan($module_name))->addClass(
-				array_key_exists($moduleid, $data['disabled_moduleids'])
-						|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
-					? ZBX_STYLE_STATUS_GREY
-					: ZBX_STYLE_STATUS_GREEN
-			);
+		if (!$data['modules']) {
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
 		}
+		else {
+			$elements = [];
 
-		if ($elements) {
-			$permissions_form_list->addRow((new CDiv($elements))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('rules-status-container')
-			);
+			foreach ($data['modules'] as $moduleid => $module_name) {
+				$elements[] = (new CSpan($module_name))->addClass(
+					array_key_exists($moduleid, $data['disabled_moduleids'])
+					|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+						? ZBX_STYLE_STATUS_GREY
+						: ZBX_STYLE_STATUS_GREEN
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow((new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
 		}
 	}
 
 	// API section.
 
-	$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
+	$is_api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 	$permissions_form_list
-		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('rules-status-container')
+		->addRow(
+			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
+		)
+		->addRow(
+			(new CDiv(
+				$is_api_access_enabled
+					? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_STATUS_GREEN)
+					: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_STATUS_GREY)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
 		);
 
-	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
-
-	if ($api_methods) {
-		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
+	if ($is_api_access_enabled) {
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+		$is_api_allow_list = CRoleHelper::getRoleApiListMode($data['roleid']) == ZBX_ROLE_RULE_API_MODE_ALLOW;
 		$elements = [];
 
-		foreach ($api_methods as $api_method) {
-			$elements[] = (new CSpan($api_method))->addClass(
-				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
+		if ($api_methods) {
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))
+					->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
+			}
+		}
+		else {
+			$elements[] = (new CSpan(_('None')))
+				->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN);
 		}
 
-		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+		$permissions_form_list->addRow(
+			$is_api_allow_list ? _('Allowed methods') : _('Denied methods'),
 			(new CDiv($elements))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
@@ -605,6 +661,31 @@ if ($data['roleid']) {
 		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		->addClass('rules-status-container')
 	);
+
+	if (CSettingsHelper::isMobileDevicesEnabled() && $data['db_user']['username'] !== ZBX_GUEST_USER) {
+		$permissions_form_list->addRow((new CTag('h4', true, _('Devices')))->addClass('input-section-header'));
+		$elements = [
+			[(new CSpan(_('Enabled')))
+				->addClass(CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $data['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY
+				)
+			]
+		];
+
+		foreach (CRoleHelper::getDevicesActionsLabels($data['user_type']) as $rule_name => $rule_label) {
+			$elements[] = (new CSpan($rule_label))
+				->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY
+				);
+		}
+
+		$permissions_form_list->addRow((new CDiv($elements))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		);
+	}
 }
 
 $tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
@@ -613,23 +694,22 @@ $tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'user.list')
 	->setArgument('page', CPagerHelper::loadPage('user.list', null))
-))->setId('cancel');
+))->addClass('js-cancel');
 
 if ($data['userid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
 		[
 			(new CSimpleButton(_('Delete')))
-				->setId('delete')
 				->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
-				->setId('delete'),
+				->addClass('js-delete'),
 			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('', _('Add')))->addClass('js-submit'),
 		[$cancel_button]
 	));
 }

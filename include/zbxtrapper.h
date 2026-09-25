@@ -15,6 +15,7 @@
 #ifndef ZABBIX_TRAPPER_H
 #define ZABBIX_TRAPPER_H
 
+#include "zbxtelemetry.h"
 #include "zbxthreads.h"
 
 #include "zbxdbhigh.h"
@@ -52,21 +53,26 @@ typedef struct
 	zbx_get_value_internal_ext_f		zbx_get_value_internal_ext_cb;
 	const char				*config_ssh_key_location;
 	const char				*config_webdriver_url;
+	const zbx_apm_db_config_t		*config_apm_db_config;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
+	const char				*config_bridge_adapter_url;
+	const char				*config_bridge_adapter_connect_to;
 }
 zbx_thread_trapper_args;
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args);
 
 int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
+int	zbx_get_user_from_json_for_device_offboard(const struct zbx_json_parse *jp, const char *device_uuid,
+		zbx_user_t *user);
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url);
+		const char *config_webdriver_url, const zbx_apm_db_config_t *apm_db_config);
 
 int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
 		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, int state, struct zbx_json *json,

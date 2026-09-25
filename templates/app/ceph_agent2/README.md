@@ -36,9 +36,9 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CEPH.USER}||`zabbix`|
-|{$CEPH.API.KEY}||`zabbix_pass`|
-|{$CEPH.CONNSTRING}||`https://localhost:8003`|
+|{$CEPH.USER}|<p>Ceph API user.</p>|`zabbix`|
+|{$CEPH.API.KEY}|<p>Ceph API key.</p>|`zabbix_pass`|
+|{$CEPH.CONNSTRING}|<p>Ceph connection string.</p>|`https://localhost:8003`|
 |{$CEPH.MODE}|<p>The mode of data collection. Supported value is `restful` (deprecated), `native`.</p>|`restful`|
 
 ### Items
@@ -144,7 +144,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 |[{#POOLNAME}] Pool Used|<p>The total bytes used in a pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",bytes_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].bytes_used`</p></li></ul>|
 |[{#POOLNAME}] Max available|<p>The maximum available space in the given pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",max_avail]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].max_avail`</p></li></ul>|
 |[{#POOLNAME}] Pool RAW Used|<p>Bytes used in pool including the copies made.</p>|Dependent item|ceph.pool["{#POOLNAME}",stored_raw]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].stored_raw`</p></li></ul>|
-|[{#POOLNAME}] Pool Percent Used|<p>The percentage of the storage used per pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",percent_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].percent_used`</p></li></ul>|
+|[{#POOLNAME}] Pool Percent Used|<p>The percentage of the storage used per pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",percent_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].percent_used`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |[{#POOLNAME}] Pool objects|<p>The number of objects in the pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",objects]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].objects`</p></li></ul>|
 |[{#POOLNAME}] Pool Read bandwidth|<p>The read rate per pool (bytes per second).</p>|Dependent item|ceph.pool["{#POOLNAME}",rd_bytes.rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].rd_bytes`</p></li><li>Change per second</li></ul>|
 |[{#POOLNAME}] Pool Write bandwidth|<p>The write rate per pool (bytes per second).</p>|Dependent item|ceph.pool["{#POOLNAME}",wr_bytes.rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].wr_bytes`</p></li><li>Change per second</li></ul>|

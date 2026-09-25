@@ -97,7 +97,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
 		ITEM_TYPE_SCRIPT => _('Script'),
 		ITEM_TYPE_BROWSER => _('Browser'),
-		ITEM_TYPE_NESTED => _('Nested')
+		ITEM_TYPE_NESTED => _('Nested'),
+		ITEM_TYPE_TELEMETRY_QUERY => _('Telemetry query')
 	];
 
 	if ($type === null) {
@@ -338,6 +339,39 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 }
 
 /**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return array
+ */
+function filterAndSortThresholds(array $thresholds, bool $is_binary_size = false): array {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	$filtered_thresholds = [];
+
+	foreach ($thresholds as $index => $threshold) {
+		if ($number_parser->parse(trim($threshold['threshold'])) == CParser::PARSE_SUCCESS) {
+			$filtered_thresholds[$index] = ['order_threshold' => $number_parser->calcValue()] + $threshold;
+		}
+	}
+
+	uasort($filtered_thresholds, static fn (array $t1, array $t2) => $t1['order_threshold'] <=> $t2['order_threshold']);
+
+	foreach ($filtered_thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+	unset($threshold);
+
+	return $filtered_thresholds;
+}
+
+/**
  * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type
@@ -569,12 +603,14 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('host_discovery_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
 			else {
-				$url = (new CUrl('host_discovery.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('context', 'template');
@@ -630,17 +666,20 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 						->setArgument('context', 'template');
 				}
 				else {
-					$url = (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
-						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-						->setArgument('context', 'template');
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
+						->setArgument('context', 'template')
+						->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
 				}
 			}
 			else {
@@ -1635,7 +1674,8 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_HTTPAGENT,
 		ITEM_TYPE_SNMP,
 		ITEM_TYPE_SCRIPT,
-		ITEM_TYPE_BROWSER
+		ITEM_TYPE_BROWSER,
+		ITEM_TYPE_TELEMETRY_QUERY
 	];
 }
 
@@ -1958,7 +1998,7 @@ function prepareLldMacroPaths(array $macro_paths): array {
  */
 function prepareLldFilter(array $filter): array {
 	$filter['conditions'] = array_values(array_filter($filter['conditions'], static function (array $condition): bool {
-		return $condition['macro'] !== '' || $condition['value'] !== '';
+		return $condition['macro'] !== '' || (array_key_exists('value', $condition) && $condition['value'] !== '');
 	}));
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
@@ -1983,7 +2023,9 @@ function prepareLldOverrides(array $overrides): array {
 	foreach ($overrides as &$override) {
 		$override['filter'] = prepareLldFilter([
 			'evaltype' => $override['filter']['evaltype'],
-			'formula' => $override['filter']['formula'],
+			'formula' => array_key_exists('formula', $override['filter'])
+				? $override['filter']['formula']
+				: '',
 			'conditions' => array_key_exists('conditions', $override['filter'])
 				? $override['filter']['conditions']
 				: []
@@ -2150,6 +2192,9 @@ function getMainItemFieldNames(array $input): array {
 		case ZBX_FLAG_DISCOVERY_CREATED:
 		case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 			return ['status'];
+
+		default:
+			return [];
 	}
 }
 
@@ -2246,6 +2291,11 @@ function getTypeItemFieldNames(array $input): array {
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];
 
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			return $input['templateid'] == 0
+				? ['query', 'time_shift', 'lookback_limit', 'granularity', 'timeout', 'delay']
+				: ['time_shift', 'lookback_limit', 'granularity', 'delay'];
+
 		case ITEM_TYPE_NESTED:
 			return [];
 	}
@@ -2333,14 +2383,21 @@ function getInheritedTimeouts(string $proxyid): array {
 		$db_proxies = API::Proxy()->get([
 			'output' => ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query'
 			],
-			'proxyids' => $proxyid,
-			'nopermissions' => true
+			'proxyids' => $proxyid
 		]);
 		$db_proxy = reset($db_proxies);
 
-		if ($db_proxy && $db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+		if (!$db_proxy) {
+			return [
+				'source' => 'inaccessible',
+				'proxyid' => $proxyid,
+				'timeouts' => []
+			];
+		}
+
+		if ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			return [
 				'source' => 'proxy',
 				'proxyid' => $proxyid,
@@ -2355,7 +2412,8 @@ function getInheritedTimeouts(string $proxyid): array {
 					ITEM_TYPE_HTTPAGENT => $db_proxy['timeout_http_agent'],
 					ITEM_TYPE_SNMP => $db_proxy['timeout_snmp_agent'],
 					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script'],
-					ITEM_TYPE_BROWSER => $db_proxy['timeout_browser']
+					ITEM_TYPE_BROWSER => $db_proxy['timeout_browser'],
+					ITEM_TYPE_TELEMETRY_QUERY => $db_proxy['timeout_telemetry_query']
 				]
 			];
 		}
@@ -2375,7 +2433,8 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_HTTPAGENT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 			ITEM_TYPE_SNMP => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SNMP_AGENT),
 			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
-			ITEM_TYPE_BROWSER => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
+			ITEM_TYPE_BROWSER => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
+			ITEM_TYPE_TELEMETRY_QUERY => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
 		]
 	];
 }
