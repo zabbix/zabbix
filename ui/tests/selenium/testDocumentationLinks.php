@@ -2630,7 +2630,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
 			],
-			// #249 Start creating Item Card widget.
+			// #250 Start creating Item Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2646,6 +2646,13 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Item card',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
+				]
+			],
+			// #251 Administration -> Data source -> APM view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.db.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
 				]
 			]
 		];

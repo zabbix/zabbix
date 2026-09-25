@@ -371,7 +371,7 @@ static char	*CONFIG_USER		= NULL;
 static char	**config_history_providers = NULL;
 
 static char			**config_telemetry_providers = NULL;
-static zbx_apm_db_config_t	apm_db_config;
+static zbx_apm_db_config_t	config_apm_db_config;
 
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
@@ -1721,7 +1721,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
-			.apm_db_config = &apm_db_config
+			.config_apm_db_config = &config_apm_db_config
 		};
 
 	zbx_thread_trapper_args		trapper_args =
@@ -1743,7 +1743,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
-			.apm_db_config = &apm_db_config,
+			.config_apm_db_config = &config_apm_db_config,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip,
@@ -2798,9 +2798,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_apm_db_config_init(&apm_db_config, config_telemetry_providers, zbx_config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault,
-			&error))
+	if (SUCCEED != zbx_apm_db_config_init_local_config(&config_apm_db_config, config_telemetry_providers,
+			zbx_config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize APM database configuration: %s", error);
 		zbx_free(error);
@@ -3048,7 +3048,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_apm_db_config_clear(&apm_db_config);
+	zbx_apm_db_config_clear(&config_apm_db_config);
 
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
