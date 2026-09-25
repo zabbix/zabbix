@@ -428,7 +428,7 @@ class CCepRule extends CApiService {
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $specific_rules + [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_rule', 'name')],
 			'filter' =>			self::getFilterValidationRules(),
-			'window_type' =>	['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH])] + ($is_update ? [] : ['default' => CCepRuleHelper::WINDOW_NONE]),
+			'window_type' =>	['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_SIMPLE_ONCE, CCepRuleHelper::WINDOW_PATTERN_MATCH])] + ($is_update ? [] : ['default' => CCepRuleHelper::WINDOW_NONE]),
 			'window' =>			['type' => API_ANY],
 			'operations' =>		['type' => API_ANY],
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::EXECUTION_CONTINUE, CCepRuleHelper::EXECUTION_STOP])],
@@ -624,8 +624,8 @@ class CCepRule extends CApiService {
 			$api_not_empty = 0;
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_NONE
-					|| $cep_rule['window_type'] == CCepRuleHelper::WINDOW_SIMPLE
-					|| $cep_rule['window_type'] == CCepRuleHelper::WINDOW_TAG_MATCH
+					|| $cep_rule['window_type'] == CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE
+					|| $cep_rule['window_type'] == CCepRuleHelper::WINDOW_SIMPLE_ONCE
 					|| $cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 				$api_required = $is_update ? 0 : API_REQUIRED;
 				$api_not_empty = API_NOT_EMPTY;
