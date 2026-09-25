@@ -955,7 +955,10 @@ window.host_wizard_edit = new class {
 									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
 								},
 								min: 1,
-								max: <?= ZBX_MAX_INT32 ?>
+								max: <?= ZBX_MAX_INT32 ?>,
+								is_enabled: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
+								}
 							}
 						}),
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
@@ -2128,6 +2131,10 @@ window.host_wizard_edit = new class {
 	#validateField(path) {
 		const validate = (rule, value) => {
 			rule = {type: 'string', active: false, required: false, ...rule};
+
+			if (rule.is_enabled !== undefined && rule.is_enabled(rule.row_index ?? null) === false) {
+				return null;
+			}
 
 			const required = (typeof rule.required === 'function')
 				? rule.required(rule.row_index ?? null)
