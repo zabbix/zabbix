@@ -877,6 +877,33 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
 
+#if defined(HAVE_APM)
+	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
+				" APMTLSCAFile configuration parameter");
+		err = 1;
+	}
+	if (NULL == config_apm_cert_file && NULL != config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSKeyFile configuration parameter must be used with APMTLSCertFile"
+				" configuration parameter");
+		err = 1;
+	}
+	if (NULL != config_apm_cert_file && NULL == config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile configuration parameter must be used with APMTLSKeyFile"
+				" configuration parameter");
+		err = 1;
+	}
+#else
+	err |= (FAIL == zbx_check_cfg_feature_str("APMListenIP", config_apm_sourceip, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_int("APMListenPort", config_apm_port, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCAFile", config_apm_ca_file, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCertFile", config_apm_cert_file, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSKeyFile", config_apm_key_file, "APM support"));
+#endif
+
 	if (0 != err)
 		zbx_exit(EXIT_FAILURE);
 }
