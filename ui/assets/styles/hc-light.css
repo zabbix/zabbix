@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .multilineinput-control .multilineinput-preview, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6397,17 +6397,14 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   display: flex;
   width: 100%; }
   .multilineinput-control .multilineinput-preview {
-    border: 1px solid #888888;
-    border-right-width: 0;
     box-sizing: border-box;
     flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    cursor: pointer;
     height: 24px;
+    padding: 0 5px;
     line-height: 22px;
-    padding: 0 5px; }
+    cursor: pointer;
+    border: 1px solid #888888;
+    border-right-width: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
     .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
@@ -6434,8 +6431,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
       border-color: #888888; }
       .multilineinput-control button:not([disabled]):not([readonly]):hover {
         background-color: #f4f4f4; }
-  .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
-    background-color: #f0f0f0 !important; }
   .multilineinput-control.multilineinput-disabled button::after {
     opacity: .5; }
   .multilineinput-control button.zi-pencil::before {
