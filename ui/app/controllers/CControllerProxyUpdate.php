@@ -272,8 +272,7 @@ class CControllerProxyUpdate extends CController {
 		$this->getInputs($proxy['apm'], ['data_collection_status']);
 
 		if ($proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
-			$this->getInputs($proxy['apm'], ['max_messages_per_second',
-				'additional_resource_attributes']);
+			$this->getInputs($proxy['apm'], ['max_messages_per_second', 'additional_resource_attributes']);
 
 			if ($this->getInput('quota_mode') === PROXY_APM_QUOTA_MODE_UNLIMITED) {
 				$proxy['apm']['max_messages_per_second'] = 0;
