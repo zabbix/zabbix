@@ -444,8 +444,10 @@ const hintBox = {
 		const box = jQuery('<div>', {'data-hintboxid': hintboxid})
 			.addClass(`${ZBX_STYLE_OVERLAY_DIALOGUE} hintbox wordbreak`);
 
-		if (target.dataset.hintboxPositionFixed) {
-			box.addClass('hintbox-position-fixed');
+		if ('hintboxPositionFixed' in target.dataset) {
+			if (target.dataset.hintboxPositionFixed) {
+				box.addClass('hintbox-position-fixed');
+			}
 		}
 		else {
 			for (let element = target; element && element !== document.body; element = element.parentElement) {
