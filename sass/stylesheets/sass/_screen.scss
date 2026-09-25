@@ -50,6 +50,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/datatable";
+@import "components/date-selector";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -57,6 +58,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/form-errors";
 @import "components/form-search";
 @import "components/inline-filter";
+@import "components/inline-list";
 @import "components/list-table";
 @import "components/no-data-message";
 @import "components/markdown";
@@ -121,6 +123,8 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-web";
 
 @import "components/modal/host-wizard";
+@import "components/modal/user-device-init-view";
+@import "components/modal/cep-edit";
 
 .link-action {
 	@extend %link-action-style;
@@ -517,7 +521,7 @@ form {
 }
 
 .list-check-radio {
-	li {
+	> li {
 		display: block;
 		line-height: 24px;
 	}
@@ -591,6 +595,8 @@ input {
 	}
 
 	&[type="password"] {
+		--font-stack: var(--font-stack-mono);
+
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
@@ -713,11 +719,7 @@ select {
 	padding: 0;
 	border: 0;
 	vertical-align: middle;
-	position: relative;
-	top: -1px;
 	overflow: hidden;
-	width: 13px;
-	height: 13px;
 	background: none;
 }
 
@@ -820,18 +822,6 @@ select {
 	}
 }
 
-.calendar-control {
-	.btn-icon {
-		&:not(:first-child) {
-			margin-left: 2px;
-		}
-
-		&::before {
-			font-size: 22px;
-		}
-	}
-}
-
 .header-kioskmode-controls {
 	position: fixed;
 	top: 5px;
@@ -926,7 +916,7 @@ select {
 // Installation.
 .setup-container {
 	background-color: $ui-bg-color;
-	width: 766px;
+	width: 816px;
 	height: 420px;
 	margin: 0 auto;
 	margin-top: 5%;
@@ -991,7 +981,7 @@ select {
 
 	.table-forms-td-left {
 		label {
-			max-width: 170px;
+			max-width: 180px;
 		}
 	}
 
@@ -1494,17 +1484,6 @@ select {
 	white-space: nowrap;
 	min-width: 160px;
 
-	.pager {
-		min-height: 18px;
-		padding: 0 0 2px;
-		border: 0;
-		top: 2px;
-
-		.pager-container {
-			min-height: inherit;
-		}
-	}
-
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
 		box-shadow: none;
@@ -1561,7 +1540,7 @@ select {
 			min-width: 10px;
 			height: 10px;
 			margin-left: 3px;
-			margin-right: 10px
+			margin-right: 10px;
 		}
 
 		.svg-graph-hintbox-trigger-color {
@@ -1734,18 +1713,6 @@ select {
 
 td.inactive-bg {
 	@extend .inactive-bg;
-}
-
-// Filter checkboxes.
-.table-forms-second-column {
-	display: inline-block;
-	width: 50%;
-	min-width: 200px;
-	text-align: right;
-
-	.second-column-label {
-		padding: 0 10px;
-	}
 }
 
 // Event status colors.
@@ -2304,7 +2271,7 @@ svg {
 
 	.preprocessing-list-item {
 		.step-parameters {
-			align-items: baseline;
+			align-items: end;
 			line-height: 22px;
 		}
 	}
@@ -2990,10 +2957,22 @@ z-select {
 }
 
 // Users permissions tab.
+.rules-status-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
+}
+
 .rules-status-container {
 	.status-green,
-	.status-grey {
+	.status-grey,
+	.btn-plus-more {
 		margin: 3px 3px 3px 0;
+	}
+
+	.status-green,
+	.status-grey {
+		max-width: 100%;
+		@extend %overflow-ellipsis;
 	}
 }
 

@@ -51,7 +51,7 @@ zabbix_export:
             - Click the *Add* button.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -63,6 +63,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -74,6 +99,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -98,7 +125,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -139,7 +166,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -296,6 +323,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -441,6 +470,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -452,6 +506,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -476,7 +532,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -517,7 +573,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -729,6 +785,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -1012,6 +1070,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -1023,6 +1106,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -1047,7 +1132,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -1088,7 +1173,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -1300,6 +1385,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -1563,6 +1650,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -1574,6 +1686,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -1598,7 +1712,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -1639,7 +1753,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -1851,6 +1965,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -2392,6 +2508,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -2403,6 +2544,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -2427,7 +2570,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -2468,7 +2611,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -2624,6 +2767,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -3487,6 +3632,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var GLPI = {
             	params: {},
             
@@ -3498,6 +3668,8 @@ zabbix_export:
             		});
             
             		GLPI.params = params;
+            		GLPI.tls = new CTlsConfig(params.tls_verify);
+            		GLPI.tls.checkURL(params.glpi_api_url);
             	},
             
             	getField: function (data, path, separator, default_value) {
@@ -3522,7 +3694,7 @@ zabbix_export:
             
             	getToken: function () {
             		var response,
-            			token_request = new HttpRequest();
+            			token_request = new HttpRequest(GLPI.tls.options);
             
             		if (typeof GLPI.params.http_proxy !== 'undefined' && GLPI.params.http_proxy !== '') {
             			token_request.setProxy(GLPI.params.http_proxy);
@@ -3563,7 +3735,7 @@ zabbix_export:
             		return_range = (typeof return_range !== 'undefined' ? return_range : false);
             		pagination_required = (typeof pagination_required !== 'undefined' ? pagination_required : false);
             		
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(GLPI.tls.options),
             			response,
             			data;
             
@@ -3682,6 +3854,8 @@ zabbix_export:
               value: '{$GLPI.USER}'
             - name: http_proxy
               value: '{$GLPI.HTTP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GLPI"}'
           tags:
             - tag: component
               value: raw
@@ -4134,7 +4308,7 @@ zabbix_export:
           description: 'GLPI REST API v2 base URL, e.g., https://glpi.example.com/api.php/v2.3.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: 'GLPI API URL'
             description: 'GLPI REST API v2 base URL, e.g., https://glpi.example.com/api.php/v2.3.'
             required: 'YES'
@@ -4143,7 +4317,7 @@ zabbix_export:
           description: 'Regex filter for restricting asset API access. Use to specify asset types that are inaccessible to the user.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Asset API access restrictions'
             description: 'Regex filter for restricting asset API access. Use to specify asset types that are inaccessible to the user.'
@@ -4152,7 +4326,7 @@ zabbix_export:
           description: 'Regex filter for including asset types in discovery. Use to include only specific asset types.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Asset type include filter'
             description: 'Regex filter for including asset types in discovery. Use to include only specific asset types.'
@@ -4161,7 +4335,7 @@ zabbix_export:
           description: 'Regex filter for excluding asset types from discovery. Use to exclude specific asset types from discovery.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Asset type exclude filter'
             description: 'Regex filter for excluding asset types from discovery. Use to exclude specific asset types from discovery.'
@@ -4169,7 +4343,7 @@ zabbix_export:
           description: 'OAuth2 client ID used for GLPI API authentication.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'GLPI client id'
             description: 'OAuth2 client ID used for GLPI API authentication.'
             required: 'YES'
@@ -4178,7 +4352,7 @@ zabbix_export:
           description: 'OAuth2 client secret used for GLPI API authentication.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'GLPI client secret'
             description: 'OAuth2 client secret used for GLPI API authentication.'
             required: 'YES'
@@ -4187,7 +4361,7 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Other
             label: 'API timeout'
             description: 'API response timeout, in seconds.'
@@ -4204,7 +4378,7 @@ zabbix_export:
           description: 'Regex filter for restricting management API access. Use to specify management types that are inaccessible to the user.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Management API access restrictions'
             description: 'Regex filter for restricting management API access. Use to specify management types that are inaccessible to the user.'
@@ -4213,7 +4387,7 @@ zabbix_export:
           description: 'Regex filter for including management types in discovery. Use to include only specific management types.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Management type include filter'
             description: 'Regex filter for including management types in discovery. Use to include only specific management types.'
@@ -4222,7 +4396,7 @@ zabbix_export:
           description: 'Regex filter for excluding management types from discovery. Use to exclude specific management types from discovery.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Management type exclude filter'
             description: 'Regex filter for excluding management types from discovery. Use to exclude specific management types from discovery.'
@@ -4231,7 +4405,7 @@ zabbix_export:
           description: 'Password of the dedicated monitoring user in GLPI.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'GLPI password'
             description: 'Password of the dedicated monitoring user in GLPI.'
             required: 'YES'
@@ -4240,7 +4414,7 @@ zabbix_export:
           description: 'Number of open High priority items to trigger an alert. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Threshold
             label: 'High priority open threshold'
             description: 'Number of open High priority items to trigger an alert. Use context macros to set different thresholds per assistance type. No less than 0.'
@@ -4250,7 +4424,7 @@ zabbix_export:
           description: 'Number of open Major priority items to trigger an alert. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Threshold
             label: 'Major priority open threshold'
             description: 'Number of open Major priority items to trigger an alert. Use context macros to set different thresholds per assistance type. No less than 0.'
@@ -4260,7 +4434,7 @@ zabbix_export:
           description: 'Number of open Very high priority items to trigger an alert. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Threshold
             label: 'Very high priority open threshold'
             description: 'Number of open Very high priority items to trigger an alert. Use context macros to set different thresholds per assistance type. No less than 0.'
@@ -4270,7 +4444,7 @@ zabbix_export:
           description: 'Maximum average solve time in minutes to trigger a warning alert. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Threshold
             label: 'Solve time warning threshold'
             description: 'Maximum average solve time in minutes to trigger a warning alert. Use context macros to set different thresholds per assistance type. No less than 0.'
@@ -4279,7 +4453,7 @@ zabbix_export:
           description: 'Username of the dedicated monitoring user in GLPI.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'GLPI user'
             description: 'Username of the dedicated monitoring user in GLPI.'
             required: 'YES'
@@ -4288,7 +4462,7 @@ zabbix_export:
           description: 'Maximum number of open assistance items to trigger a critical workload alert. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Threshold
             label: 'Workload critical threshold'
             description: 'Maximum number of open assistance items to trigger a critical workload alert. Use context macros to set different thresholds per assistance type. No less than 0.'
@@ -4298,11 +4472,27 @@ zabbix_export:
           description: 'Maximum number of open assistance items to trigger a workload warning. Use context macros to set different thresholds per assistance type.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Threshold
             label: 'Workload warning threshold'
             description: 'Maximum number of open assistance items to trigger a workload warning. Use context macros to set different thresholds per assistance type. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GLPI", e.g. {$HTTP.TLS.VERIFY:"GLPI"}.'
+          config:
+            type: LIST
+            priority: '2'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: c3c12132bf9045efa9cfe8f3d963eea2
           name: 'GLPI: General'

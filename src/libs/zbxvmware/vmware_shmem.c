@@ -13,6 +13,7 @@
 **/
 
 #include "vmware_shmem.h"
+#include "vmware_internal.h"
 #include "zbxshmem.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)

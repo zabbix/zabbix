@@ -29,7 +29,7 @@ class CControllerTimeoutsEdit extends CController {
 	}
 
 	private function getDefaultValues(): array {
-		return [
+		$default_values = [
 			'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
 			'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
 			'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
@@ -40,6 +40,7 @@ class CControllerTimeoutsEdit extends CController {
 			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
 			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
 			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
+			'timeout_telemetry_query' => CSettingsSchema::getDefault('timeout_telemetry_query'),
 			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
 			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
 			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
@@ -47,6 +48,12 @@ class CControllerTimeoutsEdit extends CController {
 			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
 			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
 		];
+
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
+			$default_values['device_link_timeout'] = CSettingsSchema::getDefault('device_link_timeout');
+		}
+
+		return $default_values;
 	}
 
 	protected function doAction(): void {

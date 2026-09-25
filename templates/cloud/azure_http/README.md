@@ -3,9 +3,9 @@
 
 ## Overview
 
-- This template is designed to monitor Microsoft Azure by HTTP.
-- It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
+This template is designed to monitor Microsoft Azure by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, MySQL and PostgreSQL servers, Microsoft SQL databases, Cosmos DB for MongoDB, Backup Jobs, Sentinel workspaces, and Container Apps.
 
 ## Included Monitoring Templates
 
@@ -20,6 +20,7 @@
 - *Azure Microsoft SQL Database by HTTP*
 - *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
+- *Azure Cosmos DB for MongoDB by HTTP*
 - *Azure Backup Jobs by HTTP*
 - *Azure Sentinel by HTTP*
 - *Azure Container Apps by HTTP*
@@ -58,6 +59,7 @@ This template has been tested on:
 |{$AZURE.PASSWORD}|<p>Client secret of the Azure service principal used for API authentication.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>Maximum time to wait for Azure API responses before request fails.</p>|`15s`|
 |{$AZURE.PROXY}|<p>HTTP proxy used for Azure API requests (leave empty to connect directly).</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure", e.g. {$HTTP.TLS.VERIFY:"Azure"}.</p>|`full`|
 |{$AZURE.VM.NAME.MATCHES}|<p>Regex string to include discovered virtual machines by name.</p>|`.*`|
 |{$AZURE.VM.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machines by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.VM.LOCATION.MATCHES}|<p>Regex string to include discovered virtual machine locations by name.</p>|`.*`|
@@ -118,6 +120,7 @@ This template has been tested on:
 |Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get storage accounts|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.storage.acc|
 |Get storage accounts errors|<p>The errors from API requests.</p>|Dependent item|azure.get.storage.acc.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Virtual machine count|<p>Get the total count of virtual machines.</p>|Dependent item|azure.get.vm.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
@@ -295,6 +298,7 @@ This template has been tested on:
 |{$AZURE.SCALESET.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure VM Scale Set", e.g. {$HTTP.TLS.VERIFY:"Azure VM Scale Set"}.</p>|`full`|
 
 ### Items
 
@@ -409,6 +413,7 @@ This template has been tested on:
 |{$AZURE.VM.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Virtual Machine", e.g. {$HTTP.TLS.VERIFY:"Azure Virtual Machine"}.</p>|`full`|
 
 ### Items
 
@@ -532,6 +537,7 @@ This template has been tested on:
 |{$AZURE.DB.ABORTED.CONN.MAX.WARN}|<p>The number of failed attempts to connect to the MySQL server for a trigger expression.</p>|`25`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Flexible Server"}.</p>|`full`|
 
 ### Items
 
@@ -618,6 +624,7 @@ This template has been tested on:
 |{$AZURE.DB.FAILED.CONN.MAX.WARN}|<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p>|`25`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Single Server"}.</p>|`full`|
 
 ### Items
 
@@ -703,6 +710,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Flexible Server"}.</p>|`full`|
 
 ### Items
 
@@ -793,6 +801,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Single Server"}.</p>|`full`|
 
 ### Items
 
@@ -878,6 +887,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Serverless Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Serverless Database"}.</p>|`full`|
 
 ### Items
 
@@ -969,6 +979,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL DTU Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL DTU Database"}.</p>|`full`|
 
 ### Items
 
@@ -1061,6 +1072,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Database"}.</p>|`full`|
 
 ### Items
 
@@ -1149,6 +1161,7 @@ This template has been tested on:
 |{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}|<p>The warning threshold of the Cosmos DB for MongoDB service availability.</p>|`70`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cosmos DB for MongoDB", e.g. {$HTTP.TLS.VERIFY:"Azure Cosmos DB for MongoDB"}.</p>|`full`|
 
 ### Items
 
@@ -1218,6 +1231,17 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.BUDGET.MONTH}|<p>Threshold for Azure monthly budget limit.</p>|`10000`|
+|{$AZURE.BILLING.MONTH.HIGH}|<p>Threshold for high Azure monthly billing.</p>|`15000`|
+|{$AZURE.BILLING.MONTH.WARN}|<p>Warning threshold for Azure monthly billing.</p>|`10000`|
+|{$AZURE.SERVICE.COST.TOP.HIGH}|<p>Threshold for high Azure top service cost.</p>|`400`|
+|{$AZURE.SERVICE.COST.TOP.WARN}|<p>Warning threshold for Azure top service cost.</p>|`200`|
+|{$AZURE.ACCOUNT.COST.DAILY.HIGH}|<p>Threshold for high Azure account daily cost.</p>|`400`|
+|{$AZURE.ACCOUNT.COST.DAILY.WARN}|<p>Warning threshold for Azure account daily cost.</p>|`200`|
+|{$AZURE.REGION.COST.DAILY.HIGH}|<p>Threshold for high Azure region daily cost.</p>|`400`|
+|{$AZURE.REGION.COST.DAILY.WARN}|<p>Warning threshold for Azure region daily cost.</p>|`200`|
+|{$AZURE.SERVICE.COST.DAILY.HIGH}|<p>Threshold for high Azure service daily cost.</p>|`400`|
+|{$AZURE.SERVICE.COST.DAILY.WARN}|<p>Warning threshold for Azure service daily cost.</p>|`200`|
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
@@ -1231,11 +1255,43 @@ This template has been tested on:
 |{$AZURE.LLD.FILTER.RESOURCE.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered resource groups by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cost Management", e.g. {$HTTP.TLS.VERIFY:"Azure Cost Management"}.</p>|`full`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get region and subscription daily data|<p>Collects Azure region and subscription daily cost data.</p>|Dependent item|azure.region.subscription.daily.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service daily data|<p>Collects Azure service daily cost data.</p>|Dependent item|azure.service.daily.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region and subscription yearly data|<p>Collects Azure region and account yearly cost data.</p>|Dependent item|azure.region.subscription.yearly.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service yearly data|<p>Collects Azure service yearly cost data.</p>|Dependent item|azure.service.yearly.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get total months|<p>Collects Azure monthly cost data.</p>|Dependent item|azure.month.cost.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service daily cost|<p>Collects daily Azure service data.</p>|Dependent item|azure.service.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p></li></ul>|
+|Get accounts daily cost|<p>Collects daily Azure account data.</p>|Dependent item|azure.account.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li></ul>|
+|Get regions daily cost|<p>Collects daily Azure region data.</p>|Dependent item|azure.regions.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get service type daily cost|<p>Collects data for each service type cost within a day:</p><p>ai_ml - `ai` and `machine learning` services</p><p>analytics - `data analysis` and `reporting` services</p><p>compute - `virtual machines` and `app runtime` services</p><p>containers - `container` services</p><p>databases - `database` services</p><p>storage - `storage` services</p><p>networking - `networking`, `routing`, and `connectivity` services</p><p>security - `security`, `identity`, and `protection` services</p><p>dev_tools - `developer tools` services</p><p>identity - `identity` and `access management` services</p><p>integration - `integration` `messaging` services</p><p>iot - `iot` services</p><p>mgmt - `monitoring`, `governance`, and `management` services</p><p>media - `media` streaming and delivery services</p><p>migration - `migration` and data transfer services</p><p>mixed_reality - `mixed` and `augmented` reality services</p><p>mobile - `mobile` backend and `real-time` communication services</p><p>hybrid - `hybrid` and `multicloud` connectivity services</p><p>web - `web` hosting and `application` hosting services</p><p>vdi - `virtual desktop` and `remote workspace` services</p>|Dependent item|azure.service.type.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.categories`</p></li></ul>|
+|Azure monthly budget delta|<p>Calculates current Azure monthly budget delta compared to previous month.</p>|Calculated|azure.monthly.delta.budget<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure monthly delta, in percent|<p>Calculates current Azure monthly delta, in percent, compared to previous month.</p>|Calculated|azure.monthly.delta.percent<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure monthly delta|<p>Calculates current Azure monthly delta compared to previous month.</p>|Calculated|azure.monthly.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get Azure monthly compare|<p>Azure monthly cost comparison.</p>|Dependent item|azure.monthly.compare.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_comparison`</p></li></ul>|
+|Get Azure daily top service|<p>Azure daily top service data.</p>|Dependent item|azure.daily.top.service.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.top_services`</p></li></ul>|
+|Azure daily service count|<p>Azure daily service count.</p>|Dependent item|azure.daily.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count_daily`</p></li></ul>|
+|Azure monthly average cost|<p>Azure monthly average cost.</p>|Calculated|azure.monthly.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure daily average cost|<p>Azure daily average cost in one week.</p>|Calculated|azure.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure daily total cost|<p>Azure daily total cost.</p>|Dependent item|azure.daily.total.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure Q1 delta|<p>Difference in cost between `Q2` and `Q1`.</p>|Calculated|azure.q1.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Q2 delta|<p>Difference in cost between `Q3` and `Q2`.</p>|Calculated|azure.q2.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Q3 delta|<p>Difference in cost between `Q4` and `Q3`.</p>|Calculated|azure.q3.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure quarterly trend cost|<p>Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.</p>|Calculated|azure.quarterly.trend.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get service type yearly cost|<p>Collects data for each service type cost within a year:</p><p>ai_ml - `ai` and `machine learning` services</p><p>analytics - `data analysis` and `reporting` services</p><p>compute - `virtual machines` and `app runtime` services</p><p>containers - `container` services</p><p>databases - `database` services</p><p>storage - `storage` services</p><p>networking - `networking`, `routing`, and `connectivity` services</p><p>security - `security`, `identity`, and `protection` services</p><p>dev_tools - `developer tools` services</p><p>identity - `identity` and `access management` services</p><p>integration - `integration` `messaging` services</p><p>iot - `iot` services</p><p>mgmt - `monitoring`, `governance`, and `management` services</p><p>media - `media` streaming and delivery services</p><p>migration - `migration` and data transfer services</p><p>mixed_reality - `mixed` and `augmented` reality services</p><p>mobile - `mobile` backend and `real-time` communication services</p><p>hybrid - `hybrid` and `multicloud` connectivity services</p><p>web - `web` hosting and `application` hosting services</p><p>vdi - `virtual desktop` and `remote workspace` services</p>|Dependent item|azure.service.type.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.type`</p></li></ul>|
+|Get subscription yearly cost|<p>Collects cost data for Azure subscription within a yearly gap.</p>|Dependent item|azure.subscription.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.subscriptions`</p></li></ul>|
+|Get region yearly cost|<p>Collects cost data for each region within a yearly gap.</p>|Dependent item|azure.region.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get service yearly cost|<p>Collects cost data for each service within a yearly gap.</p>|Dependent item|azure.service.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p></li></ul>|
+|Annual cost|<p>Azure total annual cost.</p>|Calculated|azure.annual.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Q1 cost total|<p>Total Q1 cost.</p>|Dependent item|azure.first.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q1`</p></li></ul>|
+|Q2 cost total|<p>Total Q2 cost.</p>|Dependent item|azure.second.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q2`</p></li></ul>|
+|Q3 cost total|<p>Total Q3 cost.</p>|Dependent item|azure.third.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q3`</p></li></ul>|
+|Q4 cost total|<p>Total Q4 cost.</p>|Dependent item|azure.fourth.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q4`</p></li></ul>|
 |Get monthly costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.monthly.costs|
 |Get daily costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.daily.costs|
 |Azure Cost: Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -1248,11 +1304,172 @@ This template has been tested on:
 |Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.monthly.costs.errors))>0`|Average||
 |Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.daily.costs.errors))>0`|Average||
 
+### LLD rule Azure daily service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily service cost discovery|<p>Collects daily Azure service cost data.</p>|Dependent item|azure.daily.service.cost.discovery|
+
+### Item prototypes for Azure daily service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service [{#AZURE.SERVICE.NAME}]: Get daily data|<p>Collects daily Azure `{#AZURE.SERVICE.NAME}` service data.</p>|Dependent item|azure.daily.service.cost.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure service [{#AZURE.SERVICE.NAME}]: Daily cost|<p>Collects daily Azure `{#AZURE.SERVICE.NAME}` service cost.</p>|Dependent item|azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily service cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure service daily cost warning|<p>Azure service daily cost is above warning threshold `{$AZURE.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure service daily cost high</li></ul>|
+|Azure service daily cost high|<p>Azure service daily cost has exceeded high threshold `{$AZURE.SERVICE.COST.DAILY.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily account cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily account cost discovery|<p>Collects daily Azure account cost data.</p>|Dependent item|azure.daily.account.cost.discovery|
+
+### Item prototypes for Azure daily account cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get daily data|<p>Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account data.</p>|Dependent item|azure.daily.account.cost.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.subscription_id=="{#AZURE.SUBSCRIPTION.ID}")].first()`</p></li></ul>|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Daily cost|<p>Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account cost.</p>|Dependent item|azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily account cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure account daily cost warning|<p>Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost is above warning threshold `{$AZURE.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]) >= {$AZURE.ACCOUNT.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure account daily cost high</li></ul>|
+|Azure account daily cost high|<p>Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost has exceeded high threshold `{$AZURE.ACCOUNT.COST.DAILY.HIGH}`. Immediate investigation of account spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]) >= {$AZURE.ACCOUNT.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily region cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily region cost discovery|<p>Collects daily Azure region cost data.</p>|Dependent item|azure.daily.region.cost.discovery|
+
+### Item prototypes for Azure daily region cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure region [{#AZURE.REGION.NAME}]: Get daily data|<p>Collects daily Azure `{#AZURE.REGION.NAME}` region data.</p>|Dependent item|azure.daily.region.cost.preprocessed.get["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AZURE.REGION.NAME}")].first()`</p></li></ul>|
+|Azure region [{#AZURE.REGION.NAME}]: Daily cost|<p>Collects daily Azure `{#AZURE.REGION.NAME}` region cost.</p>|Dependent item|azure.daily.region.cost["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily region cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure region daily cost warning|<p>Azure region `{#AZURE.REGION.NAME}` daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure region daily cost high</li></ul>|
+|Azure region daily cost high|<p>Azure region `{#AZURE.REGION.NAME}` daily cost has exceeded high threshold `{$AZURE.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily service type costs discovery|<p>Collects daily Azure service type data.</p>|Dependent item|azure.daily.service.type.costs.discovery|
+
+### Item prototypes for Azure daily service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Get daily data|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type data.</p>|Dependent item|azure.daily.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.category=="{#AZURE.SERVICE.TYPE}")].first()`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Daily cost|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type cost.</p>|Dependent item|azure.service.type.daily.cost["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Daily count|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type count.</p>|Dependent item|azure.service.type.daily.count["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p></li></ul>|
+
+### LLD rule Azure monthly compare discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly compare discovery|<p>Collects monthly data that compares current to previous months.</p>|Dependent item|azure.monthly.compare.discovery|
+
+### Item prototypes for Azure monthly compare discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Get data|<p>Collects Azure cost data for `{#AZURE.MONTH.DATE}` month with `{#AZURE.MONTH.TYPE}` monthly type.</p>|Dependent item|azure.monthly.compare.type.preprocessed.get["{#AZURE.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="{#AZURE.MONTH.TYPE}")].first()`</p></li></ul>|
+|Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Total cost|<p>Total `{#AZURE.MONTH.TYPE}` `{#AZURE.MONTH.DATE}` monthly cost.</p>|Dependent item|azure.monthly.compare.type.cost["{#AZURE.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure daily top service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily top service cost discovery|<p>Collects Azure top service data.</p>|Dependent item|azure.daily.top.service.cost.discovery|
+
+### Item prototypes for Azure daily top service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Get data|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` data.</p>|Dependent item|azure.daily.top.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Daily cost|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.</p>|Dependent item|azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Daily cost, in percent|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.</p>|Dependent item|azure.daily.top.service.percent["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.percent`</p></li></ul>|
+
+### Trigger prototypes for Azure daily top service cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure top daily service cost warning|<p>Azure top service `{#AZURE.SERVICE.NAME}` cost is above warning threshold `{$AZURE.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.TOP.WARN}`|Warning|**Depends on**:<br><ul><li>Azure top daily service cost high</li></ul>|
+|Azure top daily service cost high|<p>Azure top service `{#AZURE.SERVICE.NAME}` cost has exceeded high threshold `{$AZURE.SERVICE.COST.TOP.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.TOP.HIGH}`|High||
+
+### LLD rule Azure yearly service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly service type costs discovery|<p>Collects yearly Azure service type data.</p>|Dependent item|azure.yearly.service.type.costs.discovery|
+
+### Item prototypes for Azure yearly service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Get yearly data|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type data.</p>|Dependent item|azure.yearly.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.category=="{#AZURE.SERVICE.TYPE}")].first()`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Yearly cost|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type cost.</p>|Dependent item|azure.service.type.yearly.cost["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Yearly count|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type count.</p>|Dependent item|azure.service.type.yearly.count["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p></li></ul>|
+
+### LLD rule Azure yearly subscription costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly subscription costs discovery|<p>Collects yearly Azure subscription data.</p>|Dependent item|azure.yearly.subscription.costs.discovery|
+
+### Item prototypes for Azure yearly subscription costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID data.</p>|Dependent item|azure.yearly.subscription.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.subscription_id=="{#AZURE.SUBSCRIPTION.ID}")].first()`</p></li></ul>|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID total cost.</p>|Dependent item|azure.yearly.subscription.yearly.cost["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure yearly region costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly region costs discovery|<p>Collects yearly Azure region data.</p>|Dependent item|azure.yearly.region.costs.discovery|
+
+### Item prototypes for Azure yearly region costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure region [{#AZURE.REGION.NAME}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.REGION.NAME}` region data.</p>|Dependent item|azure.yearly.region.preprocessed.get["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AZURE.REGION.NAME}")].first()`</p></li></ul>|
+|Azure region [{#AZURE.REGION.NAME}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.REGION.NAME}` region total cost.</p>|Dependent item|azure.yearly.region.yearly.cost["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure yearly service costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly service costs discovery|<p>Collects yearly Azure service data.</p>|Dependent item|azure.yearly.service.costs.discovery|
+
+### Item prototypes for Azure yearly service costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service [{#AZURE.SERVICE.NAME}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.SERVICE.NAME}` service data.</p>|Dependent item|azure.yearly.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure service [{#AZURE.SERVICE.NAME}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.SERVICE.NAME}` service total cost.</p>|Dependent item|azure.yearly.service.yearly.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
 ### LLD rule Azure daily costs by services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Azure daily costs by services discovery|<p>Discovery of daily costs by services.</p>|Dependent item|azure.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Azure daily costs by services discovery|<p>Discovery of daily costs by services.</p>|Dependent item|azure.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Azure daily costs by services discovery
 
@@ -1308,6 +1525,15 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost.</p>|Dependent item|azure.monthly.cost["{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
+### Trigger prototypes for Azure monthly costs discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure monthly billing warning|<p>Azure `{#AZURE.BILLING.MONTH}` month cost is above warning threshold `{$AZURE.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BILLING.MONTH.WARN}`|Warning|**Depends on**:<br><ul><li>Azure monthly billing high</li></ul>|
+|Azure monthly billing high|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has exceeded high threshold `{$AZURE.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BILLING.MONTH.HIGH}`|High||
+|Azure monthly billing budget warning 80%|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has reached 80% of the defined budget `{$AZURE.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BUDGET.MONTH}*0.8`|Warning|**Depends on**:<br><ul><li>Azure monthly billing budget exceeded 100%</li></ul>|
+|Azure monthly billing budget exceeded 100%|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has reached or exceeded the full budget `{$AZURE.BUDGET.MONTH}`. Immediate cost control actions are recommended.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BUDGET.MONTH}`|High||
+
 # Azure SQL Managed Instance by HTTP
 
 ## Overview
@@ -1354,6 +1580,7 @@ This template has been tested on:
 |{$AZURE.SQL.INST.SPACE.CRIT}|<p>Storage space critical threshold, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure SQL Managed Instance", e.g. {$HTTP.TLS.VERIFY:"Azure SQL Managed Instance"}.</p>|`full`|
 
 ### Items
 
@@ -1434,6 +1661,7 @@ This template has been tested on:
 |{$AZURE.VAULT.PERIOD}|<p>The number of days over which to retrieve backup jobs.</p>|`7`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Backup Jobs", e.g. {$HTTP.TLS.VERIFY:"Azure Backup Jobs"}.</p>|`full`|
 |{$AZURE.JOBS.FRIENDLY.NAME.MATCHES}|<p>Set the regex string to include backup jobs based on `entityFriendlyName`.</p>|`.*`|
 |{$AZURE.JOBS.FRIENDLY.NAME.NOT.MATCHES}|<p>Set the regex string to exclude backup jobs based on `entityFriendlyName`.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.JOBS.STATUS.MATCHES}|<p>Set the regex string to include backup jobs based on status.</p>|`.*`|
@@ -1539,6 +1767,7 @@ This template has been tested on:
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure scale set ID.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Sentinel", e.g. {$HTTP.TLS.VERIFY:"Azure Sentinel"}.</p>|`full`|
 |{$AZURE.SENTINEL.PERIOD}|<p>The number of days during which to retrieve modified entities (incidents, alert rules, automation rules).</p>|`30`|
 |{$AZURE.SENTINEL.INTERVAL}|<p>The update interval for the script items that retrieve data from the API.</p>|`10m`|
 |{$AZURE.SENTINEL.INCIDENTS.NEW}|<p>The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. Can be used with context if needed (check the context values in relevant items).</p>|`1`|
@@ -1651,6 +1880,7 @@ This template has been tested on:
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure container app resource ID.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Container Apps", e.g. {$HTTP.TLS.VERIFY:"Azure Container Apps"}.</p>|`full`|
 |{$AZURE.CONTAINER_APP.JVM.METRICS}|<p>Enable Java virtual machine metric collection. Useful for container apps with Java development stack.</p>|`false`|
 |{$AZURE.CONTAINER_APP.CPU.WARN}|<p>Warning threshold for CPU utilization.</p>|`75`|
 |{$AZURE.CONTAINER_APP.CPU.CRIT}|<p>Critical threshold for CPU utilization.</p>|`90`|

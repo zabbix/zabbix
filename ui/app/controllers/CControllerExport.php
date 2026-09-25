@@ -29,6 +29,7 @@ class CControllerExport extends CController {
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
 			'dashboardids' =>	'not_empty|array_db dashboard.dashboardid',
+			'regexpids' =>		'not_empty|array_db regexps.regexpid',
 			'format' =>			'in '.implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])
 		];
 
@@ -37,7 +38,7 @@ class CControllerExport extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-		elseif (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+		elseif (!(new CFrontendActionValidator())->validate($this->getInput('backurl'))) {
 			throw new CAccessDeniedException();
 		}
 
@@ -60,6 +61,9 @@ class CControllerExport extends CController {
 
 			case 'export.dashboards':
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
+
+			case 'export.regexes':
+				return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 
 			default:
 				return false;
@@ -95,6 +99,10 @@ class CControllerExport extends CController {
 				$params['options']['dashboards'] = $this->getInput('dashboardids', []);
 				break;
 
+			case 'export.regexes':
+				$params['options']['global_regexes'] = $this->getInput('regexpids', []);
+				break;
+
 			default:
 				$this->setResponse(new CControllerResponseFatal());
 
@@ -103,12 +111,10 @@ class CControllerExport extends CController {
 
 		$result = API::Configuration()->export($params);
 
-		if ($result) {
-			$response = new CControllerResponseData([
-				'main_block' => $result,
-				'mime_type' => CExportWriterFactory::getMimeType($params['format']),
-				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$params['format']]
-			]);
+		if ($result !== false) {
+			$response = (new CControllerResponseData(['main_block' => $result]))
+				->setFileName('zbx_export_'.substr($action, 7).'.'.$params['format'])
+				->setFileMimeType(CExportWriterFactory::getMimeType($params['format']));
 		}
 		else {
 			$response = new CControllerResponseRedirect(

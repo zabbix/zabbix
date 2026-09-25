@@ -15,16 +15,19 @@
 package redis
 
 import (
+	"strconv"
+
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
 var _ plugin.Configurator = (*Plugin)(nil)
 
 type pluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyTimeout int `conf:"name=Timeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
@@ -44,8 +47,20 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("'Plugins.Redis.Timeout' is deprecated")
+
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyTimeout)
+		}
+	}
+
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
 	}
 }
 
@@ -54,11 +69,50 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 func (*Plugin) Validate(options any) error {
 	var (
 		opts pluginOptions
+		ct   int
 	)
 
 	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	for k := range opts.Sessions {
+		if opts.Sessions[k].ConnectionTimeout != "" {
+			ct, err = strconv.Atoi(opts.Sessions[k].ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					opts.Sessions[k].ConnectionTimeout,
+					k,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					opts.Sessions[k].ConnectionTimeout,
+					k,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		ct, err = strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if ct < 1 || ct > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
+		}
 	}
 
 	err = opts.Default.runSourceConsistencyValidation()

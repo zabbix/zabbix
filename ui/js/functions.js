@@ -676,7 +676,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			jQuery('<button>')
 				.addClass('btn-overlay-close')
 				.attr('type', 'button')
-				.attr('title', t('Close'))
+				.attr('aria-label', t('Close notification'))
 				.click(function() {
 					jQuery(this)
 						.closest(`.${classes[type]}`)
@@ -987,4 +987,28 @@ function convertRGBToHSL(r, g, b) {
  */
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
+}
+
+/**
+ * Validate and convert time to seconds. Logic almost matches func.inc.php timeUnitToSeconds as this doesn't allow
+ * leading zeroes to match parser
+ *
+ * @param {string} time
+ * @param {bool}   with_year
+ *
+ * @returns {int|null}  Null if not valid time unit.
+ */
+function timeUnitToSeconds(time, with_year) {
+	const suffixes = with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
+	const match = time.match(new RegExp('^(?<int>-?\\d+)(?<suffix>[' + suffixes + '])?$'));
+
+	if (match === null || (match.groups.int.length > 1 && match.groups.int.charAt(0) === '0')) {
+		return null;
+	}
+
+	if (match.groups.suffix === undefined) {
+		return parseInt(match.groups.int);
+	}
+
+	return parseInt(match.groups.int) * ZBX_TIME_SUFFIX_MULTIPLIERS[match.groups.suffix];
 }

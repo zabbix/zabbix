@@ -347,7 +347,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$this->selectDatatableRows($data['selected_events'], 'Problem');
 		}
 
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $data['locator'])->one()->waitUntilClickable()->click();
 		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($context_menu->hasTitles(['VIEW', 'CONFIGURATION', 'PROBLEM']));

@@ -68,6 +68,12 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
+			'key' => 'net.if.get',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json_exclude_keys' => ['bytes', 'packets', 'multicast']
+		],
+		[
 			'key' => 'net.tcp.listen[80]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
@@ -630,6 +636,27 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					break;
 				}
 
+				if (array_key_exists('json_exclude_keys', $item)) {
+					// Converts the JSON strings from agentd ($a) and agent2 ($b) into PHP associative arrays.
+					$a_decoded = json_decode($a, true);
+					$b_decoded = json_decode($b, true);
+
+					// Exclude keys that have dynamically changing value.
+					foreach ([&$a_decoded, &$b_decoded] as &$json) {
+						foreach ($json['values'] as &$entry) {
+							foreach ($item['json_exclude_keys'] as $exclude_key) {
+								unset($entry['in'][$exclude_key], $entry['out'][$exclude_key]);
+							}
+						}
+						unset($entry);
+					}
+					unset($json);
+
+					// Compare cleaned arrays.
+					$this->assertEquals($a_decoded, $b_decoded, 'Values do not match for '.$item['key']);
+					break;
+				}
+
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 
 					$a = substr($a, 0, $item['threshold']);
@@ -647,7 +674,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					$value = [];
 
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-						// Calculate offset between Agent and Agent2 result arrays
+						// Calculate offset between Agent and Agent2 result arrays.
 						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 							$value[$component][$i] = 0;
 

@@ -24,9 +24,11 @@ class CControllerCorrelationEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'correlationid' => ['db correlation.correlationid']
-		]]);
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -42,7 +44,7 @@ class CControllerCorrelationEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES)) {
 			return false;
 		}
 
@@ -106,7 +108,6 @@ class CControllerCorrelationEdit extends CController {
 				->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
-
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));

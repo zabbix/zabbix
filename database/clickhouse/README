@@ -19,7 +19,7 @@ Schema Creation Scripts:
 These scripts create ClickHouse table schemas for corresponding value types.
 
 Usage:
-./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>]
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>] [-e <engine>]
 
 Parameters:
 -s|--server: ClickHouse URL (default: http://localhost:8123)
@@ -28,6 +28,7 @@ Parameters:
 -p|--password: ClickHouse password (default: empty)
 -t|--ttl: Housekeeping interval in seconds (default: 2678400 (31 days))
 -P|--partition: Partitioning schema (default: toDate (by days))
+-e|--engine: Table engine (default: MergeTree())
 -i|--import-dir: Directory with the exported CSV files (default: /tmp)
 -h|--help: Display help message
 
@@ -40,6 +41,16 @@ partition schema, for example with year long housekeeping interval, it
 might be better to set monthly partitioning:
 
 ./<history table>_schema.sh -s <ClickHouse URL> -d <database> -t 31536000 -P toYYYYMM
+
+The engine is inserted into the CREATE TABLE statement as is, so it must be a
+complete engine clause, including its parameters. For example, on a server
+configured for replication ReplicatedMergeTree can be used:
+
+./history_all.sh -s <ClickHouse URL> -d zabbix -e "ReplicatedMergeTree()"
+
+If the engine takes a per table parameter, such as an explicit replica path,
+run the schema scripts individually rather than through history_all.sh, which
+passes the same arguments to all of them.
 
 Data Export Scripts:
 

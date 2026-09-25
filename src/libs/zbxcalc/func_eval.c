@@ -2000,7 +2000,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 		}
 
 		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) || (0 != item->proxyid && 0 != lazy &&
-				SUCCEED == zbx_hc_is_itemid_cached_and_normal(item->itemid)))
+				SUCCEED == zbx_hc_is_itemid_cached_and_normal(item->itemid, ts.sec - period)))
 		{
 			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;
@@ -2400,8 +2400,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	{
 		zbx_timespec_t	zero_time;
 
-		double	*t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
-		double	*x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
+		double	*t = (double *)zbx_malloc(NULL, (size_t)values.values_num * sizeof(double));
+		double	*x = (double *)zbx_malloc(NULL, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;

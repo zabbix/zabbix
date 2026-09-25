@@ -24,9 +24,11 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'moduleid' => ['db module.moduleid', 'required']
-		]]);
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(

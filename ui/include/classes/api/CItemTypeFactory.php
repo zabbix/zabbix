@@ -91,6 +91,9 @@ final class CItemTypeFactory {
 
 			case ITEM_TYPE_NESTED:
 				return self::$instances[$type] = new CItemTypeNested();
+
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				return self::$instances[$type] = new CItemTypeTelemetryQuery();
 		}
 
 		throw new APIException(ZBX_API_ERROR_INTERNAL, 'Incorrect item type.');

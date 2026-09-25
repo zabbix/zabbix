@@ -53,7 +53,6 @@ type Manager struct {
 	connMutex    sync.Mutex
 	connections  map[connKey]*RedisConn
 	keepAlive    time.Duration
-	timeout      time.Duration
 	Destroy      context.CancelFunc
 }
 
@@ -75,14 +74,13 @@ func NewRedisConn(client radix.Client) *RedisConn {
 }
 
 // NewManager initializes Manager structure and runs Go Routine that watches for unused connections.
-func NewManager(logger log.Logger, keepAlive, timeout, hkInterval time.Duration) *Manager {
+func NewManager(logger log.Logger, keepAlive, hkInterval time.Duration) *Manager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &Manager{
 		log:         logger,
 		connections: make(map[connKey]*RedisConn),
 		keepAlive:   keepAlive,
-		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
 	}
 
@@ -102,7 +100,7 @@ func (r *RedisConn) Query(cmd radix.CmdAction) error {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (m *Manager) GetConnection(u *uri.URI, params map[string]string) (*RedisConn, error) {
+func (m *Manager) GetConnection(u *uri.URI, params map[string]string, connectionTimeout int) (*RedisConn, error) {
 	ck := createConnKey(u, params)
 
 	m.managerMutex.Lock()
@@ -113,7 +111,7 @@ func (m *Manager) GetConnection(u *uri.URI, params map[string]string) (*RedisCon
 	if conn == nil {
 		var err error
 
-		conn, err = m.create(ck)
+		conn, err = m.create(ck, connectionTimeout)
 		if err != nil {
 			return nil, errs.WrapConst(err, zbxerr.ErrorConnectionFailed)
 		}
@@ -195,7 +193,7 @@ func (m *Manager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (m *Manager) create(u *connKey) (*RedisConn, error) {
+func (m *Manager) create(u *connKey, connectionTimeout int) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
@@ -217,7 +215,7 @@ func (m *Manager) create(u *connKey) (*RedisConn, error) {
 	// authConnFunc is used as radix.ConnFunc to perform AUTH and set timeout.
 	authConnFunc := func(scheme, addr string) (radix.Conn, error) {
 		dialOpts := []radix.DialOpt{
-			radix.DialTimeout(m.timeout),
+			radix.DialTimeout(time.Duration(connectionTimeout) * time.Second),
 			radix.DialAuthUser(u.uri.User(), u.uri.Password()),
 		}
 

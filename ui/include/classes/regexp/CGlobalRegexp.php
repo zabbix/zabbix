@@ -118,7 +118,7 @@ class CGlobalRegexp {
 	 * @return bool
 	 */
 	public static function matchExpression(array $expression, $string) {
-		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
+		if ($expression['expression_type'] == REGEX_TYPE_MATCHES_REGEX || $expression['expression_type'] == REGEX_TYPE_NOT_MATCHES_REGEX) {
 			$result = self::_matchRegular($expression, $string);
 		}
 		else {
@@ -137,7 +137,7 @@ class CGlobalRegexp {
 	 * @return bool
 	 */
 	private static function _matchRegular(array $expression, $string) {
-		$expected = $expression['expression_type'] == EXPRESSION_TYPE_TRUE;
+		$expected = $expression['expression_type'] == REGEX_TYPE_MATCHES_REGEX;
 		$pattern = '/'.CRegexHelper::handleSlashEscaping($expression['expression']).'/';
 		$pattern .= $expression['case_sensitive'] ? 'm' : 'mi';
 
@@ -155,14 +155,14 @@ class CGlobalRegexp {
 	private static function _matchString(array $expression, $string) {
 		$result = true;
 
-		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
+		if ($expression['expression_type'] == REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
 			$patterns = array_filter(explode($expression['exp_delimiter'], $expression['expression']), 'strlen');
 		}
 		else {
 			$patterns = [$expression['expression']];
 		}
 
-		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
+		$expectedResult = ($expression['expression_type'] != REGEX_TYPE_NOT_CONTAINS_STRING);
 
 		if (!$expression['case_sensitive']) {
 			$string = mb_strtolower($string);
@@ -176,7 +176,7 @@ class CGlobalRegexp {
 			$pos = mb_strpos($string, $pattern);
 			$tmp = (($pos !== false) == $expectedResult);
 
-			if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED && $tmp) {
+			if ($expression['expression_type'] == REGEX_TYPE_CONTAINS_ANY_SUBSTRING && $tmp) {
 				return true;
 			}
 			else {

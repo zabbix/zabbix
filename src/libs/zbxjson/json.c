@@ -1081,6 +1081,38 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 	return p;
 }
 
+const char	*zbx_json_pair_next_dyn(const struct zbx_json_parse *jp, const char *p, char **name, size_t *name_alloc)
+{
+	size_t	len;
+
+	if (NULL == (p = zbx_json_next(jp, p)))
+		return NULL;
+
+	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
+		return NULL;
+
+	if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
+		return NULL;
+
+	if (*name_alloc <= len)
+	{
+		*name_alloc = len + 1;
+		*name = (char *)zbx_realloc(*name, *name_alloc);
+	}
+
+	if (NULL == (p = json_copy_string(p, *name, *name_alloc)))
+		return NULL;
+
+	SKIP_WHITESPACE(p);
+
+	if (':' != *p++)
+		return NULL;
+
+	SKIP_WHITESPACE(p);
+
+	return p;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: find pair by name and return pointer to value                     *
@@ -1338,4 +1370,49 @@ struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
 		dst->buffer = dst->buf_stat;
 
 	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy JSON object from source to destination                       *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination JSON object                            *
+ *             src - [IN] source JSON object                                  *
+ *                                                                            *
+ * Comments: This function transfers ownership of any allocated resources     *
+ *           from source to destination object.                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_json_copy(struct zbx_json *dst, const struct zbx_json *src)
+{
+	*dst = *src;
+	if (src->buffer == src->buf_stat)
+		dst->buffer = dst->buf_stat;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns raw JSON value by definite json path                      *
+ *                                                                            *
+ * Parameters: jp   - [IN] parsed JSON document                               *
+ *             path - [IN] definite JSON path                                 *
+ *                                                                            *
+ * Return value: allocated raw JSON value or NULL if path cannot be opened    *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_json_raw_value_by_path_dyn(const struct zbx_json_parse *jp, const char *path)
+{
+	struct zbx_json_parse	jp_value;
+	char			*value;
+	size_t			value_len;
+
+	if (SUCCEED != zbx_json_open_path(jp, path, &jp_value))
+		return NULL;
+
+	value_len = (size_t)(jp_value.end - jp_value.start + 1);
+	value = (char *)zbx_malloc(NULL, value_len + 1);
+	memcpy(value, jp_value.start, value_len);
+	value[value_len] = '\0';
+
+	return value;
 }

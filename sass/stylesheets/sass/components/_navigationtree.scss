@@ -142,7 +142,7 @@ $max_levels: 10;
 
 // Modifications by themes.
 
-@if $theme-name == 'blue' or $theme-name == 'dark' {
+@if $theme-name == 'blue' or $theme-name == 'dark' or $theme-name == 'dark-blue' {
 	.navigation-tree-node-info-problems-hint {
 		.navigation-tree-node-info-problems-hint-severity-color {
 			@extend %indicator-color-box;

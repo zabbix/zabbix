@@ -87,6 +87,9 @@ class CWidgetSelectPopup {
 		}, {
 			trigger_element: document.activeElement
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		this.#overlay.$dialogue.$head.$close_button.show();
 	}
 
 	/**

@@ -91,14 +91,15 @@ class testFormTotpValidate extends testFormTotp {
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			// Successful login.
+			// Successful login. Wait for the redirect to the frontend to finish rendering before asserting.
+			$this->query('class:zi-sign-out')->waitUntilPresent();
 			$this->page->assertUserIsLoggedIn();
 			// Check that no error messages are displayed after logging in.
 			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
 		}
 		else {
 			// Verify validation error.
-			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+			$this->assertEquals($data['error'], $form->query('class:red')->waitUntilVisible()->one()->getText());
 		}
 	}
 
@@ -116,7 +117,8 @@ class testFormTotpValidate extends testFormTotp {
 		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
 		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		// Wait for the sign-in form to close so the login redirect finishes before asserting the logged-in state.
+		$form->query('button:Sign in')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->page->assertUserIsLoggedIn();
 

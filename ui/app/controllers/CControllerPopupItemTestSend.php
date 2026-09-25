@@ -61,7 +61,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				['db items.type',
 					'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 						ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-						ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_IPMI
+						ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_IPMI,
+						ITEM_TYPE_TELEMETRY_QUERY
 					]
 				]
 			],
@@ -270,6 +271,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				]
 			],
 			'valuemapid' => ['db valuemap.valuemapid'],
+			'query' => ['string'],
+			'time_shift' => ['string'],
+			'lookback_limit' => ['string'],
+			'granularity' => ['string'],
 			'verify_host' => ['boolean'],
 			'verify_peer' => ['boolean']
 		]];
@@ -277,6 +282,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$ret = $this->validateInput(self::getValidationRules());
+
+		if ($ret && $this->getInput('get_value', 0) == 1
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY
+				&& $this->getInput('proxyid', 0) == 0) {
+			error(_('Proxy is not assigned yet.'));
+			$ret = false;
+		}
 
 		if ($ret) {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
@@ -307,6 +319,22 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions() {
+		if (!parent::checkPermissions()) {
+			return false;
+		}
+
+		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
+			$proxyid = $this->getInput('proxyid', 0);
+
+			return bccomp($proxyid, $this->host['proxyid']) == 0
+				|| ($proxyid != 0 && !CProxyHelper::resolveProxyOption($proxyid)['inaccessible']);
+		}
+
+		return true;
 	}
 
 	protected function doAction() {

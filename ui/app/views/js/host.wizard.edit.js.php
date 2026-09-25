@@ -232,6 +232,8 @@ window.host_wizard_edit = new class {
 	#form_update_locked = false;
 	#pending_form_update = false;
 
+	#last_input_changed = null;
+
 	#confirm_dialogue_close = false;
 
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
@@ -249,17 +251,18 @@ window.host_wizard_edit = new class {
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
+		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange);
 
-		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
-		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
+		this.#dialogue.addEventListener('input', this.#onInputChange);
+		this.#dialogue.addEventListener('focusout', this.#onInputBlur);
 		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(null);
+				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#last_input_changed = null;
 			}
 		});
 
@@ -582,6 +585,10 @@ window.host_wizard_edit = new class {
 
 			this.#setValueByName(this.#data, detail.options.name, value?.isNew ? null : value);
 			this.#setValueByName(this.#data, detail.options.newItemName, value?.isNew ? value : null);
+
+			if (this.#data.host) {
+				this.#removeMessageBoxes();
+			}
 		});
 
 		if (this.#data.host !== null) {
@@ -2015,7 +2022,7 @@ window.host_wizard_edit = new class {
 		return Promise.reject();
 	}
 
-	#onFormDataChange(path, new_value, old_value) {
+	#onFormDataChange = (path, new_value, old_value) => {
 		if (this.#data_update_locked) {
 			return;
 		}
@@ -2026,7 +2033,9 @@ window.host_wizard_edit = new class {
 		this.#updateFieldsAsterisk();
 	}
 
-	#onInputChange({target}) {
+	#onInputChange = ({target}) => {
+		this.#last_input_changed = target.name;
+
 		if (!target.name) {
 			return;
 		}
@@ -2038,7 +2047,7 @@ window.host_wizard_edit = new class {
 		this.#setValueByName(this.#data, target.name, value);
 	}
 
-	#onInputBlur({target}) {
+	#onInputBlur = ({target}) => {
 		if (!target.name) {
 			return;
 		}

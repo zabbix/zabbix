@@ -171,7 +171,8 @@ output {
 	}
 
 	&.msg-global {
-		max-width: 475px;
+		max-width: fit-content;
+		min-width: 475px;
 		margin: 5% auto 0;
 	}
 

@@ -245,3 +245,23 @@ unsigned int	zbx_isqrt32(unsigned int value)
 
 	return result;
 }
+
+int	zbx_tag_compare(const void *a1, const void *a2)
+{
+	int	ret;
+
+	const zbx_tag_t	*t1 = (const zbx_tag_t *)a1;
+	const zbx_tag_t	*t2 = (const zbx_tag_t *)a2;
+
+	if (0 != (ret = strcmp(t1->tag, t2->tag)))
+		return ret;
+
+	return strcmp(t1->value, t2->value);
+}
+
+void	zbx_tag_clear(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+}
+

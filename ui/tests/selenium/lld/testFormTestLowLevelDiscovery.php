@@ -32,7 +32,8 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 */
 	public function testFormTestLowLevelDiscovery_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(), 'LLD for Test Button check', 'Discovery rule',
-				' created', true, true, self::HOST_ID, 'host_discovery');
+				' created', true, true, self::HOST_ID, 'lldrule'
+		);
 	}
 
 	/**
@@ -40,7 +41,8 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 */
 	public function testFormTestLowLevelDiscovery_CheckButtonStateTemplate() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(), 'LLD for Test Button check', 'Discovery rule',
-				' created', false, false, self::TEMPLATE_ID, 'host_discovery');
+				' created', false, false, self::TEMPLATE_ID, 'lldrule'
+		);
 	}
 
 	/**
@@ -54,7 +56,7 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDHost($data) {
-		$this->checkTestItem($data, true, self::HOST_ID, 'host_discovery', true);
+		$this->checkTestItem($data, true, self::HOST_ID, 'lldrule');
 	}
 
 	/**
@@ -68,6 +70,6 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDTemplate($data) {
-		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'host_discovery', true);
+		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'lldrule');
 	}
 }

@@ -15,11 +15,15 @@
 package zbxtest
 
 import (
+	"time"
+
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type MockEmptyCtx struct {
-}
+var _ plugin.ContextProvider = (*MockEmptyCtx)(nil)
+
+// MockEmptyCtx provides contextual mocking services.
+type MockEmptyCtx struct{}
 
 func (ctx MockEmptyCtx) ClientID() uint64 {
 	return 0
@@ -49,4 +53,29 @@ func (ctx MockEmptyCtx) Timeout() int {
 
 func (ctx MockEmptyCtx) Delay() string {
 	return ""
+}
+
+// LegacyTimeout is a mock method, doesn't do anything.
+func (MockEmptyCtx) LegacyTimeout() bool {
+	return false
+}
+
+// Deadline is a mock method, doesn't do anything.
+func (MockEmptyCtx) Deadline() (time.Time, bool) {
+	return time.Time{}, false
+}
+
+// Done is a mock method, doesn't do anything.
+func (MockEmptyCtx) Done() <-chan struct{} {
+	return nil
+}
+
+// Err is a mock method, doesn't do anything.
+func (MockEmptyCtx) Err() error {
+	return nil
+}
+
+// Value is a mock method, doesn't do anything.
+func (MockEmptyCtx) Value(_ any) any {
+	return nil
 }

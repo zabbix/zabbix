@@ -307,8 +307,7 @@ class testFormTags extends CWebTest {
 			case 'host prototype':
 				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$data['name'] = $data['name'].' {#KEY}';
-				$form->fill(['Host name' => $data['name']]);
-				$form->fill(['Host groups' => 'Zabbix servers']);
+				$form->fill(['Host name' => $data['name'], 'Host groups' => 'Zabbix servers']);
 				break;
 
 			case 'web scenario':
@@ -357,6 +356,11 @@ class testFormTags extends CWebTest {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
 			$screenshot_area = $this->query($this->tags_table)->one();
+
+			if ($object === 'maintenance') {
+				$screenshot_area->scrollIntoView();
+			}
+
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -556,7 +560,9 @@ class testFormTags extends CWebTest {
 				$this->query('button:Reset')->one()->click();
 				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$form->fill(['Name' => $this->update_name]);
+				$table = $this->query('class:datatable')->asDatatable()->one();
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$table->waitUntilReloaded();
 			}
 
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
@@ -982,6 +988,11 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$screenshot_area = $this->query($this->tags_table)->one();
+
+			if ($object === 'maintenance') {
+				$screenshot_area->scrollIntoView();
+				}
+
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}

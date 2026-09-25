@@ -335,7 +335,14 @@ class CDataTableOptionsPopup {
 			name: this.#column_name
 		});
 
-		this.#column.setColumnOptions(this.#data);
+		const active_element = document.activeElement;
+
+		if (active_element?.type === 'text') {
+			const column_options = this.#column.getColumnOptions();
+			column_options[active_element.name] = this.#data[active_element.name];
+
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, reset: true});
+		}
 
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {column_index});
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
@@ -353,14 +360,15 @@ class CDataTableOptionsPopup {
 
 	onUpdate() {}
 
-	onSave() {
+	onSave(e) {
+		const {reset} = e.detail;
 		const column_index = this.#column.getColumnIndex();
 		const name = this.#column.getName();
 		const column_options = this.#column.getColumnOptions();
 
-		const save = this.#column_name !== name || !deepCompare(this.#data, column_options);
+		const save = reset || this.#column_name !== name || !deepCompare(this.#data, column_options);
 
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, save});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, reset, save});
 	}
 
 	/**
@@ -408,6 +416,40 @@ class CDataTableOptionsPopup {
 		}
 	}
 
+	resize() {
+		this.#element.style.height = null;
+
+		const popup_rect = this.#element.getBoundingClientRect();
+
+		if (popup_rect.top + popup_rect.height >= window.innerHeight - 10) {
+			const element_style = getComputedStyle(this.#element);
+
+			let min_height = parseInt(element_style.rowGap) + parseInt(element_style.paddingTop)
+				+ parseInt(element_style.paddingBottom);
+
+			const header = this.#element
+				.querySelector(`.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE_HEADER}`);
+			if (header !== null) {
+				const header_style = getComputedStyle(header);
+
+				min_height += parseFloat(header_style.height) + parseInt(header_style.marginBottom);
+			}
+
+			const item = this.#element
+				.querySelector(`.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM}`);
+			if (item !== null) {
+				const item_style = getComputedStyle(item);
+
+				min_height += parseFloat(item_style.height) + parseInt(item_style.paddingTop)
+					+ parseInt(item_style.paddingBottom);
+			}
+
+			const height = Math.ceil(Math.max(min_height, window.innerHeight - popup_rect.top - 10));
+
+			this.#element.style.height = `${height}px`;
+		}
+	}
+
 	/**
 	 * Callback for handling a click outside popup.
 	 *
@@ -437,7 +479,7 @@ class CDataTableOptionsPopup {
 	}
 
 	/**
-	 * Callback for handling an "Escape" button.
+	 * Callback for handling an "Enter" and "Escape" buttons.
 	 *
 	 * @param {KeyboardEvent} e
 	 */
@@ -447,6 +489,7 @@ class CDataTableOptionsPopup {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.position();
+			this.resize();
 		}
 
 		if (e.key === 'Escape') {
