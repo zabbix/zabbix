@@ -485,7 +485,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncXmlxpath(string $value, array $parameters): string {
-		if (count($parameters) < 1 || count($parameters) > 2) {
+		if (count($parameters) < 1 || count($parameters) > 2 || $parameters[0] === '') {
 			return UNRESOLVED_MACRO_STRING;
 		}
 

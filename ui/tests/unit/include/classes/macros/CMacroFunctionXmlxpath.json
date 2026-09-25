@@ -134,5 +134,21 @@
             "parameters": []
         },
         "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": [""]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["", "dflt"]
+        },
+        "result": "*UNKNOWN*"
     }
 ]
