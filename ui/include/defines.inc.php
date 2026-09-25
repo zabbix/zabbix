@@ -413,6 +413,7 @@ define('PROXY_APM_QUOTA_MODE_CUSTOM',		1);
 define('SIGNAL_TYPE_TRACES',	0);
 define('SIGNAL_TYPE_METRICS',	1);
 define('SIGNAL_TYPE_LOGS',		2);
+
 define('PROXY_MODE_DENY', 0);
 define('PROXY_MODE_ALLOW', 1);
 

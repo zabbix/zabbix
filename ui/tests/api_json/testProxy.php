@@ -643,7 +643,7 @@ class testProxy extends CAPITest {
 					'output' => ['apm']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "timeout_telemetry_query", "lastaccess", "version", "compatibility", "state".'
 			],
 
 			// Check write-only fields are not returned.
