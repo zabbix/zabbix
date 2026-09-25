@@ -39,7 +39,7 @@ zbx_add_post_js($tags->getPostJS());
 			_("Simple (multiple) - sets up sliding time window based event operations.").PHP_EOL,
 			_("Simple (once) - same as 'Simple (multiple)', except that an event cannot be processed by another window of this type.").PHP_EOL,
 			_("Cause and symptom grouping - first event from the fixed time window will be treated as cause, others - as symptoms.").PHP_EOL,
-			_("Event pattern match - executes JavaScript to identify event patterns in sliding time window.")
+			_("Pattern match - executes JavaScript to identify event patterns in sliding time window.")
 		]))
 	)
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
