@@ -652,7 +652,7 @@ class CApiService {
 			return [];
 		}
 
-		return array_intersect(array_filter($options['groupBy'], 'is_string'), $this->groupByColumns);
+		return array_intersect($this->groupByColumns, $options['groupBy']);
 	}
 
 	/**
