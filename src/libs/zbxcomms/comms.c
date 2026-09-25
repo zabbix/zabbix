@@ -215,7 +215,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	hints.ai_family = AF_INET;
 #endif
 
-	if (SUCCEED == zbx_is_ip(host))
+	if (SUCCEED == zbx_is_ip(ip))
 		hints.ai_flags = AI_NUMERICHOST;
 
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
