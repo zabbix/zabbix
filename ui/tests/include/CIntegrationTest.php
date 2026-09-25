@@ -828,7 +828,7 @@ class CIntegrationTest extends CAPITest {
 				$child_pids = explode("\n", trim($output));
 			}
 
-			posix_kill($pid, SIGTERM);
+			posix_kill($parent_pid, SIGTERM);
 
 			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
