@@ -389,7 +389,7 @@ int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t
 	}
 	else
 	{
-		*error = zbx_dsprintf(NULL, "unknown telemetry provoder type \"%u\"", export_config->db_type);
+		*error = zbx_dsprintf(NULL, "unknown telemetry provider type \"%u\"", export_config->db_type);
 		goto out;
 	}
 

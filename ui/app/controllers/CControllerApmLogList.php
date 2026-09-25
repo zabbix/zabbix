@@ -108,7 +108,7 @@ class CControllerApmLogList extends CController {
 			'spanid' => CProfile::get('web.apm.log.filter_spanid', ''),
 			'service_name' => CProfile::get('web.apm.log.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.log.filter_scope_name', ''),
-			'severities' =>	CProfile::getArray('web.apm.log.filter_severities', []),
+			'severities' =>	CProfile::getArray('web.apm.log.filter_severities', [])
 		];
 
 		foreach (['log', 'resource', 'scope'] as $type) {

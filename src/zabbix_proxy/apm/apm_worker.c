@@ -115,7 +115,7 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 	}
 	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
 
-	/* uncommited rows are left in dataset, undo commit stats for them */
+	/* uncommitted rows are left in dataset, undo commit stats for them */
 	if (APM_COMMIT_OK != ret)
 		apm_dataset_undo_stats(&ds, worker->commit_stats);
 
