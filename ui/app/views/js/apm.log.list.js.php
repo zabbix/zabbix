@@ -165,13 +165,13 @@
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
-						.setFields(['traceid'])
+						.setFields(['traceid', 'trace_filter_from', 'trace_filter_to'])
 						.setSortable(true)
 						.setRenderer('traceid')
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('spanid', <?= json_encode(_('Span ID')) ?>)
-						.setFields(['spanid', 'traceid'])
+						.setFields(['spanid', 'traceid', 'trace_filter_from', 'trace_filter_to'])
 						.setSortable(true)
 						.setRenderer('spanid')
 						.setWidth('auto')
@@ -246,7 +246,7 @@
 					cell.appendChild(this.#prepareTextCell(data));
 				})
 				.setCellRenderer('traceid', ({cell, cell_data}) => {
-					const [traceid] = cell_data;
+					const [traceid, trace_filter_from, trace_filter_to] = cell_data;
 
 					if (traceid === '') {
 						return;
@@ -256,7 +256,9 @@
 					link.href = zabbixUrl({
 						action: 'apm.trace.list',
 						filter_traceid: traceid,
-						filter_set: '1'
+						filter_set: '1',
+						from: trace_filter_from,
+						to: trace_filter_to
 					});
 					link.textContent = traceid;
 					link.title = traceid;
@@ -270,7 +272,7 @@
 					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('spanid', ({cell, cell_data}) => {
-					const [spanid, traceid] = cell_data;
+					const [spanid, traceid, trace_filter_from, trace_filter_to] = cell_data;
 
 					if (spanid === '') {
 						return;
@@ -281,7 +283,9 @@
 						action: 'apm.trace.list',
 						filter_traceid: traceid,
 						filter_spanid: spanid,
-						filter_set: '1'
+						filter_set: '1',
+						from: trace_filter_from,
+						to: trace_filter_to
 					});
 					link.textContent = spanid;
 					link.title = spanid;
@@ -523,6 +527,39 @@
 		}
 
 		#createDetailGroups(row_data) {
+			let traceid_object = '';
+
+			if (row_data.traceid !== '') {
+				traceid_object = document.createElement('a');
+				traceid_object.href = zabbixUrl({
+					action: 'apm.trace.list',
+					filter_traceid: row_data.traceid,
+					filter_set: '1',
+					from: row_data.trace_filter_from,
+					to: row_data.trace_filter_to
+				});
+				traceid_object.textContent = row_data.traceid;
+				traceid_object.title = row_data.traceid;
+				traceid_object.ariaLabel = row_data.traceid;
+			}
+
+			let spanid_object = '';
+
+			if (row_data.spanid !== '') {
+				spanid_object = document.createElement('a');
+				spanid_object.href = zabbixUrl({
+					action: 'apm.trace.list',
+					filter_traceid: row_data.traceid,
+					filter_spanid: row_data.spanid,
+					filter_set: '1',
+					from: row_data.trace_filter_from,
+					to: row_data.trace_filter_to
+				});
+				spanid_object.textContent = row_data.spanid;
+				spanid_object.title = row_data.spanid;
+				spanid_object.ariaLabel = row_data.spanid;
+			}
+
 			return [
 				{
 					title: <?= json_encode(_('Basic information')) ?>,
@@ -533,11 +570,11 @@
 						},
 						{
 							name: <?= json_encode(_('Trace ID')) ?>,
-							value: row_data.traceid
+							value: traceid_object
 						},
 						{
 							name: <?= json_encode(_('Span ID')) ?>,
-							value: row_data.spanid
+							value: spanid_object
 						},
 						{
 							name: <?= json_encode(_('Flags')) ?>,

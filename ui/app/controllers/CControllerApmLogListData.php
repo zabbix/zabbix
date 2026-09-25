@@ -19,7 +19,7 @@ class CControllerApmLogListData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['timestamp_formatted', 'timestamp_ns_formatted', 'traceid', 'spanid',
 		'trace_flags', 'severity_text', 'severity_number', 'service_name', 'body', 'resource_schema_url',
 		'resource_attributes', 'scope_schema_url', 'scope_name', 'scope_version', 'scope_attributes', 'log_attributes',
-		'event_name'
+		'event_name', 'trace_filter_from', 'trace_filter_to'
 	];
 
 	protected array $filter;
@@ -167,7 +167,12 @@ class CControllerApmLogListData extends CControllerDataTable {
 
 			if (array_intersect($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted'])) {
 				$select_fields = array_diff($select_fields, ['timestamp_formatted', 'timestamp_ns_formatted']);
-				$select_fields[] = 'timestamp';
+				$select_fields = array_unique(array_merge($select_fields, ['timestamp']));
+			}
+
+			if (array_intersect($select_fields, ['trace_filter_from', 'trace_filter_to'])) {
+				$select_fields = array_diff($select_fields, ['trace_filter_from', 'trace_filter_to']);
+				$select_fields = array_unique(array_merge($select_fields, ['timestamp']));
 			}
 
 			$logs = API::ApmLog()->get($options + [
@@ -196,6 +201,14 @@ class CControllerApmLogListData extends CControllerDataTable {
 							: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
 								['!' => $ns]
 							);
+					}
+
+					if (in_array('trace_filter_from', $data_fields)) {
+						$log['trace_filter_from'] = zbx_date2str(ZBX_FULL_DATE_TIME, $clock - SEC_PER_MIN * 30);
+					}
+
+					if (in_array('trace_filter_to', $data_fields)) {
+						$log['trace_filter_to'] = zbx_date2str(ZBX_FULL_DATE_TIME, $clock + SEC_PER_MIN * 30);
 					}
 
 					unset($log['timestamp']);
