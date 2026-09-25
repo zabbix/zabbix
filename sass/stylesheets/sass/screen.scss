@@ -2070,17 +2070,15 @@ select {
 	width: 100%;
 
 	.multilineinput-preview {
-		border: 1px solid $form-border-color;
-		border-right-width: 0;
 		box-sizing: border-box;
 		flex: 1;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		cursor: pointer;
 		height: 24px;
-		line-height: 22px;
 		padding: 0 5px;
+		line-height: 22px;
+		cursor: pointer;
+		border: 1px solid $form-border-color;
+		border-right-width: 0;
+		@extend %overflow-ellipsis;
 
 		&.monospace-font {
 			padding-top: 1px;
@@ -2122,12 +2120,6 @@ select {
 			&:hover {
 				background-color: $btn-form-hover-bg-color;
 			}
-		}
-	}
-
-	&.multilineinput-readonly {
-		input[type=text][readonly] {
-			background-color: $form-disabled-bg-color !important;
 		}
 	}
 
