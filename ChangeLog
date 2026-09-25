@@ -3,6 +3,13 @@ Changes for 7.4.16rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
+...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
+........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
+.........T [ZBX-28146] fixed naming in Veeam Backup & Replication by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.15
@@ -1610,6 +1617,12 @@ Changes for 7.0.32rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
+...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
+........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.31
