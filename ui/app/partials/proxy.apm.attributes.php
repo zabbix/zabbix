@@ -26,8 +26,12 @@ if (!$data['readonly']) {
 }
 
 $header_columns = [
-	new CTableColumn(_('Name')),
-	new CTableColumn(_('Value')),
+	new CTableColumn(
+		(new CColHeader(_('Name')))->setWidth('170')
+	),
+	new CTableColumn(
+		(new CColHeader(_('Value')))->setWidth('170')
+	),
 	new CTableColumn(_('Type')),
 	new CTableColumn('')
 ];
