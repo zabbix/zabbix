@@ -199,11 +199,11 @@
 						.setRenderer('time_formatted')
 						.setWidth('auto'),
 					new CDataTableColumn('value', <?= json_encode(_('Sum/Value')); ?>)
-						.setFields(['value'])
+						.setFields(['type', 'value', 'sum'])
 						.setRenderer('value')
 						.setWidth('auto'),
 					new CDataTableColumn('count', <?= json_encode(_('Count')); ?>)
-						.setFields(['count'])
+						.setFields(['type', 'count'])
 						.setRenderer('count')
 						.setWidth('auto'),
 				new CDataTableColumn('time_formatted', <?= json_encode(_('Time')); ?>)
@@ -302,18 +302,18 @@
 
 					cell.appendChild(this.#prepareTextCell(value));
 				})
-				.setCellRenderer('value', ({row, cell}) => {
-					const data = this.#rows_data.get(row.dataset.rowHash);
-					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
-						? data.sum
-						: data.value;
+				.setCellRenderer('value', ({cell, cell_data}) => {
+					const [type, value, sum] = cell_data;
+					const content = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(type)
+						? sum
+						: value;
 
-					cell.appendChild(this.#prepareTextCell(value));
+					cell.appendChild(this.#prepareTextCell(content));
 				})
-				.setCellRenderer('count', ({row, cell}) => {
-					const data = this.#rows_data.get(row.dataset.rowHash);
-					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(data.type)
-						? data.count
+				.setCellRenderer('count', ({cell_data, cell}) => {
+					const [type, count] = cell_data;
+					const value = [APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM].includes(type)
+						? count
 						: '';
 
 					cell.appendChild(this.#prepareTextCell(value));
@@ -337,9 +337,7 @@
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
 					wordbreak.style.setProperty('--line-clamp', '2');
 					wordbreak.textContent = metric_description;
-					wordbreak.dataset.hintbox = '1';
-					wordbreak.dataset.hintboxStatic = '1';
-					wordbreak.dataset.hintboxHtml = metric_description;
+					wordbreak.title = metric_description;
 
 					cell.appendChild(wordbreak);
 				})
@@ -361,18 +359,18 @@
 
 					for (const [attr_name, attr_value] of Object.entries(attributes)) {
 						const content = `${attr_name}: ${attr_value}`
-						const span_attribute_label = document.createElement('span');
-						span_attribute_label.classList.add(ZBX_STYLE_TAG);
-						span_attribute_label.textContent = content;
-						span_attribute_label.dataset.hintbox = '1';
-						span_attribute_label.dataset.hintboxStatic = '1';
-						span_attribute_label.dataset.hintboxHtml = escapeHtml(content);
-						span_attribute_label.ariaExpanded = 'false';
+						const label = document.createElement('span');
+						label.classList.add(ZBX_STYLE_TAG);
+						label.textContent = content;
+						label.dataset.hintbox = '1';
+						label.dataset.hintboxStatic = '1';
+						label.dataset.hintboxHtml = escapeHtml(content);
+						label.ariaExpanded = 'false';
 
-						attribute_labels.push(span_attribute_label);
+						attribute_labels.push(label);
 
 						if (count > 0) {
-							tags_wrapper.appendChild(span_attribute_label);
+							tags_wrapper.appendChild(label);
 
 							count--;
 						}

@@ -285,13 +285,13 @@
 					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
-					const [span_attributes] = cell_data;
+					const [attributes] = cell_data;
 
-					if (!span_attributes || span_attributes.length === 0) {
+					if (!attributes || attributes.length === 0) {
 						return;
 					}
 
-					const span_attribute_labels = [];
+					const attribute_labels = [];
 
 					const tags_wrapper = document.createElement('div');
 					tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
@@ -300,42 +300,41 @@
 
 					let count = column_options.number_of_attributes;
 
-					for (const [attr_name, attr_value] of Object.entries(span_attributes)) {
+					for (const [attr_name, attr_value] of Object.entries(attributes)) {
 						const content = `${attr_name}: ${attr_value}`
 
-						const span_attribute_label = document.createElement('span');
-						span_attribute_label.classList.add(ZBX_STYLE_TAG);
-						span_attribute_label.textContent = content;
-						span_attribute_label.setAttribute('data-hintbox-html', escapeHtml(content));
-						span_attribute_label.setAttribute('data-hintbox', '1');
-						span_attribute_label.setAttribute('data-hintbox-static', '1');
-						span_attribute_label.setAttribute('aria-expanded', 'false');
+						const label = document.createElement('span');
+						label.classList.add(ZBX_STYLE_TAG);
+						label.textContent = content;
+						label.dataset.hintbox = '1';
+						label.dataset.hintboxStatic = '1';
+						label.dataset.hintboxHtml = escapeHtml(content);
+						label.ariaExpanded = 'false';
 
-						span_attribute_labels.push(span_attribute_label);
+						attribute_labels.push(label);
 
 						if (count > 0) {
-							tags_wrapper.appendChild(span_attribute_label);
+							tags_wrapper.appendChild(label);
 
 							count--;
 						}
 					}
 
-					if (Object.keys(span_attributes).length > column_options.number_of_attributes) {
+					if (Object.keys(attributes).length > column_options.number_of_attributes) {
 						const more_attributes_hintbox = document.createElement('div');
 
-						for (const tag_label of span_attribute_labels) {
+						for (const tag_label of attribute_labels) {
 							more_attributes_hintbox.appendChild(tag_label.cloneNode(true));
 						}
 
 						const more_attributes = document.createElement('button');
 						more_attributes.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
-						more_attributes.setAttribute('data-hintbox-html', more_attributes_hintbox.innerHTML);
-						more_attributes.setAttribute('data-hintbox-class',
-							`${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
-						more_attributes.setAttribute('data-hintbox', '1');
-						more_attributes.setAttribute('data-hintbox-static', '1');
-						more_attributes.setAttribute('aria-expanded', 'false');
-						more_attributes.setAttribute('aria-label', <?= json_encode(_('Show all attributes')) ?>);
+						more_attributes.dataset.hintboxHtml = more_attributes_hintbox.innerHTML;
+						more_attributes.dataset.hintboxClass = `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`;
+						more_attributes.dataset.hintbox = '1';
+						more_attributes.dataset.hintboxStatic = '1';
+						more_attributes.ariaExpanded = 'false';
+						more_attributes.ariaLabel = <?= json_encode(_('Show all attributes')) ?>;
 
 						tags_wrapper.appendChild(more_attributes);
 					}
