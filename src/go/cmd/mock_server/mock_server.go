@@ -126,7 +126,9 @@ func main() {
 	}
 
 	logOptions := log.NewOptions().WithLogType(logType).WithLevel(logLevel).WithFilename(options.LogFile)
-	if err := log.Open(logOptions); err != nil {
+
+	err := log.Open(logOptions)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
