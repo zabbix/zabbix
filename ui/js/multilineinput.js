@@ -123,7 +123,7 @@
 			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));
 		}
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: obj.options.title,
 			class: 'modal-popup multilineinput-modal',
 			content: $content,
@@ -145,6 +145,9 @@
 		}, {
 			trigger_element: obj.$button
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 
 		if (obj.options.label_before.length) {
 			height_offset += $('<div>', {class: 'multilineinput-label' + monospace_font})

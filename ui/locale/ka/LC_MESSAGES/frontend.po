@@ -11158,6 +11158,10 @@ msgstr "მიუწვდომელი მომხმარებელი"
 msgid "Inaccessible user group"
 msgstr "მიუწვდომელი მომხმარებლის ჯგუფი"
 
+#: include/classes/helpers/CItemGeneralHelper.php:283
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "მიუწვდომელი ვიჯეტი"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-08-23 11:32+0000\n"
+"PO-Revision-Date: 2026-09-11 18:50+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11306,6 +11306,10 @@ msgstr "Utilisateur inaccessible"
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
 msgstr "Groupe d'utilisateurs inaccessible"
+
+#: include/classes/helpers/CItemGeneralHelper.php:283
+msgid "Inaccessible value mapping"
+msgstr "Table de correspondance inaccessible"
 
 #: jsLoader.php:153
 msgid "Inaccessible widget"
