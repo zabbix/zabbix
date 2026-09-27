@@ -119,9 +119,9 @@ Additional information about metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
-|Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCE instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
-|Instances get|<p>GCP Cloud SQL: Instances get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Cloud SQL instances get|<p>GCP Cloud SQL: Instances get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Cloud SQL instances total|<p>GCP Cloud SQL instances total count.</p>|Dependent item|gcp.cloudsql.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p></li></ul>|
 |MSSQL instances count|<p>GCP Cloud SQL MSSQL instances count.</p>|Dependent item|gcp.cloudsql.instances.mssql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'SQLSERVER')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |MySQL instances count|<p>GCP Cloud SQL MySQL instances count.</p>|Dependent item|gcp.cloudsql.instances.mysql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'MYSQL')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

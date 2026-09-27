@@ -196,6 +196,7 @@ tests/libs/zbxexpr/zbx_user_macro_parse_dyn
 tests/libs/zbxexpr/zbx_validate_interval
 tests/libs/zbxexpression/evaluate
 tests/libs/zbxexpression/evaluate_function
+tests/libs/zbxexpression/evaluate_nodata_proxied
 tests/libs/zbxexpression/evaluate_unknown
 tests/libs/zbxexpression/evaluate_percentage_deviations_in_remainder
 tests/libs/zbxexpression/evaluate_stl
