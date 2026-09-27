@@ -21,7 +21,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -210,7 +210,6 @@ func vfsDevGet(params []string) (string, error) {
 		return "", err
 	}
 
-	//nolint:revive // should be refactored to include default statement, no-lint for now
 	switch mode {
 	case modeDisks:
 		out = vfsDevGetDisks(devs, rdevs, devNamesRgx)
@@ -220,6 +219,8 @@ func vfsDevGet(params []string) (string, error) {
 		out = vfsDevGetDevices(devs, rdevs, devNamesRgx)
 	case modeDeviceStats:
 		out = vfsDevGetDeviceStats(devs, rdevs, devNamesRgx)
+	default:
+		return "", errInvalidFirstParam
 	}
 
 	b, err := json.Marshal(out)
@@ -301,10 +302,7 @@ func devidsInit() []vfsDevice {
 		})
 	}
 
-	//nolint:revive // should be refactored to slices.SortFun, no-linting for now.
-	sort.Slice(devices, func(i, j int) bool {
-		return deviceCompare(devices[i], devices[j]) < 0
-	})
+	slices.SortFunc(devices, deviceCompare)
 
 	return devices
 }
@@ -368,7 +366,6 @@ func sysfsDevStatsGet(rdev uint64) *vfsStats {
 			continue
 		}
 
-		//nolint:revive // should be refactored to include default statement, no-lint for now
 		switch idx {
 		case 0:
 			stats.ReadsCompleted = &val
@@ -382,6 +379,8 @@ func sysfsDevStatsGet(rdev uint64) *vfsStats {
 			stats.BytesWritten = &v
 		case 10:
 			stats.IOTimeMs = &val
+		default:
+			continue
 		}
 	}
 

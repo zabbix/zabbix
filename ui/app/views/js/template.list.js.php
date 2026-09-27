@@ -285,7 +285,6 @@
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'template.dashboard.list');
 					url.searchParams.set('templateid', templateid);
-					url.searchParams.set('context', 'template');
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());

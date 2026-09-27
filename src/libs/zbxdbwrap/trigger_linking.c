@@ -1282,15 +1282,16 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	char				*sql_update_triggers_expr = NULL;
 	size_t				sql_update_triggers_expr_alloc = 512, sql_update_triggers_expr_offset = 0;
 	zbx_uint64_t			triggerid, triggerid2, functionid;
-	zbx_db_insert_t			db_insert, db_insert_funcs;
+	zbx_db_insert_t			db_insert, db_insert_funcs, db_insert_rt;
 	zbx_trigger_functions_entry_t	*found, temp_t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
-			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode",
-			"correlation_mode", "correlation_tag", "manual_close", "opdata", "discover", "event_name",
-			(char *)NULL);
+			"url", "url_name", "type", "templateid", "flags", "recovery_mode", "correlation_mode",
+			"correlation_tag", "manual_close", "opdata", "discover", "event_name", (char *)NULL);
+
+	zbx_db_insert_prepare(&db_insert_rt, "trigger_rtdata", "triggerid", "value", "state", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", (char *)NULL);
@@ -1305,12 +1306,19 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 		zbx_db_insert_add_values(&db_insert, triggerid, trigger_copy_template->description,
 				(int)trigger_copy_template->priority, (int)trigger_copy_template->status,
 				trigger_copy_template->comments, trigger_copy_template->url,
-				trigger_copy_template->url_name, (int)trigger_copy_template->type, TRIGGER_VALUE_OK,
-				TRIGGER_STATE_NORMAL, trigger_copy_template->templateid,
-				(int)trigger_copy_template->flags, (int)trigger_copy_template->recovery_mode,
-				(int)trigger_copy_template->correlation_mode, trigger_copy_template->correlation_tag,
-				(int)trigger_copy_template->manual_close, trigger_copy_template->opdata,
-				trigger_copy_template->discover, trigger_copy_template->event_name);
+				trigger_copy_template->url_name, (int)trigger_copy_template->type,
+				trigger_copy_template->templateid, (int)trigger_copy_template->flags,
+				(int)trigger_copy_template->recovery_mode, (int)trigger_copy_template->correlation_mode,
+				trigger_copy_template->correlation_tag, (int)trigger_copy_template->manual_close,
+				trigger_copy_template->opdata, trigger_copy_template->discover,
+				trigger_copy_template->event_name);
+
+
+		if (0 == (trigger_copy_template->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			zbx_db_insert_add_values(&db_insert_rt, triggerid, (int)TRIGGER_VALUE_OK,
+					(int)TRIGGER_STATE_NORMAL);
+		}
 
 		zbx_vector_uint64_append(new_triggerids, triggerid);
 
@@ -1318,19 +1326,21 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 				trigger_copy_template->description, (int)trigger_copy_template->flags);
 		zbx_audit_trigger_update_json_add_data(audit_context_mode, triggerid, trigger_copy_template->templateid,
 				trigger_copy_template->recovery_mode, trigger_copy_template->status,
-				trigger_copy_template->type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL,
-				trigger_copy_template->priority, trigger_copy_template->comments,
-				trigger_copy_template->url, trigger_copy_template->url_name,
-				trigger_copy_template->flags, trigger_copy_template->correlation_mode,
-				trigger_copy_template->correlation_tag, trigger_copy_template->manual_close,
-				trigger_copy_template->opdata, trigger_copy_template->discover,
-				trigger_copy_template->event_name);
+				trigger_copy_template->type, trigger_copy_template->priority,
+				trigger_copy_template->comments, trigger_copy_template->url,
+				trigger_copy_template->url_name, trigger_copy_template->flags,
+				trigger_copy_template->correlation_mode, trigger_copy_template->correlation_tag,
+				trigger_copy_template->manual_close, trigger_copy_template->opdata,
+				trigger_copy_template->discover, trigger_copy_template->event_name);
 
 		triggerid++;
 	}
 
-	res = zbx_db_insert_execute(&db_insert);
+	if (SUCCEED == (res = zbx_db_insert_execute(&db_insert)))
+		res = zbx_db_insert_execute(&db_insert_rt);
+
 	zbx_db_insert_clean(&db_insert);
+	zbx_db_insert_clean(&db_insert_rt);
 
 	for (i = 0; res == SUCCEED && i < trigger_copies_insert->values_num; i++)
 	{

@@ -34,12 +34,16 @@ require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testVfsFsGet.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+require_once dirname(__FILE__).'/testTriggerCEP.php';
+require_once dirname(__FILE__).'/testTriggerCEPAtScale.php';
+require_once dirname(__FILE__).'/testTriggerCEPRestart.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
@@ -49,10 +53,12 @@ require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryGet.php';
+require_once dirname(__FILE__).'/testAutoregistrationProxyGroup.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
@@ -76,6 +82,8 @@ require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
+require_once dirname(__FILE__).'/testScheduledReports.php';
+/* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
 
 use PHPUnit\Framework\TestSuite;
 
@@ -91,6 +99,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
+		$suite->addTestSuite('testAutoregistrationProxyGroup');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
@@ -98,6 +107,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
+		$suite->addTestSuite('testVfsFsGet');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
 		$suite->addTestSuite('testTagInheritance');
@@ -125,6 +135,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
@@ -142,13 +153,18 @@ class IntegrationTests {
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testHousekeepingConfSync');
-		$suite->addTestSuite('testLLDHistorySyncAtScale');
-		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
-		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
+		$suite->addTestSuite('testScheduledReports');
+		$suite->addTestSuite('testTriggerCEP');
+		$suite->addTestSuite('testTriggerCEPRestart');
+		$suite->addTestSuite('testLLDHistorySyncAtScale');
+		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
+		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
+		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		/* $suite->addTestSuite('testTelemetryQueryItems'); */
 		return $suite;
 	}
 }

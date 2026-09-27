@@ -19,9 +19,11 @@
 	const media_tab = new class {
 
 		#userid;
+		#devices;
 
-		init({userid, medias}) {
+		init({userid, medias, devices}) {
 			this.#userid = userid;
+			this.#devices = devices;
 
 			this.#initMedias(medias);
 			this.#initActions();
@@ -130,7 +132,26 @@
 			let sendto_array = null;
 			let sendto_full = '';
 
-			if (Array.isArray(media.sendto)) {
+			if (media.mediatype_type == <?= MEDIA_TYPE_PUSH ?>) {
+				const device_names = [];
+
+				media.sendto.forEach((device_uuid) => {
+					if (device_uuid in this.#devices) {
+						device_names.push(this.#devices[device_uuid].name);
+					}
+					else if (device_uuid !== '*') {
+						device_names.push(<?= json_encode(_('Inaccessible device')) ?>);
+					}
+					else {
+						device_names.push(device_uuid);
+					}
+				});
+
+				sendto_full = device_names.join(', ');
+				sendto_array = media.sendto;
+				delete(media.sendto);
+			}
+			else if (Array.isArray(media.sendto)) {
 				sendto_full = media.sendto.join(', ');
 				sendto_array = media.sendto;
 				delete(media.sendto);

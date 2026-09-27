@@ -38,8 +38,8 @@ zbx_history_get_values_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
-	
-	
+
+
 history_clickhouse_parse_response_SOURCES = \
 	history_clickhouse_parse_response.c \
 	$(top_srcdir)/src/libs/zbxhistory/history_option.c \
@@ -69,8 +69,8 @@ history_clickhouse_parse_response_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)	
-	
+	$(YAML_CFLAGS)
+
 history_provider_parse_options_SOURCES = \
 	history_provider_parse_options.c \
 	$(top_srcdir)/src/libs/zbxhistory/history_option.c \
@@ -101,7 +101,7 @@ history_provider_parse_options_CFLAGS = \
 	-I@top_srcdir@/src \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)		
-	
+	$(YAML_CFLAGS)
+
 endif
 endif
