@@ -502,7 +502,6 @@ class CApiService {
 			array $sql_parts) {
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
-		$group_by_fields = $this->getGroupByFields($options);
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
@@ -523,9 +522,10 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif ($group_by_fields) {
-				foreach ($group_by_fields as $field) {
-					if ($this->hasField($field, $table_name)) {
+			elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
+				foreach ($options['groupBy'] as $field) {
+					if (is_string($field) && in_array($field, $this->groupByColumns)
+							&& $this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -534,11 +534,13 @@ class CApiService {
 				}
 			}
 		}
-		elseif ($group_by_fields) {
+		elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+					&& $options['groupBy']) {
 			$sql_parts['select'] = [];
 
-			foreach ($group_by_fields as $field) {
-				if ($this->hasField($field, $table_name)) {
+			foreach ($options['groupBy'] as $field) {
+				if (is_string($field) && in_array($field, $this->groupByColumns)
+						&& $this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -641,21 +643,6 @@ class CApiService {
 	}
 
 	/**
-	 * Returns the requested groupBy fields that are allowed for the API service.
-	 *
-	 * @param array $options
-	 *
-	 * @return array
-	 */
-	private function getGroupByFields(array $options): array {
-		if (!$this->groupByColumns || !array_key_exists('groupBy', $options) || !is_array($options['groupBy'])) {
-			return [];
-		}
-
-		return array_intersect($this->groupByColumns, $options['groupBy']);
-	}
-
-	/**
 	 * Modifies the SQL parts to implement all of the filter related options.
 	 *
 	 * @param string $tableName
@@ -710,8 +697,9 @@ class CApiService {
 
 		$allowed_sort_fields = $this->sortColumns;
 
-		if (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
-			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
+		if ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+				&& $options['groupBy']) {
+			$allowed_sort_fields = array_intersect($this->sortColumns, $this->groupByColumns, $options['groupBy']);
 
 			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
 				$allowed_sort_fields[] = 'rowscount';
