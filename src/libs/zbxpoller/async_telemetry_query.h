@@ -48,7 +48,7 @@ zbx_telemetry_query_context;
 #endif
 
 int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_RESULT *result,
-		zbx_poller_config_t *poller_config);
+		zbx_poller_config_t *poller_config, const zbx_apm_db_config_t *apm_db_config);
 
 #ifdef HAVE_LIBCURL
 void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetry_query_context);

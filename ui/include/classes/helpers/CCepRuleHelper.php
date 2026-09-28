@@ -17,9 +17,9 @@
 class CCepRuleHelper {
 
 	public const WINDOW_NONE = 0;
-	public const WINDOW_SIMPLE = 1;
+	public const WINDOW_SIMPLE_MULTIPLE = 1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH = 3;
+	public const WINDOW_SIMPLE_ONCE = 3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
 	public const STATUS_ENABLED = 0;
@@ -91,19 +91,19 @@ class CCepRuleHelper {
 		self::WINDOW_NONE => [
 			self::WHEN_EVENT_OCCURRED
 		],
-		self::WINDOW_SIMPLE => [
+		self::WINDOW_SIMPLE_MULTIPLE => [
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_WINDOW_CLOSED
+		],
+		self::WINDOW_SIMPLE_ONCE => [
 			self::WHEN_EVENT_OCCURRED,
 			self::WHEN_EVENT_ADDED,
 			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_CAUSE_SYMPTOM => [
-			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_EVENT_ADDED,
-			self::WHEN_EVENT_EVICTED,
-			self::WHEN_WINDOW_CLOSED
-		],
-		self::WINDOW_TAG_MATCH => [
 			self::WHEN_EVENT_OCCURRED,
 			self::WHEN_EVENT_ADDED,
 			self::WHEN_EVENT_EVICTED,
@@ -484,9 +484,9 @@ class CCepRuleHelper {
 	public static function getWindowLabelStrings(): array {
 		return [
 			self::WINDOW_NONE => _('None'),
-			self::WINDOW_SIMPLE => _('Simple'),
+			self::WINDOW_SIMPLE_MULTIPLE => _('Simple (multiple)'),
+			self::WINDOW_SIMPLE_ONCE => _('Simple (once)'),
 			self::WINDOW_CAUSE_SYMPTOM => _('Cause and symptoms grouping'),
-			self::WINDOW_TAG_MATCH => _('Tag correlation'),
 			self::WINDOW_PATTERN_MATCH => _('Pattern match')
 		];
 	}

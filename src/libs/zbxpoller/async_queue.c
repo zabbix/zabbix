@@ -56,7 +56,10 @@ int	async_task_queue_init(zbx_async_queue_t *queue, zbx_thread_poller_args *poll
 	queue->config_timeout = poller_args_in->config_comms->config_timeout;
 	queue->config_unavailable_delay = poller_args_in->config_unavailable_delay;
 	queue->config_unreachable_delay = poller_args_in->config_unreachable_delay;
-	queue->config_unreachable_period = poller_args_in-> config_unreachable_period;
+	queue->config_unreachable_period = poller_args_in->config_unreachable_period;
+	queue->config_apm_db_config = poller_args_in->config_apm_db_config;
+	queue->config_source_ip = poller_args_in->config_comms->config_source_ip;
+	queue->config_ssl_ca_location = poller_args_in->config_comms->config_ssl_ca_location;
 
 	zbx_vector_uint64_create(&queue->itemids);
 	zbx_vector_int32_create(&queue->errcodes);

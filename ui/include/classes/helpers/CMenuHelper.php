@@ -337,6 +337,13 @@ class CMenuHelper {
 		}
 
 		$submenu_administration = [
+			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
+				? (new CMenuItem(_('Data source')))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('APM')))
+							->setAction('apm.db.edit')
+					]))
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
 					->setId('main-menu-general')

@@ -53,7 +53,7 @@ typedef struct
 	zbx_get_value_internal_ext_f		zbx_get_value_internal_ext_cb;
 	const char				*config_ssh_key_location;
 	const char				*config_webdriver_url;
-	const zbx_apm_db_config_t		*apm_db_config;
+	const zbx_apm_db_config_t		*config_apm_db_config;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
 	const char				*config_bridge_adapter_url;
