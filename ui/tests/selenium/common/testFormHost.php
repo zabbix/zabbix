@@ -1602,7 +1602,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #27 User macros in SNMP max repetition and retries
+			// #27 User macros in SNMP max repetition and retries.
 			[
 				[
 					'expected' => TEST_GOOD,
