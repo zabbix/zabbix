@@ -1030,7 +1030,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #33 SNMP retries empty.
+			// #33 SNMP retries and max repetition empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1042,30 +1042,12 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_ADD,
 							'type' => 'SNMP',
-							'Retries' => ''
-						]
-					],
-					'inline_errors' => [
-						'Retries' => 'This field cannot be empty.'
-					]
-				]
-			],
-			// #34 SNMP max repetition count empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'host_fields' => [
-						'Host name' => 'Empty SNMP max repetitions',
-						'Host groups' => 'Zabbix servers'
-					],
-					'interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
+							'Retries' => '',
 							'Max repetition count' => ''
 						]
 					],
 					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
 						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
@@ -1638,7 +1620,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #28 SNMP retries empty.
+			// #28 SNMP retries and max repetition empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1650,30 +1632,12 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_ADD,
 							'type' => 'SNMP',
-							'Retries' => ''
-						]
-					],
-					'inline_errors' => [
-						'Retries' => 'This field cannot be empty.'
-					]
-				]
-			],
-			// #29 SNMP max repetition count empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'host_fields' => [
-						'Host name' => 'Empty SNMP max repetitions',
-						'Host groups' => 'Zabbix servers'
-					],
-					'interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
+							'Retries' => '',
 							'Max repetition count' => ''
 						]
 					],
 					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
 						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
