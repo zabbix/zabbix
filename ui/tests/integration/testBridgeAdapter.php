@@ -147,7 +147,6 @@ class testBridgeAdapter extends CIntegrationTest {
 				self::COMPONENT_SERVER => [
 					'DebugLevel' => 4,
 					'LogFileSize' => 20,
-					'EnableMobileDevices' => 1,
 					'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 				]
 			];
@@ -160,7 +159,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'TLSCAFile' => $base_dir.'zabbix_ca_file.crt',
 				'TLSCertFile' => $base_dir.'zabbix_server.crt',
 				'TLSKeyFile' => $base_dir.'zabbix_server.key',
@@ -1738,20 +1736,10 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
-	public function mobileDevicesEnabledConfigurationProvider(): array {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'EnableMobileDevices' => 1
-			]
-		];
-	}
-
 	public function noBridgeAdapterUrlConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => null,
 				'BridgeAdapterConnectTo' => null
 			]
@@ -1777,9 +1765,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertSame(self::DEVICE_INIT_ERROR_NOT_CONFIGURED, $client->getError());
 	}
 
-	/**
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
-	 */
 	public function testBridgeAdapter_initPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
 
@@ -1807,8 +1792,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	 * device_check_permissions()'s immediate deny branch (no role_rule lookup at all), which differs from
 	 * testBridgeAdapter_initPermissionDenied() above (restricted user managing their OWN device, denied via
 	 * the "devices.actions.default_access" role rule lookup).
-	 *
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
 	 */
 	public function testBridgeAdapter_initManageOtherUserDenied(): void {
 		[$client] = $this->getServerClientAndSid();
@@ -2224,7 +2207,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.$closed_port.'/rpc',
 				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.$closed_port,
 				'TLSCAFile' => null,
@@ -2362,7 +2344,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_URL_HOST.':80/rpc',
 				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort(),
 				'TLSCAFile' => null,
@@ -2376,8 +2357,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	 * OFFBOARD_DEVICE_UUID belongs to userid=1, not the restricted user, so this already exercises
 	 * device_check_permissions()'s immediate deny branch (non-super-admin managing someone else's
 	 * device) - the offboard-side counterpart of testBridgeAdapter_initManageOtherUserDenied() above.
-	 *
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
 	 */
 	public function testBridgeAdapter_offboardPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
@@ -2455,7 +2434,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 			]
 		];
