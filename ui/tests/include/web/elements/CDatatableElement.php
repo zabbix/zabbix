@@ -29,7 +29,8 @@ class CDatatableElement extends CElement {
 	 */
 	protected $selectors = [
 		'header' => 'xpath:./div[contains(@class, "datatable-header")]/div[contains(@class, "cell-header")]',
-		'row' => 'xpath:./div[@class="datatable-body"]/div[contains(@class, "row")]',
+		'row' => 'xpath:./div[@class="datatable-body"]/div[contains(@class, "row")]'.
+				'[not(contains(@style, "visibility: hidden"))]',
 		'column' => 'xpath:./*'
 	];
 
