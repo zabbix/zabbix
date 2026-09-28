@@ -32,7 +32,10 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-var errTooManyRedirects = errs.New("too many redirects")
+var (
+	errTooManyRedirects = errs.New("too many redirects")
+	errCannotGetContent = errs.New("cannot get content of web page")
+)
 
 // Get returns the specified URL content with a timeout. If dump is true,
 // it returns the response headers (including all responses if following redirects)
@@ -55,7 +58,7 @@ func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirec
 			return "", errs.Wrapf(err, "maximum number of redirects (%d) exceeded", redirectLimit)
 		}
 
-		return "", errs.Wrap(err, "cannot get content of web page")
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
 	defer resp.Body.Close()
@@ -66,7 +69,7 @@ func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirec
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", errs.Wrap(err, "cannot get content of web page")
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
 	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
@@ -76,11 +79,11 @@ func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirec
 
 	b, err = io.ReadAll(r)
 	if err != nil {
-		return "", errs.Wrap(err, "cannot decode content of web page")
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 	h, err := httputil.DumpResponse(resp, false)
 	if err != nil {
-		return "", errs.Wrap(err, "cannot get header of web page")
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
 	return string(bytes.Join(chain, nil)) + string(h) + string(b), nil
@@ -127,7 +130,7 @@ func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*h
 
 		h, err := httputil.DumpResponse(req.Response, false)
 		if err != nil {
-			return errs.Wrap(err, "cannot get header of web page")
+			return errs.WrapConst(err, errCannotGetContent)
 		}
 
 		*chain = append(*chain, h)
