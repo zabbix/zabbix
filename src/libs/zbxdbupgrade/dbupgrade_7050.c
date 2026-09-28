@@ -2137,7 +2137,6 @@ static int	DBpatch_7050188(void)
 	return zbx_db_settings_set_value(ZBX_SETTINGS_APM, "{}", ZBX_SETTING_TYPE_STR);
 }
 
-
 static int	DBpatch_7050189(void)
 {
 	const zbx_db_field_t	field = {"sign_messages", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
