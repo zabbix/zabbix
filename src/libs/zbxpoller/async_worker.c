@@ -17,6 +17,7 @@
 #include "async_manager.h"
 
 #include "zbxalgo.h"
+#include "zbxtelemetry.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
@@ -31,13 +32,16 @@
 #define ASYNC_WORKER_INIT_THREAD	0x01
 
 static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processing_num,
-		unsigned char poller_type, int config_timeout, zbx_uint64_t processing_limit)
+		unsigned char poller_type, int config_timeout, zbx_uint64_t processing_limit,
+		const zbx_apm_db_config_t *config_apm_db_config, const char *config_source_ip,
+		const char *config_ssl_ca_location)
 {
 	zbx_poller_item_t	*poller_item;
 
 	poller_item = zbx_malloc(NULL, sizeof(zbx_poller_item_t));
 	poller_item->items.any = NULL;
 	poller_item->poller_type = poller_type;
+	poller_item->apm_db_config = NULL;
 
 	poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout, processing_num,
 			processing_limit, &poller_item->items);
@@ -46,6 +50,13 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 	{
 		poller_item->results = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(AGENT_RESULT));
 		poller_item->errcodes = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(int));
+
+		if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
+		{
+			poller_item->apm_db_config = zbx_malloc(NULL, sizeof(zbx_apm_db_config_t));
+			zbx_dc_config_get_apm_db_config(poller_item->apm_db_config, config_apm_db_config,
+					config_source_ip, config_ssl_ca_location);
+		}
 
 		switch (poller_type)
 		{
@@ -56,6 +67,10 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 			case ZBX_POLLER_TYPE_SNMP:
 				zbx_prepare_snmp_items(poller_item->items.snmp_items, poller_item->errcodes,
 						poller_item->num, poller_item->results);
+				break;
+			case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+				zbx_prepare_telemetry_query_items(poller_item->items.telemetry_query_items,
+						poller_item->errcodes, poller_item->num, poller_item->results);
 				break;
 			default: /* ZBX_POLLER_TYPE_HTTPAGENT */
 				zbx_prepare_httpagent_items(poller_item->items.httpagent_items, poller_item->errcodes,
@@ -150,6 +165,7 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
+	zbx_vector_dc_cached_data_t	cached_datas;
 	sigjmp_buf			jmp_ret;
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
@@ -175,6 +191,14 @@ static void	*async_worker_entry(void *args)
 				config_unavailable_delay = queue->config_unavailable_delay,
 				config_unreachable_period = queue->config_unreachable_period,
 				config_unreachable_delay = queue->config_unreachable_delay;
+	const int		have_cached_data = zbx_dc_config_poller_type_has_cached_data(poller_type);
+
+	const zbx_apm_db_config_t	*config_apm_db_config = queue->config_apm_db_config;
+	const char			*config_source_ip = queue->config_source_ip;
+	const char			*config_ssl_ca_location = queue->config_ssl_ca_location;
+
+	if (SUCCEED == have_cached_data)
+		zbx_vector_dc_cached_data_create(&cached_datas);
 
 	while (0 == worker->stop)
 	{
@@ -201,9 +225,16 @@ static void	*async_worker_entry(void *args)
 			zbx_vector_int32_append_array(&lastclocks, queue->lastclocks.values,
 					queue->lastclocks.values_num);
 
+			if (SUCCEED == have_cached_data)
+				zbx_vector_dc_cached_data_append_array(&cached_datas, queue->cached_datas.values,
+						queue->cached_datas.values_num);
+
 			zbx_vector_uint64_clear(&queue->itemids);
 			zbx_vector_int32_clear(&queue->lastclocks);
 			zbx_vector_int32_clear(&queue->errcodes);
+
+			if (SUCCEED == have_cached_data)
+				zbx_vector_dc_cached_data_clear(&queue->cached_datas);
 
 			processing_num = queue->processing_num -= itemids.values_num;
 		}
@@ -224,6 +255,7 @@ static void	*async_worker_entry(void *args)
 			int	nextcheck;
 
 			zbx_dc_poller_requeue_items(itemids.values, lastclocks.values, errcodes.values,
+					(SUCCEED == have_cached_data ? cached_datas.values : NULL),
 					(size_t)itemids.values_num, poller_type, &nextcheck);
 
 			if (FAIL == nextcheck || nextcheck > time(NULL))
@@ -235,6 +267,9 @@ static void	*async_worker_entry(void *args)
 			zbx_vector_int32_clear(&errcodes);
 			zbx_vector_uint64_clear(&itemids);
 
+			if (SUCCEED == have_cached_data)
+				zbx_vector_dc_cached_data_clear(&cached_datas);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "requeue items nextcheck:%d", nextcheck);
 		}
 
@@ -242,7 +277,8 @@ static void	*async_worker_entry(void *args)
 		if (1 == check_queue)
 		{
 			poller_item = dc_config_async_get_poller_items(processing_num, poller_type, config_timeout,
-					processing_limit);
+					processing_limit, config_apm_db_config, config_source_ip,
+					config_ssl_ca_location);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:" ZBX_FS_UI64,
 					processing_num, queue_poller_items_values_num);
@@ -279,6 +315,9 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_int32_destroy(&lastclocks);
 	zbx_vector_int32_destroy(&errcodes);
 	zbx_vector_uint64_destroy(&itemids);
+
+	if (SUCCEED == have_cached_data)
+		zbx_vector_dc_cached_data_destroy(&cached_datas);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
 

@@ -188,7 +188,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.http_proxy,ti.headers,ti.retrieve_mode,ti.request_method,ti.output_format,"
 				"ti.ssl_cert_file,ti.ssl_key_file,ti.ssl_key_password,ti.verify_peer,ti.verify_host,"
 				"ti.allow_traps,ti.discover,ti.lifetime_type,ti.enabled_lifetime,"
-				"ti.enabled_lifetime_type,"
+				"ti.enabled_lifetime_type,ti.query,ti.time_shift,ti.lookback_limit,"
+				"ti.granularity,"
 				"hi.interfaceid,hi.templateid,hi.name,hi.type,hi.value_type,hi.delay,hi.history,"
 				"hi.trends,hi.status,hi.trapper_hosts,hi.units,hi.formula,hi.logtimefmt,hi.valuemapid,"
 				"hi.params,hi.ipmi_sensor,hi.snmp_oid,hi.authtype,hi.username,hi.password,hi.publickey,"
@@ -197,7 +198,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"hi.status_codes,hi.follow_redirects,hi.post_type,hi.http_proxy,hi.headers,"
 				"hi.retrieve_mode,hi.request_method,hi.output_format,hi.ssl_cert_file,hi.ssl_key_file,"
 				"hi.ssl_key_password,hi.verify_peer,hi.verify_host,hi.allow_traps,hi.discover,"
-				"hi.lifetime_type,hi.enabled_lifetime,hi.enabled_lifetime_type"
+				"hi.lifetime_type,hi.enabled_lifetime,hi.enabled_lifetime_type,hi.query,hi.time_shift,"
+				"hi.lookback_limit,hi.granularity"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -325,7 +327,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->jmx_endpoint_orig = NULL;
 		item->jmx_endpoint = zbx_strdup(NULL, row[28]);
 
-		ZBX_DBROW2UINT64(item->master_itemid_orig, row[80]);
+		ZBX_DBROW2UINT64(item->master_itemid_orig, row[84]);
 		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
 		item->timeout_orig = NULL;
@@ -385,6 +387,18 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->discover_orig = 0;
 		ZBX_STR2UCHAR(item->discover, row[48]);
 
+		item->query_orig = NULL;
+		item->query = zbx_strdup(NULL, row[52]);
+
+		item->time_shift_orig = NULL;
+		item->time_shift = zbx_strdup(NULL, row[53]);
+
+		item->lookback_limit_orig = NULL;
+		item->lookback_limit = zbx_strdup(NULL, row[54]);
+
+		item->granularity_orig = NULL;
+		item->granularity = zbx_strdup(NULL, row[55]);
+
 		item->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG;
 
 		if (SUCCEED != zbx_db_is_null(row[26]))
@@ -429,57 +443,61 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			item->key_ = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
-			SET_FLAG_UINT64(row[52], item->interfaceid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INTERFACEID);
-			SET_FLAG_UINT64(row[53], item->templateid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TEMPLATEID);
-			SET_FLAG_STR(row[54], item->name, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME);
-			SET_FLAG_UCHAR(row[55], item->type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TYPE);
-			SET_FLAG_UCHAR(row[56], item->value_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUE_TYPE);
-			SET_FLAG_STR(row[57], item->delay, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DELAY);
-			SET_FLAG_STR(row[58], item->history, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HISTORY);
-			SET_FLAG_STR(row[59], item->trends, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRENDS);
-			SET_FLAG_UCHAR(row[60], item->status, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS);
-			SET_FLAG_STR(row[61], item->trapper_hosts, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRAPPER_HOSTS);
-			SET_FLAG_STR(row[62], item->units, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_UNITS);
-			SET_FLAG_STR(row[63], item->formula, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FORMULA);
-			SET_FLAG_STR(row[64], item->logtimefmt, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LOGTIMEFMT);
-			SET_FLAG_UINT64(row[65], item->valuemapid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUEMAPID);
-			SET_FLAG_STR(row[66], item->params, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PARAMS);
-			SET_FLAG_STR(row[67], item->ipmi_sensor, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_IPMI_SENSOR);
-			SET_FLAG_STR(row[68], item->snmp_oid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SNMP_OID);
-			SET_FLAG_UCHAR(row[69], item->authtype, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_AUTHTYPE);
-			SET_FLAG_STR(row[70], item->username, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_USERNAME);
-			SET_FLAG_STR(row[71], item->password, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PASSWORD);
-			SET_FLAG_STR(row[72], item->publickey, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PUBLICKEY);
-			SET_FLAG_STR(row[73], item->privatekey, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PRIVATEKEY);
-			SET_FLAG_UCHAR(row[74], item->flags, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FLAGS);
-			SET_FLAG_STR(row[75], item->description, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DESCRIPTION);
-			SET_FLAG_UCHAR(row[76], item->inventory_link, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INVENTORY_LINK);
-			SET_FLAG_STR(row[77], item->lifetime, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME);
-			SET_FLAG_UCHAR(row[100], item->lifetime_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME_TYPE);
-			SET_FLAG_STR(row[101], item->enabled_lifetime, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ENABLED_LIFETIME);
-			SET_FLAG_UCHAR(row[102], item->enabled_lifetime_type,
+			SET_FLAG_UINT64(row[56], item->interfaceid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INTERFACEID);
+			SET_FLAG_UINT64(row[57], item->templateid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TEMPLATEID);
+			SET_FLAG_STR(row[58], item->name, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME);
+			SET_FLAG_UCHAR(row[59], item->type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TYPE);
+			SET_FLAG_UCHAR(row[60], item->value_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUE_TYPE);
+			SET_FLAG_STR(row[61], item->delay, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DELAY);
+			SET_FLAG_STR(row[62], item->history, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HISTORY);
+			SET_FLAG_STR(row[63], item->trends, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRENDS);
+			SET_FLAG_UCHAR(row[64], item->status, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS);
+			SET_FLAG_STR(row[65], item->trapper_hosts, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRAPPER_HOSTS);
+			SET_FLAG_STR(row[66], item->units, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_UNITS);
+			SET_FLAG_STR(row[67], item->formula, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FORMULA);
+			SET_FLAG_STR(row[68], item->logtimefmt, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LOGTIMEFMT);
+			SET_FLAG_UINT64(row[69], item->valuemapid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUEMAPID);
+			SET_FLAG_STR(row[70], item->params, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PARAMS);
+			SET_FLAG_STR(row[71], item->ipmi_sensor, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_IPMI_SENSOR);
+			SET_FLAG_STR(row[72], item->snmp_oid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SNMP_OID);
+			SET_FLAG_UCHAR(row[73], item->authtype, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_AUTHTYPE);
+			SET_FLAG_STR(row[74], item->username, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_USERNAME);
+			SET_FLAG_STR(row[75], item->password, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PASSWORD);
+			SET_FLAG_STR(row[76], item->publickey, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PUBLICKEY);
+			SET_FLAG_STR(row[77], item->privatekey, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PRIVATEKEY);
+			SET_FLAG_UCHAR(row[78], item->flags, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FLAGS);
+			SET_FLAG_STR(row[79], item->description, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DESCRIPTION);
+			SET_FLAG_UCHAR(row[80], item->inventory_link, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INVENTORY_LINK);
+			SET_FLAG_STR(row[81], item->lifetime, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME);
+			SET_FLAG_UCHAR(row[104], item->lifetime_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME_TYPE);
+			SET_FLAG_STR(row[105], item->enabled_lifetime, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ENABLED_LIFETIME);
+			SET_FLAG_UCHAR(row[106], item->enabled_lifetime_type,
 					ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ENABLED_LIFETIME_TYPE);
-			SET_FLAG_UCHAR(row[78], item->evaltype, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_EVALTYPE);
-			SET_FLAG_STR(row[79], item->jmx_endpoint, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_JMX_ENDPOINT);
-			SET_FLAG_STR(row[81], item->timeout, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIMEOUT);
-			SET_FLAG_STR(row[82], item->url, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_URL);
-			SET_FLAG_STR(row[83], item->query_fields, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY_FIELDS);
-			SET_FLAG_STR(row[84], item->posts, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POSTS);
-			SET_FLAG_STR(row[85], item->status_codes, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS_CODES);
-			SET_FLAG_UCHAR(row[86], item->follow_redirects, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FOLLOW_REDIRECTS);
-			SET_FLAG_UCHAR(row[87], item->post_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POST_TYPE);
-			SET_FLAG_STR(row[88], item->http_proxy, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HTTP_PROXY);
-			SET_FLAG_STR(row[89], item->headers, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HEADERS);
-			SET_FLAG_UCHAR(row[90], item->retrieve_mode, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RETRIEVE_MODE);
-			SET_FLAG_UCHAR(row[91], item->request_method, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_REQUEST_METHOD);
-			SET_FLAG_UCHAR(row[92], item->output_format, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_OUTPUT_FORMAT);
-			SET_FLAG_STR(row[93], item->ssl_cert_file, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_CERT_FILE);
-			SET_FLAG_STR(row[94], item->ssl_key_file, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_FILE);
-			SET_FLAG_STR(row[95], item->ssl_key_password, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_PASSWORD);
-			SET_FLAG_UCHAR(row[96], item->verify_peer, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_PEER);
-			SET_FLAG_UCHAR(row[97], item->verify_host, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_HOST);
-			SET_FLAG_UCHAR(row[98], item->allow_traps, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS);
-			SET_FLAG_UCHAR(row[99], item->discover, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER);
+			SET_FLAG_UCHAR(row[82], item->evaltype, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_EVALTYPE);
+			SET_FLAG_STR(row[83], item->jmx_endpoint, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_JMX_ENDPOINT);
+			SET_FLAG_STR(row[85], item->timeout, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIMEOUT);
+			SET_FLAG_STR(row[86], item->url, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_URL);
+			SET_FLAG_STR(row[87], item->query_fields, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY_FIELDS);
+			SET_FLAG_STR(row[88], item->posts, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POSTS);
+			SET_FLAG_STR(row[89], item->status_codes, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS_CODES);
+			SET_FLAG_UCHAR(row[90], item->follow_redirects, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FOLLOW_REDIRECTS);
+			SET_FLAG_UCHAR(row[91], item->post_type, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POST_TYPE);
+			SET_FLAG_STR(row[92], item->http_proxy, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HTTP_PROXY);
+			SET_FLAG_STR(row[93], item->headers, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HEADERS);
+			SET_FLAG_UCHAR(row[94], item->retrieve_mode, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RETRIEVE_MODE);
+			SET_FLAG_UCHAR(row[95], item->request_method, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_REQUEST_METHOD);
+			SET_FLAG_UCHAR(row[96], item->output_format, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_OUTPUT_FORMAT);
+			SET_FLAG_STR(row[97], item->ssl_cert_file, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_CERT_FILE);
+			SET_FLAG_STR(row[98], item->ssl_key_file, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_FILE);
+			SET_FLAG_STR(row[99], item->ssl_key_password, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_PASSWORD);
+			SET_FLAG_UCHAR(row[100], item->verify_peer, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_PEER);
+			SET_FLAG_UCHAR(row[101], item->verify_host, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_HOST);
+			SET_FLAG_UCHAR(row[102], item->allow_traps, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS);
+			SET_FLAG_UCHAR(row[103], item->discover, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER);
+			SET_FLAG_STR(row[107], item->query, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY);
+			SET_FLAG_STR(row[108], item->time_shift, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIME_SHIFT);
+			SET_FLAG_STR(row[109], item->lookback_limit, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LOOKBACK_LIMIT);
+			SET_FLAG_STR(row[110], item->granularity, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_GRANULARITY);
 		}
 		else
 		{
@@ -936,6 +954,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		PREPARE_UPDATE_UC(VERIFY_HOST, verify_host)
 		PREPARE_UPDATE_UC(ALLOW_TRAPS, allow_traps)
 		PREPARE_UPDATE_UC(DISCOVER, discover)
+		PREPARE_UPDATE_STR(QUERY, query)
+		PREPARE_UPDATE_STR(TIME_SHIFT, time_shift)
+		PREPARE_UPDATE_STR(LOOKBACK_LIMIT, lookback_limit)
+		PREPARE_UPDATE_STR(GRANULARITY, granularity)
 		ZBX_UNUSED(d);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
@@ -971,7 +993,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->posts, item->status_codes, item->follow_redirects, item->post_type,
 				item->http_proxy, item->headers, item->retrieve_mode, item->request_method,
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
-				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
+				item->verify_peer, item->verify_host, item->allow_traps, item->discover, item->query,
+				item->time_shift, item->lookback_limit, item->granularity);
 
 
 		if (0 == (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
@@ -1060,7 +1083,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 				"master_itemid", "timeout", "url", "query_fields", "posts", "status_codes",
 				"follow_redirects", "post_type", "http_proxy", "headers", "retrieve_mode",
 				"request_method", "output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password",
-				"verify_peer", "verify_host", "allow_traps", "discover", (char *)NULL);
+				"verify_peer", "verify_host", "allow_traps", "discover", "query", "time_shift",
+				"lookback_limit", "granularity", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
@@ -1507,6 +1531,10 @@ static void	free_template_item(zbx_template_item_t *item)
 	CLEAN_ORIG(SSL_CERT_FILE, ssl_cert_file)
 	CLEAN_ORIG(SSL_KEY_FILE, ssl_key_file)
 	CLEAN_ORIG(SSL_KEY_PASSWORD, ssl_key_password)
+	CLEAN_ORIG(QUERY, query)
+	CLEAN_ORIG(TIME_SHIFT, time_shift)
+	CLEAN_ORIG(LOOKBACK_LIMIT, lookback_limit)
+	CLEAN_ORIG(GRANULARITY, granularity)
 #undef CLEAN_ORIG
 	zbx_free(item->key_);
 

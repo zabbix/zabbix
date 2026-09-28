@@ -279,6 +279,9 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 		case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 			break;
 
+		case ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER:
+			break;
+
 		case ZBX_PROCESS_TYPE_AGENT_POLLER:
 			break;
 

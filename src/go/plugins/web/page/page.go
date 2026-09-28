@@ -122,7 +122,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, errs.WrapConst(err, errInvalidSeventhParameter)
 		}
 
-		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
+		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, true, redirectLimit)
 		if err != nil {
 			return nil, err
 		}
@@ -150,7 +150,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		start := time.Now()
 
-		_, err = web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false, redirectLimit)
+		_, err = web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false, true, redirectLimit)
 		if err != nil {
 			//nolint:wrapcheck
 			return nil, err
@@ -167,7 +167,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, errs.WrapConst(err, errInvalidFourthParameter)
 		}
 		//nolint:wrapcheck
-		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
+		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, true, redirectLimit)
 	}
 }
 

@@ -38,9 +38,7 @@ var errTooManyRedirects = errs.New("too many redirects")
 // it returns the response headers (including all responses if following redirects)
 // concatenated with the final response body. Parameter redirectLimit specifies
 // the maximum number of redirects to follow; a value of 0 disables redirect following.
-func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (string, error) {
-	var chain [][]byte
-
+func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirectLimit int) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", errs.Wrap(err, "cannot create new request")
@@ -50,19 +48,7 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 		"User-Agent": {"Zabbix " + version.Long()},
 	}
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
-			Proxy:             http.ProxyFromEnvironment,
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				LocalAddr: &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0},
-			}).DialContext,
-		},
-		Timeout:       timeout,
-		CheckRedirect: redirectPolicy(redirectLimit, &chain),
-	}
-
+	client, chain := newClient(timeout, tlsRenegotiation, redirectLimit)
 	resp, err := client.Do(req)
 	if err != nil {
 		if errors.Is(err, errTooManyRedirects) {
@@ -84,10 +70,6 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 	}
 
 	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
-	if err != nil {
-		return "", nil
-	}
-
 	log.Debugf("determined encoding '%s'", name)
 
 	r := transform.NewReader(bytes.NewReader(b), e.NewDecoder())
@@ -102,6 +84,33 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 	}
 
 	return string(bytes.Join(chain, nil)) + string(h) + string(b), nil
+}
+
+func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*http.Client, [][]byte) {
+	var chain [][]byte
+
+	tlsConf := &tls.Config{
+		//nolint:gosec // intended behavior
+		InsecureSkipVerify: true,
+	}
+
+	if renegotiation {
+		tlsConf.Renegotiation = tls.RenegotiateFreelyAsClient
+	}
+
+	c := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig:   tlsConf,
+			Proxy:             http.ProxyFromEnvironment,
+			DisableKeepAlives: true,
+			DialContext: (&net.Dialer{
+				LocalAddr: &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0},
+			}).DialContext,
+		},
+		Timeout:       timeout,
+		CheckRedirect: redirectPolicy(redirectLimit, &chain),
+	}
+	return c, chain
 }
 
 // redirectPolicy returns function that follows at most limit redirects, to be compatible with cURL,

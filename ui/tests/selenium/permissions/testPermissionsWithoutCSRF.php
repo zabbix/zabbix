@@ -369,7 +369,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=ceprule.list',
-					'overlay' => 'update',
+					'overlay' => 'update_correlation',
 					'multiple_messages' => true
 				]
 			],
@@ -794,6 +794,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'zabbix.php?action=timeouts.edit',
 					'return_button' => false
 				]
+			],
+			// #70 Timeout options update.
+			[
+				[
+					'db' => 'SELECT * FROM settings',
+					'link' => 'zabbix.php?action=apm.db.edit',
+					'return_button' => false
+				]
 			]
 		];
 	}
@@ -825,6 +833,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				'create' => '//div[@class="header-controls"]//button',
 				'create_host' => '//div[@class="header-controls"]//button[@class="js-create-host"]',
 				'create_correlation' => '//button[text()="Create event correlation"]',
+				'update_correlation' => '//td[text()="Event correlation"]/../td[2]/a',
 				'update' => '//table[@class="list-table"]//tr[1]/td[2]/a|//div[contains(@class, "datatable-scrollable")]'.
 						'//div[@class="row"][1]/div[2]//a',
 				'trigger_update' => '//table[@class="list-table"]//tr[1]/td[4]/a',

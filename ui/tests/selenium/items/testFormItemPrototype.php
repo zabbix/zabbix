@@ -633,7 +633,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'Calculated',
 				'Dependent item',
 				'Script',
-				'Browser'
+				'Browser',
+				'Telemetry query'
 			]);
 			if (isset($data['type'])) {
 				$type_field->select($data['type']);
