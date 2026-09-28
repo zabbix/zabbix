@@ -150,5 +150,13 @@
             "parameters": ["", "dflt"]
         },
         "result": "*UNKNOWN*"
-    }
+    },
+	{
+		"value": "",
+		"macrofunc": {
+			"function": "xmlxpath",
+			"parameters": ["//pod"]
+		},
+		"result": "*UNKNOWN*"
+	}
 ]
