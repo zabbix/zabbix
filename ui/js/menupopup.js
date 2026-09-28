@@ -1526,7 +1526,8 @@ function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 				manualinput_default_value: url.manualinput_default_value,
 				scriptid: url.scriptid,
 				hostid,
-				eventid
+				eventid,
+				error: 'error' in url ? url.error : null
 			});
 		}
 	}
@@ -1602,6 +1603,10 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 					item.url = data.params.url;
 					if (data.params.target !== '') {
 						item.target = data.params.target;
+					}
+
+					if (data.params.error !== null) {
+						item.dataAttributes = {error: data.params.error};
 					}
 				}
 			}
@@ -2287,6 +2292,10 @@ jQuery(function($) {
 
 			if (options.clickCallback !== undefined) {
 				link.on('click', options.clickCallback);
+			}
+
+			if (options.url === null && 'dataAttributes' in options && 'error' in options.dataAttributes) {
+				link.on('click', (e) => alert(e.target.dataset.error));
 			}
 		}
 
