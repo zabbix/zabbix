@@ -6176,7 +6176,7 @@ z-navigation-tree {
   --navigation-tree-hover-bg-color: #f4f4f4;
   --navigation-tree-border-color: #9f9f9f;
   --navigation-tree-selected-bg-color: #f4f4f4;
-  --navigation-tree-muted-color: #333333;
+  --navigation-tree-muted-color: #000000;
   display: block;
   min-inline-size: 0;
   min-block-size: 0; }
