@@ -1136,18 +1136,11 @@ class CDataTable {
 
 		this.#sortColumns();
 
-		this.updateUserConfig()
-			.getData()
-			.then(response => {
-				if (!response) {
-					return;
-				}
+		this.updateUserConfig();
+		this.#options_popup_updated = true;
 
-				this.#options_popup_updated = true;
-
-				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
-				this.dispatchEvent(CDataTable.EVENT_SAVE);
-			});
+		this.dispatchEvent(CDataTable.EVENT_INIT);
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
 	onColumnDuplicate(e) {
