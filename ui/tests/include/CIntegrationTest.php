@@ -529,6 +529,7 @@ class CIntegrationTest extends CAPITest {
 		$failed_pids = [];
 		$failed_kills = [];
 		$backtraces = [];
+		$child_pids[] = $parent_pid;
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
