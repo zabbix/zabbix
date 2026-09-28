@@ -84,6 +84,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY =
 		'bridge-adapter returned too large response body for device.notify request';
 	private const LOG_ADAPTER_INCOMPLETE_ERROR = 'incomplete error in bridge-adapter response body';
+	private const LOG_ADAPTER_DETAILED_MESSAGE = 'detailed_message: Mock bridge-adapter device limit exceeded';
 	private const LOG_ADAPTER_MISSING_RESULT = 'missing result in bridge-adapter response body';
 	private const LOG_ADAPTER_MISSING_RESULT_FIELDS =
 		'missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter';
@@ -1537,6 +1538,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::INIT_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_DETAILED_MESSAGE, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
 			120, 1
 		);
