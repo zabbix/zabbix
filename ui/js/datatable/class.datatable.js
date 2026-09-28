@@ -330,6 +330,9 @@ class CDataTable {
 	/** @type {number|null} */
 	#resize_debounce_timeout_id = null;
 
+	/** @type {CanvasRenderingContext2D|null} */
+	#canvas_context = null;
+
 	/** @type {HTMLDivElement|null} */
 	#ghost_row = null;
 
@@ -2269,14 +2272,29 @@ class CDataTable {
 		return duplicate_column;
 	}
 
+	#measureHeaderMinWidth(column) {
+		if (this.#canvas_context === null) {
+			const computed_style = getComputedStyle(column.getHeaderCell()?.target ?? this.#element);
+
+			this.#canvas_context = document.createElement('canvas').getContext('2d');
+			this.#canvas_context.font = `${computed_style.fontSize} ${computed_style.fontFamily}`;
+		}
+
+		let measured_width = Math.ceil(this.#canvas_context.measureText(column.getName()).width)
+			+ CDataTable.COLUMN_HEADER_PADDING * 2;
+
+		if (this.#visible_columns.at(-1) === column) {
+			measured_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH;
+		}
+
+		return measured_width;
+	}
+
 	#getColumnMinWidth(column) {
-		let min_width = CDataTable.COLUMN_INITIAL_MIN_WIDTH;
+		let min_width = Math.max(CDataTable.COLUMN_INITIAL_MIN_WIDTH, this.#measureHeaderMinWidth(column));
 
 		if (column.getOptionsPopupHandler()) {
 			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH;
-		}
-		else {
-			min_width += CDataTable.COLUMN_HEADER_PADDING;
 		}
 
 		if (column.isSortable()) {
@@ -2365,16 +2383,15 @@ class CDataTable {
 		}
 
 		const overrides = column.getOverrides();
+		const min_width = this.#getColumnMinWidth(column);
 		const header_width = Math.ceil(column.getHeaderCell()?.target?.offsetWidth ?? 0);
 		const data_width = Math.ceil(column.getDataCells().at(0)?.target?.offsetWidth ?? 0);
 
 		let width;
 		if (column.getWidth() === 'max-content') {
-			width = Math.max(header_width + 1, data_width + 1);
+			width = Math.max(min_width, header_width + 1, data_width + 1);
 		}
 		else {
-			const min_width = this.#getColumnMinWidth(column);
-
 			width = Math.max(min_width, data_width);
 		}
 
