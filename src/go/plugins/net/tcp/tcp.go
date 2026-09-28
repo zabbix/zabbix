@@ -17,6 +17,7 @@ package tcpudp
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -95,9 +96,20 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	if _, err := net.DialTimeout("tcp", address, time.Duration(timeout)*time.Second); err != nil {
+	dialer := net.Dialer{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	conn, err := dialer.DialContext(context.Background(), "tcp", address)
+	if err != nil {
 		return 0, nil
 	}
+
+	closeErr := conn.Close()
+	if closeErr != nil {
+		log.Debugf("failed to close net tcp port check connection: %s", closeErr)
+	}
+
 	return 1, nil
 }
 
@@ -319,7 +331,7 @@ func (p *Plugin) httpsExpect(ip string, port string, timeout int) int {
 
 	// does NOT return an error on >=400 status codes same as C agent
 	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
-		time.Second*time.Duration(timeout), false)
+		time.Second*time.Duration(timeout), false, false)
 	if err != nil {
 		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
 		return 0
