@@ -3070,8 +3070,7 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 	if (SUCCEED != zbx_jsonpath_compile(pattern, &jsonpath))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid jsonpath expression: %s", zbx_json_strerror());
-		*error = zbx_strdup(*error, "invalid jsonpath expression");
+		*error = zbx_dsprintf(*error, "invalid jsonpath expression: %s", zbx_json_strerror());
 		goto out;
 	}
 
@@ -3096,24 +3095,26 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 		if (FAIL == zbx_jsonobj_open(json_str, &obj))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "failed to open JSON: %s", zbx_json_strerror());
-			continue;
+			*error = zbx_dsprintf(*error, "failed to open JSON: %s", zbx_json_strerror());
+			goto clear_jsonpath;
 		}
 
-		if (SUCCEED == zbx_jsonobj_query_precompiled_vector_str(&obj, &jsonpath, &matches))
+		if (SUCCEED != zbx_jsonobj_query_precompiled_vector_str(&obj, &jsonpath, &matches))
 		{
-			for (int j = 0; j < matches.values_num; j++)
-			{
-				zbx_variant_t	elem;
-
-				zbx_variant_set_str(&elem, matches.values[j]);
-				zbx_vector_var_append(result, elem);
-			}
-
-			zbx_vector_str_clear(&matches);
+			*error = zbx_dsprintf(*error, "jsonpath query failed: %s", zbx_json_strerror());
+			zbx_jsonobj_clear(&obj);
+			goto clear_jsonpath;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "jsonpath query failed: %s", zbx_json_strerror());
+
+		for (int j = 0; j < matches.values_num; j++)
+		{
+			zbx_variant_t	elem;
+
+			zbx_variant_set_str(&elem, matches.values[j]);
+			zbx_vector_var_append(result, elem);
+		}
+
+		zbx_vector_str_clear(&matches);
 
 		zbx_jsonobj_clear(&obj);
 	}
@@ -3231,7 +3232,6 @@ static int	evaluate_XMLXPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 	if (SUCCEED != zbx_xml_xpath_check(pattern, error_buf, sizeof(error_buf)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid XML xpath expression: %s", error_buf);
 		*error = zbx_dsprintf(*error, "invalid XML xpath expression: %s", error_buf);
 		goto out;
 	}
@@ -3255,18 +3255,18 @@ static int	evaluate_XMLXPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		else
 			zbx_variant_set_str(&matches, zbx_strdup(NULL, values.values[i].value.str));
 
-		if (SUCCEED == zbx_query_xpath_vector(&matches, pattern, &error_query))
+		if (SUCCEED != zbx_query_xpath_vector(&matches, pattern, &error_query))
 		{
-			zbx_vector_var_append_array(result, matches.data.vector->values,
-					matches.data.vector->values_num);
-			zbx_vector_var_clear(matches.data.vector);
 			zbx_variant_clear(&matches);
+			*error = zbx_dsprintf(*error, "XML xpath query failed: %s", ZBX_NULL2EMPTY_STR(error_query));
+			zbx_free(error_query);
+			goto out;
 		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "XML xpath query failed: %s", ZBX_NULL2EMPTY_STR(error_query));
-			zbx_variant_clear(&matches);
-		}
+
+		zbx_vector_var_append_array(result, matches.data.vector->values,
+				matches.data.vector->values_num);
+		zbx_vector_var_clear(matches.data.vector);
+		zbx_variant_clear(&matches);
 
 		zbx_free(error_query);
 	}
