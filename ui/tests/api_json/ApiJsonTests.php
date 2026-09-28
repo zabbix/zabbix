@@ -51,6 +51,7 @@ require_once dirname(__FILE__).'/testDpopAuthentication.php';
 require_once dirname(__FILE__).'/testGraphPrototype.php';
 require_once dirname(__FILE__).'/testHaNode.php';
 require_once dirname(__FILE__).'/testHistory.php';
+require_once dirname(__FILE__).'/testHistoryIterativeResult.php';
 require_once dirname(__FILE__).'/testHost.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testHostImport.php';
@@ -136,6 +137,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHaNode');
 		$suite->addTestSuite('testHistory');
+		$suite->addTestSuite('testHistoryIterativeResult');
 		$suite->addTestSuite('testHost');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testHostImport');

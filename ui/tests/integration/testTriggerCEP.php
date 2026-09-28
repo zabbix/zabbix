@@ -2377,7 +2377,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true,
 			bool $extra_tag_via_webhook = false, ?int $window_tag_execute_when = null) {
-		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_TAG_MATCH, self::CEP_RULE_CLOSE_ON_UP,
+		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_SIMPLE_ONCE, self::CEP_RULE_CLOSE_ON_UP,
 			$tag_exists_condition, $extra_tag_via_webhook, $window_tag_execute_when
 		);
 	}
@@ -2644,7 +2644,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Prepare the simple window flavour of the windowless scenario, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple');
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple');
 	}
 
 	/**
@@ -2652,7 +2652,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowTagOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag');
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE, 'tag');
 	}
 
 	/**
@@ -2660,7 +2660,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * rather than when it occurs, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleEvictedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple evicted',
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple evicted',
 			CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
@@ -2670,7 +2670,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * the window rather than when it occurs, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowTagEvictedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag evicted',
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE, 'tag evicted',
 			CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
@@ -2692,7 +2692,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * event occurs, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleClosedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple closed',
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple closed',
 			CCepRuleHelper::WHEN_WINDOW_CLOSED
 		);
 	}
@@ -2702,7 +2702,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowTagClosedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag closed',
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE, 'tag closed',
 			CCepRuleHelper::WHEN_WINDOW_CLOSED
 		);
 	}
@@ -2897,7 +2897,7 @@ class testTriggerCEP extends CIntegrationTest {
 		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_SERVICE_TAG, [], $operations,
-			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $this->buildWindowOperationsWindow()
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2949,7 +2949,7 @@ class testTriggerCEP extends CIntegrationTest {
 			+ $this->buildWindowOperationsWindow();
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_UNSUPPRESS, [], $operations,
-			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $window
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -3005,7 +3005,7 @@ class testTriggerCEP extends CIntegrationTest {
 		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY, [], $operations,
-			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $this->buildWindowOperationsWindow()
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -3046,7 +3046,7 @@ class testTriggerCEP extends CIntegrationTest {
 		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_UNCONDITIONAL, [],
-			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE,
+			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			$this->buildWindowOperationsWindow()
 		));
 
@@ -3100,7 +3100,7 @@ class testTriggerCEP extends CIntegrationTest {
 		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_CAPACITY, [],
-			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $window
+			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -3417,7 +3417,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindow() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
@@ -3428,7 +3428,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowOnEvicted() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
@@ -3438,7 +3438,7 @@ HEREDOC;
 	 * performed when an "up" event is added to it, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowTagCloseWindow() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
@@ -3449,7 +3449,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowTagCloseWindowOnEvicted() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
@@ -3510,7 +3510,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowDiscardDown() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_ADDED, true
 		);
 	}
@@ -3520,7 +3520,7 @@ HEREDOC;
 	 * they occur, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowTagCloseWindowDiscardDown() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_ADDED, true
 		);
 	}
@@ -3579,7 +3579,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE),
 			CCepRuleHelper::WHEN_EVENT_ADDED, false, true
 		);
@@ -3589,7 +3589,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowOnEvictedSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED),
 			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
@@ -3599,7 +3599,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
 	 */
 	public function prepareDataCepWindowTagCloseWindowSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE),
 			CCepRuleHelper::WHEN_EVENT_ADDED, false, true
 		);
@@ -3609,7 +3609,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
 	 */
 	public function prepareDataCepWindowTagCloseWindowOnEvictedSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED),
 			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
@@ -3676,7 +3676,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowDoubleRule() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED, false, false, true
 		);
 	}
@@ -3685,7 +3685,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowOnEvictedDoubleRule() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
 		);
 	}
@@ -3706,7 +3706,7 @@ HEREDOC;
 	 * prepareDataCepWindowCauseSymptomCloseOnDuration().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowAged() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, false, false,
 			true
 		);
@@ -3718,7 +3718,7 @@ HEREDOC;
 	 * simple one, see prepareDataCepWindowSimpleCloseWindowAged().
 	 */
 	public function prepareDataCepWindowTagCloseWindowAged() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, false, false,
 			true
 		);
@@ -3731,7 +3731,7 @@ HEREDOC;
 	 * changes and prepareDataCepWindowSimpleCloseWindowAged() for what ends the window.
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowAgedSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED),
 			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true, false, false, true
 		);
@@ -3741,7 +3741,7 @@ HEREDOC;
 	 * @see prepareDataCepWindowSimpleCloseWindowAgedSingleService()
 	 */
 	public function prepareDataCepWindowTagCloseWindowAgedSingleService() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED),
 			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true, false, false, true
 		);
@@ -3756,7 +3756,7 @@ HEREDOC;
 	 * correlation window is exclusive.
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowAgedDoubleRule() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true, false,
 			true
 		);
@@ -3814,7 +3814,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowSuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false,
 			false, false, false, true
 		);
@@ -3827,7 +3827,7 @@ HEREDOC;
 	 * two flavours never share one, the rule being what a suppression is keyed on.
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowManualSuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false,
 			false, false, false, false, true
 		);
@@ -3839,7 +3839,7 @@ HEREDOC;
 	 * window held, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowOnEvictedSuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_EVICTED, false,
 			false, false, false, false, true
 		);
@@ -3850,7 +3850,7 @@ HEREDOC;
 	 * suppress at the same points as the one that does not, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowTagCloseWindowSuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false, false,
 			false, false, true
 		);
@@ -3889,7 +3889,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindowAged().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowAgedSuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_EVICTED, false,
 			false, false, false, true, true
 		);
@@ -3906,7 +3906,7 @@ HEREDOC;
 	 * runEventAssessmentTestCepWindowCloseWindow().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowUnsuppressPoints() {
-		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_UNSUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false,
 			false, false, false, true, true
 		);
@@ -3937,9 +3937,9 @@ HEREDOC;
 	 *     all taken and is evicted - without ever entering the window it ends. Being evicted rather than held is
 	 *     also why this flavour needs the extra "close" operation below.
 	 *
-	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE window does nothing of its own, so the
-	 * two event driven execution points are all it has; a WINDOW_TAG_MATCH window correlates the events of a group
-	 * and a WINDOW_CAUSE_SYMPTOM window ranks them, without that giving either of them another execution point;
+	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE_MULTIPLE window does nothing of its own, so
+	 * the two event driven execution points are all it has; a WINDOW_SIMPLE_ONCE window correlates the events of a
+	 * group and a WINDOW_CAUSE_SYMPTOM window ranks them, without that giving either of them another execution point;
 	 * and a WINDOW_PATTERN_MATCH window additionally has the pattern match execution point.
 	 *
 	 * However the operation is reached, an "up" event is recognised by the presence of a CEP_STATE_TAG_UP tag, a
@@ -4341,7 +4341,7 @@ HEREDOC;
 	 * Prepare the simple window flavour of the reset scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowSimpleReset() {
-		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_RESET
 		);
 	}
@@ -4351,7 +4351,7 @@ HEREDOC;
 	 * prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowTagReset() {
-		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_RESET
 		);
 	}
@@ -4379,7 +4379,7 @@ HEREDOC;
 	 * Prepare the simple window flavour of the delete scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowSimpleDelete() {
-		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_DELETE
 		);
 	}
@@ -4389,7 +4389,7 @@ HEREDOC;
 	 * prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowTagDelete() {
-		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_DELETE
 		);
 	}
@@ -4542,7 +4542,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseOnDurationOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseOnDuration() {
-		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION
 		);
 	}
@@ -4552,7 +4552,7 @@ HEREDOC;
 	 * prepareDataCepWindowCloseOnDurationOperations().
 	 */
 	public function prepareDataCepWindowTagCloseOnDuration() {
-		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_DURATION
 		);
 	}
@@ -4629,7 +4629,7 @@ HEREDOC;
 	 * prepareDataCepWindowUnresolvedLimitsOperations().
 	 */
 	public function prepareDataCepWindowSimpleUnresolvedLimits() {
-		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_LIMITS
 		);
 	}
@@ -4639,7 +4639,7 @@ HEREDOC;
 	 * prepareDataCepWindowUnresolvedLimitsOperations().
 	 */
 	public function prepareDataCepWindowTagUnresolvedLimits() {
-		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_LIMITS
 		);
 	}
@@ -4784,7 +4784,7 @@ HEREDOC;
 	 * prepareDataCepWindowCapacityOperations().
 	 */
 	public function prepareDataCepWindowSimpleCapacity() {
-		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple capacity');
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple capacity');
 	}
 
 	/**
@@ -4792,7 +4792,7 @@ HEREDOC;
 	 * prepareDataCepWindowCapacityOperations().
 	 */
 	public function prepareDataCepWindowTagCapacity() {
-		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag capacity');
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE, 'tag capacity');
 	}
 
 	/**
@@ -4800,7 +4800,7 @@ HEREDOC;
 	 * gets a window of its own and fits into it, see prepareDataCepWindowCapacityOperations().
 	 */
 	public function prepareDataCepWindowSimpleCapacityPerService() {
-		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			'simple capacity service', true
 		);
 	}
@@ -4810,7 +4810,7 @@ HEREDOC;
 	 * every id gets a window of its own and fits into it, see prepareDataCepWindowCapacityOperations().
 	 */
 	public function prepareDataCepWindowTagCapacityPerService() {
-		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			'tag capacity service', true
 		);
 	}
@@ -4821,7 +4821,7 @@ HEREDOC;
 	 * event, see prepareDataCepWindowCapacityOperations().
 	 */
 	public function prepareDataCepWindowCapacityDiscardUp() {
-		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			'capacity discard', true, true
 		);
 	}
@@ -5787,7 +5787,7 @@ HEREDOC;
 	 *
 	 * The rule matches the problem events of these scenarios only - its single filter condition requires the
 	 * 'state' tag, which only the close-on-up trigger prototypes add - and puts every matched event into a
-	 * "Tag correlation" (WINDOW_TAG_MATCH) window keyed on the 'service' tag, so a "down_N" event and the
+	 * "Tag correlation" (WINDOW_SIMPLE_ONCE) window keyed on the 'service' tag, so a "down_N" event and the
 	 * "up_N" event pairing with it (even when the "up" is raised on another trigger) belong to the same
 	 * window. The window is one hour long with no capacity limit, so nothing is evicted during the run.
 	 *
@@ -5822,7 +5822,7 @@ HEREDOC;
 	 * itself - rather than a tagging webhook - drive those services into problem state.
 	 */
 	private function buildCloseOnUpCepRuleParams(string $name, bool $tag_exists_condition = false,
-			int $window_type = CCepRuleHelper::WINDOW_TAG_MATCH,
+			int $window_type = CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			?int $window_tag_execute_when = null): array {
 		$close_window_condition = $tag_exists_condition
 			? self::buildUpEventOperationCondition()
@@ -11082,7 +11082,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_CepWindowSimple() {
-		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple all');
+		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple all');
 
 		$this->runEventAssessmentTestCepWindowNone();
 	}
@@ -11166,7 +11166,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_CepWindowSimpleOperationSteps() {
-		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple');
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple');
 
 		$this->runEventAssessmentTestCepWindowOperationSteps($rule);
 	}
@@ -11211,7 +11211,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_CepWindowSimpleOperationStepsAdded() {
-		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple added');
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple added');
 
 		$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
 	}
@@ -11263,7 +11263,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_CepWindowSimpleOperationStepsClosed() {
-		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple closed');
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple closed');
 
 		$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_WINDOW_CLOSED);
 	}
@@ -11289,7 +11289,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_CepWindowSimpleOperationStepsBurst() {
-		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple burst');
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, 'simple burst');
 
 		$this->runStressTestCepWindowOperationStepsBurst($rule);
 	}
