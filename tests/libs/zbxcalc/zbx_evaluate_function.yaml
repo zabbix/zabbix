@@ -6108,8 +6108,7 @@ in:
   function: jsonpath
   params: '5m,"$.val"'
 out:
-  return: SUCCEED
-  value: ['str']
+  return: FAIL
 ---
 test case: Evaluate jsonpath(5m,"$.val") only invalid json
 in:
@@ -6125,8 +6124,7 @@ in:
   function: jsonpath
   params: '5m,"$.val"'
 out:
-  return: SUCCEED
-  value: []
+  return: FAIL
 ---
 test case: Evaluate jsonpath(5m,"invalid jsonpath") invalid jsonpath
 in:
@@ -6154,8 +6152,7 @@ in:
   function: jsonpath
   params: '5m,"$.val.sum()"'
 out:
-  return: SUCCEED
-  value: []
+  return: FAIL
 ---
 test case: Evaluate jsonpath(5m,"$.val") log data type
 in:
@@ -6324,8 +6321,7 @@ in:
   function: xmlxpath
   params: '5m,"/root/val"'
 out:
-  return: SUCCEED
-  value: ['<val>str</val>']
+  return: FAIL
 ---
 test case: Evaluate xmlxpath(5m,"/root/val") only invalid xml
 in:
@@ -6341,8 +6337,7 @@ in:
   function: xmlxpath
   params: '5m,"/root/val"'
 out:
-  return: SUCCEED
-  value: []
+  return: FAIL
 ---
 test case: Evaluate xmlxpath(5m,"invalid xpath") invalid xpath
 in:
@@ -6468,8 +6463,7 @@ in:
   function: xmlxpath
   params: '5m,"sum(/root/val)"'
 out:
-  return: SUCCEED
-  value: []
+  return: FAIL
 ---
 test case: Evaluate xmlxpath(5m,"boolean(/root/val)") boolean(...)
 in:
