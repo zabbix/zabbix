@@ -46,7 +46,7 @@ zabbix_export:
         
         ***NOTE:*** Veeam Backup & Replication v13 also provides a native REST API on port 9419, separate from the Enterprise Manager REST API used by this template.
         
-        A different Veeam Backup and Replication by HTTP template is required for monitoring the native VBR REST API.
+        A different Veeam Backup & Replication by HTTP template is required for monitoring the native VBR REST API.
         
         > See [Veeam Data Platform Feature Comparison](https://www.veeam.com/licensing-pricing.html) for more details.
         
@@ -64,7 +64,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:

@@ -120,7 +120,7 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	#getDefaultSelectable() {
-		if (this.#config === null) {
+		if (this.#config === null || this.#hosts.length == 0) {
 			return null;
 		}
 

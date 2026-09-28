@@ -43,7 +43,7 @@ class testCepRule extends CAPITest {
 				],
 				[
 					'name' => 'window_type=simple',
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'sortorder' => 2,
 					'operations' => [
 						[
@@ -596,7 +596,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'sortorder' => 1,
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'operations' => [
 						[
 							'sortorder' => 1,
@@ -611,7 +611,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'sortorder' => 1,
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'operations' => [
 						[
 							'sortorder' => 1,
@@ -2085,9 +2085,9 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window_type": value must be one of '.implode(', ', [
 					CCepRuleHelper::WINDOW_NONE,
-					CCepRuleHelper::WINDOW_SIMPLE,
+					CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					CCepRuleHelper::WINDOW_TAG_MATCH,
+					CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 					CCepRuleHelper::WINDOW_PATTERN_MATCH
 				]).'.'
 			],
@@ -2135,7 +2135,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
@@ -2152,7 +2152,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'unexpected' => true
 					]
@@ -2171,7 +2171,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => 'abc'
 					]
@@ -2190,7 +2190,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => 0
 					]
@@ -2209,7 +2209,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => SEC_PER_YEAR + 1
 					]
@@ -2228,7 +2228,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '2h'
 					]
@@ -2247,7 +2247,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1y'
 					]
@@ -2266,7 +2266,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$DURATION}'
 					]
@@ -2285,7 +2285,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$DURATIon}'
 					]
@@ -2304,7 +2304,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'duration')).'}'
 					]
@@ -2323,7 +2323,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'capacity' => 'abc'
@@ -2343,7 +2343,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'capacity' => -1
@@ -2363,7 +2363,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$DURATION}',
 						'capacity' => '{$CAPACITY}'
@@ -2383,7 +2383,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$DURATION}',
 						'capacity' => '{$CAPAcity}'
@@ -2403,7 +2403,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '{$DURATION}',
 						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'capacity')).'}'
@@ -2423,7 +2423,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'script' => 123
@@ -2431,7 +2431,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/script": a character string is expected.'
 			],
-			'Window script must be empty for WINDOW_SIMPLE' => [
+			'Window script must be empty for WINDOW_SIMPLE_MULTIPLE' => [
 				'request' => [
 					'name' => 'ceprule',
 					'sortorder' => 1,
@@ -2443,7 +2443,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'script' => 'abc'
@@ -2471,7 +2471,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/script": value must be empty.'
 			],
-			'Window script must be empty for WINDOW_TAG_MATCH' => [
+			'Window script must be empty for WINDOW_SIMPLE_ONCE' => [
 				'request' => [
 					'name' => 'ceprule',
 					'sortorder' => 1,
@@ -2483,7 +2483,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 					'window' => [
 						'duration' => '1h',
 						'script' => 'abc'
@@ -2523,7 +2523,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_host_group' => 123
@@ -2543,7 +2543,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_host' => 123
@@ -2563,7 +2563,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => 123
@@ -2583,7 +2583,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
@@ -2603,7 +2603,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
@@ -2624,7 +2624,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
@@ -2645,7 +2645,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
@@ -2694,7 +2694,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'event_count_tag' => 123
@@ -2714,7 +2714,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'event_count_tag' => ''
@@ -2778,7 +2778,7 @@ class testCepRule extends CAPITest {
 							'event_name' => 'bla'
 						]
 					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'duration' => '1h',
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
@@ -3102,14 +3102,14 @@ class testCepRule extends CAPITest {
 			'Unexpected fields in window are rejected' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 					'window' => [
 						'unexpected' => true
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
 			],
-			'Cannot change window_type from WINDOW_SIMPLE to WINDOW_NONE when operations[].execute_when is not supported' => [
+			'Cannot change window_type from WINDOW_SIMPLE_MULTIPLE to WINDOW_NONE when operations[].execute_when is not supported' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:window_type=simple',
 					'window_type' => CCepRuleHelper::WINDOW_NONE
@@ -3133,7 +3133,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/tags": cannot be empty.'
 			],
-			'Script is required for WINDOW_TAG_MATCH' => [
+			'Script is required for WINDOW_SIMPLE_ONCE' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'name' => 'pattern',
@@ -3144,7 +3144,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/script": cannot be empty.'
 			],
-			'Can switch to WINDOW_TAG_MATCH' => [
+			'Can switch to WINDOW_SIMPLE_ONCE' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'name' => 'pattern',
@@ -3276,4 +3276,3 @@ class testCepRule extends CAPITest {
 		$this->call('ceprule.update', $request, $expected_error);
 	}
 }
-
