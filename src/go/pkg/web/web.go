@@ -86,10 +86,10 @@ func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirec
 		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
-	return string(bytes.Join(chain, nil)) + string(h) + string(b), nil
+	return string(bytes.Join(*chain, nil)) + string(h) + string(b), nil
 }
 
-func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*http.Client, [][]byte) {
+func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*http.Client, *[][]byte) {
 	var chain [][]byte
 
 	tlsConf := &tls.Config{
@@ -113,7 +113,7 @@ func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*h
 		Timeout:       timeout,
 		CheckRedirect: redirectPolicy(redirectLimit, &chain),
 	}
-	return c, chain
+	return c, &chain
 }
 
 // redirectPolicy returns function that follows at most limit redirects, to be compatible with cURL,
