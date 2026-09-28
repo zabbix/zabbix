@@ -392,7 +392,7 @@ static void	permissions_rebuild_task(void)
 
 	for (int i = 0; i < (int)ARRSIZE(tables); i++)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("delete from %s", tables[i]))
+		if (ZBX_DB_OK > zbx_db_execute_once("delete from %s", tables[i]))
 		{
 			res = FAIL;
 			zabbix_log(LOG_LEVEL_WARNING, "cannot delete from permission cache tables");
@@ -486,13 +486,15 @@ static void	permissions_rebuild_task(void)
 	if (SUCCEED != res)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot insert permissions");
 out:
-	if (SUCCEED == res)
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_commit_basic())
 	{
-		if (ZBX_DB_OK != zbx_db_commit())
-			res = FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot commit permissions cache, doing a rollback instead");
+		res = FAIL;
 	}
-	else
-		zbx_db_rollback();
+
+	if (SUCCEED != res)
+		(void)zbx_db_rollback_basic();
+
 skip:
 	zbx_vector_uint64_destroy(&ids);
 	zbx_db_close();
