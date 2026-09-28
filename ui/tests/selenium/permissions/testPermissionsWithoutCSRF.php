@@ -834,10 +834,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				'create_host' => '//div[@class="header-controls"]//button[@class="js-create-host"]',
 				'create_correlation' => '//button[text()="Create event correlation"]',
 				'update' => '//table[@class="list-table"]//tr[1]/td[2]/a|//div[contains(@class, "datatable-scrollable")]'.
-						'//div[@class="row"][1]/div[2]//a',
+						'//div[@class="datatable-row"][1]/div[2]//a',
 				'trigger_update' => '//table[@class="list-table"]//tr[1]/td[4]/a',
 				'item_update' => '//table[@class="list-table"]//tr[1]/td[3]/a',
-				'problem' => '//div[contains(@class, "datatable-scrollable")]//div[@class="row"][1]//a[text()="Update"]',
+				'problem' => '//div[contains(@class, "datatable-scrollable")]//div[@class="datatable-row"][1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
 
