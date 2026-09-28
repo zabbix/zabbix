@@ -20,6 +20,7 @@ class CDocHelper {
 	const ADMINISTRATION_AUDITLOG_EDIT =						'web_interface/frontend_sections/administration/audit_log';
 	const ADMINISTRATION_AUTOREG_EDIT =							'web_interface/frontend_sections/administration/general#autoregistration';
 	const ADMINISTRATION_CONNECTOR_LIST =						'web_interface/frontend_sections/administration/general#connectors';
+	const ADMINISTRATION_DATA_SOURCE_APM_EDIT =					'web_interface/frontend_sections/administration/data_source#apm';
 	const ADMINISTRATION_GEOMAPS_EDIT =							'web_interface/frontend_sections/administration/general#geographical-maps';
 	const ADMINISTRATION_GUI_EDIT =								'web_interface/frontend_sections/administration/general#gui';
 	const ADMINISTRATION_HOUSEKEEPING_EDIT =					'web_interface/frontend_sections/administration/housekeeping';
@@ -53,8 +54,9 @@ class CDocHelper {
 	const DASHBOARDS_PROPERTIES_EDIT =							'web_interface/frontend_sections/dashboards#creating-a-dashboard';
 	const DASHBOARDS_SHARE_EDIT =								'web_interface/frontend_sections/dashboards#sharing';
 	const DASHBOARDS_WIDGET_EDIT =								'web_interface/frontend_sections/dashboards/widgets';
+	const DATA_COLLECTION_CEPRULE_EDIT =						'config/ceprules/global#configuration';
+	const DATA_COLLECTION_CEPRULE_LIST =						'web_interface/frontend_sections/data_collection/ceprules';
 	const DATA_COLLECTION_CORRELATION_EDIT =					'config/event_correlation/global#configuration';
-	const DATA_COLLECTION_CORRELATION_LIST =					'web_interface/frontend_sections/data_collection/correlation';
 	const DATA_COLLECTION_DISCOVERY_EDIT =						'discovery/network_discovery/rule#rule-attributes';
 	const DATA_COLLECTION_DISCOVERY_LIST =						'web_interface/frontend_sections/data_collection/discovery';
 	const DATA_COLLECTION_GRAPH_EDIT =							'config/visualization/graphs/custom#configuring-custom-graphs';

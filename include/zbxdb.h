@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #define ZBX_DBVERSION_UNDEFINED			0
 
@@ -91,6 +92,12 @@ zbx_db_config_t;
 #endif
 
 #ifdef HAVE_MYSQL
+#	define ZBX_SQL_FORCE_PK		" force index (primary)"
+#else
+#	define ZBX_SQL_FORCE_PK		""
+#endif
+
+#ifdef HAVE_MYSQL
 #	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else
 #	define	ZBX_SQL_STRCMP			"%s'%s'"
@@ -114,6 +121,12 @@ zbx_db_config_t;
 			ZBX_STR2UINT64(uint, row);	\
 	}						\
 	while (0)
+
+#define ZBX_DBROW2STR(str, row)				\
+	if (NULL == str || 0 != strcmp(str, row))	\
+	{						\
+		str = zbx_strdup(str, row);		\
+	}
 
 #ifdef HAVE_MYSQL
 #	define ZBX_SQL_SORT_ASC(field)	field " asc"
@@ -163,7 +176,7 @@ typedef enum
 zbx_escape_sequence_t;
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-char		*zbx_db_dyn_escape_like_pattern(const char *src);
+char		*zbx_dbconn_dyn_escape_like_pattern(const zbx_dbconn_t *db, const char *src);
 
 size_t		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
@@ -208,6 +221,16 @@ typedef enum
 }
 zbx_db_ext_err_code_t;
 
+/*****************************************************************************
+*                                                                            *
+* Version format for PostgreSQL, MySQL and MariaDB: MMmmuu                   *
+*          M = major version part                                            *
+*          m = minor version part                                            *
+*          u = patch version part                                            *
+*                                                                            *
+* Example: if the original DB version was 1.2.34 then 10234 is set           *
+*                                                                            *
+******************************************************************************/
 struct zbx_db_version_info_t
 {
 	/* information about database server */
@@ -248,6 +271,10 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+
+#if defined(HAVE_MYSQL)
+	int			mariadb_fork;
+#endif
 };
 
 typedef enum
@@ -264,13 +291,13 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
-#elif defined(HAVE_MYSQL)
-int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
 void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info);
+
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DB_TIMESTAMP()	"unix_timestamp()"
@@ -314,6 +341,7 @@ void	zbx_init_library_db(zbx_db_config_t *config);
 void	zbx_deinit_library_db(zbx_db_config_t *config);
 
 zbx_dbconn_t	*zbx_dbconn_create(void);
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config);
 void	zbx_dbconn_free(zbx_dbconn_t *db);
 
 int	zbx_dbconn_set_connect_options(zbx_dbconn_t *db, int options);
@@ -339,12 +367,16 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db);
 int	zbx_dbconn_end(zbx_dbconn_t *db, int ret);
 
 zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, int num);
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t * const *fields, int fields_num);
-void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args);
+void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		va_list args);
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...);
+void	zbx_dbconn_prepare_insert_table(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		...);
 void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
 int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
@@ -354,6 +386,7 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
 int	zbx_db_insert_get_row_count(zbx_db_insert_t *self);
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -367,6 +400,8 @@ int	zbx_dbconn_lock_record(zbx_dbconn_t *db, const char *table, zbx_uint64_t id,
 		zbx_uint64_t add_id);
 int	zbx_dbconn_lock_records(zbx_dbconn_t *db, const char *table, const zbx_vector_uint64_t *ids);
 int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids);
 
 int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char program_type);
 void	zbx_db_config_validate(zbx_db_config_t *config);
@@ -395,14 +430,15 @@ int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const
 int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
 		const zbx_vector_uint64_t *ids);
 
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
-char	*zbx_db_dyn_escape_string(const char *src);
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+char	*zbx_dbconn_dyn_escape_field(const zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *src);
+char	*zbx_dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src);
+char	*zbx_dbconn_dyn_escape_string_len(const zbx_dbconn_t *db, const char *src, size_t length);
 
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num);
+void	zbx_dbconn_add_str_condition_alloc(const zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *fieldname, const char * const *values, const int num);
 
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
 const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
@@ -417,7 +453,7 @@ int	zbx_db_get_row_num(zbx_db_result_t result);
 int	zbx_db_is_null(const char *field);
 
 #if defined(HAVE_POSTGRESQL)
-char	*zbx_db_get_schema_esc(void);
+char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db);
 #endif
 
 int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -476,9 +512,6 @@ zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
-/* connection pool */
-typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
-
 typedef struct
 {
 	int	max_open;
@@ -531,6 +564,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t **fields, int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_prepare_table(zbx_db_insert_t *self, const zbx_db_table_t *db_table, ...);
 int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 const char	*zbx_db_last_strerr(void);
 zbx_err_codes_t	zbx_db_last_errcode(void);
@@ -560,6 +594,16 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
+char	*zbx_db_dyn_escape_like_pattern(const char *src);
+char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
+char	*zbx_db_dyn_escape_string(const char *src);
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char * const *values, const int num);
+#if defined(HAVE_POSTGRESQL)
+char	*zbx_db_get_schema_esc(void);
+#endif
+
 /* type of value in settings table */
 #define ZBX_SETTING_TYPE_STR			1
 #define ZBX_SETTING_TYPE_INT			2
@@ -582,11 +626,19 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
+zbx_dbconn_t	*zbx_db_dbconn(void);
+
+void	zbx_db_unstash_connection(zbx_dbconn_t *db);
+void	zbx_db_stash_connection(zbx_dbconn_t *db);
+
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"
 #define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
 #define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
 #define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #endif
 

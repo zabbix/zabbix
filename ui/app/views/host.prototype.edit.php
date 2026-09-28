@@ -92,9 +92,10 @@ if ($data['host_prototype']['templates']) {
 		->setAttribute('data-field-type', 'array')
 		->setAttribute('data-field-name', 'templates');
 
+	$can_edit_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 	foreach ($data['host_prototype']['templates'] as $template) {
-		if ($data['user']['can_edit_templates'] && array_key_exists($template['templateid'],
-				$data['editable_templates'])) {
+		if ($can_edit_templates && array_key_exists($template['templateid'], $data['editable_templates'])) {
 			$template_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
 				->setArgument('popup', 'template.edit')

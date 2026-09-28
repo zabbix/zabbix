@@ -22,6 +22,7 @@
 #include "zbxself.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
+#include "zbxresolver.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxip.h"
@@ -335,7 +336,7 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 
 int	zbx_async_check_agent(zbx_dc_agent_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
-		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
+		void *arg, void *arg_action, struct event_base *base, zbx_ares_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {

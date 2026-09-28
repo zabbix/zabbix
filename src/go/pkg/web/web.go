@@ -33,7 +33,7 @@ import (
 
 // Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
 // parameter is set
-func Get(url string, timeout time.Duration, dump bool) (string, error) {
+func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", fmt.Errorf("Cannot create new request: %w", err)
@@ -43,20 +43,7 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 		"User-Agent": {"Zabbix " + version.Long()},
 	}
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
-			Proxy:             http.ProxyFromEnvironment,
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				LocalAddr: &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0},
-			}).DialContext,
-		},
-		Timeout:       timeout,
-		CheckRedirect: disableRedirect,
-	}
-
-	resp, err := client.Do(req)
+	resp, err := newClient(timeout, tlsRenegotiation).Do(req)
 	if err != nil {
 		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
@@ -91,6 +78,30 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 	}
 
 	return string(h) + string(b), nil
+}
+
+func newClient(timeout time.Duration, renegotiation bool) *http.Client {
+	tlsConf := &tls.Config{
+		//nolint:gosec // intended behavior
+		InsecureSkipVerify: true,
+	}
+
+	if renegotiation {
+		tlsConf.Renegotiation = tls.RenegotiateFreelyAsClient
+	}
+
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig:   tlsConf,
+			Proxy:             http.ProxyFromEnvironment,
+			DisableKeepAlives: true,
+			DialContext: (&net.Dialer{
+				LocalAddr: &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0},
+			}).DialContext,
+		},
+		Timeout:       timeout,
+		CheckRedirect: disableRedirect,
+	}
 }
 
 func disableRedirect(req *http.Request, via []*http.Request) error {

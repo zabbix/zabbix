@@ -395,3 +395,17 @@ button {
 		opacity: 0.75;
 	}
 }
+
+.btn-plus-more {
+	@extend %button;
+	@extend %button-form-colors;
+	@extend %button-disabled;
+
+	padding: 0 3px;
+	font-size: $font-h3-size;
+	height: 16px;
+	line-height: 15px;
+	color: $btn-plus-more;
+	background-color: $btn-plus-more-bg-color;
+	border-color: $btn-plus-more-border-color;
+}

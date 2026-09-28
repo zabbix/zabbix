@@ -1206,6 +1206,8 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from trigger_discovery where", "triggerid", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_depends where", "triggerid_down", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_depends where", "triggerid_up", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
 	if (0 != selementids.values_num)
