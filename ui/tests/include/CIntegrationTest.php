@@ -498,7 +498,7 @@ class CIntegrationTest extends CAPITest {
 		$usleep_total = 0;
 
 		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			if (posix_kill($parent_pid, 0)) {
+			if (!posix_kill($parent_pid, 0)) {
 				return;
 			}
 
@@ -529,6 +529,7 @@ class CIntegrationTest extends CAPITest {
 		$failed_pids = [];
 		$failed_kills = [];
 		$backtraces = [];
+		$child_pids[] = $parent_pid;
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
