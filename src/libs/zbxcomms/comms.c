@@ -315,8 +315,12 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {
 #ifdef HAVE_ARES_QUERY_CACHE
 	struct ares_addrinfo	*ares_ai = NULL;
+	int			ai_flags = 0;
 
-	if (0 != zbx_ares_getaddrinfo(host, NULL, AI_NUMERICHOST, PF_UNSPEC, 0, &ares_ai, zbx_socket_strerror_message,
+	if (SUCCEED == zbx_is_ip(host))
+		ai_flags = AI_NUMERICHOST;
+
+	if (0 != zbx_ares_getaddrinfo(host, NULL, ai_flags, PF_UNSPEC, 0, &ares_ai, zbx_socket_strerror_message,
 			sizeof(zbx_socket_strerror_message)) ||
 			FAIL == zbx_inet_ntop(ares_ai->nodes->ai_addr, ip, (socklen_t)iplen))
 	{
@@ -328,11 +332,11 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 #else
 	struct addrinfo	hints, *ai = NULL;
 
-	assert(ip);
-
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = AI_NUMERICHOST;
+
+	if (SUCCEED == zbx_is_ip(host))
+		hints.ai_flags = AI_NUMERICHOST;
 
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
