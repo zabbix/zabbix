@@ -56,7 +56,7 @@
 		}
 
 		#resetDefaults(reset_button) {
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
 				'class': 'position-middle',
 				'content': document.createElement('span').innerText = <?= json_encode(
@@ -90,6 +90,9 @@
 					}
 				]
 			}, reset_button);
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$close_btn.show();
 		}
 	};
 </script>

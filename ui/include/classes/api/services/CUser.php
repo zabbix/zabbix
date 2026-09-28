@@ -156,7 +156,7 @@ class CUser extends CApiService {
 			if (is_array($options['output'])) {
 				$options['output'] = array_intersect($options['output'], $user_output_fields);
 			}
-			elseif ($options['output'] === API_OUTPUT_EXTEND) {
+			elseif ($options['output'] == API_OUTPUT_EXTEND) {
 				$options['output'] = $user_output_fields;
 			}
 		}

@@ -43,13 +43,15 @@ function Overlay(type, dialogueid) {
 
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
-	const $close_btn = jQuery('<button>', {
+	// Hide the button to prevent incorrect screen reader announcements when opening a dialog.
+	this.$dialogue.$close_btn = jQuery('<button>', {
 		class: 'btn-overlay-close',
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
 		e.preventDefault();
 	}.bind(this))
-		.attr('aria-label', t('Close modal window'));
+		.attr('aria-label', t('Close modal window'))
+		.hide();
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
@@ -58,7 +60,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.$head.append(this.$dialogue.$header, $close_btn);
+	this.$dialogue.$head.append(this.$dialogue.$header, this.$dialogue.$close_btn);
 
 	this.$dialogue.append(this.$dialogue.$head);
 	this.$dialogue.append(this.$dialogue.$body);
