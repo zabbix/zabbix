@@ -507,7 +507,11 @@ class CMacroFunction {
 		libxml_clear_errors();
 		libxml_use_internal_errors($prev_use_internal_errors);
 
-		if ($invalid_xpath || $result === NAN) {
+		if ($invalid_xpath) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		if (is_float($result) && is_nan($result)) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
