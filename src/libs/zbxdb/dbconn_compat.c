@@ -329,10 +329,38 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 		return;
 	}
 
-	va_list	args;
+	va_list			args;
+	const zbx_db_table_t	*db_table;
+
+	if (NULL == (db_table = zbx_db_get_table(table)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_exit(EXIT_FAILURE);
+	}
+
 
 	va_start(args, table);
-	zbx_dbconn_prepare_vinsert(dbconn, self, table, args);
+	zbx_dbconn_prepare_vinsert(dbconn, self, db_table, args);
+	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_prepare_table(zbx_db_insert_t *self, const zbx_db_table_t *db_table, ...)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	va_list	args;
+
+	va_start(args, db_table);
+	zbx_dbconn_prepare_vinsert(dbconn, self, db_table, args);
 	va_end(args);
 }
 

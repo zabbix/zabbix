@@ -1,0 +1,16 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "pre_release": false,
+    "platform_info": "x86_64-w64-mingw32-generic",
+    "argv": ["smartctl", "-a", "/dev/csmi0,1", "-j"],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/csmi0,1 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}

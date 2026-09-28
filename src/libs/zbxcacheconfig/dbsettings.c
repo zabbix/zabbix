@@ -168,7 +168,8 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"vault_provider",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"work_period",			ZBX_SETTING_TYPE_STR, 		0,			"1-5,09:00-18:00"},
 	{"x_frame_options",		ZBX_SETTING_TYPE_STR, 		0,			"SAMEORIGIN"},
-	{"proxy_secrets_provider",	ZBX_SETTING_TYPE_INT,		ZBX_SERVER | ZBX_PROXY, "0"},
+	{"proxy_secrets_provider",	ZBX_SETTING_TYPE_INT,		ZBX_SERVER | ZBX_PROXY,	"0"},
+	{"apm_global_db",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"{}"},
 };
 
 const zbx_setting_entry_t	*zbx_settings_desc_table_get(void)
@@ -572,6 +573,117 @@ static void	update_hk_history_overrides(const char *history_status)
 	}
 }
 
+static void	store_apm_global_db_option_str(zbx_json_parse_t *jp, const char *name, const char **target,
+		const char *default_value, char *buf, size_t buf_size, int found, int status, zbx_uint64_t revision,
+		const char *log_name, int masked)
+{
+	const char	*value_str;
+
+	if (ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED == status)
+	{
+		value_str = default_value;
+	}
+	else if (SUCCEED != zbx_json_value_by_name(jp, name, buf, buf_size, NULL))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get '%s' from apm_global_db", name);
+		value_str = default_value;
+	}
+	else
+		value_str = buf;
+
+	if (NULL == *target || 0 != strcmp(*target, value_str))
+	{
+		const char	*log_target = ZBX_NULL2STR(*target);
+		const char	*log_source = value_str;
+
+		if (SUCCEED == masked)
+		{
+			log_target = ZBX_STRMASK(log_target);
+			log_source = ZBX_STRMASK(log_source);
+		}
+
+		UPDATE_REVISION(revision, log_name, "%s", log_target, log_source);
+		dc_strpool_replace(found, target, value_str);
+	}
+}
+
+static void	store_apm_global_db_option_int(zbx_json_parse_t *jp, const char *name, int *target, int default_value,
+		char *buf, size_t buf_size, int status, zbx_uint64_t revision, const char *log_name)
+{
+	int	value_int;
+
+	if (ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED == status)
+	{
+		value_int = default_value;
+	}
+	else if (SUCCEED != zbx_json_value_by_name(jp, name, buf, buf_size, NULL) ||
+			SUCCEED != zbx_is_int(buf, &value_int))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get '%s' from apm_global_db", name);
+		value_int = default_value;
+	}
+
+	if (*target != value_int)
+	{
+		UPDATE_REVISION(revision, log_name, "%d", *target, value_int);
+		*target = value_int;
+	}
+}
+
+static void	update_apm_global_db(const char *value_str, int found, zbx_uint64_t revision)
+{
+	zbx_json_parse_t		jp;
+	zbx_config_apm_global_db_t	*apm_global_db = &get_dc_config()->config->apm_global_db;
+	char				buf[MAX_STRING_LEN + 1];
+	int				status;
+
+	if (SUCCEED != zbx_json_open(value_str, &jp))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot parse apm_global_db");
+		status = ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED;
+	}
+	else if (SUCCEED == zbx_json_object_is_empty(&jp))
+	{
+		status = ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED;
+	}
+	else if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_APM_GLOBAL_DB_TAG_STATUS, buf, sizeof(buf), NULL) ||
+			SUCCEED != zbx_is_int(buf, &status) || !(0 == status || 1 == status))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get '%s' from apm_global_db", ZBX_APM_GLOBAL_DB_TAG_STATUS);
+		status = ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED;
+	}
+
+	if (status != apm_global_db->status)
+	{
+		UPDATE_REVISION(revision, "apm_global_db_status", "%d", apm_global_db->status, status);
+		apm_global_db->status = status;
+	}
+
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_URL, &apm_global_db->url, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_URL, FAIL);
+
+	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_AUTHENTICATION_TYPE,
+			&apm_global_db->authentication_type, ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_USR_PWD, buf,
+			sizeof(buf), status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_AUTHENTICATION_TYPE);
+
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_USERNAME, &apm_global_db->username, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_USERNAME, SUCCEED);
+
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_PASSWORD, &apm_global_db->password, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_PASSWORD, SUCCEED);
+
+	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_DB, &apm_global_db->db, "", buf,
+			sizeof(buf), found, status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_DB, FAIL);
+
+	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_PEER,
+			&apm_global_db->ssl_verify_peer, ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_DISABLED, buf,
+			sizeof(buf), status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_PEER);
+
+	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST,
+			&apm_global_db->ssl_verify_host, ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_DISABLED, buf,
+			sizeof(buf), status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST);
+}
+
 static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uint64_t revision,
 		int defaults_log_level)
 {
@@ -864,6 +976,11 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	store_int_setting(values, "proxy_secrets_provider", defaults_log_level, &config->config->proxy_secrets_provider,
 			revision);
+
+	if (SUCCEED == setting_get_str(values, "apm_global_db", defaults_log_level, &value_str))
+	{
+		update_apm_global_db(value_str, found, revision);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
