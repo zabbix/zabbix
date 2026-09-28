@@ -247,25 +247,37 @@ class ZBase {
 					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
-					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
-						echo (new CView('general.warning', [
-							'header' => _('Vault connection failed.'),
-							'messages' => [$e->getMessage()],
-							'theme' => ZBX_DEFAULT_THEME
-						]))->getOutput();
+					switch ($e->getCode()) {
+						case CConfigFile::CONFIG_VAULT_ERROR:
+							echo (new CView('general.warning', [
+								'header' => _('Vault connection failed.'),
+								'messages' => [$e->getMessage()],
+								'theme' => ZBX_DEFAULT_THEME
+							]))->getOutput();
 
-						session_write_close();
-						exit;
-					}
-					else {
-						$session = new CCookieSession();
-						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+							session_write_close();
+							exit;
 
-						if (!$session->session_start($sessionid)) {
-							throw new Exception(_('Session initialization error.'));
-						}
+						case CConfigFile::CONFIG_ERROR:
+							echo (new CView('general.warning', [
+								'header' => 'Configuration file error',
+								'messages' => [$e->getMessage()],
+								'theme' => ZBX_DEFAULT_THEME
+							]))->getOutput();
 
-						CSessionHelper::set('sessionid', $sessionid);
+							session_write_close();
+							exit;
+
+						default:
+							$session = new CCookieSession();
+							$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+							if (!$session->session_start($sessionid)) {
+								throw new Exception(_('Session initialization error.'));
+							}
+
+							CSessionHelper::set('sessionid', $sessionid);
+							break;
 					}
 				}
 				break;

@@ -38,6 +38,7 @@ class testPageEventCorrelation extends CWebTest {
 	}
 
 	const CORRELATION_SQL = 'SELECT * FROM correlation ORDER BY correlationid';
+	const CEP_SQL = 'SELECT NULL FROM cep_rule';
 	const EVENT_OLD_OPERATIONS = 'Event correlation for closing old events';
 	const EVENT_NEW_OPERATIONS = 'Event correlation for closing new events';
 	const EVENT_BOTH_OPERATIONS = 'Both operations';
@@ -249,63 +250,177 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					[
-						'Name' => self::EVENT_OLD_OPERATIONS,
-						'Conditions' => 'Old event tag name equals old event tag',
-						'Operations' => 'Close new event',
-						'Status' => 'Disabled'
-					],
-					[
-						'Name' => self::EVENT_NEW_OPERATIONS,
-						'Conditions' => 'New event tag name equals new event tag',
-						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
-					],
-					[
 						'Name' => self::EVENT_BOTH_OPERATIONS,
+						'Type' => 'Event correlation',
 						'Conditions' => 'Old event tag name equals old event tag',
+						'Time window processing' => '',
 						'Operations' => 'Close old events'."\n".'Close new event',
-						'Status' => 'Disabled'
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Disabled',
+						'Info' => ''
 					],
 					[
-						'Name' => self::EVENT_HOSTGROUP,
-						'Conditions' => 'New event host group does not equal Applications',
-						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
-					],
-					[
-						'Name' => self::EVENT_PAIR,
-						'Conditions' => 'Value of old event tag event tag old name equals value of new event tag event tag new name',
-						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
-					],
-					[
-						'Name' => self::EVENT_OLD_VALUE,
-						'Conditions' => 'Value of old event tag old event tag value contains 777',
-						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
-					],
-					[
-						'Name' => self::EVENT_NEW_VALUE,
-						'Conditions' => 'Value of new event tag new event tag value does not contain AAA',
-						'Operations' => 'Close new event',
-						'Status' => 'Enabled'
+						'Name' => 'Close problems older than 2 weeks',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Tag value dc equals north',
+						'Time window processing' => 'Simple',
+						'Operations' => 'Execute when Event evicted: Close',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
 					],
 					[
 						'Name' => self::MULTIPLE_CONDITIONS,
+						'Type' => 'Event correlation',
 						'Conditions' => 'Old event tag name equals test old event tag'."\n".
 								'New event tag name equals test new event tag'."\n".
 								'New event host group does not equal Applications'."\n".
 								'Value of old event tag event tag old name equals value of new event tag event tag new name'."\n".
 								'Value of old event tag old event tag value contains test 1'."\n".
 								'Value of new event tag new event tag value does not contain test 2',
+						'Time window processing' => '',
 						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => 'Deduplicate repeating events by keeping only the cause problem',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Tag value net equals infra',
+						'Time window processing' => 'Cause and symptoms grouping',
+						'Operations' => 'Execute when Event occurred: Discard',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
+					],
+					[
+						'Name' => 'Detect missing \'communication\' events',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Host group equals remote',
+						'Time window processing' => 'Pattern match',
+						'Operations' => 'Execute when Event occurred: Set name Risk detected: Communication down'."\n".
+								'Execute when Pattern matched: Clone first',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
+					],
+					[
+						'Name' => 'Detect physical security incident based on event pattern match',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Host group equals west',
+						'Time window processing' => 'Pattern match',
+						'Operations' => 'Execute when Event occurred: Set name Engine issue'."\n".
+								'Execute when Pattern matched: Clone first',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_NEW_OPERATIONS,
+						'Type' => 'Event correlation',
+						'Conditions' => 'New event tag name equals new event tag',
+						'Time window processing' => '',
+						'Operations' => 'Close old events',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_OLD_OPERATIONS,
+						'Type' => 'Event correlation',
+						'Conditions' => 'Old event tag name equals old event tag',
+						'Time window processing' => '',
+						'Operations' => 'Close new event',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Disabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_HOSTGROUP,
+						'Type' => 'Event correlation',
+						'Conditions' => 'New event host group does not equal Applications',
+						'Time window processing' => '',
+						'Operations' => 'Close old events',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_PAIR,
+						'Type' => 'Event correlation',
+						'Conditions' => 'Value of old event tag event tag old name equals value of new event tag event tag new name',
+						'Time window processing' => '',
+						'Operations' => 'Close old events',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => 'Increase event severity and normalize tags',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Host group equals payments',
+						'Time window processing' => 'None',
+						'Operations' => 'Execute when Event occurred: Set env:prod'."\n".
+								'Execute when Event occurred: Increase severity',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_NEW_VALUE,
+						'Type' => 'Event correlation',
+						'Conditions' => 'Value of new event tag new event tag value does not contain AAA',
+						'Time window processing' => '',
+						'Operations' => 'Close new event',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => self::EVENT_OLD_VALUE,
+						'Type' => 'Event correlation',
+						'Conditions' => 'Value of old event tag old event tag value contains 777',
+						'Time window processing' => '',
+						'Operations' => 'Close old events',
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
+					],
+					[
+						'Name' => 'Reduce problem noise by grouping events',
+						'Type' => 'Complex event processing',
+						'Conditions' => 'Tag value net equals infra'."\n".'Host group equals network',
+						'Time window processing' => 'Cause and symptoms grouping',
+						'Operations' => 'Execute when Window closed: Close'."\n".'Execute when Window closed: Increase severity',
+						'Stop after this rule' => 'Enabled',
+						'Sort order' => '1',
+						'Status' => 'Disabled',
+						'Info' => ''
 					],
 					[
 						'Name' => self::EVENT_WITHOUT_SEVERAL_SPACES,
+						'Type' => 'Event correlation',
 						'Conditions' => 'Old event tag name equals tag for filter',
+						'Time window processing' => '',
 						'Operations' => 'Close old events',
-						'Status' => 'Enabled'
+						'Stop after this rule' => '',
+						'Sort order' => '',
+						'Status' => 'Enabled',
+						'Info' => ''
 					]
 				]
 			]
@@ -423,12 +538,18 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::EVENT_BOTH_OPERATIONS,
+						'Close problems older than 2 weeks',
+						'Deduplicate repeating events by keeping only the cause problem',
+						'Detect missing \'communication\' events',
+						'Detect physical security incident based on event pattern match',
 						self::EVENT_NEW_OPERATIONS,
 						self::EVENT_OLD_OPERATIONS,
 						self::EVENT_HOSTGROUP,
 						self::EVENT_PAIR,
+						'Increase event severity and normalize tags',
 						self::EVENT_NEW_VALUE,
 						self::EVENT_OLD_VALUE,
+						'Reduce problem noise by grouping events',
 						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
@@ -531,7 +652,13 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::EVENT_BOTH_OPERATIONS,
-						self::EVENT_OLD_OPERATIONS
+						'Close problems older than 2 weeks',
+						'Deduplicate repeating events by keeping only the cause problem',
+						'Detect missing \'communication\' events',
+						'Detect physical security incident based on event pattern match',
+						self::EVENT_OLD_OPERATIONS,
+						'Increase event severity and normalize tags',
+						'Reduce problem noise by grouping events'
 					]
 				]
 			],
@@ -555,12 +682,17 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'All'
 					],
 					'expected' => [
+						'Deduplicate repeating events by keeping only the cause problem',
+						'Detect missing \'communication\' events',
+						'Detect physical security incident based on event pattern match',
 						self::EVENT_NEW_OPERATIONS,
 						self::EVENT_OLD_OPERATIONS,
 						self::EVENT_HOSTGROUP,
 						self::EVENT_PAIR,
+						'Increase event severity and normalize tags',
 						self::EVENT_NEW_VALUE,
-						self::EVENT_OLD_VALUE
+						self::EVENT_OLD_VALUE,
+						'Reduce problem noise by grouping events'
 					]
 				]
 			]
@@ -595,13 +727,19 @@ class testPageEventCorrelation extends CWebTest {
 					'sort_field' => 'Name',
 					'expected' => [
 						self::EVENT_WITHOUT_SEVERAL_SPACES,
+						'Reduce problem noise by grouping events',
 						self::EVENT_OLD_VALUE,
 						self::EVENT_NEW_VALUE,
+						'Increase event severity and normalize tags',
 						self::EVENT_PAIR,
 						self::EVENT_HOSTGROUP,
 						self::EVENT_OLD_OPERATIONS,
 						self::EVENT_NEW_OPERATIONS,
+						'Detect physical security incident based on event pattern match',
+						'Detect missing \'communication\' events',
+						'Deduplicate repeating events by keeping only the cause problem',
 						self::MULTIPLE_CONDITIONS,
+						'Close problems older than 2 weeks',
 						self::EVENT_BOTH_OPERATIONS
 					]
 				]
@@ -617,6 +755,12 @@ class testPageEventCorrelation extends CWebTest {
 						'Enabled',
 						'Enabled',
 						'Enabled',
+						'Disabled',
+						'Disabled',
+						'Disabled',
+						'Disabled',
+						'Disabled',
+						'Disabled',
 						'Disabled',
 						'Disabled'
 					]
@@ -691,7 +835,10 @@ class testPageEventCorrelation extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=ceprule.list');
 
 		// Events count that will be selected before Enable/Disable/Delete action.
-		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::CORRELATION_SQL);
+		$selected_count = (array_key_exists('name', $data))
+			? count($data['name'])
+			: CDBHelper::getCount(self::CORRELATION_SQL) + CDBHelper::getCount(self::CEP_SQL);
+
 		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
 		$this->assertSelectedCount($selected_count);
 		$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
@@ -775,7 +922,9 @@ class testPageEventCorrelation extends CWebTest {
 			$data['name'] = [$data['name']];
 		}
 
-		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::CORRELATION_SQL);
+		$selected_count = (array_key_exists('name', $data))
+			? count($data['name'])
+			: CDBHelper::getCount(self::CORRELATION_SQL) + CDBHelper::getCount(self::CEP_SQL);
 		$plural = ($selected_count === 1) ? '' : 's';
 
 		if (array_key_exists('link_button', $data)) {
@@ -811,7 +960,9 @@ class testPageEventCorrelation extends CWebTest {
 			);
 		}
 		else {
-			$this->assertEquals($selected_count, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status='.$status));
+			$this->assertEquals(CDBHelper::getCount(self::CORRELATION_SQL),
+					CDBHelper::getCount('SELECT NULL FROM correlation WHERE status='.$status)
+			);
 		}
 
 		// Verify that there is no selected event correlations.
@@ -833,7 +984,7 @@ class testPageEventCorrelation extends CWebTest {
 	 */
 	protected function deleteAction($names = []) {
 		$plural = (count($names) === 1) ? '' : 's';
-		$all = CDBHelper::getCount(self::CORRELATION_SQL);
+		$all = CDBHelper::getCount(self::CORRELATION_SQL) + CDBHelper::getCount(self::CEP_SQL);
 		$this->page->login()->open('zabbix.php?action=ceprule.list');
 
 		// Delete event correlation(s).
