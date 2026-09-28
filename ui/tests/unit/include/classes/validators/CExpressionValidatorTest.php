@@ -238,6 +238,7 @@ class CExpressionValidatorTest extends TestCase {
 			['histogram_quantile(0.5, bucket_rate_foreach(/host/key, 1m))>0', [], ['rc' => false, 'error' => 'unknown function "histogram_quantile"']],
 			['contains(last(/host/item), "abc")=1', [], ['rc' => true, 'error' => null]],
 			['contains(last(/host/item))=1', [], ['rc' => false, 'error' => 'invalid number of parameters in function "contains"']],
+			['contains(last(/host/item), "")=1', [], ['rc' => true, 'error' => null]],
 			['substring(last(/host/item), 1, 3)="ab"', [], ['rc' => true, 'error' => null]],
 			['substring(last(/host/item), 1)="ab"', [], ['rc' => false, 'error' => 'invalid number of parameters in function "substring"']]
 		];

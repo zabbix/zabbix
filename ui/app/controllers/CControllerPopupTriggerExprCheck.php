@@ -207,6 +207,10 @@ class CControllerPopupTriggerExprCheck extends CController {
 				$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
 				$quote_params = array_filter($quote_params, 'strlen');
 
+				if (array_key_exists('search', $data['params'])) {
+					$quote_params['search'] = $data['params']['search'];
+				}
+
 				foreach ($quote_params as $param_key => $param) {
 					$data['params'][$param_key] = CExpressionParser::quoteString($param);
 				}
@@ -233,11 +237,11 @@ class CControllerPopupTriggerExprCheck extends CController {
 				// Functions where item is wrapped in last() like func(last(/host/item)).
 				$last_functions = [
 					'abs', 'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift',
-					'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'contains',
-					'cos',
-					'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'jsonpath', 'left', 'length',
-					'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round',
-					'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'substring', 'tan', 'trim', 'truncate', 'xmlxpath'
+					'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat',
+					'contains', 'cos', 'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'jsonpath',
+					'left', 'length', 'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace',
+					'right', 'round', 'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'substring', 'tan', 'trim',
+					'truncate', 'xmlxpath'
 				];
 
 				if (in_array($function, $last_functions)) {
