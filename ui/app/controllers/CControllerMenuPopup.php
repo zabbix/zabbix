@@ -464,9 +464,9 @@ class CControllerMenuPopup extends CController {
 				unset($selement['urls'][$url_nr]);
 			}
 			elseif (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
-				$selement['urls'][$url_nr]['url'] = 'javascript: alert('.
-					json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
-				');';
+				$selement['urls'][$url_nr]['dataAttributes']['error']
+					= _s('Provided URL "%1$s" is invalid.', $url['url']);
+				$selement['urls'][$url_nr]['url'] = null;
 			}
 		}
 
@@ -746,9 +746,9 @@ class CControllerMenuPopup extends CController {
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
 					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert('.
-							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
-						');';
+						$url['dataAttributes']['error']
+							= json_encode(_s('Provided URL "%1$s" is invalid.', $url['url']));
+						$url['url'] = null;
 						unset($url['target'], $url['rel']);
 					}
 				}

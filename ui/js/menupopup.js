@@ -1776,6 +1776,10 @@ jQuery(function($) {
 			if (options.clickCallback !== undefined) {
 				link.on('click', options.clickCallback);
 			}
+
+			if (options.url === null && 'dataAttributes' in options && 'error' in options.dataAttributes) {
+				link.on('click', (e) => alert(e.target.dataset.error));
+			}
 		}
 
 		if (options.selected) {
