@@ -84,7 +84,17 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY =
 		'bridge-adapter returned too large response body for device.notify request';
 	private const LOG_ADAPTER_INCOMPLETE_ERROR = 'incomplete error in bridge-adapter response body';
-	private const LOG_ADAPTER_DETAILED_MESSAGE = 'detailed_message: Mock bridge-adapter device limit exceeded';
+	private const LOG_ADAPTER_INIT_ERROR_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected init data: "device.init mock failure"';
+	private const LOG_ADAPTER_NOTIFY_ERROR_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected notification data: "device.notify mock failure"';
+	private const LOG_ADAPTER_OFFBOARD_ERROR_DETAIL_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected offboard data: {"details":[{"@type":"bridge_jsonrpc.ErrorInfo",'.
+		'"reason":"DEVICE_NOT_FOUND","domain":"bridge.device"}]}';
+	private const LOG_ADAPTER_INIT_ERROR_DETAIL_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected init data: {"details":[{"@type":"bridge_jsonrpc.ErrorInfo",'.
+		'"reason":"DEVICE_LIMIT_EXCEEDED","domain":"bridge.device",'.
+		'"detailed_message":"Mock bridge-adapter device limit exceeded"}]}';
 	private const LOG_ADAPTER_MISSING_RESULT = 'missing result in bridge-adapter response body';
 	private const LOG_ADAPTER_MISSING_RESULT_FIELDS =
 		'missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter';
@@ -1514,6 +1524,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::INIT_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INIT_ERROR_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
 			120, 1
 		);
@@ -1538,7 +1549,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::INIT_DEVICE_UUID
 		], $sid);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_DETAILED_MESSAGE, true, 120, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INIT_ERROR_DETAIL_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
 			120, 1
 		);
@@ -2036,6 +2047,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'message' => 'Bridge adapter integration test message'
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_NOTIFY_ERROR_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertFalse($result);
@@ -2307,6 +2319,9 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::OFFBOARD_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_OFFBOARD_ERROR_DETAIL_DATA, true,
+			120, 1
+		);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
 			120, 1
 		);
