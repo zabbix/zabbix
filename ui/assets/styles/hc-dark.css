@@ -10866,6 +10866,14 @@ z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, in
   background-color: #dddddd;
   color: #000000; }
 
+.status-container .status-amp-severity-trace,
+.status-container .status-amp-severity-debug,
+.status-container .status-amp-severity-info,
+.status-container .status-amp-severity-warn,
+.status-container .status-amp-severity-error,
+.status-container .status-amp-severity-fatal {
+  color: #000000; }
+
 .na-bg,
 .log-na-bg,
 .normal-bg,

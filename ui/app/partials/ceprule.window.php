@@ -36,18 +36,18 @@ zbx_add_post_js($tags->getPostJS());
 	->addItem((new CLabel(_('Time window'), 'ceprule-window-type'))
 		->addItem(makeHelpIcon([
 			_("None - there will be no time window specific processing.").PHP_EOL,
-			_("Simple - set up time window based event eviction operations.").PHP_EOL,
-			_("Cause and symptom grouping - first event from the window (fixed) will be treated as cause other symptoms.").PHP_EOL,
-			_("Tag correlation - map past and current window events using tags.").PHP_EOL,
-			_("Pattern match - execute JavaScript to identify event patterns.")
+			_("Simple (multiple) - sets up sliding time window based event operations.").PHP_EOL,
+			_("Simple (once) - same as 'Simple (multiple)', except that an event cannot be processed by another window of this type.").PHP_EOL,
+			_("Cause and symptom grouping - first event from the fixed time window will be treated as cause, others - as symptoms.").PHP_EOL,
+			_("Pattern match - executes JavaScript to identify event patterns in sliding time window.")
 		]))
 	)
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
 		->setId('ceprule-window-type')
 		->addValue(_('None'), CCepRuleHelper::WINDOW_NONE)
-		->addValue(_('Simple'), CCepRuleHelper::WINDOW_SIMPLE)
+		->addValue(_('Simple (multiple)'), CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE)
+		->addValue(_('Simple (once)'), CCepRuleHelper::WINDOW_SIMPLE_ONCE)
 		->addValue(_('Cause and symptoms grouping'), CCepRuleHelper::WINDOW_CAUSE_SYMPTOM)
-		->addValue(_('Tag correlation'), CCepRuleHelper::WINDOW_TAG_MATCH)
 		->addValue(_('Pattern match'), CCepRuleHelper::WINDOW_PATTERN_MATCH)
 		->setModern(true)
 	))

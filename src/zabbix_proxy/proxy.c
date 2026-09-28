@@ -341,7 +341,7 @@ static char	*config_ssl_key_location = NULL;
 static char	*config_webdriver_url = NULL;
 
 static char	*config_apm_sourceip = NULL;
-static int	config_apm_port = 4317;
+static int	config_apm_port = 0;
 static char	*config_apm_ca_file = NULL;
 static char	*config_apm_cert_file = NULL;
 static char	*config_apm_key_file = NULL;
@@ -656,6 +656,11 @@ static void	zbx_set_defaults(void)
 		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is deprecated"
 				", please specify port in Server parameter (e.g. 127.0.0.1:10052)");
 	}
+
+#ifdef HAVE_APM
+	if (0 == config_apm_port)
+		config_apm_port = 4317;
+#endif
 }
 
 /******************************************************************************
