@@ -479,7 +479,7 @@ class CMacroFunction {
 	/**
 	 * Extracts a value from an XML string using an XPath pattern.
 	 *
-	 * @param string $value       [IN] The input value, expected to be an XML document.
+	 * @param string $value       [IN] The input value, expected to be an XML document, not empty string.
 	 * @param array  $parameters  [IN] [0] XPath pattern, [1] optional default value.
 	 *
 	 * @return string
@@ -490,11 +490,11 @@ class CMacroFunction {
 		}
 
 		$dom = new DOMDocument();
-		$use_internal_errors = libxml_use_internal_errors(true);
+		$prev_use_internal_errors = libxml_use_internal_errors(true);
 
 		if (!$dom->loadXML($value)) {
 			libxml_clear_errors();
-			libxml_use_internal_errors($use_internal_errors);
+			libxml_use_internal_errors($prev_use_internal_errors);
 
 			return UNRESOLVED_MACRO_STRING;
 		}
@@ -505,9 +505,9 @@ class CMacroFunction {
 		$invalid_xpath = $result === false && libxml_get_errors() !== [];
 
 		libxml_clear_errors();
-		libxml_use_internal_errors($use_internal_errors);
+		libxml_use_internal_errors($prev_use_internal_errors);
 
-		if ($invalid_xpath) {
+		if ($invalid_xpath || $result === NAN) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
