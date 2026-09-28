@@ -93,6 +93,8 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
+			'Max repetition count' => 10,
+			'Retries' => 5,
 			'Use combined requests' => true
 		],
 		'JMX' => [
@@ -288,6 +290,7 @@ class testFormHost extends CWebTest {
 				// Check fields' lengths.
 				$field_lengths = [
 					'Max repetition count' => 255,
+					'Retries' => 255,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -1008,6 +1011,64 @@ class testFormHost extends CWebTest {
 						'Retries' => 'Value is not a valid integer.'
 					]
 				]
+			],
+			// #32 User macros in SNMP max repetition and retries
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with user macro in SNMP interface',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '{$MACRO}',
+							'Retries' => '{$MACRO}'
+						]
+					]
+				]
+			],
+			// #33 SNMP retries empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #34 SNMP max repetition count empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP max repetitions',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Max repetition count' => 'This field cannot be empty.'
+					]
+				]
 			]
 		];
 	}
@@ -1556,6 +1617,64 @@ class testFormHost extends CWebTest {
 					],
 					'inline_errors' => [
 						'Retries' => 'Value is not a valid integer.'
+					]
+				]
+			],
+			// #27 User macros in SNMP max repetition and retries
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with user macro in SNMP interface',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '{$MACRO}',
+							'Retries' => '{$MACRO}'
+						]
+					]
+				]
+			],
+			// #28 SNMP retries empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #29 SNMP max repetition count empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP max repetitions',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
 			]
