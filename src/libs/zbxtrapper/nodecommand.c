@@ -370,6 +370,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	char			*tz = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
 	zbx_dc_um_handle_t	*um_handle_unmasked = NULL, *um_handle_masked = NULL;
+	const char		*resolved_manualinput = NULL;	/* validated raw user input, or NULL */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
@@ -543,69 +544,22 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 	}
 
-	if (0 != hostid)	/* script on host */
-		macro_scope_type = ZBX_SCRIPT_SCOPE_HOST;
-	else
-		macro_scope_type = ZBX_SCRIPT_SCOPE_EVENT;
-
-	um_handle_masked = zbx_dc_open_user_macros_masked();
-	um_handle_unmasked = zbx_dc_open_user_macros_secure();
-
-	/* substitute macros in script body and webhook parameters */
-
 	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
 	{
-		char	*expanded_cmd = NULL, *manualinput_exp = NULL;
-		size_t	expanded_cmd_size;
-
 		if (NULL == manualinput)
 		{
 			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
 			goto fail;
 		}
 
-		ZBX_STRDUP(manualinput_exp, manualinput);
-
-		if (SUCCEED != substitute_script_macros(&manualinput_exp, error, sizeof(error), macro_scope_type,
-				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz))
-		{
-			zbx_free(manualinput_exp);
-			goto fail;
-		}
-
-		if (FAIL == validate_manualinput(manualinput_exp, script.manualinput_validator,
+		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator,
 				script.manualinput_validator_type))
 		{
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
-			zbx_free(manualinput_exp);
 			goto fail;
 		}
 
-		script.command = zbx_strdup(script.command, expanded_cmd);
-		zbx_free(expanded_cmd);
-
-		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
-		{
-			for (int n = 0; n < webhook_params.values_num; n++)
-			{
-				char	*expanded_value = NULL;
-				size_t	expanded_value_size;
-
-				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
-				if (NULL == strstr(webhook_params.values[n].second, "{MANUALINPUT}"))
-					continue;
-
-				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput_exp,
-						&expanded_value, &expanded_value_size);
-
-				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second,
-						expanded_value);
-
-				zbx_free(expanded_value);
-			}
-		}
-		zbx_free(manualinput_exp);
+		resolved_manualinput = manualinput;
 	}
 	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
@@ -614,28 +568,40 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				script.name);
 	}
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
-	{
-		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
-				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz))
-		{
-			goto fail;
-		}
-
-		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
-				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto fail;
-		}
-	}
+	if (0 != hostid)	/* script on host */
+		macro_scope_type = ZBX_SCRIPT_SCOPE_HOST;
 	else
+		macro_scope_type = ZBX_SCRIPT_SCOPE_EVENT;
+
+	um_handle_masked = zbx_dc_open_user_macros_masked();
+	um_handle_unmasked = zbx_dc_open_user_macros_secure();
+
+	/* substitute macros in script body*/
+
+	/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
+	if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
+			um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz,
+			resolved_manualinput))
+	{
+		goto fail;
+	}
+
+	/* masked / original copy (audit log): pass NULL so {MANUALINPUT} stays literal */
+	if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
+			um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, NULL))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
+	}
+
+	/* substitute macros in webhook parameters */
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 	{
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
 					sizeof(error), macro_scope_type, um_handle_unmasked, problem_event,
-					recovery_event, &user->userid, &host, tz))
+					recovery_event, &user->userid, &host, tz, resolved_manualinput))
 			{
 				goto fail;
 			}

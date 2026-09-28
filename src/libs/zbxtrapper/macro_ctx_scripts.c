@@ -22,6 +22,8 @@
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 
+#define MVAR_MANUALINPUT	"{MANUALINPUT}"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: formats full user name from name, surname and alias.              *
@@ -111,6 +113,7 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 	const zbx_uint64_t	*userid = va_arg(args, const zbx_uint64_t *);
 	const zbx_dc_host_t	*dc_host = va_arg(args, const zbx_dc_host_t *);
+	const char		*manualinput = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -118,7 +121,12 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 	if (0 == p->indexed)
 	{
-		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
+		if (NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
+		{
+			*replace_to = zbx_strdup(*replace_to, manualinput);
+			p->pos = p->token.loc.r;
+		}
+		else if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_to);
 			p->pos = p->token.loc.r;
@@ -178,6 +186,16 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
 	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
 	const char			*tz = va_arg(args, const char *);
+	const char			*manualinput = va_arg(args, const char *);
+
+	if (0 == p->indexed && NULL != manualinput && NULL != p->macro &&
+			0 == strcmp(p->macro, MVAR_MANUALINPUT))
+	{
+		*replace_to = zbx_strdup(*replace_to, manualinput);
+		p->pos = p->token.loc.r;
+
+		return ret;
+	}
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, NULL, event, r_event, userid, dc_host, NULL, NULL, NULL,
 			tz,  replace_to, data, error, maxerrlen);
@@ -218,8 +236,9 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 }
 
 int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
-		zbx_dc_um_handle_t * um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz)
+		zbx_dc_um_handle_t *um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz,
+		const char *manualinput)
 {
 	int	ret = SUCCEED;
 
@@ -229,11 +248,11 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	{
 		case ZBX_SCRIPT_SCOPE_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
-					userid, dc_host);
+					userid, dc_host, manualinput);
 			break;
 		case ZBX_SCRIPT_SCOPE_EVENT:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv,
-					um_handle, event, r_event, userid, dc_host, tz);
+					um_handle, event, r_event, userid, dc_host, tz, manualinput);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
