@@ -93,6 +93,8 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
+			'Max repetition count' => 10,
+			'Retries' => 5,
 			'Use combined requests' => true
 		],
 		'JMX' => [
@@ -266,10 +268,10 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asGridForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
-			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Retries', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Retries', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
 		];
@@ -287,7 +289,8 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' => 10,
+					'Max repetition count' => 255,
+					'Retries' => 255,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -704,7 +707,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -753,7 +756,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
@@ -855,7 +858,8 @@ class testFormHost extends CWebTest {
 							'type' => 'SNMP',
 							'SNMP version' => 'SNMPv2',
 							'SNMP community' => '{$SNMP_TEST}',
-							'Max repetition count' => '20'
+							'Max repetition count' => '20',
+							'Retries' => '19'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -922,6 +926,7 @@ class testFormHost extends CWebTest {
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '15',
+							'Retries' => '10',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -964,6 +969,86 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'Default' => true
 						]
+					]
+				]
+			],
+			// #30 SNMP too high retries count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #31 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
+					]
+				]
+			],
+			// #32 User macros in SNMP max repetition and retries
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with user macro in SNMP interface',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '{$MACRO}',
+							'Retries' => '{$MACRO}'
+						]
+					]
+				]
+			],
+			// #33 SNMP retries and max repetition empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
+						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
 			]
@@ -1422,7 +1507,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1443,7 +1528,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
@@ -1472,6 +1557,88 @@ class testFormHost extends CWebTest {
 					],
 					'inline_errors' => [
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #25 SNMP too high value in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #26 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
+					]
+				]
+			],
+			// #27 User macros in SNMP max repetition and retries.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with user macro in SNMP interface',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '{$MACRO}',
+							'Retries' => '{$MACRO}'
+						]
+					]
+				]
+			],
+			// #28 SNMP retries and max repetition empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
+						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
 			]
