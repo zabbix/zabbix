@@ -229,8 +229,11 @@ class CApmMetric extends CApmGeneral {
 				])
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => $options['time_till']
-				])
-				->limit(($options['limit'] ?? 0) + $options['offset']);
+				]);
+
+			if ($options['limit'] !== null) {
+				$sub_query->limit($options['limit'] + ($options['offset'] ?? 0));
+			}
 
 			if ($options['with_flags_on'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
