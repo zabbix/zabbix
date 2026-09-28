@@ -35,44 +35,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-/**********************************************************************************
- *                                                                                *
- * Purpose: replaces occurrence of macro in input string with value given in      *
- *          macrovalue, with memory management                                    *
- *                                                                                *
- * Parameters:  in               - [IN] input string to be processed              *
- *              macro            - [IN] macro to replace                          *
- *              macrovalue       - [IN] value to replace macro with               *
- *              out              - [IN/OUT] pointer to memory holding result      *
- *              out_alloc        - [IN/OUT] size of memory holding result         *
- *                                                                                *
- * Return value:  SUCCEED - remote command was executed successfully              *
- *                FAIL    - error occurred                                        *
- *                                                                                *
- **********************************************************************************/
-static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
-		size_t *out_alloc)
-{
-	zbx_token_t	token;
-	int		pos = 0;
-	size_t		out_offset = 0, macrovalue_len;
-
-	macrovalue_len = strlen(macrovalue);
-	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
-	out_offset++;
-
-	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
-	{
-		pos = token.loc.r;
-
-		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
-		{
-			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
-					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
-		}
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: executes remote command and waits for result                      *
