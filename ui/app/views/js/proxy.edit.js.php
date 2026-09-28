@@ -175,7 +175,7 @@ window.proxy_edit_popup = new class {
 
 		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser']) {
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query']) {
 			document.getElementById(id).readOnly = !custom_timeouts_enabled;
 		}
 	}

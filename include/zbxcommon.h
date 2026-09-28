@@ -151,7 +151,8 @@ typedef enum
 	ITEM_TYPE_SNMP,
 	ITEM_TYPE_SCRIPT,
 	ITEM_TYPE_BROWSER,
-	ITEM_TYPE_NESTED_LLD 	/* 23 */
+	ITEM_TYPE_NESTED_LLD,
+	ITEM_TYPE_TELEMETRY_QUERY	/* 24 */
 }
 zbx_item_type_t;
 
@@ -326,7 +327,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SUPERVISOR		48
 #define ZBX_PROCESS_TYPE_CEP_MANAGER		49
 #define ZBX_PROCESS_TYPE_CEP_WORKER		50
-#define ZBX_PROCESS_TYPE_COUNT			51	/* number of process types */
+#define ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER	51
+#define ZBX_PROCESS_TYPE_COUNT			52	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_MAIN			126

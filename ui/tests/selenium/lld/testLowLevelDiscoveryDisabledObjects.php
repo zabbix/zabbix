@@ -201,9 +201,10 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		// Emulate item discovery in DB.
 		foreach ($discovered_items as $discovered_item) {
 			DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
-					' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+					' params, posts, headers, query, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
 					zbx_dbstr(self::$hint_hostid).', '.zbx_dbstr($discovered_item['item_name']).', \'\', '.
-					zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
+					zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', \'{}\', '.
+					zbx_dbstr($discovered_item['status']).')'
 			);
 			DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete, disable_source,'.
 					' ts_disable, status) VALUES ('.zbx_dbstr($discovered_item['itemdiscoveryid']).', '.
