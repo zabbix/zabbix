@@ -1,5 +1,5 @@
 
-# MikroTik CCR2004-16G-2S by SNMP
+# MikroTik CCR2004-16G-2S+ by SNMP
 
 ## Overview
 
