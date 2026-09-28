@@ -2139,7 +2139,8 @@ static int	DBpatch_7050188(void)
 
 static int	DBpatch_7050189(void)
 {
-	const zbx_db_field_t	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"max_repetitions", "10", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
 	return DBmodify_field_type("interface_snmp", &field, NULL);
 }
 
