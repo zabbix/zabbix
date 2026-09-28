@@ -117,17 +117,87 @@ out:
 	return ret;
 }
 
-/*******************************************************************************
- *                                                                             *
- * Comments: This function is used only for the hgset and ugset tables. The    *
- *           correct way to get the next id is to call zbx_db_get_maxid_num(). *
- *           However, that function calls zbx_db_select(), which must not be   *
- *           used with ZBX_DB_CONNECT_ONCE connections. Since this function is *
- *           used only for these two tables, which are always empty at this    *
- *           point, the next hgsetid and ugsetid values are always 1.          *
- *                                                                             *
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets nextid in table ids for the specified table                  *
+ *                                                                            *
+ * Parameters: tablename - [IN] the name of a table                           *
+ *             num       - [IN] the number of reserved records                *
+ *                                                                            *
+ * Return value: SUCCEED - nextid was set successfully                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function is used only for the hgset and ugset tables. The   *
+ *           correct way to get the next id and update the table ids is to    *
+ *           call zbx_db_get_maxid_num(). However, that function calls        *
+ *           zbx_db_select(), which must not be used with ZBX_DB_CONNECT_ONCE *
+ *           connections. Since this function is used only for these two      *
+ *           tables, which are always empty at this point, nextid can be set  *
+ *           directly.                                                        *
+ *                                                                            *
  ******************************************************************************/
-static int	permission_groupsets_insert(zbx_hashset_t *group_sets, zbx_db_insert_t *db_gset,
+static int	set_group_nextid(const char *tablename, int num)
+{
+	zbx_db_result_t		result;
+	int			ret = SUCCEED;
+	const zbx_db_table_t	*table;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
+
+	if (NULL == (table = zbx_db_get_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
+
+	result = zbx_db_select_once("select nextid from ids where table_name='%s' and field_name='%s'", table->table,
+			table->recid);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch nextid for table %s and field name from %s", table->table,
+				table->recid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL != zbx_db_fetch(result))
+	{
+		zbx_db_free_result(result);
+
+		if (ZBX_DB_OK > zbx_db_execute_once("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and"
+				" field_name='%s'", (zbx_uint64_t) num, table->table, table->recid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot update nextid for table %s and field name from %s",
+					table->table, table->recid);
+			ret = FAIL;
+			goto out;
+		}
+	}
+	else if (ZBX_DB_OK > zbx_db_execute_once("insert into ids (table_name,field_name,nextid)"
+			" values ('%s','%s'," ZBX_FS_UI64 ")", table->table, table->recid, (zbx_uint64_t) num))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot insert nextid for table %s and field name from %s", table->table,
+				table->recid);
+		ret = FAIL;
+		goto out;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s table:'%s' recid:'%s'", __func__, zbx_result_string(ret),
+			table->table, table->recid);
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
+ * Comments: This function is used only for the hgset and ugset tables. Since *
+ *           these two tables are always empty at this point, the next        *
+ *           hgsetid and ugsetid values are always 1.                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *group_sets, zbx_db_insert_t *db_gset,
 		zbx_db_insert_t *db_gset_groups, zbx_db_insert_t *db_gset_parents)
 {
 #define FIRST_ID	1
@@ -137,6 +207,9 @@ static int	permission_groupsets_insert(zbx_hashset_t *group_sets, zbx_db_insert_
 
 	if (0 == group_sets->num_data)
 		return SUCCEED;
+
+	if (SUCCEED != set_group_nextid(tbl_name, group_sets->num_data))
+		return FAIL;
 
 	zbx_hashset_iter_reset(group_sets, &iter);
 
@@ -212,7 +285,7 @@ static int	permission_hgsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_prepare(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "hostid", "groupid", "hosts_groups", &hgsets, 0)))
-		ret = permission_groupsets_insert(&hgsets, &db_insert, &db_insert_groups, &db_insert_hosts);
+		ret = permission_groupsets_insert("hgset", &hgsets, &db_insert, &db_insert_groups, &db_insert_hosts);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_groups);
@@ -235,7 +308,7 @@ static int	permission_ugsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_prepare(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "userid", "usrgrpid", "users_groups", &ugsets, 1)))
-		ret = permission_groupsets_insert(&ugsets, &db_insert, &db_insert_groups, &db_insert_users);
+		ret = permission_groupsets_insert("ugset", &ugsets, &db_insert, &db_insert_groups, &db_insert_users);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_groups);
