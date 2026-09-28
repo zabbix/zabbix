@@ -266,9 +266,9 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asGridForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Retries', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Retries', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
 			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
@@ -287,7 +287,8 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' => 10,
+					'Max repetition count' => 255,
+					'Retries' => 255,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -704,7 +705,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -753,11 +754,50 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
-			// #24 Host without interface.
+			// #24 Too low value in Retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too low retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '0'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be greater than or equal to 1.'
+					]
+				]
+			],
+			// #25 Too high value in Retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #26 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -767,7 +807,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #25 UTF8MB4 check.
+			// #27 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -779,7 +819,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #26 Default values of all interfaces.
+			// #28 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -807,7 +847,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #27 Change default host interface.
+			// #29 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -833,7 +873,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #28 Different versions of SNMP interface and encryption.
+			// #30 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -891,7 +931,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #29 All interfaces and all fields in form.
+			// #31 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -922,6 +962,7 @@ class testFormHost extends CWebTest {
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '15',
+							'Retries' => '3',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -1422,7 +1463,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1443,7 +1484,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
@@ -1528,6 +1569,7 @@ class testFormHost extends CWebTest {
 							'port' => '166',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '10',
+							'Retries' => '4',
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
@@ -1599,6 +1641,7 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '90',
+							'Retries' => '91',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
@@ -1704,6 +1747,7 @@ class testFormHost extends CWebTest {
 							'port' => '501',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '20',
+							'Retries' => '12',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
@@ -1970,6 +2014,7 @@ class testFormHost extends CWebTest {
 								'port' => '122',
 								'SNMP version' => 'SNMPv3',
 								'Max repetition count' => '13',
+								'Retries' => '5',
 								'Context name' => 'zabbix',
 								'Security name' => 'selenium',
 								'Security level' => 'authPriv',
