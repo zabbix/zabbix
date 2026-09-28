@@ -47,9 +47,10 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_DISCOVERY_ACTIONS =  'ui.configuration.discovery_actions';
 	public const UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS =  'ui.configuration.autoregistration_actions';
 	public const UI_CONFIGURATION_INTERNAL_ACTIONS =  'ui.configuration.internal_actions';
-	public const UI_CONFIGURATION_EVENT_CORRELATION = 'ui.configuration.event_correlation';
+	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
+	public const UI_ADMINISTRATION_DATA_SOURCE = 'ui.administration.data_source';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
@@ -84,6 +85,7 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
 	public const ACTIONS_EDIT_OWN_MEDIA = 'actions.edit_own_media';
 	public const ACTIONS_EDIT_USER_MEDIA = 'actions.edit_user_media';
+	public const ACTIONS_SELECT_SERVER_FOR_MONITORING = 'actions.select_server_for_monitoring';
 
 	public const DEVICES_ACCESS = 'devices.access';
 	public const DEVICES_ACTIONS_MANAGE_OWN = 'devices.actions.manage_own';
@@ -298,7 +300,7 @@ class CRoleHelper {
 			$rules = array_merge($rules, [
 				self::UI_REPORTS_AUDIT,
 				self::UI_REPORTS_ACTION_LOG,
-				self::UI_CONFIGURATION_EVENT_CORRELATION,
+				self::UI_CONFIGURATION_CEPRULES,
 				self::UI_ADMINISTRATION_MEDIA_TYPES,
 				self::UI_ADMINISTRATION_SCRIPTS,
 				self::UI_ADMINISTRATION_USER_GROUPS,
@@ -308,6 +310,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_AUTHENTICATION,
 				self::UI_ADMINISTRATION_LINKED_DEVICES,
 				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_ADMINISTRATION_DATA_SOURCE,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
 				self::UI_ADMINISTRATION_PROXY_GROUPS,
@@ -338,6 +341,7 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
 			$rules[] = self::ACTIONS_MANAGE_SLA;
+			$rules[] = self::ACTIONS_SELECT_SERVER_FOR_MONITORING;
 		}
 
 		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING,
@@ -483,7 +487,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event correlation')];
+					$labels += [self::UI_CONFIGURATION_CEPRULES => _('Event processing')];
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -539,6 +543,7 @@ class CRoleHelper {
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
+						self::UI_ADMINISTRATION_DATA_SOURCE => _('Data source'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
 						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),
@@ -597,6 +602,12 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
+		}
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [
+				self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring and discovery')
+			];
 		}
 
 		return $labels;

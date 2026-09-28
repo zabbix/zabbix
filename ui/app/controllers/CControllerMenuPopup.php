@@ -710,15 +710,24 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
+			$is_writable = 	(bool) API::Trigger()->get([
+				'output' => [],
+				'triggerids' => $data['triggerid'],
+				'editable' => true
+			]);
+
 			$menu_data = [
 				'type' => 'trigger',
 				'triggerid' => $data['triggerid'],
 				'backurl' => $data['backurl'],
 				'items' => $items,
 				'show_events' => $show_events,
+				'isWritable' => $is_writable,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'allowed_ui_conf_maintenance' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE),
+				'allowed_edit_maintenance' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE),
 				'allowed_actions_change_problem_ranking' =>
 					CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 			];

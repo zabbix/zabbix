@@ -70,10 +70,7 @@ class CControllerProxyGroupList extends CController {
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'profileIdx' => 'web.proxygroups.filter',
-			'active_tab' => CProfile::get('web.proxygroups.filter.active', 1),
-			'user' => [
-				'can_edit_proxies' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-			]
+			'active_tab' => CProfile::get('web.proxygroups.filter.active', 1)
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

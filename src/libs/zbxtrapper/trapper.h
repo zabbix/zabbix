@@ -15,11 +15,6 @@
 #ifndef ZABBIX_ZBX_TRAPPER_H
 #define ZABBIX_ZBX_TRAPPER_H
 
-typedef enum
-{
-	ROLE_PERM_DENY = 0,
-	ROLE_PERM_ALLOW = 1,
-}
-zbx_user_role_permission_t;
+
 
 #endif

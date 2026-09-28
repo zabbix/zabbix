@@ -303,6 +303,13 @@ $default_url_label = array_key_exists('profile_redirect_url', $data) && $data['p
 	: null;
 
 $user_form_list
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
+		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
+			DB::getFieldLength('users', 'default_maintenance_period'))
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -418,10 +425,18 @@ if ($data['roleid']) {
 	}
 
 	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addRow((new CTag('h4', true, _('User group permissions')))->addClass('input-section-header'))
+		->addRow(_('Permissions'), (new CDiv($permissions_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+		->addRow(_('Proxies'), (new CDiv($data['proxies_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		)
+		->addRow(_('Proxy groups'), (new CDiv($data['proxy_groups_list']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
 

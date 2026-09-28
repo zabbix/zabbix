@@ -42,7 +42,7 @@ $deviceTable = (new CTableInfo())
 	->setHeader([
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
-		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Added on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN] ? '' : null
 	])

@@ -259,11 +259,19 @@ zbx_vc_item_update_t;
 ZBX_VECTOR_DECL(vc_itemupdate, zbx_vc_item_update_t)
 ZBX_VECTOR_IMPL(vc_itemupdate, zbx_vc_item_update_t)
 
-static zbx_vector_vc_itemupdate_t	vc_itemupdates;
+static ZBX_THREAD_LOCAL zbx_vector_vc_itemupdate_t	vc_itemupdates;
+static ZBX_THREAD_LOCAL int 				vc_itemupdates_initialized = 0;
 
 static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t type, int arg1, int arg2)
 {
 	zbx_vc_item_update_t	*update;
+
+	if (0 == vc_itemupdates_initialized)
+	{
+		zbx_vector_vc_itemupdate_create(&vc_itemupdates);
+		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, 256);
+		vc_itemupdates_initialized = 1;
+	}
 
 	if (vc_itemupdates.values_num == vc_itemupdates.values_alloc)
 		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, (size_t)(vc_itemupdates.values_alloc * 1.5));
@@ -2343,9 +2351,6 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
 		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
 
-	zbx_vector_vc_itemupdate_create(&vc_itemupdates);
-	zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, 256);
-
 	ret = SUCCEED;
 out:
 	zbx_vc_enable();
@@ -2366,8 +2371,6 @@ void	zbx_vc_destroy(void)
 
 	if (NULL != vc_cache)
 	{
-		zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
-
 		zbx_hashset_destroy(&vc_cache->items);
 		zbx_hashset_destroy(&vc_cache->strpool);
 
@@ -2483,6 +2486,18 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 			continue;
 		}
 
+		if (NULL != item)
+		{
+			/* If the new value type does not match the item's type in cache remove it, */
+			/* so it's cached with the correct type from correct tables when accessed   */
+			/* next time or now if it has trigger.                                      */
+			if (item->value_type != h->entry.value_type)
+			{
+				vc_remove_item(item);
+				item = NULL;
+			}
+		}
+
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t	item_local = {
@@ -2507,14 +2522,9 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 			else
 				last_value_timestamp = (int)time(NULL);
 
-			/* If the new value type does not match the item's type in cache remove it, */
-			/* so it's cached with the correct type from correct tables when accessed   */
-			/* next time.                                                               */
-			/* Also remove item if the value adding failed. In this case we             */
-			/* won't have the latest data in cache - so the requests must go directly   */
-			/* to the database.                                                         */
-			if (item->value_type != h->entry.value_type ||
-					FAIL == vch_item_add_value_at_head(item, &record))
+			/* Remove item if the value adding failed. In this case we won't have the   */
+			/* latest data in cache - so the requests must go directly to the database. */
+			if (FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;
@@ -3192,7 +3202,7 @@ void	zbx_vc_flush_stats(void)
 	zbx_vc_item_t	*item = NULL;
 	zbx_uint64_t	itemid = 0;
 
-	if (ZBX_VC_DISABLED == vc_state || 0 == vc_itemupdates.values_num)
+	if (ZBX_VC_DISABLED == vc_state || 0 == vc_itemupdates_initialized || 0 == vc_itemupdates.values_num)
 		return;
 
 	zbx_vector_vc_itemupdate_sort(&vc_itemupdates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3229,9 +3239,9 @@ void	zbx_vc_flush_stats(void)
 
 	UNLOCK_CACHE;
 
-	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
+	zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
+	vc_itemupdates_initialized = 0;
 }
-
 
 /******************************************************************************
  *                                                                            *

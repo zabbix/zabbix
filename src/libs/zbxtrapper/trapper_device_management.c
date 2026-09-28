@@ -24,6 +24,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
 #include "zbxcacheconfig.h"
 #include "zbx_bridge_adapter_constants.h"
 

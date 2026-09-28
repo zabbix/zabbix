@@ -23,11 +23,12 @@ class CControllerUserDeviceInit extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'userid' => ['db users.userid', 'required']
+			'admin_mode' => ['boolean', 'required'],
+			'userid' => ['db users.userid', 'required', 'when' => ['admin_mode', 'in' => [1]]]
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
@@ -47,12 +48,12 @@ class CControllerUserDeviceInit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (CWebUser::isGuest() || !CSettingsHelper::isMobileDevicesEnabled()) {
 			return false;
 		}
 
-		if (CWebUser::$data['userid'] == $this->getInput('userid')) {
+		if ($this->getInput('admin_mode') == 0 || CWebUser::$data['userid'] == $this->getInput('userid')) {
 			return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
 		}
 
@@ -60,8 +61,8 @@ class CControllerUserDeviceInit extends CController {
 			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES);
 	}
 
-	protected function doAction() {
-		$device = API::Device()->init(['userid' => $this->getInput('userid')]);
+	protected function doAction(): void {
+		$device = API::Device()->init(['userid' => $this->getInput('userid', CWebUser::$data['userid'])]);
 		$output = [];
 
 		if ($device) {

@@ -95,7 +95,13 @@ class CBanner {
 					this.#getCurrentData();
 				}
 			})
-			.catch(error => console.log('Could not get saved data.', error))
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				console.log('Could not get saved data.', error);
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;
@@ -126,6 +132,10 @@ class CBanner {
 				this.#updateData(response.banners);
 			})
 			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
 				console.log('Could not get current banner data.', error);
 
 				if (this.#number_of_attempts === CBanner.NUMBER_OF_ATTEMPTS) {
@@ -340,7 +350,13 @@ class CBanner {
 
 				this.#displayActiveBanner();
 			})
-			.catch(error => console.log('Could not update banner data.', error))
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				console.log('Could not update banner data.', error);
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;

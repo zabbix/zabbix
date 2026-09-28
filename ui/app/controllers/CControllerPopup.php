@@ -40,6 +40,7 @@ class CControllerPopup extends CController {
 		$this->supported_popups = [
 			'acknowledge.edit' => _('Update problem'),
 			'action.edit' => _('Action edit'),
+			'ceprule.edit' => _('CEP rule edit'),
 			'connector.edit' => _('Connector edit'),
 			'correlation.edit' => _('Correlation edit'),
 			'discovery.edit' => _('Discovery rule edit'),

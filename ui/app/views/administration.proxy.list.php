@@ -99,7 +99,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			->setArgument('proxy_groupid', $proxy['proxy_groupid'])
 			->getUrl();
 
-		$proxy_name_prefix[] = $data['user']['can_edit_proxy_groups']
+		$proxy_name_prefix[] = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
 			? (new CLink($proxy['proxyGroup']['name'], $proxy_group_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
@@ -186,7 +186,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 				->setArgument('hostid', $host['hostid'])
 				->getUrl();
 
-			$hosts[] = $data['user']['can_edit_hosts']
+			$hosts[] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CLink($host['name'], $host_url))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_LINK : null)
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)

@@ -34,7 +34,8 @@ class CProxy extends CApiService {
 		'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
 		'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 		'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-		'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state'
+		'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query', 'lastaccess', 'version',
+		'compatibility', 'state'
 	];
 
 	/**
@@ -59,8 +60,8 @@ class CProxy extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'proxy_groupids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode', 'allowed_addresses', 'address', 'port', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'local_address', 'local_port', 'allowed_addresses', 'address', 'port', 'description', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_unique(array_merge(DB::getFilterFields('proxy', self::OUTPUT_FIELDS), DB::getFilterFields('proxy_rtdata', self::OUTPUT_FIELDS)))],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('proxy', self::OUTPUT_FIELDS)],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -86,12 +87,8 @@ class CProxy extends CApiService {
 		}
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			if ($permission == PERM_READ_WRITE) {
-				return $options['countOutput'] ? '0' : [];
-			}
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $options['editable']) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -124,6 +121,10 @@ class CProxy extends CApiService {
 
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
+		}
 
 		// proxy_groupids
 		if ($options['proxy_groupids'] !== null) {
@@ -339,6 +340,7 @@ class CProxy extends CApiService {
 		}
 
 		self::updateHosts($proxies, $db_proxies);
+		self::unlinkFromUserGroups($proxies, $db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -393,6 +395,79 @@ class CProxy extends CApiService {
 		}
 	}
 
+	private static function unlinkFromUserGroups(array $proxies, ?array $db_proxies = null): void {
+		$proxyids = [];
+
+		foreach ($proxies as $proxy) {
+			if ($db_proxies !== null) {
+				if ($db_proxies[$proxy['proxyid']]['proxy_groupid'] == 0 && $proxy['proxy_groupid'] != 0) {
+					$proxyids[$proxy['proxyid']] = true;
+				}
+			}
+			elseif ($proxy['proxy_groupid'] == 0) {
+				$proxyids[$proxy['proxyid']] = true;
+			}
+		}
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$db_usrgrps = [];
+
+		$resource = DBselect(
+			'SELECT ugp.usrgrpid,ugp.proxyid,ugp.usrgrp_proxyid,ug.name'.
+			' FROM usrgrp_proxy ugp'.
+			' JOIN usrgrp ug ON ug.usrgrpid=ugp.usrgrpid'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM usrgrp_proxy ugp2'.
+				' WHERE ugp.usrgrpid=ugp2.usrgrpid'.
+					' AND '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
+			')'
+		);
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['usrgrpid'], $db_usrgrps)) {
+				$db_usrgrps[$row['usrgrpid']] = [
+					'name' => $row['name'],
+					'usrgrpid' => $row['usrgrpid'],
+					'proxies' => []
+				];
+			}
+
+			$db_usrgrps[$row['usrgrpid']]['proxies'][$row['usrgrp_proxyid']] = [
+				'usrgrp_proxyid' => $row['usrgrp_proxyid'],
+				'proxyid' => $row['proxyid']
+			];
+		}
+
+		if ($db_usrgrps) {
+			$usrgrps = [];
+			$indexes = [];
+
+			foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
+				$usrgrps[] = [
+					'name' => $db_usrgrp['name'],
+					'usrgrpid' => $db_usrgrp['usrgrpid'],
+					'proxies' => []
+				];
+
+				$indexes[$db_usrgrpid] = array_key_last($usrgrps);
+
+				foreach ($db_usrgrp['proxies'] as $proxy) {
+					if (!array_key_exists($proxy['proxyid'], $proxyids)) {
+						$usrgrps[$indexes[$db_usrgrpid]]['proxies'][] = [
+							'proxyid' => $proxy['proxyid']
+						];
+					}
+				}
+			}
+
+			CUserGroup::updateForce($usrgrps, $db_usrgrps);
+		}
+	}
+
 	/**
 	 * @param array $proxyids
 	 *
@@ -408,6 +483,8 @@ class CProxy extends CApiService {
 		}
 
 		$this->validateDelete($proxyids, $db_proxies);
+
+		self::unlinkFromUserGroups($db_proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
@@ -431,7 +508,7 @@ class CProxy extends CApiService {
 		}
 
 		$db_proxies = $this->get([
-			'output' => ['proxyid', 'name'],
+			'output' => ['proxyid', 'name', 'proxy_groupid'],
 			'proxyids' => $proxyids,
 			'editable' => true,
 			'preservekeys' => true
@@ -522,97 +599,101 @@ class CProxy extends CApiService {
 	 */
 	private static function validateCreate(array &$proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>					['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('proxy', 'name')],
-			'proxy_groupid' =>			['type' => API_ID, 'default' => 0],
-			'local_address' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_address')],
-											['else' => true, 'type' => API_HOST_ADDRESS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'local_address')]
+			'name' =>						['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('proxy', 'name')],
+			'proxy_groupid' =>				['type' => API_ID, 'default' => 0],
+			'local_address' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_address')],
+												['else' => true, 'type' => API_HOST_ADDRESS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'local_address')]
 			]],
-			'local_port' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_port')],
-											['else' => true, 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'local_port')]
+			'local_port' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_port')],
+												['else' => true, 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'local_port')]
 			]],
-			'operating_mode' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE])],
-			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
+			'operating_mode' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE])],
+			'description' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
+			'allowed_addresses' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
 			]],
-			'address' => 				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')]
+			'address' => 					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')]
 			]],
-			'port' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'port')]
+			'port' =>						['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'port')]
 			]],
-			'tls_connect' =>			['type' => API_MULTIPLE, 'default' => DB::getDefault('proxy', 'tls_connect'), 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_connect')]
+			'tls_connect' =>				['type' => API_MULTIPLE, 'default' => DB::getDefault('proxy', 'tls_connect'), 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_connect')]
 			]],
-			'tls_accept' =>				['type' => API_MULTIPLE, 'default' => DB::getDefault('proxy', 'tls_accept'), 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_accept')]
+			'tls_accept' =>					['type' => API_MULTIPLE, 'default' => DB::getDefault('proxy', 'tls_accept'), 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_accept')]
 			]],
-			'tls_psk_identity' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_psk_identity')]
+			'tls_psk_identity' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_psk_identity')]
 			]],
-			'tls_psk' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_psk')]
+			'tls_psk' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_psk')]
 			]],
-			'tls_issuer' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_issuer')]
+			'tls_issuer' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_issuer')]
 			]],
-			'tls_subject' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
+			'tls_subject' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
 			]],
-			'custom_timeouts' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]), 'default' => DB::getDefault('proxy', 'custom_timeouts')],
-			'timeout_zabbix_agent' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_zabbix_agent')]
+			'custom_timeouts' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]), 'default' => DB::getDefault('proxy', 'custom_timeouts')],
+			'timeout_zabbix_agent' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_zabbix_agent')]
 			]],
-			'timeout_simple_check' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_simple_check')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_simple_check')]
+			'timeout_simple_check' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_simple_check')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_simple_check')]
 			]],
-			'timeout_snmp_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_snmp_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_snmp_agent')]
+			'timeout_snmp_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_snmp_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_snmp_agent')]
 			]],
-			'timeout_external_check' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_external_check')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_external_check')]
+			'timeout_external_check' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_external_check')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_external_check')]
 			]],
-			'timeout_db_monitor' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_db_monitor')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_db_monitor')]
+			'timeout_db_monitor' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_db_monitor')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_db_monitor')]
 			]],
-			'timeout_http_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_http_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_http_agent')]
+			'timeout_http_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_http_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_http_agent')]
 			]],
-			'timeout_ssh_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_ssh_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_ssh_agent')]
+			'timeout_ssh_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_ssh_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_ssh_agent')]
 			]],
-			'timeout_telnet_agent' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telnet_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telnet_agent')]
+			'timeout_telnet_agent' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telnet_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telnet_agent')]
 			]],
-			'timeout_script' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
+			'timeout_script' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
 			]],
-			'timeout_browser' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
+			'timeout_browser' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
 			]],
-			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
-				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
+			'timeout_telemetry_query' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telemetry_query')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telemetry_query')]
+			]],
+			'hosts' =>						['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -824,7 +905,8 @@ class CProxy extends CApiService {
 				'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'tls_psk_identity', 'tls_psk', 'custom_timeouts', 'timeout_zabbix_agent',
 				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
+				'timeout_telemetry_query'
 			],
 			'proxyids' => array_column($proxies, 'proxyid'),
 			'preservekeys' => true
@@ -838,86 +920,90 @@ class CProxy extends CApiService {
 		self::addRequiredFieldsByCustomTimeouts($proxies, $db_proxies);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-			'proxyid' =>				['type' => API_ANY],
-			'name' =>					['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
-			'proxy_groupid' =>			['type' => API_ANY],
-			'local_address' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_address')],
-											['else' => true, 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'local_address')]
+			'proxyid' =>					['type' => API_ANY],
+			'name' =>						['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
+			'proxy_groupid' =>				['type' => API_ANY],
+			'local_address' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_address')],
+												['else' => true, 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'local_address')]
 			]],
-			'local_port' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_port')],
-											['else' => true, 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'local_port')]
+			'local_port' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'proxy_groupid', 'in' => '0'], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'local_port')],
+												['else' => true, 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'local_port')]
 			]],
-			'operating_mode' =>			['type' => API_ANY],
-			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
+			'operating_mode' =>				['type' => API_ANY],
+			'description' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
+			'allowed_addresses' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
 			]],
-			'address' => 				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')]
+			'address' => 					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')]
 			]],
-			'port' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'port')]
+			'port' =>						['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'port')]
 			]],
-			'tls_connect' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_connect')]
+			'tls_connect' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_connect')]
 			]],
-			'tls_accept' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_accept')]
+			'tls_accept' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('proxy', 'tls_accept')]
 			]],
-			'tls_psk_identity' =>		['type' => API_ANY],
-			'tls_psk' =>				['type' => API_ANY],
-			'tls_issuer' =>				['type' => API_ANY],
-			'tls_subject' =>			['type' => API_ANY],
-			'custom_timeouts' =>		['type' => API_ANY],
-			'timeout_zabbix_agent' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_zabbix_agent')]
+			'tls_psk_identity' =>			['type' => API_ANY],
+			'tls_psk' =>					['type' => API_ANY],
+			'tls_issuer' =>					['type' => API_ANY],
+			'tls_subject' =>				['type' => API_ANY],
+			'custom_timeouts' =>			['type' => API_ANY],
+			'timeout_zabbix_agent' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_zabbix_agent')]
 			]],
-			'timeout_simple_check' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_simple_check')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_simple_check')]
+			'timeout_simple_check' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_simple_check')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_simple_check')]
 			]],
-			'timeout_snmp_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_snmp_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_snmp_agent')]
+			'timeout_snmp_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_snmp_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_snmp_agent')]
 			]],
-			'timeout_external_check' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_external_check')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_external_check')]
+			'timeout_external_check' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_external_check')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_external_check')]
 			]],
-			'timeout_db_monitor' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_db_monitor')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_db_monitor')]
+			'timeout_db_monitor' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_db_monitor')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_db_monitor')]
 			]],
-			'timeout_http_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_http_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_http_agent')]
+			'timeout_http_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_http_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_http_agent')]
 			]],
-			'timeout_ssh_agent' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_ssh_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_ssh_agent')]
+			'timeout_ssh_agent' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_ssh_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_ssh_agent')]
 			]],
-			'timeout_telnet_agent' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telnet_agent')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telnet_agent')]
+			'timeout_telnet_agent' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telnet_agent')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telnet_agent')]
 			]],
-			'timeout_script' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
+			'timeout_script' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
 			]],
-			'timeout_browser' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
+			'timeout_browser' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
 			]],
-			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
-				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
+			'timeout_telemetry_query' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_telemetry_query')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_telemetry_query')]
+			]],
+			'hosts' =>						['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -982,7 +1068,7 @@ class CProxy extends CApiService {
 				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], array_flip(['timeout_zabbix_agent',
 					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
 					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
-					'timeout_browser'
+					'timeout_browser', 'timeout_telemetry_query'
 				]));
 			}
 		}
@@ -1094,7 +1180,8 @@ class CProxy extends CApiService {
 					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
 				$proxy += array_intersect_key($db_defaults, array_flip(['timeout_zabbix_agent', 'timeout_simple_check',
 					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
+					'timeout_telemetry_query'
 				]));
 			}
 		}

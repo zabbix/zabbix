@@ -58,6 +58,12 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 					['autologout_visible', 'in' => [1]]
 				]
 			],
+			'default_maintenance_period' => ['db users.default_maintenance_period', 'not_empty',
+				'use' => [CTimeUnitValidator::class, [
+					'min' => 5 * SEC_PER_MIN,
+					'max' => CMaintenanceHelper::MAX_TIMEPERIOD
+				]]
+			],
 			'refresh' => ['db users.refresh', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
@@ -101,7 +107,8 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page']);
+		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'default_maintenance_period',
+			'refresh', 'rows_per_page']);
 
 		if ($this->getInput('autologout_visible') == 0) {
 			$user['autologout'] = 0;
