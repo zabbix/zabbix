@@ -1,1 +1,0 @@
-........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)

@@ -1,0 +1,1 @@
+A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
