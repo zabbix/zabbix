@@ -188,8 +188,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	const char			*tz = va_arg(args, const char *);
 	const char			*manualinput = va_arg(args, const char *);
 
-	if (0 == p->indexed && NULL != manualinput && NULL != p->macro &&
-			0 == strcmp(p->macro, MVAR_MANUALINPUT))
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
 	{
 		*replace_to = zbx_strdup(*replace_to, manualinput);
 		p->pos = p->token.loc.r;
@@ -198,7 +197,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	}
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, NULL, event, r_event, userid, dc_host, NULL, NULL, NULL,
-			tz,  replace_to, data, error, maxerrlen);
+			tz, replace_to, data, error, maxerrlen);
 
 	if (SUCCEED == ret && NULL != p->macro)
 	{
@@ -237,8 +236,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 
 int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
 		zbx_dc_um_handle_t *um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz,
-		const char *manualinput)
+		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz, const char *manualinput)
 {
 	int	ret = SUCCEED;
 
