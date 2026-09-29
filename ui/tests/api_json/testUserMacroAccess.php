@@ -80,6 +80,13 @@ class testUserMacroAccess extends CAPITest {
 						'id' => ':template_group:usermacro.access.template.group',
 						'permission' => PERM_READ_WRITE
 					]
+				],
+				[
+					'name' => 'usermacro.access.usergroup3',
+					'hostgroup_rights' => [
+						'id' => ':host_group:usermacro.access.group1',
+						'permission' => PERM_READ
+					]
 				]
 			],
 			'users' => [
@@ -96,6 +103,14 @@ class testUserMacroAccess extends CAPITest {
 					'passwd' => '|-|e!1@ (/\)0rLD!',
 					'usrgrps' => [
 						['usrgrpid' => ':user_group:usermacro.access.usergroup2']
+					],
+					'roleid' => ':role:usermacro.access.admin.role'
+				],
+				[
+					'username' => 'usermacro.access.user.3',
+					'passwd' => '|-|e!1@ (/\)0rLD!',
+					'usrgrps' => [
+						['usrgrpid' => ':user_group:usermacro.access.usergroup3']
 					],
 					'roleid' => ':role:usermacro.access.admin.role'
 				]
@@ -227,6 +242,17 @@ class testUserMacroAccess extends CAPITest {
 				['hostmacroid' => ':macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
+
+		yield 'filter "{$UM1}" for "usermacro.access.user.3" with read permission return macro' => [
+			['username' => 'usermacro.access.user.3', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'output' => ['hostmacroid', 'macro', 'value'],
+				'filter' => ['macro' => '{$UM1}']
+			],
+			[
+				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+			]
+		];
 	}
 
 	/**
@@ -281,7 +307,15 @@ class testUserMacroAccess extends CAPITest {
 			'No permissions to referred object or it does not exist!'
 		];
 
-		return;
+		yield 'admin read only permission "usermacro.access.user.3" update macro fail' => [
+			['username' => 'usermacro.access.user.3', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'hostmacroid' => ':macro:{$UM1}',
+				'value' => 'abc'
+			],
+			[],
+			'No permissions to referred object or it does not exist!'
+		];
 	}
 
 	/**
