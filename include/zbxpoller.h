@@ -117,12 +117,12 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_ares_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,
-		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_ares_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,
-		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 
 void	zbx_set_snmp_bulkwalk_options(const char *progname);
 #endif

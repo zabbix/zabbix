@@ -2137,6 +2137,20 @@ static int	DBpatch_7050188(void)
 	return zbx_db_settings_set_value(ZBX_SETTINGS_APM, "{}", ZBX_SETTING_TYPE_STR);
 }
 
+static int	DBpatch_7050189(void)
+{
+	const zbx_db_field_t	field = {"max_repetitions", "10", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("interface_snmp", &field, NULL);
+}
+
+static int	DBpatch_7050190(void)
+{
+	const zbx_db_field_t	field = {"retries", "5", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2332,5 +2346,7 @@ DBPATCH_ADD(7050185, 0, 1)
 DBPATCH_ADD(7050186, 0, 1)
 DBPATCH_ADD(7050187, 0, 1)
 DBPATCH_ADD(7050188, 0, 1)
+DBPATCH_ADD(7050189, 0, 1)
+DBPATCH_ADD(7050190, 0, 1)
 
 DBPATCH_END()
