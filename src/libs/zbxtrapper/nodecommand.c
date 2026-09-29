@@ -536,7 +536,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	um_handle_masked = zbx_dc_open_user_macros_masked();
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
-	/* substitute macros in script body and in webhook parameters*/
+	/* substitute macros in script body and in webhook parameters */
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
@@ -558,10 +558,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	else
 	{
 		/* webhook body: expand ONLY {MANUALINPUT}; all other macros are left as-is */
-		if (SUCCEED != substitute_manualinput_macro(&script.command, error, sizeof(error), manualinput))
-		{
+		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
 			goto fail;
-		}
 
 		/* webhook parameters: full macro resolution, including {MANUALINPUT} */
 		for (int i = 0; i < webhook_params.values_num; i++)

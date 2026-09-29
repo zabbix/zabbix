@@ -232,8 +232,8 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	return ret;
 }
 
-static int	macro_manualinput_only_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
-		char **data, char *error, size_t maxerrlen)
+static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
 {
 	const char	*manualinput = va_arg(args, const char *);
 
@@ -241,11 +241,8 @@ static int	macro_manualinput_only_resolv(zbx_macro_resolv_data_t *p, va_list arg
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	if (0 == p->indexed && NULL != p->macro && NULL != manualinput &&
-			0 == strcmp(p->macro, MVAR_MANUALINPUT))
-	{
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
 		*replace_to = zbx_strdup(*replace_to, manualinput);
-	}
 
 	return SUCCEED;
 }
@@ -279,10 +276,10 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitutes ONLY the {MANUALINPUT} macro in the given data        *
+ * Purpose: replaces macros in JavaScript webhook scripts                     *
  *                                                                            *
  * Parameters: data        - [IN/OUT] pointer to data where the macro should  *
- *                                     be resolved                            *
+ *                                    be resolved                             *
  *             error       - [OUT] pre-allocated buffer for error message     *
  *             maxerrlen   - [IN] size of pre-allocated error message buffer  *
  *             manualinput - [IN] validated raw manual input, or NULL         *
@@ -290,25 +287,14 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
  * Return value:  SUCCEED - processed successfully (even if macro is absent)  *
  *                FAIL    - error occurred                                    *
  *                                                                            *
- * Comments: Used for the JavaScript body of webhook scripts, where support   *
- *           for all macros except {MANUALINPUT} was intentionally removed.   *
- *           All other macros are left in place, unexpanded.                  *
- *                                                                            *
  ******************************************************************************/
-int	substitute_manualinput_macro(char **data, char *error, size_t maxerrlen, const char *manualinput)
+int	substitute_webhook_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
 {
-	int	ret = SUCCEED;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == manualinput)
-	{
-		/* nothing to expand - leave the body untouched */
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): no manual input", __func__);
-		return SUCCEED;
-	}
-
-	ret = zbx_substitute_macros(data, error, maxerrlen, &macro_manualinput_only_resolv, manualinput);
+	ret = zbx_substitute_macros(data, error, maxerrlen, &macro_webhook_resolv, manualinput);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
