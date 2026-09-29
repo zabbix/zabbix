@@ -27,8 +27,19 @@ $trace_view = (new CDiv())
 			->addClass('trace-view-header')
 			->addItem([
 				(new CDiv())
-					->setAttribute('data-trace-id', '')
-					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+					->addClass('trace-view-header-info')
+					->addItem([
+						(new CSpan(_('Trace ID').': '.$data['trace']['traceid']))
+							->addClass('trace-id')
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+						(new CButton())
+							->removeId()
+							->setTitle(_('Copy to clipboard'))
+							->addClass(ZBX_ICON_COPY)
+							->addClass(ZBX_STYLE_BTN_ICON)
+							->addClass('btn-small')
+							->addClass('js-copy-button')
+					]),
 				(new CButtonIcon(ZBX_ICON_CLOSE))
 					->addClass('trace-view-close-button')
 					->addClass('js-close-button')
@@ -61,7 +72,9 @@ $trace_view = (new CDiv())
 						(new CSplitViewPane())
 							->addClass('trace-tree')
 							->addItem([
-								(new CDiv('Span tree'))->addClass('trace-tree-header'),
+								(new CDiv(
+									(new CSpan(_('Span tree')))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS))
+								)->addClass('trace-tree-header'),
 								(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
 							])
 					)

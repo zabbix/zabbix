@@ -11,26 +11,37 @@
 	--trace-time-tick-label-bg-color: #{$ui-bg-color};
 
 	display: grid;
-	grid-template-rows: auto auto minmax(0, 1fr);
-	min-inline-size: 0;
 	inline-size: 100%;
-	min-block-size: 0;
+	min-inline-size: 0;
 	block-size: 100%;
+	min-block-size: 0;
 	background: var(--trace-bg-color);
 	color: #{$font-color};
+	grid-template-rows: auto auto minmax(0, 1fr);
 
 	.trace-view-header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		box-sizing: border-box;
-		overflow: hidden;
 		min-inline-size: 0;
 		block-size: 40px;
 		padding-inline: 10px;
 		border-block-end: 1px solid var(--trace-border-color);
 
+		.trace-view-header-info {
+			display: flex;
+			overflow: hidden;
+			flex: 1 1;
+
+			.trace-id {
+				margin-inline-end: 5px;
+				font-size: 14px;
+				font-weight: 700;
+			}
+		}
+
 		.trace-view-close-button {
+			flex: 0 0;
 			margin-inline-end: -8px;
 
 			&::before {
@@ -60,32 +71,32 @@
 	}
 
 	.trace-time-tick {
-		display: flex;
 		position: absolute;
-		inset-block: 0;
 		inset-inline-start: var(--trace-tick-position);
+		display: flex;
 		align-items: center;
-		transform: translateX(-50%);
-		white-space: nowrap;
 		line-height: 1;
+		white-space: nowrap;
+		transform: translateX(-50%);
+		inset-block: 0;
 
 		&::before {
-			content: '';
 			position: absolute;
-			inset-block: 0;
 			inset-inline-start: 50%;
 			inline-size: 1px;
 			background-image: repeating-linear-gradient(180deg, var(--trace-grid-line-color) 0px, var(--trace-grid-line-color) 2px, transparent 2px, transparent 5px);
-			background-position: left;
 			background-repeat: no-repeat;
+			background-position: left;
 			background-size: 1px 100%;
+			content: '';
+			inset-block: 0;
 		}
 
 		> span {
 			position: absolute;
 			inset-inline-start: 50%;
-			transform: translateX(-50%);
 			font-size: 11px;
+			transform: translateX(-50%);
 			font-variant-numeric: tabular-nums;
 		}
 
@@ -94,12 +105,12 @@
 
 			> span {
 				position: absolute;
-				inset-inline-start: 1px;
 				z-index: 1;
+				inset-inline-start: 1px;
 				padding-block: 3px;
 				padding-inline-end: 5px;
-				transform: none;
 				background-color: var(--trace-time-tick-label-bg-color);
+				transform: none;
 			}
 		}
 
@@ -108,11 +119,11 @@
 
 			> span {
 				position: absolute;
-				inset-inline-start: calc(100% - 1px);
 				z-index: 1;
+				inset-inline-start: calc(100% - 1px);
 				padding-inline-start: 5px;
-				transform: translateX(-100%);
 				background-color: var(--trace-time-tick-label-bg-color);
+				transform: translateX(-100%);
 			}
 		}
 	}
@@ -132,18 +143,18 @@
 
 			.trace-tree {
 				display: grid;
-				grid-template-rows: 38px minmax(0, 1fr);
 				min-block-size: 100%;
+				grid-template-rows: 38px minmax(0, 1fr);
 
 				.trace-tree-header {
-					grid-row: 1;
 					display: flex;
-					align-items: center;
 					overflow: hidden;
+					align-items: center;
 					box-sizing: border-box;
 					padding-inline: 10px;
 					border-block-end: 1px solid var(--trace-border-color);
 					font-weight: 700;
+					grid-row: 1;
 				}
 
 				z-navigation-tree {
@@ -155,30 +166,31 @@
 
 			.trace-time {
 				display: grid;
-				flex: 1 0;
-				grid-template-rows: 38px minmax(0, 1fr);
 				overflow-x: hidden;
+				flex: 1 0;
 				min-inline-size: 0;
 				min-block-size: 100%;
+				grid-template-rows: 38px minmax(0, 1fr);
 
 				.trace-time-header {
-					grid-row: 1;
 					position: relative;
 					display: flex;
-					align-items: center;
 					overflow: hidden;
+					align-items: center;
 					box-sizing: border-box;
 					min-inline-size: 0;
 					padding-inline: 10px;
 					border-block-end: 1px solid var(--trace-border-color);
+					grid-row: 1;
 				}
 
 				.trace-waterfall {
-					grid-row: 2;
 					position: relative;
 					overflow: hidden;
 					min-inline-size: 0;
 					padding-inline: 11px;
+					background-color: var(--trace-bg-color);
+					grid-row: 2;
 
 					.trace-waterfall-row {
 						position: relative;
@@ -205,15 +217,15 @@
 
 	.trace-grid-line {
 		position: absolute;
-		inset-block: 0;
 		inset-inline-start: var(--trace-grid-line-position);
 		inline-size: 1px;
-		opacity: .45;
 		background-image: repeating-linear-gradient(180deg, var(--trace-grid-line-color) 0px, var(--trace-grid-line-color) 2px, transparent 2px, transparent 5px);
-		background-position: left;
 		background-repeat: no-repeat;
+		background-position: left;
 		background-size: 1px 100%;
+		opacity: .45;
 		pointer-events: none;
+		inset-block: 0;
 	}
 
 	.trace-span-bar {
@@ -222,49 +234,49 @@
 		inset-inline-start: var(--trace-span-start);
 		inline-size: #{"max(2px, var(--trace-span-width))"};
 		block-size: var(--trace-bar-block-size);
-		transform: translateY(-50%);
 		border-radius: 2px;
 		background: var(--trace-span-color);
+		transform: translateY(-50%);
 	}
 
 	.trace-span-label {
 		position: absolute;
 		inset-block-start: calc(100% + 4px);
 		inset-inline-start: 0;
-		transform: none;
-		white-space: nowrap;
 		color: var(--trace-muted-color);
 		font-size: 11px;
 		line-height: 1;
+		white-space: nowrap;
+		transform: none;
 	}
 
 	.trace-event-marker {
 		position: absolute;
+		z-index: 2;
 		inset-block-start: 50%;
 		inset-inline-start: var(--trace-event-position);
-		z-index: 2;
+		box-sizing: border-box;
 		inline-size: var(--trace-marker-size);
 		block-size: var(--trace-marker-size);
-		transform: translate(-50%, -50%) rotate(45deg);
-		box-sizing: border-box;
 		border: 1px solid var(--trace-bg-color);
 		background: #fff;
+		transform: translate(-50%, -50%) rotate(45deg);
 		cursor: default;
 
 		&[data-count]::after {
-			content: attr(data-count);
 			position: absolute;
 			inset-block-start: -10px;
 			inset-inline-start: 8px;
 			min-inline-size: 12px;
 			block-size: 12px;
-			transform: rotate(-45deg);
 			border-radius: 6px;
 			background: #{$ui-selected-bg-color};
 			color: #fff;
 			font-size: 9px;
 			line-height: 12px;
 			text-align: center;
+			content: attr(data-count);
+			transform: rotate(-45deg);
 		}
 	}
 }
@@ -291,12 +303,12 @@
 
 	.trace-tooltip-attributes {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		row-gap: 8px;
-		column-gap: 8px;
 		margin-block-start: 4px;
 		padding-block-start: 10px;
 		border-block-start: 1px solid #{$ui-border-color};
+		grid-template-columns: repeat(2, 1fr);
+		row-gap: 8px;
+		column-gap: 8px;
 
 		.trace-tooltip-attribute {
 			display: grid;
