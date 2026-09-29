@@ -113,6 +113,7 @@ func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*h
 		Timeout:       timeout,
 		CheckRedirect: redirectPolicy(redirectLimit, &chain),
 	}
+
 	return c, &chain
 }
 
