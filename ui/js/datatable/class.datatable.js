@@ -2594,6 +2594,7 @@ class CDataTable {
 		this.#resize_debounce_timeout_id = setTimeout(() => {
 			this.#calculateColumnWidths();
 			this.#handleScrollbar();
+			this.#handleCompactFooter();
 		}, 0)
 	}
 
@@ -2865,6 +2866,12 @@ class CDataTable {
 		this.#element.insertBefore(this.#scrollbar, this.#footer);
 	}
 
+	#handleCompactFooter() {
+		const show_compact_footer = this.#pager.getNumPages() > 1 && this.#element.offsetWidth < 950;
+
+		this.#footer.classList.toggle('datatable-footer-compact', show_compact_footer);
+	}
+
 	#applyLastColumnPadding() {
 		if (!this.isCustomizable()) {
 			return;
@@ -2899,7 +2906,7 @@ class CDataTable {
 				options_link?.style.setProperty('margin-right', `${right_offset - 1}px`);
 			}
 			else {
-				header_cell.target.style.paddingRight = `${right_offset + CDataTable.COLUMN_HEADER_PADDING - 1}px`;
+				header_cell.target.style.paddingRight = `${right_offset - 1}px`;
 			}
 		} else {
 			options_link?.style.removeProperty('margin-right');
@@ -2926,25 +2933,5 @@ class CDataTable {
 			this.#header.scrollTo({left});
 			this.#body.scrollTo({left});
 		}
-	}
-
-	#convertPercentToPixels(percent) {
-		return Math.ceil((percent / 100) * this.#body.scrollWidth);
-	}
-
-	#getWidthWithoutUnit(width) {
-		if (!width) {
-			return width;
-		}
-
-		if (width.endsWith('%')) {
-			return this.#convertPercentToPixels(width.substring(0, width.length - 1));
-		}
-
-		if (width.endsWith('px')) {
-			return parseInt(width.substring(0, width.length - 2));
-		}
-
-		return width;
 	}
 }

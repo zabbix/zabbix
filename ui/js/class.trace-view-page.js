@@ -21,6 +21,9 @@ class TraceViewPage {
 	/** @type {HTMLElement} */
 	#container;
 
+	/** @type {HTMLButtonElement|null} */
+	#copy_button = null;
+
 	/** @type {HTMLElement} */
 	#timeline;
 
@@ -45,7 +48,7 @@ class TraceViewPage {
 	/** @type {Map<string, object>} */
 	#spans = new Map();
 
-	/** @type {object | null} */
+	/** @type {Object<string, any> | null} */
 	#trace = null;
 
 	/** @type {number} */
@@ -62,6 +65,7 @@ class TraceViewPage {
 
 	constructor(container, trace) {
 		this.#container = container;
+		this.#copy_button = container.querySelector('.js-copy-button');
 		this.#timeline = container.querySelector('[data-trace-timeline]');
 		this.#overview = container.querySelector('[data-trace-overview]');
 		this.#tree = container.querySelector('[data-trace-tree]');
@@ -90,6 +94,7 @@ class TraceViewPage {
 	}
 
 	#addEventListeners() {
+		this.#copy_button?.addEventListener('click', this.#onCopyTraceId);
 		this.#timeline.addEventListener('input', this.#onTimelineInput);
 		this.#timeline.addEventListener('change', this.#onTimelineChange);
 		this.#tree.addEventListener('toggle', this.#onTreeToggle);
@@ -97,28 +102,33 @@ class TraceViewPage {
 	}
 
 	#removeEventListeners() {
+		this.#copy_button?.removeEventListener('click', this.#onCopyTraceId);
 		this.#timeline.removeEventListener('input', this.#onTimelineInput);
 		this.#timeline.removeEventListener('change', this.#onTimelineChange);
 		this.#tree.removeEventListener('toggle', this.#onTreeToggle);
 		this.#tree.removeEventListener('select', this.#onTreeSelect);
 	}
 
-	#onTimelineInput = event => {
-		this.#applyTimelineValue(event.target.value);
+	#onCopyTraceId = () => {
+		writeTextClipboard(this.#trace.id ?? '');
+	}
+
+	#onTimelineInput = e => {
+		this.#applyTimelineValue(e.target.value);
 	};
 
-	#onTimelineChange = event => {
-		this.#applyTimelineValue(event.target.value);
+	#onTimelineChange = e => {
+		this.#applyTimelineValue(e.target.value);
 	};
 
 	#onTreeToggle = () => {
 		this.#renderWaterfall();
 	};
 
-	#onTreeSelect = event => {
+	#onTreeSelect = e => {
 		this.#container.dispatchEvent(new CustomEvent('span-select', {
 			bubbles: true,
-			detail: event.detail
+			detail: e.detail
 		}));
 	};
 
@@ -176,20 +186,11 @@ class TraceViewPage {
 	}
 
 	#render() {
-		this.#renderHeader();
 		this.#renderTimeline();
 		this.#renderOverview();
 		this.#renderTree();
 		this.#renderTimeHeader();
 		this.#renderWaterfall();
-	}
-
-	#renderHeader() {
-		const trace_id = this.#container.querySelector('[data-trace-id]');
-
-		if (trace_id !== null) {
-			trace_id.textContent = this.#trace?.id ? `Trace ID: ${this.#trace.id}` : 'Trace';
-		}
 	}
 
 	#renderTimeline() {
