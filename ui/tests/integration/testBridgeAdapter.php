@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/../../include/classes/api/helpers/CApiTokenHelp
  */
 class testBridgeAdapter extends CIntegrationTest {
 	private const ADAPTER_HOST = '127.0.0.1';
-	private const ADAPTER_URL_HOST = 'bridge.example.com';
 	private const ADAPTER_SCRIPT = __DIR__.'/data/bridge_adapter_mock.py';
 	private const INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000101';
 	private const NOTIFY_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000102';
@@ -173,8 +172,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				'TLSCAFile' => $base_dir.'zabbix_ca_file.crt',
 				'TLSCertFile' => $base_dir.'zabbix_server.crt',
 				'TLSKeyFile' => $base_dir.'zabbix_server.key',
-				'BridgeAdapterURL' => 'https://'.self::ADAPTER_URL_HOST.':443/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort()
+				'BridgeAdapterURL' => 'https://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 			]
 		];
 	}
@@ -964,7 +962,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		$adapter_cert = $base_dir.'bridge_adapter.crt';
 		$adapter_ext = $base_dir.'bridge_adapter.ext';
 
-		file_put_contents($adapter_ext, "subjectAltName=DNS:".self::ADAPTER_URL_HOST."\n");
+		file_put_contents($adapter_ext, "subjectAltName=IP:".self::ADAPTER_HOST."\n");
 
 		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($ca_key).' 4096');
 		self::executeOpenSsl('openssl req -x509 -new -nodes -key '.escapeshellarg($ca_key).
@@ -979,7 +977,7 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($adapter_key).' 2048');
 		self::executeOpenSsl('openssl req -new -key '.escapeshellarg($adapter_key).' -out '.
-				escapeshellarg($adapter_csr).' -subj '.escapeshellarg('/CN='.self::ADAPTER_URL_HOST));
+				escapeshellarg($adapter_csr).' -subj '.escapeshellarg('/CN='.self::ADAPTER_HOST));
 		self::executeOpenSsl('openssl x509 -req -in '.escapeshellarg($adapter_csr).' -CA '.
 				escapeshellarg($ca_cert).' -CAkey '.escapeshellarg($ca_key).' -CAcreateserial -out '.
 				escapeshellarg($adapter_cert).' -days 1 -sha256 -extfile '.escapeshellarg($adapter_ext));
@@ -1753,8 +1751,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'BridgeAdapterURL' => null,
-				'BridgeAdapterConnectTo' => null
+				'BridgeAdapterURL' => null
 			]
 		];
 	}
@@ -2222,7 +2219,6 @@ class testBridgeAdapter extends CIntegrationTest {
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.$closed_port.'/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.$closed_port,
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
 				'TLSKeyFile' => null
@@ -2361,8 +2357,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_URL_HOST.':80/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort(),
+				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc',
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
 				'TLSKeyFile' => null
@@ -2444,63 +2439,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_MISSING_UUID, true, 120, 1);
 
 		$this->assertFalse($offboard_response);
-	}
-
-	public function noConnectToConfigurationProvider(): array {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
-			]
-		];
-	}
-
-	/**
-	 * @configurationDataProvider noConnectToConfigurationProvider
-	 */
-	public function testBridgeAdapter_noConnectTo(): void {
-		self::startBridgeAdapterMockNoTls();
-
-		try {
-			[$client, $sid] = $this->getServerClientAndSid();
-
-			$init_response = $client->initDevice([
-				'userid' => 1,
-				'uuid' => self::INIT_DEVICE_UUID
-			], $sid);
-
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
-				120, 1
-			);
-
-			$this->assertNotFalse($init_response, $client->getError() ?? '');
-
-			$this->assertAdapterRequest('device.init', static function (array $request): bool {
-				return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
-			});
-
-			$mediatypeid = self::$push_mediatypeid;
-
-			$notify_result = $client->testMediaType([
-				'mediatypeid' => $mediatypeid,
-				'sendto' => self::NOTIFY_DEVICE_UUID,
-				'subject' => 'Bridge adapter integration test',
-				'message' => 'Bridge adapter integration test message'
-			], $sid);
-
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true,
-				120, 1
-			);
-
-			$this->assertNotFalse($notify_result, $client->getError() ?? '');
-
-			$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-				return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
-			});
-		} finally {
-			self::stopBridgeAdapterMock();
-		}
 	}
 
 	/**

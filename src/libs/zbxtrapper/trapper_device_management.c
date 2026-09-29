@@ -406,9 +406,8 @@ static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_
 }
 
 static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *config_comms,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
-		const char *payload, const char *request, char **body_data, struct zbx_json_parse *jp_body,
-		char **error)
+		const char *config_bridge_adapter_url, const char *payload, const char *request, char **body_data,
+		struct zbx_json_parse *jp_body, char **error)
 {
 	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
 	zbx_http_jsonrpc_error_t	http_error;
@@ -425,9 +424,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	}
 
 	ret = zbx_http_post_json_rpc(config_bridge_adapter_url, config_tls->ca_file, config_tls->crl_file,
-			config_tls->cert_file, config_tls->key_file, config_bridge_adapter_connect_to, payload, request,
-			ZBX_BRIDGE_ADAPTER_SERVICE_NAME, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, body_data, jp_body,
-			&http_error);
+			config_tls->cert_file, config_tls->key_file, payload, request, ZBX_BRIDGE_ADAPTER_SERVICE_NAME,
+			(long)ZBX_BRIDGE_ADAPTER_TIMEOUT, body_data, jp_body, &http_error);
 
 	if (SUCCEED != ret)
 	{
@@ -498,8 +496,8 @@ static void	trapper_device_bridge_adapter_handle_error(const struct zbx_json_par
 #endif
 
 static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to, char **error,
-		char **reason, char **domain, struct zbx_json *json)
+		const char *config_bridge_adapter_url, char **error, char **reason, char **domain,
+		struct zbx_json *json)
 {
 #define ZBX_ENROLL_URL_LEN		2048
 #define ZBX_BRIDGE_ENCRYPTION_KEY_LEN	256
@@ -509,7 +507,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	ZBX_UNUSED(jp);
 	ZBX_UNUSED(config_comms);
 	ZBX_UNUSED(config_bridge_adapter_url);
-	ZBX_UNUSED(config_bridge_adapter_connect_to);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(reason);
 	ZBX_UNUSED(domain);
@@ -545,8 +542,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	zbx_json_close(&request);
 
 	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url,
-			config_bridge_adapter_connect_to, request.buffer, ZBX_PROTO_VALUE_DEVICE_INIT, &body_data,
-			&jp_body, error))
+			request.buffer, ZBX_PROTO_VALUE_DEVICE_INIT, &body_data, &jp_body, error))
 		goto out;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
@@ -609,12 +605,11 @@ out2:
  *                                                                            *
  * Purpose: processes device initialization request                           *
  *                                                                            *
- * Parameters: sock                             - [IN]                        *
- *             jp                               - [IN]                        *
- *             config_comms                     - [IN]                        *
- *             config_frontend_allowed_ip       - [IN]                        *
- *             config_bridge_adapter_url        - [IN]                        *
- *             config_bridge_adapter_connect_to - [IN]                        *
+ * Parameters: sock                       - [IN]                              *
+ *             jp                         - [IN]                              *
+ *             config_comms               - [IN]                              *
+ *             config_frontend_allowed_ip - [IN]                              *
+ *             config_bridge_adapter_url  - [IN]                              *
  *                                                                            *
  * Comments: validates caller permissions for requested target user and       *
  *           forwards request to bridge adapter                               *
@@ -622,7 +617,7 @@ out2:
  ******************************************************************************/
 void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to)
+		const char *config_bridge_adapter_url)
 {
 	struct zbx_json		json;
 	int			ret;
@@ -642,8 +637,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED == (ret = trapper_device_init(jp, config_comms, config_bridge_adapter_url,
-			config_bridge_adapter_connect_to, &error, &reason, &domain, &json)))
+	if (SUCCEED == (ret = trapper_device_init(jp, config_comms, config_bridge_adapter_url, &error,
+			&reason, &domain, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
@@ -670,14 +665,13 @@ out:
 }
 
 static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to, char **error,
-		char **reason, char **domain, struct zbx_json *json)
+		const char *config_bridge_adapter_url, char **error, char **reason, char **domain,
+		struct zbx_json *json)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(jp);
 	ZBX_UNUSED(config_comms);
 	ZBX_UNUSED(config_bridge_adapter_url);
-	ZBX_UNUSED(config_bridge_adapter_connect_to);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(reason);
 	ZBX_UNUSED(domain);
@@ -710,8 +704,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	zbx_json_close(&request);
 
 	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url,
-			config_bridge_adapter_connect_to, request.buffer, ZBX_PROTO_VALUE_DEVICE_OFFBOARD, &body_data,
-			&jp_body, error))
+			request.buffer, ZBX_PROTO_VALUE_DEVICE_OFFBOARD, &body_data, &jp_body, error))
 		goto out;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
@@ -737,12 +730,11 @@ out2:
  *                                                                            *
  * Purpose: processes device offboarding request                              *
  *                                                                            *
- * Parameters: sock                             - [IN]                        *
- *             jp                               - [IN]                        *
- *             config_comms                     - [IN]                        *
- *             config_frontend_allowed_ip       - [IN]                        *
- *             config_bridge_adapter_url        - [IN]                        *
- *             config_bridge_adapter_connect_to - [IN]                        *
+ * Parameters: sock                       - [IN]                              *
+ *             jp                         - [IN]                              *
+ *             config_comms               - [IN]                              *
+ *             config_frontend_allowed_ip - [IN]                              *
+ *             config_bridge_adapter_url  - [IN]                              *
  *                                                                            *
  * Comments: resolves device owner, validates caller permissions and forwards *
  *           request to bridge adapter                                        *
@@ -750,7 +742,7 @@ out2:
  ******************************************************************************/
 void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to)
+		const char *config_bridge_adapter_url)
 {
 	struct zbx_json		json;
 	int			ret;
@@ -771,8 +763,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED == (ret = trapper_device_offboard(jp, config_comms, config_bridge_adapter_url,
-			config_bridge_adapter_connect_to, &error, &reason, &domain, &json)))
+	if (SUCCEED == (ret = trapper_device_offboard(jp, config_comms, config_bridge_adapter_url, &error,
+			&reason, &domain, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
