@@ -55,9 +55,12 @@ z-timeline-range-slider {
 			- var(--timeline-range-slider-selected-start-position, 0%)
 		);
 		box-sizing: border-box;
-		background: var(--timeline-range-slider-selection-bg-color);
-		border-inline: 1px solid var(--timeline-range-slider-selection-border-color);
+		border-inline: 3px solid var(--timeline-range-slider-selection-border-color);
 		cursor: grab;
+
+		&.resized {
+			background: var(--timeline-range-slider-selection-bg-color);
+		}
 	}
 
 	&[resizing] .z-timeline-range-slider-selection {

@@ -6532,9 +6532,10 @@ z-timeline-range-slider {
     inset-inline-start: var(--timeline-range-slider-selected-start-position, 0%);
     inline-size: calc( var(--timeline-range-slider-selected-end-position, 100%) - var(--timeline-range-slider-selected-start-position, 0%) );
     box-sizing: border-box;
-    background: var(--timeline-range-slider-selection-bg-color);
-    border-inline: 1px solid var(--timeline-range-slider-selection-border-color);
+    border-inline: 3px solid var(--timeline-range-slider-selection-border-color);
     cursor: grab; }
+    z-timeline-range-slider .z-timeline-range-slider-selection.resized {
+      background: var(--timeline-range-slider-selection-bg-color); }
   z-timeline-range-slider[resizing] .z-timeline-range-slider-selection {
     cursor: grabbing; }
   z-timeline-range-slider .z-timeline-range-slider-handle {

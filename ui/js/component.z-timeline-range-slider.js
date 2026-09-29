@@ -261,6 +261,8 @@ class ZTimelineRangeSlider extends HTMLElement {
 			return;
 		}
 
+		this.#selection.classList.add('resized');
+
 		const value = this.#valueFromEvent(e);
 		const drag_state = this.#drag_state;
 
