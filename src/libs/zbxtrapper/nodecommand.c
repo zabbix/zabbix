@@ -536,27 +536,34 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	um_handle_masked = zbx_dc_open_user_macros_masked();
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
-	/* substitute macros in script body*/
-
-	/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
-	if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
-			um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz,
-			manualinput))
+	/* substitute macros in script body and in webhook parameters*/
+	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		goto fail;
+		/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
+		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
+				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz,
+				manualinput))
+		{
+			goto fail;
+		}
+
+		/* masked / original copy (audit log): pass NULL so {MANUALINPUT} stays literal */
+		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
+				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, NULL))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto fail;
+		}
 	}
-
-	/* masked / original copy (audit log): pass NULL so {MANUALINPUT} stays literal */
-	if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
-			um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, NULL))
+	else
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		goto fail;
-	}
+		/* webhook body: expand ONLY {MANUALINPUT}; all other macros are left as-is */
+		if (SUCCEED != substitute_manualinput_macro(&script.command, error, sizeof(error), manualinput))
+		{
+			goto fail;
+		}
 
-	/* substitute macros in webhook parameters */
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
-	{
+		/* webhook parameters: full macro resolution, including {MANUALINPUT} */
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,

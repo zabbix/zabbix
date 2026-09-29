@@ -234,6 +234,25 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	return ret;
 }
 
+static int	macro_manualinput_only_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen)
+{
+	const char	*manualinput = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput &&
+			0 == strcmp(p->macro, MVAR_MANUALINPUT))
+	{
+		*replace_to = zbx_strdup(*replace_to, manualinput);
+		p->pos = p->token.loc.r;
+	}
+
+	return SUCCEED;
+}
+
 int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
 		zbx_dc_um_handle_t *um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz, const char *manualinput)
@@ -255,6 +274,44 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: substitutes ONLY the {MANUALINPUT} macro in the given data        *
+ *                                                                            *
+ * Parameters: data        - [IN/OUT] pointer to data where the macro should  *
+ *                                     be resolved                            *
+ *             error       - [OUT] pre-allocated buffer for error message     *
+ *             maxerrlen   - [IN] size of pre-allocated error message buffer  *
+ *             manualinput - [IN] validated raw manual input, or NULL         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully (even if macro is absent)  *
+ *                FAIL    - error occurred                                    *
+ *                                                                            *
+ * Comments: Used for the JavaScript body of webhook scripts, where support   *
+ *           for all macros except {MANUALINPUT} was intentionally removed.   *
+ *           All other macros are left in place, unexpanded.                  *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_manualinput_macro(char **data, char *error, size_t maxerrlen, const char *manualinput)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL == manualinput)
+	{
+		/* nothing to expand - leave the body untouched */
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): no manual input", __func__);
+		return SUCCEED;
+	}
+
+	ret = zbx_substitute_macros(data, error, maxerrlen, &macro_manualinput_only_resolv, manualinput);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
