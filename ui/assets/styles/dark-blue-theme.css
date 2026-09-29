@@ -9714,7 +9714,7 @@ div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-wi
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 5; }
+    z-index: 20; }
   .is-loading::after {
     background-color: rgba(0, 31, 66, 0.8);
     border: 2px solid #9eccff;
@@ -9730,7 +9730,7 @@ div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-wi
     left: 0;
     right: 0;
     animation: is-loading-kf .6s infinite linear;
-    z-index: 5;
+    z-index: 20;
     content: ''; }
   .is-loading.is-loading-fadein::before {
     opacity: 0;

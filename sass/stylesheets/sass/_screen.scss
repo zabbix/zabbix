@@ -1771,7 +1771,7 @@ td.inactive-bg {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 5;
+		z-index: 20;
 	}
 
 	&::after {
@@ -1789,7 +1789,7 @@ td.inactive-bg {
 		left: 0;
 		right: 0;
 		animation: is-loading-kf .6s infinite linear;
-		z-index: 5; // More than z-index of .msg-*.
+		z-index: 20; // More than z-index of .msg-*.
 		content: '';
 	}
 
