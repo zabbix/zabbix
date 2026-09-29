@@ -404,7 +404,8 @@ class CControllerMenuPopup extends CController {
 
 		foreach ($urls as &$url) {
 			if (!$url_validator->validate($url['url'])) {
-				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
+				$url['error'] = _s('Provided URL "%1$s" is invalid.', $url['url']);
+				$url['url'] = null;
 			}
 		}
 		unset($url);
@@ -976,7 +977,8 @@ class CControllerMenuPopup extends CController {
 			}
 			else {
 				$menu_data_parameters += [
-					'url' => 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');'
+					'url' => null,
+					'error' => _s('Provided URL "%1$s" is invalid.', $url['url'])
 				];
 			}
 
