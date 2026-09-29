@@ -22,8 +22,9 @@ require_once dirname(__FILE__).'/../../include/classes/validators/CApiInputValid
  * @onAfter clearData
  */
 class testTrapperAuthentication extends CIntegrationTest {
-	private const USERNAME = 'trapper_authentication_admin';
+	private const USERNAME = 'trapper_authentication_superadmin';
 	private const PASSWORD = 'TrapperAuthentication123!';
+	private const NONEXISTENT_ID = '999999999999';
 
 	private static $usrgrpids = [];
 	private static $roleid;
@@ -41,20 +42,15 @@ class testTrapperAuthentication extends CIntegrationTest {
 		self::$hostgroupid = $response['result']['groupids'][0];
 
 		$response = $this->call('usergroup.create', [
-			[
-				'name' => 'Trapper authentication enabled group',
-				'hostgroup_rights' => [[
-					'id' => self::$hostgroupid,
-					'permission' => PERM_READ_WRITE
-				]]
-			],
+			['name' => 'Trapper authentication enabled group'],
 			['name' => 'Trapper authentication disabled group']
 		]);
 		self::$usrgrpids = $response['result']['usrgrpids'];
 
+		// Super admin passes the user type checks of every request, so a denial can only come from the group.
 		$response = $this->call('role.create', [
-			'name' => 'Trapper authentication admin role',
-			'type' => USER_TYPE_ZABBIX_ADMIN,
+			'name' => 'Trapper authentication super admin role',
+			'type' => USER_TYPE_SUPER_ADMIN,
 			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
 		]);
 		self::$roleid = $response['result']['roleids'][0];
@@ -108,7 +104,17 @@ class testTrapperAuthentication extends CIntegrationTest {
 	}
 
 	public function serverConfigurationProvider(): array {
-		return [self::COMPONENT_SERVER => ['EnableGlobalScripts' => 1]];
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 1,
+				// Authentication result is logged by get_user_from_json() on debug level.
+				'DebugLevel' => 4,
+				'LogFileSize' => 0,
+				// report.test is only authenticated when report manager is running; web service is not contacted.
+				'StartReportWriters' => 1,
+				'WebServiceURL' => 'http://127.0.0.1:1/report'
+			]
+		];
 	}
 
 	public static function clearData(): void {
@@ -147,27 +153,51 @@ class testTrapperAuthentication extends CIntegrationTest {
 	}
 
 	public static function authenticationDataProvider() {
+		// The last element is the error expected after the request has passed authentication, null on success.
 		$requests = [
 			'item.test' => ['testItem', [[
 				'item' => ['value' => '42', 'value_type' => ITEM_VALUE_TYPE_TEXT, 'steps' => []]
-			]]],
-			'expressions.evaluate' => ['expressionsEvaluate', [['expressions' => ['1=1']]]],
-			'status.get' => ['getStatus', []],
-			'command' => ['executeScript', []],
-			'history.push' => ['pushHistory', []]
+			]], null],
+			'expressions.evaluate' => ['expressionsEvaluate', [['expressions' => ['1=1']]], null],
+			'status.get' => ['getStatus', [], null],
+			'queue.get' => ['getQueue', [CZabbixServer::QUEUE_OVERVIEW], null],
+			'command' => ['executeScript', [], null],
+			'history.push' => ['pushHistory', [], null],
+			'alert.send' => ['testMediaType', [[
+				'mediatypeid' => self::NONEXISTENT_ID,
+				'sendto' => 'trapper_authentication',
+				'subject' => 'Trapper authentication',
+				'message' => 'Trapper authentication'
+			]], 'Cannot find the specified media type.'],
+			'report.test' => ['testReport', [['name' => 'Trapper authentication']], 'cannot find tag: dashboardid'],
+			'cep.rule.reset' => ['resetCepRule', [['cep_ruleid' => 'invalid']], 'Cannot parse request tag: cep_ruleid.']
 		];
 
 		$data = [];
 		foreach (['session', 'token'] as $credential_type) {
-			foreach ($requests as $request => [$method, $params]) {
-				$data[$credential_type.' '.$request] = [$credential_type, $method, $params];
+			foreach ($requests as $request => [$method, $params, $error]) {
+				$data[$credential_type.' '.$request] = [$credential_type, $method, $params, $error];
 			}
 		}
 
 		return $data;
 	}
 
-	private function sendTrapperRequest(CZabbixServer $server, $method, $credential, $params) {
+	/**
+	 * Sends the request and checks that the server logged the expected authentication result for it.
+	 */
+	private function sendTrapperRequest(CZabbixServer $server, $method, $credential, $params, bool $granted) {
+		$result = $this->sendRequest($server, $method, $credential, $params);
+
+		// Log is read incrementally, so only the line logged for this request can match.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of get_user_from_json():'.($granted ? 'SUCCEED' : 'FAIL'), true, 5, 1
+		);
+
+		return $result;
+	}
+
+	private function sendRequest(CZabbixServer $server, $method, $credential, $params) {
 		if ($method === 'executeScript') {
 			if (self::$scriptid === null) {
 				$response = $this->call('script.create', [
@@ -194,8 +224,18 @@ class testTrapperAuthentication extends CIntegrationTest {
 		return $server->$method(...array_merge($params, [$credential]));
 	}
 
-	private function assertSuccessfulTrapperRequest(CZabbixServer $server, $method, $credential, $params): void {
-		$result = $this->sendTrapperRequest($server, $method, $credential, $params);
+	private function assertAuthenticatedTrapperRequest(CZabbixServer $server, $method, $credential, $params,
+			?string $error): void {
+		$result = $this->sendTrapperRequest($server, $method, $credential, $params, true);
+
+		if ($error !== null) {
+			// The request is expected to fail, but only after passing the authentication.
+			$this->assertFalse($result);
+			$this->assertSame($error, $server->getError());
+
+			return;
+		}
+
 		$this->assertNotFalse($result, $server->getError() ?? '');
 
 		if ($method === 'executeScript') {
@@ -210,7 +250,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 	/**
 	 * @dataProvider authenticationDataProvider
 	 */
-	public function testTrapperAuthentication_disabledGroup($credential_type, $method, $params) {
+	public function testTrapperAuthentication_disabledGroup($credential_type, $method, $params, $error) {
 		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
 		$server = new CZabbixServer('127.0.0.1',
@@ -219,7 +259,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 		);
 		$credential = self::$credentials[$credential_type];
 
-		$this->assertSuccessfulTrapperRequest($server, $method, $credential, $params);
+		$this->assertAuthenticatedTrapperRequest($server, $method, $credential, $params, $error);
 
 		// One disabled group must deny access even while the other group remains enabled.
 		$this->call('usergroup.update', [
@@ -230,7 +270,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 		$this->assertEquals(ZBX_SESSION_ACTIVE, CDBHelper::getValue(
 			'SELECT status FROM sessions WHERE sessionid='.zbx_dbstr(self::$credentials['session'])
 		));
-		$this->assertFalse($this->sendTrapperRequest($server, $method, $credential, $params));
+		$this->assertFalse($this->sendTrapperRequest($server, $method, $credential, $params, false));
 		$this->assertSame('Permission denied.', $server->getError());
 
 		$this->call('usergroup.update', [
@@ -238,6 +278,6 @@ class testTrapperAuthentication extends CIntegrationTest {
 			'users_status' => GROUP_STATUS_ENABLED
 		]);
 
-		$this->assertSuccessfulTrapperRequest($server, $method, $credential, $params);
+		$this->assertAuthenticatedTrapperRequest($server, $method, $credential, $params, $error);
 	}
 }

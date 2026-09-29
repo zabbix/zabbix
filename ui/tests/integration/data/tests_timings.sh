@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4577
+  [Integration]=4606
   [testTriggerCEPRestart]=1800
   [testTriggerCEP]=900
   [testVfsFsGet]=730
@@ -37,6 +37,7 @@ declare -A BASELINE_TIMES=(
   [testTelnetChecks]=54
   [testUserParametersReload]=47
   [testHashicorpVault]=45
+  [testTrapperAuthentication]=45
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
   [testHistoryValueDuplicates]=43
@@ -56,7 +57,6 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosInItemNames]=20
   [testConnectorExport]=18
   [testBrowserMonitoring]=17
-  [testTrapperAuthentication]=17
   [testAutoregistrationHostMetaDataItem]=16
   [testAutoregistrationProxyGroup]=20
   [testWebScenarioDynamicVariables]=15
