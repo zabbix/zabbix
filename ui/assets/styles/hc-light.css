@@ -5805,11 +5805,15 @@ section {
     .trace-view .trace-view-header .trace-view-header-info {
       display: flex;
       overflow: hidden;
-      flex: 1 1; }
+      flex: 1 1;
+      align-items: center;
+      height: 100%; }
       .trace-view .trace-view-header .trace-view-header-info .trace-id {
-        margin-inline-end: 5px;
         font-size: 14px;
         font-weight: 700; }
+      .trace-view .trace-view-header .trace-view-header-info .btn-icon {
+        margin-inline-start: 5px;
+        margin-inline-end: 2px; }
     .trace-view .trace-view-header .trace-view-close-button {
       flex: 0 0;
       margin-inline-end: -8px; }
@@ -5879,6 +5883,7 @@ section {
       min-block-size: 100%; }
       .trace-view .trace-view-container .trace-scroll .trace-body {
         display: flex;
+        overflow: hidden;
         min-block-size: 100%; }
       .trace-view .trace-view-container .trace-scroll .trace-tree {
         display: grid;

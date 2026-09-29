@@ -32,11 +32,17 @@
 			display: flex;
 			overflow: hidden;
 			flex: 1 1;
+			align-items: center;
+			height: 100%;
 
 			.trace-id {
-				margin-inline-end: 5px;
 				font-size: 14px;
 				font-weight: 700;
+			}
+
+			.btn-icon {
+				margin-inline-start: 5px;
+				margin-inline-end: 2px;
 			}
 		}
 
@@ -138,6 +144,7 @@
 
 			.trace-body {
 				display: flex;
+				overflow: hidden;
 				min-block-size: 100%;
 			}
 
