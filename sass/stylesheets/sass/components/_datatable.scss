@@ -10,7 +10,6 @@
 	position: relative;
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius);
-	container-type: inline-size;
 
 	&::before {
 		content: '';
@@ -451,6 +450,15 @@
 				justify-self: end;
 			}
 		}
+
+		&.datatable-footer-compact {
+			grid-template-columns: 1fr max-content;
+
+			&.pager .table-stats {
+				grid-column: 1 / -1;
+				grid-row: 2;
+			}
+		}
 	}
 
 	.datatable-cell {
@@ -864,17 +872,6 @@
 		padding: 100px 0;
 		border-top: none;
 		background-color: $ui-bg-color;
-	}
-
-	@container (max-width: 950px) {
-		.datatable-footer {
-			grid-template-columns: 1fr max-content;
-
-			&.pager .table-stats {
-				grid-column: 1 / -1;
-				grid-row: 2;
-			}
-		}
 	}
 }
 
