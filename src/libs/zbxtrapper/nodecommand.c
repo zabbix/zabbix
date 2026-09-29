@@ -332,7 +332,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	char			*tz = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
 	zbx_dc_um_handle_t	*um_handle_unmasked = NULL, *um_handle_masked = NULL;
-	const char		*resolved_manualinput = NULL;	/* validated raw user input, or NULL */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
@@ -520,14 +519,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
 		}
-
-		resolved_manualinput = manualinput;
 	}
 	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
 				"does not accept additional manual input, but request contains it anyway",
 				script.name);
+		manualinput = NULL; /* ignore input the script does not accept */
 	}
 
 	if (0 != hostid)	/* script on host */
@@ -543,7 +541,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
 	if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
 			um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz,
-			resolved_manualinput))
+			manualinput))
 	{
 		goto fail;
 	}
@@ -563,7 +561,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
 					sizeof(error), macro_scope_type, um_handle_unmasked, problem_event,
-					recovery_event, &user->userid, &host, tz, resolved_manualinput))
+					recovery_event, &user->userid, &host, tz, manualinput))
 			{
 				goto fail;
 			}
