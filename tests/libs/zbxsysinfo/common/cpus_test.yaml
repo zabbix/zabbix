@@ -1,0 +1,179 @@
+---
+test case: "[item-level] 1 CPU: empty history - no samples collected yet (agent just started, before first collector tick)"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_first_1: 0
+  h_count_1: 0
+out:
+  status_1: "offline"
+---
+test case: "[item-level] 2 CPUs: 1-st - empty history, 2-nd - not yet full history, not wrapped - online"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_cpu_cnt: 2
+  h_first_1: 0
+  h_count_1: 0
+  h_first_2: 0
+  h_count_2: 205
+  last_sample_2: "online"
+out:
+  status_1: "offline"
+  status_2: "online"
+---
+test case: "[item-level] 2 CPUs: full history, not wrapped, 1-st - online, 2-nd - offline"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_cpu_cnt: 2
+  h_first_1: 0
+  h_count_1: 901
+  h_first_2: 0
+  h_count_2: 901
+  last_sample_1: "online"
+  last_sample_2: "offline"
+out:
+  status_1: "online"
+  status_2: "offline"
+---
+test case: "[item-level] 2 CPUs: full history, wrapped many times, 1-st - online, 2-nd - offline (DEV-4798 regression)"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_cpu_cnt: 2
+  h_first_1: 42
+  h_count_1: 901
+  h_first_2: 42
+  h_count_2: 901
+  last_sample_1: "online"
+  last_sample_2: "offline"
+out:
+  status_1: "online"
+  status_2: "offline"
+---
+test case: "[item-level] 1 CPU: full history, h_first=899 - index lands one step before the final wrap-reset boundary - online"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_first_1: 899
+  h_count_1: 901
+  last_sample_1: "online"
+out:
+  status_1: "online"
+---
+test case: "[item-level] 2 CPUs: 1-st one slot before buffer full - online, 2-nd buffer exactly full - offline"
+in:
+  test_type: ZBX_SYSTEM_CPU_DISCOVERY_TEST
+  h_cpu_cnt: 2
+  h_first_1: 0
+  h_count_1: 900
+  last_sample_1: "online"
+  h_first_2: 0
+  h_count_2: 901
+  last_sample_2: "offline"
+out:
+  status_1: "online"
+  status_2: "offline"
+---
+test case: "first sample written into an empty buffer"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 0
+  h_count: 0
+  last_sample: "online"
+  value: 111
+out:
+  h_first: 0
+  h_count: 1
+  write_index: 0
+  status: "online"
+  value: 111
+---
+test case: "failed sample (counters unreadable) written into an empty buffer"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 0
+  h_count: 0
+  last_sample: "offline"
+out:
+  h_first: 0
+  h_count: 1
+  write_index: 0
+  status: "offline"
+---
+test case: "two slots before the buffer is full - h_count still increments (899 -> 900)"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 0
+  h_count: 899
+  last_sample: "online"
+  value: 444
+out:
+  h_first: 0
+  h_count: 900
+  write_index: 899
+  status: "online"
+  value: 444
+---
+test case: "one slot before the buffer is full - h_count still increments"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 0
+  h_count: 900
+  last_sample: "online"
+  value: 222
+out:
+  h_first: 0
+  h_count: 901
+  write_index: 900
+  status: "online"
+  value: 222
+---
+test case: "buffer not yet full but write index still wraps because h_first is already non-zero (900 -> 901)"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 1
+  h_count: 900
+  last_sample: "offline"
+out:
+  h_first: 1
+  h_count: 901
+  write_index: 0
+  status: "offline"
+---
+test case: "buffer already full - next sample starts the wrap instead of growing h_count"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 0
+  h_count: 901
+  last_sample: "online"
+  value: 333
+out:
+  h_first: 1
+  h_count: 901
+  write_index: 0
+  status: "online"
+  value: 333
+---
+test case: "buffer full and wrapping - h_first resets to 0 at the ring boundary"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 900
+  h_count: 901
+  last_sample: "offline"
+out:
+  h_first: 0
+  h_count: 901
+  write_index: 900
+  status: "offline"
+---
+test case: "buffer full and wrapping - h_first increments without resetting one step before the ring boundary (899 -> 900)"
+in:
+  test_type: ZBX_UPDATE_CPU_COUNTERS_TEST
+  h_first: 899
+  h_count: 901
+  last_sample: "online"
+  value: 555
+out:
+  h_first: 900
+  h_count: 901
+  write_index: 899
+  status: "online"
+  value: 555
+...
