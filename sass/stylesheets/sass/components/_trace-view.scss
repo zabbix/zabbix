@@ -117,84 +117,88 @@
 		}
 	}
 
-	.trace-scroll {
-		overflow: auto;
-		min-inline-size: 0;
-		min-block-size: 0;
+	.trace-view-container {
+		overflow-y: auto;
+		block-size: 100%;
 
-		.trace-body {
-			display: flex;
-			min-block-size: 100%;
-		}
-
-		.trace-tree {
-			display: grid;
-			grid-template-rows: 38px minmax(0, 1fr);
-			min-block-size: 100%;
-
-			.trace-tree-header {
-				grid-row: 1;
-				display: flex;
-				align-items: center;
-				overflow: hidden;
-				box-sizing: border-box;
-				padding-inline: 10px;
-				border-block-end: 1px solid var(--trace-border-color);
-				font-weight: 700;
-			}
-
-			z-navigation-tree {
-				--navigation-tree-row-block-size: var(--trace-row-block-size);
-
-				grid-row: 2;
-			}
-		}
-
-		.trace-time {
-			display: grid;
-			flex: 1 0;
-			grid-template-rows: 38px minmax(0, 1fr);
-			overflow-x: hidden;
+		.trace-scroll {
 			min-inline-size: 0;
 			min-block-size: 100%;
 
-			.trace-time-header {
-				grid-row: 1;
-				position: relative;
+			.trace-body {
 				display: flex;
-				align-items: center;
-				overflow: hidden;
-				box-sizing: border-box;
-				min-inline-size: 0;
-				padding-inline: 10px;
-				border-block-end: 1px solid var(--trace-border-color);
+				min-block-size: 100%;
 			}
 
-			.trace-waterfall {
-				grid-row: 2;
-				position: relative;
-				overflow: hidden;
-				min-inline-size: 0;
-				padding-inline: 11px;
+			.trace-tree {
+				display: grid;
+				grid-template-rows: 38px minmax(0, 1fr);
+				min-block-size: 100%;
 
-				.trace-waterfall-row {
+				.trace-tree-header {
+					grid-row: 1;
+					display: flex;
+					align-items: center;
+					overflow: hidden;
+					box-sizing: border-box;
+					padding-inline: 10px;
+					border-block-end: 1px solid var(--trace-border-color);
+					font-weight: 700;
+				}
+
+				z-navigation-tree {
+					--navigation-tree-row-block-size: var(--trace-row-block-size);
+
+					grid-row: 2;
+				}
+			}
+
+			.trace-time {
+				display: grid;
+				flex: 1 0;
+				grid-template-rows: 38px minmax(0, 1fr);
+				overflow-x: hidden;
+				min-inline-size: 0;
+				min-block-size: 100%;
+
+				.trace-time-header {
+					grid-row: 1;
 					position: relative;
-					z-index: 1;
+					display: flex;
+					align-items: center;
 					overflow: hidden;
 					box-sizing: border-box;
 					min-inline-size: 0;
-					min-block-size: var(--trace-row-block-size);
+					padding-inline: 10px;
+					border-block-end: 1px solid var(--trace-border-color);
+				}
+
+				.trace-waterfall {
+					grid-row: 2;
+					position: relative;
+					overflow: hidden;
+					min-inline-size: 0;
+					padding-inline: 11px;
+
+					.trace-waterfall-row {
+						position: relative;
+						z-index: 1;
+						overflow: hidden;
+						box-sizing: border-box;
+						min-inline-size: 0;
+						min-block-size: var(--trace-row-block-size);
+					}
 				}
 			}
-		}
 
-		.trace-details {
-			min-inline-size: 0;
-			min-block-size: min-content;
+			.trace-details {
+				min-inline-size: 0;
+				min-block-size: min-content;
 
-			.details-panel {
-				inline-size: var(--trace-details-width);
-				border-inline-start: 1px solid var(--trace-border-color);
+				.details-panel {
+					inline-size: var(--trace-details-width);
+					border-inline-start: 1px solid var(--trace-border-color);
+				}
 			}
 		}
 	}

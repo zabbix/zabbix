@@ -209,7 +209,7 @@ class CHtmlPage {
 					->setAttribute('aria-label', _('Content controls: header'));
 			}
 
-			$divs[] = new CDiv($title_tag);
+			$divs[] = (new CDiv($title_tag))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 		}
 
 		if ($this->doc_url !== '') {
