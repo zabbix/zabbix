@@ -515,8 +515,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		const char *config_bridge_adapter_ca_file,
 		const char *config_bridge_adapter_crl_file,
 		const char *config_bridge_adapter_cert_file,
-		const char *config_bridge_adapter_key_file,
-		const char *config_bridge_adapter_connect_to)
+		const char *config_bridge_adapter_key_file)
 {
 	zbx_config_t	cfg;
 
@@ -536,7 +535,6 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	ZBX_UNUSED(config_bridge_adapter_crl_file);
 	ZBX_UNUSED(config_bridge_adapter_cert_file);
 	ZBX_UNUSED(config_bridge_adapter_key_file);
-	ZBX_UNUSED(config_bridge_adapter_connect_to);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 	alerter_send_result(socket, NULL, FAIL, "Application compiled without cURL library.", NULL);
@@ -563,9 +561,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
 			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
-			config_bridge_adapter_connect_to, payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY,
-			ZBX_BRIDGE_ADAPTER_SERVICE_NAME, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data, &jp_body,
-			&err_kind))
+			payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY, ZBX_BRIDGE_ADAPTER_SERVICE_NAME,
+			(long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data, &jp_body, &err_kind))
 	{
 		switch (err_kind)
 		{
@@ -718,8 +715,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_bridge_adapter_ca_file,
 						alerter_args_in->config_bridge_adapter_crl_file,
 						alerter_args_in->config_bridge_adapter_cert_file,
-						alerter_args_in->config_bridge_adapter_key_file,
-						alerter_args_in->config_bridge_adapter_connect_to);
+						alerter_args_in->config_bridge_adapter_key_file);
 				break;
 			case ZBX_RTC_SHUTDOWN:
 				zbx_set_exiting_with_succeed();
