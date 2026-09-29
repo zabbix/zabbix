@@ -490,6 +490,12 @@ int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, c
 	if (0 != zbx_strcmp_null(cfg_now->ssl_ca_location,  cfg_new->ssl_ca_location))
 		return FAIL;
 
+	if (cfg_now->ssl_verify_peer != cfg_new->ssl_verify_peer)
+		return FAIL;
+
+	if (cfg_now->ssl_verify_host != cfg_new->ssl_verify_host)
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -520,5 +526,8 @@ void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm
 
 	if (NULL != src->ssl_ca_location)
 		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+
+	dst->ssl_verify_host = src->ssl_verify_host;
+	dst->ssl_verify_peer = src->ssl_verify_peer;
 }
 
