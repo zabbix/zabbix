@@ -547,9 +547,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		/* masked / original copy (audit log): pass NULL so {MANUALINPUT} stays literal */
+		/* masked / original copy (audit log): expand {MANUALINPUT} as well, but keep user macros masked */
 		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
-				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, NULL))
+				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, manualinput))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
