@@ -23,10 +23,6 @@ require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
  */
 class testUserMacroAccess extends CAPITest {
 
-	/**
-	 * User.1 and admin.1 have RW access to macros of host.1 via user_group.1 and host_group.1.
-	 * Similarly, there's a second ".2" branch. Each should have access to their branch macros only.
-	 */
 	public static function prepareTestData(): void {
 		CTestDataHelper::createObjects([
 			'template_groups' => [
@@ -101,22 +97,6 @@ class testUserMacroAccess extends CAPITest {
 					'usrgrps' => [
 						['usrgrpid' => ':user_group:usermacro.access.usergroup2']
 					],
-					'roleid' => ':role:usermacro.access.user.role'
-				],
-				[
-					'username' => 'usermacro.access.admin.1',
-					'passwd' => '|-|e!1@ (/\)0rLD!',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:usermacro.access.usergroup1']
-					],
-					'roleid' => ':role:usermacro.access.admin.role'
-				],
-				[
-					'username' => 'usermacro.access.admin.2',
-					'passwd' => '|-|e!1@ (/\)0rLD!',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:usermacro.access.usergroup2']
-					],
 					'roleid' => ':role:usermacro.access.admin.role'
 				]
 			]
@@ -141,7 +121,7 @@ class testUserMacroAccess extends CAPITest {
 	}
 
 	public static function getProvider() {
-		yield 'no filtering for "usermacro.access.user.1" return macros only for host "usermacro.access.host1"' => [
+		yield 'no filtering for "usermacro.access.user.1" return macros only for host user have access' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value']
@@ -171,7 +151,7 @@ class testUserMacroAccess extends CAPITest {
 			[]
 		];
 
-		yield 'search for "usermacro.access.user.1" return macros only for host "usermacro.access.host1"' => [
+		yield 'search for "usermacro.access.user.1" return macros only for host user have access' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
@@ -192,7 +172,7 @@ class testUserMacroAccess extends CAPITest {
 			[]
 		];
 
-		yield 'filter "{$UM1}" for "usermacro.access.user.1" return macro' => [
+		yield 'filter "{$UM1}" for "usermacro.access.user.1" return macro for host user have access' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
@@ -215,7 +195,7 @@ class testUserMacroAccess extends CAPITest {
 			]
 		];
 
-		yield 'search for "usermacro.access.user.2" return macros only for host "usermacro.access.host2" and "usermacro.access.template"' => [
+		yield 'search for "usermacro.access.user.2" return macros only for host user have access' => [
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
@@ -252,79 +232,73 @@ class testUserMacroAccess extends CAPITest {
 	/**
 	 * @dataProvider getProvider
 	 */
-	public function testUserMacroAccessGet(array $login, array $request, array $expected_result,
-			?string $expected_error = null): void {
+	public function testUserMacroAccessGet(array $login, array $request, array $expected): void {
 		CTestDataHelper::convertCustomObjectReference($request, 'hostids', true);
 		CTestDataHelper::convertCustomObjectReference($request, 'hostmacroids', true);
 
-		foreach ($expected_result as &$macro) {
+		foreach ($expected as &$macro) {
 			CTestDataHelper::convertCustomObjectReference($macro, 'hostmacroid');
 		}
 		unset($macro);
 
 		$this->authorize($login['username'], $login['password']);
-		$result = $this->call('usermacro.get', $request, $expected_error);
-
-		if ($expected_error !== null) {
-			return;
-		}
+		$result = $this->call('usermacro.get', $request);
 
 		$this->assertArrayHasKey('result', $result);
-		$this->assertSame($expected_result, $result['result']);
+		$this->assertSame($expected, $result['result']);
 	}
 
 	public static function updateProvider() {
-		// yield 'with "usermacro.access.user.1"'
-
-		// return;
-		return [
-			'User cannot update any macro' => [
-				'login' => ['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
-				'request' => [
-					'hostmacroid' => ':macro:{$UM2}',
-					'value' => 'abc'
-				],
-				'expected_result' => [],
-				'expected_error' => 'No permissions to call "usermacro.update".'
+		yield 'user permission "usermacro.access.user.1" fail' => [
+			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'hostmacroid' => ':macro:{$UM2}',
+				'value' => 'abc'
 			],
-			'Admin can update owned macro' => [
-				'login' => ['username' => 'usermacro.access.admin.1', 'password' => '|-|e!1@ (/\)0rLD!'],
-				'request' => [
-					'hostmacroid' => ':macro:{$UM1}',
-					'value' => 'abc'
-				],
-				'expected_result' => [
-					'hostmacroids' => [':macro:{$UM1}']
-				]
-			],
-			'Admin cannot update other macro' => [
-				'login' => ['username' => 'usermacro.access.admin.1', 'password' => '|-|e!1@ (/\)0rLD!'],
-				'request' => [
-					'hostmacroid' => ':macro:{$UM2}',
-					'value' => 'abc'
-				],
-				'expected_result' => [],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
+			[],
+			'No permissions to call "usermacro.update".'
 		];
+
+		yield 'admin permission "usermacro.access.user.2" update macros' => [
+			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'hostmacroid' => ':macro:{$UM2}',
+				'value' => 'abc'
+			],
+			[
+				'hostmacroids' => [':macro:{$UM2}']
+			],
+			null
+		];
+
+		yield 'admin permission "usermacro.access.user.2" change for non accessible hosts fail' => [
+			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'hostmacroid' => ':macro:{$UM1}',
+				'value' => 'abc'
+			],
+			[],
+			'No permissions to referred object or it does not exist!'
+		];
+
+		return;
 	}
 
 	/**
 	 * @dataProvider updateProvider
 	 */
-	public function testUserMacroAccessUpdate(array $login, array $request, array $expected_result,
-			?string $expected_error = null): void {
+	public function testUserMacroAccessUpdate(array $login, array $request, array $expected, ?string $error): void {
 		CTestDataHelper::convertCustomObjectReference($request, 'hostmacroid');
-		CTestDataHelper::convertCustomObjectReference($expected_result, 'hostmacroids', true);
+		CTestDataHelper::convertCustomObjectReference($expected, 'hostmacroids', true);
 
 		$this->authorize($login['username'], $login['password']);
-		$result = $this->call('usermacro.update', $request, $expected_error);
+		$result = $this->call('usermacro.update', $request, $error);
 
-		if ($expected_error !== null) {
+		if ($error !== null) {
 			return;
 		}
 
 		$this->assertArrayHasKey('result', $result);
-		$this->assertSame($expected_result, $result['result']);
+		$this->assertSame($expected, $result['result']);
 	}
 }
