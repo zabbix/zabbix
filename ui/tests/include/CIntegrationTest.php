@@ -475,6 +475,7 @@ class CIntegrationTest extends CAPITest {
 						break;
 					case self::COMPONENT_JAVA:
 						self::waitForLogLineToBePresent($component, 'listening on', false, 10, 3);
+						break;
 				}
 
 				if (static::$trace_delays) {
@@ -785,6 +786,7 @@ class CIntegrationTest extends CAPITest {
 		if ($component === self::COMPONENT_JAVA) {
 			$script = PHPUNIT_BINARY_DIR.'/zabbix_java/startup.sh';
 
+			self::clearLog($component);
 			self::executeCommand($script, []);
 			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
 
@@ -838,8 +840,9 @@ class CIntegrationTest extends CAPITest {
 		if ($pid !== false && is_numeric($pid)) {
 			if ($component === self::COMPONENT_JAVA) {
 				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
-
 				self::executeCommand($script, []);
+				$pids[] = $pid;
+				sleep(3);
 			} else {
 				$output = shell_exec('pgrep -P '.$pid);
 				if ($output !== false && $output !== null) {
@@ -868,17 +871,24 @@ class CIntegrationTest extends CAPITest {
 		$pid = @file_get_contents($pid_path);
 
 		if ($pid !== false && is_numeric($pid)) {
-			$output = shell_exec('pgrep -P '.$pid);
-			if ($output !== false && $output !== null) {
-				$child_pids = explode("\n", trim($output));
-				foreach ($child_pids as $child_pid) {
-					if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-						posix_kill($child_pid, SIGKILL);
+			if ($component === self::COMPONENT_JAVA) {
+				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
+
+				self::executeCommand($script, []);
+				sleep(3);
+			} else {
+				$output = shell_exec('pgrep -P '.$pid);
+				if ($output !== false && $output !== null) {
+					$child_pids = explode("\n", trim($output));
+					foreach ($child_pids as $child_pid) {
+						if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+							posix_kill($child_pid, SIGKILL);
+						}
 					}
 				}
-			}
 
-			posix_kill($pid, SIGKILL);
+				posix_kill($pid, SIGKILL);
+			}
 		}
 
 		unlink($pid_path);
