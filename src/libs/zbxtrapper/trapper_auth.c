@@ -61,7 +61,8 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
  *                                only used, and required, in                 *
  *                                ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD mode        *
  *                                                                            *
- * Return value: SUCCEED - managed to find and authenticate user              *
+ * Return value: SUCCEED - managed to find and authenticate user, user is not *
+ *                         disabled                                           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
