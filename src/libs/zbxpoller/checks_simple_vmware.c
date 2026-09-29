@@ -4638,7 +4638,7 @@ int	check_vcenter_vm_hv_maintenance(AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
