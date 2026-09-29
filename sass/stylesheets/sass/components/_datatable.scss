@@ -356,7 +356,7 @@
 			&.row-selected {
 				.datatable-row-spacer,
 				.datatable-cell:not(.datatable-cell-bg) {
-					border-bottom-color: rgba(31, 44, 51, .1);
+					border-bottom-color: $ui-border-color;
 					background-color: $lighter-yellow;
 				}
 			}
@@ -891,16 +891,20 @@
 	}
 }
 
-#datatable-traces {
+#datatable-traces,
+#datatable-metrics,
+#datatable-logs {
 	.datatable-row:not(.row-selected):hover {
 		cursor: pointer;
 
 		.datatable-cell {
-			border-bottom-color: rgba(31, 44, 51, .1);
+			border-block-end-color: $ui-border-color;
 			background-color: $ui-hover-bg-color;
 		}
 	}
+}
 
+#datatable-traces {
 	.span-count {
 		color: $font-alt-color;
 	}

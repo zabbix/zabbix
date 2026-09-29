@@ -2747,7 +2747,7 @@ button {
           justify-content: flex-end; }
       .datatable .datatable-body .datatable-row.row-selected .datatable-row-spacer,
       .datatable .datatable-body .datatable-row.row-selected .datatable-cell:not(.datatable-cell-bg) {
-        border-bottom-color: rgba(31, 44, 51, 0.1);
+        border-bottom-color: #003a7a;
         background-color: rgba(0, 58, 122, 0.5); }
       .datatable .datatable-body .datatable-row .table-stats.table-stats-small {
         font-size: 11px; }
@@ -3072,11 +3072,16 @@ button {
   .datatable-resizing .datatable .datatable-cell.datatable-cell-resizing .header-resizer {
     z-index: 4; }
 
-#datatable-traces .datatable-row:not(.row-selected):hover {
+#datatable-traces .datatable-row:not(.row-selected):hover,
+#datatable-metrics .datatable-row:not(.row-selected):hover,
+#datatable-logs .datatable-row:not(.row-selected):hover {
   cursor: pointer; }
-  #datatable-traces .datatable-row:not(.row-selected):hover .datatable-cell {
-    border-bottom-color: rgba(31, 44, 51, 0.1);
+  #datatable-traces .datatable-row:not(.row-selected):hover .datatable-cell,
+  #datatable-metrics .datatable-row:not(.row-selected):hover .datatable-cell,
+  #datatable-logs .datatable-row:not(.row-selected):hover .datatable-cell {
+    border-block-end-color: #003a7a;
     background-color: rgba(0, 58, 122, 0.35); }
+
 #datatable-traces .span-count {
   color: #939ca4; }
 #datatable-traces .error-count {
