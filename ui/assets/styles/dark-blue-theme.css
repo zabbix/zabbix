@@ -6628,10 +6628,8 @@ z-timeline-range-slider {
     inset-inline-start: var(--timeline-range-slider-selected-start-position, 0%);
     inline-size: calc( var(--timeline-range-slider-selected-end-position, 100%) - var(--timeline-range-slider-selected-start-position, 0%) );
     box-sizing: border-box;
-    border-inline: 3px solid var(--timeline-range-slider-selection-border-color);
+    background: var(--timeline-range-slider-selection-bg-color);
     cursor: grab; }
-    z-timeline-range-slider .z-timeline-range-slider-selection.resized {
-      background: var(--timeline-range-slider-selection-bg-color); }
   z-timeline-range-slider[resizing] .z-timeline-range-slider-selection {
     cursor: grabbing; }
   z-timeline-range-slider .z-timeline-range-slider-handle {
@@ -6639,14 +6637,14 @@ z-timeline-range-slider {
     inset-block: 0;
     inline-size: var(--timeline-range-slider-handle-size);
     cursor: ew-resize; }
-    z-timeline-range-slider .z-timeline-range-slider-handle:first-child {
-      transform: translateX(100%); }
-    z-timeline-range-slider .z-timeline-range-slider-handle:last-child {
+    z-timeline-range-slider .z-timeline-range-slider-handle.z-timeline-range-slider-handle-start {
+      border-inline-start: 3px solid var(--timeline-range-slider-selection-border-color);
+      inset-inline-start: var(--timeline-range-slider-selected-start-position, 0%);
+      transform: translateX(0); }
+    z-timeline-range-slider .z-timeline-range-slider-handle.z-timeline-range-slider-handle-end {
+      border-inline-end: 3px solid var(--timeline-range-slider-selection-border-color);
+      inset-inline-start: var(--timeline-range-slider-selected-end-position, 100%);
       transform: translateX(-100%); }
-  z-timeline-range-slider .z-timeline-range-slider-handle-start {
-    inset-inline-start: var(--timeline-range-slider-selected-start-position, 0%); }
-  z-timeline-range-slider .z-timeline-range-slider-handle-end {
-    inset-inline-start: var(--timeline-range-slider-selected-end-position, 100%); }
   z-timeline-range-slider > .z-timeline-range-slider-scale {
     grid-row: 1;
     display: none;
