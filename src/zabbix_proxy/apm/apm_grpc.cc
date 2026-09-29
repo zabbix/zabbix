@@ -28,6 +28,7 @@ extern "C" {
 	#include "apm_queue.h"
 	#include "zbxmw.h"
 	#include "zbxlog.h"
+	#include "zbxip.h"
 }
 
 using grpc::CallbackServerContext;
@@ -219,6 +220,10 @@ namespace
 	std::string build_listen_address(const char *address, int port)
 	{
 		std::string addr = (address != nullptr && address[0] != '\0') ? address : "0.0.0.0";
+
+		if (SUCCEED == zbx_is_ip6(addr.c_str()))
+			addr = "[" + addr + "]";
+
 		return addr + ":" + std::to_string(port);
 	}
 
