@@ -5865,65 +5865,67 @@ section {
         padding-inline-start: 5px;
         transform: translateX(-100%);
         background-color: var(--trace-time-tick-label-bg-color); }
-  .trace-view .trace-scroll {
-    overflow: auto;
-    min-inline-size: 0;
-    min-block-size: 0; }
-    .trace-view .trace-scroll .trace-body {
-      display: flex;
-      min-block-size: 100%; }
-    .trace-view .trace-scroll .trace-tree {
-      display: grid;
-      grid-template-rows: 38px minmax(0, 1fr);
-      min-block-size: 100%; }
-      .trace-view .trace-scroll .trace-tree .trace-tree-header {
-        grid-row: 1;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        box-sizing: border-box;
-        padding-inline: 10px;
-        border-block-end: 1px solid var(--trace-border-color);
-        font-weight: 700; }
-      .trace-view .trace-scroll .trace-tree z-navigation-tree {
-        --navigation-tree-row-block-size: var(--trace-row-block-size);
-        grid-row: 2; }
-    .trace-view .trace-scroll .trace-time {
-      display: grid;
-      flex: 1 0;
-      grid-template-rows: 38px minmax(0, 1fr);
-      overflow-x: hidden;
+  .trace-view .trace-view-container {
+    overflow-y: auto;
+    block-size: 100%; }
+    .trace-view .trace-view-container .trace-scroll {
       min-inline-size: 0;
       min-block-size: 100%; }
-      .trace-view .trace-scroll .trace-time .trace-time-header {
-        grid-row: 1;
-        position: relative;
+      .trace-view .trace-view-container .trace-scroll .trace-body {
         display: flex;
-        align-items: center;
-        overflow: hidden;
-        box-sizing: border-box;
+        min-block-size: 100%; }
+      .trace-view .trace-view-container .trace-scroll .trace-tree {
+        display: grid;
+        grid-template-rows: 38px minmax(0, 1fr);
+        min-block-size: 100%; }
+        .trace-view .trace-view-container .trace-scroll .trace-tree .trace-tree-header {
+          grid-row: 1;
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          box-sizing: border-box;
+          padding-inline: 10px;
+          border-block-end: 1px solid var(--trace-border-color);
+          font-weight: 700; }
+        .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree {
+          --navigation-tree-row-block-size: var(--trace-row-block-size);
+          grid-row: 2; }
+      .trace-view .trace-view-container .trace-scroll .trace-time {
+        display: grid;
+        flex: 1 0;
+        grid-template-rows: 38px minmax(0, 1fr);
+        overflow-x: hidden;
         min-inline-size: 0;
-        padding-inline: 10px;
-        border-block-end: 1px solid var(--trace-border-color); }
-      .trace-view .trace-scroll .trace-time .trace-waterfall {
-        grid-row: 2;
-        position: relative;
-        overflow: hidden;
-        min-inline-size: 0;
-        padding-inline: 11px; }
-        .trace-view .trace-scroll .trace-time .trace-waterfall .trace-waterfall-row {
+        min-block-size: 100%; }
+        .trace-view .trace-view-container .trace-scroll .trace-time .trace-time-header {
+          grid-row: 1;
           position: relative;
-          z-index: 1;
+          display: flex;
+          align-items: center;
           overflow: hidden;
           box-sizing: border-box;
           min-inline-size: 0;
-          min-block-size: var(--trace-row-block-size); }
-    .trace-view .trace-scroll .trace-details {
-      min-inline-size: 0;
-      min-block-size: min-content; }
-      .trace-view .trace-scroll .trace-details .details-panel {
-        inline-size: var(--trace-details-width);
-        border-inline-start: 1px solid var(--trace-border-color); }
+          padding-inline: 10px;
+          border-block-end: 1px solid var(--trace-border-color); }
+        .trace-view .trace-view-container .trace-scroll .trace-time .trace-waterfall {
+          grid-row: 2;
+          position: relative;
+          overflow: hidden;
+          min-inline-size: 0;
+          padding-inline: 11px; }
+          .trace-view .trace-view-container .trace-scroll .trace-time .trace-waterfall .trace-waterfall-row {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            box-sizing: border-box;
+            min-inline-size: 0;
+            min-block-size: var(--trace-row-block-size); }
+      .trace-view .trace-view-container .trace-scroll .trace-details {
+        min-inline-size: 0;
+        min-block-size: min-content; }
+        .trace-view .trace-view-container .trace-scroll .trace-details .details-panel {
+          inline-size: var(--trace-details-width);
+          border-inline-start: 1px solid var(--trace-border-color); }
   .trace-view .trace-grid-line {
     position: absolute;
     inset-block: 0;

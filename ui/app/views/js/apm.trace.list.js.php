@@ -534,11 +534,8 @@
 				return;
 			}
 
-			const span_details = document.createElement('div');
-			trace_details.appendChild(span_details);
-
 			this.#details_panel?.destroy();
-			this.#details_panel = new CDetailsPanel(span_details, {
+			this.#details_panel = new CDetailsPanel(trace_details, {
 				title: <?= json_encode(_('Span details')); ?>,
 				groups: this.#collectSpanDetailsGroups(span)
 			});
