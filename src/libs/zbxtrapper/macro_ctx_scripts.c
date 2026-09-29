@@ -124,7 +124,6 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 		if (NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
 		{
 			*replace_to = zbx_strdup(*replace_to, manualinput);
-			p->pos = p->token.loc.r;
 		}
 		else if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
@@ -191,7 +190,6 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
 	{
 		*replace_to = zbx_strdup(*replace_to, manualinput);
-		p->pos = p->token.loc.r;
 
 		return ret;
 	}
@@ -247,7 +245,6 @@ static int	macro_manualinput_only_resolv(zbx_macro_resolv_data_t *p, va_list arg
 			0 == strcmp(p->macro, MVAR_MANUALINPUT))
 	{
 		*replace_to = zbx_strdup(*replace_to, manualinput);
-		p->pos = p->token.loc.r;
 	}
 
 	return SUCCEED;
