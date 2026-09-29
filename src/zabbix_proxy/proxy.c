@@ -890,6 +890,24 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (NULL != config_apm_ca_file && '\0' == *config_apm_ca_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSCAFile is defined but empty");
+		err = 1;
+	}
+
+	if (NULL != config_apm_cert_file && '\0' == *config_apm_cert_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSCertFile is defined but empty");
+		err = 1;
+	}
+
+	if (NULL != config_apm_key_file && '\0' == *config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSKeyFile is defined but empty");
+		err = 1;
+	}
+
 	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
