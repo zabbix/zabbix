@@ -1067,7 +1067,7 @@ in:
   test_type: both
 out:
   return: SYSINFO_RET_FAIL
-  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+  error: 'Invalid fourth parameter: value must be from 0 up to and including 1000.'
 ---
 test case: 'Redirect limit is negative [127.0.0.1,,,-1]'
 in:
@@ -1075,7 +1075,7 @@ in:
   test_type: both
 out:
   return: SYSINFO_RET_FAIL
-  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+  error: 'Invalid fourth parameter: value must be from 0 up to and including 1000.'
 ---
 test case: 'Redirect limit is not a number [127.0.0.1,,,abc]'
 in:
@@ -1083,7 +1083,7 @@ in:
   test_type: both
 out:
   return: SYSINFO_RET_FAIL
-  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+  error: 'Invalid fourth parameter: value must be from 0 up to and including 1000.'
 ---
 test case: 'Too many parameters [127.0.0.1,,,0,extra]'
 in:
