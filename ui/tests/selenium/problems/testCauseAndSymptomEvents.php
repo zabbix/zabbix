@@ -575,7 +575,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 */
 	public function testCauseAndSymptomEvents_FilterResults($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
-		$displayed_symptom_xpath = 'xpath:.//div[@class="datatable-row"]//a[text()="Problem trap>10 [Symptom]"]';
+		$displayed_symptom_xpath = 'xpath:.//div[@class="row"]//a[text()="Problem trap>10 [Symptom]"]';
 
 		// Reset datatable layout to default before checking the its default state.
 		$table = $this->getDatatable();
