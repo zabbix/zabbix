@@ -1437,6 +1437,12 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 			}
 		}
 
+		for (const checkbox of document.querySelectorAll('#lefty_unsigned, #righty_unsigned')) {
+			if (checkbox.checked) {
+				return true;
+			}
+		}
+
 		for (const input of document.querySelectorAll('#lefty_min, #lefty_max, #righty_min, #righty_max')) {
 			if (!input.disabled && input.value !== '') {
 				return true;
