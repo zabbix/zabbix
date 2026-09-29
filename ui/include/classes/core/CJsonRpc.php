@@ -85,8 +85,8 @@ class CJsonRpc {
 			$auth['auth'] = $session->extractSessionId();
 		}
 
-		$calls_data = [];
-		$calls_data_auth = [];
+		$no_auth_calls = [];
+		$auth_calls = [];
 		$api_method_names = [];
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -136,41 +136,39 @@ class CJsonRpc {
 			}
 
 			if ($this->apiClient->requiresAuthentication($api, $method)) {
-				$calls_data_auth[] = $call_data;
+				$auth_calls[] = $call_data;
 			}
 			else {
-				$calls_data[] = $call_data;
+				$no_auth_calls[] = $call_data;
 			}
 		}
 
-		$auth_response = $calls_data_auth || $auth['auth'] !== null
+		$auth_response = $auth_calls || $auth['auth'] !== null
 			? $this->apiClient->authenticate($auth, implode(',', $api_method_names))
 			: null;
 
 		$is_auth_error = $auth_response !== null && $auth_response->errorCode !== null;
 
-		// Process protected methods.
 		if ($is_auth_error) {
-			foreach ($calls_data_auth as $call) {
+			foreach ($auth_calls as $call) {
 				$this->processResult($call, $auth_response);
 			}
 		}
 		else {
-			foreach ($calls_data_auth as $call) {
+			foreach ($auth_calls as $call) {
 				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
 				$this->processResult($call, $result);
 			}
 		}
 
-		// Process public methods.
 		if ($auth['auth'] !== null && $is_auth_error) {
-			foreach ($calls_data as $call) {
+			foreach ($no_auth_calls as $call) {
 				$this->processResult($call, $auth_response);
 			}
 		}
 		else {
-			foreach ($calls_data as $call) {
+			foreach ($no_auth_calls as $call) {
 				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
 				$this->processResult($call, $result);
