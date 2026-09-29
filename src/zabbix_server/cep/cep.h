@@ -94,5 +94,7 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
+void	cep_event_handle_link_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
+void	cep_event_handle_unlink_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
 
 #endif /* ZABBIX_CEP_H */

@@ -45,6 +45,7 @@ int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *
 #define CEP_POS_UNKNOWN	0x00
 #define CEP_POS_FIRST	0x01
 #define CEP_POS_LAST	0x02
+#define CEP_POS_CURRENT	0x04
 
 typedef struct
 {
@@ -60,7 +61,7 @@ typedef struct
 	zbx_vector_str_t	host_names;
 	zbx_vector_str_t	group_names;
 
-	zbx_dbconn_pool_t	*dbpool;
+	zbx_dbconn_pool_t	*dbpool;	/* for macro resolving */
 
 	zbx_uint32_t		pos;
 

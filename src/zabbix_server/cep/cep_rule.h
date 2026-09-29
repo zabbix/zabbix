@@ -55,5 +55,7 @@ int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
 
+int	cep_rule_has_window_scope_ops(const zbx_cep_rule_t *rule, int when);
+
 #endif
 

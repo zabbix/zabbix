@@ -56,7 +56,7 @@ zbx_cep_window_sync_entry_t;
 
 ZBX_VECTOR_LITE_DECL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
 
-typedef struct
+struct zbx_cep_window
 {
 	zbx_uint64_t		ruleid;
 	zbx_uint64_t		windowid;
@@ -88,8 +88,7 @@ typedef struct
 	zbx_atomic_uint32_t	refcount;
 	zbx_cep_window_ref_t	*ref;
 	pthread_mutex_t		lock;
-}
-zbx_cep_window_t;
+};
 
 ZBX_PTR_VECTOR_LITE_DECL(cep_window_ptr, zbx_cep_window_t *)
 

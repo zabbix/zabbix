@@ -218,6 +218,30 @@ static int	cep_operation_condition_eval_suppressed(const zbx_cep_op_condition_t 
 	return cep_operation_condition_eval_state(condition, (0 != event->suppress.values_num));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate event current scope operation condition                  *
+ *                                                                            *
+ * Parameters: condition - [IN] operation condition to evaluate               *
+ *             ctx       - [IN] event context                                 *
+ *                                                                            *
+ * Return value: non-zero if condition matches, 0 otherwise                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_operation_condition_eval_scope(const zbx_cep_op_condition_t *condition,
+	zbx_cep_event_context_t *ctx)
+{
+	switch (condition->operator)
+	{
+		case ZBX_CONDITION_OPERATOR_YES:
+			return (0 != (ctx->pos & CEP_POS_CURRENT));
+		case ZBX_CONDITION_OPERATOR_NO:
+			return (0 == (ctx->pos & CEP_POS_CURRENT));
+		default:
+			return 0;
+	}
+}
+
 static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
 {
 	switch (condition->type)
@@ -238,6 +262,8 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 			return cep_operation_condition_eval_copied(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_SUPPRESSED:
 			return cep_operation_condition_eval_suppressed(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_CURRENT:
+			return cep_operation_condition_eval_scope(condition, ctx);
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation condition type %d", condition->type);
 			return 0;
@@ -1219,3 +1245,47 @@ void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_
 		*error = NULL;
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if rule has operations to be executed for all window events *
+ *                                                                            *
+ * Parameters: rule - [IN] cep rule                                           *
+ *             when - [IN] operation execution phase (ZBX_CEP_WHEN_*)         *
+ *                                                                            *
+ * Return value: SUCCEED - at least one operation of the given execution phase*
+ *                         is not limited to the current event                *
+ *               FAIL    - all operations of the given execution phase are    *
+ *                         limited to the current event or there are no       *
+ *                         such operations                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	cep_rule_has_window_scope_ops(const zbx_cep_rule_t *rule, int when)
+{
+	for (int i = 0; i < rule->operations.values_num; i++)
+	{
+		zbx_cep_operation_t	*op = &rule->operations.values[i];
+
+		if (op->execute_when == when)
+		{
+			int	j;
+
+			for (j = 0; j < op->conditions.values_num; j++)
+			{
+				zbx_cep_op_condition_t	*cond = &op->conditions.values[j];
+
+				if (ZBX_CONDITION_TYPE_EVENT_CURRENT == cond->type &&
+						ZBX_CONDITION_OPERATOR_YES == cond->operator)
+				{
+					break;
+				}
+			}
+
+			if (j == op->conditions.values_num)
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+

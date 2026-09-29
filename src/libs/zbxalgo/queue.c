@@ -182,6 +182,49 @@ void	*zbx_queue_ptr_peek(zbx_queue_ptr_t *queue)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: pops the last (most recently pushed) value in the queue           *
+ *                                                                            *
+ * Parameters: queue - [IN]                                                   *
+ *                                                                            *
+ * Return value: The last queue element or NULL if queue is empty             *
+ *                                                                            *
+ ******************************************************************************/
+void	*zbx_queue_ptr_pop_last(zbx_queue_ptr_t *queue)
+{
+	if (queue->tail_pos == queue->head_pos)
+		return NULL;
+
+	if (0 == queue->head_pos)
+		queue->head_pos = queue->alloc_num;
+
+	return queue->values[--queue->head_pos];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: peek at the last (most recently pushed) value in queue without    *
+ *          removing it                                                       *
+ *                                                                            *
+ * Parameters: queue - [IN]                                                   *
+ *                                                                            *
+ * Return value: The last queue element or NULL if queue is empty             *
+ *                                                                            *
+ ******************************************************************************/
+void	*zbx_queue_ptr_peek_last(zbx_queue_ptr_t *queue)
+{
+	if (queue->tail_pos == queue->head_pos)
+		return NULL;
+
+	int	pos = queue->head_pos;
+
+	if (0 == pos)
+		pos = queue->alloc_num;
+
+	return queue->values[--pos];
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: removes specified value from queue                                *
  *                                                                            *
  * Parameters: queue - [IN]                                                   *
