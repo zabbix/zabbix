@@ -531,15 +531,15 @@ void	*zbx_apm_manager_thread(void *args)
 			if (SUCCEED == apm_manager_global_config_active(manager))
 			{
 				apm_config.enabled = apm_manager_update_global_config(manager, &apm_global,
-						apm_args->source_ip, apm_args->ca_location);
+						apm_args->export_config->source_ip, apm_args->ca_location);
 			}
 
 			if (apm_enabled != apm_config.enabled)
 			{
 				if (APM_STATUS_ENABLED == apm_config.enabled)
 				{
-					if (FAIL == apm_manager_activate(manager, apm_args->export_config->source_ip,
-							apm_args->port, tls, &error))
+					if (FAIL == apm_manager_activate(manager, apm_args->source_ip, apm_args->port,
+							tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
 								" %s", error);
