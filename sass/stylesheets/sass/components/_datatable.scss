@@ -647,8 +647,8 @@
 				column-gap: 5px;
 				min-height: 16px;
 
-				&.wrap {
-					flex-wrap: wrap;
+				&.nowrap {
+					flex-wrap: nowrap;
 				}
 
 				& > .link-action {

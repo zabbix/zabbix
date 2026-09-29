@@ -2927,8 +2927,8 @@ button {
         flex-wrap: wrap;
         column-gap: 5px;
         min-height: 16px; }
-        .datatable .datatable-cell.datatable-cell-data .flex-wrapper.wrap {
-          flex-wrap: wrap; }
+        .datatable .datatable-cell.datatable-cell-data .flex-wrapper.nowrap {
+          flex-wrap: nowrap; }
         .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item {
           display: flex;
           min-width: 0; }

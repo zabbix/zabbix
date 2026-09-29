@@ -203,7 +203,7 @@
 					const input_id = `${column.getId()}_${eventid}`;
 
 					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER, ZBX_STYLE_NOWRAP);
 
 					const checkbox = document.createElement('input');
 					checkbox.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
