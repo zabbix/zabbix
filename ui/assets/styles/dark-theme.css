@@ -886,23 +886,21 @@ body {
   grid-template-areas: "sidebar header" "sidebar content";
   margin: 0;
   overflow: hidden; }
-  body > z-split-view {
-    --min-content-size: 768px; }
-    body > z-split-view .wrapper {
-      overflow-y: auto;
-      overscroll-behavior-y: contain; }
-    body > z-split-view .side-drawer {
-      background-color: #2b2b2b;
-      overflow-y: auto;
-      overscroll-behavior-y: contain;
-      position: sticky;
-      inset-block-start: 0;
-      z-index: 998; }
-    body > z-split-view:has(.side-drawer.closed) {
-      grid-template-columns: none; }
-      body > z-split-view:has(.side-drawer.closed) .side-drawer,
-      body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
-        display: none; }
+  body > z-split-view .wrapper {
+    overflow-y: auto;
+    overscroll-behavior-y: contain; }
+  body > z-split-view .side-drawer {
+    background-color: #2b2b2b;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 998; }
+  body > z-split-view:has(.side-drawer.closed) {
+    grid-template-columns: none; }
+    body > z-split-view:has(.side-drawer.closed) .side-drawer,
+    body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
+      display: none; }
   body > z-split-view,
   body > .wrapper {
     grid-area: content;

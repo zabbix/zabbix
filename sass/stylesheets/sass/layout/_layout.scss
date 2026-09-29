@@ -14,8 +14,6 @@ body {
 	overflow: hidden;
 
 	> z-split-view {
-		--min-content-size: 768px;
-
 		.wrapper {
 			overflow-y: auto;
 			overscroll-behavior-y: contain;
