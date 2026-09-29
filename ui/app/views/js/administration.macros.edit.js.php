@@ -19,47 +19,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
-	<?= (new CRow([
-			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
-					->addClass('macro')
-					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}')
-					->disableSpellcheck()
-					->setErrorContainer('macro_#{rowNum}_error_container')
-					->setErrorLabel(_('Macro'))
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol(
-				(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
-					->setErrorContainer('macro_#{rowNum}_error_container')
-					->setErrorLabel(_('Value'))
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
-					->setAttribute('placeholder', _('description'))
-					->setErrorContainer('macro_#{rowNum}_error_container')
-					->setErrorLabel(_('Description'))
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol(
-				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString().
-		(new CRow([
-			(new CCol())
-				->setId('macro_#{rowNum}_error_container')
-				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setColSpan(4)
-		]))->toString()
-	?>
-</script>
-
 <script type="text/javascript">
 	$(function() {
 		const table = $('#tbl_macros');

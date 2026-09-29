@@ -118,7 +118,8 @@ $page = (new CHtmlPage())
 	)
 	->setNavigation(
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
-	);
+	)
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()));
 
 if ($data['is_inaccessible']) {
 	$page->addItem(

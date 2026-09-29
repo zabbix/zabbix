@@ -118,7 +118,9 @@ $filter = (new CFilter())
 			->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
 	]);
 
-$html_page->addItem($filter);
+$html_page
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
+	->addItem($filter);
 
 $csrf_token = CCsrfTokenHelper::get('template');
 

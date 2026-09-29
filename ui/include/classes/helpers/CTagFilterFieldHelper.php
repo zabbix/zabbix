@@ -100,9 +100,9 @@ class CTagFilterFieldHelper {
 	 * @param array  $options
 	 * @param string $options['tag_field_name']  (optional)
 	 *
-	 * @return string
+	 * @return CRow
 	 */
-	public static function getTemplate(array $options = []): string {
+	public static function getTemplate(array $options = []): CRow {
 		$options += [
 			'tag_field_name' => 'filter_tags'
 		];
@@ -132,7 +132,6 @@ class CTagFilterFieldHelper {
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('form_row')
-			->toString();
+			->addClass('form_row');
 	}
 }

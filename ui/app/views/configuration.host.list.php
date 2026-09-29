@@ -199,7 +199,9 @@ $filter = (new CFilter())
 			])
 	]);
 
-$html_page->addItem($filter);
+$html_page
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
+	->addItem($filter);
 
 $current_time = time();
 $csrf_token = CCsrfTokenHelper::get('host');

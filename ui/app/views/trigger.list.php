@@ -188,7 +188,9 @@ if ($data['single_selected_hostid'] != 0) {
 	$html_page->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
-$html_page->addItem($filter);
+$html_page
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
+	->addItem($filter);
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'trigger.list')

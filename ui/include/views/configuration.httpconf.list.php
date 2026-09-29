@@ -114,7 +114,9 @@ if (!empty($this->data['hostid'])) {
 	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
-$html_page->addItem($filter);
+$html_page
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
+	->addItem($filter);
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])

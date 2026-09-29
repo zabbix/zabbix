@@ -325,6 +325,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons,
 			? getHostNavigation('items', $data['hostid'])
 			: null
 	)
+	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
 	->addItem($filter)
 	->addItem($form)
 	->show();
