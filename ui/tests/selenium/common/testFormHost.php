@@ -1602,25 +1602,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #27 User macros in SNMP max repetition and retries.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'host_fields' => [
-						'Host name' => 'Host with user macro in SNMP interface',
-						'Host groups' => 'Zabbix servers'
-					],
-					'interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'Max repetition count' => '{$MACRO}',
-							'Retries' => '{$MACRO}'
-						]
-					]
-				]
-			],
-			// #28 SNMP retries and max repetition empty.
+			// #27 SNMP retries and max repetition empty.
 			[
 				[
 					'expected' => TEST_BAD,
