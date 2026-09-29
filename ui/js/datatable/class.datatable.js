@@ -92,6 +92,9 @@ class CDataTable {
 	static COLUMN_INITIAL_MIN_WIDTH = 32;
 
 	/** @type {number} */
+	static COLUMN_MAX_ALLOWED_CALC_WIDTH = 400;
+
+	/** @type {number} */
 	static COLUMN_HEADER_PADDING = 8;
 
 	/** @type {number} */
@@ -2284,7 +2287,11 @@ class CDataTable {
 	}
 
 	#getColumnMinWidth(column) {
-		let min_width = Math.max(CDataTable.COLUMN_INITIAL_MIN_WIDTH, this.#measureHeaderMinWidth(column));
+		let min_width = CDataTable.COLUMN_INITIAL_MIN_WIDTH;
+
+		if (!column.isResized()) {
+			min_width = Math.max(min_width, this.#measureHeaderMinWidth(column));
+		}
 
 		if (column.getOptionsPopupHandler()) {
 			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH;
@@ -2382,7 +2389,8 @@ class CDataTable {
 
 		let width;
 		if (column.getWidth() === 'max-content') {
-			width = Math.max(min_width, header_width + 1, data_width + 1);
+			width = Math.min(CDataTable.COLUMN_MAX_ALLOWED_CALC_WIDTH, Math.max(min_width, header_width + 1,
+				data_width + 1));
 		}
 		else {
 			width = Math.max(min_width, data_width);

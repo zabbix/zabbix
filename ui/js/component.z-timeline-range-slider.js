@@ -86,6 +86,7 @@ class ZTimelineRangeSlider extends HTMLElement {
 		this.#selection = document.createElement('div');
 		this.#selection.classList.add('z-timeline-range-slider-selection');
 		this.#selection.dataset.action = 'move';
+		this.#selection.hidden = true;
 
 		this.#handle_start = document.createElement('div');
 		this.#handle_start.classList.add('z-timeline-range-slider-handle', 'z-timeline-range-slider-handle-start');
@@ -260,6 +261,8 @@ class ZTimelineRangeSlider extends HTMLElement {
 		if (e.pointerId !== this.#pointer_id || this.#drag_state === null) {
 			return;
 		}
+
+		this.#selection.hidden = false;
 
 		const value = this.#valueFromEvent(e);
 		const drag_state = this.#drag_state;

@@ -883,6 +883,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
 
 #if defined(HAVE_APM)
+	if (NULL != config_apm_sourceip && SUCCEED != zbx_is_supported_ip(config_apm_sourceip))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"APMListenIP\" configuration parameter: '%s'",
+				config_apm_sourceip);
+		err = 1;
+	}
+
 	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
@@ -1790,7 +1797,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 		.cert_file = config_apm_cert_file,
 		.key_file = config_apm_key_file,
 		.ca_location = config_ssl_ca_location,
-		.source_ip = zbx_config_source_ip
+		.source_ip = config_apm_sourceip
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){
