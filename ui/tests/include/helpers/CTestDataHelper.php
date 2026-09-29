@@ -20,8 +20,6 @@
 class CTestDataHelper {
 	private static $objectids = [];
 
-	private static $sessionids = [];
-
 	/**
 	 * Create objects using API.
 	 * Usually only the object's "name/key" need to be provided. Some defaults (e.g. item's type, value_type) are mixed
@@ -1107,29 +1105,6 @@ class CTestDataHelper {
 		}
 
 		self::$objectids = [];
-		self::$sessionids = [];
-	}
-
-	public static function authorizeActors(array $users): void {
-		$id = 0;
-
-		foreach ($users as $user_reference => $user) {
-			$result = CDataHelper::callRaw([
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => $user['username'],
-					'password' => $user['passwd']
-				],
-				'id' => ++$id
-			]);
-
-			self::$sessionids[$user_reference] = $result['result'];
-		}
-	}
-
-	public static function setActor(string $user_reference) {
-		CAPIHelper::setSessionId(self::$sessionids[$user_reference]);
 	}
 
 	private static function prepareEnabledGuestUser(): array {
