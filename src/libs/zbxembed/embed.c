@@ -15,6 +15,7 @@
 #include "zbxembed.h"
 #include "embed_xml.h"
 #include "embed.h"
+#include "duktape.h"
 
 #include "httprequest.h"
 #include "zabbix.h"

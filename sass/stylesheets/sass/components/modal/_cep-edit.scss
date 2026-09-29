@@ -1,0 +1,29 @@
+#ceprule-window-groupby {
+	.multiselect-control {
+		display: inline-block;
+	}
+}
+
+#ceprule-window-capacity,
+#ceprule-window-counttag {
+	line-height: 16px;
+}
+
+#ceprule-operation-period-argument {
+	display: inline;
+}
+
+#ceprule-operations-table {
+	td {
+		line-height: $body-line-height;
+		padding-top: 9px;
+		padding-bottom: 4px;
+	}
+
+	.error-container-row {
+		td:empty {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+}

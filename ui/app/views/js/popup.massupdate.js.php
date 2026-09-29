@@ -159,14 +159,20 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		return false;
 	}
 
-	monitored_by.addEventListener('change', (e) => {
-		obj.querySelector('.js-field-proxy').style.display =
-			e.target.value == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
-		obj.querySelector('.js-field-proxy-group').style.display =
-			e.target.value == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
-	});
+	const updateFieldsVisibility = () => {
+		const value = monitored_by.querySelector('input[name="monitored_by"]:checked').value;
 
-	monitored_by.dispatchEvent(new CustomEvent('change', {}));
+		obj.querySelector('.js-field-proxy').style.display =
+			value == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
+
+		obj.querySelector('.js-field-proxy-group').style.display =
+			value == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
+	};
+
+	updateFieldsVisibility();
+
+	monitored_by.querySelectorAll('input[name="monitored_by"]')
+		.forEach(input => input.addEventListener('change', updateFieldsVisibility));
 })();
 
 // Inventory mode.
@@ -329,9 +335,10 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	let overlay = overlays_stack.end();
 
-	$(overlay.$dialogue||document).on('remove', () => {
+	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 		$(document).off('add.popup', processAddfromPopup);
 	});
+
 	$(document).on('add.popup', processAddfromPopup);
 
 	function processAddfromPopup(ev, data) {
@@ -401,7 +408,7 @@ function submitPopup(overlay) {
 	}
 
 	if (warning_message !== '') {
-		overlayDialogue({
+		const warning_overlay = overlayDialogue({
 			title: <?= json_encode(_('Warning')) ?>,
 			content: $('<span>').text(warning_message),
 			buttons: [
@@ -415,6 +422,9 @@ function submitPopup(overlay) {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: overlay.$btn_submit
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		warning_overlay.$dialogue.$head.$close_button.show();
 
 		overlay.unsetLoading();
 		return false;

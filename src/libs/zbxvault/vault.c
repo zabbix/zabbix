@@ -310,6 +310,52 @@ fail:
 	return ret;
 }
 
+int	zbx_vault_apm_db_credentials_get(const zbx_config_vault_t *config_vault, char **username, char **password,
+		const char *vault_path, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **error)
+{
+	int		ret = FAIL;
+	zbx_kvs_t	kvs;
+	const zbx_kv_t	*kv_username, *kv_password;
+	zbx_kv_t	kv_local;
+
+	if (NULL == vault_path)
+		return SUCCEED;
+
+	zbx_kvs_create(&kvs, 2);
+
+	if (SUCCEED != zbx_vault_get_kvs_cb(config_vault->url, config_vault->prefix, config_vault->token,
+			config_vault->app_role_id, config_vault->tls_cert_file, config_vault->tls_key_file,
+			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			vault_path, ZBX_VAULT_TIMEOUT, &kvs, NULL, error))
+	{
+		goto fail;
+	}
+
+	kv_local.key = (char *)zbx_vault_dbuser_key;
+	if (NULL == (kv_username = zbx_kvs_search(&kvs, &kv_local)))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_USERNAME);
+		goto fail;
+	}
+
+	kv_local.key = (char *)zbx_vault_dbpassword_key;
+	if (NULL == (kv_password = zbx_kvs_search(&kvs, &kv_local)))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_PASSWORD);
+		goto fail;
+	}
+
+	*username = zbx_strdup(NULL, kv_username->value);
+	*password = zbx_strdup(NULL, kv_password->value);
+
+	ret = SUCCEED;
+fail:
+	zbx_kvs_destroy(&kvs);
+
+	return ret;
+}
+
 int	zbx_vault_token_from_env_get(char **token, char **error)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV)

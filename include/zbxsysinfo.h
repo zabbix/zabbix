@@ -180,6 +180,9 @@ void	zbx_free_perf_collector(void);
 
 #define ZBX_CHECK_TIMEOUT_UNDEFINED	0
 int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
+int	zbx_validate_item_max_repetitions(const char *max_repetitions_str, int *max_repetitions_out, char *error,
+		size_t error_len);
+int	zbx_validate_item_retries(const char *retries_str, int *retries_out, char *error, size_t error_len);
 
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result);
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,

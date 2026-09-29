@@ -904,7 +904,8 @@ class testFormUserRoles extends CWebTest {
 						'Enabled' => true
 					],
 					'api_list' => [
-						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
+						'action.get', 'alert.get', 'apmlog.get', 'apmmetric.get', 'apmspan.get', 'apmtrace.get',
+						'ceprule.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
 						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
 						'dcheck.get', 'dhost.get', 'discoveryrule.get', 'discoveryruleprototype.get', 'drule.get',
 						'dservice.get', 'event.acknowledge', 'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get',
@@ -930,7 +931,8 @@ class testFormUserRoles extends CWebTest {
 						'Enabled' => true
 					],
 					'api_list' => [
-						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'configuration.export',
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
+						'apmmetric.get', 'apmspan.get', 'apmtrace.get', 'ceprule.get', 'configuration.export',
 						'configuration.import', 'configuration.importcompare', 'correlation.get', 'dashboard.create',
 						'dashboard.delete', 'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get',
 						'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update',
@@ -974,19 +976,21 @@ class testFormUserRoles extends CWebTest {
 						'Enabled' => true
 					],
 					'api_list' => [
-						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
-						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
-						'configuration.export', 'configuration.import', 'configuration.importcompare', 'connector.create',
-						'connector.delete', 'connector.get', 'connector.update', 'correlation.create', 'correlation.delete',
-						'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete', 'dashboard.get',
-						'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.create', 'discoveryrule.delete',
-						'discoveryrule.get', 'discoveryrule.update', 'discoveryruleprototype.create',
-						'discoveryruleprototype.delete', 'discoveryruleprototype.get', 'discoveryruleprototype.update',
-						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',
-						'event.get', 'graph.create', 'graph.delete', 'graph.get', 'graph.update', 'graphitem.get',
-						'graphprototype.create', 'graphprototype.delete', 'graphprototype.get', 'graphprototype.update',
-						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete',
-						'host.get', 'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
+						'apmmetric.get', 'apmspan.get', 'apmtrace.get', 'auditlog.get', 'authentication.get',
+						'authentication.update', 'autoregistration.get', 'autoregistration.update', 'ceprule.create',
+						'ceprule.delete', 'ceprule.get', 'ceprule.resettimewindows', 'ceprule.update', 'configuration.export',
+						'configuration.import', 'configuration.importcompare', 'connector.create', 'connector.delete',
+						'connector.get', 'connector.update', 'correlation.create', 'correlation.delete', 'correlation.get',
+						'correlation.update', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
+						'dcheck.get', 'dhost.get', 'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get',
+						'discoveryrule.update', 'discoveryruleprototype.create', 'discoveryruleprototype.delete',
+						'discoveryruleprototype.get', 'discoveryruleprototype.update', 'drule.create', 'drule.delete',
+						'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create',
+						'graph.delete', 'graph.get', 'graph.update', 'graphitem.get', 'graphprototype.create',
+						'graphprototype.delete', 'graphprototype.get', 'graphprototype.update', 'hanode.get',
+						'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
+						'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
 						'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
 						'hostgroup.propagate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
 						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
@@ -1051,8 +1055,15 @@ class testFormUserRoles extends CWebTest {
 
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User role created');
-		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
-				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
+		$sql_api =
+			'SELECT value_str'.
+			' FROM role_rule'.
+			' WHERE type=1'.
+				' AND name LIKE '.zbx_dbstr('api.method%').
+				' AND roleid in ('.
+					'SELECT roleid FROM role WHERE name='.zbx_dbstr($data['fields']['Name']).
+				')'.
+			' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
 		sort($role_rules);
 		$this->assertEquals($data['api_list'], $role_rules);

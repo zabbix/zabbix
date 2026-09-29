@@ -75,11 +75,7 @@ class CControllerProxyList extends CController {
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'filter' => $filter,
-			'active_tab' => CProfile::get('web.proxies.filter.active', 1),
-			'user' => [
-				'can_edit_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'can_edit_proxy_groups' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
-			]
+			'active_tab' => CProfile::get('web.proxies.filter.active', 1)
 		];
 
 		if ($filter['version'] == ZBX_PROXY_VERSION_ANY_OUTDATED) {

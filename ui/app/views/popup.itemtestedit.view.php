@@ -197,11 +197,30 @@ if ($data['is_item_testable']) {
 						$data['inputs']['host']['interface']['details']['max_repetitions'], false,
 						DB::getFieldLength('interface_snmp', 'max_repetitions')
 					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAriaRequired()
 				))
 					->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 					->addClass('js-popup-row-snmp-max-repetition'),
+
+			(!str_starts_with($data['inputs']['item']['snmp_oid'], 'get[')
+				&& !str_starts_with($data['inputs']['item']['snmp_oid'], 'walk[')
+			)
+				? null
+				: [(new CLabel(_('Retries'), 'interface[details][retries]'))
+						->setAsteriskMark()
+						->addClass('js-popup-row-snmp-retries'),
+					(new CFormField(
+						(new CTextBox('interface[details][retries]',
+							$data['inputs']['host']['interface']['details']['retries'], false,
+							DB::getFieldLength('interface_snmp', 'retries')
+						))
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAriaRequired()
+					))
+						->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+						->addClass('js-popup-row-snmp-retries')
+				],
 
 			(new CLabel(_('Context name'), 'interface[details][contextname]'))
 				->addClass('js-popup-row-snmpv3-contextname'),
@@ -290,7 +309,9 @@ if ($data['is_item_testable']) {
 		(new CLabel(_('Test with'), 'test_with'))->addClass('js-test-with-row'),
 		(new CFormField([
 			(new CRadioButtonList('test_with', (int) $data['test_with']))
-				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER)
+				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER,
+					disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+				)
 				->addValue(_('Proxy'), CControllerPopupItemTest::TEST_WITH_PROXY)
 				->setReadonly(!$data['proxies_enabled'])
 				->setModern(),
@@ -300,6 +321,7 @@ if ($data['is_item_testable']) {
 					'object_name' => 'proxies',
 					'multiple' => false,
 					'data' => $data['ms_proxy'],
+					'readonly' => !$data['proxies_enabled'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'proxies',
@@ -645,6 +667,8 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'rules_get_value' => $data['js_validation_rules_get_value'],
 			'is_item_testable' => $data['is_item_testable'],
+			'can_select_server_for_test' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING),
+			'proxies_enabled' => $data['proxies_enabled'],
 			'show_prev' => $data['show_prev'],
 			'show_snmp_form' => $data['show_snmp_form'],
 			'interface_address_enabled' => $data['interface_address_enabled'],

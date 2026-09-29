@@ -47,9 +47,10 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_DISCOVERY_ACTIONS =  'ui.configuration.discovery_actions';
 	public const UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS =  'ui.configuration.autoregistration_actions';
 	public const UI_CONFIGURATION_INTERNAL_ACTIONS =  'ui.configuration.internal_actions';
-	public const UI_CONFIGURATION_EVENT_CORRELATION = 'ui.configuration.event_correlation';
+	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
+	public const UI_ADMINISTRATION_DATA_SOURCE = 'ui.administration.data_source';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
@@ -64,6 +65,9 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_MEDIA_TYPES = 'ui.administration.media_types';
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
+
+	public const PROFILE_REDIRECT_ENFORCE = 'profile.redirect.enforce';
+	public const PROFILE_REDIRECT_URL = 'profile.redirect.url';
 
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
@@ -81,6 +85,7 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
 	public const ACTIONS_EDIT_OWN_MEDIA = 'actions.edit_own_media';
 	public const ACTIONS_EDIT_USER_MEDIA = 'actions.edit_user_media';
+	public const ACTIONS_SELECT_SERVER_FOR_MONITORING = 'actions.select_server_for_monitoring';
 
 	public const DEVICES_ACCESS = 'devices.access';
 	public const DEVICES_ACTIONS_MANAGE_OWN = 'devices.actions.manage_own';
@@ -132,11 +137,11 @@ class CRoleHelper {
 	 * @param string $rule_name  Name of the rule to check access for.
 	 * @param string $roleid     ID of the role where check of access is necessary to perform.
 	 *
-	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
+	 * @return mixed  Returns value if role have access to specified rule, false - otherwise.
 	 *
 	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name, string $roleid): bool {
+	public static function checkAccess(string $rule_name, string $roleid): mixed {
 		self::loadRoleRules($roleid);
 
 		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
@@ -144,6 +149,17 @@ class CRoleHelper {
 		}
 
 		return self::$roles[$roleid]['rules'][$rule_name];
+	}
+
+	/**
+	 * Returns mode for treating API methods: 0 - deny list; 1 - allow list.
+	 *
+	 * @throws Exception
+	 */
+	public static function getRoleApiListMode(string $roleid): int {
+		self::loadRoleRules($roleid);
+
+		return (int) self::$roles[$roleid]['rules']['api.mode'];
 	}
 
 	/**
@@ -176,8 +192,12 @@ class CRoleHelper {
 
 		if (!$roleid) {
 			self::$roles[0] = [
-				'type'	=> USER_TYPE_ZABBIX_USER,
-				'rules' => ['api' => []]
+				'type' => USER_TYPE_ZABBIX_USER,
+				'rules' => [
+					'api' => [],
+					'api.access' => (bool) ZBX_ROLE_RULE_DISABLED,
+					'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY
+				]
 			];
 
 			return;
@@ -185,9 +205,9 @@ class CRoleHelper {
 
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api', 'actions', 'actions.default_access', 'devices.access', 'devices.actions',
-				'devices.actions.default_access'
+			'selectRules' => ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url', 'modules',
+				'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access',
+				'devices.access', 'devices.actions', 'devices.actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -200,9 +220,11 @@ class CRoleHelper {
 
 		$rules = [
 			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
+			'profile.redirect.enforce' => (bool) $role['rules']['profile.redirect.enforce'],
+			'profile.redirect.url' => $role['rules']['profile.redirect.url'],
 			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
 			'api.access' => (bool) $role['rules']['api.access'],
-			'api.mode' => (bool) $role['rules']['api.mode'],
+			'api.mode' => (int) $role['rules']['api.mode'],
 			'api' => $role['rules']['api'],
 			'actions.default_access' => (bool) $role['rules']['actions.default_access'],
 			'devices.access' => (bool) $role['rules']['devices.access'],
@@ -278,7 +300,7 @@ class CRoleHelper {
 			$rules = array_merge($rules, [
 				self::UI_REPORTS_AUDIT,
 				self::UI_REPORTS_ACTION_LOG,
-				self::UI_CONFIGURATION_EVENT_CORRELATION,
+				self::UI_CONFIGURATION_CEPRULES,
 				self::UI_ADMINISTRATION_MEDIA_TYPES,
 				self::UI_ADMINISTRATION_SCRIPTS,
 				self::UI_ADMINISTRATION_USER_GROUPS,
@@ -288,6 +310,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_AUTHENTICATION,
 				self::UI_ADMINISTRATION_LINKED_DEVICES,
 				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_ADMINISTRATION_DATA_SOURCE,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
 				self::UI_ADMINISTRATION_PROXY_GROUPS,
@@ -318,6 +341,7 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
 			$rules[] = self::ACTIONS_MANAGE_SLA;
+			$rules[] = self::ACTIONS_SELECT_SERVER_FOR_MONITORING;
 		}
 
 		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING,
@@ -463,7 +487,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event correlation')];
+					$labels += [self::UI_CONFIGURATION_CEPRULES => _('Event processing')];
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -519,6 +543,7 @@ class CRoleHelper {
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
+						self::UI_ADMINISTRATION_DATA_SOURCE => _('Data source'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
 						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),
@@ -577,6 +602,12 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
+		}
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [
+				self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring and discovery')
+			];
 		}
 
 		return $labels;

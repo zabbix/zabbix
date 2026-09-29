@@ -211,6 +211,10 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
 				}
 
+				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+				}
+
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
 			}
 			elseif (in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_RULE_CREATED])) {
@@ -269,7 +273,7 @@ abstract class CItemGeneral extends CApiService {
 				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-					ITEM_TYPE_BROWSER
+					ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 				];
 
 				if (in_array($item['type'], $delay_types)) {
@@ -310,9 +314,13 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
 				}
 
-				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+				if ($item['type'] == ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
 						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
@@ -385,6 +393,34 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				$item['headers'] = $fields;
+			}
+
+			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+				/** @var CItemTypeTelemetryQuery $item_type */
+				$path = '/'.($i + 1);
+
+				if (array_key_exists('granularity', $item)
+						&& !$item_type::validateGranularity($item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if (array_key_exists('query', $item)) {
+					if (!$item_type::validateColumns($item, $path, $error)
+							|| !$item_type::validateAggregatedColumns($item, $path, $error)
+							|| !$item_type::validateFilter($item, $path, $error)
+							|| !$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+
+					$item['query'] = $item_type::convertFilterFormulaToExpression($item['query']);
+
+					if (strlen($item_type::prepareQueryFieldForDb($item['query']))
+							> DB::getFieldLength('items', 'query')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/query', _('value is too long')
+						));
+					}
+				}
 			}
 		}
 		unset($item);
@@ -858,6 +894,50 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $chunks;
+	}
+
+	/**
+	 * Validate effective granularity and lookback limit values of inherited telemetry query items and item prototypes.
+	 *
+	 * An inherited item can override these fields. Therefore, a valid template update can become invalid when combined
+	 * with a value already stored on a child item.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected static function validateInheritedTelemetryQueryItems(array $items, array $db_items): void {
+		foreach ($items as $item) {
+			if ($item['type'] != ITEM_TYPE_TELEMETRY_QUERY
+					|| (!array_key_exists('granularity', $item) && !array_key_exists('lookback_limit', $item))) {
+				continue;
+			}
+
+			$item += $db_items[$item['itemid']];
+
+			if (CItemTypeTelemetryQuery::validateGranularity($item, '')) {
+				continue;
+			}
+
+			if (self::isItemPrototype()) {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited item prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited item prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+			else {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited item with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited item with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+
+			$hosts = DB::select('hosts', [
+				'output' => ['host'],
+				'hostids' => $item['hostid']
+			]);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $hosts[0]['host']));
+		}
 	}
 
 	protected static function showObjectMismatchError(array $item, array $upd_db_item): void {
@@ -1520,7 +1600,13 @@ abstract class CItemGeneral extends CApiService {
 
 			// SSH item type specific fields.
 			'publickey' => DB::getDefault('items', 'publickey'),
-			'privatekey' => DB::getDefault('items', 'privatekey')
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+
+			// Telemetry query
+			'time_shift' => DB::getDefault('items', 'time_shift'),
+			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
+			'granularity' => DB::getDefault('items', 'granularity'),
+			'query' => []
 		];
 
 		$value_type_field_defaults = [
@@ -2837,6 +2923,10 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('headers', $item)) {
 			$item['headers'] = self::prepareHeadersForApi($item['headers'], $sortorder);
 		}
+
+		if (array_key_exists('query', $item)) {
+			$item['query'] = CItemTypeTelemetryQuery::prepareQueryFieldForApi($item['query']);
+		}
 	}
 
 	private static function prepareQueryFieldsForApi(string $query_fields, bool $sortorder): array {
@@ -2912,6 +3002,12 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('headers', $item)) {
 			$item['headers'] = self::prepareHeadersForDb($item['headers']);
+		}
+
+		if (array_key_exists('query', $item)) {
+			$item['query'] = $item['query']
+				? CItemTypeTelemetryQuery::prepareQueryFieldForDb($item['query'])
+				: DB::getDefault('items', 'query');
 		}
 	}
 

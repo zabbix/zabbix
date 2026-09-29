@@ -262,14 +262,30 @@ class CSvgGraphHelper {
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = array_key_exists('color', $data_set)
-				? CColorPicker::getColorVariations($data_set['color'], count($items))
-				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
+			if ($data_set['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
+				$colors = array_key_exists('color', $data_set)
+					? CColorPicker::getColorVariations($data_set['color'], count($items))
+					: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
-			foreach ($items as $item) {
-				$data_set['color'] = array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-				$max_metrics--;
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$data_set['color'] = array_shift($colors);
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
+			}
+			else {
+				$data_set['color'] = array_key_exists('color', $data_set)
+					? '#'.$data_set['color']
+					: CColorPicker::getPaletteColors($data_set['color_palette'], 1)[0];
+
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
 			}
 		}
 	}
@@ -683,11 +699,15 @@ class CSvgGraphHelper {
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
 			if (!array_key_exists($key, $tr_groups)) {
+				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
+				$extend = (int) ($period * sqrt(SEC_PER_HOUR / ($period + SEC_PER_HOUR)));
+
 				$tr_groups[$key] = [
 					'time' => [
-						'from' => $metric['time_period']['time_from'],
-						'to' => $metric['time_period']['time_to']
-					]
+						'from' => $metric['time_period']['time_from'] - $extend,
+						'to' => $metric['time_period']['time_to'] + $extend
+					],
+					'width' => (int) ceil($width * ($period + 2 * $extend) / $period)
 				];
 			}
 
@@ -702,7 +722,7 @@ class CSvgGraphHelper {
 		// Request data.
 		foreach ($tr_groups as $tr_group) {
 			$results = Manager::History()->getGraphAggregationByWidth($tr_group['items'], $tr_group['time']['from'],
-				$tr_group['time']['to'], $width
+				$tr_group['time']['to'], $tr_group['width']
 			);
 
 			if ($results) {
@@ -712,20 +732,90 @@ class CSvgGraphHelper {
 
 					// Collect and sort data points.
 					if (array_key_exists($item['itemid'], $results)) {
+						$left = null;
+						$right = null;
+
 						foreach ($results[$item['itemid']]['data'] as $point) {
-							$metric['points'][$point['clock']] = [
+							$value = [
 								'min' => $multiplier * $point['min'],
 								'avg' => $multiplier * $point['avg'],
 								'max' => $multiplier * $point['max']
 							];
+
+							if ($point['clock'] < $metric['time_period']['time_from']) {
+								if ($left === null || $point['clock'] > $left['clock']) {
+									$left = ['clock' => $point['clock']] + $value;
+								}
+							}
+							elseif ($point['clock'] > $metric['time_period']['time_to']) {
+								if ($right === null || $point['clock'] < $right['clock']) {
+									$right = ['clock' => $point['clock']] + $value;
+								}
+							}
+							else {
+								$metric['points'][$point['clock']] = $value;
+							}
 						}
 
 						unset($metric['history'], $metric['trends']);
+
+						self::addSyntheticEdgePoints($metric,
+							$metric['time_period']['time_from'],
+							$metric['time_period']['time_to'],
+							$left, $right
+						);
 					}
 				}
 				unset($metric);
 			}
 		}
+	}
+
+	/**
+	 * Add a synthetic, non-hoverable point at a visible edge so the line reaches it.
+	 */
+	private static function addSyntheticEdgePoints(array &$metric, int $from, int $to, ?array $left,
+			?array $right): void {
+		if (!$metric['points']
+				|| !in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
+			return;
+		}
+
+		$is_staircase = $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE;
+		$first_clock = array_key_first($metric['points']);
+		$last_clock = array_key_last($metric['points']);
+
+		if ($left !== null && $first_clock > $from) {
+			$metric['points'][$from] = self::interpolateEdgePoint($left,
+				['clock' => $first_clock] + $metric['points'][$first_clock], $from, $is_staircase
+			);
+		}
+
+		if ($right !== null && $last_clock < $to) {
+			$metric['points'][$to] = self::interpolateEdgePoint(
+				['clock' => $last_clock] + $metric['points'][$last_clock], $right, $to, $is_staircase
+			);
+		}
+
+		ksort($metric['points']);
+	}
+
+	/**
+	 * Interpolate a point at clock $at between $before and $after.
+	 */
+	private static function interpolateEdgePoint(array $before, array $after, int $at, bool $is_staircase): array {
+		$point = ['synthetic' => true];
+		$ratio = ($after['clock'] - $before['clock']) != 0
+			? ($at - $before['clock']) / ($after['clock'] - $before['clock'])
+			: 0;
+
+		foreach (['min', 'avg', 'max'] as $approximation) {
+			$point[$approximation] = $is_staircase
+				? $before[$approximation]
+				: $before[$approximation] + ($after[$approximation] - $before[$approximation]) * $ratio;
+		}
+
+		return $point;
 	}
 
 	private static function populateValuesBetweenHeartbeats(array &$metrics, int $width) {
@@ -865,7 +955,8 @@ class CSvgGraphHelper {
 			}
 
 			$result = Manager::History()->getAggregationByInterval(
-				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
+				$metric['items'], $metric['time_period']['time_from'],
+				$metric['time_period']['time_to'] + 2 * $metric['options']['aggregate_interval'],
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
 			);
 
@@ -971,6 +1062,26 @@ class CSvgGraphHelper {
 			}
 
 			ksort($metric['points'], SORT_NUMERIC);
+
+			$right = null;
+
+			foreach ($metric['points'] as $tick => $value) {
+				if ($tick > $metric['time_period']['time_to']) {
+					if ($right === null) {
+						$right = ['clock' => $tick] + $value;
+					}
+
+					unset($metric['points'][$tick]);
+				}
+			}
+
+			if ($right !== null && $right['avg'] == 0
+					&& $metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
+				$right = null;
+			}
+
+			self::addSyntheticEdgePoints($metric, $metric['time_period']['time_from'],
+				$metric['time_period']['time_to'], null, $right);
 		}
 	}
 
@@ -990,20 +1101,31 @@ class CSvgGraphHelper {
 			if ($metric['points']) {
 				switch ($metric['options']['approximation']) {
 					case APPROXIMATION_MIN:
-						$values = array_column($metric['points'], 'min');
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = $min_values;
+						$max_values = $min_values;
 						break;
 					case APPROXIMATION_MAX:
-						$values = array_column($metric['points'], 'max');
+						$max_values = array_column($metric['points'], 'max');
+						$min_values = $max_values;
+						$avg_values = $max_values;
+						break;
+					case APPROXIMATION_ALL:
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = array_column($metric['points'], 'avg');
+						$max_values = array_column($metric['points'], 'max');
 						break;
 					default:
-						$values = array_column($metric['points'], 'avg');
+						$avg_values = array_column($metric['points'], 'avg');
+						$min_values = $avg_values;
+						$max_values = $avg_values;
 				}
 
 				$item += [
 					'units' => $metric['units'],
-					'min' => min($values),
-					'avg' => array_sum($values) / count($values),
-					'max' => max($values),
+					'min' => min($min_values),
+					'avg' => array_sum($avg_values) / count($avg_values),
+					'max' => max($max_values),
 					'invert_values' => $metric['options']['invert_values']
 				];
 			}
@@ -1036,9 +1158,10 @@ class CSvgGraphHelper {
 			}
 
 			$db_triggers = DBselect(
-				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
-				' FROM triggers tr,functions f,items i,hosts h'.
+				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,trd.value'.
+				' FROM triggers tr,trigger_rtdata trd,functions f,items i,hosts h'.
 				' WHERE tr.triggerid=f.triggerid'.
+				' AND trd.triggerid=f.triggerid'.
 				" AND f.name IN ('last','min','avg','max')".
 				' AND tr.status='.TRIGGER_STATUS_ENABLED.
 				' AND i.itemid=f.itemid'.

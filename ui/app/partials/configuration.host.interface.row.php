@@ -56,13 +56,36 @@ $snmp_details = (new CDiv(
 				_('Max repetition count'),
 				makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 			], 'interfaces[#{iface.interfaceid}][details][max_repetitions]'))
-				->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
+				->setId('snmp_repetition_count_label_#{iface.interfaceid}')
+				->setAsteriskMark(),
 			(new CFormField(
-				(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
-					'#{iface.details.max_repetitions}', 10, false, false, false
-				))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				(new CTextBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
+					'#{iface.details.max_repetitions}',
+					false,
+					DB::getFieldLength('interface_snmp', 'max_repetitions')
+				))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
 			))
 				->setId('snmp_repetition_count_field_#{iface.interfaceid}')
+		])
+		->addItem([
+			(new CLabel([
+				_('Retries'),
+				makeHelpIcon(_('Maximum number of retries after a timeout for walk[]/get[] items. For walk[], retries are shared across the entire walk. 0 disables retries.'))
+			], 'interfaces[#{iface.interfaceid}][details][retries]'))
+				->setId('snmp_retries_label_#{iface.interfaceid}')
+				->setAsteriskMark(),
+			(new CFormField(
+				(new CTextBox('interfaces[#{iface.interfaceid}][details][retries]',
+					'#{iface.details.retries}',
+					false,
+					DB::getFieldLength('interface_snmp', 'retries')
+				))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
+			))
+				->setId('snmp_retries_field_#{iface.interfaceid}')
 		])
 		->addItem([
 			(new CLabel(_('Context name'), 'interfaces[#{iface.interfaceid}][details][contextname]'))
