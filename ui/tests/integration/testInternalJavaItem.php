@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @required-components server
  * @hosts java_host
  * @backup hosts
- * 
+ *
  */
 class testInternalJavaItem extends CIntegrationTest {
 
@@ -31,7 +31,7 @@ class testInternalJavaItem extends CIntegrationTest {
 			'key' => 'zabbix[java,,ping]',
 			'type' => ITEM_TYPE_INTERNAL,
 			'value_type' => ITEM_VALUE_TYPE_UINT64
-		],		
+		],
 		'zbx_java_ver_test' => [
 			'name' => 'zbx_java_ver_test',
 			'key' => 'zabbix[java,,version]',
@@ -200,7 +200,7 @@ class testInternalJavaItem extends CIntegrationTest {
 
 	/**
 	 *
- 	 * @required-components java
+	 * @required-components java
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testInternalJavaItem_ping() {
@@ -222,7 +222,7 @@ class testInternalJavaItem extends CIntegrationTest {
 
 	/**
 	 *
- 	 * @required-components java
+	 * @required-components java
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testInternalJavaItem_ver() {
@@ -245,7 +245,7 @@ class testInternalJavaItem extends CIntegrationTest {
 
 	/**
 	 *
- 	 * @required-components java
+	 * @required-components java
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testInternalJavaItem_invalid() {
