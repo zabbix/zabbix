@@ -55,6 +55,13 @@ class CApiService {
 	protected $sortColumns = [];
 
 	/**
+	 * An array of fields that can be used for grouping.
+	 *
+	 * @var array
+	 */
+	protected $groupByColumns = [];
+
+	/**
 	 * An array of allowed get() options that are supported by all APIs.
 	 *
 	 * @var array
@@ -515,9 +522,10 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
+			elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
 				foreach ($options['groupBy'] as $field) {
-					if (is_string($field) && $this->hasField($field, $table_name)) {
+					if (is_string($field) && in_array($field, $this->groupByColumns)
+							&& $this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -526,11 +534,13 @@ class CApiService {
 				}
 			}
 		}
-		elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
+		elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+					&& $options['groupBy']) {
 			$sql_parts['select'] = [];
 
 			foreach ($options['groupBy'] as $field) {
-				if (is_string($field) && $this->hasField($field, $table_name)) {
+				if (is_string($field) && in_array($field, $this->groupByColumns)
+						&& $this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -687,8 +697,9 @@ class CApiService {
 
 		$allowed_sort_fields = $this->sortColumns;
 
-		if (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
-			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
+		if ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+				&& $options['groupBy']) {
+			$allowed_sort_fields = array_intersect($this->sortColumns, $this->groupByColumns, $options['groupBy']);
 
 			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
 				$allowed_sort_fields[] = 'rowscount';
