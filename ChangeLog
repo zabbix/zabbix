@@ -1,6 +1,12 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F....P.. [ZBXNEXT-10084] added open telemetry collector to proxy (gklavins, katkuzmina, vmaksimovs, wiper)
+..F....... [ZBXNEXT-10083] implemented OpenTelemetry trace visualization (ashubin, averza, dfofanovs, gklavins)
+.........T [ZBXNEXT-10728] switched filesystem monitoring in OS templates to vfs.fs.get[short|full] (egordymov)
+...G...... [ZBXNEXT-10753] added optional "redirect_limit" parameter to web.page.get, web.page.perf and web.page.regexp agent item keys (MVekslers)
+A.F.I...S. [ZBXNEXT-10111,ZBXNEXT-10722] added user macro usage for 'Max repetition count' SNMP interface field. Added 'Retries' SNMP interface field to configure native bulk requests. (gberzina, jburlakovs, scernisenko)
+.........T [ZBXNEXT-10760] added Telemetry query poller to Zabbix health templates (mruszczyk)
 .........T [ZBXNEXT-10550] added OpenTelemetry templates for Proxmox, Envoy proxy, OpenRouter and Overview (abakaldin, abrosimovs, egordymov)
 A.F....PS. [ZBXNEXT-10680] implemented APM global data source (gklavins, mkorotkov, wczerneha)
 ...G...... [ZBXNEXT-10438] added mode and mountpoint parameters to vfs.fs.get for Zabbix agents (vsmelovs)
@@ -46,6 +52,17 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-28173] fixed database reconnection (wiper)
+..F....... [ZBX-27927] added unsigned option to SVG graph axes (dfofanovs)
+.........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
+........S. [ZBX-27673] fixed browser item timeout (sboidenko)
+.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
+.........T [ZBX-28164] fixed naming in README.md for MikroTik family templates (egordymov)
+..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
+..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
+A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
+..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
 ...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
 ..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
@@ -548,6 +565,15 @@ Changes for 7.4.16rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
+........S. [ZBX-27673] fixed browser item timeout (sboidenko)
+.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
+.........T [ZBX-28164] fixed naming in README.md for MikroTik family templates (egordymov)
+..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
+..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
+A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
+..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
 ...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
 ..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
@@ -2162,6 +2188,14 @@ Changes for 7.0.32rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
+........S. [ZBX-27673] fixed browser item timeout (sboidenko)
+.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
+..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
+A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
+..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
+..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
 ...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
 ..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
