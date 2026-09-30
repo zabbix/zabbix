@@ -2654,6 +2654,27 @@ class testDocumentationLinks extends CWebTest {
 					'url' => 'zabbix.php?action=apm.db.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
 				]
+			],
+			// #252 APM -> Traces view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.trace.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/traces'
+				]
+			],
+			// #253 APM -> Metrics view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.metric.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/metrics'
+				]
+			],
+			// #254 APM -> Logs view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.log.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/logs'
+				]
 			]
 		];
 	}
