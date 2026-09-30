@@ -92,6 +92,9 @@ class CDataTable {
 	static COLUMN_INITIAL_MIN_WIDTH = 32;
 
 	/** @type {number} */
+	static COLUMN_MIN_ALLOWED_CALC_WIDTH = 200;
+
+	/** @type {number} */
 	static COLUMN_MAX_ALLOWED_CALC_WIDTH = 400;
 
 	/** @type {number} */
@@ -2393,7 +2396,7 @@ class CDataTable {
 				data_width + 1));
 		}
 		else {
-			width = Math.max(min_width, data_width);
+			width = Math.max(CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH, Math.max(min_width, data_width));
 		}
 
 		const calculated_width = `${width}px`;
@@ -2593,8 +2596,9 @@ class CDataTable {
 
 		this.#resize_debounce_timeout_id = setTimeout(() => {
 			this.#calculateColumnWidths();
-			this.#handleScrollbar();
 			this.#handleCompactFooter();
+
+			requestAnimationFrame(() => this.#handleScrollbar());
 		}, 0)
 	}
 
