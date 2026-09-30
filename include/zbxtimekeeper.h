@@ -76,5 +76,6 @@ int	zbx_timekeeper_get_stat(zbx_timekeeper_t *timekeeper, int unit_index, int co
 zbx_timekeeper_state_t	*zbx_timekeeper_get_counters(zbx_timekeeper_t *timekeeper);
 
 int	zbx_timekeeper_get_usage(zbx_timekeeper_t *timekeeper, zbx_vector_dbl_t *usage);
+void	zbx_timekeeper_reset(zbx_timekeeper_t *timekeeper, int index);
 
 #endif

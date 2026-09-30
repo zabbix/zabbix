@@ -432,12 +432,16 @@ static void	add_command(const char *key, zbx_uint64_t id, int timeout)
  *     config_revision_local - [IN/OUT] revision of processed configuration     *
  *     config_timeout        - [IN] global timeout value for checks without     *
  *                                  timeouts                                    *
+ *     config_hostname       - [IN]                                             *
+ *     addrs                 - [IN]                                             *
+ *     config_tls            - [IN]                                             *
+ *     config_source_ip      - [IN]                                             *
+ *     config_buffer_send    - [IN]                                             *
+ *     config_buffer_size    - [IN]                                             *
+ *     debug_level           - [IN]                                             *
  *                                                                              *
- * Comments:                                                                    *
- *    String is represented as "ZBX_EOF" termination list, with '\n'            *
- *    delimiter between elements.                                               *
- *    Each element represented as:                                              *
- *           <key>:<refresh time>:<last log size>:<modification time>           *
+ * Return value: SUCCEED     - list of active checks parsed successfully        *
+ *               FAIL        - error occurred                                   *
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,

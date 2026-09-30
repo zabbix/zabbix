@@ -212,6 +212,7 @@ func (c *Connector) refreshActiveChecks() bool {
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
+		c.configRevision = 0
 
 		return false
 	} else if c.firstActiveChecksLog {
@@ -391,7 +392,10 @@ func (c *Connector) run() {
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
 
 	time.Sleep(time.Duration(1e9 - time.Now().Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
 run:
 	for {
 		select {
@@ -521,7 +525,8 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 
 		var err error
 		var taskResult *string
-		taskResult, err = taskManager.PerformTask(item, timeout, clientID)
+
+		taskResult, err = taskManager.PerformTask(item, timeout, false, clientID)
 		if err != nil {
 			return "", err
 		} else if taskResult == nil {

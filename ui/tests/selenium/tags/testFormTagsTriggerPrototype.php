@@ -115,7 +115,7 @@ class testFormTagsTriggerPrototype extends testFormTags {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
-		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$host_link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
 		$this->checkInheritedElementTags($data, 'trigger prototype', $host_link, $expression);
 	}

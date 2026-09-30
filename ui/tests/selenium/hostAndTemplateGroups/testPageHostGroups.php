@@ -480,7 +480,7 @@ class testPageHostGroups extends testPageGroups {
 					'expected' => TEST_BAD,
 					'groups' => 'Group for Maintenance',
 					'error' => 'Cannot delete host group "Group for Maintenance" because maintenance'.
-						' "Maintenance for host group testing" must contain at least one host or host group.'
+						' "Maintenance for host group testing" must contain at least one host group, host or trigger.'
 				]
 			],
 			[

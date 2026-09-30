@@ -13,7 +13,10 @@ Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make s
 ## Configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
 
-**Plugins.MQTT.Timeout** — connection timeout (how long to wait for a connection to respond before shutting it down).  
+**Plugins.MQTT.Timeout** — connection timeout (how long to wait for a connection to respond before shutting it down).
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 *Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
 *Limits:* 1-30
 
@@ -37,6 +40,9 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 
 **Plugins.MQTT.Sessions.<session_name>.TLSKeyFile** — Full pathname of a file containing the MQTT private key.
 *Default value:* 
+
+**Plugins.MQTT.Sessions.<session_name>.ConnectionTimeout** — Timeout used when establishing MQTT timeout.
+*Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf). 
 
 ### Connection and authentication
 The plugin uses broker URI, topic, username and password from item key parameters.

@@ -32,7 +32,7 @@ zabbix_export:
         It is recommended to fill in the values of the filter host wizard configuration fields to avoid getting redundant data.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -44,6 +44,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             try {
             
             	const js_start = new Date().getTime();
@@ -54,7 +79,9 @@ zabbix_export:
             		data: {}
             	};
             
-            	var req = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify);
+            	tls.checkURL(params.url);
+            	var req = new HttpRequest(tls.options);
             
             	var out = {};
             	var queue = [];
@@ -153,6 +180,8 @@ zabbix_export:
               value: '{$SHAREPOINT.PASSWORD}'
             - name: root
               value: '{$SHAREPOINT.ROOT}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft SharePoint"}'
             - name: url
               value: '{$SHAREPOINT.URL}'
             - name: user
@@ -262,12 +291,39 @@ zabbix_export:
           key: sharepoint.directory.discovery
           delay: '{$SHAREPOINT.LLD_INTERVAL}'
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             try {
             
             	var params = JSON.parse(value);
             	var result = [];
             
-            	var req = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify);
+            	tls.checkURL(params.url);
+            	var req = new HttpRequest(tls.options);
             
             	var queue = [];
             
@@ -436,6 +492,8 @@ zabbix_export:
               value: '{$SHAREPOINT.PASSWORD}'
             - name: root
               value: '{$SHAREPOINT.ROOT}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft SharePoint"}'
             - name: url
               value: '{$SHAREPOINT.URL}'
             - name: user
@@ -456,11 +514,27 @@ zabbix_export:
         - tag: target
           value: sharepoint
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Microsoft SharePoint", e.g. {$HTTP.TLS.VERIFY:"Microsoft SharePoint"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$SHAREPOINT.GET_INTERVAL}'
           value: 1m
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Other
             label: 'Get interval'
         - macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
@@ -468,7 +542,7 @@ zabbix_export:
           description: 'Filter of discoverable dictionaries by full path.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Filter for full path (include)'
             description: 'Filter of discoverable dictionaries by full path.'
@@ -477,7 +551,7 @@ zabbix_export:
           description: 'Filter to exclude discovered dictionaries by full path.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for full path (exclude)'
             description: 'Filter to exclude discovered dictionaries by full path.'
@@ -486,7 +560,7 @@ zabbix_export:
           description: 'Filter of discoverable dictionaries by name.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Filters
             label: 'Filter for name (include)'
             description: 'Filter of discoverable dictionaries by name.'
@@ -495,7 +569,7 @@ zabbix_export:
           description: 'Filter to exclude discovered dictionaries by name.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for name (exclude)'
             description: 'Filter to exclude discovered dictionaries by name.'
@@ -504,7 +578,7 @@ zabbix_export:
           description: 'Filter of discoverable types.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Filter for type (include)'
             description: 'Filter of discoverable types.'
@@ -513,7 +587,7 @@ zabbix_export:
           description: 'Filter to exclude discovered types.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Filter for type (exclude)'
             description: 'Filter to exclude discovered types.'
@@ -521,7 +595,7 @@ zabbix_export:
           value: 3h
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Other
             label: 'LLD interval'
         - macro: '{$SHAREPOINT.MAX_HEALTH_SCORE}'
@@ -531,7 +605,7 @@ zabbix_export:
             in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Other
             label: 'Max health score'
             description: |
@@ -542,27 +616,27 @@ zabbix_export:
           type: SECRET_TEXT
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: Password
             required: 'YES'
         - macro: '{$SHAREPOINT.ROOT}'
           value: '/Shared Documents'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: Root
         - macro: '{$SHAREPOINT.URL}'
           description: 'Portal page URL. For example http://sharepoint.companyname.local/'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'Portal page URL'
             description: 'Portal page URL. For example http://sharepoint.companyname.local/'
             required: 'YES'
         - macro: '{$SHAREPOINT.USER}'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: Username
             required: 'YES'
       dashboards:

@@ -40,6 +40,7 @@ class CControllerPopup extends CController {
 		$this->supported_popups = [
 			'acknowledge.edit' => _('Update problem'),
 			'action.edit' => _('Action edit'),
+			'ceprule.edit' => _('CEP rule edit'),
 			'connector.edit' => _('Connector edit'),
 			'correlation.edit' => _('Correlation edit'),
 			'discovery.edit' => _('Discovery rule edit'),
@@ -51,11 +52,14 @@ class CControllerPopup extends CController {
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),
 			'item.prototype.edit' => _('Item prototype edit'),
+			'lldrule.edit' => _('Discovery rule edit'),
+			'lldrule.prototype.edit' => _('Discovery prototype edit'),
 			'maintenance.edit' => _('Maintenance edit'),
 			'mediatype.edit' => _('Media type edit'),
 			'module.edit' => _('Module edit'),
 			'proxy.edit' => _('Proxy edit'),
 			'proxygroup.edit' => _('Proxy group edit'),
+			'regex.edit' => _('Configuration of regular expressions'),
 			'templategroup.edit' => _('Template group edit'),
 			'scheduledreport.edit' => _('Scheduled report edit'),
 			'script.edit' => _('Script edit'),
@@ -76,8 +80,7 @@ class CControllerPopup extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			/** @var CRouter $router */
-			$router = clone APP::Component()->get('router');
+			$router = clone CRouter::getInstance();
 
 			$this->action = $this->getInput('popup');
 			$router->setAction($this->action);
@@ -86,6 +89,28 @@ class CControllerPopup extends CController {
 			$this->popup_controller = new $popup_controller_class;
 
 			$ret = $this->popup_controller->checkInput();
+
+			if (!$ret) {
+				$response = $this->popup_controller->getResponse();
+
+				if ($response instanceof CControllerResponseData) {
+					$data = $response->getData();
+
+					if (array_key_exists('main_block', $data)) {
+						$main_block = json_decode($data['main_block'], true);
+
+						if (array_key_exists('error', $main_block)) {
+							if (array_key_exists('title', $main_block['error'])) {
+								CMessageHelper::setErrorTitle($main_block['error']['title']);
+							}
+
+							foreach ($main_block['error']['messages'] as $message) {
+								CMessageHelper::addError($message);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		if (!$ret) {

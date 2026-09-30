@@ -1,0 +1,59 @@
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+#ifndef ZABBIX_CEP_RULE_H
+#define ZABBIX_CEP_RULE_H
+
+#include "cep_event.h"
+#include "zbxcacheconfig.h"
+#include "zbxmw.h"
+
+char	*cep_tag_value_inc(const char *value);
+char	*cep_tag_value_dec(const char *value);
+
+#define CEP_FLAG(x)  (__UINT64_C(1) << (x))
+
+#define CEP_FLAG_WHEN_ALL		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_ADDED) | \
+					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED)  | \
+					CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH))
+
+#define CEP_OP_SET_NAME_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_CLOSE_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_SET_SEVERITY_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_INCREASE_SEVERITY_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_DECREASE_SEVERITY_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_SUPPRESS_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_ADD_TAG_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_SET_TAG_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_SET_TAG_VALUE_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_INCREASE_TAG_VALUE_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_DECREASE_TAG_VALUE_MASK	CEP_FLAG_WHEN_ALL
+#define CEP_OP_RENAME_TAG_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_REMOVE_TAG_MASK		CEP_FLAG_WHEN_ALL
+#define CEP_OP_COPY_EVENT_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | \
+						CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
+#define CEP_OP_DISCARD_MASK		CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED)
+#define CEP_OP_CLOSE_WINDOW_MASK	(CEP_FLAG(ZBX_CEP_WHEN_EVENT_ADDED) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | \
+						CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH))
+#define CEP_OP_UNSUPPRESS_MASK		CEP_FLAG_WHEN_ALL
+
+int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
+
+int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
+		int *matched_rules_num, zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
+
+void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
+
+#endif
+

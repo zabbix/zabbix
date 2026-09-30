@@ -21,8 +21,17 @@ COMMON_SRC = \
 
 COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
-DBHIGH_LIBS = \
-	$(DBHIGH_DEPS) \
+DBHIGH_LIBS =
+
+if SERVER
+DBHIGH_LIBS += $(SERVER_GROUPED_LIBS) @SERVER_LIBS@
+else
+if PROXY
+DBHIGH_LIBS += $(PROXY_GROUPED_LIBS) @PROXY_LIBS@
+endif
+endif
+
+DBHIGH_LIBS += \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -33,8 +42,6 @@ DBadd_condition_alloc_SOURCES = \
 	$(COMMON_SRC)
 
 DBadd_condition_alloc_LDADD = $(DBHIGH_LIBS)
-
-DBadd_condition_alloc_LDADD += @SERVER_LIBS@
 
 DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
@@ -47,8 +54,6 @@ zbx_merge_tags_SOURCES = \
 
 zbx_merge_tags_LDADD = $(DBHIGH_LIBS)
 
-zbx_merge_tags_LDADD += @SERVER_LIBS@
-
 zbx_merge_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_merge_tags_CFLAGS = $(COMMON_FLAGS)
@@ -60,8 +65,6 @@ zbx_del_tags_SOURCES = \
 
 zbx_del_tags_LDADD = $(DBHIGH_LIBS)
 
-zbx_del_tags_LDADD += @SERVER_LIBS@
-
 zbx_del_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_del_tags_CFLAGS = $(COMMON_FLAGS)
@@ -72,8 +75,6 @@ zbx_add_tags_SOURCES = \
 	$(COMMON_SRC)
 
 zbx_add_tags_LDADD = $(DBHIGH_LIBS)
-
-zbx_add_tags_LDADD += @SERVER_LIBS@
 
 zbx_add_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
@@ -89,7 +90,7 @@ zbx_sync_rowset_merge_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(COMMON_COMPILER_FLAGS)
 
-zbx_sync_rowset_merge_LDADD =  $(DBHIGH_LIBS) @SERVER_LIBS@ $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+zbx_sync_rowset_merge_LDADD =  $(DBHIGH_LIBS) $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_sync_rowset_merge_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
@@ -98,8 +99,6 @@ zbx_merge_item_params_SOURCES = \
 	$(COMMON_SRC)
 
 zbx_merge_item_params_LDADD = $(DBHIGH_LIBS)
-
-zbx_merge_item_params_LDADD += @SERVER_LIBS@
 
 zbx_merge_item_params_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
@@ -114,8 +113,6 @@ DBadd_condition_alloc_SOURCES = \
 
 DBadd_condition_alloc_LDADD = \
 	$(DBHIGH_LIBS)
-
-DBadd_condition_alloc_LDADD += @PROXY_LIBS@
 
 DBadd_condition_alloc_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 

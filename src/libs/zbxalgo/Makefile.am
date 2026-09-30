@@ -12,4 +12,5 @@ libzbxalgo_a_SOURCES = \
 	linked_list.c \
 	prediction.c \
 	queue.c \
-	vector.c
+	vector.c \
+	channel.c

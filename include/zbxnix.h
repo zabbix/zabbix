@@ -53,13 +53,16 @@ int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
 
 void	zbx_set_is_running(int (*is_running_func)(void *args), void *args);
 
+void	zbx_exit_thread(int ret) ZBX_NORETURN;
+
 #define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)
 
-#define ZBX_INIT_THREAD_OR_RETURN(jmp_ret)			\
+#define ZBX_INIT_THREAD_OR_RETURN(jmp_ret, unit_status)		\
 		zbx_init_thread_signal_handler(&jmp_ret);	\
+		zbx_set_exit(zbx_exit_from_thread, unit_status);\
 		if (0 != sigsetjmp(jmp_ret, 1))			\
 		{						\
-			return ZBX_THREAD_FAILURE;		\
+			zbx_exit(EXIT_FAILURE);			\
 		}
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,

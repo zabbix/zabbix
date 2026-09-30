@@ -385,19 +385,121 @@ out:
 	return ret;
 }
 
+static int	match_mountpoint(const wchar_t *current, const wchar_t *requested)
+{
+	size_t	sz;
+
+	if (NULL == requested)
+		return SUCCEED;
+
+	sz = wcslen(current);
+
+	if (0 < sz && L'\\' == current[sz - 1])
+		sz--;
+
+	if (0 != _wcsnicmp(current, requested, sz))
+		return FAIL;
+
+	return (sz == wcslen(requested) ? SUCCEED : FAIL);
+}
+
+static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
+{
+	size_t			sz;
+	struct zbx_json		j;
+	zbx_vector_ptr_t	mount_paths;
+	char			*error = NULL;
+	wchar_t			*wmountpoint = NULL;
+
+	zbx_vector_ptr_create(&mount_paths);
+
+	if (FAIL == get_mount_paths(&mount_paths, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_ptr_destroy(&mount_paths);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (NULL != mountpoint)
+		wmountpoint = zbx_utf8_to_unicode(mountpoint);
+
+	for (int i = 0; i < mount_paths.values_num; i++)
+	{
+		char	*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
+
+		if (FAIL == match_mountpoint(mount_paths.values[i], wmountpoint))
+			continue;
+
+		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, fstype, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSLABEL, fslabel, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSDRIVETYPE, fsdrivetype, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+
+		zbx_free(fsname);
+		zbx_free(fstype);
+		zbx_free(fslabel);
+		zbx_free(fsdrivetype);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+	zbx_json_free(&j);
+
+	zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
+	zbx_vector_ptr_destroy(&mount_paths);
+	zbx_free(wmountpoint);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	size_t			sz;
 	struct zbx_json		j;
-	zbx_vector_ptr_t	mntpoints;
+	zbx_vector_ptr_t	mntpoints, mount_paths;
 	zbx_wmpoint_t		*mpoint;
 	int			ret = SYSINFO_RET_FAIL;
-	char			*error = NULL;
-	zbx_vector_ptr_t	mount_paths;
+	char			*mode, *mountpoint, *error = NULL;
+	wchar_t			*wmountpoint = NULL;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			return vfs_fs_get_short(mountpoint, result);
+
+		if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	/* 'timeout_event' argument is here to make the vfs_fs_get() prototype as required by */
+	/* zbx_execute_threaded_metric() on MS Windows */
+	ZBX_UNUSED(timeout_event);
 
 	zbx_vector_ptr_create(&mount_paths);
 	zbx_vector_ptr_create(&mntpoints);
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (FAIL == get_mount_paths(&mount_paths, &error))
 	{
@@ -405,12 +507,14 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 		goto out;
 	}
 
-	/* 'timeout_event' argument is here to make the vfs_fs_size() prototype as required by */
-	/* zbx_execute_threaded_metric() on MS Windows */
-	ZBX_UNUSED(timeout_event);
+	if (NULL != mountpoint)
+		wmountpoint = zbx_utf8_to_unicode(mountpoint);
 
 	for (int i = 0; i < mount_paths.values_num; i++)
 	{
+		if (FAIL == match_mountpoint(mount_paths.values[i], wmountpoint))
+			continue;
+
 		if (FAIL == add_fs_to_vector(&mntpoints, mount_paths.values[i], &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
@@ -420,18 +524,25 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	}
 
 	zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
+
 	if (FAIL == get_mount_paths(&mount_paths, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto out;
 	}
 
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
 	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		zbx_wmpoint_t	mpoint_local;
 		int		idx;
 
+		if (FAIL == match_mountpoint(mount_paths.values[i], wmountpoint))
+			continue;
+
 		mpoint_local.fsname = zbx_unicode_to_utf8(mount_paths.values[i]);
+
 		if (0 < (sz = strlen(mpoint_local.fsname)) && '\\' == mpoint_local.fsname[--sz])
 			mpoint_local.fsname[sz] = '\0';
 
@@ -452,19 +563,22 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 			zbx_json_close(&j);
 			zbx_json_close(&j);
 		}
+
 		zbx_free(mpoint_local.fsname);
 	}
 
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+	zbx_json_free(&j);
+
 	ret = SYSINFO_RET_OK;
 out:
 	zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
 	zbx_vector_ptr_destroy(&mount_paths);
 	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_wmpoints_free);
 	zbx_vector_ptr_destroy(&mntpoints);
-	zbx_json_free(&j);
+	zbx_free(wmountpoint);
 
 	return ret;
 }

@@ -304,11 +304,12 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	 * depending on LLD type.
 	 */
 	public function testFormLowLevelDiscoveryFromHost_CheckInterfaces() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.
 				self::$interfaces_hostid.'&context=host'
 		);
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 
 		$interfaces = [
 			'Zabbix agent' => '127.0.0.1:10050',
@@ -321,5 +322,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 			$form->fill(['Type' => $type]);
 			$form->checkValue(['Host interface' => $interface]);
 		}
+
+		$dialog->close();
 	}
 }

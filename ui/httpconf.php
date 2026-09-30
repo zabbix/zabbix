@@ -30,7 +30,7 @@ $fields = [
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO,	'isset({form}) || isset({add}) || isset({update})'],
-	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
+	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS,	DB_ID,			'isset({form}) && ({form} == "update" || {form} == "clone")'],
 	'name'            => [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'delay'           => [T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'retries'         => [T_ZBX_INT, O_OPT, null,	BETWEEN(1, 10),	'isset({add}) || isset({update})',
@@ -104,7 +104,6 @@ $fields = [
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh'		=> [T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	'backurl'			=> [T_ZBX_STR, O_OPT, null,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -119,6 +118,8 @@ if (!empty($_REQUEST['steps'])) {
 /*
  * Permissions
  */
+$backurl = (new CUrl('httpconf.php'))->setArgument('context', getRequest('context'));
+
 if (hasRequest('httptestid')) {
 	$httptests = API::HttpTest()->get([
 		'output' => [],
@@ -127,6 +128,7 @@ if (hasRequest('httptestid')) {
 	]);
 
 	if (!$httptests) {
+		zbx_add_post_js("history.replaceState({}, '');");
 		access_deny();
 	}
 
@@ -140,11 +142,6 @@ elseif (hasRequest('hostid')) {
 	if ($hostid != 0 && !isWritableHostTemplates([$hostid])) {
 		access_deny();
 	}
-}
-
-// Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
-	access_deny();
 }
 
 $tags = getRequest('tags', []);
@@ -188,7 +185,6 @@ if (hasRequest('delete') && hasRequest('httptestid')) {
 	unset($_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
-	unset($_REQUEST['httptestid']);
 	unset($_REQUEST['templated']);
 	$_REQUEST['form'] = 'clone';
 }
@@ -199,12 +195,12 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
-		$messageTrue = _('Web scenario updated');
-		$messageFalse = _('Cannot update web scenario');
+		$message_success = _('Web scenario updated');
+		$message_failed = _('Cannot update web scenario');
 	}
 	else {
-		$messageTrue = _('Web scenario added');
-		$messageFalse = _('Cannot add web scenario');
+		$message_success = _('Web scenario added');
+		$message_failed = _('Cannot add web scenario');
 	}
 
 	$result = false;
@@ -263,8 +259,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$httpTest[$pair_type][] = $pair;
 			}
 		}
-
-		if (isset($_REQUEST['httptestid'])) {
+		if (hasRequest('httptestid') && getRequest('form') !== 'clone') {
 			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get([
 				'httptestids' => $_REQUEST['httptestid'],
@@ -354,7 +349,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		unset($_REQUEST['form']);
-		show_messages(true, $messageTrue);
 	}
 	catch (Exception $e) {
 		$msg = $e->getMessage();
@@ -363,10 +357,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			error($msg);
 		}
 
-		show_messages(false, null, $messageFalse);
+		show_error_message($message_failed);
 	}
 
 	$result = DBend($result);
+
+	if ($result) {
+		CMessageHelper::setSuccessTitle($message_success);
+
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.massenable', 'httptest.massdisable'])
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
@@ -401,10 +402,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.ma
 		CMessageHelper::setErrorTitle($message);
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhistory'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))
@@ -426,10 +425,10 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 	}
 
 	$web_scenarios_count = count(getRequest('group_httptestid'));
-	$messageSuccess = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
-	$messageFailed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
+	$message_success = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
+	$message_failed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	show_messages($result, $message_success, $message_failed);
 }
 
 if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {

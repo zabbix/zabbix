@@ -16,6 +16,7 @@
 
 #include "discoverer_int.h"
 #include "discoverer_queue.h"
+#include "discoverer_job.h"
 
 #include "zbxdbhigh.h"
 #include "zbxip.h"

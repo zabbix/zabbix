@@ -611,8 +611,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'discovery rule',
-					'url' => 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D=',
-					'form' => 'id:host-discovery-form',
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids%5B0%5D=',
+					'overlay_form' => true,
+					'form' => 'id:lldrule-form',
 					'fields' => [
 						'Type' => 'Dependent item'
 					]
@@ -692,8 +693,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'discovery rule',
-					'url' => 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D=',
-					'form' => 'id:host-discovery-form',
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids%5B0%5D=',
+					'overlay_form' => true,
+					'form' => 'id:lldrule-form',
 					'fields' => [
 						'Type' => 'Dependent item'
 					]

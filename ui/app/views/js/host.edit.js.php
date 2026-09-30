@@ -288,7 +288,7 @@ window.host_edit_popup = {
 	},
 
 	updateTagsList() {
-		const fields = getFormFields(this.form_element);
+		const fields = this.form.getAllValues();
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
@@ -565,6 +565,8 @@ window.host_edit_popup = {
 					details.contextname = details.contextname.trim();
 					details.privpassphrase = details.privpassphrase.trim();
 					details.securityname = details.securityname.trim();
+					details.max_repetitions = details.max_repetitions.trim();
+					details.retries = details.retries.trim();
 				}
 			}
 		}

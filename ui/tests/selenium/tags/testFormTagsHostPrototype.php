@@ -91,8 +91,8 @@ class testFormTagsHostPrototype extends testFormTags {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
-		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
-		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=template&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$host_link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
 		$form = $this->checkTagsCreate($data, 'host prototype');
 		// Remove index and action key in tags of element.
