@@ -1494,6 +1494,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	s->max_len_limit = 0;
+
 	ret = SUCCEED;
 out:
 	zbx_socket_timeout_cleanup(s);
@@ -1725,6 +1727,12 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 
 	return res;
 }
+
+#define ZBX_TCP_EXPECT_HEADER		1
+#define ZBX_TCP_EXPECT_VERSION		2
+#define ZBX_TCP_EXPECT_VERSION_VALIDATE	3
+#define ZBX_TCP_EXPECT_LENGTH		4
+#define ZBX_TCP_EXPECT_SIZE		5
 
 /******************************************************************************
  *                                                                            *

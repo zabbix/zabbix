@@ -130,6 +130,33 @@ func (sl *ServerListener) run() {
 				break
 			}
 		}
+<<<<<<< HEAD
+=======
+
+		remoteIP := conn.RemoteIP()
+
+		if !isAllowedConnection(remoteIP, allowedPeers) {
+			err = conn.Close()
+			if err != nil {
+				log.Warningf(
+					"failed to close connection to rejected host %q",
+					remoteIP,
+				)
+			}
+
+			log.Warningf(
+				"connection from %q rejected, allowed hosts: %q",
+				remoteIP,
+				sl.options.Server,
+			)
+
+			continue
+		}
+
+		conn.SetMaxRecvSize(zbxcomms.MaxPassiveCheckDataSize)
+
+		go handleConnection(sl.scheduler, conn)
+>>>>>>> fcb1dd53e51 (...G...... [DEV-4861] fixed remote memory exhaustion in Zabbix agent and Zabbix agent2 passive checks)
 	}
 
 	log.Debugf("listener has been stopped")
