@@ -113,9 +113,9 @@ final class CItemData {
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
 			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'web.page.get[host,<path>,<port>,<redirect_limit>]',
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]',
 			'wmi.get[namespace,query]',
 			'wmi.getall[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
@@ -221,9 +221,9 @@ final class CItemData {
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
 			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'web.page.get[host,<path>,<port>,<redirect_limit>]',
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]',
 			'wmi.get[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
@@ -2778,7 +2778,7 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.vm.vfs.fs.size'
 				]
 			],
-			'web.page.get[host,<path>,<port>]' => [
+			'web.page.get[host,<path>,<port>,<redirect_limit>]' => [
 				'description' => _('Get content of web page. Returns web page source as text'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
@@ -2786,7 +2786,7 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#web.page.get'
 				]
 			],
-			'web.page.perf[host,<path>,<port>]' => [
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]' => [
 				'description' => _('Loading time of full web page (in seconds). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
@@ -2794,7 +2794,7 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#web.page.perf'
 				]
 			],
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]' => [
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]' => [
 				'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter'),
 				'value_type' => ITEM_VALUE_TYPE_STR,
 				'documentation_link' => [

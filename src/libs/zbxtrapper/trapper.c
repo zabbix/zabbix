@@ -1159,8 +1159,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const zbx_apm_db_config_t *config_apm_db_config,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
-		zbx_ipc_async_socket_t *rtc)
+		const char *config_bridge_adapter_url, zbx_ipc_async_socket_t *rtc)
 {
 #define ZBX_NON_JSON_LOG_INTERVAL	5
 	int			ret = SUCCEED;
@@ -1316,7 +1315,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_trapper_device_init(sock, &jp, config_comms, config_frontend_allowed_ip,
-					config_bridge_adapter_url, config_bridge_adapter_connect_to);
+					config_bridge_adapter_url);
 		}
 	}
 	else if (0 == strcmp(value, ZBX_PROTO_VALUE_DEVICE_OFFBOARD))
@@ -1324,7 +1323,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_trapper_device_offboard(sock, &jp, config_comms, config_frontend_allowed_ip,
-					config_bridge_adapter_url, config_bridge_adapter_connect_to);
+					config_bridge_adapter_url);
 		}
 	}
 	else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
@@ -1349,8 +1348,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_apm_db_config_t *config_apm_db_config,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
-		zbx_ipc_async_socket_t *rtc)
+		const char *config_bridge_adapter_url, zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1360,7 +1358,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
 			config_webdriver_url, config_apm_db_config, trapper_process_request_cb, autoreg_update_host_cb,
-			config_frontend_allowed_ip, config_bridge_adapter_url, config_bridge_adapter_connect_to, rtc);
+			config_frontend_allowed_ip, config_bridge_adapter_url, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1469,7 +1467,6 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->autoreg_update_host_cb,
 					trapper_args_in->config_frontend_allowed_ip,
 					trapper_args_in->config_bridge_adapter_url,
-					trapper_args_in->config_bridge_adapter_connect_to,
 					&rtc);
 			sec = zbx_time() - sec;
 

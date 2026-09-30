@@ -427,7 +427,6 @@ clean:
  *             crl_file          - [IN] optional, https:// only               *
  *             cert_file         - [IN] optional, https:// only (mTLS)        *
  *             key_file          - [IN] optional, https:// only (mTLS)        *
- *             connect_to_value  - [IN] optional CURLOPT_CONNECT_TO value     *
  *             payload           - [IN] JSON-RPC request body                 *
  *             request           - [IN] method name, for log messages only    *
  *             service_name      - [IN] name of the remote endpoint, for      *
@@ -446,9 +445,8 @@ clean:
  *                                                                            *
  ******************************************************************************/
 int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
-		const char *key_file, const char *connect_to_value, const char *payload, const char *request,
-		const char *service_name, long timeout, char **body_data, struct zbx_json_parse *jp_body,
-		zbx_http_jsonrpc_error_t *err_kind)
+		const char *key_file, const char *payload, const char *request, const char *service_name, long timeout,
+		char **body_data, struct zbx_json_parse *jp_body, zbx_http_jsonrpc_error_t *err_kind)
 {
 #define ZBX_HTTPS_SCHEME	"https://"
 
@@ -456,7 +454,7 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 	CURL			*curl = NULL;
 	CURLcode		err;
 	CURLoption		opt;
-	struct curl_slist	*headers = NULL, *connect_to = NULL;
+	struct curl_slist	*headers = NULL;
 	char			*error_curl = NULL, errbuf[CURL_ERROR_SIZE], jsonrpc[ZBX_MAX_UINT64_LEN];
 	long			http_code = 0;
 	int			ret = FAIL;
@@ -548,24 +546,6 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 		}
 	}
 
-	if (NULL != connect_to_value)
-	{
-		connect_to = curl_slist_append(connect_to, connect_to_value);
-
-		if (NULL == connect_to)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			goto out;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
-			goto out;
-		}
-	}
-
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to %s: %s", service_name, curl_easy_strerror(err));
@@ -623,7 +603,6 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 	body.data = NULL;
 	ret = SUCCEED;
 out:
-	curl_slist_free_all(connect_to);
 	curl_slist_free_all(headers);
 	if (NULL != curl)
 		curl_easy_cleanup(curl);
