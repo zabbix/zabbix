@@ -382,16 +382,6 @@
 						cell.textContent = severity_data.label;
 					}
 				})
-				.setCellRenderer('custom_text', ({column_index, cell_data, cell}) => {
-					const [custom_text] = cell_data;
-					const compact_view = this.#datatable.getOption('compact_view');
-
-					cell.textContent = custom_text[column_index];
-
-					if (compact_view.checked) {
-						cell.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					}
-				})
 				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [hosts] = cell_data;
 
@@ -690,7 +680,17 @@
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh());
+
+			const custom_text_renderer = this.#datatable.getCellRenderer('custom_text');
+
+			this.#datatable.setCellRenderer('custom_text', function(data) {
+				custom_text_renderer.call(this, data);
+
+				if (this.getOption('compact_view').checked) {
+					data.cell.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+				}
+			})
 				.init(user_configs);
 		}
 
