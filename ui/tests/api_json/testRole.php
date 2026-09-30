@@ -908,6 +908,18 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'apm.traces',
+									'status' => '1'
+								],
+								[
+									'name' => 'apm.metrics',
+									'status' => '1'
+								],
+								[
+									'name' => 'apm.logs',
+									'status' => '1'
+								],
+								[
 									'name' => 'services.services',
 									'status' => '1'
 								],
@@ -933,18 +945,6 @@ class testRole extends CAPITest {
 								],
 								[
 									'name' => 'monitoring.discovery',
-									'status' => '1'
-								],
-								[
-									'name' => 'apm.traces',
-									'status' => '1'
-								],
-								[
-									'name' => 'apm.metrics',
-									'status' => '1'
-								],
-								[
-									'name' => 'apm.logs',
 									'status' => '1'
 								],
 								[
