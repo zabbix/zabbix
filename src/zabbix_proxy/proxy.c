@@ -340,7 +340,7 @@ static char	*config_ssl_key_location = NULL;
 /* browser item */
 static char	*config_webdriver_url = NULL;
 
-static char	*config_apm_sourceip = NULL;
+static char	*config_apm_listen_ip = NULL;
 static int	config_apm_port = 0;
 static char	*config_apm_ca_file = NULL;
 static char	*config_apm_cert_file = NULL;
@@ -883,10 +883,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
 
 #if defined(HAVE_APM)
-	if (NULL != config_apm_sourceip && SUCCEED != zbx_is_supported_ip(config_apm_sourceip))
+	if (NULL != config_apm_listen_ip && SUCCEED != zbx_is_supported_ip(config_apm_listen_ip))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"APMListenIP\" configuration parameter: '%s'",
-				config_apm_sourceip);
+				config_apm_listen_ip);
 		err = 1;
 	}
 
@@ -927,7 +927,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 #else
-	err |= (FAIL == zbx_check_cfg_feature_str("APMListenIP", config_apm_sourceip, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMListenIP", config_apm_listen_ip, "APM support"));
 	err |= (FAIL == zbx_check_cfg_feature_int("APMListenPort", config_apm_port, "APM support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCAFile", config_apm_ca_file, "APM support"));
 	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCertFile", config_apm_cert_file, "APM support"));
@@ -1225,7 +1225,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",			&config_telemetry_providers,	ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"APMListenIP",			&config_apm_sourceip,			ZBX_CFG_TYPE_STRING,
+		{"APMListenIP",			&config_apm_listen_ip,			ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_INT,
 			ZBX_CONF_PARM_OPT,	1024,			32767},
@@ -1810,12 +1810,13 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	{
 		.config_timeout = zbx_config_timeout,
 		.export_config = &config_apm_db_config,
-		.port = config_apm_port,
-		.ca_file = config_apm_ca_file,
-		.cert_file = config_apm_cert_file,
-		.key_file = config_apm_key_file,
 		.ca_location = config_ssl_ca_location,
-		.source_ip = config_apm_sourceip
+		.source_ip = zbx_config_source_ip,
+		.apm_port = config_apm_port,
+		.apm_ca_file = config_apm_ca_file,
+		.apm_cert_file = config_apm_cert_file,
+		.apm_key_file = config_apm_key_file,
+		.apm_listen_ip = config_apm_listen_ip
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){

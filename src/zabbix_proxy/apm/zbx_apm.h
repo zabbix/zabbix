@@ -20,12 +20,13 @@ typedef struct
 {
 	int			config_timeout;
 	zbx_apm_db_config_t	*export_config;
-	int			port;
-	const char		*ca_file;
-	const char		*cert_file;
-	const char		*key_file;
 	const char		*ca_location;
 	const char		*source_ip;
+	int			apm_port;
+	const char		*apm_ca_file;
+	const char		*apm_cert_file;
+	const char		*apm_key_file;
+	const char		*apm_listen_ip;
 }
 zbx_thread_apm_manager_args_t;
 

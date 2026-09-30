@@ -460,9 +460,9 @@ void	*zbx_apm_manager_thread(void *args)
 
 	apm_args = (const zbx_thread_apm_manager_args_t *)unit_args->args.args;
 
-	apm_config_tls.ca_file = apm_args->ca_file;
-	apm_config_tls.key_file = apm_args->key_file;
-	apm_config_tls.cert_file = apm_args->cert_file;
+	apm_config_tls.ca_file = apm_args->apm_ca_file;
+	apm_config_tls.key_file = apm_args->apm_key_file;
+	apm_config_tls.cert_file = apm_args->apm_cert_file;
 
 	tls = apm_manager_validate_tls(&apm_config_tls);
 
@@ -532,15 +532,15 @@ void	*zbx_apm_manager_thread(void *args)
 					SUCCEED == apm_manager_global_config_active(manager))
 			{
 				apm_config.enabled = apm_manager_update_global_config(manager, &apm_global,
-						apm_args->export_config->source_ip, apm_args->ca_location);
+						apm_args->source_ip, apm_args->ca_location);
 			}
 
 			if (apm_enabled != apm_config.enabled)
 			{
 				if (APM_STATUS_ENABLED == apm_config.enabled)
 				{
-					if (FAIL == apm_manager_activate(manager, apm_args->source_ip, apm_args->port,
-							tls, &error))
+					if (FAIL == apm_manager_activate(manager, apm_args->apm_listen_ip,
+							apm_args->apm_port, tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
 								" %s", error);
