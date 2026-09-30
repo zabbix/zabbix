@@ -23,8 +23,11 @@ class CSvgGraph extends CSvg {
 	public const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
 
 	public const SVG_GRAPH_X_AXIS_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 10;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 16;
 	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER = 5;
+	public const SVG_GRAPH_LABEL_STEP_WIDTH = 16;
+
+	public const SVG_GRAPH_MIN_GRID_WIDTH = 150;
 
 	private $canvas_x;
 	private $canvas_y;
@@ -163,14 +166,11 @@ class CSvgGraph extends CSvg {
 	 */
 	private $offset_right = 20;
 
-	/**
-	 * Maximum width of container for every Y axis.
-	 *
-	 * @var int
-	 */
-	private $max_yaxis_width = 120;
-
 	private $cell_height_min = 30;
+
+	private $yaxis_font_size = 7;
+
+	private $is_yaxis_width_changed = false;
 
 	/**
 	 * Height for X axis container.
@@ -1049,12 +1049,11 @@ class CSvgGraph extends CSvg {
 				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize($this->yaxis_font_size, 0, $value)['width']);
 				}
 
-				$this->offset_left = min($this->max_yaxis_width,
-					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
-				);
+				$this->offset_left = max($this->offset_left,
+					self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width);
 			}
 		}
 
@@ -1065,13 +1064,37 @@ class CSvgGraph extends CSvg {
 				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize($this->yaxis_font_size, 0, $value)['width']);
 				}
 
-				$this->offset_right = min($this->max_yaxis_width,
-					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
-				);
+				$this->offset_right = max($this->offset_right,
+					self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width);
 			}
+		}
+
+		if ($this->width - $this->offset_left - $this->offset_right < self::SVG_GRAPH_MIN_GRID_WIDTH) {
+			$remaining_width = $this->width  - self::SVG_GRAPH_MIN_GRID_WIDTH;
+			$scale = $remaining_width / ($this->offset_left + $this->offset_right);
+			$max_left_width = ceil($scale * $this->offset_left);
+			$max_right_width = ceil($scale * $this->offset_right);
+
+			$max_left_width = ceil($max_left_width / self::SVG_GRAPH_LABEL_STEP_WIDTH)
+				* self::SVG_GRAPH_LABEL_STEP_WIDTH;
+			$max_right_width = ceil($max_right_width / self::SVG_GRAPH_LABEL_STEP_WIDTH)
+				* self::SVG_GRAPH_LABEL_STEP_WIDTH;
+
+			if ($max_left_width < self::SVG_GRAPH_LABEL_STEP_WIDTH + self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER
+				|| $max_right_width < self::SVG_GRAPH_LABEL_STEP_WIDTH + self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER) {
+				$max_left_width = max($max_left_width, self::SVG_GRAPH_LABEL_STEP_WIDTH
+					+ self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER);
+				$max_right_width = max($max_right_width, self::SVG_GRAPH_LABEL_STEP_WIDTH
+					+ self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER);
+			}
+
+			$this->offset_left = $max_left_width;
+			$this->offset_right = $max_right_width;
+
+			$this->is_yaxis_width_changed = true;
 		}
 
 		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
@@ -1519,8 +1542,19 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function drawYAxes(): void {
+		$ellipsis_width = imageTextSize($this->yaxis_font_size, 0, '...')['width'];
+
 		if ($this->show_left_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
+
+			if ($this->is_yaxis_width_changed) {
+				foreach ($grid_values as &$val) {
+					$val = $this->truncateTextByMaxWidth($this->yaxis_font_size, $val,
+						$this->offset_left - self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER, $ellipsis_width);
+				}
+				unset($val);
+			}
+
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
 					->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
@@ -1532,6 +1566,14 @@ class CSvgGraph extends CSvg {
 
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+			if ($this->is_yaxis_width_changed) {
+				foreach ($grid_values as &$val) {
+					$val = $this->truncateTextByMaxWidth($this->yaxis_font_size, $val,
+						$this->offset_right - self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER, $ellipsis_width);
+				}
+				unset($val);
+			}
 
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
@@ -2041,5 +2083,34 @@ class CSvgGraph extends CSvg {
 		}
 
 		return $grid_values;
+	}
+
+	/**
+	 * Truncates a string to the specified maximum width in pixels and appends an ellipsis.
+	 *
+	 * @param int    $font_size 		Font size used to calculate text width.
+	 * @param string $text 				Text to truncate.
+	 * @param int    $max_width 		Maximum allowed text width in pixels.
+	 * @param int    $ellipsis_width 	Width of the ellipsis in pixels.
+	 *
+	 * @return string
+	 */
+	function truncateTextByMaxWidth(int $font_size, string $text, int $max_width, int $ellipsis_width): string {
+		$text_width = imageTextSize($font_size, 0, $text)['width'];
+
+		if ($text_width <= $max_width || $max_width < $ellipsis_width) {
+			return $text;
+		}
+
+		$target_width = $max_width - $ellipsis_width;
+		$text_length = mb_strlen($text);
+		$cut_length = (int) floor($text_length * ($target_width / $text_width));
+		$text = mb_substr($text, 0, $cut_length);
+
+		while (imageTextSize($font_size, 0, $text)['width'] > $target_width) {
+			$text = trim(mb_substr($text, 0, -1));
+		}
+
+		return $text.'...';
 	}
 }
