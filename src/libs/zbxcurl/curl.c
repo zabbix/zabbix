@@ -21,7 +21,8 @@
 
 /* added in 7.85.0 (0x075500) */
 #if LIBCURL_VERSION_NUM < 0x075500
-#	define CURLOPT_PROTOCOLS_STR	10318L
+#	define CURLOPT_PROTOCOLS_STR		10318L
+#	define CURLOPT_REDIR_PROTOCOLS_STR	10319L
 #endif
 
 static int	zbx_curl_has_multi_wait(char **error);
@@ -229,11 +230,29 @@ static void	setopt_error(const char *option, CURLcode err, char **error)
 			option, curl_easy_strerror(err), libcurl_version_str());
 }
 
-int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: limits the protocols cURL is allowed to use to HTTP and, when it  *
+ *          is supported, HTTPS                                               *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] cURL easy handle                             *
+ *             opt        - [IN] deprecated numeric protocol option to use    *
+ *                               with cURL older than 7.85.0                  *
+ *             opt_str    - [IN] the *_STR counterpart of "opt"               *
+ *             error      - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the protocols were limited                         *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: the caller must ensure that the cURL library is at least 7.19.4  *
+ *           (0x071304), neither option exists before that version.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	curl_setopt_http_protocols(CURL *easyhandle, long opt, long opt_str, char **error)
 {
 	CURLcode	err;
-	static ZBX_THREAD_LOCAL char	*protocols_str;
-	static ZBX_THREAD_LOCAL long	protocols = 0;
+	static ZBX_THREAD_LOCAL const char	*protocols_str;
+	static ZBX_THREAD_LOCAL long		protocols;
 
 /* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071304
@@ -241,45 +260,56 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 #	define CURLPROTO_HTTPS		(1<<1)
 #endif
 
-	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
-	if (libcurl_version_num() >= 0x071304)
+	if (NULL == protocols_str)
 	{
-		if (0 == protocols)
+		if (SUCCEED == zbx_curl_protocol("HTTPS", NULL))
 		{
-			if (SUCCEED == zbx_curl_protocol("HTTPS", NULL))
-			{
-				protocols_str = "HTTP,HTTPS";
-				protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
-			}
-			else
-			{
-				protocols_str = "HTTP";
-				protocols = CURLPROTO_HTTP;
-			}
-		}
-
-		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
-		if (libcurl_version_num() >= 0x075500)
-		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
-					CURLOPT_PROTOCOLS_STR, protocols_str)))
-			{
-				setopt_error(protocols_str, err, error);
-				return FAIL;
-			}
+			protocols_str = "HTTP,HTTPS";
+			protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
 		}
 		else
 		{
-			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, protocols)))
-			{
-				setopt_error(protocols_str, err, error);
-				return FAIL;
-			}
+			protocols_str = "HTTP";
+			protocols = CURLPROTO_HTTP;
 		}
 	}
 
+	/* the numeric options were replaced by their *_STR counterparts */
+	/* remove when cURL requirement will become >= 7.85.0 (0x075500) */
+	if (libcurl_version_num() >= 0x075500)
+		err = curl_easy_setopt(easyhandle, (CURLoption)opt_str, protocols_str);
+	else
+		err = curl_easy_setopt(easyhandle, (CURLoption)opt, protocols);
+
+	if (CURLE_OK != err)
+	{
+		setopt_error(protocols_str, err, error);
+		return FAIL;
+	}
+
 	return SUCCEED;
+}
+
+int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
+{
+	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
+	if (libcurl_version_num() < 0x071304)
+		return SUCCEED;
+
+	return curl_setopt_http_protocols(easyhandle, 181L, CURLOPT_PROTOCOLS_STR, error);
+}
+
+int	zbx_curl_setopt_redir_https(CURL *easyhandle, char **error)
+{
+	/* CURLOPT_REDIR_PROTOCOLS (182L) is supported starting with version 7.19.4 (0x071304) */
+	if (libcurl_version_num() < 0x071304)
+	{
+		*error = zbx_dsprintf(*error, "cURL library cannot limit the protocols redirects are followed"
+				" with (using version %s, 7.19.4 or newer is required)", libcurl_version_str());
+		return FAIL;
+	}
+
+	return curl_setopt_http_protocols(easyhandle, 182L, CURLOPT_REDIR_PROTOCOLS_STR, error);
 }
 
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)

@@ -571,6 +571,9 @@ zbx_proxy_suppress_t;
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 #endif
 
+/* maximum size of data received during a passive check */
+#define ZBX_MAX_PASSIVE_CHECK_DATA_SIZE	(8 * ZBX_MEBIBYTE)
+
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 

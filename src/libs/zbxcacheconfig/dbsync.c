@@ -1603,7 +1603,10 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
 		if (FAIL == dbsync_compare_str(dbrow[21], snmp->contextname))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_int(dbrow[22], snmp->max_repetitions))
+		if (FAIL == dbsync_compare_str(dbrow[22], snmp->max_repetitions))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[23], snmp->retries))
 			return FAIL;
 	}
 	else if (NULL != snmp)
@@ -1700,14 +1703,14 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 			"select i.interfaceid,i.hostid,i.type,i.main,i.useip,i.ip,i.dns,i.port,"
 			"i.available,i.disable_until,i.error,i.errors_from,"
 			"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
-			"s.authprotocol,s.privprotocol,s.contextname,s.max_repetitions"
+			"s.authprotocol,s.privprotocol,s.contextname,s.max_repetitions,s.retries"
 			" from interface i"
 			" left join interface_snmp s on i.interfaceid=s.interfaceid")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 23, dbsync_interface_preproc_row);
+	dbsync_prepare(sync, 24, dbsync_interface_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

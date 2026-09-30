@@ -1121,13 +1121,21 @@ class CSvgGraphHelper {
 						$max_values = $avg_values;
 				}
 
-				$item += [
-					'units' => $metric['units'],
-					'min' => min($min_values),
-					'avg' => array_sum($avg_values) / count($avg_values),
-					'max' => max($max_values),
-					'invert_values' => $metric['options']['invert_values']
-				];
+				$avg = array_sum($avg_values) / count($avg_values);
+
+				$item += $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON
+					? [
+						'units' => $metric['units'],
+						'min' => -max($min_values),
+						'avg' => -$avg,
+						'max' => -min($max_values)
+					]
+					: [
+						'units' => $metric['units'],
+						'min' => min($min_values),
+						'avg' => $avg,
+						'max' => max($max_values)
+					];
 			}
 
 			$items[] = $item;

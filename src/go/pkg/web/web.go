@@ -17,7 +17,7 @@ package web
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -28,24 +28,37 @@ import (
 	"golang.org/x/text/transform"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
-// Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
-// parameter is set
-func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool) (string, error) {
+var (
+	errTooManyRedirects = errs.New("too many redirects")
+	errCannotGetContent = errs.New("cannot get content of web page")
+)
+
+// Get returns the specified URL content with a timeout. If dump is true,
+// it returns the response headers (including all responses if following redirects)
+// concatenated with the final response body. Parameter redirectLimit specifies
+// the maximum number of redirects to follow; a value of 0 disables redirect following.
+func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool, redirectLimit int) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("Cannot create new request: %w", err)
+		return "", errs.Wrap(err, "cannot create new request")
 	}
 
 	req.Header = map[string][]string{
 		"User-Agent": {"Zabbix " + version.Long()},
 	}
 
-	resp, err := newClient(timeout, tlsRenegotiation).Do(req)
+	client, chain := newClient(timeout, tlsRenegotiation, redirectLimit)
+	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %w", err)
+		if errors.Is(err, errTooManyRedirects) {
+			return "", errs.Wrapf(err, "maximum number of redirects (%d) exceeded", redirectLimit)
+		}
+
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
 	defer resp.Body.Close()
@@ -56,31 +69,29 @@ func Get(url string, timeout time.Duration, dump, tlsRenegotiation bool) (string
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %w", err)
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
 	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
-	if err != nil {
-		return "", nil
-	}
-
 	log.Debugf("determined encoding '%s'", name)
 
 	r := transform.NewReader(bytes.NewReader(b), e.NewDecoder())
 
 	b, err = io.ReadAll(r)
 	if err != nil {
-		return "", fmt.Errorf("Cannot decode content of web page: %w", err)
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 	h, err := httputil.DumpResponse(resp, false)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get header of web page: %w", err)
+		return "", errs.WrapConst(err, errCannotGetContent)
 	}
 
-	return string(h) + string(b), nil
+	return string(bytes.Join(*chain, nil)) + string(h) + string(b), nil
 }
 
-func newClient(timeout time.Duration, renegotiation bool) *http.Client {
+func newClient(timeout time.Duration, renegotiation bool, redirectLimit int) (*http.Client, *[][]byte) {
+	var chain [][]byte
+
 	tlsConf := &tls.Config{
 		//nolint:gosec // intended behavior
 		InsecureSkipVerify: true,
@@ -90,7 +101,7 @@ func newClient(timeout time.Duration, renegotiation bool) *http.Client {
 		tlsConf.Renegotiation = tls.RenegotiateFreelyAsClient
 	}
 
-	return &http.Client{
+	c := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig:   tlsConf,
 			Proxy:             http.ProxyFromEnvironment,
@@ -100,10 +111,31 @@ func newClient(timeout time.Duration, renegotiation bool) *http.Client {
 			}).DialContext,
 		},
 		Timeout:       timeout,
-		CheckRedirect: disableRedirect,
+		CheckRedirect: redirectPolicy(redirectLimit, &chain),
 	}
+
+	return c, &chain
 }
 
-func disableRedirect(req *http.Request, via []*http.Request) error {
-	return http.ErrUseLastResponse
+// redirectPolicy returns function that follows at most limit redirects, to be compatible with cURL,
+// append the headers of every response that is redirected to chain.
+func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*http.Request) error {
+	return func(req *http.Request, via []*http.Request) error {
+		if limit <= 0 {
+			return http.ErrUseLastResponse
+		}
+
+		if len(via) > limit {
+			return errTooManyRedirects
+		}
+
+		h, err := httputil.DumpResponse(req.Response, false)
+		if err != nil {
+			return errs.WrapConst(err, errCannotGetContent)
+		}
+
+		*chain = append(*chain, h)
+
+		return nil
+	}
 }

@@ -23,20 +23,20 @@
 #define ZBX_BRIDGE_TIME_LEN		64
 
 #define ZBX_PUSH_BA_ERR_NOT_CONFIGURED	\
-	"Cannot deliver mobile device notification, bridge-adapter is not configured."
+	"Cannot send notification to device: bridge adapter is not configured."
 #define ZBX_PUSH_BA_ERR_CONNECT	\
-	"Cannot deliver mobile device notification, cannot connect to bridge-adapter."
+	"Cannot send notification to device: cannot connect to bridge adapter."
 #define ZBX_PUSH_BA_ERR_INVALID_RESPONSE	\
-	"Cannot deliver mobile device notification, bridge-adapter returned an invalid response."
+	"Cannot send notification to device: bridge adapter returned an invalid response."
 #define ZBX_PUSH_BA_ERR_RETURNED_ERROR	\
-	"Cannot deliver mobile device notification, bridge-adapter returned an error."
+	"Cannot send notification to device: bridge adapter returned an error."
 
 #define ZBX_PUSH_ALERT_ERR_INVALID_UUID	\
-	"Cannot deliver notification, recipient is not a valid device ID."
+	"Cannot send notification to device: invalid device ID."
 #define ZBX_PUSH_ALERT_ERR_DEVICE_UNKNOWN	\
-	"Cannot deliver notification, device id is not known."
+	"Cannot send notification to device: unknown device."
 #define ZBX_PUSH_ALERT_ERR_DEVICE_NOT_ACTIVE	\
-	"Cannot deliver notification, target device is not in Active state."
+	"Cannot send notification to device: device must have \"Active\" status."
 #define ZBX_PUSH_TEST_ERR_DEVICE_NOT_FOUND	\
 	"Cannot find enabled device for push media type test."
 
