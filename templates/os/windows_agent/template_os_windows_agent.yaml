@@ -20,7 +20,7 @@ zabbix_export:
         This is an official Windows template. It requires Zabbix agent 8.0 or newer.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -1458,15 +1458,6 @@ zabbix_export:
           tags:
             - tag: component
               value: os
-        - uuid: f59d6794a6b94e93aced78a688507677
-          name: 'Get filesystems'
-          key: vfs.fs.get
-          history: '0'
-          value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
-          tags:
-            - tag: component
-              value: raw
         - uuid: 3b1e4ecaa04a46e9b0aee956918f0713
           name: 'Memory utilization'
           key: 'vm.memory.size[pused]'
@@ -2550,8 +2541,8 @@ zabbix_export:
                 - 1h
         - uuid: c22b79b52f9148728095bda2796a753e
           name: 'Mounted filesystem discovery'
-          type: DEPENDENT
-          key: vfs.fs.dependent.discovery
+          key: 'vfs.fs.get[short]'
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
@@ -2583,7 +2574,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.free
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -2603,7 +2594,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.pfree
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -2623,7 +2614,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.pused
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -2678,7 +2669,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.total
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -2697,7 +2688,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.used
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -2707,22 +2698,17 @@ zabbix_export:
                   value: '{#FSTYPE}'
             - uuid: bf93dcebfe504ac0a45cf3ef76cd1dc7
               name: 'FS [{#FSLABEL}({#FSNAME})]: Get data'
-              type: DEPENDENT
-              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              key: 'vfs.fs.get[full,{#FSNAME}]'
               history: '0'
               value_type: TEXT
-              description: 'Intermediate data of `{#FSNAME}` filesystem.'
+              description: 'The `vfs.fs.get[full,{#FSNAME}]` key acquires disk space and inode statistics for the `{#FSNAME}` filesystem only. Later to be extracted by preprocessing in dependent items.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
-              master_item:
-                key: vfs.fs.get
+                    - '$[0]'
               tags:
                 - tag: component
                   value: raw
-                - tag: component
-                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
                 - tag: fstype
@@ -2741,8 +2727,6 @@ zabbix_export:
                   item:
                     host: 'Windows by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
-          master_item:
-            key: vfs.fs.get
           lld_macro_paths:
             - lld_macro: '{#FSDRIVETYPE}'
               path: $.fsdrivetype
@@ -2755,7 +2739,7 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 6h
       tags:
         - tag: class
           value: os
