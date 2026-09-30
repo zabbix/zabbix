@@ -2042,7 +2042,7 @@ class CSvgGraph extends CSvg {
 			);
 		}
 		else {
-			$relative_values = calculateGraphScaleValues($min, $max, $interval,	$units, $power, 14, $unsigned);
+			$relative_values = calculateGraphScaleValues($min, $max, $interval, $units, $power, 14, $unsigned);
 		}
 
 		$absolute_values = [];

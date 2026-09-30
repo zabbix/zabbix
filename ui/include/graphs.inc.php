@@ -1217,7 +1217,6 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 	$scale_overall = 0;
 	$min_position = 0;
 	$clearance = 0.5;
-	$negative_modifier = $unsigned ? 10 : -10;
 
 	// Negative scale calculation
 	if ($min_negative_power !== null) {
@@ -1226,9 +1225,15 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 		$min_position = -1 * ($max_negative_power - $min_negative_power);
 
 		if ($lower_power_shift > 0) {
+			$value = -10 ** $max_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => -1 * ($max_negative_power - $min_negative_power),
-				'value' => $negative_modifier ** $max_negative_power
+				'value' => $value
 			];
 
 			$start_index++;
@@ -1256,17 +1261,29 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 					break;
 				}
 
+				$value = -10 ** $log_value;
+
+				if ($unsigned) {
+					$value = abs($value);
+				}
+
 				$rows[] = [
 					'log_value' => -1 * ($log_value - $min_negative_power),
-					'value' => $negative_modifier ** $log_value
+					'value' => $value
 				];
 			}
 		}
 
 		if ($upper_power_shift > 0 && !$has_zero) {
+			$value = -10 ** $min_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => 1,
-				'value' => $negative_modifier ** $min_negative_power
+				'value' => $value
 			];
 		}
 	}
