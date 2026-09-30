@@ -171,6 +171,5 @@ if ($debug_mode) {
 }
 
 imageOut($im);
-imagedestroy($im);
 
 require_once dirname(__FILE__).'/include/page_footer.php';

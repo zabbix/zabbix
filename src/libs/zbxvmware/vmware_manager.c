@@ -128,10 +128,10 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 
 	if (ZBX_VMWARE_UPDATE_CONF != job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_READY))
 		ret = FAIL;
-	else if (0 != (job->service->jobs_flag & (job->type << ZBX_VMWARE_JOB_RUN)))
+	else if (0 != (job->service->jobs_flag & ZBX_VMWARE_TO_JOB_RUN(job->type)))
 		ret = FAIL;
 	else
-		job->service->jobs_flag |= (job->type << ZBX_VMWARE_JOB_RUN);
+		job->service->jobs_flag |= ZBX_VMWARE_TO_JOB_RUN(job->type);
 
 	zbx_vmware_unlock();
 
@@ -158,7 +158,7 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 	}
 
 	zbx_vmware_lock();
-	job->service->jobs_flag &= ~(job->type << ZBX_VMWARE_JOB_RUN);
+	job->service->jobs_flag &= ~ZBX_VMWARE_TO_JOB_RUN(job->type);
 	zbx_vmware_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s ret:%s", __func__, vmware_job_type_string(job),

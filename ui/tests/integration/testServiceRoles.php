@@ -321,6 +321,9 @@ class testServiceRoles extends CIntegrationTest {
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_ITEM_NAME, 0);
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_ITEM_NAME, 1);
 
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 60, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 30, 3);
+
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
 			'actionids' => self::$actionid,

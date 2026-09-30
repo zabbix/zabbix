@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for changecount() function evaluation.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @hosts test_host
  * @backup history
  */

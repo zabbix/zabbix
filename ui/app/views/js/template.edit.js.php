@@ -221,7 +221,7 @@ window.template_edit_popup = new class {
 		parameters.templateid = this.templateid;
 		this.#prepareFields(parameters);
 
-		PopUp('template.edit', parameters, {
+		PopUp('template.edit', JSON.stringify(parameters), {
 			dialogueid: 'templates-form'
 		});
 	}

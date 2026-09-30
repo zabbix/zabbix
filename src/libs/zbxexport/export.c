@@ -82,6 +82,9 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 				break;
 			}
 
+			if (NULL == end)
+				break;
+
 			start = end;
 		} while (NULL != start++);
 	}

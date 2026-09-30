@@ -102,7 +102,7 @@ class testDashboardsListPage extends CWebTest {
 
 		// Check header buttons.
 		$this->assertTrue($this->query('button:Create dashboard')->exists());
-		$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+		$this->assertTrue($this->query('xpath://button[@aria-label="Enter full screen mode"]')->exists());
 	}
 
 	public static function getCheckFilterData() {

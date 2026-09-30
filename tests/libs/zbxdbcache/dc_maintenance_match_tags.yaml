@@ -361,7 +361,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (17)
+test case: Maintenance tags with matching event tags (19)
 in:
   maintenance:
     tags_evaltype: and/or
@@ -392,7 +392,8 @@ in:
       - tag: b
         value: 1
 out:
-  return: SUCCEED---
+  return: SUCCEED
+---
 test case: Maintenance tags with not matching event tags (1)
 in:
   maintenance:
@@ -550,7 +551,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Maintenance tags with matching event tags (8)
+test case: Maintenance tags with matching event tags (20)
 in:
   maintenance:
     tags_evaltype: and/or

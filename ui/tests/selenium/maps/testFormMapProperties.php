@@ -1256,7 +1256,7 @@ class testFormMapProperties extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', self::MAP_CLONE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
-		$form->query('button:Clone')->one()->click();
+		$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
 		$form->fill(['Name' => self::CLONED_MAP]);
 		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
