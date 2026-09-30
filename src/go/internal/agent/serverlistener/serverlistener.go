@@ -119,6 +119,8 @@ func (sl *ServerListener) run(allowedPeers *zbxnet.AllowedPeers) {
 			continue
 		}
 
+		conn.SetMaxRecvSize(zbxcomms.MaxPassiveCheckDataSize)
+
 		go handleConnection(sl.scheduler, conn)
 	}
 
