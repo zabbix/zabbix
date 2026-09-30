@@ -137,7 +137,7 @@ class testUserMacroAccess extends CAPITest {
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
-				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template'],
+				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template']
 			],
 			[
 				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
@@ -148,7 +148,7 @@ class testUserMacroAccess extends CAPITest {
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
-				'hostids' => [':host:usermacro.access.host2'],
+				'hostids' => [':host:usermacro.access.host2']
 			],
 			[]
 		];
@@ -189,7 +189,7 @@ class testUserMacroAccess extends CAPITest {
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
 				'output' => ['hostmacroid', 'macro', 'value'],
-				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template'],
+				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template']
 			],
 			[
 				['hostmacroid' => ':user_macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
