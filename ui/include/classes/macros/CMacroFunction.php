@@ -500,7 +500,9 @@ class CMacroFunction {
 		}
 
 		libxml_clear_errors();
-		$result = @(new DOMXPath($dom))->evaluate($parameters[0], $dom->firstChild);
+
+		$context = $dom->createDocumentFragment();
+		$result = @(new DOMXPath($dom))->evaluate($parameters[0], $context, false);
 
 		$invalid_xpath = $result === false && libxml_get_errors() !== [];
 
@@ -511,29 +513,43 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
+		if ($result instanceof DOMNodeList) {
+			$output = '';
+			$found = false;
+
+			foreach ($result as $node) {
+				if ($node === $context) {
+					continue;
+				}
+
+				$found = true;
+
+				if ($node instanceof DOMNameSpaceNode) {
+					if ($node->prefix !== 'xml') {
+						$output .=
+							' xmlns'.($node->prefix !== '' ? ':'.$node->prefix : '').'="'.$node->namespaceURI.'"';
+					}
+				}
+				else {
+					$output .= $dom->saveXML($node);
+				}
+			}
+
+			if (!$found) {
+				return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
+			}
+
+			return $output;
+		}
+
 		if (is_float($result)) {
 			if (!is_finite($result)) {
 				return UNRESOLVED_MACRO_STRING;
 			}
 
-			$s = sprintf('%.6F', $result);
-			return str_contains($s, '.') ? rtrim(rtrim($s, '0'), '.') : $s;
-		}
+			$result = sprintf('%.6F', $result);
 
-		if ($result instanceof DOMNodeList) {
-			if ($result->length == 0) {
-				return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
-			}
-
-			$output = '';
-
-			foreach ($result as $node) {
-				if ($node instanceof DOMNode) {
-					$output .= $dom->saveXML($node);
-				}
-			}
-
-			return $output;
+			return str_contains($result, '.') ? rtrim(rtrim($result, '0'), '.') : $result;
 		}
 
 		return is_bool($result) ? (string) (int) $result : (string) $result;
