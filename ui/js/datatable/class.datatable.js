@@ -2396,7 +2396,11 @@ class CDataTable {
 				data_width + 1));
 		}
 		else {
-			width = Math.max(CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH, Math.max(min_width, data_width));
+			width = Math.max(min_width, data_width);
+
+			if (column.getWidth() === 'auto') {
+				width = Math.max(CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH, width);
+			}
 		}
 
 		const calculated_width = `${width}px`;
