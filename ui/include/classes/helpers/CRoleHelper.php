@@ -436,17 +436,11 @@ class CRoleHelper {
 				return $labels;
 
 			case self::UI_SECTION_APM:
-				$labels = [];
-
-				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [
-						self::UI_APM_TRACES => _('Traces'),
-						self::UI_APM_METRICS => _('Metrics'),
-						self::UI_APM_LOGS => _('Logs')
-					];
-				}
-
-				return $labels;
+				return [
+					self::UI_APM_TRACES => _('Traces'),
+					self::UI_APM_METRICS => _('Metrics'),
+					self::UI_APM_LOGS => _('Logs')
+				];
 
 			case self::UI_SECTION_SERVICES:
 				$labels = [self::UI_SERVICES_SERVICES => _('Services')];
