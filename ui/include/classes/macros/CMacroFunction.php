@@ -477,6 +477,85 @@ class CMacroFunction {
 	}
 
 	/**
+	 * Extracts a value from an XML string using an XPath pattern.
+	 *
+	 * @param string $value       [IN] The input value, expected to be an XML document, not empty string.
+	 * @param array  $parameters  [IN] [0] XPath pattern, [1] optional default value.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncXmlxpath(string $value, array $parameters): string {
+		if ($value === '' || count($parameters) < 1 || count($parameters) > 2 || $parameters[0] === '') {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$dom = new DOMDocument();
+		$prev_use_internal_errors = libxml_use_internal_errors(true);
+
+		if (!$dom->loadXML($value, LIBXML_NONET)) {
+			libxml_clear_errors();
+			libxml_use_internal_errors($prev_use_internal_errors);
+
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		libxml_clear_errors();
+
+		$context = $dom->createDocumentFragment();
+		$result = @(new DOMXPath($dom))->evaluate($parameters[0], $context, false);
+
+		$invalid_xpath = $result === false && libxml_get_errors() !== [];
+
+		libxml_clear_errors();
+		libxml_use_internal_errors($prev_use_internal_errors);
+
+		if ($invalid_xpath) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		if ($result instanceof DOMNodeList) {
+			$output = '';
+			$found = false;
+
+			foreach ($result as $node) {
+				if ($node === $context) {
+					continue;
+				}
+
+				$found = true;
+
+				if ($node instanceof DOMNameSpaceNode) {
+					if ($node->prefix !== 'xml') {
+						$output .=
+							' xmlns'.($node->prefix !== '' ? ':'.$node->prefix : '').'="'.$node->namespaceURI.'"';
+					}
+				}
+				else {
+					$output .= $dom->saveXML($node);
+				}
+			}
+
+			if (!$found) {
+				return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
+			}
+
+			return $output;
+		}
+
+		if (is_float($result)) {
+			if (!is_finite($result)) {
+				return UNRESOLVED_MACRO_STRING;
+			}
+
+			$result = sprintf('%.6F', $result);
+
+			return str_contains($result, '.') ? rtrim(rtrim($result, '0'), '.') : $result;
+		}
+
+		return is_bool($result) ? (string) (int) $result : (string) $result;
+	}
+
+	/**
 	 * Removes default empty parameter.
 	 *
 	 * @param array $parameters  [IN] The input value.
@@ -535,6 +614,9 @@ class CMacroFunction {
 
 			case 'uppercase':
 				return self::macrofuncUppercase($value, $macrofunc['parameters']);
+
+			case 'xmlxpath':
+				return self::macrofuncXmlxpath($value, $macrofunc['parameters']);
 		}
 
 		return UNRESOLVED_MACRO_STRING;

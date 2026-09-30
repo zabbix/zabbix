@@ -18,6 +18,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxeval.h"
+#include "zbxexpr.h"
 #include "zbxavailability.h"
 #include "zbxtelemetry.h"
 #include "zbxtime.h"

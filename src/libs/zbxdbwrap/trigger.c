@@ -435,13 +435,30 @@ int	zbx_db_get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
 	expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
-	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
+	if (SUCCEED != zbx_expression_eval_execute(&eval, ts, &value, error))
 	{
-		*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
-		zbx_variant_clear(&value);
+		zbx_expression_eval_clear(&eval);
+
+		goto out;
 	}
 
+	if (ZBX_VARIANT_VECTOR == value.type)
+	{
+		*error = zbx_dsprintf(NULL, "unsupported expression macro result \"%s\" of type \"%s\"",
+				zbx_variant_value_desc(&value), zbx_variant_type_desc(&value));
+
+		zbx_variant_clear(&value);
+		zbx_expression_eval_clear(&eval);
+
+		goto out;
+	}
+
+	*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
+
+	zbx_variant_clear(&value);
 	zbx_expression_eval_clear(&eval);
+
+	ret = SUCCEED;
 out:
 	zbx_eval_clear(&ctx);
 	zbx_free(expression);

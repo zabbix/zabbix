@@ -114,6 +114,11 @@ class CMathFunctionValidatorTest extends TestCase {
 			['concat("a", "a", "a")', ['rc' => true, 'error' => null]],
 			['concat("a", "a", "a", "a")', ['rc' => true, 'error' => null]],
 
+			['contains()', ['rc' => false, 'error' => 'invalid number of parameters in function "contains"']],
+			['contains("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "contains"']],
+			['contains("a", "a")', ['rc' => true, 'error' => null]],
+			['contains("a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "contains"']],
+
 			['cos()', ['rc' => false, 'error' => 'invalid number of parameters in function "cos"']],
 			['cos(1)', ['rc' => true, 'error' => null]],
 			['cos(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "cos"']],
@@ -315,6 +320,12 @@ class CMathFunctionValidatorTest extends TestCase {
 			['stddevsamp(1)', ['rc' => true, 'error' => null]],
 			['stddevsamp(1, 1)', ['rc' => true, 'error' => null]],
 			['stddevsamp(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "stddevsamp"']],
+
+			['substring()', ['rc' => false, 'error' => 'invalid number of parameters in function "substring"']],
+			['substring("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "substring"']],
+			['substring("a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "substring"']],
+			['substring("a", "a", "a")', ['rc' => true, 'error' => null]],
+			['substring("a", "a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "substring"']],
 
 			['sum()', ['rc' => false, 'error' => 'invalid number of parameters in function "sum"']],
 			['sum(1)', ['rc' => true, 'error' => null]],
