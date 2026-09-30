@@ -500,7 +500,7 @@ class CMacroFunction {
 		}
 
 		libxml_clear_errors();
-		$result = @(new DOMXPath($dom))->evaluate($parameters[0]);
+		$result = @(new DOMXPath($dom))->evaluate($parameters[0], $dom->firstChild);
 
 		$invalid_xpath = $result === false && libxml_get_errors() !== [];
 
@@ -512,11 +512,7 @@ class CMacroFunction {
 		}
 
 		if (is_float($result)) {
-			if (is_nan($result)) {
-				return UNRESOLVED_MACRO_STRING;
-			}
-
-			if (is_finite($result)) {
+			if (!is_finite($result)) {
 				return UNRESOLVED_MACRO_STRING;
 			}
 
