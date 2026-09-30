@@ -2694,7 +2694,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 		zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	*arg_vector, ret_value;
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, arg_validation_ret;
 	char		*operator = NULL, *pattern = NULL;
 
 	if (0 == token->opt || 3 < token->opt)
@@ -2703,6 +2703,9 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 				ctx->expression + token->loc.l);
 		return FAIL;
 	}
+
+	if (UNKNOWN != (arg_validation_ret = eval_validate_function_args(ctx, token, output, error)))
+		return arg_validation_ret;
 
 	arg_vector = &output->values[output->values_num - token->opt];
 
