@@ -271,6 +271,9 @@ class CRoleHelper {
 			self::UI_MONITORING_HOSTS,
 			self::UI_MONITORING_LATEST_DATA,
 			self::UI_MONITORING_MAPS,
+			self::UI_APM_TRACES,
+			self::UI_APM_METRICS,
+			self::UI_APM_LOGS,
 			self::UI_SERVICES_SERVICES,
 			self::UI_SERVICES_SLA_REPORT,
 			self::UI_INVENTORY_OVERVIEW,
@@ -282,9 +285,6 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
 				self::UI_MONITORING_DISCOVERY,
-				self::UI_APM_TRACES,
-				self::UI_APM_METRICS,
-				self::UI_APM_LOGS,
 				self::UI_SERVICES_SLA,
 				self::UI_REPORTS_SCHEDULED_REPORTS,
 				self::UI_REPORTS_SYSTEM_INFO,
