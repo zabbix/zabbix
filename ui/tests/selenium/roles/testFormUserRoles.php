@@ -240,6 +240,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
@@ -302,6 +303,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
@@ -522,6 +524,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
@@ -1129,6 +1132,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
