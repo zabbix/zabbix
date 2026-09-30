@@ -392,7 +392,6 @@
 					url.searchParams.set('hostid', hostid);
 
 					const edit_link = document.createElement('a');
-					edit_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
