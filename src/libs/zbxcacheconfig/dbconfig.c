@@ -2193,7 +2193,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 {
 	int			found;
 	ZBX_DC_SNMPINTERFACE	*snmp;
-	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol, max_repetitions;
+	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol;
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
@@ -2203,13 +2203,11 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	ZBX_STR2UCHAR(securitylevel, row[16]);
 	ZBX_STR2UCHAR(authprotocol, row[19]);
 	ZBX_STR2UCHAR(privprotocol, row[20]);
-	ZBX_STR2UCHAR(max_repetitions, row[22]);
 
 	if (0 != found)
 	{
 		if (snmp->bulk != bulk || version != snmp->version || securitylevel != snmp->securitylevel ||
-				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol ||
-				max_repetitions != snmp->max_repetitions)
+				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol)
 		{
 			*modified = 1;
 		}
@@ -2220,7 +2218,6 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	snmp->securitylevel = securitylevel;
 	snmp->authprotocol = authprotocol;
 	snmp->privprotocol = privprotocol;
-	snmp->max_repetitions = max_repetitions;
 
 	if (SUCCEED == dc_strpool_replace(found, &snmp->community, row[14]))
 		*modified = 1;
@@ -2231,6 +2228,10 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	if (SUCCEED == dc_strpool_replace(found, &snmp->privpassphrase, row[18]))
 		*modified = 1;
 	if (SUCCEED == dc_strpool_replace(found, &snmp->contextname, row[21]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->max_repetitions, row[22]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->retries, row[23]))
 		*modified = 1;
 
 	return snmp;
@@ -2255,6 +2256,8 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	dc_strpool_release(snmp->authpassphrase);
 	dc_strpool_release(snmp->privpassphrase);
 	dc_strpool_release(snmp->contextname);
+	dc_strpool_release(snmp->max_repetitions);
+	dc_strpool_release(snmp->retries);
 
 	zbx_hashset_remove_direct(&config->interfaces_snmp, snmp);
 
@@ -9495,7 +9498,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
-				dst_item->snmp_max_repetitions = snmp->max_repetitions;
+				zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+				zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 			}
 			else
 			{
@@ -9509,7 +9513,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				*dst_item->snmp_max_repetitions_orig = '\0';
 				dst_item->snmp_max_repetitions = 0;
+				*dst_item->snmp_retries_orig = '\0';
+				dst_item->snmp_retries = 0;
 				dst_item->timeout = 0;
 			}
 
@@ -9718,7 +9725,8 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		dst_item->snmpv3_privprotocol = snmp->privprotocol;
 		zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 		dst_item->snmp_version = snmp->version;
-		dst_item->snmp_max_repetitions = snmp->max_repetitions;
+		zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+		zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 	}
 	else
 	{
@@ -9732,6 +9740,11 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		dst_item->snmpv3_privprotocol = 0;
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+		*dst_item->snmp_max_repetitions_orig = '\0';
+		dst_item->snmp_max_repetitions = 0;
+		*dst_item->snmp_retries_orig = '\0';
+		dst_item->snmp_retries = 0;
+		dst_item->timeout = 0;
 		dst_item->snmp_max_repetitions = 0;
 	}
 

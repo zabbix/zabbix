@@ -101,7 +101,6 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent (active)|system.swap.size[,free]|
 |Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Dependent item|system.swap.pfree<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value)`</p></li></ul>|
 |Free system page table entries|<p>This indicates the number of page table entries not currently in use by the system. If the number is less than 5,000, there may be a memory leak or you running out of memory.</p>|Zabbix agent (active)|perf_counter_en["\Memory\Free System Page Table Entries"]|
-|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get|
 |Host name of Zabbix agent running||Zabbix agent (active)|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Memory page faults per second|<p>Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages faulted per second because only one page is faulted in each fault operation, hence this is also equal to the number of page fault operations. This counter includes both hard faults (those that require disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most processors can handle large numbers of soft faults without significant consequence. However, hard faults, which require disk access, can cause significant delays.</p>|Zabbix agent (active)|perf_counter_en["\Memory\Page Faults/sec"]|
 |Memory pages per second|<p>This measures the rate at which pages are read from or written to disk to resolve hard page faults.</p><p>If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p>|Zabbix agent (active)|perf_counter_en["\Memory\Pages/sec"]|
@@ -233,13 +232,13 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of filesystems of different types.</p>|Dependent item|vfs.fs.dependent.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Mounted filesystem discovery|<p>Discovery of filesystems of different types.</p>|Zabbix agent (active)|vfs.fs.get[short]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Mounted filesystem discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FS [{#FSLABEL}({#FSNAME})]: Get data|<p>Intermediate data of `{#FSNAME}` filesystem.</p>|Dependent item|vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.fsname=='{#FSNAME}')].first()`</p></li></ul>|
+|FS [{#FSLABEL}({#FSNAME})]: Get data|<p>The `vfs.fs.get[full,{#FSNAME}]` key acquires disk space and inode statistics for the `{#FSNAME}` filesystem only. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get[full,{#FSNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
 |FS [{#FSLABEL}({#FSNAME})]: Space: Available|<p>Available storage space expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},free]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.free`</p></li></ul>|
 |FS [{#FSLABEL}({#FSNAME})]: Space: Total|<p>Total space expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},total]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.total`</p></li></ul>|
 |FS [{#FSLABEL}({#FSNAME})]: Space: Used|<p>Used storage expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.used`</p></li></ul>|

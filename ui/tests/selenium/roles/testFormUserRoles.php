@@ -305,7 +305,10 @@ class testFormUserRoles extends CWebTest {
 						'Reports' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						// The field ID is used here and throughout, as the user role form contains two "Enabled" labels, which causes phpunit warnings.
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Add problem comments' => false,
@@ -337,7 +340,9 @@ class testFormUserRoles extends CWebTest {
 						'Alerts' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
@@ -374,7 +379,9 @@ class testFormUserRoles extends CWebTest {
 						'Administration' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
@@ -638,7 +645,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_deny',
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -655,7 +662,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_deny',
 						'User type' => 'Admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -672,7 +679,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_deny',
 						'User type' => 'Super admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -689,7 +696,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_allow',
 						'User type' => 'User',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -707,7 +714,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_allow',
 						'User type' => 'Admin',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -725,7 +732,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_allow',
 						'User type' => 'Super admin',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -855,7 +862,7 @@ class testFormUserRoles extends CWebTest {
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
-		$form->checkValue(['Enabled' => false]);
+		$form->checkValue(['id:api-access' => false]);
 
 		// The API method buttons are disabled by default.
 		$this->assertFalse($form->getField('API methods')->isEnabled());
@@ -901,24 +908,25 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_api',
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.get', 'alert.get', 'apmlog.get', 'apmmetric.get', 'apmspan.get', 'apmtrace.get',
 						'ceprule.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
 						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
-						'dcheck.get', 'dhost.get', 'discoveryrule.get', 'discoveryruleprototype.get', 'drule.get',
-						'dservice.get', 'event.acknowledge', 'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get',
-						'hanode.get', 'history.get', 'history.push', 'host.get', 'hostdashboard.get', 'hostgroup.get',
-						'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get', 'iconmap.get',
-						'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create', 'map.delete',
-						'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get', 'proxygroup.get',
-						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
-						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get',
-						'sla.getsli', 'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get',
-						'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get',
-						'trigger.get', 'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
-						'usermacro.get', 'valuemap.get'
+						'dcheck.get', 'device.get', 'device.init', 'device.offboard', 'dhost.get', 'discoveryrule.get',
+						'discoveryruleprototype.get', 'drule.get', 'dservice.get', 'event.acknowledge', 'event.get',
+						'graph.get', 'graphitem.get', 'graphprototype.get', 'hanode.get', 'history.get', 'history.push',
+						'host.get', 'hostdashboard.get', 'hostgroup.get', 'hostinterface.get', 'hostprototype.get',
+						'housekeeping.get', 'httptest.get', 'iconmap.get', 'image.get', 'item.get', 'itemprototype.get',
+						'maintenance.get', 'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get',
+						'module.get', 'problem.get', 'proxy.get', 'proxygroup.get', 'role.get', 'script.execute',
+						'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts', 'service.create',
+						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
+						'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create',
+						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get',
+						'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get','usermacro.get',
+						'valuemap.get'
 					]
 				]
 			],
@@ -928,20 +936,20 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_api',
 						'User type' => 'Admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
 						'apmmetric.get', 'apmspan.get', 'apmtrace.get', 'ceprule.get', 'configuration.export',
 						'configuration.import', 'configuration.importcompare', 'correlation.get', 'dashboard.create',
-						'dashboard.delete', 'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get',
-						'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update',
-						'discoveryruleprototype.create', 'discoveryruleprototype.delete', 'discoveryruleprototype.get',
-						'discoveryruleprototype.update', 'drule.create', 'drule.delete', 'drule.get', 'drule.update',
-						'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
-						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete',
-						'graphprototype.get', 'graphprototype.update', 'hanode.get', 'history.clear', 'history.get',
-						'history.push', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
+						'dashboard.delete', 'dashboard.get', 'dashboard.update', 'dcheck.get', 'device.get', 'device.init',
+						'device.offboard','dhost.get','discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get',
+						'discoveryrule.update', 'discoveryruleprototype.create', 'discoveryruleprototype.delete',
+						'discoveryruleprototype.get','discoveryruleprototype.update', 'drule.create', 'drule.delete',
+						'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create',
+						'graph.delete', 'graph.get', 'graph.update', 'graphitem.get', 'graphprototype.create',
+						'graphprototype.delete', 'graphprototype.get', 'graphprototype.update', 'hanode.get', 'history.clear',
+						'history.get', 'history.push', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
 						'host.update', 'hostdashboard.get', 'hostgroup.delete','hostgroup.get', 'hostgroup.massadd',
 						'hostgroup.massremove', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
 						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
@@ -973,7 +981,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_api',
 						'User type' => 'Super admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
@@ -983,13 +991,13 @@ class testFormUserRoles extends CWebTest {
 						'configuration.import', 'configuration.importcompare', 'connector.create', 'connector.delete',
 						'connector.get', 'connector.update', 'correlation.create', 'correlation.delete', 'correlation.get',
 						'correlation.update', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
-						'dcheck.get', 'dhost.get', 'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get',
-						'discoveryrule.update', 'discoveryruleprototype.create', 'discoveryruleprototype.delete',
-						'discoveryruleprototype.get', 'discoveryruleprototype.update', 'drule.create', 'drule.delete',
-						'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create',
-						'graph.delete', 'graph.get', 'graph.update', 'graphitem.get', 'graphprototype.create',
-						'graphprototype.delete', 'graphprototype.get', 'graphprototype.update', 'hanode.get',
-						'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
+						'dcheck.get', 'device.get', 'device.init', 'device.offboard', 'dhost.get', 'discoveryrule.create',
+						'discoveryrule.delete', 'discoveryrule.get','discoveryrule.update', 'discoveryruleprototype.create',
+						'discoveryruleprototype.delete', 'discoveryruleprototype.get', 'discoveryruleprototype.update',
+						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',
+						'event.get', 'graph.create', 'graph.delete', 'graph.get', 'graph.update', 'graphitem.get',
+						'graphprototype.create', 'graphprototype.delete', 'graphprototype.get', 'graphprototype.update',
+						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
 						'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
 						'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
 						'hostgroup.propagate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
@@ -1204,7 +1212,7 @@ class testFormUserRoles extends CWebTest {
 					'to_user' => true,
 					'fields' => [
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1223,7 +1231,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => ['*.create'],
