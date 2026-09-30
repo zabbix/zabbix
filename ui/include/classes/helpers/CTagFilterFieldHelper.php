@@ -53,33 +53,7 @@ class CTagFilterFieldHelper {
 		);
 
 		foreach (array_values($data['tags']) as $i => $tag) {
-			$tags_table->addRow([
-				(new CTextBox($options['tag_field_name'].'['.$i.'][tag]', $tag['tag']))
-					->setAttribute('placeholder', _('tag'))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-				(new CSelect($options['tag_field_name'].'['.$i.'][operator]'))
-					->addOptions(CSelect::createOptionsFromArray([
-						TAG_OPERATOR_EXISTS => _('Exists'),
-						TAG_OPERATOR_EQUAL => _('Equals'),
-						TAG_OPERATOR_LIKE => _('Contains'),
-						TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
-						TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
-						TAG_OPERATOR_NOT_LIKE => _('Does not contain')
-					]))
-					->setValue((int) $tag['operator'])
-					->setFocusableElementId($options['tag_field_name'].'-'.$i.'-operator-select')
-					->setId($options['tag_field_name'].'_'.$i.'_operator'),
-				(new CTextBox($options['tag_field_name'].'['.$i.'][value]', $tag['value']))
-					->setAttribute('placeholder', _('value'))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setId($options['tag_field_name'].'_'.$i.'_value'),
-				(new CCol(
-					(new CButton($options['tag_field_name'].'['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-						->removeId()
-				))->addClass(ZBX_STYLE_NOWRAP)
-			], 'form_row');
+			$tags_table->addRow(self::getFilterRow($options, $tag, $i));
 		}
 
 		$tags_table->addRow(
@@ -107,12 +81,17 @@ class CTagFilterFieldHelper {
 			'tag_field_name' => 'filter_tags'
 		];
 
-		return (new CRow([
-			(new CTextBox($options['tag_field_name'].'[#{rowNum}][tag]'))
+		return self::getFilterRow($options, ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']);
+	}
+
+	private static function getFilterRow(array $options, array $tag, ?int $i = null): CRow {
+		$index = $i === null ? '#{rowNum}' : $i;
+
+		$items = [
+			(new CTextBox($options['tag_field_name'].'['.$index.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->removeId(),
-			(new CSelect($options['tag_field_name'].'[#{rowNum}][operator]'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CSelect($options['tag_field_name'].'['.$index.'][operator]'))
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),
 					TAG_OPERATOR_EQUAL => _('Equals'),
@@ -121,17 +100,28 @@ class CTagFilterFieldHelper {
 					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
-				->setValue(TAG_OPERATOR_LIKE),
-			(new CTextBox($options['tag_field_name'].'[#{rowNum}][value]'))
+				->setValue((int) $tag['operator'])
+				->setFocusableElementId($options['tag_field_name'].'-'.$index.'-operator-select')
+				->setId($options['tag_field_name'].'_'.$index.'_operator'),
+			(new CTextBox($options['tag_field_name'].'['.$index.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->removeId(),
+				->setId($options['tag_field_name'].'_'.$index.'_value'),
 			(new CCol(
-				(new CButton($options['tag_field_name'].'[#{rowNum}][remove]', _('Remove')))
+				(new CButton($options['tag_field_name'].'['.$index.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row');
+		];
+
+		if ($i === null) {
+			foreach ($items as $item) {
+				$item->removeId();
+				$item->removeAttribute('focusable-element-id');
+			}
+		}
+
+		return (new CRow($items))->addClass('form_row');
 	}
 }
