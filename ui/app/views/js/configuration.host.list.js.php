@@ -365,6 +365,7 @@
 								const discovery_rule_link = document.createElement('a');
 								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
 								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
+								discovery_rule_link.textContent = discovery.rule.name;
 
 								cell.appendChild(discovery_rule_link);
 							}
@@ -392,19 +393,11 @@
 					url.searchParams.set('popup', 'host.edit');
 					url.searchParams.set('hostid', hostid);
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const edit_link = document.createElement('a');
-					edit_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(edit_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(edit_link);
 
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -435,10 +428,8 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(maintenance_icon);
+						cell.appendChild(maintenance_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
