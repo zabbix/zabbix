@@ -42,7 +42,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
 			'itemid'				=> 'db items.itemid',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY, ITEM_TYPE_NESTED]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
@@ -73,6 +73,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'valuemapid'			=> 'int32',
+			'signal_type'			=> 'int32',
+			'metric_point_type'		=> 'int32',
+			'columns'				=> 'array',
+			'aggregated_columns'	=> 'array',
+			'conditions'			=> 'array',
+			'evaltype'				=> 'int32',
+			'formula'				=> 'string',
+			'time_shift'			=> 'string',
+			'lookback_limit'		=> 'string',
+			'granularity'			=> 'string',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1'
 		];
@@ -97,12 +107,115 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		return $result;
 	}
 
+	/**
+	 * Validation rules to check if all data is correct to open test edit form.
+	 */
+	public static function getValidationRules(bool $allow_lld_macro): array {
+		return ['object', 'fields' => [
+			'type' => ['db items.type', 'required', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
+			]],
+			'key' => ['db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []], 'when' => [
+				['type', 'in' => self::$item_types_has_key_mandatory]
+			]],
+			'params_f' => ['db items.params', 'required', 'not_empty',
+				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
+				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
+			],
+			'signal_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'metric_point_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
+				],
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
+					['signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]]
+				]
+			],
+			'columns' => ['objects', 'required', 'uniq' => ['column', 'attribute_key'],
+				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
+				'fields' => [
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'aggregated_columns' => ['objects', 'required', 'not_empty', 'uniq' => ['alias'],
+				'messages' => [
+					'required' => _('At least one aggregated column must be specified.'),
+					'not_empty' => _('At least one aggregated column must be specified.'),
+					'uniq' => _('Alias is not unique.')
+				],
+				'fields' => [
+					'function' => ['integer', 'required',
+						'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+							AGGREGATE_PERCENTILE
+						]
+					],
+					'column' => CTelemetryHelper::getColumnValidationRules(
+						CTelemetryHelper::SECTION_AGGREGATED_COLUMNS
+					),
+					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
+					],
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
+				'fields' => [
+					'formulaid' => ['string', 'required', 'not_empty'],
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					],
+					'operator' => [
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
+							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						],
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+								CONDITION_OPERATOR_NOT_LIKE
+							],
+							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						]
+					],
+					'value' => [
+						['string', 'required', 'length' => 255,
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
+						],
+						['string', 'required', 'length' => 255, 'not_empty',
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+						]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules($allow_lld_macro)
+		]];
+	}
+
 	private function checkTestInputs(): bool {
 		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
 		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 		$this->test_type = (int) $this->getInput('test_type');
-		$this->is_item_testable = in_array($this->item_type, $testable_item_types)
-			&& $this->item_type != ITEM_TYPE_NESTED;
+		$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 		// Check if key is valid for item types it's mandatory.
 		if (in_array($this->item_type, self::$item_types_has_key_mandatory)) {
@@ -110,6 +223,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
+
+				return false;
+			}
+		}
+
+		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
+			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+
+			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
+				error($error);
 
 				return false;
 			}
@@ -195,7 +318,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
 		if (array_key_exists('macros', $data)) {
-			$data['macros'] = json_decode($data['macros'], true);
+			$data['macros'] = array_combine(
+				array_column($data['macros'], 'name'),
+				array_column($data['macros'], 'value')
+			);
 		}
 
 		$inputs = $this->getItemTestProperties($this->getInputAll());
@@ -449,6 +575,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
+		$monitored_by_server = $this->host['status'] != HOST_STATUS_TEMPLATE
+			&& $this->host['monitored_by'] == ZBX_MONITORED_BY_SERVER;
+
 		if (in_array($this->item_type, $this->items_support_proxy)) {
 			if (array_key_exists('proxyid', $data)) {
 				$proxyid = $data['proxyid'];
@@ -460,19 +589,50 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				$proxyid = 0;
 			}
 
-			if (array_key_exists('test_with', $data)) {
+			if ($monitored_by_server) {
+				$test_with = self::TEST_WITH_SERVER;
+			}
+			elseif (array_key_exists('test_with', $data)) {
 				$test_with = $data['test_with'];
 			}
 			else {
-				$test_with = $this->getInput('test_with', $proxyid == 0
+				$default_test_with = $proxyid == 0
+						&& CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 					? self::TEST_WITH_SERVER
-					: self::TEST_WITH_PROXY
-				);
+					: self::TEST_WITH_PROXY;
+
+				$test_with = $this->getInput('test_with', $default_test_with);
 			}
 		}
 		else {
 			$test_with = self::TEST_WITH_SERVER;
 			$proxyid = 0;
+		}
+
+		$ms_proxy = [];
+		$ms_proxy_inaccessible = false;
+
+		if ($proxyid != 0) {
+			$resolved_proxy = CProxyHelper::resolveProxyOption($proxyid);
+			$ms_proxy = [$resolved_proxy];
+			$ms_proxy_inaccessible = $resolved_proxy['inaccessible'];
+		}
+		elseif (array_key_exists('proxy_groupid', $this->host) && $this->host['proxy_groupid'] != 0) {
+			$accessible_proxy_group = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'proxy_groupids' => [$this->host['proxy_groupid']]
+			]);
+
+			if (!$accessible_proxy_group) {
+				$ms_proxy = [[
+					'id' => 0,
+					'name' => _('Inaccessible proxy'),
+					'inaccessible' => true
+				]];
+				$ms_proxy_inaccessible = true;
+
+				$test_with = $this->getInput('test_with', self::TEST_WITH_PROXY);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -498,13 +658,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
 			'test_with' => $test_with,
-			'ms_proxy' => $proxyid != 0
-				? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-					'output' => ['proxyid', 'name'],
-					'proxyids' => [$proxyid]
-				]), ['proxyid' => 'id'])
-				: [],
-			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
+			'ms_proxy' => $ms_proxy,
+			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible
+				&& !($monitored_by_server && !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)),
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']
 			),
@@ -515,7 +671,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_warning' => $show_warning,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules())
+			)->getRules(),
+			'js_validation_rules_get_value' => (new CFormValidator(
+				CControllerPopupItemTestGetValue::getValidationRules())
+			)->getRules()
 		]));
 	}
 }

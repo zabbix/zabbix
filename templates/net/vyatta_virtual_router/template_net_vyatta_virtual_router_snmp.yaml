@@ -25,7 +25,7 @@ zabbix_export:
         Template for Vyatta Virtual Router 1908e.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1372,12 +1372,20 @@ zabbix_export:
         - tag: target
           value: vyatta-1908e
       macros:
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '2'
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$VYATTA.CPU.USED.HIGH}'
           value: '95'
           description: 'High severity threshold of CPU utilization.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'CPU usage (high)'
             description: 'High severity threshold of CPU utilization.'
@@ -1387,7 +1395,7 @@ zabbix_export:
           description: 'Warning threshold of CPU utilization.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'CPU usage (warning)'
             description: 'Warning threshold of CPU utilization.'
@@ -1397,7 +1405,7 @@ zabbix_export:
           description: 'Sets the IP regex filter to use in BGP peer discovery for including.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: 'Filters: BGP peers'
             label: 'Type filter for bgp peers discovery (include)'
             description: 'Sets the IP regex filter to use in BGP peer discovery for including.'
@@ -1406,7 +1414,7 @@ zabbix_export:
           description: 'Sets the IP regex filter to use in BGP peer discovery for excluding.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: 'Filters: BGP peers'
             label: 'Type filter for bgp peers discovery (exclude)'
             description: 'Sets the IP regex filter to use in BGP peer discovery for excluding.'
@@ -1415,7 +1423,7 @@ zabbix_export:
           description: 'Sets the OID regex filter to use in CPU discovery for including. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: 'Filters: CPU'
             label: 'OID filter for CPU discovery (include)'
             description: 'Sets the OID regex filter to use in CPU discovery for including. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
@@ -1424,7 +1432,7 @@ zabbix_export:
           description: 'Sets the OID regex filter to use in CPU discovery for excluding. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: 'Filters: CPU'
             label: 'OID filter for CPU discovery (exclude)'
             description: 'Sets the OID regex filter to use in CPU discovery for excluding. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
@@ -1433,7 +1441,7 @@ zabbix_export:
           description: 'Sets the administrative status regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: 'Filters: Interfaces'
             label: 'Administrative status filter for interface discovery (include)'
             description: 'Sets the administrative status regex filter to use in network interface discovery for including.'
@@ -1442,7 +1450,7 @@ zabbix_export:
           description: 'Sets the administrative status regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: 'Filters: Interfaces'
             label: 'Administrative status filter for interface discovery (exclude)'
             description: 'Sets the administrative status regex filter to use in network interface discovery for excluding.'
@@ -1451,7 +1459,7 @@ zabbix_export:
           description: 'Sets the alias regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: 'Filters: Interfaces'
             label: 'Alias filter for interface discovery (include)'
             description: 'Sets the alias regex filter to use in network interface discovery for including.'
@@ -1460,7 +1468,7 @@ zabbix_export:
           description: 'Sets the alias regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: 'Filters: Interfaces'
             label: 'Alias filter for interface discovery (exclude)'
             description: 'Sets the alias regex filter to use in network interface discovery for excluding.'
@@ -1469,7 +1477,7 @@ zabbix_export:
           description: 'Sets the description regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: 'Filters: Interfaces'
             label: 'Description filter for interface discovery (include)'
             description: 'Sets the description regex filter to use in network interface discovery for including.'
@@ -1478,7 +1486,7 @@ zabbix_export:
           description: 'Sets the description regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: 'Filters: Interfaces'
             label: 'Description filter for interface discovery (exclude)'
             description: 'Sets the description regex filter to use in network interface discovery for excluding.'
@@ -1487,7 +1495,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: 'Filters: Interfaces'
             label: 'Name filter for interface discovery (include)'
             description: 'Sets the name regex filter to use in network interface discovery for including.'
@@ -1496,7 +1504,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in network interface discovery for excluding. Filters out `loopbacks`, `nulls`, docker `veth` links, and `docker0 bridge` by default.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: 'Filters: Interfaces'
             label: 'Name filter for interface discovery (exclude)'
             description: 'Sets the name regex filter to use in network interface discovery for excluding. Filters out `loopbacks`, `nulls`, docker `veth` links, and `docker0 bridge` by default.'
@@ -1505,7 +1513,7 @@ zabbix_export:
           description: 'Sets the operative status regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: 'Filters: Interfaces'
             label: 'Operative status filter for interface discovery (include)'
             description: 'Sets the operative status regex filter to use in network interface discovery for including.'
@@ -1514,7 +1522,7 @@ zabbix_export:
           description: 'Sets the operative status regex filter to use in network interface discovery for excluding. Ignore `notPresent(6)`.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: 'Filters: Interfaces'
             label: 'Operative status filter for interface discovery (exclude)'
             description: 'Sets the operative status regex filter to use in network interface discovery for excluding. Ignore `notPresent(6)`.'
@@ -1523,7 +1531,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: 'Filters: Interfaces'
             label: 'Type filter for interface discovery (include)'
             description: 'Sets the type regex filter to use in network interface discovery for including.'
@@ -1532,7 +1540,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: 'Filters: Interfaces'
             label: 'Type filter for interface discovery (exclude)'
             description: 'Sets the type regex filter to use in network interface discovery for excluding.'
@@ -1541,7 +1549,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in storage discovery for including.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: 'Filters: Storage'
             label: 'Name filter for storage discovery (include)'
             description: 'Sets the name regex filter to use in storage discovery for including.'
@@ -1550,7 +1558,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in storage discovery for excluding.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: 'Filters: Storage'
             label: 'Name filter for storage discovery (exclude)'
             description: 'Sets the name regex filter to use in storage discovery for excluding.'
@@ -1559,7 +1567,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in storage discovery for including.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: 'Filters: Storage'
             label: 'Type filter for storage discovery (include)'
             description: 'Sets the type regex filter to use in storage discovery for including.'
@@ -1568,7 +1576,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in storage discovery for excluding.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: 'Filters: Storage'
             label: 'Type filter for storage discovery (exclude)'
             description: 'Sets the type regex filter to use in storage discovery for excluding.'
@@ -1577,7 +1585,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Thresholds
             label: 'ICMP packet loss (warning)'
             description: 'Warning threshold of ICMP packet loss in %.'
@@ -1587,7 +1595,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'ICMP response time (warning)'
             description: 'Warning threshold of the average ICMP response time in seconds.'
@@ -1597,7 +1605,7 @@ zabbix_export:
           description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
           config:
             type: CHECKBOX
-            priority: '11'
+            priority: '12'
             label: 'Interfaces control'
             description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
             options:
@@ -1608,7 +1616,7 @@ zabbix_export:
           description: 'Load per CPU considered sustainable. Tune if needed.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'The CPU load per core'
             description: 'CPU load per core is considered sustainable. No less than 0.'
@@ -1618,7 +1626,7 @@ zabbix_export:
           description: 'High severity threshold of memory utilization.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Memory usage (high)'
             description: 'High severity threshold of memory utilization.'
@@ -1628,7 +1636,7 @@ zabbix_export:
           description: 'Warning threshold of memory utilization.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'Memory usage (warning)'
             description: 'Warning threshold of memory utilization.'
@@ -1646,7 +1654,7 @@ zabbix_export:
           description: 'High severity threshold of storage utilization.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Storage usage (high)'
             description: 'High severity threshold of storage utilization.'
@@ -1656,7 +1664,7 @@ zabbix_export:
           description: 'Warning threshold of storage utilization.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Storage usage (warning)'
             description: 'Warning threshold of storage utilization.'
@@ -3917,11 +3925,20 @@ zabbix_export:
               newvalue: Up
   triggers:
     - uuid: ab635805cfb74121827f3f31e985e875
-      expression: '(last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])>0 and last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])<10m) or (last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])=0 and last(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance])<10m)'
+      expression: |
+        (last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])>0 and change(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])<0 and last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])-lastclock(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0],#2)))
+        or (last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])=0 and change(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance])<0 and last(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance],#2)<42949672.96-(lastclock(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance])-lastclock(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance])>{$SNMP.UPTIME.WARN}
       name: 'Vyatta: Host has been restarted'
-      event_name: 'Vyatta: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Vyatta: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Vyatta: No SNMP data collection'

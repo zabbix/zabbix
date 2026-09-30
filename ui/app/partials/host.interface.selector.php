@@ -24,7 +24,9 @@ $interface = array_key_exists($data['interfaceid'], $data['interfaces'])
 	: [];
 
 if ($data['discovered']) {
-	(new CInput('hidden', 'interfaceid', $data['interfaceid']))->show();
+	(new CInput('hidden', 'interfaceid', $data['interfaceid']))
+		->setAttribute('data-field-type', 'hidden')
+		->show();
 
 	$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 	$select_interface = new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true);

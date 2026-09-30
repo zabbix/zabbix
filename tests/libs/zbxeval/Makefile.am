@@ -33,24 +33,20 @@ SERVER_tests = \
 	zbx_eval_calc_avg \
 	zbx_eval_calc_min \
 	zbx_eval_calc_max \
-	zbx_eval_calc_sum
-
-endif
+	zbx_eval_calc_sum \
+	zbx_eval_variant_to_value_type
 
 noinst_PROGRAMS = $(SERVER_tests)
 
-if SERVER
 COMMON_SRC_FILES = \
-	../../zbxmocktest.h
+	../../zbxmocktest.h \
+	../../zbxmockvariant.c \
+	../../zbxmockvariant.h
 
 EVAL_LIBS = \
-	$(EVAL_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
-
-if HAVE_IPMI
-	EVAL_LIBS += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
-endif
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
@@ -491,4 +487,19 @@ zbx_eval_calc_sum_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $
 
 zbx_eval_calc_sum_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+#zbx_eval_variant_to_value_type
+
+zbx_eval_variant_to_value_type_SOURCES = \
+	zbx_eval_variant_to_value_type.c \
+	mock_eval.c mock_eval.h \
+	$(COMMON_SRC_FILES)
+
+zbx_eval_variant_to_value_type_LDADD = \
+	$(EVAL_LIBS)
+
+zbx_eval_variant_to_value_type_LDADD += @SERVER_LIBS@
+
+zbx_eval_variant_to_value_type_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_eval_variant_to_value_type_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif

@@ -36,6 +36,11 @@ final class CSettingsSchema {
 		'alert_usrgrpid' => [
 			'column' => 'value_usrgrpid'
 		],
+		'apm_global_db' => [
+			'column' => 'value_str',
+			'default' => '{}',
+			'length' => 65535
+		],
 		'auditlog_enabled' => [
 			'column' => 'value_int',
 			'default' => 1
@@ -51,11 +56,6 @@ final class CSettingsSchema {
 		'autoreg_tls_accept' => [
 			'column' => 'value_int',
 			'default' => 1
-		],
-		'banner_data' => [
-			'column' => 'value_str',
-			'default' => '',
-			'length' => 65535
 		],
 		'blink_period' => [
 			'column' => 'value_str',
@@ -108,6 +108,11 @@ final class CSettingsSchema {
 			'column' => 'value_str',
 			'default' => 'system',
 			'length' => 50
+		],
+		'device_link_timeout' => [
+			'column' => 'value_str',
+			'default' => '60s',
+			'length' => 32
 		],
 		'disabled_usrgrpid' => [
 			'column' => 'value_usrgrpid'
@@ -409,6 +414,11 @@ final class CSettingsSchema {
 			'default' => '',
 			'length' => 65535
 		],
+		'serverid' => [
+			'column' => 'value_str',
+			'default' => '',
+			'length' => 36
+		],
 		'session_key' => [
 			'column' => 'value_str',
 			'default' => '',
@@ -543,6 +553,11 @@ final class CSettingsSchema {
 			'length' => 255
 		],
 		'timeout_zabbix_agent' => [
+			'column' => 'value_str',
+			'default' => '3s',
+			'length' => 255
+		],
+		'timeout_telemetry_query' => [
 			'column' => 'value_str',
 			'default' => '3s',
 			'length' => 255

@@ -417,7 +417,7 @@ $mediatype_form_grid
 	->addItem([
 		(new CLabel(_('Menu entry name'), 'event_menu_name'))
 			->setId('webhook_url_name_label')
-			->setAsteriskMark(),
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CFormField(
 			(new CTextBox('event_menu_name', $data['event_menu_name'], false,
 				DB::getFieldLength('media_type', 'event_menu_name')
@@ -425,20 +425,21 @@ $mediatype_form_grid
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
-				->setAriaRequired()
+				->setAriaRequired($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 		))->setId('webhook_url_name_field')
 	])
 	->addItem([
 		(new CLabel(_('Menu entry URL'), 'event_menu_url'))
 			->setId('webhook_event_menu_url_label')
-			->setAsteriskMark(),
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CFormField(
 			(new CTextAreaFlexible('event_menu_url', $data['event_menu_url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('media_type', 'event_menu_url'))
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
-				->setAriaRequired()
+				->addClass(ZBX_STYLE_ALIGN_TOP)
+				->setAriaRequired($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 		))->setId('webhook_event_menu_url_field')
 	])
 	->addItem([
@@ -456,6 +457,18 @@ $mediatype_form_grid
 				->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 				->setUncheckedValue(MEDIA_TYPE_STATUS_DISABLED)
 		)
+	])
+	->addItem([
+		(new CLabel([
+			_('Bridge adapter connection'),
+			makeHelpIcon(_('Bridge Adapter connection details can be found in Zabbix configuration file.'))
+		]))
+			->setId('bridge_adapter_label'),
+		(new CFormField(
+			CSettingsHelper::isBridgeAdapterConfigured() ? _('Configured') : _('Not configured')
+		))
+			->setId('bridge_adapter_field')
+			->addClass(CSettingsHelper::isBridgeAdapterConfigured() ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 	]);
 
 $message_template = (new CTemplateTag('message-templates-row-tmpl'))
@@ -579,18 +592,7 @@ $email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_P
 // Append tabs to form.
 $form
 	->addItem($tabs)
-	->addItem($parameters_exec_template)
-	->addItem(
-		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
-			'rules' => $data['js_validation_rules'],
-			'clone_rules' => $data['js_clone_validation_rules'],
-			'mediatype' => $data,
-			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
-			'smtp_server_default' => $email_defaults['smtp_server'],
-			'smtp_email_default' =>  $email_defaults['smtp_email'],
-			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider()
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($parameters_exec_template);
 
 if ($data['mediatypeid']) {
 	$buttons = [
@@ -630,7 +632,18 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('mediatype.edit.js.php').
+		'mediatype_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'mediatype' => $data,
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
+			'smtp_server_default' => $email_defaults['smtp_server'],
+			'smtp_email_default' =>  $email_defaults['smtp_email'],
+			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider()
+		]).');'
+	,
 	'dialogue_class' => 'modal-popup-static'
 ];
 

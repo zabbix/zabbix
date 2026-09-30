@@ -14,7 +14,7 @@ zabbix_export:
         This Zabbix template enables monitoring of Aranet Cloud sensors via the Aranet Cloud API. It collects temperature, humidity, CO₂, and other environmental metrics from linked devices, providing real-time data visualization, alerting, and historical trends within Zabbix. Easy to configure and ideal for smart building, greenhouse, or industrial monitoring setups.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -25,6 +25,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Aranet = {
             	params: {},
             	auth_token: null,
@@ -45,11 +70,14 @@ zabbix_export:
             				Aranet.params.api_endpoint += '/';
             			}
             		}
+            
+            		Aranet.tls = new CTlsConfig(params.tls_verify);
+            		Aranet.tls.checkURL(Aranet.params.api_endpoint);
             	},
             
             	request: function (method, query, data) {
             		var response,
-            			request = new HttpRequest(),
+            			request = new HttpRequest(Aranet.tls.options),
             			url = Aranet.params.api_endpoint + query;
             
             		request.addHeader('Content-Type: application/json');
@@ -295,6 +323,8 @@ zabbix_export:
               value: '{$ARANET.API.PASSWORD}'
             - name: space_name
               value: '{$ARANET.API.SPACE_NAME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Aranet Cloud"}'
             - name: username
               value: '{$ARANET.API.USERNAME}'
           tags:
@@ -1308,7 +1338,7 @@ zabbix_export:
           description: 'Aranet Cloud API endpoint.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: 'API URL'
             description: 'Aranet Cloud API endpoint.'
             required: 'YES'
@@ -1317,7 +1347,7 @@ zabbix_export:
           description: 'Aranet Cloud password.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: Password
             description: 'Aranet Cloud password.'
             required: 'YES'
@@ -1325,7 +1355,7 @@ zabbix_export:
           description: 'Aranet Cloud organization name.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: Organization
             description: 'Aranet Cloud organization name.'
             required: 'YES'
@@ -1333,7 +1363,7 @@ zabbix_export:
           description: 'Aranet Cloud username.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: Username
             description: 'Aranet Cloud username.'
             required: 'YES'
@@ -1342,7 +1372,7 @@ zabbix_export:
           description: 'Battery voltage critical threshold.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Battery critical'
             description: 'Battery voltage critical threshold.'
@@ -1352,7 +1382,7 @@ zabbix_export:
           description: 'Battery voltage warning threshold.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Battery warning'
             description: 'Battery voltage warning threshold.'
@@ -1362,7 +1392,7 @@ zabbix_export:
           description: 'CO2 critical threshold.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'CO2 critical'
             description: 'CO2 critical threshold.'
@@ -1372,7 +1402,7 @@ zabbix_export:
           description: 'CO2 warning threshold.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'CO2 warning'
             description: 'CO2 warning threshold.'
@@ -1382,7 +1412,7 @@ zabbix_export:
           description: 'Maximum humidity threshold.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'Max humidity'
             description: 'Maximum humidity threshold.'
@@ -1392,7 +1422,7 @@ zabbix_export:
           description: 'Minimum humidity threshold.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Min humidity'
             description: 'Minimum humidity threshold.'
@@ -1402,7 +1432,7 @@ zabbix_export:
           description: 'Data update delay threshold.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Update delay'
             description: 'Data update delay threshold.'
@@ -1411,7 +1441,7 @@ zabbix_export:
           description: 'Filter of discoverable sensors by gateway id.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Sensors filter (by gateway ID)'
             description: 'Filter of discoverable sensors by gateway id.'
@@ -1420,7 +1450,7 @@ zabbix_export:
           description: 'Filter of discoverable sensors by gateway name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Sensors filter (by gateway name)'
             description: 'Filter of discoverable sensors by gateway name.'
@@ -1429,7 +1459,7 @@ zabbix_export:
           description: 'Filter to exclude discoverable sensors by gateway name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Sensors filter (exclude gateway)'
             description: 'Filter to exclude discoverable sensors by gateway name.'
@@ -1438,7 +1468,7 @@ zabbix_export:
           description: 'Filter of discoverable sensors by id.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Sensors filter (by ID)'
             description: 'Filter of discoverable sensors by id.'
@@ -1447,7 +1477,7 @@ zabbix_export:
           description: 'Filter of discoverable sensors by name.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Sensors filter (include)'
             description: 'Filter of discoverable sensors by name.'
@@ -1456,7 +1486,23 @@ zabbix_export:
           description: 'Filter to exclude discoverable sensors by name.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Sensors filter (exclude)'
             description: 'Filter to exclude discoverable sensors by name.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Aranet Cloud", e.g. {$HTTP.TLS.VERIFY:"Aranet Cloud"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled

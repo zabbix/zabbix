@@ -83,7 +83,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 	switch (state)
 	{
 		case ZBX_TRIGGER_CACHE_EVAL_CTX:
-			if ('\0' == *trigger->expression)
+			if (NULL == trigger->expression || '\0' == *trigger->expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx, trigger->expression,
@@ -94,7 +94,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 			}
 			break;
 		case ZBX_TRIGGER_CACHE_EVAL_CTX_R:
-			if ('\0' == *trigger->recovery_expression)
+			if (NULL == trigger->recovery_expression || '\0' == *trigger->recovery_expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx_r, trigger->recovery_expression,
@@ -569,6 +569,35 @@ void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get the first function ID from a trigger expression               *
+ *                                                                            *
+ * Parameters: trigger - [IN]                                                 *
+ *                                                                            *
+ * Return value: first function ID, or 0 if none found                        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger)
+{
+	zbx_trigger_cache_t	*cache;
+	zbx_vector_uint64_t	functionids;
+	zbx_uint64_t		functionid = 0;
+
+	zbx_vector_uint64_create(&functionids);
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+	{
+		zbx_eval_get_functionids_ordered(&cache->eval_ctx, &functionids);
+		if (0 != functionids.values_num)
+			functionid = functionids.values[0];
+	}
+
+	zbx_vector_uint64_destroy(&functionids);
+
+	return functionid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get functionids from trigger expression                           *
  *                                                                            *
  * Parameters: trigger     - [IN] the trigger                                 *
@@ -912,6 +941,9 @@ void	zbx_db_trigger_clean(zbx_db_trigger *trigger)
 	zbx_free(trigger->url_name);
 	zbx_free(trigger->opdata);
 	zbx_free(trigger->event_name);
+	zbx_free(trigger->correlation_tag);
+
+	zbx_vector_uint64_destroy(&trigger->dep_triggerids);
 
 	if (NULL != trigger->cache)
 		trigger_cache_free((zbx_trigger_cache_t *)trigger->cache);
@@ -1076,7 +1108,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value,
 			evaluate_item.key_orig = item.key_orig;
 
 			if (SUCCEED == evaluate_function_trigger_cb(&var, &evaluate_item, function.function, parameter,
-					&ts, &error) && ZBX_VARIANT_NONE != var.type)
+					&ts, NULL, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);

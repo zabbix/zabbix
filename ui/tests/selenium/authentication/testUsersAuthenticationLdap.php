@@ -3216,6 +3216,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 */
 	protected function submitLdapForm($alert) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->query('xpath:.//button[@type="submit"]')->waitUntilClickable()->one();
 		$form->submit();
 
 		// isAlertPresent method can't be used as is completes before the alert actually appears (due to inline validation).

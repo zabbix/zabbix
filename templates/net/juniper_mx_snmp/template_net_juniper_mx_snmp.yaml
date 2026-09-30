@@ -40,7 +40,7 @@ zabbix_export:
             OSPFV3-MIB-JUNIPER
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -2332,7 +2332,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Thresholds
             label: 'ICMP losses warning'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -2342,7 +2342,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Thresholds
             label: 'ICMP response time warning'
             description: 'Warning threshold of the average ICMP response time in seconds.'
@@ -2563,6 +2563,15 @@ zabbix_export:
             label: 'Warning temperature (Routing Engine)'
             description: 'Threshold of temperature sensor for trigger. Used for Routing Engine.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '26'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: 6131b952fe8f42e7b65a8a8538d86016
           name: 'Juniper MX: General'
@@ -3820,11 +3829,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: 4882bb9496ac40bc97c3c5278c0181c8
-      expression: '(last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])>0 and change(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])<0 and last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])-lastclock(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])=0 and change(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0])<0 and last(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0])-lastclock(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Juniper MX by SNMP/juniper.mx.system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Juniper MX by SNMP/juniper.mx.system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Juniper MX: Host has been restarted'
-      event_name: 'Juniper MX: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Juniper MX: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Juniper MX: No SNMP data collection'

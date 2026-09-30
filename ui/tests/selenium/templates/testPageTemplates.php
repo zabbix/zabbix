@@ -51,11 +51,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
-		$table->waitUntilReady();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded()->waitUntilReady();
 		$this->zbxTestTextPresent($this->templateName);
 
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
@@ -91,7 +92,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
-		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
+		$sqlTriggers = 'select triggerid,expression,description,url,status,priority,comments,templateid,type,flags'.
+				' from triggers order by triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('zabbix.php?action=template.list');
@@ -127,7 +129,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->assertDatatableDataColumn([$this->templateName]);
 		$this->assertDatatableStats(1);
 	}
@@ -136,12 +138,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getDatatable();
 		$filter->getField('Linked templates')->fill([
 				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->assertDatatableDataColumn(['Template ZBX6663 First']);
 		$this->assertDatatableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
 		$this->assertDatatableStats(1);
@@ -160,7 +163,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertDatatableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->assertDatatableStats(0);
 	}
 
@@ -469,10 +472,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Template for');
+		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
 		$filter->submit();
-		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$table_rows_count = $table->getRows()->count();
+		$table_rows_count = $table->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

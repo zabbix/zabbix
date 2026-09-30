@@ -134,11 +134,13 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Create problems and events.
 		$time = time();
-		foreach (CDataHelper::getIds('description') as $name => $id) {
+		$triggerids = CDataHelper::getIds('description');
+		foreach ($triggerids as $name => $id) {
 			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.zbx_dbstr('Trigger for char'));
+		DBexecute('UPDATE triggers SET manual_close=1 WHERE triggerid='.zbx_dbstr($triggerids['Trigger for char']));
+		DBexecute('UPDATE trigger_rtdata SET value=1 WHERE triggerid='.zbx_dbstr($triggerids['Trigger for char']));
 
 		$eventids = [];
 		foreach (['Trigger for text', 'Trigger for unsigned', 'Trigger for icon test'] as $event_name) {
@@ -203,8 +205,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for unsigned'],
 					// If problem is Acknowledged - label is changed to Unacknowledge.
+					// Two last empty labels belong to the "Suppress trigger" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
@@ -231,8 +234,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
+					// Two last empty labels belong to the "Suppress triggers" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-						'Acknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
@@ -250,8 +254,9 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problem selected - History label is absent.
+					// Two last empty labels belong to the "Suppress triggers" link and to the error message container.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-						'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
+						'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', '', ''
 					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -276,7 +281,7 @@ class testFormUpdateProblem extends CWebTest {
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 
@@ -286,9 +291,13 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check form labels.
 		$count = count($data['problems']);
+		// Two last empty labels belong to the "Suppress trigger(s)" link and to the error message container.
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Convert to cause', 'Close problem', ''];
+				'Acknowledge', 'Convert to cause', 'Close problem', '', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
+
+		// Check the link that leads to the ad-hoc maintenance creation form.
+		$this->assertTrue($form->query('link', 'Suppress trigger'.($count > 1 ? 's' : ''))->one()->isClickable());
 
 		// Check "Problem" field value.
 		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
@@ -390,7 +399,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check other buttons in overlay.
 		$button_queries = [
 			// Button ? (help) is covered in testDocumentationLinks.
-			'xpath:.//button[@title="Close"]' => true,
+			'xpath:.//button[@aria-label="Close modal window"]' => true,
 			'xpath:.//button[@id="suppress_until_problem_calendar"]' => false,
 			'button:Update' => true,
 			'button:Cancel' => true
@@ -804,7 +813,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		$count = count($data['problems']);
 		$table->findRows('Problem', $data['problems']);
@@ -897,7 +906,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', 'Trigger for log')
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', 'Trigger for log')
 				->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -910,7 +919,7 @@ class testFormUpdateProblem extends CWebTest {
 				'Acknowledge' => true
 		]);
 
-		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
+		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@aria-label="Close modal window"]' : 'button:Cancel')->one()
 				->waitUntilClickable()->click();
 		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
@@ -919,7 +928,7 @@ class testFormUpdateProblem extends CWebTest {
 
 	public function testFormUpdateProblem_CheckSuppressIcon() {
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();

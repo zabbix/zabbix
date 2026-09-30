@@ -11,7 +11,7 @@
 	vertical-align: top;
 	border-width: 1px;
 	border-style: solid;
-	border-radius: 2px;
+	border-radius: var(--badge-border-radius);
 }
 
 .status-container {
@@ -42,6 +42,17 @@
 		&[data-hintbox='1'] {
 			cursor: pointer;
 		}
+	}
+}
+
+.status-list-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	.status-green, .status-grey {
+		margin-top: 1px;
+		margin-bottom: 1px;
 	}
 }
 

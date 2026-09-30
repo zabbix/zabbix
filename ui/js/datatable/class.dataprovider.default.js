@@ -137,7 +137,7 @@ class CDefaultDataProvider extends CDataProvider {
 			],
 			body: JSON.stringify({
 				data_fields,
-				options: Object.assign({}, column_options, options),
+				options: {...options, columns: column_options},
 				filter,
 				page,
 				sort_field,
@@ -153,6 +153,13 @@ class CDefaultDataProvider extends CDataProvider {
 				}
 
 				return response;
+			})
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				throw error;
 			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {

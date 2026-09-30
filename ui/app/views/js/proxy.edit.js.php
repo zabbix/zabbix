@@ -21,10 +21,12 @@ window.proxy_edit_popup = new class {
 		this.clone_proxyid = null;
 		this.form = null;
 		this.form_element = null;
+		this.warnings = [];
 	}
 
-	init({proxyid, rules}) {
+	init({proxyid, rules, warnings}) {
 		this.proxyid = proxyid;
+		this.warnings = warnings;
 
 		this.overlay = overlays_stack.getById('proxy.edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -82,11 +84,25 @@ window.proxy_edit_popup = new class {
 			document.getElementById(id).disabled = false;
 		}
 
+		document.getElementById('tls_psk_identity').focus();
+
 		this.display_change_psk = false;
 	}
 
 	_update() {
 		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
+		const has_selection = $proxy_group.length > 0;
+
+		if (has_selection && this.warnings.length) {
+			this.#removePopupMessages();
+
+			const message_box = makeMessageBox('warning', this.warnings, null, true, false)[0];
+
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
+		}
+		else if (!has_selection) {
+			this.#removePopupMessages();
+		}
 
 		for (const element of this.form_element.querySelectorAll('.js-local-address')) {
 			element.style.display = $proxy_group.length ? '' : 'none';
@@ -159,7 +175,7 @@ window.proxy_edit_popup = new class {
 
 		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser']) {
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query']) {
 			document.getElementById(id).readOnly = !custom_timeouts_enabled;
 		}
 	}
@@ -173,6 +189,9 @@ window.proxy_edit_popup = new class {
 	}
 
 	clone({title, buttons, rules}) {
+		this.#removePopupMessages();
+
+		this.warnings = [];
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
 
@@ -185,6 +204,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	delete() {
+		this.#removePopupMessages();
+
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
@@ -193,6 +214,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	submit() {
+		this.#removePopupMessages();
+
 		const fields = this.form.getAllValues();
 
 		if (this.proxyid !== null) {
@@ -275,5 +298,13 @@ window.proxy_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 };

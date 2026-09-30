@@ -127,5 +127,4 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 #	define ZBX_STRMASK(x)	((void)(x), ZBX_SECRET_MASK)
 #endif
 
-
 #endif /* ZABBIX_STR_H */

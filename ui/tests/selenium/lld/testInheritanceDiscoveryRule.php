@@ -52,10 +52,10 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	public function testInheritanceDiscoveryRule_SimpleUpdate($data) {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
-
-		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
+		$this->page->login()->open('zabbix.php?action=popup&popup=lldrule.edit&context=template&itemid='.$data['itemid']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
+		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
@@ -101,9 +101,10 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
-		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&context=template&hostid='.$this->templateid);
-
-		$form = $this->query('name:itemForm')->waitUntilVisible()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.$this->templateid);
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->fill(['Name' => $data['name'], 'Key' => $data['key']]);
 
 		if (array_key_exists('macros', $data)) {
@@ -115,17 +116,17 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				$this->query('id:lld_macro_paths_'.$i.'_path')->one()->fill($lld_macro['path']);
 
 				if ($i !== $last) {
-					$this->zbxTestClick('lld_macro_add');
+					$form->getField('LLD macros')->query('button:Add')->one()->click();
 				}
 			}
 		}
 
-		$this->zbxTestClickWait('add');
+		$form->submit();
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
 				$this->zbxTestCheckHeader('Discovery rules');
-				$this->zbxTestTextPresent('Discovery rule created');
 
 				$itemId = 0;
 
@@ -159,9 +160,10 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				}
 
 				// Host form check.
-				$this->zbxTestLogin('host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$this->hostid);
+				$this->zbxTestLogin('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$this->hostid);
 				$this->zbxTestClickLinkText($data['name']);
-				$this->zbxTestWaitForPageToLoad();
+				$host_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
 				$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="name"][@value="'.$data['name'].'"][@readonly]');
 				$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="key"][@value="'.$data['key'].'"][@readonly]');
 				if (array_key_exists('macros', $data)) {
@@ -175,13 +177,16 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 						);
 					}
 				}
+
+				$host_dialog->close();
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
 				$this->zbxTestCheckHeader('Discovery rules');
-				$this->zbxTestTextPresent('Cannot add discovery rule');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', $data['errors']);
+
+				$dialog->close();
 				break;
 		}
 	}

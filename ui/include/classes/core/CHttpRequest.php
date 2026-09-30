@@ -23,7 +23,7 @@ class CHttpRequest {
 	 * Additional HTTP headers not prefixed with HTTP_ in the $_SERVER super global variable.
 	 * Must be in upper case.
 	 */
-	private array $extra_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'AUTHORIZATION', 'PATH_INFO'];
+	private array $extra_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'AUTHORIZATION', 'PATH_INFO', 'X-HPKE-NEED-HINT'];
 
 	private $body;
 	private $method;
@@ -114,20 +114,19 @@ class CHttpRequest {
 		return $this->headers;
 	}
 
-	/**
-	 * Get authentication header bearer value, return null when no authentication header exists or
-	 * authentication method is not bearer type.
-	 *
-	 * @return string|null
-	 */
-	public function getAuthBearerValue() {
-		$auth = $this->header('AUTHORIZATION');
+	public function getParsedAuthHeader():array {
+		$auth_data = ['type' => null, 'auth' => null];
 
-		if (is_string($auth) && substr($auth, 0, 7) === ZBX_API_HEADER_AUTHENTICATE_PREFIX) {
-			return substr($auth, 7);
+		$auth_header = $this->header('AUTHORIZATION');
+
+		if (is_string($auth_header)) {
+			$auth_type = explode(' ', $auth_header)[0];
+
+			$auth_data['type'] = $auth_type;
+			$auth_data['auth'] = substr($auth_header, strlen($auth_type) + 1);
 		}
 
-		return null;
+		return $auth_data;
 	}
 
 	/**
@@ -184,5 +183,9 @@ class CHttpRequest {
 		$this->raw .= "\r\n".$this->body;
 
 		return $this->raw;
+	}
+
+	public function isHpkeHeadersRequested(): bool {
+		return $this->header('X-HPKE-NEED-HINT') == 1;
 	}
 }

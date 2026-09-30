@@ -125,6 +125,7 @@ window.host_wizard_edit = new class {
 					version: <?= SNMP_V2C ?>,
 					community: '{$SNMP_COMMUNITY}',
 					max_repetitions: 10,
+					retries: 5,
 					contextname: '',
 					securityname: '',
 					securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
@@ -232,6 +233,8 @@ window.host_wizard_edit = new class {
 	#form_update_locked = false;
 	#pending_form_update = false;
 
+	#last_input_changed = null;
+
 	#confirm_dialogue_close = false;
 
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
@@ -249,17 +252,18 @@ window.host_wizard_edit = new class {
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
+		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange);
 
-		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
-		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
+		this.#dialogue.addEventListener('input', this.#onInputChange);
+		this.#dialogue.addEventListener('focusout', this.#onInputBlur);
 		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(null);
+				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#last_input_changed = null;
 			}
 		});
 
@@ -534,7 +538,7 @@ window.host_wizard_edit = new class {
 				field_with_error.scrollIntoView({block: 'center', behavior: 'auto'});
 			}
 			else {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = 0;
 			}
 		});
 	}
@@ -582,6 +586,10 @@ window.host_wizard_edit = new class {
 
 			this.#setValueByName(this.#data, detail.options.name, value?.isNew ? null : value);
 			this.#setValueByName(this.#data, detail.options.newItemName, value?.isNew ? value : null);
+
+			if (this.#data.host) {
+				this.#removeMessageBoxes();
+			}
 		});
 
 		if (this.#data.host !== null) {
@@ -938,6 +946,29 @@ window.host_wizard_edit = new class {
 									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V3 ?>
 								}
 							}
+						}),
+						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
+							[`interfaces.${row_index}.details.max_repetitions`]: {
+								row_index,
+								type: 'integer',
+								required: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
+								},
+								min: 1,
+								max: <?= ZBX_MAX_INT32 ?>,
+								is_enabled: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
+								}
+							}
+						}),
+						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
+							[`interfaces.${row_index}.details.retries`]: {
+								row_index,
+								type: 'integer',
+								required: true,
+								min: <?= SNMP_RETRIES_MIN ?>,
+								max: <?= SNMP_RETRIES_MAX ?>
+							}
 						})
 					}
 				});
@@ -1085,7 +1116,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#removeMessageBoxes() {
-		this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
+		this.#dialogue.querySelectorAll(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY} .msg-bad`)
+			.forEach(message_box => message_box.remove());
 	}
 
 	#updateStepsQueue() {
@@ -1214,7 +1246,7 @@ window.host_wizard_edit = new class {
 
 		const step = this.#getCurrentStep();
 
-		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
+		const scroll_top = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop;
 		const step_init = path === undefined;
 
 		switch (step) {
@@ -1366,6 +1398,7 @@ window.host_wizard_edit = new class {
 						const visible_fields = {
 							'js-snmp-community': false,
 							'js-snmp-repetition-count': false,
+							'js-snmp-retries': false,
 							'js-snmpv3-contextname': false,
 							'js-snmpv3-securityname': false,
 							'js-snmpv3-securitylevel': false,
@@ -1378,11 +1411,13 @@ window.host_wizard_edit = new class {
 						switch (Number(field.details.version)) {
 							case <?= SNMP_V1 ?>:
 								visible_fields['js-snmp-community'] = true;
+								visible_fields['js-snmp-retries'] = true;
 								break;
 
 							case <?= SNMP_V2C ?>:
 								visible_fields['js-snmp-community'] = true;
 								visible_fields['js-snmp-repetition-count'] = true;
+								visible_fields['js-snmp-retries'] = true;
 								break;
 
 							case <?= SNMP_V3 ?>:
@@ -1390,6 +1425,7 @@ window.host_wizard_edit = new class {
 								visible_fields['js-snmpv3-securityname'] = true;
 								visible_fields['js-snmpv3-securitylevel'] = true;
 								visible_fields['js-snmp-repetition-count'] = true;
+								visible_fields['js-snmp-retries'] = true;
 
 								switch (Number(field.details.securitylevel)) {
 									case <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>:
@@ -1467,7 +1503,7 @@ window.host_wizard_edit = new class {
 
 		requestAnimationFrame(() => {
 			if (path) {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = scroll_top;
 			}
 			else if (step_init) {
 				this.#overlay.recoverFocus();
@@ -2014,7 +2050,7 @@ window.host_wizard_edit = new class {
 		return Promise.reject();
 	}
 
-	#onFormDataChange(path, new_value, old_value) {
+	#onFormDataChange = (path, new_value, old_value) => {
 		if (this.#data_update_locked) {
 			return;
 		}
@@ -2025,7 +2061,9 @@ window.host_wizard_edit = new class {
 		this.#updateFieldsAsterisk();
 	}
 
-	#onInputChange({target}) {
+	#onInputChange = ({target}) => {
+		this.#last_input_changed = target.name;
+
 		if (!target.name) {
 			return;
 		}
@@ -2037,7 +2075,7 @@ window.host_wizard_edit = new class {
 		this.#setValueByName(this.#data, target.name, value);
 	}
 
-	#onInputBlur({target}) {
+	#onInputBlur = ({target}) => {
 		if (!target.name) {
 			return;
 		}
@@ -2093,6 +2131,10 @@ window.host_wizard_edit = new class {
 	#validateField(path) {
 		const validate = (rule, value) => {
 			rule = {type: 'string', active: false, required: false, ...rule};
+
+			if (rule.is_enabled !== undefined && rule.is_enabled(rule.row_index ?? null) === false) {
+				return null;
+			}
 
 			const required = (typeof rule.required === 'function')
 				? rule.required(rule.row_index ?? null)
@@ -2246,8 +2288,9 @@ window.host_wizard_edit = new class {
 				field.parentNode.insertBefore(message_element, field.nextSibling);
 			}
 			else if (parent.parentElement.classList.contains('<?= CMacroValue::ZBX_STYLE_MACRO_INPUT_GROUP ?>')) {
-				parent.parentElement.parentNode.insertBefore(message_element, field.nextSibling);
-			} else {
+				parent.parentElement.parentNode.insertBefore(message_element, parent.parentElement.nextSibling);
+			}
+			else {
 				parent.parentNode.insertBefore(message_element, parent.nextSibling);
 			}
 		});

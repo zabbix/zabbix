@@ -52,7 +52,7 @@ zabbix_export:
         Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -460,8 +460,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = { "data": {}, "error": "" },
             	api_url = "",
             	policies = {},
@@ -514,7 +540,7 @@ zabbix_export:
             		request.setProxy(params.http_proxy);
             	}
             
-            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = tls.checkURL(params.scheme + '://' + params.fqdn + ':' + params.port);
             
             	var firewall_data = getHttpData(
             		api_url + '/api/v2/monitor/firewall/policy'
@@ -562,6 +588,8 @@ zabbix_export:
               value: '{$FGATE.API.PORT}'
             - name: scheme
               value: '{$FGATE.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"FortiGate"}'
             - name: token
               value: '{$FGATE.API.TOKEN}'
           tags:
@@ -697,8 +725,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = {"data": {}, "error": ""},
             	api_url = "",
             	interfaces = {},
@@ -751,7 +805,7 @@ zabbix_export:
             		request.setProxy(params.http_proxy);
             	}
             
-            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = tls.checkURL(params.scheme + '://' + params.fqdn + ':' + params.port);
             
             	var netif_data = getHttpData(
             		api_url + '/api/v2/monitor/system/interface'
@@ -803,6 +857,8 @@ zabbix_export:
               value: '{$FGATE.API.PORT}'
             - name: scheme
               value: '{$FGATE.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"FortiGate"}'
             - name: token
               value: '{$FGATE.API.TOKEN}'
           tags:
@@ -845,8 +901,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = {"data": {}, "error": ""},
             	api_url = "",
             	error_msg = "";
@@ -898,7 +980,7 @@ zabbix_export:
             		request.setProxy(params.http_proxy);
             	}
             
-            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = tls.checkURL(params.scheme + '://' + params.fqdn + ':' + params.port);
             
             	var resource_list = getHttpData(
             		api_url + '/api/v2/monitor/system/resource/usage?interval=1-min'
@@ -943,6 +1025,8 @@ zabbix_export:
               value: '{$FGATE.API.PORT}'
             - name: scheme
               value: '{$FGATE.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"FortiGate"}'
             - name: token
               value: '{$FGATE.API.TOKEN}'
           tags:
@@ -985,8 +1069,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = {"data": {}, "error": ""},
             	api_url = "",
             	health_members = [],
@@ -1041,7 +1151,7 @@ zabbix_export:
             		request.setProxy(params.http_proxy);
             	}
             
-            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = tls.checkURL(params.scheme + '://' + params.fqdn + ':' + params.port);
             
             	var sdwan_member_data = getHttpData(
             		api_url + '/api/v2/monitor/virtual-wan/members'
@@ -1127,6 +1237,8 @@ zabbix_export:
               value: '{$FGATE.API.PORT}'
             - name: scheme
               value: '{$FGATE.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"FortiGate"}'
             - name: token
               value: '{$FGATE.API.TOKEN}'
           tags:
@@ -1169,8 +1281,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value),
-            	request = new HttpRequest(),
+            	tls = new CTlsConfig(params.tls_verify),
+            	request = new HttpRequest(tls.options),
             	result = {"data": {}, "lld": [], "error": ""},
             	api_url = "",
             	error_msg = "";
@@ -1244,7 +1382,7 @@ zabbix_export:
             		}
             	});
             
-            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = tls.checkURL(params.scheme + '://' + params.fqdn + ':' + params.port);
             
             	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
             		request.setProxy(params.http_proxy);
@@ -1286,6 +1424,8 @@ zabbix_export:
               value: '{$FGATE.API.PORT}'
             - name: scheme
               value: '{$FGATE.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"FortiGate"}'
             - name: token
               value: '{$FGATE.API.TOKEN}'
           tags:
@@ -3020,7 +3160,7 @@ zabbix_export:
           description: 'Threshold of CPU utilization for critical trigger in %.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'CPU usage critical threshold (%)'
             description: 'Threshold of CPU utilization for critical trigger in %. In the range from 0 to 100 inclusive.'
@@ -3030,7 +3170,7 @@ zabbix_export:
           description: 'Threshold of CPU utilization for warning trigger in %.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'CPU usage warning threshold (%)'
             description: 'Threshold of CPU utilization for warning trigger in %. In the range from 0 to 100 inclusive.'
@@ -3040,7 +3180,7 @@ zabbix_export:
           description: 'Threshold of disk free space for critical trigger in %.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Disk free space critical threshold (%)'
             description: 'Threshold of disk free space for critical trigger in %. In the range from 0 to 100 inclusive.'
@@ -3050,7 +3190,7 @@ zabbix_export:
           description: 'Threshold of disk free space for warning trigger in %.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Disk free space warning threshold (%)'
             description: 'Threshold of disk free space for warning trigger in %. In the range from 0 to 100 inclusive.'
@@ -3118,7 +3258,7 @@ zabbix_export:
           description: 'This macro is used in "New available firmware found" trigger.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'Firmware update trigger macro'
             description: 'This macro is used in "New available firmware found" trigger.'
@@ -3128,7 +3268,7 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Firewall action filter (include)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3137,7 +3277,7 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Firewall action filter (exclude)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3146,7 +3286,7 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Firewall name filter (include)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3155,7 +3295,7 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Firewall name filter (exclude)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3164,7 +3304,7 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Firewall type filter (include)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
@@ -3173,16 +3313,32 @@ zabbix_export:
           description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Firewall type filter (exclude)'
             description: 'This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "FortiGate", e.g. {$HTTP.TLS.VERIFY:"FortiGate"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$MEMORY.UTIL.CRIT}'
           value: '90'
           description: 'Threshold of memory utilization for critical trigger in %.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Memory usage critical threshold (%)'
             description: 'Threshold of memory utilization for critical trigger in %. In the range from 0 to 100 inclusive.'
@@ -3192,7 +3348,7 @@ zabbix_export:
           description: 'Threshold of memory utilization for warning trigger in %.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Memory usage warning threshold (%)'
             description: 'Threshold of memory utilization for warning trigger in %. In the range from 0 to 100 inclusive.'
@@ -3202,7 +3358,7 @@ zabbix_export:
           description: 'Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Other
             label: 'Interface operational state macro (for "Link down")'
             description: 'Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.'
@@ -3212,7 +3368,7 @@ zabbix_export:
           description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'Error packet rate warning threshold (%)'
             description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
@@ -3222,7 +3378,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3231,7 +3387,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3240,7 +3396,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter for network interfaces by description'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3249,7 +3405,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3258,7 +3414,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Filter for network interface by name'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3267,7 +3423,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3276,7 +3432,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Network interface status filter (include)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3285,7 +3441,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Network interface status filter (exclude)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3294,7 +3450,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Filter for network interfaces by type'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3303,7 +3459,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Filter for network interfaces by type (exclude)'
             description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -3312,7 +3468,7 @@ zabbix_export:
           description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Interface bandwidth usage warning threshold (%)'
             description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context. In the range from 0 to 100 inclusive.'
@@ -3322,7 +3478,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '51'
+            priority: '52'
             section_name: Filters
             label: 'SD-WAN health ID filter (include)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3331,7 +3487,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '52'
+            priority: '53'
             section_name: Filters
             label: 'SD-WAN health ID filter (exclude)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3340,7 +3496,7 @@ zabbix_export:
           description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '50'
+            priority: '51'
             section_name: Other
             label: 'SD-WAN health interface control'
             description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
@@ -3350,7 +3506,7 @@ zabbix_export:
           description: 'Threshold of packets loss for warning trigger in %. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '59'
+            priority: '60'
             section_name: Thresholds
             label: 'SD-WAN health interface loss warning'
             description: 'Threshold of packets loss for warning trigger in %. Can be used with interface name as context. In the range from 0 to 100 inclusive.'
@@ -3360,7 +3516,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '55'
+            priority: '56'
             section_name: Filters
             label: 'SD-WAN health interface name filter (include)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3369,7 +3525,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '56'
+            priority: '57'
             section_name: Filters
             label: 'SD-WAN health interface name filter (exclude)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3378,7 +3534,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '53'
+            priority: '54'
             section_name: Filters
             label: 'SD-WAN health name filter (include)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3387,7 +3543,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '54'
+            priority: '55'
             section_name: Filters
             label: 'SD-WAN health name filter (exclude)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3396,7 +3552,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '57'
+            priority: '58'
             section_name: Filters
             label: 'SD-WAN health status filter (include)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3405,7 +3561,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '58'
+            priority: '59'
             section_name: Filters
             label: 'SD-WAN health status filter (exclude)'
             description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
@@ -3414,7 +3570,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'SD-WAN member ID filter (include)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3423,7 +3579,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '44'
             section_name: Filters
             label: 'SD-WAN member ID filter (exclude)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3432,7 +3588,7 @@ zabbix_export:
           description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Other
             label: 'SD-WAN member interface control'
             description: 'Macro for the interface state for "Link down" trigger. Can be used with interface name as context.'
@@ -3442,7 +3598,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Filters
             label: 'SD-WAN member name filter (include)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3451,7 +3607,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Filters
             label: 'SD-WAN member name filter (exclude)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3460,7 +3616,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '46'
+            priority: '47'
             section_name: Filters
             label: 'SD-WAN member status filter (include)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3469,7 +3625,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '47'
+            priority: '48'
             section_name: Filters
             label: 'SD-WAN member status filter (exclude)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3478,7 +3634,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '48'
+            priority: '49'
             section_name: Filters
             label: 'SD-WAN member zone filter (include)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3487,7 +3643,7 @@ zabbix_export:
           description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '49'
+            priority: '50'
             section_name: Filters
             label: 'SD-WAN member zone filter (exclude)'
             description: 'This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.'
@@ -3496,7 +3652,7 @@ zabbix_export:
           description: 'Number of days until the license expires.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Thresholds
             label: 'Service expiry warning'
             description: 'Number of days until the license expires.'
@@ -3506,7 +3662,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Service key filter (include)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
@@ -3515,7 +3671,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Service key filter (exclude)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
@@ -3524,7 +3680,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Service license control'
             description: 'This macro is used in Service discovery. Can be used with interface name as context.'
@@ -3534,7 +3690,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Service status filter (include)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
@@ -3543,7 +3699,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Service status filter (exclude)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
@@ -3552,7 +3708,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Service type filter (include)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
@@ -3561,7 +3717,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Service type filter (exclude)'
             description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'

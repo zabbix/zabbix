@@ -61,7 +61,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataEvents(array $options): array|string {
 		return API::Event()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -90,7 +90,9 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataProblems(array $options): array|string {
 		return API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => [
+				'eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid', 'flags'
+			],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
@@ -151,7 +153,7 @@ class CScreenProblem extends CScreenBase {
 			? $filter['triggerids']
 			: null;
 		$show_opdata = array_key_exists('show_opdata', $column_options)
-			&& $column_options['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY;
+			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
@@ -278,7 +280,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 
-			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
+			$problems = $filter['show'] == TRIGGERS_OPTION_ALL
 				? self::getDataEvents($options)
 				: self::getDataProblems($options);
 
@@ -302,19 +304,19 @@ class CScreenProblem extends CScreenBase {
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
-						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
+						'skipDependent' => $filter['show'] == TRIGGERS_OPTION_ALL ? null : true,
 						'preservekeys' => true
 					];
 
-					$details = (array_key_exists('details', $column_options)
-						&& $column_options['details'] == 1);
+					$details = array_key_exists('details', $column_options) && $column_options['details'] == 1;
+					$custom_text = array_key_exists('custom_text', $column_options);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
 						$options['selectFunctions'] = ['itemid'];
 					}
 
-					if ($resolve_comments || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details || $custom_text) {
 						$options['output'][] = 'expression';
 					}
 
@@ -374,6 +376,7 @@ class CScreenProblem extends CScreenBase {
 	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
 		$userids = [];
+		$cepruleids = [];
 
 		foreach ($problems as $problem) {
 			foreach ($problem['suppression_data'] as $data) {
@@ -382,6 +385,9 @@ class CScreenProblem extends CScreenBase {
 				}
 				elseif ($data['userid'] != 0) {
 					$userids[] = $data['userid'];
+				}
+				elseif ($data['cep_ruleid'] != 0) {
+					$cepruleids[] = $data['cep_ruleid'];
 				}
 			}
 		}
@@ -402,6 +408,14 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
+		if ($cepruleids) {
+			$ceprules = API::CEPRule()->get([
+				'output' => ['name'],
+				'cep_ruleids' => $cepruleids,
+				'preservekeys' => true
+			]);
+		}
+
 		foreach ($problems as &$problem) {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
@@ -414,6 +428,12 @@ class CScreenProblem extends CScreenBase {
 					$data['username'] = array_key_exists($data['userid'], $users)
 						? getUserFullname($users[$data['userid']])
 						: _('Inaccessible user');
+				}
+
+				if ($data['cep_ruleid'] != 0) {
+					$data['ceprule_name'] = array_key_exists($data['cep_ruleid'], $ceprules)
+						? $ceprules[$data['cep_ruleid']]['name']
+						: _('Inaccessible complex event processing rule');
 				}
 			}
 			unset($data);
@@ -497,11 +517,11 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
-			'output' => ['eventid', 'r_eventid', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'acknowledged', 'cep_ruleid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -518,7 +538,7 @@ class CScreenProblem extends CScreenBase {
 
 		$r_events = $r_eventids
 			? API::Event()->get([
-				'output' => ['clock', 'ns', 'correlationid', 'userid'],
+				'output' => ['clock', 'ns', 'correlationid', 'userid', 'cep_ruleid'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
@@ -532,12 +552,14 @@ class CScreenProblem extends CScreenBase {
 				$event['r_ns'] = $r_events[$event['r_eventid']]['ns'];
 				$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
 				$event['userid'] = $r_events[$event['r_eventid']]['userid'];
+				$event['cep_ruleid'] = $r_events[$event['r_eventid']]['cep_ruleid'];
 			}
 			else {
 				$event['r_clock'] = 0;
 				$event['r_ns'] = 0;
 				$event['correlationid'] = 0;
 				$event['userid'] = 0;
+				$event['cep_ruleid'] = '0';
 			}
 		}
 		unset($event);
@@ -552,11 +574,13 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
-			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged',
+				'cep_ruleid'
+			],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -600,11 +624,10 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		$show_opdata = array_key_exists('show_opdata', $column_options)
-			? $column_options['show_opdata'] == 1
-			: OPERATIONAL_DATA_SHOW_SEPARATELY;
+			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		// resolve macros
-		if ($column_options['details'] == 1 || $show_opdata) {
+		if ((array_key_exists('details', $column_options) && $column_options['details'] == 1) || $show_opdata) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -625,25 +648,30 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_comments) {
-			foreach ($data['problems'] as &$problem) {
+			$events = [];
+
+			foreach ($data['problems'] as $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
-				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
-					[
-						'triggerid' => $problem['objectid'],
-						'expression' => $trigger['expression'],
-						'comments' => $trigger['comments'],
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					],
-					['events' => true]
-				);
+
+				$events[$problem['eventid']] = [
+					'triggerid' => $problem['objectid'],
+					'expression' => $trigger['expression'],
+					'comments' => $trigger['comments'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				];
 			}
-			unset($problem);
+			$events = CMacrosResolverHelper::resolveEventDescriptions($events);
 
 			foreach ($data['triggers'] as &$trigger) {
 				unset($trigger['comments']);
 			}
 			unset($trigger);
+
+			foreach ($data['problems'] as &$problem) {
+				$problem['comments'] = $events[$problem['eventid']]['comments'];
+			}
+			unset($problem);
 		}
 
 		// get additional data
@@ -653,6 +681,7 @@ class CScreenProblem extends CScreenBase {
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 
+		$cep_ruleids = [];
 		$correlationids = [];
 		$userids = [];
 
@@ -660,6 +689,7 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists($eventid, $problems_data)) {
 				$problem_data = $problems_data[$eventid];
 
+				$problem['cep_ruleid'] = $problem_data['cep_ruleid'];
 				$problem['r_eventid'] = $problem_data['r_eventid'];
 				$problem['r_clock'] = $problem_data['r_clock'];
 				$problem['r_ns'] = $problem_data['r_ns'];
@@ -670,6 +700,9 @@ class CScreenProblem extends CScreenBase {
 				$problem['acknowledged'] = $problem_data['acknowledged'];
 				$problem['suppression_data'] = $problem_data['suppression_data'];
 
+				if ($problem['cep_ruleid'] != 0) {
+					$cep_ruleids[$problem['cep_ruleid']] = true;
+				}
 				if ($problem['correlationid'] != 0) {
 					$correlationids[$problem['correlationid']] = true;
 				}
@@ -688,6 +721,14 @@ class CScreenProblem extends CScreenBase {
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($data['problems'], $data['triggers']);
 		$data['actions'] = $actions['data'];
+
+		$data['cep_rules'] = $cep_ruleids
+			? API::CepRule()->get([
+				'output' => ['name'],
+				'cep_ruleids' => array_keys($cep_ruleids),
+				'preservekeys' => true
+			])
+			: [];
 
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([
@@ -821,7 +862,7 @@ class CScreenProblem extends CScreenBase {
 					(new CDiv(
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					))->addClass(ZBX_STYLE_TABLE_STATS)
-				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_PAGER_CONTAINER)
 			))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 			if ($data['show_timeline']) {

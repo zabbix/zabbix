@@ -318,6 +318,10 @@ function PopUp(action, parameters, {
 		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
 	}
 
+	if (action === 'template.edit') {
+		parameters = JSON.stringify(parameters);
+	}
+
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
@@ -371,6 +375,9 @@ function PopUp(action, parameters, {
 					script_inline: resp.script_inline,
 					data: resp.data || null
 				});
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
 
 				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
@@ -1123,6 +1130,30 @@ function deepCompare(first, second) {
 	return false;
 }
 
+function deepMerge(target, ...sources) {
+	if (!sources.length) {
+		return target;
+	}
+
+	const source = sources.shift();
+
+	if (typeof target === 'object' && typeof source === 'object') {
+		for (const key in source) {
+			if (typeof source[key] === 'object') {
+				if (!target[key]) {
+					Object.assign(target, {[key]: {}});
+				}
+
+				deepMerge(target[key], source[key]);
+			} else {
+				Object.assign(target, {[key]: source[key]});
+			}
+		}
+	}
+
+	return deepMerge(target, ...sources);
+}
+
 /**
  * Set value in multidimensional object.
  *
@@ -1138,8 +1169,16 @@ function objectSetDeepValue(object, path, value) {
 	while (path.length > 1) {
 		const key = path.shift();
 
-		if (!(key in tmp)) {
-			tmp[key] = {};
+		if (!Object.hasOwn(tmp, key)) {
+			tmp[key] = Object.create(null);
+		}
+		else if (tmp[key] === null) {
+			if (value === null) {
+				return object;
+			}
+			else {
+				throw Error('Trying to set value to null object.');
+			}
 		}
 
 		if (typeof tmp[key] !== 'object') {

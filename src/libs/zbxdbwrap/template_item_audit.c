@@ -134,4 +134,8 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, const zbx_templ
 		lld_audit_item_add_uint64(item, "discover", item->discover);
 	}
 
+	zbx_audit_item_update_json_add_query(audit_context_mode, item->itemid, item->flags, item->query);
+	lld_audit_item_add_string(item, "time_shift", item->time_shift);
+	lld_audit_item_add_string(item, "lookback_limit", item->lookback_limit);
+	lld_audit_item_add_string(item, "granularity", item->granularity);
 }

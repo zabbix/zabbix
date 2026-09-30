@@ -110,7 +110,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -1752,7 +1752,6 @@ zabbix_export:
         - uuid: 59a7d05c7ac14281a52b47d690d4748e
           name: 'Hyper-V Failover Cluster'
           display_period: '600'
-          auto_start: 'NO'
           pages:
             - name: Overview
               widgets:
