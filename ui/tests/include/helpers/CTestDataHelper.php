@@ -33,7 +33,7 @@ class CTestDataHelper {
 	 */
 	public static function createObjects(array $objects): void {
 		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions'
+			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'media_type'
 		], []);
 
 		try {
@@ -43,12 +43,14 @@ class CTestDataHelper {
 			self::createProxies($objects['proxies']);
 			self::createHosts($objects['hosts']);
 			self::createTriggers($objects['triggers']);
+			self::createTriggerPrototypes($objects['trigger_prototypes']);
 			self::createRoles($objects['roles']);
 			self::createUserGroups($objects['user_groups']);
 			self::createUsers($objects['users']);
 			self::createScripts($objects['scripts']);
 			self::createDrules($objects['drules']);
 			self::createActions($objects['actions']);
+			self::createMediatypes($objects['media_type']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -764,6 +766,89 @@ class CTestDataHelper {
 		self::convertPropertyReference($triggers, 'dependencies.triggerid');
 	}
 
+	private static function createTriggerPrototypes(array $trigger_prototypes): void {
+		if (!$trigger_prototypes) {
+			return;
+		}
+
+		$discovered_triggers = [];
+
+		foreach ($trigger_prototypes as &$trigger_prototype) {
+			if (array_key_exists('discovered_triggers', $trigger_prototype)) {
+				foreach ($trigger_prototype['discovered_triggers'] as &$discovered_trigger) {
+					if (array_key_exists('tags', $trigger_prototype)) {
+						$discovered_trigger += ['tags' => []];
+						$discovered_trigger['tags'] = array_merge($discovered_trigger['tags'],
+							$trigger_prototype['tags']
+						);
+					}
+
+					$discovered_triggers[] = $discovered_trigger + [
+						'trigger_prototypeid' => ':trigger_prototype:'.$trigger_prototype['description']
+					];
+				}
+				unset($discovered_trigger);
+
+				unset($trigger_prototype['discovered_triggers']);
+			}
+		}
+
+		self::convertTriggerReferences($trigger_prototypes);
+
+		$result = CDataHelper::call('triggerprototype.create', array_values($trigger_prototypes));
+
+		foreach ($trigger_prototypes as $trigger_prototype) {
+			self::$objectids['trigger_prototype'][$trigger_prototype['description']]
+				= array_shift($result['triggerids']);
+		}
+
+		self::createDiscoveredTriggers($discovered_triggers);
+	}
+
+	public static function convertTriggerPrototypeReferences(array &$trigger_prototypes): void {
+		self::convertPropertyReference($trigger_prototypes, 'triggerid');
+	}
+
+	private static function createDiscoveredTriggers(array $discovered_triggers): void {
+		if (!$discovered_triggers) {
+			return;
+		}
+
+		$trigger_prototypeids = [];
+
+		foreach ($discovered_triggers as $i => &$trigger) {
+			$trigger_prototypeids[$i] = $trigger['trigger_prototypeid'];
+
+			unset($trigger['trigger_prototypeid']);
+		}
+		unset($trigger);
+
+		$result = CDataHelper::call('trigger.create', $discovered_triggers);
+
+		$trigger_discoveries = [];
+
+		foreach ($discovered_triggers as $i => $trigger) {
+			$triggerid = $result['triggerids'][$i];
+
+			self::$objectids['discovered_trigger'][$trigger['description']] = $triggerid;
+			$trigger_discoveries[] = ['triggerid' => $triggerid, 'parent_triggerid' => $trigger_prototypeids[$i]];
+		}
+
+		self::convertPropertyReference($trigger_discoveries, 'parent_triggerid');
+
+		DB::insert('trigger_discovery', $trigger_discoveries, false);
+
+		DB::update('triggers', [
+			'values' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+			'where' => ['triggerid' => $result['triggerids']]
+		]);
+
+		DB::update('trigger_tag', [
+			'values' => ['automatic' => ZBX_TAG_AUTOMATIC],
+			'where' => ['triggerid' => $result['triggerids']]
+		]);
+	}
+
 	private static function createRoles(array $roles): void {
 		if (!$roles) {
 			return;
@@ -931,6 +1016,24 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.opcommand_hst.hostid');
 		self::convertPropertyReference($actions, 'operations.opgroup.groupid');
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
+	}
+
+	public static function createMediatypes(array $mediatypes): void {
+		if (!$mediatypes) {
+			return;
+		}
+
+		self::convertUserGroupReferences($mediatypes);
+
+		$result = CDataHelper::call('mediatype.create', $mediatypes);
+
+		foreach ($mediatypes as $mediatype) {
+			self::$objectids['media_type'][$mediatype['name']] = array_shift($result['mediatypeids']);
+		}
+	}
+
+	public static function convertMediatypesReferences(array &$mediatypes): void {
+		self::convertPropertyReference($mediatypes, 'mediatypeid');
 	}
 
 	/**
@@ -1141,6 +1244,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('host_group', self::$objectids)) {
 			CDataHelper::call('hostgroup.delete', array_values(self::$objectids['host_group']));
+		}
+
+		if (array_key_exists('media_type', self::$objectids)) {
+			CDataHelper::call('mediatype.delete', array_values(self::$objectids['media_type']));
 		}
 
 		self::$objectids = [];
