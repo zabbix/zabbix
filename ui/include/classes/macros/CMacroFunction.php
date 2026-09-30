@@ -511,8 +511,17 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		if (is_float($result) && is_nan($result)) {
-			return UNRESOLVED_MACRO_STRING;
+		if (is_float($result)) {
+			if (is_nan($result)) {
+				return UNRESOLVED_MACRO_STRING;
+			}
+
+			if (is_finite($result)) {
+				return UNRESOLVED_MACRO_STRING;
+			}
+
+			$s = sprintf('%.6F', $result);
+			return str_contains($s, '.') ? rtrim(rtrim($s, '0'), '.') : $s;
 		}
 
 		if ($result instanceof DOMNodeList) {
@@ -523,7 +532,9 @@ class CMacroFunction {
 			$output = '';
 
 			foreach ($result as $node) {
-				$output .= $dom->saveXML($node);
+				if ($node instanceof DOMNode) {
+					$output .= $dom->saveXML($node);
+				}
 			}
 
 			return $output;
