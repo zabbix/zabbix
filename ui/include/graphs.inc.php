@@ -1203,7 +1203,7 @@ function calculateGraphScaleValues(float $min, float $max, float $interval, stri
  * @param int        $precision_max      Maximum precision to use for the scale.
  * @param float|null $lower_power_shift  Scale bottom positive power shift extreme.
  * @param float|null $upper_power_shift  Scale top positive power shift extreme.
- * @param bool       $unsigned  Modify negative scale values to positive.
+ * @param bool       $unsigned           Modify negative scale values to positive.
  *
  * @return array
  */
