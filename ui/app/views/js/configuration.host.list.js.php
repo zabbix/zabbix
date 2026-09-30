@@ -391,15 +391,12 @@
 					url.searchParams.set('popup', 'host.edit');
 					url.searchParams.set('hostid', hostid);
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const edit_link = document.createElement('a');
 					edit_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
-					flex_wrapper.appendChild(edit_link);
+					cell.appendChild(edit_link);
 
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -430,10 +427,8 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(maintenance_icon);
+						cell.appendChild(maintenance_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
