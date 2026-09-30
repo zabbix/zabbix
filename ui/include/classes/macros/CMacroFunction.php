@@ -492,7 +492,7 @@ class CMacroFunction {
 		$dom = new DOMDocument();
 		$prev_use_internal_errors = libxml_use_internal_errors(true);
 
-		if (!$dom->loadXML($value)) {
+		if (!$dom->loadXML($value, LIBXML_NONET)) {
 			libxml_clear_errors();
 			libxml_use_internal_errors($prev_use_internal_errors);
 
