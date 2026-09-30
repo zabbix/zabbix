@@ -135,7 +135,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one();
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
+		$this->zbxTestAssertElementNotPresentXpath("//header/div[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute('//button['.CXPathHelper::fromClass('btn-dashboard-normal').']', 'aria-label', 'Exit full screen mode');
 
@@ -144,7 +144,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->query('xpath://button[contains(@class, "btn-kiosk")]')->waitUntilPresent()->one();
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'aria-label', 'Enter full screen mode');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//header[@class='header-title']");
+		$this->zbxTestAssertElementPresentXpath("//header/div[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
 	}
 
@@ -160,7 +160,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one();
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
+		$this->zbxTestAssertElementNotPresentXpath("//header/div[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute('//button['.CXPathHelper::fromClass('btn-dashboard-normal').']', 'data-hintbox-html', 'Normal view');
 

@@ -50,7 +50,7 @@ final class CRouter {
 	 * Mapping between action and corresponding controller, layout and view.
 	 */
 	private array $routes = [
-		// Action									Controller															Layout					View
+		// Action									Controller														Layout					View
 		'acknowledge.edit'							=> [CControllerAcknowledgeEdit::class,							ZBX_LAYOUT_JSON,		'acknowledge.edit'],
 		'acknowledge.rank.change'					=> [CControllerAcknowledgeRankChange::class,					ZBX_LAYOUT_JSON,		null],
 		'action.create'								=> [CControllerActionCreate::class,								ZBX_LAYOUT_JSON,		null],
@@ -67,6 +67,13 @@ final class CRouter {
 		'apm.db.edit'								=> [CControllerApmDbEdit::class,								ZBX_LAYOUT_HTMLPAGE,	'administration.apm.db.edit'],
 		'apm.db.update'								=> [CControllerApmDbUpdate::class,								ZBX_LAYOUT_JSON,		null],
 		'apm.db.test'								=> [CControllerApmDbTest::class,								ZBX_LAYOUT_JSON,		null],
+		'apm.log.list'								=> [CControllerApmLogList::class,								ZBX_LAYOUT_HTMLPAGE,	'apm.log.list'],
+		'apm.log.list.data'							=> [CControllerApmLogListData::class,							ZBX_LAYOUT_JSON,		null],
+		'apm.metric.list'							=> [CControllerApmMetricList::class,							ZBX_LAYOUT_HTMLPAGE,	'apm.metric.list'],
+		'apm.metric.list.data'						=> [CControllerApmMetricListData::class,						ZBX_LAYOUT_JSON,		null],
+		'apm.trace.list'							=> [CControllerApmTraceList::class,								ZBX_LAYOUT_HTMLPAGE,	'apm.trace.list'],
+		'apm.trace.list.data'						=> [CControllerApmTraceListData::class,							ZBX_LAYOUT_JSON,		null],
+		'apm.trace.list.split.view'					=> [CControllerApmTraceListSplitView::class,					ZBX_LAYOUT_JSON,		null],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,						ZBX_LAYOUT_HTMLPAGE,	'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class, 						ZBX_LAYOUT_JSON,		null],
 		'auditlog.csv'								=> [CControllerAuditLogList::class,								ZBX_LAYOUT_DOWNLOAD,	'reports.auditlog.list.csv'],

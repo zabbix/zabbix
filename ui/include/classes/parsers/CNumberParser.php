@@ -73,7 +73,7 @@ class CNumberParser extends CParser {
 		}
 
 		if ($this->options['with_size_suffix']) {
-			$this->suffixes .= ZBX_SIZE_SUFFIXES;
+			$this->suffixes .= '|'.ZBX_SIZE_SUFFIXES;
 
 			$this->suffix_multipliers += $this->options['is_binary_size']
 				? ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY
@@ -81,7 +81,7 @@ class CNumberParser extends CParser {
 		}
 
 		if ($this->options['with_time_suffix']) {
-			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
+			$this->suffixes .= '|'.($this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES);
 			$this->suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
 		}
 
@@ -94,6 +94,8 @@ class CNumberParser extends CParser {
 			$this->macro_parsers[] = new CLLDMacroParser();
 			$this->macro_parsers[] = new CLLDMacroFunctionParser();
 		}
+
+		$this->suffixes = trim($this->suffixes, '|');
 	}
 
 	/**
@@ -125,7 +127,7 @@ class CNumberParser extends CParser {
 
 			$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
 			$pattern = ($this->options['with_size_suffix'] || $this->options['with_time_suffix'])
-				? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
+				? '/^'.$pattern.'(?<suffix>('.$this->suffixes.'))?/'
 				: '/^'.$pattern.'/';
 
 			if (!preg_match($pattern, $fragment, $matches)) {

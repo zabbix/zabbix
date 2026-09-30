@@ -1374,6 +1374,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 		proxy->location = ZBX_LOC_NOWHERE;
 	}
 
+	dc_strpool_release(proxy->apm);
 	dc_strpool_release(proxy->allowed_addresses);
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
@@ -7356,6 +7357,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		proxy->mode = mode;
 		proxy->proxy_groupid = proxy_groupid;
 
+		dc_strpool_replace(found, &proxy->apm, row[28]);
+
 		proxy->revision = revision;
 	}
 
@@ -11790,7 +11793,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
-	if (0 != local_apm_db_config->status)
+	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
 		return;
@@ -12775,6 +12778,16 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 
 	dst_proxy->addr = NULL;
 	dst_proxy->port = 0;
+
+	if ('\0' != *src_proxy->apm)
+		dst_proxy->apm = zbx_strdup(NULL, src_proxy->apm);
+	else
+		dst_proxy->apm = NULL;
+}
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy)
+{
+	zbx_free(proxy->apm);
 }
 
 int	zbx_dc_config_get_last_sync_time(void)
@@ -17556,3 +17569,25 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
+
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
+{
+	char	*apm_config = old_config;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL == old_config || *revision < config->revision.settings_table)
+	{
+		if (NULL != dc_local()->apm_config)
+			apm_config = zbx_strdup(apm_config, dc_local()->apm_config);
+
+		*revision = config->revision.settings_table;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return apm_config;
+}
+
+
+

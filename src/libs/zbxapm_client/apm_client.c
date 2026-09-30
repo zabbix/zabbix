@@ -1,0 +1,126 @@
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+#include "zbx_apm_client.h"
+
+#include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "zbxserialize.h"
+#include "zbxipcservice.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve statistics from the APM service                          *
+ *                                                                            *
+ * Parameters: stats - [OUT] APM export statistics                            *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
+{
+#define APM_STATS_TIMEOUT	1
+
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+	unsigned char		*ptr;
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_APM, APM_STATS_TIMEOUT, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to APM service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_APM_GET_STATS, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send get stats message to APM service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&socket, &response))
+	{
+		*error = zbx_strdup(NULL, "read stats response from APM service");
+		goto out;
+	}
+
+	ptr = response.data;
+	ptr += zbx_deserialize_value(ptr, &stats->written_logs);
+	ptr += zbx_deserialize_value(ptr, &stats->written_traces);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_gauge);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_sum);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_histogram);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_exponential_histogram);
+	ptr += zbx_deserialize_value(ptr, &stats->written_metrics_summary);
+	ptr += zbx_deserialize_value(ptr, &stats->accepted_requests);
+	(void)zbx_deserialize_value(ptr, &stats->dropped_requests);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+
+#undef APM_STATS_TIMEOUT
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize APM statistics into the specified buffer                *
+ *                                                                            *
+ * Parameters: stats - [IN] statistics to serialize                           *
+ *             buf   - [OUT] output buffer                                    *
+ *             len   - [IN] size of the output buffer                         *
+ *                                                                            *
+ * Return value: size of the serialized data or 0 if the buffer was too small *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_apm_serialize_stats(const zbx_apm_stats_t *stats, unsigned char *buf, zbx_uint32_t len)
+{
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, stats->written_logs);
+	zbx_serialize_prepare_value(data_len, stats->written_traces);
+	zbx_serialize_prepare_value(data_len, stats->written_metrics_gauge);
+	zbx_serialize_prepare_value(data_len, stats->written_metrics_sum);
+	zbx_serialize_prepare_value(data_len, stats->written_metrics_histogram);
+	zbx_serialize_prepare_value(data_len, stats->written_metrics_exponential_histogram);
+	zbx_serialize_prepare_value(data_len, stats->written_metrics_summary);
+	zbx_serialize_prepare_value(data_len, stats->accepted_requests);
+	zbx_serialize_prepare_value(data_len, stats->dropped_requests);
+
+	if (data_len > len)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("insufficient buffer size to serialize APM stats");
+		return 0;
+	}
+
+	buf += zbx_serialize_value(buf, stats->written_logs);
+	buf += zbx_serialize_value(buf, stats->written_traces);
+	buf += zbx_serialize_value(buf, stats->written_metrics_gauge);
+	buf += zbx_serialize_value(buf, stats->written_metrics_sum);
+	buf += zbx_serialize_value(buf, stats->written_metrics_histogram);
+	buf += zbx_serialize_value(buf, stats->written_metrics_exponential_histogram);
+	buf += zbx_serialize_value(buf, stats->written_metrics_summary);
+	buf += zbx_serialize_value(buf, stats->accepted_requests);
+	(void)zbx_serialize_value(buf, stats->dropped_requests);
+
+	return data_len;
+}
+

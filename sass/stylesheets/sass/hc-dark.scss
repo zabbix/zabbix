@@ -850,6 +850,17 @@ textarea.has-error {
 	}
 }
 
+.status-container {
+	.status-amp-severity-trace,
+	.status-amp-severity-debug,
+	.status-amp-severity-info,
+	.status-amp-severity-warn,
+	.status-amp-severity-error,
+	.status-amp-severity-fatal {
+		color: $ui-bg-color;
+	}
+}
+
 .na-bg,
 .log-na-bg,
 .normal-bg,

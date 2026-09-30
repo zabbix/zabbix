@@ -3,6 +3,7 @@
 DIST_SUBDIRS = \
 	zbxalgo \
 	zbxalerter \
+	zbxapm_client \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
@@ -101,6 +102,7 @@ DIST_SUBDIRS = \
 if SERVER
 SERVER_SUBDIRS = \
 	zbxalerter \
+	zbxapm_client \
 	zbxasynchttppoller \
 	zbxasyncpoller \
 	zbxaudit \
@@ -181,6 +183,7 @@ endif
 else
 if PROXY
 PROXY_SUBDIRS = \
+	zbxapm_client \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \

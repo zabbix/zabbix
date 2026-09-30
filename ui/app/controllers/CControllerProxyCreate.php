@@ -109,6 +109,27 @@ class CControllerProxyCreate extends CController {
 				['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 				['db proxy.tls_subject', 'when' => ['tls_accept_certificate', true]]
 			],
+			'data_collection_status' => ['required', 'boolean',
+				'in' => [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED]
+			],
+			'quota_mode' => ['required', 'integer',
+				'in' => [PROXY_APM_QUOTA_MODE_UNLIMITED, PROXY_APM_QUOTA_MODE_CUSTOM],
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
+			],
+			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
+				'when' => [['quota_mode', 'in' => [PROXY_APM_QUOTA_MODE_CUSTOM]]]
+			],
+			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
+				'fields' => [
+					'key' => ['required', 'string', 'not_empty'],
+					'value' => ['required', 'string'],
+					'signal_type' => ['required', 'integer',
+						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
+					]
+				],
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
+				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
+			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
 			],
@@ -270,7 +291,15 @@ class CControllerProxyCreate extends CController {
 		if (!($tls_accept & HOST_ENCRYPTION_PSK) && !($tls_accept & HOST_ENCRYPTION_CERTIFICATE)) {
 			$tls_accept = HOST_ENCRYPTION_NONE;
 		}
+
 		$proxy['tls_accept'] = $tls_accept;
+
+		$proxy['apm'] = [];
+		$this->getInputs($proxy['apm'], ['data_collection_status']);
+
+		if ($proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
+			$this->getInputs($proxy['apm'], ['max_messages_per_second', 'additional_resource_attributes']);
+		}
 
 		$result = API::Proxy()->create($proxy);
 

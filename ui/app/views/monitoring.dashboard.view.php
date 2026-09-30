@@ -19,8 +19,15 @@
  * @var array $data
  */
 
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
+
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
+
+	$html_page = (new CHtmlPage())
+		->setWebLayoutMode($web_layout_mode)
+		->show();
 
 	return;
 }
@@ -37,9 +44,6 @@ $this->addJsFile('class.geomaps.js');
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
 $this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
-
-$this->enableLayoutModes();
-$web_layout_mode = $this->getLayoutMode();
 
 $html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])

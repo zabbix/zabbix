@@ -252,6 +252,8 @@ class TabIndicatorFactory {
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyApm':
+				return new ProxyApmTabIndicatorItem;
 			case 'ProxyTimeouts':
 				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
@@ -813,6 +815,25 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
 		}
+	}
+}
+
+class ProxyApmTabIndicatorItem extends TabIndicatorItem {
+
+	#data_collection_status;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+
+		this.#data_collection_status = document.querySelector('[name="data_collection_status"]');
+	}
+
+	getValue() {
+		return this.#data_collection_status?.checked ?? false;
+	}
+
+	initObserver(element) {
+		this.#data_collection_status?.addEventListener('change', () => this.addAttributes());
 	}
 }
 

@@ -57,7 +57,7 @@ window.proxy_edit_popup = new class {
 		jQuery('#proxy_groupid').on('change', () => this._update());
 
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
-				'custom_timeouts']) {
+				'custom_timeouts', 'data_collection_status', 'quota_mode']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -178,6 +178,45 @@ window.proxy_edit_popup = new class {
 				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query']) {
 			document.getElementById(id).readOnly = !custom_timeouts_enabled;
 		}
+
+		const data_collection_status = this.form
+			.findFieldByName('data_collection_status')?.getField()?.checked ?? false;
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode, .js-apm-attributes')) {
+			field?.toggleAttribute('hidden', !data_collection_status);
+		}
+
+		const fields = this.getAllValues();
+		const quota_mode_unlimited = fields.quota_mode === PROXY_APM_QUOTA_MODE_UNLIMITED;
+
+		const max_messages_per_second = this.form.findFieldByName('max_messages_per_second')?.getField();
+		max_messages_per_second?.toggleAttribute('disabled', quota_mode_unlimited);
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode-custom')) {
+			field?.toggleAttribute('hidden', quota_mode_unlimited);
+		}
+
+		const additional_resource_attributes = this.form
+			.findFieldByName('additional_resource_attributes')?.getFields() ?? [];
+
+		for (const [, field] of Object.entries(additional_resource_attributes)) {
+			field?.getField()?.toggleAttribute('disabled', !data_collection_status);
+		}
+	}
+
+	/**
+	 * @returns {Object<string, any>}
+	 */
+	getAllValues() {
+		const values = this.form.getAllValues();
+		const data_collection_status = parseInt(values.data_collection_status);
+		const quota_mode = parseInt(document.querySelector('[name="quota_mode"]:checked')?.value);
+
+		return {
+			...values,
+			data_collection_status,
+			quota_mode
+		};
 	}
 
 	refreshConfig() {
@@ -223,6 +262,14 @@ window.proxy_edit_popup = new class {
 		}
 		else if (this.clone_proxyid !== null) {
 			fields.clone_proxyid = this.clone_proxyid;
+		}
+
+		if (fields.data_collection_status === PROXY_APM_DATA_COLLECTION_DISABLED) {
+			for (const field of ['max_messages_per_second', 'additional_resource_attributes']) {
+				if (field in fields) {
+					delete fields[field];
+				}
+			}
 		}
 
 		const curl = new Curl('zabbix.php');

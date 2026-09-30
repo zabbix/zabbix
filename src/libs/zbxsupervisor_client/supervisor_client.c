@@ -14,6 +14,7 @@
 
 #include "supervisor_client.h"
 #include "zbx_cep_client.h"
+#include "zbx_apm_client.h"
 #include "zbxmw.h"
 #include "zbxsupervisor_client.h"
 
@@ -172,6 +173,9 @@ int	zbx_supervisor_get_process_count(int process_type)
 	{
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
 			service = ZBX_IPC_SERVICE_CEP;
+			break;
+		case ZBX_PROCESS_TYPE_APM_WORKER:
+			service = ZBX_IPC_SERVICE_APM;
 			break;
 		default:
 			return  ZBX_PROCESS_TYPE_COUNT > process_type ? config_forks[process_type] : 0;
