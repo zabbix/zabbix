@@ -125,21 +125,16 @@ class CJsonRpc {
 				continue;
 			}
 
-			$call_data = [
+			$call = [
 				'api' => $request_api,
-				'method' => $request_method,
-				'params' => $call['params']
-			];
-
-			if (array_key_exists('id', $call)) {
-				$call_data += ['id' => $call['id']];
-			}
+				'method' => $request_method
+			] + array_intersect_key($call, array_flip(['params', 'id']));
 
 			if ($this->apiClient->requiresAuthentication($api, $method)) {
-				$auth_calls[] = $call_data;
+				$auth_calls[] = $call;
 			}
 			else {
-				$no_auth_calls[] = $call_data;
+				$no_auth_calls[] = $call;
 			}
 		}
 
