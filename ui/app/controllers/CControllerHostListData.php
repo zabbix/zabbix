@@ -241,18 +241,30 @@ class CControllerHostListData extends CControllerDataTable {
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
 
+		$lld_parentids = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('discoveryRule', $host) && $host['discoveryRule']) {
+				$lld_parentids[$host['discoveryRule']['itemid']] = true;
+			}
+		}
+
+		$editable_lld_parents = $lld_parentids
+			? API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
 		foreach ($hosts as &$host) {
-			$is_discovery_rule_editable = $host['discoveryRule']
-				&& API::DiscoveryRule()->get([
-					'output' => [],
-					'itemids' => $host['discoveryRule']['itemid'],
-					'editable' => true
-				]);
+			$discovery_rule = array_key_exists('discoveryRule', $host) ? $host['discoveryRule'] : null;
 
 			$host['discovery'] = [
 				'data' => $host['discoveryData'],
-				'rule' => $host['discoveryRule'],
-				'editable' => $is_discovery_rule_editable
+				'rule' => $discovery_rule,
+				'editable' => $discovery_rule && array_key_exists($discovery_rule['itemid'], $editable_lld_parents)
 			];
 
 			$host['maintenance'] = null;
