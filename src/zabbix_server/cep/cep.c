@@ -58,6 +58,8 @@ ZBX_VECTOR_LITE_IMPL(lite_uint64, zbx_uint64_t)
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
 
+ZBX_VECTOR_LITE_IMPL(cep_win_event, zbx_cep_win_event_t)
+
 /* When CEP is notified about deleted events it might not be able to remove them from cache */
 /* if their handles are held by other entities. In this case mark them as deleted in cache  */
 /* and pretend those events are not cached when requested.                                  */
@@ -352,7 +354,7 @@ static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: acquire (with incremented refcoutn) event handle by event ID      *
+ * Purpose: acquire (with incremented refcount) event handle by event ID      *
  *                                                                            *
  * Parameters: cep     - [IN] cep cache                                       *
  *             eventid - [IN] event ID                                        *
@@ -2180,3 +2182,62 @@ void	cep_event_handle_unlink_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zb
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire reference to cep window through non-owning link           *
+ *                                                                            *
+ * Parameters: cep    - [IN] cep cache, must be acquired by caller            *
+ *             window - [IN] cep window                                       *
+ *                                                                            *
+ * Return value: window with incremented refcount or NULL if window is being  *
+ *               released                                                     *
+ *                                                                            *
+ * Comments: Must be called with cep cache locked - window unlinks itself     *
+ *           from event handles under cache lock before being freed.          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_window_t *window)
+{
+	ZBX_UNUSED(cep);
+
+	if (0 == atomic_fetch_add(&window->refcount, 1))
+	{
+		/* window is being released, revert refcount and return NULL */
+		atomic_fetch_sub(&window->refcount, 1);
+		return NULL;
+	}
+
+	return window;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire windows linked to the specified events                    *
+ *                                                                            *
+ * Parameters: cep        - [IN] cep cache, must be acquired by caller        *
+ *             handles    - [IN] event handles, referenced by caller          *
+ *             win_events - [OUT] window/event handle pairs with acquired     *
+ *                          window and event handle references                *
+ *                                                                            *
+ * Comments: Windows being released are skipped.                              *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_acquire_event_windows(zbx_cep_t *cep, const zbx_vector_cep_event_handle_t *handles,
+		zbx_vector_cep_win_event_t *win_events)
+{
+	for (int i = 0; i < handles->values_num; i++)
+	{
+		zbx_cep_event_handle_t	h = handles->values[i];
+
+		for (int j = 0; j < h->windows.values_num; j++)
+		{
+			zbx_cep_win_event_t	win_event;
+
+			if (NULL == (win_event.window = cep_acquire_window(cep, h->windows.values[j])))
+				continue;
+
+			win_event.hevent = zbx_cep_event_handle_addref(h);
+			zbx_vector_cep_win_event_append(win_events, win_event);
+		}
+	}
+}
