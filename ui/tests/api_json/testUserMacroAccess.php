@@ -116,19 +116,6 @@ class testUserMacroAccess extends CAPITest {
 				]
 			]
 		]);
-
-		$macros = CDataHelper::call('usermacro.get', [
-			'output' => ['hostmacroid', 'macro'],
-			'hostids' => CTestDataHelper::getConvertedValueReferences([
-				':host:usermacro.access.host1',
-				':host:usermacro.access.host2',
-				':template:usermacro.access.template'
-			])
-		]);
-
-		foreach ($macros as $macro) {
-			CTestDataHelper::addCustomReference('macro', $macro['macro'], $macro['hostmacroid']);
-		}
 	}
 
 	public static function cleanTestData(): void {
@@ -142,7 +129,7 @@ class testUserMacroAccess extends CAPITest {
 				'output' => ['hostmacroid', 'macro', 'value']
 			],
 			[
-				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -153,7 +140,7 @@ class testUserMacroAccess extends CAPITest {
 				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template'],
 			],
 			[
-				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -174,7 +161,7 @@ class testUserMacroAccess extends CAPITest {
 				'searchByAny' => true
 			],
 			[
-				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -194,7 +181,7 @@ class testUserMacroAccess extends CAPITest {
 				'filter' => ['macro' => '{$UM1}']
 			],
 			[
-				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -205,8 +192,8 @@ class testUserMacroAccess extends CAPITest {
 				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template'],
 			],
 			[
-				['hostmacroid' => ':macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
-				['hostmacroid' => ':macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
+				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -218,8 +205,8 @@ class testUserMacroAccess extends CAPITest {
 				'searchByAny' => true
 			],
 			[
-				['hostmacroid' => ':macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
-				['hostmacroid' => ':macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
+				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -239,7 +226,7 @@ class testUserMacroAccess extends CAPITest {
 				'filter' => ['macro' => '{$UM2}']
 			],
 			[
-				['hostmacroid' => ':macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -250,7 +237,7 @@ class testUserMacroAccess extends CAPITest {
 				'filter' => ['macro' => '{$UM1}']
 			],
 			[
-				['hostmacroid' => ':macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 	}
@@ -259,13 +246,11 @@ class testUserMacroAccess extends CAPITest {
 	 * @dataProvider getProvider
 	 */
 	public function testUserMacroAccessGet(array $login, array $request, array $expected): void {
-		CTestDataHelper::convertCustomObjectReference($request, 'hostids', true);
-		CTestDataHelper::convertCustomObjectReference($request, 'hostmacroids', true);
+		CTestDataHelper::convertUsertMacroReferences($expected);
 
-		foreach ($expected as &$macro) {
-			CTestDataHelper::convertCustomObjectReference($macro, 'hostmacroid');
+		if (array_key_exists('hostids', $request)) {
+			CTestDataHelper::convertValueReferences($request['hostids']);
 		}
-		unset($macro);
 
 		$this->authorize($login['username'], $login['password']);
 		$result = $this->call('usermacro.get', $request);
@@ -278,7 +263,7 @@ class testUserMacroAccess extends CAPITest {
 		yield 'user permission "usermacro.access.user.1" fail' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':macro:{$UM2}',
+				'hostmacroid' => ':user_macro:{$UM1}',
 				'value' => 'abc'
 			],
 			[],
@@ -288,11 +273,11 @@ class testUserMacroAccess extends CAPITest {
 		yield 'admin permission "usermacro.access.user.2" update macros' => [
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':macro:{$UM2}',
+				'hostmacroid' => ':user_macro:{$UM2}',
 				'value' => 'abc'
 			],
 			[
-				'hostmacroids' => [':macro:{$UM2}']
+				'hostmacroids' => [':user_macro:{$UM2}']
 			],
 			null
 		];
@@ -300,7 +285,7 @@ class testUserMacroAccess extends CAPITest {
 		yield 'admin permission "usermacro.access.user.2" change for non accessible hosts fail' => [
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':macro:{$UM1}',
+				'hostmacroid' => ':user_macro:{$UM1}',
 				'value' => 'abc'
 			],
 			[],
@@ -310,7 +295,7 @@ class testUserMacroAccess extends CAPITest {
 		yield 'admin read only permission "usermacro.access.user.3" update macro fail' => [
 			['username' => 'usermacro.access.user.3', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':macro:{$UM1}',
+				'hostmacroid' => ':user_macro:{$UM1}',
 				'value' => 'abc'
 			],
 			[],
@@ -322,8 +307,13 @@ class testUserMacroAccess extends CAPITest {
 	 * @dataProvider updateProvider
 	 */
 	public function testUserMacroAccessUpdate(array $login, array $request, array $expected, ?string $error): void {
-		CTestDataHelper::convertCustomObjectReference($request, 'hostmacroid');
-		CTestDataHelper::convertCustomObjectReference($expected, 'hostmacroids', true);
+		if (array_key_exists('hostmacroid', $request)) {
+			$request['hostmacroid'] = CTestDataHelper::getConvertedValueReference($request['hostmacroid']);
+		}
+
+		if (array_key_exists('hostmacroids', $expected)) {
+			CTestDataHelper::convertValueReferences($expected['hostmacroids']);
+		}
 
 		$this->authorize($login['username'], $login['password']);
 		$result = $this->call('usermacro.update', $request, $error);

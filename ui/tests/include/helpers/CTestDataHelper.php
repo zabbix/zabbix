@@ -123,6 +123,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$template_macro = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -134,6 +135,14 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as $macro) {
+					$template_macro[] = $macro + ['hostid' => ':template:'.$template['host']];
+				}
+
+				unset($template['macros']);
+			}
 
 			if (array_key_exists('value_maps', $template)) {
 				foreach ($template['value_maps'] as $value_map) {
@@ -169,6 +178,7 @@ class CTestDataHelper {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
+		self::createUserMacro($template_macro);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -188,6 +198,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$host_macro = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -200,6 +211,14 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as $macro) {
+					$host_macro[] = $macro + ['hostid' => ':host:'.$host['host']];
+				}
+
+				unset($host['macros']);
+			}
 
 			if (array_key_exists('value_maps', $host)) {
 				foreach ($host['value_maps'] as $value_map) {
@@ -243,6 +262,7 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
+		self::createUserMacro($host_macro);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -254,6 +274,25 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
 		self::convertPropertyReference($hosts, 'proxyid');
+	}
+
+	private static function createUserMacro(array $user_macro): void {
+		if (!$user_macro) {
+			return;
+		}
+
+		self::convertUsertMacroReferences($user_macro);
+
+		$result = CDataHelper::call('usermacro.create', $user_macro);
+
+		foreach ($user_macro as $macro) {
+			self::$objectids['user_macro'][$macro['macro']] = array_shift($result['hostmacroids']);
+		}
+	}
+
+	public static function convertUsertMacroReferences(array &$host_macro): void {
+		self::convertPropertyReference($host_macro, 'hostmacroid');
+		self::convertPropertyReference($host_macro, 'hostid');
 	}
 
 	/**
@@ -1176,24 +1215,6 @@ class CTestDataHelper {
 
 		if ($guest) {
 			CDataHelper::call('user.update', $guest);
-		}
-	}
-
-	/**
-	 * Avoid adding objects that are cleaned up.
-	 *
-	 * @see CTestDataHelper::cleanUp()
-	 */
-	public static function addCustomReference(string $object_type, string $object_name, string $id): void {
-		self::$objectids[$object_type][$object_name] = $id;
-	}
-
-	public static function convertCustomObjectReference(array &$object, string $property,
-			bool $multiple_values = false): void {
-		if (array_key_exists($property, $object)) {
-			$object[$property] = $multiple_values
-				? self::getConvertedValueReferences($object[$property])
-				: self::getConvertedValueReference($object[$property]);
 		}
 	}
 }
