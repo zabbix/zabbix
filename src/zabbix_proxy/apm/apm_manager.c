@@ -528,7 +528,8 @@ void	*zbx_apm_manager_thread(void *args)
 			if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
 				apm_config_reset(&apm_config);
 
-			if (SUCCEED == apm_manager_global_config_active(manager))
+			if (APM_STATUS_ENABLED == apm_config.enabled &&
+					SUCCEED == apm_manager_global_config_active(manager))
 			{
 				apm_config.enabled = apm_manager_update_global_config(manager, &apm_global,
 						apm_args->export_config->source_ip, apm_args->ca_location);
