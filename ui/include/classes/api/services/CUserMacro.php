@@ -199,8 +199,6 @@ class CUserMacro extends CApiService {
 			$sqlPartsGlobal['limit'] = $options['limit'];
 		}
 
-		$output_original = $options['output'];
-
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
 			$sqlPartsGlobal = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
@@ -217,7 +215,6 @@ class CUserMacro extends CApiService {
 		}
 		// init HOSTS
 		else {
-			$options['output'] = $this->outputExtend($options['output'], ['hostid']);
 			$sqlParts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
 			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -237,7 +234,7 @@ class CUserMacro extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $output_original);
+			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$result = array_values($result);

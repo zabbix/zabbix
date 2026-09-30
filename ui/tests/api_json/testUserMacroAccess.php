@@ -59,8 +59,8 @@ class testUserMacroAccess extends CAPITest {
 				]
 			],
 			'roles' => [
-				['name' => 'usermacro.access.user.role', 'type' => USER_TYPE_ZABBIX_USER],
-				['name' => 'usermacro.access.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN]
+				['name' => 'usermacro.access.user.role', 'type' => USER_TYPE_ZABBIX_USER, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]],
+				['name' => 'usermacro.access.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]]
 			],
 			'user_groups' => [
 				[
