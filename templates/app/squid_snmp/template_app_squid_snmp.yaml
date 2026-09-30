@@ -36,7 +36,7 @@ zabbix_export:
         4\. Add SNMPv2 interface to Squid host. Set **Port** as {$SQUID.SNMP.PORT} and **SNMP community** as {$SQUID.SNMP.COMMUNITY}.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -801,11 +801,16 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 89efc9400197427fa718395286dd3583
-              expression: 'last(/Squid by SNMP/squid[cacheUptime])<10m'
+              expression: 'change(/Squid by SNMP/squid[cacheUptime])<0 and last(/Squid by SNMP/squid[cacheUptime],#2)<42949672.96-(lastclock(/Squid by SNMP/squid[cacheUptime])-lastclock(/Squid by SNMP/squid[cacheUptime],#2))'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/Squid by SNMP/squid[cacheUptime])>{$SNMP.UPTIME.WARN}'
               name: 'Squid: Squid has been restarted'
-              event_name: 'Squid: Squid has been restarted (uptime < 10m)'
+              event_name: 'Squid: Squid has been restarted'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: |
+                The uptime counter has decreased, which indicates that Squid has been restarted.
+                A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -841,6 +846,15 @@ zabbix_export:
         - tag: target
           value: squid
       macros:
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the restart problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the restart problem auto-resolves.'
         - macro: '{$SQUID.FILE.DESC.WARN.MIN}'
           value: '100'
           description: 'The threshold for minimum number of available file descriptors'

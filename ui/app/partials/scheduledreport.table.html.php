@@ -21,13 +21,13 @@
 
 $table = (new CTableInfo())
 	->setHeader([
-		($data['source'] === 'scheduledreport-form')
+		($data['source'] === 'scheduledreport-list-form')
 			? (new CColHeader((new CCheckBox('all_scheduledreports'))
 				->setAttribute('data-source', $data['source'])
 				->onClick('checkAll(this.dataset.source, "all_scheduledreports", "reportids");')
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
-		($data['source'] === 'scheduledreport-form')
+		($data['source'] === 'scheduledreport-list-form')
 			? make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.list')
@@ -61,8 +61,9 @@ $now = time();
 
 foreach ($data['reports'] as $report) {
 	$name = new CLink($report['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'scheduledreport.edit')
+		->setArgument('action', 'popup')
 		->setArgument('reportid', $report['reportid'])
+		->setArgument('popup', 'scheduledreport.edit')
 	);
 
 	$info_icons = [];
@@ -95,22 +96,19 @@ foreach ($data['reports'] as $report) {
 		}
 	}
 
-	$status = ($data['source'] === 'scheduledreport-form' && $data['allowed_edit'])
-		? (new CLink($status_name, (new CUrl('zabbix.php'))
-			->setArgument('action', ($report['status'] == ZBX_REPORT_STATUS_DISABLED)
-				? 'scheduledreport.enable'
-				: 'scheduledreport.disable'
+	$status = ($data['source'] === 'scheduledreport-list-form' && $data['allowed_edit'])
+		? (new CLink($status_name))
+			->setAttribute('data-reportid', $report['reportid'])
+			->addClass(($report['status'] == ZBX_REPORT_STATUS_DISABLED)
+				? 'js-enable-scheduledreport'
+				: 'js-disable-scheduledreport'
 			)
-			->setArgument('reportids', [$report['reportid']])
-			->getUrl()
-		))
-			->addCsrfToken(CCsrfTokenHelper::get('scheduledreport'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 		: new CSpan($status_name);
 	$status->addClass($status_class);
 
 	$table->addRow([
-		($data['source'] === 'scheduledreport-form')
+		($data['source'] === 'scheduledreport-list-form')
 			? new CCheckBox('reportids['.$report['reportid'].']', $report['reportid'])
 			: null,
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),

@@ -300,9 +300,7 @@ const hintBox = {
 				hintBox.hideHint($target[0], false);
 			}
 
-			if ($target[0].dataset.hintboxContents) {
-				hintBox.showHintStart(e, $target, delay);
-			}
+			hintBox.showHintStart(e, $target, delay);
 		};
 
 		const cancelHintboxGeneration = () => {
@@ -355,7 +353,7 @@ const hintBox = {
 
 	showHintStart: function (e, $target, delay) {
 		const showHintHandler = function() {
-			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxContents, $target.data('hintbox-class'),
+			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxHtml, $target.data('hintbox-class'),
 				false, $target.data('hintbox-style')
 			);
 		}
@@ -397,35 +395,35 @@ const hintBox = {
 		}).appendTo(box);
 
 		xhr.done(function(resp) {
-			let hintbox_contents = '';
+			let hintbox_html = '';
 
 			if ('error' in resp) {
 				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				hintbox_contents += message_box.innerHTML;
+				hintbox_html += message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
-					hintbox_contents += resp.messages;
+					hintbox_html += resp.messages;
 				}
 
 				if (resp.data) {
-					hintbox_contents += resp.data;
+					hintbox_html += resp.data;
 				}
 
 				if (resp.value) {
-					hintbox_contents += resp.value;
+					hintbox_html += resp.value;
 				}
 			}
 
-			target.dataset.hintboxContents = hintbox_contents;
+			target.dataset.hintboxHtml = hintbox_html;
 
 			$preloader.remove();
 
 			if (target.hintBoxItem !== undefined) {
 				const hintbox_container = box[0].querySelector('.hintbox-container');
 
-				hintbox_container.innerHTML = hintbox_contents;
+				hintbox_container.innerHTML = hintbox_html;
 
 				// Reset hintbox position.
 				box.css({
@@ -443,13 +441,21 @@ const hintBox = {
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo = '.wrapper',
 			reposition_on_resize = true) {
 		const hintboxid = hintBox.getUniqueId();
-		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
+		const box = jQuery('<div>', {'data-hintboxid': hintboxid})
+			.addClass(`${ZBX_STYLE_OVERLAY_DIALOGUE} hintbox wordbreak`);
 
 		for (let element = target; element && element !== document.body; element = element.parentElement) {
 			if (getComputedStyle(element).position === 'fixed') {
 				box.addClass('hintbox-position-fixed');
 				break;
 			}
+		}
+
+		if (!isStatic) {
+			id = 'hintbox-' + hintboxid;
+			$(target).attr('aria-describedby', id);
+			box.attr('id', id);
+			box.attr('role', 'tooltip');
 		}
 
 		if (styles) {
@@ -512,7 +518,7 @@ const hintBox = {
 			box.prepend(hintbox_header);
 		}
 
-		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
+		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxHtml === '') {
 			hintBox.preloadHint(e, target, box);
 		}
 
@@ -561,7 +567,7 @@ const hintBox = {
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = target.dataset.hintboxContents;
+				hintText = target.dataset.hintboxHtml;
 			}
 
 			target.isStatic = true;
@@ -639,8 +645,8 @@ const hintBox = {
 		target.hintBoxItem.show();
 
 		if (target.isStatic) {
-			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
+			Focuser.recoverFocus(target.hintBoxItem[0]);
+			Focuser.containFocus(target.hintBoxItem[0]);
 
 			target.dispatchEvent(new CustomEvent('onShowStaticHint'));
 		}
@@ -716,34 +722,32 @@ const hintBox = {
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
 
 			// Event coordinates relative to host.
-			if (target.event_x === undefined) {
-				let client_x, client_y;
+			let client_x, client_y;
 
-				if (e.clientX !== undefined) {
-					client_x = e.clientX;
-					client_y = e.clientY;
-				}
-				else {
-					const $target = jQuery(target);
-					const offset = $target.offset();
-
-					client_x = offset.left;
-					client_y = offset.top + $target.height() / 2;
-				}
-
-				target.event_x = client_x - host_rect.left + host_x_min;
-				target.event_y = client_y - host_rect.top + host_y_min;
+			if (e.clientX !== undefined) {
+				client_x = e.clientX;
+				client_y = e.clientY;
 			}
+			else {
+				const $target = jQuery(target);
+				const offset = $target.offset();
+
+				client_x = offset.left;
+				client_y = offset.top + $target.height() / 2;
+			}
+
+			const event_x = client_x - host_rect.left + host_x_min;
+			const event_y = client_y - host_rect.top + host_y_min;
 
 			let hint_fits_vertically = true;
 
 			// Hint fits under event.
-			if (target.event_y + EVENT_OFFSET + SCREEN_Y_PADDING + hint_rect.height <= host_y_max) {
-				css.top = target.event_y + EVENT_OFFSET;
+			if (event_y + EVENT_OFFSET + SCREEN_Y_PADDING + hint_rect.height <= host_y_max) {
+				css.top = event_y + EVENT_OFFSET;
 			}
 			// Hint fits above event.
-			else if (target.event_y - EVENT_OFFSET - SCREEN_Y_PADDING - hint_rect.height >= host_y_min) {
-				css.top = target.event_y - EVENT_OFFSET - hint_rect.height;
+			else if (event_y - EVENT_OFFSET - SCREEN_Y_PADDING - hint_rect.height >= host_y_min) {
+				css.top = event_y - EVENT_OFFSET - hint_rect.height;
 			}
 			// Hint fits neither under nor above event - then show it in the biggest part of the screen.
 			else {
@@ -756,28 +760,28 @@ const hintBox = {
 			}
 
 			// Hint fits right of the event.
-			if (target.event_x + EVENT_OFFSET + css.width <= host_x_max) {
-				css.left = target.event_x + EVENT_OFFSET;
+			if (event_x + EVENT_OFFSET + css.width <= host_x_max) {
+				css.left = event_x + EVENT_OFFSET;
 			}
 			// Hint fits left of the event.
-			else if (target.event_x - EVENT_OFFSET - css.width >= host_x_min) {
-				css.left = target.event_x - css.width - EVENT_OFFSET;
+			else if (event_x - EVENT_OFFSET - css.width >= host_x_min) {
+				css.left = event_x - css.width - EVENT_OFFSET;
 			}
 			// Hint fits neither right nor left of the event.
 			else {
 				if (hint_fits_vertically) {
-					css.left = host_client_width / 2 > target.event_x
-						? Math.min(target.event_x + EVENT_OFFSET, host_x_max - css.width)
-						: Math.max(target.event_x - EVENT_OFFSET - css.width, host_x_min);
+					css.left = host_client_width / 2 > event_x
+						? Math.min(event_x + EVENT_OFFSET, host_x_max - css.width)
+						: Math.max(event_x - EVENT_OFFSET - css.width, host_x_min);
 				}
 				else {
-					if (host_client_width / 2 > target.event_x) {
-						css.width = Math.min(css.width, host_x_max - target.event_x - EVENT_OFFSET);
-						css.left = target.event_x + EVENT_OFFSET;
+					if (host_client_width / 2 > event_x) {
+						css.width = Math.min(css.width, host_x_max - event_x - EVENT_OFFSET);
+						css.left = event_x + EVENT_OFFSET;
 					}
 					else {
-						css.width = Math.min(css.width, target.event_x - EVENT_OFFSET - host_x_min);
-						css.left = target.event_x - EVENT_OFFSET - css.width;
+						css.width = Math.min(css.width, event_x - EVENT_OFFSET - host_x_min);
+						css.left = event_x - EVENT_OFFSET - css.width;
 					}
 				}
 			}
@@ -804,9 +808,6 @@ const hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
-		delete target.event_x;
-		delete target.event_y;
-
 		if (target.isStatic) {
 			target.dispatchEvent(new CustomEvent('onDeleteStaticHint'));
 		}
@@ -973,7 +974,8 @@ function toggleSection(toggle, profile_idx = '') {
 
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
-	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
+	toggle.setAttribute('aria-label', is_collapsed ? t('Collapse section') : t('Expand section'));
+	toggle.setAttribute('aria-expanded', is_collapsed ? 'true' : 'false');
 
 	section.dispatchEvent(new CustomEvent(!is_collapsed ? 'collapse' : 'expand'));
 
@@ -1378,6 +1380,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Event hub initialization.
 
 	ZABBIX.EventHub = new CEventHub();
+
+	// Banner initialization.
+
+	if (typeof CBanner !== 'undefined') {
+		ZABBIX.Banner = new CBanner();
+	}
 
 	// Software version check initialization.
 

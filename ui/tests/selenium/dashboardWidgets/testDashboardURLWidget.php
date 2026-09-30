@@ -277,7 +277,7 @@ class testDashboardURLWidget extends testWidgets {
 					'fields' => [
 						'URL' => 'dns://zabbix.com'
 					],
-					'error' => 'Invalid parameter "URL": unacceptable URL.'
+					'error' => 'Invalid parameter "URL": unacceptable URL scheme.'
 				]
 			],
 			[
@@ -286,7 +286,7 @@ class testDashboardURLWidget extends testWidgets {
 					'fields' => [
 						'URL' => 'message://zabbix.com'
 					],
-					'error' => 'Invalid parameter "URL": unacceptable URL.'
+					'error' => 'Invalid parameter "URL": unacceptable URL scheme.'
 				]
 			],
 			// Widget name "URL", if no name is given.
@@ -842,7 +842,7 @@ class testDashboardURLWidget extends testWidgets {
 				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			}
 			else {
-				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL.');
+				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL scheme.');
 				CMessageElement::find()->one()->close();
 				COverlayDialogElement::find()->one()->close();
 			}

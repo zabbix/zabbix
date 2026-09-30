@@ -69,10 +69,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel([_('Tile URL'), $hintbox_tile_url], 'geomaps_tile_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('geomaps_tile_url', $data['geomaps_tile_url'], false,
-				CSettingsSchema::getFieldLength('geomaps_tile_url'))
-			)
+			(new CTextAreaFlexible('geomaps_tile_url', $data['geomaps_tile_url']))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(CSettingsSchema::getFieldLength('geomaps_tile_url'))
 				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setAriaRequired()
 		)
@@ -101,17 +100,12 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps')))->removeId())
 	->setId('geomaps-form')
 	->setName('geomaps-form')
-	->setAction(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'geomaps.update')
-			->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('geomaps_tab', _('Geographical maps'), $form_grid)
 			->setFooter(makeFormFooter(
-				new CSubmit('update', _('Update'))
+				(new CSubmit('', _('Update')))->addClass('js-submit')
 			))
 	);
 

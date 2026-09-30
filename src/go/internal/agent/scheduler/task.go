@@ -15,6 +15,7 @@
 package scheduler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -40,6 +41,14 @@ const (
 	priorityStopperTaskNs
 )
 
+var (
+	_ context.Context        = (*taskBase)(nil)
+	_ plugin.ContextProvider = (*exporterTask)(nil)
+	_ plugin.ContextProvider = (*directExporterTask)(nil)
+	_ plugin.ContextProvider = (*watcherTask)(nil)
+	_ plugin.ContextProvider = (*commandTask)(nil)
+)
+
 // exporterTaskAccessor is used by clients to track item exporter tasks .
 type exporterTaskAccessor interface {
 	task() *exporterTask
@@ -52,6 +61,31 @@ type taskBase struct {
 	index     int
 	active    bool
 	recurring bool
+}
+
+// Done is implementing the context.Context interface.
+func (*taskBase) Done() <-chan struct{} {
+	return nil
+}
+
+// Err is implementing the context.Context interface.
+func (*taskBase) Err() error {
+	return nil
+}
+
+// Value is implementing the context.Context interface.
+func (*taskBase) Value(_ any) any {
+	return nil
+}
+
+// Deadline is implementing the context.Context interface.
+func (*taskBase) Deadline() (time.Time, bool) {
+	return time.Time{}, false
+}
+
+// LegacyTimeout is implementing the context.Context interface.
+func (*taskBase) LegacyTimeout() bool {
+	return false
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -97,7 +131,9 @@ func (t *taskBase) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// collectorTask provides access to plugin Collector interaface.
+// collectorTask represents a recurring collection cycle for a plugin.
+// It is scheduled at the plugin collector interval and consumes the whole
+// plugin capacity while Collect() is running.
 type collectorTask struct {
 	taskBase
 	seed uint64
@@ -152,8 +188,9 @@ func (t *collectorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// exporterTask provides access to plugin Exporter interaface. It's used
-// for active check items.
+// exporterTask represents a recurring active check for one monitored item.
+// It is used to collect item values at the configured update interval and
+// write the results to the client's output.
 type exporterTask struct {
 	taskBase
 	item    clientItem
@@ -166,26 +203,34 @@ type exporterTask struct {
 
 func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	exporter, _ := a.(plugin.Exporter)
-	timeout := ctx.Timeout()
-
-	if a.HandleTimeout() {
-		timeout = maxItemTimeout
-	}
+	ctx = plugin.StartTimeout(ctx, time.Now())
 
 	var ret any
 	var err error
-	tc := make(chan bool)
+
+	tc := make(chan bool, 1)
 
 	go func() {
 		ret, err = exporter.Export(key, params, ctx)
 		tc <- true
 	}()
 
+	// from an architectural standpoint we should not be supporting something
+	// like this, but alas, this evil hack was left behind by our predecessors
+	if a.ForceEffectiveTimeoutExtension() {
+		select {
+		case <-tc:
+			return ret, err //nolint:wrapcheck
+		case <-time.After(time.Duration(maxItemTimeout) * time.Second):
+			return nil, errs.New("timeout occurred while gathering data")
+		}
+	}
+
 	select {
 	case <-tc:
 		return ret, err //nolint:wrapcheck
-	case <-time.After(time.Second * time.Duration(timeout)):
-		return nil, errs.New("timeout occurred while gathering data")
+	case <-ctx.Done():
+		return nil, errs.Wrap(ctx.Err(), "timeout occurred while gathering data")
 	}
 }
 
@@ -290,10 +335,15 @@ func (t *exporterTask) Delay() string {
 	return t.item.delay
 }
 
-// directExporterTask provides access to plugin Exporter interaface.
-// It's used for non-recurring exporter requests - single passive checks
-// and internal requests to obtain HostnameItem, HostMetadataItem,
-// HostInterfaceItem etc values.
+// LegacyTimeout is implementing the context.Context interface.
+func (t *exporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
+}
+
+// directExporterTask represents an on-demand exporter request.
+// It is used for single passive checks and internal requests to resolve values
+// such as HostnameItem, HostMetadataItem, and HostInterfaceItem. The task stays
+// recurring only while it waits for a chance to run before its expiration time.
 type directExporterTask struct {
 	taskBase
 	item   clientItem
@@ -409,7 +459,14 @@ func (t *directExporterTask) Delay() string {
 	return t.item.delay
 }
 
-// starterTask provides access to plugin Exporter interaface Start() method.
+// LegacyTimeout is implementing the context.Context interface.
+func (t *directExporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
+}
+
+// starterTask represents plugin startup work for an inactive Runner plugin.
+// It is used to run Start() before scheduling item collection, exports, or
+// watcher updates for the plugin.
 type starterTask struct {
 	taskBase
 }
@@ -436,7 +493,9 @@ func (t *starterTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// stopperTask provides access to plugin Exporter interaface Start() method.
+// stopperTask represents plugin shutdown work for a Runner plugin that is no
+// longer used by any client. It is used to run Stop() as a scheduled plugin
+// task.
 type stopperTask struct {
 	taskBase
 }
@@ -463,7 +522,9 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// stopperTask provides access to plugin Watcher interaface.
+// watcherTask represents the active-check items watched by a plugin for one
+// client. It is used to pass the current item list to Watch(); an empty list
+// tells the plugin to stop watching items for that client.
 type watcherTask struct {
 	taskBase
 	items  []*plugin.Item
@@ -522,7 +583,9 @@ func (t *watcherTask) Delay() string {
 	return ""
 }
 
-// configuratorTask provides access to plugin Configurator interaface.
+// configuratorTask represents plugin configuration work.
+// It is queued before regular plugin work when a Configurator plugin becomes
+// active. It is used to pass global and plugin-specific options to Configure().
 type configuratorTask struct {
 	taskBase
 	options *agent.AgentOptions
@@ -550,7 +613,9 @@ func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// commandTask executes remote commands received with active requests
+// commandTask represents one remote command request.
+// It invokes the system.run exporter path with command-specific output and
+// timeout handling instead of registering a regular item check.
 type commandTask struct {
 	taskBase
 	id      uint64
@@ -598,7 +663,10 @@ func (t *commandTask) perform(s Scheduler) {
 
 		var cr *resultcache.CommandResult
 
-		if ret, err := e.Export("system.run", t.params, t); err == nil {
+		exportStartedCtx := plugin.StartTimeout(t, time.Now())
+
+		ret, err := e.Export("system.run", t.params, exportStartedCtx)
+		if err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

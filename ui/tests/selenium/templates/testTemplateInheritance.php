@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
@@ -114,21 +112,25 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$template.'&filter_set=1');
 		$this->zbxTestCheckHeader('Templates');
 
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Items')->waitUntilVisible()->one()->click();
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Items')
+				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 
-		$this->zbxTestInputTypeWait('name', $itemName);
-		$this->zbxTestInputType('key', $keyName);
-		$this->zbxTestDropdownSelect('type', 'Simple check');
-		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
-		$this->zbxTestInputType('units', 'units');
-		$this->zbxTestInputTypeOverwrite('delay', '33s');
-		$this->zbxTestInputTypeOverwrite('history', '54d');
-		$this->zbxTestInputTypeOverwrite('trends', '55d');
-		$this->zbxTestInputType('description', 'description');
+		$form->fill([
+			'Name' => $itemName,
+			'Key' => $keyName,
+			'Type' => 'Simple check',
+			'Type of information' => 'Numeric (unsigned)',
+			'Units' => 'units',
+			'Update interval' => '33s',
+			'id:history' => '54d',
+			'id:trends' => '55d',
+			'Description' => 'description'
+		]);
+
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
-
 		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($result) {
@@ -186,8 +188,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
-		$table->findRow('Name', $template)
-				->getColumn('Actions')->query('button:Unlink and clear')->one()->click();
+		$table->findRow('Name', $template)->getColumn('Actions')->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($table->findRow('Name', $template)->isValid());
 		$form->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -204,16 +205,21 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a trigger
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Triggers')->waitUntilVisible()->one()->click();
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Triggers')
+				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->zbxTestInputTypeWait('name', 'Test LLD trigger1');
-		$this->zbxTestInputType('expression', 'last(/Inheritance test template/key-item-inheritance-test,#1)=0');
-		$this->zbxTestCheckboxSelect('type_1');
-		$this->zbxTestInputType('description', 'comments');
-		$this->zbxTestInputType('url', 'zabbix.php');
-		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelect('status', false);
+		$form = $dialog->asForm();
+
+		$form->fill([
+			'Name' => 'Test LLD trigger1',
+			'Expression' => 'last(/Inheritance test template/key-item-inheritance-test,#1)=0',
+			'PROBLEM event generation mode' => 'Multiple',
+			'Description' => 'comments',
+			'Menu entry URL' => 'zabbix.php',
+			'Severity' => 'Warning',
+			'Enabled' => false
+		]);
 
 		$dialog->getFooter()->query('button:Add')->one()->click();
 		$dialog->ensureNotPresent();
@@ -245,7 +251,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Graphs')->waitUntilVisible()->one()->click();
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Graphs')
+				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create graph');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph1');
@@ -302,21 +309,26 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an LLD rule
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
+		$form = $this->query('id:lldrule-form')->waitUntilVisible()->asForm()->one();
 
-		$this->zbxTestInputTypeWait('name', 'Test LLD');
-		$this->zbxTestInputType('key', 'test-lld');
-		$this->zbxTestDropdownSelect('type', 'Simple check');
-		$this->zbxTestInputType('delay', '31s');
-		$this->zbxTestInputType('lifetime', '32d');
-		$this->zbxTestInputType('js-item-description-field', 'description');
-		$this->zbxTestInputType('delay_flex_0_delay', '50s');
-		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestClickWait('interval_add');
+		$form->fill([
+			'Name' => 'Test LLD',
+			'Key' => 'test-lld',
+			'Type' => 'Simple check',
+			'Update interval' => '31s',
+			'id:lifetime' => '32d',
+			'id:delay_flex_0_delay' => '50s',
+			'id:delay_flex_0_period' => '1-7,00:00-24:00',
+			'Description' => 'description'
+		]);
+
+		$form->getField('Custom intervals')->query('button:Add')->one()->click();
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestClickWait('add');
+		$form->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule created');
 
 		// check that the inherited rule matches the original
@@ -349,26 +361,30 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an item prototype
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Item prototypes');
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+				->waitUntilVisible()->one()->click();
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
+				->query('link:Item prototypes')->one()->click();
+
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
 
-		$this->zbxTestInputTypeWait('name', 'Test LLD item');
-		$this->zbxTestInputType('key', 'test-lld-item[{#KEY}]');
-		$this->zbxTestDropdownSelect('type', 'Simple check');
-		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
-		$this->zbxTestInputType('units', 'units');
-		$this->zbxTestInputType('delay', '33s');
-		$this->zbxTestInputType('history', '54d');
-		$this->zbxTestInputType('trends', '55d');
-		$this->zbxTestInputType('description', 'description');
-		$form->fill(['Value mapping' => 'Template value mapping']);
-		$this->zbxTestCheckboxSelect('status', false);
-		$this->zbxTestInputType('delay_flex_0_delay', '50s');
-		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
+		$form->fill([
+			'Name' => 'Test LLD item',
+			'Key' => 'test-lld-item[{#KEY}]',
+			'Type' => 'Simple check',
+			'Type of information' => 'Numeric (unsigned)',
+			'Units' => 'units',
+			'Update interval' => '33s',
+			'id:history' => '54d',
+			'id:trends' => '55d',
+			'Description' => 'description',
+			'Value mapping' => 'Template value mapping',
+			'Create enabled' => false,
+			'id:delay_flex_0_delay' => '50s',
+			'id:delay_flex_0_period' => '1-7,00:00-24:00'
+		]);
 		$form->getFieldContainer('Custom intervals')->query('button:Add')->waitUntilClickable()->one()->click();
 
 		$dialog->getFooter()->query('button:Add')->one()->click();
@@ -380,8 +396,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Discovery', 'Discovery');
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Item prototypes');
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule', true)
+				->query('link:Item prototypes')->one()->click();
 		$this->zbxTestAssertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
 		$this->zbxTestClickLinkTextWait('Test LLD item');
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -396,7 +412,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$overlay->asForm()->checkValue(['Value mapping' => 'Template value mapping']);
+		$overlay->asForm()->checkValue(['Value mapping' => $this->templateName.': Template value mapping']);
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
@@ -413,19 +429,23 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an trigger prototype
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()
-				->one()->click();
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+				->waitUntilVisible()->one()->click();
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
+				->query('link:Trigger prototypes')->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->zbxTestInputTypeByXpath("//input[@name='name']", 'Test LLD trigger');
-		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype[{#KEY}],#1)=0');
-		$this->zbxTestCheckboxSelect('type_1');
-		$this->zbxTestInputType('description', 'comments');
-		$this->zbxTestInputType('url', 'zabbix.php');
-		$this->zbxTestClickXpath("//label[@for='priority_2']");
-		$this->zbxTestCheckboxSelect('status', false);
+		$form = $dialog->asForm();
+
+		$form->fill([
+			'Name' => 'Test LLD trigger',
+			'Expression' => 'last(/Inheritance test template/item-discovery-prototype[{#KEY}],#1)=0',
+			'PROBLEM event generation mode' => 'Multiple',
+			'Description' => 'comments',
+			'Menu entry URL' => 'zabbix.php',
+			'Severity' => 'Warning',
+			'Create enabled' => false
+		]);
 
 		$dialog->getFooter()->query('button:Add')->one()->click();
 		$dialog->ensureNotPresent();
@@ -441,14 +461,14 @@ class testTemplateInheritance extends CLegacyWebTest {
 		// check that the inherited trigger prototype matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Discovery', 'Discovery');
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule', true)
+				->query('link:Trigger prototypes')->one()->click();
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkTextWait('Test LLD trigger');
 		COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
-		$getName = $this->zbxTestGetValue("//input[@name='name']");
+		$this->query('id:name')->waitUntilVisible()->one();
+		$getName = $this->zbxTestGetValue("//z-textarea-flexible[@name='name']");
 		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
@@ -470,9 +490,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Graph prototypes');
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+				->waitUntilVisible()->one()->click();
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
+				->query('link:Graph prototypes')->one()->click();
 		$this->zbxTestCheckHeader('Graph prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create graph prototype');
 
@@ -514,8 +535,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Discovery', 'Discovery');
-		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
-		$this->zbxTestClickLinkTextWait('Graph prototypes');
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule', true)
+				->query('link:Graph prototypes')->one()->click();
 
 		$this->zbxTestAssertElementText("//a[text()='Test LLD graph']/parent::td", "$this->templateName: Test LLD graph");
 		$this->zbxTestClickLinkTextWait('Test LLD graph');
@@ -548,11 +569,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenObjects($host, $column, $objects) {
 		$this->query('button:Reset')->one()->click();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', $host)->getColumn($column)->query('link', $objects)->one()->click();
 	}
 }

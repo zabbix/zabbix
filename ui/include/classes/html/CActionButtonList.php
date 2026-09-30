@@ -49,6 +49,8 @@ class CActionButtonList extends CObject {
 	 */
 	protected $selected_count_element = null;
 
+	protected bool $add_selected_count_element = true;
+
 	/**
 	 * @param string       $action_name			Name of submit buttons.
 	 * @param string       $checkboxes_name		Name of parameter into which checked checkboxes will be put in.
@@ -143,6 +145,12 @@ class CActionButtonList extends CObject {
 		}
 	}
 
+	public function setAddSelectedCountElement(bool $add_selected_count_element): self {
+		$this->add_selected_count_element = $add_selected_count_element;
+
+		return $this;
+	}
+
 	/**
 	 * Returns current element for showing how many checkboxes are selected. If currently no
 	 * element exists, constructs and returns default one.
@@ -170,7 +178,13 @@ class CActionButtonList extends CObject {
 		zbx_add_post_js('chkbxRange.pageGoName = '.json_encode($this->checkboxes_name).';');
 		zbx_add_post_js('chkbxRange.prefix = '.json_encode($this->name_prefix).';');
 
-		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $this->buttons]))
+		$items = [$this->buttons];
+
+		if ($this->add_selected_count_element) {
+			array_unshift($items, $this->getSelectedCountElement());
+		}
+
+		$this->items[] = (new CDiv($items))
 			->setId('action_buttons')
 			->addClass(ZBX_STYLE_ACTION_BUTTONS);
 

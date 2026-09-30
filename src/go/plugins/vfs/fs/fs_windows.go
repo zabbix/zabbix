@@ -15,6 +15,7 @@
 package vfsfs
 
 import (
+	"strings"
 	"syscall"
 
 	"golang.org/x/sys/windows"
@@ -146,13 +147,105 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	return
 }
 
-func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
+func matchMountpoint(path, mountpoint string) bool {
+	if mountpoint == "" {
+		return true
 	}
+
+	path = strings.TrimSuffix(path, `\`)
+	mountpoint = strings.TrimSuffix(mountpoint, `\`)
+
+	return strings.EqualFold(path, mountpoint)
+}
+
+func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
+	}
+
+	fsmap := make(map[string]*FsInfoNew, len(paths))
+
 	for _, path := range paths {
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
+
+		fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path)
+		if fsErr != nil {
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
+			continue
+		}
+
+		stats, fsErr := getFsStats(path)
+		if fsErr != nil {
+			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fsErr)
+			continue
+		}
+
+		fsmap[path] = &FsInfoNew{
+			FsName:     &fsname,
+			FsType:     &fstype,
+			DriveType:  &drivetype,
+			DriveLabel: &drivelabel,
+			Bytes:      stats,
+		}
+	}
+
+	paths, err = getMountPaths()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*FsInfoNew, 0, len(fsmap))
+	for _, path := range paths {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
+
+		if info, ok := fsmap[path]; ok {
+			data = append(data, info)
+		}
+	}
+
+	return data, nil
+}
+
+func (p *Plugin) getFsInfoShort(mountpoint string) ([]*FsInfoNew, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*FsInfoNew, 0)
+	for _, path := range paths {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
+		if fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path); fsErr == nil {
+			data = append(data, &FsInfoNew{
+				FsName:     &fsname,
+				FsType:     &fstype,
+				DriveType:  &drivetype,
+				DriveLabel: &drivelabel,
+			})
+		} else {
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
+		}
+	}
+
+	return data, nil
+}
+
+func (p *Plugin) getMountedFilesystems() ([]*FsInfo, error) {
+	paths, err := getMountPaths()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*FsInfo, 0, len(paths))
+	for _, path := range paths {
+		if fsname, fstype, drivetype, drivelabel, fsErr := getFsInfo(path); fsErr == nil {
 			data = append(data, &FsInfo{
 				FsName:     &fsname,
 				FsType:     &fstype,
@@ -160,46 +253,11 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 				DriveLabel: &drivelabel,
 			})
 		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fsErr)
 		}
 	}
-	return
-}
 
-func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
-	}
-	fsmap := make(map[string]*FsInfoNew)
-	for _, path := range paths {
-		var info FsInfoNew
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
-			info.FsName = &fsname
-			info.FsType = &fstype
-			info.DriveType = &drivetype
-			info.DriveLabel = &drivelabel
-		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
-			continue
-		}
-		if stats, fserr := getFsStats(path); err == nil {
-			info.Bytes = stats
-			fsmap[path] = &info
-		} else {
-			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fserr)
-			continue
-		}
-	}
-	if paths, err = getMountPaths(); err != nil {
-		return
-	}
-	for _, path := range paths {
-		if info, ok := fsmap[path]; ok {
-			data = append(data, info)
-		}
-	}
-	return
+	return data, nil
 }
 
 func getFsInode(string) (*FsStats, error) {

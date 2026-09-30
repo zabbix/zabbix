@@ -926,8 +926,7 @@ class CWidgetBase {
 	 * @returns {boolean}
 	 */
 	isUserInteracting() {
-		return this._target
-			.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+		return isUserInteracting(this._target);
 	}
 
 	/**
@@ -1664,7 +1663,7 @@ class CWidgetBase {
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
 			li_button.setAttribute('data-hintbox-ignore-position-change', '1');
-			li_button.setAttribute('data-hintbox-contents', info[i].hint);
+			li_button.setAttribute('data-hintbox-html', info[i].hint);
 			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
 
@@ -1793,7 +1792,9 @@ class CWidgetBase {
 		if (this._is_editable) {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
-			this._button_edit.title = t('Edit')
+			this._button_edit.setAttribute("data-hintbox", '1');
+			this._button_edit.setAttribute("data-hintbox-contents", t('Edit'));
+			this._button_edit.setAttribute('aria-label', t('Edit widget settings'));
 			this._button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, 'js-widget-edit');
 
 			const li = document.createElement('li');
@@ -1804,9 +1805,9 @@ class CWidgetBase {
 
 		this._button_actions = document.createElement('button');
 		this._button_actions.type = 'button';
-		this._button_actions.title = t('Actions');
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
+		this._button_actions.setAttribute('aria-label', t('Open widget actions'))
 		this._button_actions.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, 'js-widget-action');
 
 		const li = document.createElement('li');

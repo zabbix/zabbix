@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [8.0.0beta1])
+AC_INIT([Zabbix], [8.0.0rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -22,7 +22,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/zabbix_server/server.c])
 AC_CONFIG_HEADERS([include/common/config.h])
 
-AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include'])
+AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include -I$(top_srcdir)/src'])
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -385,6 +385,27 @@ dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+
+case "$host_os" in
+  aix*)
+    AC_MSG_CHECKING([for ODM libraries (-lodm -lcfg)])
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS -lodm -lcfg"
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [#include <odmi.h>
+         #include <sys/cfgodm.h>],
+        [odm_initialize();
+         odm_open_class(CuAt_CLASS);]
+      )],
+      [AC_MSG_RESULT([yes])
+       AC_DEFINE([HAVE_LIBODM], 1, [Define to 1 if you have the ODM libraries (-lodm -lcfg)])],
+      [AC_MSG_RESULT([no])
+       LIBS="$saved_LIBS"
+       AC_MSG_ERROR([ODM libraries (-lodm -lcfg) not found, ODM support will not be available])]
+    )
+    ;;
+esac
 
 dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
@@ -1933,6 +1954,8 @@ if test "x$want_ares" = "xyes"; then
 	fi
 	have_ares="yes"
 fi
+AM_CONDITIONAL(HAVE_ARES, [test "x$have_ares" = "xyes"])
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
 
@@ -2070,8 +2093,6 @@ if test "x$agent2" = "xyes"; then
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
-		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
@@ -2083,11 +2104,9 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libzbxagent2specsysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
-		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
+		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxagent2logfiles.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2182,6 +2201,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxbincommon/Makefile
+	src/libs/zbxcep_client/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
@@ -2223,6 +2243,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxmw/Makefile
 	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
@@ -2266,6 +2287,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxhttppoller/Makefile
+	src/libs/zbxtelemetry/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
@@ -2309,6 +2331,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/cachehistory/Makefile
+    src/zabbix_server/cep/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile

@@ -68,14 +68,17 @@ const char	*zbx_curl_content_type(CURL *easyhandle);
 
 int	zbx_curl_protocol(const char *protocol, char **error);
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
+int	zbx_curl_setopt_redir_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error);
 int	zbx_curl_has_ssl(char **error);
 int	zbx_curl_has_http_bearer(char **error);
 int	zbx_curl_has_oauth2_bearer(char **error);
 int	zbx_curl_has_smtp_auth(char **error);
-int	zbx_curl_good_for_elasticsearch(char **error);
 
 #endif /* HAVE_LIBCURL */
+
+void	zbx_curl_init(void);
+void	zbx_curl_cleanup(void);
 
 #endif /* ZABBIX_CURL_H */

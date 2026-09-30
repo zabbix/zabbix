@@ -18,6 +18,25 @@
 #include "zbxvariant.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
+
+typedef enum
+{
+	ZBX_VALUE_UNKNOWN,
+	ZBX_VALUE_NONE,
+	ZBX_VALUE_SECONDS,
+	ZBX_VALUE_NVALUES,
+	ZBX_VALUE_NODATA,
+}
+zbx_value_type_t;
+
+typedef struct
+{
+	int			value;
+	zbx_value_type_t	type;
+	int			timeshift;
+}
+zbx_history_selector_t;
 
 /* the item history value */
 typedef struct
@@ -28,6 +47,29 @@ typedef struct
 zbx_history_record_t;
 
 ZBX_VECTOR_DECL(history_record, zbx_history_record_t)
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		value_type;
+	zbx_history_value_t	value;
+	zbx_timespec_t		ts;
+	int			ttl;
+}
+zbx_history_entry_t;
+
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	int				index;
+	const zbx_history_selector_t	*selector;
+	zbx_vector_history_record_t	rows;
+}
+zbx_item_history_t;
+
+ZBX_VECTOR_DECL(item_history, zbx_item_history_t)
+#define ZBX_HISTORY_CHECK_TYPE_FLAGS(flags, value_type) \
+	(0 == (flags & (__UINT64_C(1) << value_type)) ? FAIL : SUCCEED)
 
 void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
@@ -46,20 +88,19 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
-		int config_log_slow_queries, char **error);
+		int config_history_storage_pipelines, char **providers, int config_log_slow_queries,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error);
+
 void	zbx_history_destroy(void);
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_history_value_t	value;
+	zbx_history_entry_t	entry;
 	zbx_uint64_t		lastlogsize;
-	zbx_timespec_t		ts;
 	int			mtime;
-	unsigned char		value_type;
 	unsigned char		flags;		/* see ZBX_DC_FLAG_* */
 	unsigned char		state;
-	int			ttl;		/* time-to-live of the history value */
 }
 zbx_dc_history_t;
 
@@ -67,18 +108,21 @@ ZBX_PTR_VECTOR_DECL(dc_history_ptr, zbx_dc_history_t *)
 
 void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history);
 
-int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
-		int config_history_storage_pipelines);
+int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
+void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start, int limit);
 
-int	zbx_history_requires_trends(int value_type);
-void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
-		const char *config_history_storage_url);
+zbx_uint64_t	zbx_history_get_precache_flags(void);
+zbx_uint64_t	zbx_history_get_trends_flags(void);
+zbx_uint64_t	zbx_history_get_housekeep_flags(void);
+zbx_uint64_t	zbx_history_get_default_type_flags(void);
 
-#define FLUSH_SUCCEED		0
-#define FLUSH_FAIL		-1
-#define FLUSH_DUPL_REJECTED	-2
+int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned char program_type);
+
+#define ZBX_HISTORY_FLUSH_SUCCEED		0
+#define ZBX_HISTORY_FLUSH_FAIL		-1
+#define ZBX_HISTORY_FLUSH_DUPL_REJECTED	-2
 
 #define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
 #define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
@@ -87,5 +131,13 @@ void	zbx_history_check_version(struct zbx_json *json, int *result, int config_al
 #define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
 #define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
 #define ZBX_DC_FLAG_HASTRIGGER	0x40	/* value is used in trigger expression */
+
+void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
+int	zbx_history_get_flush_error(zbx_uint64_t error_mask, unsigned char value_type);
+
+int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2);
+int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2);
+
+int	zbx_history_value_type_from_str(const char *value_type_str);
 
 #endif

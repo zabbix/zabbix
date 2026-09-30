@@ -345,6 +345,7 @@ window.action_edit_popup = new class {
 				case <?= ZBX_CONDITION_TYPE_DRULE ?>:
 				case <?= ZBX_CONDITION_TYPE_DCHECK ?>:
 				case <?= ZBX_CONDITION_TYPE_PROXY ?>:
+				case <?= ZBX_CONDITION_TYPE_PROXY_GROUP ?>:
 				case <?= ZBX_CONDITION_TYPE_DOBJECT ?>:
 				case <?= ZBX_CONDITION_TYPE_HOST_NAME ?>:
 				case <?= ZBX_CONDITION_TYPE_EVENT_TYPE ?>:

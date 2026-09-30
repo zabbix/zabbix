@@ -148,7 +148,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows(this.parent_discoveryid, response.keepids ?? []);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -157,7 +157,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows(this.parent_discoveryid);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 					}
 
 					location.href = location.href;
@@ -183,9 +183,14 @@
 				callback: ({data, event}) => {
 					uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 
-					if (data.submit.success?.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
+					if (data.submit?.redirect_url) {
+						const url = new URL(data.submit.redirect_url, location.href);
+						event.setRedirectUrl(url.href);
+					}
+					else if (data.submit.success?.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
 
+						url.searchParams.set('action', 'lldrule.list');
 						url.searchParams.set('context', this.context);
 
 						event.setRedirectUrl(url.href);

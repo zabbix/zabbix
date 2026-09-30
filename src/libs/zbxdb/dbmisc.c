@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #if defined(HAVE_POSTGRESQL)
 #	include "zbx_dbversion_constants.h"
+#	include "zbxip.h"
 #endif
 
 ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
@@ -33,7 +34,7 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
 					"escalations", "autoreg_host", "event_suppress", "trigger_queue",
 					"proxy_history", "proxy_dhistory", "proxy_autoreg_host", "host_proxy",
-					"lld_macro_export"
+					"lld_macro_export", "cep_window"
 };
 
 #define ZBX_IDS_SIZE	ARRSIZE(idcache_tables)
@@ -324,6 +325,44 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: retrieve and reserve a range of cached ids for a table            *
+ *                                                                            *
+ * Parameters: tablename - [IN] name of the table to get ids for              *
+ *             num       - [IN] number of ids to reserve                      *
+ *                                                                            *
+ * Return value: first id of the reserved range, 0 if the table is not        *
+ *               cached or has not yet had an id cached for it                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num)
+{
+	const char	**ptr;
+	size_t		index;
+	zbx_uint64_t	nextid = 0;
+
+	if (NULL == (ptr = (const char **)bsearch(&tablename, idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]),
+			compare_table_names)))
+	{
+		return 0;
+	}
+
+	index = (size_t)(ptr - idcache_tables);
+
+	zbx_mutex_lock(idcache_mutex);
+
+	if (0 != idcache->lastids[index])
+	{
+		nextid = idcache->lastids[index] + 1;
+		idcache->lastids[index] += (zbx_uint64_t)num;
+	}
+
+	zbx_mutex_unlock(idcache_mutex);
+
+	return nextid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get next id for requested table                                   *
  *                                                                            *
  ******************************************************************************/
@@ -394,11 +433,12 @@ int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Comments: sync changes with 'db_get_escape_string_len'                     *
- *           and 'zbx_db_dyn_escape_string'                                   *
+ * Comments: sync changes with 'dbconn_get_escape_string_len'                 *
+ *           and 'zbx_dbconn_dyn_escape_string'                               *
  *                                                                            *
  ******************************************************************************/
-static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_sequence_t flag)
+static void	dbconn_escape_string(const zbx_dbconn_t *db, const char *src, char *dst, size_t len,
+		zbx_escape_sequence_t flag)
 {
 	const char	*s;
 	char		*d;
@@ -409,7 +449,7 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
 
 	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == db_is_escape_sequence(*s))
+		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == dbconn_is_escape_sequence(db, *s))
 		{
 			if (2 > len)
 				break;
@@ -434,7 +474,8 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
  * Purpose: to calculate escaped string length limited by bytes or characters *
  *          whichever is reached first.                                       *
  *                                                                            *
- * Parameters: s         - [IN] string to escape                              *
+ * Parameters: db        - [IN] database connection                           *
+ *             s         - [IN] string to escape                              *
  *             max_bytes - [IN] limit in bytes                                *
  *             max_chars - [IN] limit in characters                           *
  *             flag      - [IN] sequences need to be escaped on/off           *
@@ -443,7 +484,7 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
  *               with terminating '\0'                                        *
  *                                                                            *
  ******************************************************************************/
-static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t max_chars,
+static size_t	dbconn_get_escape_string_len(const zbx_dbconn_t *db, const char *s, size_t max_bytes, size_t max_chars,
 		zbx_escape_sequence_t flag)
 {
 	size_t	csize, len = 1;	/* '\0' */
@@ -462,7 +503,7 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
 		if (max_bytes < csize)
 			break;
 
-		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == db_is_escape_sequence(*s))
+		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == dbconn_is_escape_sequence(db, *s))
 			len++;
 
 		s += csize;
@@ -479,7 +520,8 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
  * Purpose: to escape string limited by bytes or characters, whichever limit  *
  *          is reached first.                                                 *
  *                                                                            *
- * Parameters: src       - [IN] string to escape                              *
+ * Parameters: db        - [IN] database connection                           *
+ *             src       - [IN] string to escape                              *
  *             max_bytes - [IN] limit in bytes                                *
  *             max_chars - [IN] limit in characters                           *
  *             flag      - [IN] sequences need to be escaped on/off           *
@@ -487,43 +529,45 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
  * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
-char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag)
+char	*dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src, size_t max_bytes, size_t max_chars,
+		zbx_escape_sequence_t flag)
 {
 	char	*dst = NULL;
 	size_t	len;
 
-	len = db_get_escape_string_len(src, max_bytes, max_chars, flag);
+	len = dbconn_get_escape_string_len(db, src, max_bytes, max_chars, flag);
 
 	dst = (char *)zbx_malloc(dst, len);
 
-	db_escape_string(src, dst, len, flag);
+	dbconn_escape_string(db, src, dst, len, flag);
 
 	return dst;
 }
 
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
+char	*zbx_dbconn_dyn_escape_string_len(const zbx_dbconn_t *db, const char *src, size_t length)
 {
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
 }
 
-char	*zbx_db_dyn_escape_string(const char *src)
+char	*zbx_dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src)
 {
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
  *                                                                            *
  * Return value: return length of escaped LIKE pattern with terminating '\0'  *
  *                                                                            *
- * Comments: sync changes with 'db_escape_like_pattern'                       *
+ * Comments: sync changes with 'dbconn_escape_like_pattern'                       *
  *                                                                            *
  ******************************************************************************/
-static size_t	db_get_escape_like_pattern_len(const char *src)
+static size_t	dbconn_get_escape_like_pattern_len(const zbx_dbconn_t *db, const char *src)
 {
 	size_t		len;
 	const char	*s;
 
-	len = db_get_escape_string_len(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON) - 1; /* minus '\0' */
+	/* minus '\0' */
+	len = dbconn_get_escape_string_len(db, src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON) - 1;
 
 	for (s = src; s && *s; s++)
 	{
@@ -559,7 +603,7 @@ static size_t	db_get_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
+static void	dbconn_escape_like_pattern(const zbx_dbconn_t *db, const char *src, char *dst, size_t len)
 {
 	char		*d;
 	char		*tmp = NULL;
@@ -569,7 +613,7 @@ static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
 
 	tmp = (char *)zbx_malloc(tmp, len);
 
-	db_escape_string(src, tmp, len, ESCAPE_SEQUENCE_ON);
+	dbconn_escape_string(db, src, tmp, len, ESCAPE_SEQUENCE_ON);
 
 	len--; /* '\0' */
 
@@ -596,16 +640,16 @@ static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_db_dyn_escape_like_pattern(const char *src)
+char	*zbx_dbconn_dyn_escape_like_pattern(const zbx_dbconn_t *db, const char *src)
 {
 	size_t	len;
 	char	*dst = NULL;
 
-	len = db_get_escape_like_pattern_len(src);
+	len = dbconn_get_escape_like_pattern_len(db, src);
 
 	dst = (char *)zbx_malloc(dst, len);
 
-	db_escape_like_pattern(src, dst, len);
+	dbconn_escape_like_pattern(db, src, dst, len);
 
 	return dst;
 }
@@ -728,16 +772,18 @@ int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, con
 	return SUCCEED;
 }
 
-char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag)
+char	*dbconn_dyn_escape_field_len(const zbx_dbconn_t *db, const zbx_db_field_t *field, const char *src,
+		zbx_escape_sequence_t flag)
 {
 #if defined(HAVE_MYSQL)
-	return db_dyn_escape_string(src, get_string_field_size(field), get_string_field_chars(field), flag);
+	return dbconn_dyn_escape_string(db, src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src)
+char	*zbx_dbconn_dyn_escape_field(const zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *src)
 {
 	const zbx_db_table_t	*table;
 	const zbx_db_field_t	*field;
@@ -748,7 +794,7 @@ char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, co
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	return db_dyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_field_len(db, field, src, ESCAPE_SEQUENCE_ON);
 }
 
 int	zbx_db_is_null(const char *field)
@@ -772,6 +818,9 @@ zbx_db_config_t	*zbx_db_config_create(void)
 void	zbx_db_config_free(zbx_db_config_t *config)
 {
 	zbx_free(config->dbhost);
+#if defined(HAVE_POSTGRESQL)
+	zbx_free(config->dbports);
+#endif
 	zbx_free(config->dbname);
 	zbx_free(config->dbschema);
 	zbx_free(config->dbuser);
@@ -835,6 +884,85 @@ int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char progr
 	return 0 != err ? FAIL : SUCCEED;
 }
 
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse and validate database host configuration for PostgreSQL     *
+ *                                                                            *
+ * Parameters: config - [IN/OUT] database configuration                       *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - host string is valid or empty                      *
+ *               FAIL - host string contains invalid address or port          *
+ *                                                                            *
+ * Comments: This function handles multiple comma-separated addresses for     *
+ *           PostgreSQL. It extracts ports from the addresses and updates     *
+ *           the config->dbports and config->dbhost fields.                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
+{
+
+	char		*start, *result = NULL;
+	size_t		result_alloc = 0, result_offset = 0;
+	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
+
+	if ('\0' == *config->dbhost)
+		return SUCCEED;
+
+	if (NULL == strchr(config->dbhost, ',') && NULL == strchr(config->dbhost, ':'))
+	{
+		if (0 != config->dbport)
+			config->dbports = zbx_strdcatf(NULL, "%u", config->dbport);
+
+		return SUCCEED;
+	}
+
+	for (start = config->dbhost; '\0' != *start;)
+	{
+		char		*parsed_ip = NULL, *end;
+		unsigned short	parsed_port;
+
+		if (NULL != (end = strchr(start, ',')))
+			*end = '\0';
+
+		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
+		{
+			*error = zbx_dsprintf(NULL, "error parsing the \"DBHost\" parameter: address \"%s\" is "
+					"invalid", start);
+
+			zbx_free(result);
+			zbx_free(config->dbports);
+
+			return FAIL;
+		}
+
+		if (NULL != config->dbports)
+			config->dbports = zbx_strdcatf(config->dbports, ",%u", parsed_port);
+		else
+			config->dbports = zbx_strdcatf(NULL, "%u", parsed_port);
+
+		if (NULL != result)
+			zbx_strcpy_alloc(&result, &result_alloc, &result_offset, ",");
+
+		zbx_strcpy_alloc(&result, &result_alloc, &result_offset, parsed_ip);
+
+		zbx_free(parsed_ip);
+
+		if (NULL != end)
+			start = end + 1;
+		else
+			break;
+	}
+
+	zbx_free(config->dbhost);
+	config->dbhost = result;
+
+	return SUCCEED;
+}
+
+#endif
+
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	check_cfg_empty_str(const char *parameter, const char *value)
 {
@@ -852,6 +980,16 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
  ******************************************************************************/
 void	zbx_db_config_validate(zbx_db_config_t *config)
 {
+#ifdef HAVE_POSTGRESQL
+	char *error = NULL;
+
+	if (SUCCEED != zbx_dbconn_parse_and_validate_dbhost(config, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	check_cfg_empty_str("DBTLSConnect", config->db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config->db_tls_cert_file);
 	check_cfg_empty_str("DBTLSKeyFile", config->db_tls_key_file);
@@ -1165,10 +1303,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: locks a records in a table by field name                          *
+ * Purpose: locks a records in a table by field name using index hint         *
  *                                                                            *
- * Parameters: table      - [IN] the target table                             *
- *             field_name - [IN] field name                                   *
+ * Parameters: db         - [IN] database connection                          *
+ *             table      - [IN] target table name                            *
+ *             field_name - [IN]                                              *
+ *             index_hint - [IN] index hint for MYSQL, "" if not used         *
  *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
  *                                   OUT - resulting array of locked IDs      *
  *                                                                            *
@@ -1177,7 +1317,8 @@ out:
  *               FAIL    - no records were locked                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+static int	dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *index_hint, zbx_vector_uint64_t *ids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1189,7 +1330,8 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 	if (0 == ids->values_num)
 		return FAIL;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s%s where", field_name, table_name,
+			index_hint);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
 	result = zbx_dbconn_select(db, "%s", sql);
@@ -1208,6 +1350,51 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 		zbx_vector_uint64_remove_noorder(ids, i);
 
 	return (0 != ids->values_num ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locks a records in a table by field name                          *
+ *                                                                            *
+ * Parameters: db        - [IN] database connection                           *
+ *             table      - [IN] the target table                             *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	return dbconn_lock_ids(db, table_name, field_name, "", ids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lock records in a table by field name using the primary key       *
+ *                                                                            *
+ * Parameters: db         - [IN] database connection                          *
+ *             table_name - [IN] target table                                 *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ * Comments: The primary key index is forced only for MySQL, where the query  *
+ *           optimizer may otherwise skip the index entirely and end up       *
+ *           locking more rows than intended.                                 *
+ *                                                                            *
+ *****************************************************************************/
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids)
+{
+	return dbconn_lock_ids(db, table_name, field_name, ZBX_SQL_FORCE_PK, ids);
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1340,7 +1527,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
  *          it is designed for generating WHERE conditions for strings. Hence,   *
  *          this function is simpler, because only IN condition is possible.     *
  *                                                                               *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction           *
+ * Parameters: db         - [IN] database connection                             *
+ *             sql        - [IN/OUT] buffer for SQL query construction           *
  *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                    *
  *             sql_offset - [IN/OUT] current position in the 'sql' buffer        *
  *             fieldname  - [IN] field name to be used in SQL WHERE condition    *
@@ -1349,8 +1537,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
  *                                                                               *
  *                                                                               *
  *********************************************************************************/
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num)
+void	zbx_dbconn_add_str_condition_alloc(const zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *fieldname, const char * const *values, const int num)
 {
 #if defined(HAVE_SQLITE3)
 #define MAX_EXPRESSIONS	950
@@ -1398,7 +1586,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			if ('\0' == *values[i])
 				continue;
 
-			value_esc = zbx_db_dyn_escape_string(values[i]);
+			value_esc = zbx_dbconn_dyn_escape_string(db, values[i]);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
 			zbx_free(value_esc);
 		}
@@ -1426,7 +1614,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		}
 		cnt++;
 #endif
-		value_esc = zbx_db_dyn_escape_string(values[i]);
+		value_esc = zbx_dbconn_dyn_escape_string(db, values[i]);
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");

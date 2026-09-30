@@ -29,7 +29,7 @@ zabbix_export:
         Test availability: `zabbix_get -s docker-host -k docker.info`
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1130,7 +1130,7 @@ zabbix_export:
               key: 'docker.container_info["{#NAME}",full]'
               history: '0'
               value_type: CHAR
-              description: 'Return low-level information about a container.'
+              description: 'Returns low-level information about a container.'
               tags:
                 - tag: component
                   value: raw
@@ -1333,11 +1333,43 @@ zabbix_export:
                   value: memory
                 - tag: container
                   value: '{#NAME}'
-            - uuid: 6f39422b278b4a4398bfbd993f247fd0
-              name: 'Container {#NAME}: Memory usage'
-              type: DEPENDENT
-              key: 'docker.container_stats.memory.usage["{#NAME}"]'
+            - uuid: 70c03e3f3a1840eea8e2256e93abd3f8
+              name: 'Container {#NAME}: Memory usage active'
+              type: CALCULATED
+              key: 'docker.container_stats.memory.usage_active["{#NAME}"]'
+              value_type: FLOAT
               units: B
+              params: 'last(//docker.container_stats.memory.usage_total["{#NAME}"]) - last(//docker.container_stats.memory.usage_inactive["{#NAME}"])'
+              description: 'Calculates the active memory usage of the container.'
+              tags:
+                - tag: component
+                  value: memory
+                - tag: container
+                  value: '{#NAME}'
+            - uuid: ae89e231a2484859a6266decdbefd756
+              name: 'Container {#NAME}: Memory usage inactive'
+              type: DEPENDENT
+              key: 'docker.container_stats.memory.usage_inactive["{#NAME}"]'
+              value_type: FLOAT
+              units: B
+              description: 'Gets the inactive memory usage of the container.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.memory_stats.stats.inactive_file
+              master_item:
+                key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                - tag: component
+                  value: memory
+                - tag: container
+                  value: '{#NAME}'
+            - uuid: 6f39422b278b4a4398bfbd993f247fd0
+              name: 'Container {#NAME}: Memory usage total'
+              type: DEPENDENT
+              key: 'docker.container_stats.memory.usage_total["{#NAME}"]'
+              units: B
+              description: 'Gets the total memory usage (inactive, active) from the container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1385,7 +1417,7 @@ zabbix_export:
               key: 'docker.container_stats["{#NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Get container stats based on resource usage.'
+              description: 'Gets container stats based on resource usage.'
               tags:
                 - tag: component
                   value: raw
@@ -1581,7 +1613,7 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'Docker by Zabbix agent 2'
-                    key: 'docker.container_stats.memory.usage["{#NAME}"]'
+                    key: 'docker.container_stats.memory.usage_total["{#NAME}"]'
                 - sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: F63100

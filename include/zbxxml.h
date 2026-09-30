@@ -21,8 +21,6 @@
 #	include <libxml/tree.h>
 #endif
 
-int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	zbx_xml_free_data_dyn(char **data);
 char	*zbx_xml_escape_dyn(const char *data);
 void	zbx_xml_escape_xpath(char **data);
 
@@ -53,6 +51,7 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 xmlNode	*zbx_xml_node_get(xmlDoc *xdoc, xmlNode *node, const char *xpath);
 xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath);
 int	zbx_xml_node_remove(xmlDoc *xdoc, xmlNode *node, const char *xpath);
+void	zbx_xml_node_dump(xmlNode *node, int log_level);
 #endif /* HAVE_LIBXML2 && HAVE_LIBCURL */
 
 typedef int (*zbx_xml_resolv_func_t)(char **data, char *error, size_t maxerrlen, va_list args);

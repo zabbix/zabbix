@@ -1,0 +1,312 @@
+---
+test case: same names same values
+in:
+  names_src:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  values_src:
+  - "1"
+  - "2"
+  - "3"
+  names_dst:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  values_dst:
+  - "1"
+  - "2"
+  - "3"
+out:
+  result: SUCCEED
+  exp_names:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  exp_values:
+  - "1"
+  - "2"
+  - "3"
+---
+test case: same names diff values
+in:
+  names_src:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  values_src:
+  - "1"
+  - "2"
+  - "3"
+  names_dst:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  values_dst:
+  - "3"
+  - "4"
+  - "5"
+out:
+  result: SUCCEED
+  exp_names:
+  - "Name1"
+  - "Name2"
+  - "Name3"
+  exp_values:
+  - "1"
+  - "2"
+  - "3"
+---
+test case: diff numbers of parameters src < dst
+in:
+  names_src:
+  - "Name1"
+  values_src:
+  - "1"
+  names_dst:
+  - "Name2"
+  - "Name3"
+  values_dst:
+  - "3"
+  - "4"
+out:
+  result: SUCCEED
+  exp_names:
+  - "Name1"
+  - "Name3"
+  exp_values:
+  - "1"
+  - "4"
+---
+test case: diff numbers of parameters src > dst
+in:
+  names_src:
+  - "Name1"
+  - "Name2"
+  values_src:
+  - "1"
+  - "3"
+  names_dst:
+  - "Name3"
+  values_dst:
+  - "4"
+out:
+  result: SUCCEED
+  exp_names:
+  - "Name1"
+  - "Name2"
+  exp_values:
+  - "1"
+  - "3"
+---
+test case: diff dst and src
+in:
+  names_src:
+  - "Name1"
+  - "Name2"
+  values_src:
+  - "11"
+  - "21"
+  names_dst:
+  - "Name3"
+  - "Name4"
+  values_dst:
+  - "1"
+  - "21"
+out:
+  result: SUCCEED
+  exp_names:
+  - "Name1"
+  - "Name2"
+  exp_values:
+  - "11"
+  - "21"
+---
+test case: duplicates in src
+in:
+  names_src:
+  - "Name1"
+  - "Name1"
+  values_src:
+  - "11"
+  - "11"
+  names_dst:
+  - "Name3"
+  - "Name4"
+  values_dst:
+  - "1"
+  - "21"
+out:
+  error_msg: |
+    Cannot create Name1 item parameter: "11" already exists.
+  result: FAIL
+---
+test case: same names same values, but first name too long
+in:
+  names_src:
+  - "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - "Name2"
+  - "Name3"
+  values_src:
+  - "1"
+  - "2"
+  - "3"
+  names_dst:
+  - "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - "Name2"
+  - "Name3"
+  values_dst:
+  - "1"
+  - "2"
+  - "3"
+out:
+  error_msg: |
+    Cannot create item parameter: name "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." is too long.
+  result: FAIL
+---
+test case: empty name
+in:
+  names_src:
+  - ""
+  values_src:
+  - "1"
+  names_dst:
+  - "Name1"
+  values_dst:
+  - "1"
+out:
+  error_msg: |
+    Cannot create item parameter: empty item parameter name.
+  result: FAIL
+---
+test case: some ASCII and emojis
+in:
+  names_src:
+  - "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  values_src:
+  - "😊😊😊😊😊😊"
+  names_dst:
+  - "😊😊😊😊😊😊"
+  values_dst:
+  - "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  result: SUCCEED
+  exp_names:
+  - "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  exp_values:
+  - "😊😊😊😊😊😊"
+---
+test case: same names same values bin
+in:
+  used_buffer: yes
+  src_name_buf_length: 6
+  src_name_buf:
+    - '\x6E\x61\x6D\x65\x31\x00' # name1
+  src_value_buf_length: 2
+  src_value_buf:
+    - '\x31\x00' # 1
+  dst_name_buf_length: 6
+  dst_name_buf:
+    - '\x6E\x61\x6D\x65\x31\x00' # name1
+  dst_value_buf_length: 2
+  dst_value_buf:
+    - '\x31\x00' # 1
+out:
+  result: SUCCEED
+  exp_names:
+  - "name1"
+  exp_values:
+  - "1"
+---
+test case: diff names diff values bin
+in:
+  used_buffer: yes
+  src_name_buf_length: 6
+  src_name_buf:
+    - '\x6E\x61\x6D\x65\x31\x00' # name1
+  src_value_buf_length: 2
+  src_value_buf:
+    - '\x31\x00' # 1
+  dst_name_buf_length: 6
+  dst_name_buf:
+    - '\x6E\x61\x6D\x65\x32\x00' # name2
+  dst_value_buf_length: 2
+  dst_value_buf:
+    - '\x32\x00' # 2
+out:
+  result: SUCCEED
+  exp_names:
+  - "name1"
+  exp_values:
+  - "1"
+---
+test case: broken utf8
+in:
+  used_buffer: yes
+  src_name_buf_length: 5
+  src_name_buf:
+    - '\xF4\x90\x80\x80\x00' # name2
+  src_value_buf_length: 2
+  src_value_buf:
+    - '\x31\x00' # 1
+  dst_name_buf_length: 6
+  dst_name_buf:
+    - '\x6E\x61\x6D\x65\x32\x00' # name2
+  dst_value_buf_length: 2
+  dst_value_buf:
+    - '\x32\x00' # 2
+out:
+  error_msg: |
+    Cannot create item parameter: name "?" has invalid UTF-8 sequence.
+  result: FAIL
+---
+test case: broken utf8 rollback name
+in:
+  used_buffer: yes
+  src_name_buf_length: 5
+  src_name_buf:
+    - '\xF4\x90\x80\x80\x00' # broken utf8
+  src_value_buf_length: 2
+  src_value_buf:
+    - '\x31\x00' # 1
+  dst_name_buf_length: 6
+  dst_name_buf:
+    - '\x6E\x61\x6D\x65\x32\x00' # name2
+  dst_value_buf_length: 2
+  dst_value_buf:
+    - '\x32\x00' # 2
+  rollback: yes
+out:
+  error_msg: |
+    Cannot update item parameter: name "?" has invalid UTF-8 sequence.
+  result: FAIL
+  exp_names:
+  - "name2"
+  exp_values:
+  - "2"
+---
+test case: broken utf8 rollback value
+in:
+  used_buffer: yes
+  src_name_buf_length: 6
+  src_name_buf:
+    - '\x6E\x61\x6D\x65\x31\x00' # name1
+  src_value_buf_length: 5
+  src_value_buf:
+    - '\xF4\x90\x80\x80\x00' # broken utf8
+  dst_name_buf_length: 6
+  dst_name_buf:
+    - '\x6E\x61\x6D\x65\x33\x00' # name3
+  dst_value_buf_length: 2
+  dst_value_buf:
+    - '\x35\x00' # 5
+  rollback: yes
+out:
+  error_msg: |
+    Cannot update item parameter: value "?" has invalid UTF-8 sequence.
+  result: FAIL
+  exp_names:
+  - "name3"
+  exp_values:
+  - "5"
+...

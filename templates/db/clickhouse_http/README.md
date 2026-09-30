@@ -46,19 +46,19 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CLICKHOUSE.USER}||`zabbix`|
-|{$CLICKHOUSE.PASSWORD}||`zabbix_pass`|
-|{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression</p>|`5`|
+|{$CLICKHOUSE.USER}|<p>ClickHouse username.</p>|`zabbix`|
+|{$CLICKHOUSE.PASSWORD}|<p>ClickHouse password.</p>|`zabbix_pass`|
+|{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression.</p>|`5`|
 |{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>||
-|{$CLICKHOUSE.PORT}|<p>The port of ClickHouse HTTP endpoint</p>|`8123`|
-|{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
-|{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
-|{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases</p>|`CHANGE_IF_NEEDED`|
-|{$CLICKHOUSE.LLD.FILTER.DICT.MATCHES}|<p>Filter of discoverable dictionaries</p>|`.*`|
-|{$CLICKHOUSE.LLD.FILTER.DICT.NOT_MATCHES}|<p>Filter to exclude discovered dictionaries</p>|`CHANGE_IF_NEEDED`|
-|{$CLICKHOUSE.LLD.FILTER.TABLE.MATCHES}|<p>Filter of discoverable tables</p>|`.*`|
-|{$CLICKHOUSE.LLD.FILTER.TABLE.NOT_MATCHES}|<p>Filter to exclude discovered tables</p>|`CHANGE_IF_NEEDED`|
-|{$CLICKHOUSE.QUERY_TIME.MAX.WARN}|<p>Maximum ClickHouse query time in seconds for trigger expression</p>|`600`|
+|{$CLICKHOUSE.PORT}|<p>ClickHouse HTTP port.</p>|`8123`|
+|{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https.</p>|`http`|
+|{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases.</p>|`.*`|
+|{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases.</p>|`CHANGE_IF_NEEDED`|
+|{$CLICKHOUSE.LLD.FILTER.DICT.MATCHES}|<p>Filter of discoverable dictionaries.</p>|`.*`|
+|{$CLICKHOUSE.LLD.FILTER.DICT.NOT_MATCHES}|<p>Filter to exclude discovered dictionaries.</p>|`CHANGE_IF_NEEDED`|
+|{$CLICKHOUSE.LLD.FILTER.TABLE.MATCHES}|<p>Filter of discoverable tables.</p>|`.*`|
+|{$CLICKHOUSE.LLD.FILTER.TABLE.NOT_MATCHES}|<p>Filter to exclude discovered tables.</p>|`CHANGE_IF_NEEDED`|
+|{$CLICKHOUSE.QUERY_TIME.MAX.WARN}|<p>Maximum ClickHouse query time in seconds for trigger expression.</p>|`600`|
 |{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN}|<p>Maximum size of the queue for operations waiting to be performed for trigger expression.</p>|`20`|
 |{$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}|<p>Maximum diff between log_pointer and log_max_index.</p>|`30`|
 |{$CLICKHOUSE.REPLICA.MAX.WARN}|<p>Replication lag across all tables for trigger expression.</p>|`600`|

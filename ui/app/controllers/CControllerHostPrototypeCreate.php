@@ -83,9 +83,22 @@ class CControllerHostPrototypeCreate extends CController {
 						],
 						['db interface.dns', 'required', 'not_empty', 'when' => ['useip', 'in' => [INTERFACE_USE_DNS]]]
 					],
-					'port' => ['db interface.port', 'required', 'not_empty',
-						'use' => [CPortParser::class, ['usermacros' => true]],
-						'messages' => ['use' => _('Incorrect port.')]
+					'port' => [
+						['db interface.port'],
+						['db interface.port', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
+								'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER
+							]]
+						],
+						['db interface.port', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
+								'min' => ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER,
+								'max' => ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER
+							]],
+							'when' => ['type', 'in' => [INTERFACE_TYPE_AGENT]]
+						]
 					],
 					'details' => ['object', 'fields' => [
 						'version' => ['db interface_snmp.version', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
@@ -95,9 +108,19 @@ class CControllerHostPrototypeCreate extends CController {
 						'community' => ['db interface_snmp.community', 'required', 'not_empty', 'when' => [
 							'version', 'in' => [SNMP_V1, SNMP_V2C]
 						]],
-						'max_repetitions' => ['db interface_snmp.max_repetitions', 'in 1:'.ZBX_MAX_INT32, 'when' => [
-							'version', 'in' => [SNMP_V2C, SNMP_V3]
-						]],
+						'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]],
+							'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
+						],
+						'retries' => ['db interface_snmp.retries', 'required', 'not_empty',
+							'use' => [CNumberValidator::class, [
+								'usermacros' => true, 'lldmacros' => true, 'with_float' => false,
+								'min' => SNMP_RETRIES_MIN, 'max' => SNMP_RETRIES_MAX
+							]]
+						],
 						'contextname' => ['db interface_snmp.contextname', 'when' => ['version', 'in' => [SNMP_V3]]],
 						'securityname' => ['db interface_snmp.securityname', 'when' => ['version', 'in' => [SNMP_V3]]],
 						'securitylevel' => [
@@ -190,7 +213,7 @@ class CControllerHostPrototypeCreate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();

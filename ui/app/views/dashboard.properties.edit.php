@@ -56,8 +56,9 @@ if (!$data['dashboard']['template']) {
 }
 
 $form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-	(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
+	(new CTextAreaFlexible('name', $data['dashboard']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('dashboard', 'name'))
 		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );
@@ -71,9 +72,9 @@ foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
 	$display_period_select->addOption(new CSelectOption($period, secondsToPeriod($period)));
 }
 
-$form_list->addRow(new CLabel(_('Default page display period'), 'display_period'), $display_period_select);
+$form_list->addRow(new CLabel(_('Default slideshow interval'), 'display_period'), $display_period_select);
 
-$form_list->addRow(new CLabel(_('Start slideshow automatically'), 'auto_start'),
+$form_list->addRow(new CLabel(_('Start slideshow'), 'auto_start'),
 	(new CCheckBox('auto_start'))->setChecked($data['dashboard']['auto_start'] == 1)
 );
 

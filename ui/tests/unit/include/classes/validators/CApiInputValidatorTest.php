@@ -847,6 +847,138 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
 			],
 			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'length' => 5],
+				'{$MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,60:900'],
+				'{$MACRO}',
+				'/1/int',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_USER_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				123,
+				'/1/int',
+				'123'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				2147483647,
+				'/1/int',
+				'2147483647'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 4],
+				99999,
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 10],
+				9999999999,
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'length' => 5],
+				'{#MACRO}',
+				'/1/int',
+				'Invalid parameter "/1/int": value is too long.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MALformed}',
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				'{#MACRO}',
+				'/1/int',
+				'{#MACRO}'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_LLD_MACRO, 'in' => '0,60:900'],
+				901,
+				'/1/int',
+				'Invalid parameter "/1/int": value must be one of 0, 60-900.'
+			],
+			[
+				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_ALLOW_LLD_MACRO, 'in' => '0,60:900', 'length' => 5],
+				null,
+				'/1/int',
+				null
+			],
+			[
 				['type' => API_INTS32],
 				[0, 1],
 				'/output',
@@ -1679,6 +1811,18 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				[0, []],
 				'/output',
 				'Invalid parameter "/output/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOATS, 'in' => '1.5:3.0'],
+				[1.5, 2.7],
+				'/output',
+				[1.5, 2.7]
+			],
+			[
+				['type' => API_FLOATS, 'in' => '1.5:3.0'],
+				[1.5, '2.7', 3.1],
+				'/output',
+				'Invalid parameter "/output/3": value must be within the range of 1.5-3.0.'
 			],
 			[
 				['type' => API_ID],
@@ -4639,9 +4783,15 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_URL],
-				'javascript:alert()',
+				'//',
 				'/1/url',
 				'Invalid parameter "/1/url": unacceptable URL.'
+			],
+			[
+				['type' => API_URL],
+				'javascript:alert()',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			[
 				['type' => API_URL],
@@ -4662,6 +4812,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'javascript:{$URL}'
 			],
 			[
+				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
+				'javascript:{$URL}',
+				'/1/url',
+				'javascript:{$URL}'
+			],
+			[
 				['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO],
 				'text{EVENT.TAGS."JIRAID"}text',
 				'/1/url',
@@ -4672,6 +4828,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'text{MANUALINPUT}text',
 				'/1/url',
 				'text{MANUALINPUT}text'
+			],
+			[
+				['type' => API_URL],
+				'invalid://user@host:8080',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
+			],
+			[
+				['type' => API_URL],
+				'http://www.zabbix.com',
+				'/1/url',
+				'http://www.zabbix.com'
+			],
+			[
+				['type' => API_URL],
+				'zabbix.php',
+				'/1/url',
+				'zabbix.php'
 			],
 			[
 				['type' => API_IP],
@@ -5656,6 +5830,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/uuid": UUIDv4 is expected.'
 			],
 			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78'
+			],
+			[
+				['type' => API_UUID_V7],
+				null,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				true,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				1,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				[],
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": cannot be empty.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'23',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234567890123456789012345678901234567890',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'123456789012345678901234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234-1234-1234-1234-1234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'12345678-1234-1234-1234-123456789012',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-xf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-0c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-cf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
 				['type' => API_CUIDS],
 				[],
 				'/',
@@ -6149,7 +6407,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
 				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
 				'/',
-				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+				['type' => ['3'], 'value' => ['1', '2', '3', '4', '1']]
 			],
 			[
 				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
@@ -6162,6 +6420,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
 				'/',
 				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				null,
+				'/',
+				null
 			],
 			[
 				['type' => API_VALUE],
@@ -8861,6 +9125,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				str_repeat('abc123 ', 1429),
 				'/1/sp_private_key',
 				'Invalid parameter "/1/sp_private_key": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'index.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list',
+				'/1/action_url',
+				'zabbix.php?action=host.list'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=host.list&keys[]=param',
+				'/1/action_url',
+				'zabbix.php?action=host.list&keys[]=param'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action[]=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php?action=unknown.action',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": invalid action in the frontend URL.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'non_zabbix.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.php',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'unknown.php?action=host.list',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'https://www.zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'zabbix.com',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION],
+				'',
+				'/1/action_url',
+				''
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": cannot be empty.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 64],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'Invalid parameter "/1/action_url": value is too long.'
+			],
+			[
+				['type' => API_FRONTEND_ACTION, 'length' => 65],
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now',
+				'/1/action_url',
+				'zabbix.php?action=dashboard.view&dashboardid=1&from=now-1h&to=now'
 			]
 		];
 	}

@@ -15,7 +15,6 @@
 
 
 require_once __DIR__.'/../include/CAPITest.php';
-require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareHostsData
@@ -858,21 +857,21 @@ class testHost extends CAPITest {
 				'hostids' => [
 					'maintenance_1'
 				],
-				'expected_error' => 'Cannot delete host "api_test_hosts_maintenance_1" because maintenance "API test hosts - maintenance with one host" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host "api_test_hosts_maintenance_1" because maintenance "API test hosts - maintenance with one host" must contain at least one host group, host or trigger.'
 			],
 			'Test host.delete two hosts in maintenance, one is allowed, the other is not' => [
 				'hostids' => [
 					'maintenance_1',
 					'maintenance_7'
 				],
-				'expected_error' => 'Cannot delete host "api_test_hosts_maintenance_1" because maintenance "API test hosts - maintenance with one host" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host "api_test_hosts_maintenance_1" because maintenance "API test hosts - maintenance with one host" must contain at least one host group, host or trigger.'
 			],
 			'Test host.delete both from one maintenance' => [
 				'hostids' => [
 					'maintenance_5',
 					'maintenance_6'
 				],
-				'expected_error' => 'Cannot delete hosts "api_test_hosts_maintenance_5", "api_test_hosts_maintenance_6" because maintenance "API test hosts - maintenance with two hosts (non-deletable)" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete hosts "api_test_hosts_maintenance_5", "api_test_hosts_maintenance_6" because maintenance "API test hosts - maintenance with two hosts (non-deletable)" must contain at least one host group, host or trigger.'
 			]
 		];
 	}
@@ -1274,6 +1273,20 @@ class testHost extends CAPITest {
 
 					// Sample of unspecified property.
 					'inventory_mode' => null,
+
+					// Write-only properties.
+					'tls_psk_identity' => null,
+					'tls_psk' => null,
+					'name_upper' => null
+				]
+			],
+			'Check if {"output": true} excludes write-only properties' => [
+				'request' => [
+					'output' => true,
+					'hostids' => ['99013']
+				],
+				'expected_result' => [
+					'hostid' => '99013',
 
 					// Write-only properties.
 					'tls_psk_identity' => null,

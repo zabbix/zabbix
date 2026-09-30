@@ -16,6 +16,7 @@
 
 #include "history_compress.h"
 
+#include "version.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
@@ -29,8 +30,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
-#include "trigger_housekeeper.h"
 #include "housekeeper_table.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"
@@ -1186,6 +1187,119 @@ static int	housekeeping_proxy_dhistory(int now)
 	return deleted;
 }
 
+static int	housekeeping_group_sets(int now)
+{
+	static int	last_exec_time = 0;
+	int		deleted = 0, rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SEC_PER_WEEK > now - last_exec_time)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "Skipping %s(), last time executed at %d", __func__, last_exec_time);
+		goto skip;
+	}
+
+	last_exec_time = now;
+
+	zbx_db_begin();
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
+			"delete from permission where not exists("
+				"select null"
+				" from user_ugset uu"
+				" where permission.ugsetid = uu.ugsetid"
+			") or not exists("
+				"select null"
+				" from host_hgset hh"
+				" where permission.hgsetid = hh.hgsetid"
+			")")))
+	{
+		goto out;
+	}
+
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
+			"delete from ugset_group where not exists("
+				"select null"
+				" from user_ugset uu"
+				" where ugset_group.ugsetid = uu.ugsetid"
+			")")))
+	{
+		goto out;
+	}
+
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
+			"delete from ugset where not exists("
+				"select null"
+				" from user_ugset uu"
+				" where ugset.ugsetid = uu.ugsetid"
+			")")))
+	{
+		goto out;
+	}
+
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
+			"delete from hgset_group where not exists("
+				"select null"
+				" from host_hgset hh"
+				" where hgset_group.hgsetid = hh.hgsetid"
+			")")))
+	{
+		goto out;
+	}
+
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
+			"delete from hgset where not exists("
+				"select null"
+				" from host_hgset hh"
+				" where hgset.hgsetid = hh.hgsetid"
+			")")))
+	{
+		goto out;
+	}
+
+	deleted += rc;
+out:
+	if (ZBX_DB_OK <= rc)
+	{
+		if (ZBX_DB_OK != zbx_db_commit())
+			deleted = 0;
+	}
+	else
+	{
+		zbx_db_rollback();
+		deleted = 0;
+	}
+skip:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+
+	return deleted;
+}
+
+static int	housekeeping_dpop_jti_cache(int now)
+{
+	int	deleted = 0, rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
+
+	rc = zbx_db_execute("delete from dpop_jti_cache where expires_at<%d", now);
+
+	if (ZBX_DB_OK <= rc)
+		deleted = rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+
+	return deleted;
+}
+
 static int	get_housekeeping_period(double time_slept)
 {
 	if (SEC_PER_HOUR > time_slept)
@@ -1194,6 +1308,111 @@ static int	get_housekeeping_period(double time_slept)
 		return 24 * SEC_PER_HOUR;
 	else
 		return (int)time_slept;
+}
+
+static int	housekeeping_delete_internal_events(int config_max_hk_delete)
+{
+#define HK_EVENT_MAX_DELETE_RATIO	5
+#define HK_MIN_BATCH_SIZE		100
+
+	int			deleted_num = 0, batch_size = config_max_hk_delete / HK_EVENT_MAX_DELETE_RATIO;
+	zbx_vector_uint64_t	eventids, r_eventids;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0;
+
+	if (HK_MIN_BATCH_SIZE > batch_size)
+		batch_size = HK_MIN_BATCH_SIZE;
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_create(&r_eventids);
+
+	zbx_db_begin();
+
+	while (0 == config_max_hk_delete || deleted_num < config_max_hk_delete)
+	{
+		size_t	sql_offset = 0;
+		int	events_num;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select eventid from events where source=%d"
+				" order by eventid", EVENT_SOURCE_INTERNAL);
+		result = zbx_db_select_n(sql, batch_size);
+
+		zbx_vector_uint64_clear(&eventids);
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	eventid;
+
+			ZBX_STR2UINT64(eventid, row[0]);
+			zbx_vector_uint64_append(&eventids, eventid);
+		}
+		zbx_db_free_result(result);
+		if (0 == (events_num = eventids.values_num))
+			break;
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select r_eventid from event_recovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	eventid;
+
+			ZBX_STR2UINT64(eventid, row[0]);
+			zbx_vector_uint64_append(&r_eventids, eventid);
+		}
+		zbx_db_free_result(result);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from event_recovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+				break;
+
+		if (0 != r_eventids.values_num)
+		{
+			zbx_vector_uint64_sort(&r_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&r_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_vector_uint64_append_array(&eventids, r_eventids.values, r_eventids.values_num);
+			zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_vector_uint64_clear(&r_eventids);
+		}
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from events where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			break;
+
+		deleted_num += eventids.values_num;
+
+		if (events_num != batch_size)
+			break;
+
+		zbx_vector_uint64_clear(&eventids);
+	}
+
+	zbx_db_commit();
+
+	zbx_vector_uint64_destroy(&r_eventids);
+	zbx_vector_uint64_destroy(&eventids);
+	zbx_free(sql);
+
+	return deleted_num;
+
+#undef HK_MIN_BATCH_SIZE
+#undef HK_EVENT_MAX_DELETE_RATIO
 }
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
@@ -1248,6 +1467,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		hk_tsdb_check_config();
 	}
 #endif
+	housekeeping_disable_unsupported_types();
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1314,14 +1534,22 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));
 		sec = zbx_time();
-		zbx_int64_t	d_history_and_trends = housekeeping_history_and_trends(now);
+
+		zbx_int64_t	d_events = 0, d_history_and_trends = housekeeping_history_and_trends(now);
+
+		if (0 == zbx_dc_get_internal_action_count())
+		{
+			zbx_setproctitle("%s [removing internal events]", get_process_type_string(process_type));
+			d_events += housekeeping_delete_internal_events(
+					housekeeper_args_in->config_max_housekeeper_delete);
+		}
 
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
 		zbx_int64_t	d_problems = housekeeping_problems(now,
 				housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		zbx_int64_t	d_events = housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
+		d_events += housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_max_housekeeper_delete);
@@ -1338,6 +1566,13 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		int	records = housekeeping_proxy_dhistory(now);
 
+		zbx_setproctitle("%s [removing unlinked group sets]", get_process_type_string(process_type));
+		int	d_sets = housekeeping_group_sets(now);
+
+		zbx_setproctitle("%s [removing expired device authentication records]",
+				get_process_type_string(process_type));
+		int	d_dpop_jti_cache = housekeeping_dpop_jti_cache(now);
+
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		housekeeper_process(housekeeper_args_in->config_max_housekeeper_delete, &d_history_and_trends,
 				&d_events, &d_problems);
@@ -1347,9 +1582,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_snprintf(msg, sizeof(msg), "%s [deleted " ZBX_FS_I64 " hist/trends, " ZBX_FS_I64 " events, "
 				ZBX_FS_I64 " problems, %d sessions, %d alarms, %d audit, %d autoreg_host,"
-				" %d records in " ZBX_FS_DBL " sec, %s]", get_process_type_string(process_type),
+				" %d records, %d sets, %d expired device authentication records in "
+				"" ZBX_FS_DBL " sec, %s]",
+				get_process_type_string(process_type),
 				d_history_and_trends, d_events, d_problems, d_sessions, d_services, d_audit,
-				d_autoreg_host, records, sec, sleeptext);
+				d_autoreg_host, records, d_sets, d_dpop_jti_cache, sec, sleeptext);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
 

@@ -28,7 +28,7 @@ zabbix_export:
         *NOTE.* Some metrics may not be collected depending on your InfluxDB instance version and configuration.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -602,31 +602,32 @@ zabbix_export:
           value: influxdb
       macros:
         - macro: '{$INFLUXDB.API.TOKEN}'
-          description: 'InfluxDB API Authorization Token'
+          type: SECRET_TEXT
+          description: 'InfluxDB API Authorization Token.'
           config:
             type: TEXT
             priority: '2'
             label: 'InfluxDB API token'
-            description: 'InfluxDB API Authorization Token'
+            description: 'InfluxDB API Authorization Token.'
             required: 'YES'
         - macro: '{$INFLUXDB.ORG_NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable organizations'
+          description: 'Filter of discoverable organizations.'
           config:
             type: TEXT
             priority: '3'
             section_name: Filters
             label: 'Organizations filter (include)'
-            description: 'Filter of discoverable organizations'
+            description: 'Filter of discoverable organizations.'
         - macro: '{$INFLUXDB.ORG_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered organizations'
+          description: 'Filter to exclude discovered organizations.'
           config:
             type: TEXT
             priority: '4'
             section_name: Filters
             label: 'Organizations filter (exclude)'
-            description: 'Filter to exclude discovered organizations'
+            description: 'Filter to exclude discovered organizations.'
         - macro: '{$INFLUXDB.REQ.FAIL.MAX.WARN}'
           value: '2'
           description: 'Maximum number of query requests failures for trigger expression.'
@@ -649,12 +650,12 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$INFLUXDB.URL}'
           value: 'http://localhost:8086'
-          description: 'InfluxDB instance URL'
+          description: 'InfluxDB instance URL.'
           config:
             type: TEXT
             priority: '1'
             label: 'InfluxDB instance URL'
-            description: 'InfluxDB instance URL'
+            description: 'InfluxDB instance URL.'
             required: 'YES'
       dashboards:
         - uuid: 41d42bb27ae14b529b337aac88bf4685

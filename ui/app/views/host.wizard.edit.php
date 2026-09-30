@@ -285,7 +285,7 @@ function stepSelectTemplate($old_template_count): array {
 		),
 		new CTemplateTag('host-wizard-template-tags-more',
 			(new CButtonIcon(ZBX_ICON_MORE))
-				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP)
+				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER)
 		)
 	];
 }
@@ -409,7 +409,7 @@ function stepInstallAgent($agent_script_data): array {
 									(new CTag('h6', true, [_('Verify Zabbix server, proxy, or cluster address')]))
 										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									(new CFormField([
-										new CTextBox('agent_script_server_host'),
+										new CTextAreaFlexible('agent_script_server_host'),
 										(new CDiv(
 											_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
@@ -463,9 +463,9 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass(ZBX_STYLE_FORMATED_GROUP),
 									(new CFormField([
 										new CLabel(_('Pre-shared key identity')),
-										(new CTextBox('tls_psk_identity', '', false,
-											DB::getFieldLength('hosts', 'tls_psk_identity')
-										))->setAriaRequired(),
+										(new CTextAreaFlexible('tls_psk_identity', ''))
+											->setMaxlength(DB::getFieldLength('hosts', 'tls_psk_identity'))
+											->setAriaRequired(),
 										(new CDiv(
 											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
@@ -749,12 +749,29 @@ function stepAddHostInterface(): array {
 							(new CFormField([
 								(new CLabel([
 									_('Max repetition count'),
-									makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
-								], 'interfaces[#{row_index}][details][max_repetitions]')),
-								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
-									false, false, false
-								)
+									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
+								], 'interfaces[#{row_index}][details][max_repetitions]'))
+									->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][details][max_repetitions]', 0,
+									false,
+									DB::getFieldLength('interface_snmp', 'max_repetitions')
+								))
+									->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+									->setAriaRequired()
 							]))->addClass('js-snmp-repetition-count'),
+							(new CFormField([
+								(new CLabel([
+									_('Retries'),
+									makeHelpIcon(_('Maximum number of retries after a timeout for walk[]/get[] items. For walk[], retries are shared across the entire walk. 0 disables retries.'))
+								], 'interfaces[#{row_index}][details][retries]'))
+									->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][details][retries]', 0,
+									false,
+									DB::getFieldLength('interface_snmp', 'retries')
+								))
+									->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+									->setAriaRequired()
+							]))->addClass('js-snmp-retries'),
 							(new CFormField([
 								new CLabel(_('Context name'), 'interfaces[#{row_index}][details][contextname]'),
 								new CTextBox('interfaces[#{row_index}][details][contextname]', '', false,

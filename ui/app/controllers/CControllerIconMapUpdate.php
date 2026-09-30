@@ -41,7 +41,7 @@ class CControllerIconMapUpdate extends CController {
 	}
 
 	protected function checkInput() {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();

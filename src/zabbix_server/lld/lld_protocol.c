@@ -13,6 +13,7 @@
 **/
 
 #include "lld_protocol.h"
+#include "lld_manager.h"
 
 #include "zbxserialize.h"
 #include "zbxipcservice.h"

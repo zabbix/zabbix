@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -37,10 +38,10 @@ type image struct {
 	SharedSize  int64    `json:"SharedSize"`
 }
 
-func keyImagesHandler(client *http.Client, query string, _ ...string) (string, error) {
+func keyImagesHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
 	var data []image
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

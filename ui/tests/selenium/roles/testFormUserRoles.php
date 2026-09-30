@@ -71,6 +71,7 @@ class testFormUserRoles extends CWebTest {
 				'name' => 'role_for_update',
 				'type' => 1,
 				'rules' => [
+					'api.access' => ZBX_ROLE_RULE_ENABLED,
 					'api' => [
 						'*.create',
 						'host.*',
@@ -80,7 +81,10 @@ class testFormUserRoles extends CWebTest {
 			],
 			[
 				'name' => 'super_role',
-				'type' => 3
+				'type' => 3,
+				'rules' => [
+					'api.access' => ZBX_ROLE_RULE_ENABLED
+				]
 			],
 			[
 				'name' => 'role_for_delete',
@@ -633,7 +637,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'user_ui_api_deny',
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -649,7 +654,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'admin_ui_api_deny',
-						'User type' => 'Admin'
+						'User type' => 'Admin',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -665,7 +671,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'super_admin_ui_api_deny',
-						'User type' => 'Super admin'
+						'User type' => 'Super admin',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -682,6 +689,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_allow',
 						'User type' => 'User',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -699,6 +707,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_allow',
 						'User type' => 'Admin',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -716,6 +725,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_allow',
 						'User type' => 'Super admin',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -845,13 +855,12 @@ class testFormUserRoles extends CWebTest {
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
+		$form->checkValue(['Enabled' => false]);
 
-		// Unchecking API, button and radio button becomes disabled.
-		$form->fill(['Enabled' => false]);
+		// The API method buttons are disabled by default.
 		$this->assertFalse($form->getField('API methods')->isEnabled());
 		$this->assertFalse($this->query('button:Select')->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
-		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals(4, $form->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
@@ -873,12 +882,12 @@ class testFormUserRoles extends CWebTest {
 				$this->page->scrollToTop();
 			}
 
-			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
+			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://z-textarea-flexible[@id="name"]'], $role);
 		}
 
 		// Screen for the existing super admin role.
 		$this->page->open('zabbix.php?action=userrole.edit&roleid=3');
-		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
+		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://z-textarea-flexible[@id="name"]']);
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isClickable());
 		}
@@ -891,23 +900,26 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'user_api',
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'api_list' => [
-						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
+						'action.get', 'alert.get', 'apmlog.get', 'apmmetric.get', 'apmspan.get', 'apmtrace.get',
+						'ceprule.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
 						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
-						'dcheck.get', 'dhost.get', 'discoveryrule.get', 'discoveryruleprototype.get', 'drule.get',
-						'dservice.get', 'event.acknowledge', 'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get',
-						'hanode.get', 'history.get', 'history.push', 'host.get', 'hostdashboard.get', 'hostgroup.get',
-						'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get', 'iconmap.get',
-						'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create', 'map.delete',
-						'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get', 'proxygroup.get',
-						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
-						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get',
-						'sla.getsli', 'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get',
-						'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get',
-						'trigger.get', 'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
-						'usermacro.get', 'valuemap.get'
+						'dcheck.get', 'device.get', 'device.init', 'device.offboard', 'dhost.get', 'discoveryrule.get',
+						'discoveryruleprototype.get', 'drule.get', 'dservice.get', 'event.acknowledge', 'event.get',
+						'graph.get', 'graphitem.get', 'graphprototype.get', 'hanode.get', 'history.get', 'history.push',
+						'host.get', 'hostdashboard.get', 'hostgroup.get', 'hostinterface.get', 'hostprototype.get',
+						'housekeeping.get', 'httptest.get', 'iconmap.get', 'image.get', 'item.get', 'itemprototype.get',
+						'maintenance.get', 'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get',
+						'module.get', 'problem.get', 'proxy.get', 'proxygroup.get', 'role.get', 'script.execute',
+						'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts', 'service.create',
+						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
+						'task.create', 'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create',
+						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get',
+						'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get','usermacro.get',
+						'valuemap.get'
 					]
 				]
 			],
@@ -916,19 +928,21 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'admin_api',
-						'User type' => 'Admin'
+						'User type' => 'Admin',
+						'Enabled' => true
 					],
 					'api_list' => [
-						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'configuration.export',
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
+						'apmmetric.get', 'apmspan.get', 'apmtrace.get', 'ceprule.get', 'configuration.export',
 						'configuration.import', 'configuration.importcompare', 'correlation.get', 'dashboard.create',
-						'dashboard.delete', 'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get',
-						'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update',
-						'discoveryruleprototype.create', 'discoveryruleprototype.delete', 'discoveryruleprototype.get',
-						'discoveryruleprototype.update', 'drule.create', 'drule.delete', 'drule.get', 'drule.update',
-						'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
-						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete',
-						'graphprototype.get', 'graphprototype.update', 'hanode.get', 'history.clear', 'history.get',
-						'history.push', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
+						'dashboard.delete', 'dashboard.get', 'dashboard.update', 'dcheck.get', 'device.get', 'device.init',
+						'device.offboard','dhost.get','discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get',
+						'discoveryrule.update', 'discoveryruleprototype.create', 'discoveryruleprototype.delete',
+						'discoveryruleprototype.get','discoveryruleprototype.update', 'drule.create', 'drule.delete',
+						'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create',
+						'graph.delete', 'graph.get', 'graph.update', 'graphitem.get', 'graphprototype.create',
+						'graphprototype.delete', 'graphprototype.get', 'graphprototype.update', 'hanode.get', 'history.clear',
+						'history.get', 'history.push', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
 						'host.update', 'hostdashboard.get', 'hostgroup.delete','hostgroup.get', 'hostgroup.massadd',
 						'hostgroup.massremove', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
 						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
@@ -959,22 +973,25 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'super_admin_api',
-						'User type' => 'Super admin'
+						'User type' => 'Super admin',
+						'Enabled' => true
 					],
 					'api_list' => [
-						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
-						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
-						'configuration.export', 'configuration.import', 'configuration.importcompare', 'connector.create',
-						'connector.delete', 'connector.get', 'connector.update', 'correlation.create', 'correlation.delete',
-						'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete', 'dashboard.get',
-						'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.create', 'discoveryrule.delete',
-						'discoveryrule.get', 'discoveryrule.update', 'discoveryruleprototype.create',
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
+						'apmmetric.get', 'apmspan.get', 'apmtrace.get', 'auditlog.get', 'authentication.get',
+						'authentication.update', 'autoregistration.get', 'autoregistration.update', 'ceprule.create',
+						'ceprule.delete', 'ceprule.get', 'ceprule.resettimewindows', 'ceprule.update', 'configuration.export',
+						'configuration.import', 'configuration.importcompare', 'connector.create', 'connector.delete',
+						'connector.get', 'connector.update', 'correlation.create', 'correlation.delete', 'correlation.get',
+						'correlation.update', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
+						'dcheck.get', 'device.get', 'device.init', 'device.offboard', 'dhost.get', 'discoveryrule.create',
+						'discoveryrule.delete', 'discoveryrule.get','discoveryrule.update', 'discoveryruleprototype.create',
 						'discoveryruleprototype.delete', 'discoveryruleprototype.get', 'discoveryruleprototype.update',
 						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',
 						'event.get', 'graph.create', 'graph.delete', 'graph.get', 'graph.update', 'graphitem.get',
 						'graphprototype.create', 'graphprototype.delete', 'graphprototype.get', 'graphprototype.update',
-						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete',
-						'host.get', 'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
+						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
+						'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
 						'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
 						'hostgroup.propagate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
 						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
@@ -1039,8 +1056,15 @@ class testFormUserRoles extends CWebTest {
 
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User role created');
-		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
-				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
+		$sql_api =
+			'SELECT value_str'.
+			' FROM role_rule'.
+			' WHERE type=1'.
+				' AND name LIKE '.zbx_dbstr('api.method%').
+				' AND roleid in ('.
+					'SELECT roleid FROM role WHERE name='.zbx_dbstr($data['fields']['Name']).
+				')'.
+			' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
 		sort($role_rules);
 		$this->assertEquals($data['api_list'], $role_rules);
@@ -1180,7 +1204,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'to_user' => true,
 					'fields' => [
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1199,6 +1224,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => ['*.create'],
@@ -1561,7 +1587,9 @@ class testFormUserRoles extends CWebTest {
 			// Check the layout of tag related fields in Service section of user role config form.
 			$tag_field = $form->getField($field.' access to services with tag');
 			foreach (['tag', 'value'] as $input_type) {
-				$input = $tag_field->query('xpath:.//input[contains(@name, '.CXPathHelper::escapeQuotes('tag_'.$input_type).')]')->one();
+				$input = $tag_field->query('xpath:.//z-textarea-flexible[contains(@name, '.
+						CXPathHelper::escapeQuotes('tag_'.$input_type).')]'
+				)->one();
 				$this->assertEquals($input_type, $input->getAttribute('placeholder'));
 				$this->assertEquals(255, $input->getAttribute('maxlength'));
 			}

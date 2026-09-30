@@ -116,8 +116,41 @@ static int	check_common_params(const char *host, const char *path, char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses the optional "redirect_limit" parameter                    *
+ *                                                                            *
+ * Parameters: str            - [IN] parameter value, can be NULL or empty    *
+ *             redirect_limit - [OUT] number of redirects to follow           *
+ *             error          - [OUT] reason why the value was rejected       *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter is not set or holds a valid value    *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_redirect_limit(const char *str, int *redirect_limit, char **error)
+{
+#	define ZBX_MAX_REDIRECT_LIMIT	1000
+
+	if (NULL == str || '\0' == *str)
+	{
+		*redirect_limit = 0;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != zbx_is_uint_range(str, redirect_limit, 0, ZBX_MAX_REDIRECT_LIMIT))
+	{
+		*error = zbx_dsprintf(*error, "value must be from 0 up to and including %d", ZBX_MAX_REDIRECT_LIMIT);
+		return FAIL;
+	}
+
+	return SUCCEED;
+
+#	undef ZBX_MAX_REDIRECT_LIMIT
+}
+
 #ifdef HAVE_LIBCURL
-static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
+static int	curl_page_get(char *url, int redirect_limit, int timeout, char **buffer, char **error)
 {
 	CURLcode		err;
 	CURL			*easyhandle;
@@ -137,7 +170,10 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
+					0 == redirect_limit ? 0L : 1L)) ||
+			(0 != redirect_limit && CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS,
+					(long)redirect_limit))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)) ||
 			(NULL != sysinfo_get_config_source_ip() &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE,
@@ -171,6 +207,9 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))
 		goto out;
 
+	if (0 != redirect_limit && SUCCEED != zbx_curl_setopt_redir_https(easyhandle, error))
+		goto out;
+
 	*errbuf = '\0';
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
@@ -187,6 +226,10 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 
 		ret = SYSINFO_RET_OK;
 	}
+	else if (CURLE_TOO_MANY_REDIRECTS == err)
+	{
+		*error = zbx_dsprintf(*error, "Maximum number of redirects (%d) exceeded.", redirect_limit);
+	}
 	else
 	{
 		*error = zbx_dsprintf(*error, "Cannot perform request: %s", '\0' == *errbuf ?
@@ -201,8 +244,8 @@ out:
 	return ret;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
-		char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int redirect_limit, int timeout,
+		char **buffer, char **error)
 {
 	char	*url = NULL;
 	int	ret;
@@ -246,7 +289,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 		goto out;
 	}
 
-	ret = curl_page_get(url, timeout, buffer, error);
+	ret = curl_page_get(url, redirect_limit, timeout, buffer, error);
 out:
 	zbx_free(url);
 
@@ -273,8 +316,8 @@ static char	*find_port_sep(char *host, size_t len)
 	return NULL;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
-		char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int redirect_limit, int timeout,
+		char **buffer, char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
 	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
@@ -283,6 +326,13 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 
 	if (SUCCEED != check_common_params(host, path, error))
 		return SYSINFO_RET_FAIL;
+
+	if (0 != redirect_limit)
+	{
+		*error = zbx_strdup(*error, "Zabbix agent was compiled without cURL library required for following"
+				" redirects.");
+		return SYSINFO_RET_FAIL;
+	}
 
 	if (SUCCEED == detect_url(host))
 	{
@@ -436,10 +486,10 @@ out:
 
 int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL;
-	int	ret;
+	char	*hostname, *path_str, *port_str, *redirect_str, *buffer = NULL, *error = NULL;
+	int	ret, redirect_limit;
 
-	if (3 < request->nparam)
+	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -448,8 +498,17 @@ int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	hostname = get_rparam(request, 0);
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
+	redirect_str = get_rparam(request, 3);
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
+	if (SUCCEED != parse_redirect_limit(redirect_str, &redirect_limit, &error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid fourth parameter: %s.", error));
+		zbx_free(error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, redirect_limit, request->timeout,
+			&buffer, &error)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, buffer);
@@ -462,11 +521,11 @@ int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname, *path_str, *port_str, *error = NULL;
+	char	*hostname, *path_str, *port_str, *redirect_str, *error = NULL;
 	double	start_time;
-	int	ret;
+	int	ret, redirect_limit;
 
-	if (3 < request->nparam)
+	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -475,10 +534,19 @@ int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 	hostname = get_rparam(request, 0);
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
+	redirect_str = get_rparam(request, 3);
+
+	if (SUCCEED != parse_redirect_limit(redirect_str, &redirect_limit, &error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid fourth parameter: %s.", error));
+		zbx_free(error);
+		return SYSINFO_RET_FAIL;
+	}
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, NULL, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, redirect_limit, request->timeout,
+			NULL, &error)))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	else
 		SET_MSG_RESULT(result, error);
@@ -488,11 +556,12 @@ int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL, *regexp, *length_str;
+	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL, *regexp, *length_str,
+			*redirect_str;
 	const char	*output;
-	int		length, ret;
+	int		length, ret, redirect_limit;
 
-	if (6 < request->nparam)
+	if (7 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -510,6 +579,7 @@ int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 	regexp = get_rparam(request, 3);
 	length_str = get_rparam(request, 4);
 	output = get_rparam(request, 5);
+	redirect_str = get_rparam(request, 6);
 
 	if (NULL == length_str || '\0' == *length_str)
 		length = ZBX_MAX_UINT31_1;
@@ -523,7 +593,15 @@ int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
+	if (SUCCEED != parse_redirect_limit(redirect_str, &redirect_limit, &error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid seventh parameter: %s.", error));
+		zbx_free(error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, redirect_limit, request->timeout,
+			&buffer, &error)))
 	{
 		char	*ptr = NULL, *str;
 

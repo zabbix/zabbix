@@ -51,7 +51,7 @@ $html_page = (new CHtmlPage())
 							'parameters' => [
 								'srctbl' => 'drules',
 								'srcfld1' => 'druleid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_druleids_',
 								'enabled_only' => 1
 							]

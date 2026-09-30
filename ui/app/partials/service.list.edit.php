@@ -51,7 +51,7 @@ $table = (new CTableInfo())
 		(new CColHeader(_('Status')))->addStyle('width: 14%;'),
 		(new CColHeader(_('Root cause')))->addStyle('width: 25%;'),
 		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS),
 		(new CColHeader())
 	]))
 	->setPageNavigation($data['paging']);

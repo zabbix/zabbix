@@ -181,7 +181,7 @@ window.mfa_edit = new class {
 		const form_fields = this.#form.getAllValues();
 
 		for (const key in this.#change_sensitive_data) {
-			if (form_fields.hasOwnProperty(key)) {
+			if (Object.hasOwn(form_fields, key)) {
 				if (this.#change_sensitive_data[key] !== form_fields[key]) {
 					return true;
 				}

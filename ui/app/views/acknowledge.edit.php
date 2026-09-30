@@ -41,7 +41,7 @@ $form_list = (new CFormList())
 
 if (array_key_exists('history', $data)) {
 	$form_list->addRow(_('History'),
-		(new CDiv(makeEventHistoryTable($data['history'], $data['users'])))
+		(new CDiv(makeEventHistoryTable($data['history'], $data['users'], $data['maintenances'], $data['ceprules'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
@@ -74,35 +74,33 @@ $form_list
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->addClass('js-operation-checkbox')
 				->setChecked($data['change_severity'])
-				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
+				->setEnabled($data['allowed_change_severity'] && $data['editable_triggers_count'] > 0),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
-			->addClass(ZBX_STYLE_HOR_LIST)
+			->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Suppress'),
 			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
 		], 'suppress_problem'),
 		(new CList([
-			(new CListItem(
-				(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
-					->addClass('js-operation-checkbox')
-					->setChecked($data['suppress_problem'])
-					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addClass('align-top'),
+			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
+				->addClass('js-operation-checkbox')
+				->setChecked($data['suppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed']),
 			(new CListItem(
 				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
 					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
 					->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
 					->setEnabled(false)
 					->setModern(true)
-			))->addClass('align-top'),
+			))->addClass(ZBX_STYLE_ALIGN_TOP),
 			(new CDateSelector('suppress_until_problem', $data['suppress_until_problem']))
 				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_($data['suppress_until_problem']))
 				->setAriaRequired()
 				->setEnabled(false)
-		]))->addClass(ZBX_STYLE_HOR_LIST)
+		]))->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))], 'unsuppress_problem'),
@@ -123,7 +121,6 @@ if ($data['has_unack_events']) {
 		], 'acknowledge_problem'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
@@ -139,7 +136,6 @@ if ($data['has_ack_events']) {
 		new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))], 'unacknowledge_problem'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
@@ -164,7 +160,31 @@ $form_list
 			->addClass('js-operation-checkbox')
 			->setChecked($data['close_problem'])
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
-	)
+	);
+
+if ($data['allowed_ui_conf_maintenance'] && $data['allowed_edit_maintenance']) {
+	if ($data['editable_triggers_count'] > 0) {
+		$maintenance_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'maintenance.edit')
+			->setArgument('context', 'trigger');
+
+		foreach ($data['eventids'] as $key => $eventid) {
+			$maintenance_url->setArgument("eventids[{$key}]", $eventid);
+		}
+
+		$form_list->addRow('',
+			(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['editable_triggers_count']), $maintenance_url))
+		);
+	}
+	else {
+		$form_list->addRow('',
+			(new CSpan(_n('Suppress trigger', 'Suppress triggers', $selected_events)))->addClass(ZBX_STYLE_DISABLED)
+		);
+	}
+}
+
+$form_list
 	->addRow('',
 		(new CDiv(''))->setId('operations-count-error-container')
 	);

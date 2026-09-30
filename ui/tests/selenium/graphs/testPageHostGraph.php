@@ -15,8 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup graphs
@@ -30,7 +29,8 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			'class' => CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -67,8 +67,10 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
@@ -76,7 +78,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
 			'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
 			'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',
-			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
+			'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Web scenarios'
 		];
 		$count_items = CDBHelper::getValue('SELECT COUNT(*) FROM items WHERE hostid='.$hostid);
@@ -466,12 +468,13 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		$dialog->submit();
+		$this->page->waitUntilReady();
 
 		if (array_key_exists('error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 		else {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
+			$this->query('class:msg-good')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"copied")]');
 
 			// DB check, if copy target was host or template.
@@ -610,10 +613,17 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_DeleteSelected($data) {
 		$this->selectGraph($data);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+		$selected_count = ($data['graph'] === 'all') ? $before_rows_count : count($data['graph']);
+		$this->assertSelectedCount($selected_count);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
+		$this->assertTableStats($before_rows_count - $selected_count);
+		$this->assertSelectedCount(0);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

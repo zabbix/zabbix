@@ -256,6 +256,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS", e.g. {$HTTP.TLS.VERIFY:"AWS"}.</p>|`full`|
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
@@ -293,6 +294,13 @@ Additional information about the metrics and used API methods:
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable backup vaults by region.</p>|`.*`|
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by region.</p>|`CHANGE_IF_NEEDED`|
 
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get EC2 instances|<p>Get EC2 instances.</p>|Script|aws.ec2.get|
+|EC2 instances count|<p>Get the total count of EC2 instances.</p>|Dependent item|aws.ec2.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+
 ### LLD rule S3 buckets discovery
 
 |Name|Description|Type|Key and additional info|
@@ -303,7 +311,7 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|EC2 instances discovery|<p>Get EC2 instances.</p>|Script|aws.ec2.discovery|
+|EC2 instances discovery|<p>Discover EC2 instances.</p>|Dependent item|aws.ec2.discovery|
 
 ### LLD rule RDS instances discovery
 
@@ -520,6 +528,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS EC2", e.g. {$HTTP.TLS.VERIFY:"AWS EC2"}.</p>|`full`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -541,9 +550,9 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html</p>|Script|aws.ec2.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ec2.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get volumes data|<p>Get volumes attached to instance.</p><p>DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html</p>|Script|aws.ec2.get_volumes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check result of the instance metric data has been got correctly.</p>|Dependent item|aws.ec2.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check result of the alarm data has been got correctly.</p>|Dependent item|aws.ec2.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get volumes info check|<p>Check result of the volume information has been got correctly.</p>|Dependent item|aws.ec2.volumes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|EC2 metrics check|<p>Checks whether EC2 metric data was retrieved correctly.</p>|Dependent item|aws.ec2.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ec2.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get volumes info check|<p>Checks whether the volume information was retrieved correctly.</p>|Dependent item|aws.ec2.volumes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Credit CPU: Balance|<p>The number of earned CPU credits that an instance has accrued since it was launched or started. For T2 Standard, the CPUCreditBalance also includes the number of launch credits that have been accrued.</p><p>Credits are accrued in the credit balance after they are earned, and removed from the credit balance when they are spent. The credit balance has a maximum limit, determined by the instance size. After the limit is reached, any new credits that are earned are discarded. For T2 Standard, launch credits do not count towards the limit.</p><p>The credits in the CPUCreditBalance are available for the instance to spend to burst beyond its baseline CPU utilization.</p><p>When an instance is running, credits in the CPUCreditBalance do not expire. When a T3 or T3a instance stops, the CPUCreditBalance value persists for seven days. Thereafter, all accrued credits are lost. When a T2 instance stops, the CPUCreditBalance value does not persist, and all accrued credits are lost.</p>|Dependent item|aws.ec2.cpu.credit_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "CPUCreditBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Credit CPU: Usage|<p>The number of CPU credits spent by the instance for CPU utilization.</p><p>One CPU credit equals one vCPU running at 100% utilization for one minute or an equivalent combination of vCPUs, utilization, and time (for example, one vCPU running at 50% utilization for two minutes or two vCPUs running at 25% utilization for two minutes).</p>|Dependent item|aws.ec2.cpu.credit_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "CPUCreditUsage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Credit CPU: Surplus balance|<p>The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.</p><p>The CPUSurplusCreditBalance value is paid down by earned CPU credits. If the number of surplus credits exceeds the maximum number of credits that the instance can earn in a 24-hour period, the spent surplus credits above the maximum incur an additional charge.</p>|Dependent item|aws.ec2.cpu.surplus_credit_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -604,13 +613,13 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |AWS EC2: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS EC2: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
-### LLD rule Instance Volumes discovery
+### LLD rule EC2 volumes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Instance Volumes discovery|<p>Discovery attached EBS volumes.</p>|Dependent item|aws.ec2.volumes.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|EC2 volumes discovery|<p>Discovery attached EBS volumes.</p>|Dependent item|aws.ec2.volumes.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
-### Item prototypes for Instance Volumes discovery
+### Item prototypes for EC2 volumes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
@@ -633,7 +642,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |[{#VOLUME_ID}]: Consumed Read/Write, ops|<p>Used with Provisioned IOPS SSD volumes only.</p><p>The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.</p><p>I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units.</p><p>For example, a 1024K I/O would count as 4 consumed IOPS.</p>|Dependent item|aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Burst balance|<p>Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.</p><p>Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.</p><p>Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.</p>|Dependent item|aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "BurstBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
-### Trigger prototypes for Instance Volumes discovery
+### Trigger prototypes for EC2 volumes discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
@@ -826,6 +835,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS RDS instance", e.g. {$HTTP.TLS.VERIFY:"AWS RDS instance"}.</p>|`full`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -849,10 +859,10 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |Get instance info|<p>Get instance info.</p><p>DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html</p>|Script|aws.rds.get_instance_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.rds.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance events data|<p>DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html</p>|Script|aws.rds.get_events<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get instance info check|<p>Data collection check.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get events check|<p>Data collection check.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RDS metrics check|<p>Checks whether RDS metric data was retrieved correctly.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get instance info check|<p>Checks whether the instance information was retrieved correctly.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get events check|<p>Checks whether the instance event data was retrieved correctly.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Class|<p>Contains the name of the compute and memory capacity class of the DB instance.</p>|Dependent item|aws.rds.class<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].DBInstanceClass.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Engine|<p>Database engine.</p>|Dependent item|aws.rds.engine<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Engine.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Engine version|<p>Indicates the database engine version.</p>|Dependent item|aws.rds.engine.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].EngineVersion.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -1184,6 +1194,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS S3 bucket", e.g. {$HTTP.TLS.VERIFY:"AWS S3 bucket"}.</p>|`full`|
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1197,8 +1208,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |Get metrics data|<p>Get bucket metrics.</p><p>Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html</p>|Script|aws.s3.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.s3.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|S3 metrics check|<p>Checks whether S3 metric data was retrieved correctly.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Bucket Size|<p>This is a daily metric for the bucket.</p><p>The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class, or S3 Glacier Flexible Retrieval (GLACIER) storage class.</p><p>This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.bucket_size_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Number of objects|<p>This is a daily metric for the bucket.</p><p>The total number of objects stored in a bucket for all storage classes.</p><p>This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.number_of_objects<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
@@ -1441,6 +1452,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Serverless Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1460,8 +1472,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ECS metrics check|<p>Checks whether ECS metric data was retrieved correctly.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Container Instance Count|<p>The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.</p>|Dependent item|aws.ecs.container_instance_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Task Count|<p>The number of tasks running in the cluster.</p>|Dependent item|aws.ecs.task_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Service Count|<p>The number of services in the cluster.</p>|Dependent item|aws.ecs.service_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -1717,6 +1729,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1736,8 +1749,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ECS metrics check|<p>Checks whether ECS metric data was retrieved correctly.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Container Instance Count|<p>The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.</p>|Dependent item|aws.ecs.container_instance_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Task Count|<p>The number of tasks running in the cluster.</p>|Dependent item|aws.ecs.task_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Service Count|<p>The number of services in the cluster.</p>|Dependent item|aws.ecs.service_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -1992,6 +2005,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Application Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
 |{$AWS.HTTP.4XX.FAIL.MAX.WARN}|<p>Maximum number of HTTP request failures for a trigger expression.</p>|`5`|
@@ -2010,8 +2024,8 @@ See the section below for a list of macros used for LLD filters.
 |Get metrics data|<p>Get ELB Application Load Balancer metrics.</p><p>Full metrics list related to Application Load Balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html</p>|Script|aws.elb.alb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get target groups|<p>Get ELB target group.</p><p>`DescribeTargetGroups` API method: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html</p>|Script|aws.elb.alb.get_target_groups<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get ELB ALB alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.elb.alb.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Application Load Balancer metrics data has been received correctly.</p>|Dependent item|aws.elb.alb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.elb.alb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ALB metrics check|<p>Checks whether ALB metric data was retrieved correctly.</p>|Dependent item|aws.elb.alb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.elb.alb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Active Connection Count|<p>The total number of active concurrent TCP connections from clients to the load balancer and from the load balancer to targets.</p>|Dependent item|aws.elb.alb.active_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |New Connection Count|<p>The total number of new TCP connections established from clients to the load balancer and from the load balancer to targets.</p>|Dependent item|aws.elb.alb.new_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Rejected Connection Count|<p>The number of connections that were rejected because the load balancer had reached its maximum number of connections.</p>|Dependent item|aws.elb.alb.rejected_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2278,6 +2292,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.REGION}|<p>AWS Network Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Network Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.ELB.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
@@ -2296,8 +2311,8 @@ See the section below for a list of macros used for LLD filters.
 |Get metrics data|<p>Get ELB Network Load Balancer metrics.</p><p>Full metrics list related to Network Load Balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html</p>|Script|aws.elb.nlb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get target groups|<p>Get ELB target group.</p><p>`DescribeTargetGroups` API method: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html</p>|Script|aws.elb.nlb.get_target_groups<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get ELB NLB alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.elb.nlb.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Network Load Balancer metrics data has been received correctly.</p>|Dependent item|aws.elb.nlb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.elb.nlb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|NLB metrics check|<p>Checks whether NLB metric data was retrieved correctly.</p>|Dependent item|aws.elb.nlb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.elb.nlb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Active Flow Count|<p>The total number of concurrent flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ActiveFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Active Flow Count TCP|<p>The total number of concurrent TCP flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Active Flow Count TLS|<p>The total number of concurrent TLS flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p>|Dependent item|aws.elb.nlb.active_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2553,6 +2568,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Lambda", e.g. {$HTTP.TLS.VERIFY:"AWS Lambda"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
@@ -2567,8 +2583,8 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |Get metrics data|<p>Get Lambda function metrics.</p><p>Full metrics list related to the Lambda function: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html</p>|Script|aws.lambda.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get Lambda alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.lambda.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Lambda function metrics data has been received correctly.</p>|Dependent item|aws.lambda.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.lambda.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Lambda metrics check|<p>Checks whether Lambda metric data was retrieved correctly.</p>|Dependent item|aws.lambda.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.lambda.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Async events received sum|<p>The number of events that Lambda successfully queues for processing. This metric provides insight into the number of events that a Lambda function receives.</p>|Dependent item|aws.lambda.async_events_received.sum<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Async event age average|<p>The time between when Lambda successfully queues the event and when the function is invoked. The value of this metric increases when events are being retried due to invocation failures or throttling.</p>|Dependent item|aws.lambda.async_event_age.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "AsyncEventAge")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Async events dropped sum|<p>The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or an `OnFailure` destination, events are sent there before they're dropped.</p>|Dependent item|aws.lambda.async_events_dropped.sum<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2781,6 +2797,7 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|-------|
 |{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Backup Vault", e.g. {$HTTP.TLS.VERIFY:"AWS Backup Vault"}.</p>|`full`|
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>AWS backup vault region code.</p>|`us-west-1`|
@@ -3014,7 +3031,7 @@ Also, see the Macros section for a list of macros used in LLD filters.
 
 Additional information about metrics and used API methods:
 
-* [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
+* [Describe AWS Cost Explorer API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
 
 
 ### Macros used
@@ -3026,43 +3043,232 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.BUDGET.MONTH}|<p>Threshold for AWS monthly budget limit.</p>|`10000`|
+|{$AWS.BILLING.MONTH.HIGH}|<p>Threshold for high AWS monthly billing.</p>|`15000`|
+|{$AWS.BILLING.MONTH.WARN}|<p>Warning threshold for AWS monthly billing.</p>|`10000`|
+|{$AWS.SERVICE.COST.TOP.HIGH}|<p>Threshold for high AWS top service cost.</p>|`400`|
+|{$AWS.SERVICE.COST.TOP.WARN}|<p>Warning threshold for AWS top service cost.</p>|`200`|
+|{$AWS.ACCOUNT.COST.DAILY.HIGH}|<p>Threshold for high AWS account daily cost.</p>|`400`|
+|{$AWS.ACCOUNT.COST.DAILY.WARN}|<p>Warning threshold for AWS account daily cost.</p>|`200`|
+|{$AWS.REGION.COST.DAILY.HIGH}|<p>Threshold for high AWS region daily cost.</p>|`400`|
+|{$AWS.REGION.COST.DAILY.WARN}|<p>Warning threshold for AWS region daily cost.</p>|`200`|
+|{$AWS.SERVICE.COST.DAILY.HIGH}|<p>Threshold for high AWS service daily cost.</p>|`400`|
+|{$AWS.SERVICE.COST.DAILY.WARN}|<p>Warning threshold for AWS service daily cost.</p>|`200`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Cost Explorer", e.g. {$HTTP.TLS.VERIFY:"AWS Cost Explorer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
-|{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
-|{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
+|{$AWS.BILLING.MONTH}|<p>Number of months of historical cost data to get from AWS Cost Explorer API (maximum 12 months).</p>|`11`|
+|{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter to include discoverable billing services by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get yearly service cost data|<p>Collects AWS service yearly data.</p>|Dependent item|aws.yearly.service.data.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get daily service cost data|<p>Collects AWS service daily data.</p>|Dependent item|aws.daily.service.data.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="SERVICE")].data.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region and account yearly costs|<p>Get region and account yearly costs.</p>|Dependent item|aws.region.account.yearly.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region yearly costs|<p>Collects yearly region costs.</p>|Dependent item|aws.region.yearly.costs.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get account monthly costs|<p>Collects monthly account costs.</p>|Dependent item|aws.account.monthly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li></ul>|
+|AWS monthly budget delta|<p>Calculates AWS current monthly budget delta compared to previous month.</p>|Calculated|aws.monthly.budget.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS monthly delta, in percent|<p>Calculates AWS current monthly delta, in percent, compared to previous month.</p>|Calculated|aws.monthly.delta.percent<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS monthly delta|<p>Calculates AWS current monthly delta compared to previous month.</p>|Calculated|aws.monthly.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get current month|<p>Collects AWS current month data.</p>|Dependent item|aws.current.month.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.monthly_comparison`</p></li></ul>|
+|Get region and account daily costs|<p>Collects region and account daily cost data.</p>|Dependent item|aws.region.account.daily.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type == "REGION_ACCOUNT")].data[0].Groups`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get region daily costs|<p>Collects AWS daily cost by region (BlendedCost).</p>|Dependent item|aws.region.daily.costs.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get account total daily cost|<p>Collects total daily AWS cost per linked account (BlendedCost).</p>|Dependent item|aws.account.total.daily.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get monthly costs|<p>Get raw data on the monthly costs by service.</p>|Script|aws.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get daily costs|<p>Get raw data on the daily costs by service.</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS cost total|<p>Total cost across all AWS billing months.</p>|Calculated|aws.cost.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get AWS month total cost|<p>Collects AWS billing data with monthly comparison and quarterly cost aggregation.</p>|Dependent item|aws.month.total.cost.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Q1 cost|<p>First quarter total cost.</p>|Dependent item|aws.first.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q1`</p></li></ul>|
+|AWS Q2 cost|<p>Second quarter total cost.</p>|Dependent item|aws.second.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q2`</p></li></ul>|
+|AWS Q3 cost|<p>Third quarter total cost.</p>|Dependent item|aws.third.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q3`</p></li></ul>|
+|AWS Q4 cost|<p>Fourth quarter total cost.</p>|Dependent item|aws.fourth.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q4`</p></li></ul>|
+|AWS Q1 delta|<p>Difference in cost between `Q2` and `Q1`.</p>|Calculated|aws.q1.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS Q2 delta|<p>Difference in cost between `Q3` and `Q2`.</p>|Calculated|aws.q2.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS Q3 delta|<p>Difference in cost between `Q4` and `Q3`.</p>|Calculated|aws.q3.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS quarterly trend cost|<p>Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.</p>|Calculated|aws.quarterly.trend.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get AWS monthly service type|<p>Collects monthly AWS service data and groups services into predefined categories:</p><p>  compute - compute and server execution services for running applications and workloads</p><p>  storage - data storage and backup services</p><p>  networking - networking, traffic routing, and content delivery services</p><p>  security - security, identity, encryption, and compliance services</p><p>  containers - container orchestration and registry services</p><p>  database - managed database and caching services</p><p>  analytics - data processing, analytics, and search services</p><p>  integration - messaging, event-driven, and workflow integration services</p><p>  business - business communication and productivity services</p><p>  ml_ai - machine learning and artificial intelligence services</p><p>  developer_tools - CI/CD, development, and monitoring tools for developers</p><p>  management - monitoring, governance, and infrastructure management services</p><p>  migration - data migration and transfer services</p><p>  media - media processing, streaming, and delivery services</p><p>  iot - Internet of Things device and data services</p><p>  frontend - application frontend, mobile, and API interface services</p><p>  financial - billing, cost management, and financial optimization services</p>|Dependent item|aws.monthly.service.type.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.category_totals`</p></li></ul>|
+|Get AWS daily service type|<p>Collects daily AWS service data and groups services into predefined categories:</p><p>  compute - compute and server execution services for running applications and workloads</p><p>  storage - data storage and backup services</p><p>  networking - networking, traffic routing, and content delivery services</p><p>  security - security, identity, encryption, and compliance services</p><p>  containers - container orchestration and registry services</p><p>  database - managed database and caching services</p><p>  analytics - data processing, analytics, and search services</p><p>  integration - messaging, event-driven, and workflow integration services</p><p>  business - business communication and productivity services</p><p>  ml_ai - machine learning and artificial intelligence services</p><p>  developer_tools - CI/CD, development, and monitoring tools for developers</p><p>  management - monitoring, governance, and infrastructure management services</p><p>  migration - data migration and transfer services</p><p>  media - media processing, streaming, and delivery services</p><p>  iot - Internet of Things device and data services</p><p>  frontend - application frontend, mobile, and API interface services</p><p>  financial - billing, cost management, and financial optimization services</p>|Dependent item|aws.daily.service.type.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.categories`</p></li></ul>|
+|AWS daily service count|<p>Total AWS service daily count.</p>|Dependent item|aws.daily.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_service_count`</p></li></ul>|
+|Get services yearly stats|<p>Collects total yearly cost for AWS services.</p>|Dependent item|aws.services.yearly.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_totals`</p></li></ul>|
+|Get top daily service|<p>Collects AWS daily top cost services (BlendedCost).</p>|Dependent item|aws.top.daily.service.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.top_services`</p></li></ul>|
+|AWS monthly average cost|<p>AWS service monthly average cost.</p>|Calculated|aws.monthly.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS daily average cost|<p>AWS service daily average cost.</p>|Calculated|aws.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|AWS daily total service cost|<p>AWS daily service total cost.</p>|Calculated|aws.daily.service.total.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### LLD rule AWS daily costs by services discovery
+### LLD rule AWS service type yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS daily costs by services discovery|<p>Discovery of daily blended costs by services.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
+|AWS service type yearly cost discovery|<p>Discovers AWS service type total yearly value.</p>|Dependent item|aws.service.type.yearly.cost.discovery|
 
-### Item prototypes for AWS daily costs by services discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost|<p>The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-
-### LLD rule AWS monthly costs by services discovery
+### Item prototypes for AWS service type yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS monthly costs by services discovery|<p>Discovery of monthly costs by services.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Get yearly data|<p>Collects yearly preprocessed data for AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.yearly.processed.get["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.TYPE}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Yearly cost|<p>Collects yearly total cost for AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.yearly.total.cost["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Yearly count|<p>Collects yearly total count for AWS `{#AWS.SERVICE.TYPE}` service.</p>|Dependent item|aws.service.type.yearly.total.count["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
 
-### Item prototypes for AWS monthly costs by services discovery
+### LLD rule AWS account yearly cost discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost|<p>The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.</p>|Dependent item|aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS account yearly cost discovery|<p>Discovers AWS account total yearly value.</p>|Dependent item|aws.account.yearly.cost.discovery|
+
+### Item prototypes for AWS account yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Account [{#AWS.LINKED.ACCOUNT}]: Get yearly data|<p>Collects yearly preprocessed data for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.yearly.processed.get["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.account_id=="{#AWS.LINKED.ACCOUNT}")].first()`</p></li></ul>|
+|Account [{#AWS.LINKED.ACCOUNT}]: Total yearly cost|<p>Collects yearly total cost for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.yearly.total.cost["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+
+### LLD rule AWS region yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS region yearly cost discovery|<p>Discovers AWS region total yearly value.</p>|Dependent item|aws.region.yearly.cost.discovery|
+
+### Item prototypes for AWS region yearly cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region [{#AWS.REGION}]: Get yearly data|<p>Collects yearly preprocessed data for `{#AWS.REGION}` AWS region.</p>|Dependent item|aws.region.yearly.processed.get["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AWS.REGION}")].first()`</p></li></ul>|
+|Region [{#AWS.REGION}]: Total yearly cost|<p>Collects yearly total cost for `{#AWS.REGION}` AWS region.</p>|Dependent item|aws.region.yearly.cost["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule AWS month comparison discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS month comparison discovery|<p>Discovers current month data and previous month data.</p>|Dependent item|aws.month.comparison.discovery|
+
+### Item prototypes for AWS month comparison discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#AWS.MONTH}]: Type [{#AWS.MONTH.TYPE}]: Get data|<p>Collects the latest data of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.</p>|Dependent item|aws.month.comparison.current.get["{#AWS.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="{#AWS.MONTH.TYPE}")].first()`</p></li></ul>|
+|Month [{#AWS.MONTH}]: Type [{#AWS.MONTH.TYPE}]: Total cost|<p>Collects total cost of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.</p>|Dependent item|aws.month.comparison.current.cost["{#AWS.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.amount`</p></li></ul>|
+
+### LLD rule AWS daily service type discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS daily service type discovery|<p>Discovers total amount of each AWS service type.</p>|Dependent item|aws.daily.service.type.discovery|
+
+### Item prototypes for AWS daily service type discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service [{#AWS.SERVICE.TYPE}]: Get daily data|<p>Collects data of AWS `{#AWS.SERVICE.TYPE}` service type.</p>|Dependent item|aws.service.type.preprocessed.daily.get["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.TYPE}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.TYPE}]: Daily count|<p>Collects AWS `{#AWS.SERVICE.TYPE}` service type total count.</p>|Dependent item|aws.service.type.count["{#AWS.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
+
+### LLD rule AWS top service daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS top service daily cost discovery|<p>Discovers top daily services and billing data.</p>|Dependent item|aws.top.service.daily.cost.discovery|
+
+### Item prototypes for AWS top service daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Top service [{#AWS.SERVICE.NAME}]: Get data|<p>Collects top daily data for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.preprocessed.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.NAME}")].first()`</p></li></ul>|
+|Top service [{#AWS.SERVICE.NAME}]: cost|<p>Collects top daily cost for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
+|Top service [{#AWS.SERVICE.NAME}]: cost, in percent|<p>Collects top daily percent for `{#AWS.SERVICE.NAME}` AWS service.</p>|Dependent item|aws.top.daily.service.cost.percent["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.percent`</p></li></ul>|
+
+### Trigger prototypes for AWS top service daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS top daily service cost warning|<p>AWS `{#AWS.SERVICE.NAME}` top service cost is above warning threshold `{$AWS.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.TOP.WARN}`|Warning|**Depends on**:<br><ul><li>AWS top daily service cost high</li></ul>|
+|AWS top daily service cost high|<p>AWS `{#AWS.SERVICE.NAME}` top service cost has exceeded high threshold `{$AWS.SERVICE.COST.TOP.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.TOP.HIGH}`|High||
+
+### LLD rule AWS account daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS account daily cost discovery|<p>Discovers AWS account total daily cost and affected regions.</p>|Dependent item|aws.account.daily.cost.discovery|
+
+### Item prototypes for AWS account daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Account [{#AWS.LINKED.ACCOUNT}]: Get daily data|<p>Collects daily preprocessed data for `{#AWS.LINKED.ACCOUNT}` AWS accounts.</p>|Dependent item|aws.account.daily.cost.processed.get["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.linked_account=="{#AWS.LINKED.ACCOUNT}")].first()`</p></li></ul>|
+|Account [{#AWS.LINKED.ACCOUNT}]: Total daily cost|<p>Collects total daily cost for `{#AWS.LINKED.ACCOUNT}` AWS account.</p>|Dependent item|aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total`</p></li></ul>|
+
+### Trigger prototypes for AWS account daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS account daily cost warning|<p>AWS `{#AWS.LINKED.ACCOUNT}` account daily cost is above warning threshold `{$AWS.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]) >= {$AWS.ACCOUNT.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS account daily cost high</li></ul>|
+|AWS account daily cost high|<p>AWS `{#AWS.LINKED.ACCOUNT}` account daily cost has exceeded high threshold `{$AWS.ACCOUNT.COST.DAILY.HIGH}`. Immediate investigation of account spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]) >= {$AWS.ACCOUNT.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS region daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS region daily cost discovery|<p>Discovers AWS daily region cost data.</p>|Dependent item|aws.region.daily.cost.discovery|
+
+### Item prototypes for AWS region daily cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region [{#AWS.REGION}]: Get daily data|<p>Collects AWS service daily cost from `{#AWS.REGION}` region.</p>|Dependent item|aws.region.daily.cost.processed.get["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AWS.REGION}")].first()`</p></li></ul>|
+|Region [{#AWS.REGION}]: Total daily cost|<p>Collects `{#AWS.REGION}` region daily cost.</p>|Dependent item|aws.region.daily.cost["{#AWS.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for AWS region daily cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS region daily cost warning|<p>AWS `{#AWS.REGION}` region daily cost is above warning threshold `{$AWS.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.region.daily.cost["{#AWS.REGION}"]) >= {$AWS.REGION.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS region daily cost high</li></ul>|
+|AWS region daily cost high|<p>AWS `{#AWS.REGION}` region daily cost has exceeded high threshold `{$AWS.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.region.daily.cost["{#AWS.REGION}"]) >= {$AWS.REGION.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS service yearly discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service yearly discovery|<p>Discovers AWS service yearly data.</p>|Dependent item|aws.service.yearly.discovery|
+
+### Item prototypes for AWS service yearly discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS service [{#AWS.SERVICE.NAME}]: Get yearly data|<p>Collects AWS yearly data for AWS `{#AWS.SERVICE.NAME}` service.</p>|Dependent item|aws.service.yearly.preprocessed.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AWS.SERVICE.NAME}")].first()`</p></li></ul>|
+|AWS service [{#AWS.SERVICE.NAME}]: Total yearly cost|<p>Collects AWS `{#AWS.SERVICE.NAME}` service yearly cost.</p>|Dependent item|aws.service.yearly.category.get["{#AWS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_amount`</p></li></ul>|
+
+### LLD rule AWS daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS daily costs by service discovery|<p>Discovery of daily blended costs by service.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
+
+### Item prototypes for AWS daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost|<p>The daily blended cost of the `{#AWS.BILLING.SERVICE.NAME}` service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Trigger prototypes for AWS daily costs by service discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS service daily cost warning|<p>AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost is above warning threshold `{$AWS.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/AWS Cost Explorer by HTTP/aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>AWS service daily cost high</li></ul>|
+|AWS service daily cost high|<p>AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost has exceeded high threshold `{$AWS.SERVICE.COST.DAILY.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.DAILY.HIGH}`|High||
+
+### LLD rule AWS monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS monthly costs by service discovery|<p>Discovery of monthly costs by service.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p></li></ul>|
+
+### Item prototypes for AWS monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost|<p>The monthly cost by service `{#AWS.BILLING.SERVICE.NAME}`.</p>|Dependent item|aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule AWS monthly costs discovery
 
@@ -3074,7 +3280,16 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#AWS.BILLING.MONTH}]: Blended cost per month|<p>The blended cost by month {#AWS.BILLING.MONTH}.</p>|Dependent item|aws.monthly.cost["{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#AWS.BILLING.MONTH}]: Blended cost per month|<p>The blended cost by month `{#AWS.BILLING.MONTH}`.</p>|Dependent item|aws.monthly.cost["{#AWS.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Trigger prototypes for AWS monthly costs discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS monthly billing warning|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost is above warning threshold `{$AWS.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BILLING.MONTH.WARN}`|Warning|**Depends on**:<br><ul><li>AWS monthly billing high</li></ul>|
+|AWS monthly billing high|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has exceeded high threshold `{$AWS.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BILLING.MONTH.HIGH}`|High||
+|AWS monthly billing budget warning 80%|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached 80% of the defined budget `{$AWS.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BUDGET.MONTH}*0.8`|Warning|**Depends on**:<br><ul><li>AWS monthly billing budget exceeded 100%</li></ul>|
+|AWS monthly billing budget exceeded 100%|<p>AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached or exceeded the full budget `{$AWS.BUDGET.MONTH}`. Immediate cost control actions are recommended.</p>|`last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BUDGET.MONTH}`|High||
 
 ## Feedback
 

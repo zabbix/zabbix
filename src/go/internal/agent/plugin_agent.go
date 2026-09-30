@@ -33,7 +33,10 @@ var (
 	performTask   PerformTask
 )
 
-type PerformTask func(key string, timeout time.Duration, clientID uint64) (result *string, err error)
+// PerformTask function signature for scheduler task performing functions.
+type PerformTask func(
+	key string, timeout time.Duration, legacyTimeout bool, clientID uint64,
+) (result *string, err error)
 
 // Plugin -
 type Plugin struct {
@@ -79,7 +82,8 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 
 	var err error
 	var taskResult *string
-	taskResult, err = performTask(item, timeout, clientID)
+
+	taskResult, err = performTask(item, timeout, false, clientID)
 	if err != nil {
 		return "", err
 	} else if taskResult == nil {

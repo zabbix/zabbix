@@ -24,84 +24,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxavailability.h"
-
-void	__wrap_zbx_sleep_loop(int sleeptime);
-zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num);
-int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha);
-int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *trigger_opdata, const char *error);
-int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
-void	__wrap_zbx_clean_events(void);
-void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, zbx_vector_history_record_t *values);
-void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
-		const zbx_vector_history_record_t *expected_values, const zbx_vector_history_record_t *returned_values);
-void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
-
-void	__wrap_zbx_sleep_loop(int sleeptime)
-{
-	ZBX_UNUSED(sleeptime);
-}
-
-zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
-{
-	ZBX_UNUSED(table_name);
-	ZBX_UNUSED(num);
-	return 0;
-}
-
-int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha)
-{
-	ZBX_UNUSED(ha);
-	return SUCCEED;
-}
-
-int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *trigger_opdata, const char *error)
-{
-	ZBX_UNUSED(source);
-	ZBX_UNUSED(object);
-	ZBX_UNUSED(objectid);
-	ZBX_UNUSED(timespec);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(trigger_description);
-	ZBX_UNUSED(trigger_expression);
-	ZBX_UNUSED(trigger_recovery_expression);
-	ZBX_UNUSED(trigger_priority);
-	ZBX_UNUSED(trigger_type);
-	ZBX_UNUSED(trigger_tags);
-	ZBX_UNUSED(trigger_correlation_mode);
-	ZBX_UNUSED(trigger_correlation_tag);
-	ZBX_UNUSED(trigger_value);
-	ZBX_UNUSED(trigger_opdata);
-	ZBX_UNUSED(error);
-	return SUCCEED;
-
-}
-
-int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
-{
-	ZBX_UNUSED(trigger_diff);
-	ZBX_UNUSED(triggerids_lock);
-	return SUCCEED;
-}
-
-void	__wrap_zbx_clean_events(void)
-{
-}
-
-void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group)
-{
-	ZBX_UNUSED(ts_from);
-	ZBX_UNUSED(table_group);
-}
+#include "mocks/valuecache/valuecache_mock.h"
 
 /******************************************************************************
  *                                                                            *
@@ -314,7 +237,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mockdb_init();
 
-	err = zbx_history_init(NULL, NULL, 0, &error);
+	err = zbx_history_init(NULL, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL, &error);
 	zbx_mock_assert_result_eq("zbx_history_init()", SUCCEED, err);
 
 	if (FAIL == zbx_is_uint64(zbx_mock_get_parameter_string("in.itemid"), &itemid))

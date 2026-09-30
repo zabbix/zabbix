@@ -9,7 +9,7 @@ zabbix_export:
       name: 'Cisco Catalyst 3750V2-24PS by SNMP'
       description: |
         Template Cisco Catalyst 3750V2-24PS
-          
+        
           MIBs used:
           CISCO-MEMORY-POOL-MIB
           IF-MIB
@@ -38,7 +38,7 @@ zabbix_export:
         Refer to the vendor documentation.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-6
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -318,7 +318,7 @@ zabbix_export:
           preprocessing:
             - type: REGEX
               parameters:
-                - 'Version (.+), RELEASE'
+                - 'Version\s+([^\s,]+)'
                 - \1
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -835,7 +835,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    2. `{ $IFCONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
                   tags:
                     - tag: scope
                       value: availability
@@ -1384,12 +1384,21 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'The time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '21'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           description: 'Critical threshold of the temperature in °C.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold for temperature (critical)'
             description: 'Critical threshold of the temperature in °C.'
@@ -1399,7 +1408,7 @@ zabbix_export:
           description: 'Critical threshold of the low temperature in °C.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Thresholds
             label: 'Threshold for low temperature (critical)'
             description: 'Critical threshold of the low temperature in °C.'
@@ -1409,7 +1418,7 @@ zabbix_export:
           description: 'Warning threshold of the temperature in °C.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Thresholds
             label: 'Threshold for temperature (warning)'
             description: 'Warning threshold of the temperature in °C.'
@@ -2102,11 +2111,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: a9633d3df8724c7cba6dfc6ec790c1fd
-      expression: '(last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime)<10m)'
+      expression: |
+        (last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)>0 and change(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)<0 and last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime,#2)<42949672.96-(lastclock(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)-lastclock(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime,#2)))
+        or (last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)=0 and change(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime)<0 and last(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime,#2)<42949672.96-(lastclock(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime)-lastclock(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime,#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Cisco Catalyst 3750V2-24PS by SNMP/system.hw.uptime)>{$SNMP.UPTIME.WARN}
+        or last(/Cisco Catalyst 3750V2-24PS by SNMP/system.net.uptime)>{$SNMP.UPTIME.WARN}
       name: 'Cisco Catalyst 3750V2-24PS: Host has been restarted'
-      event_name: 'Cisco Catalyst 3750V2-24PS: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Cisco Catalyst 3750V2-24PS: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       tags:
         - tag: scope

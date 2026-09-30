@@ -157,10 +157,13 @@ class CControllerHintboxEventlist extends CController {
 			}
 
 			if (bccomp($problem['eventid'], $this->getInput('eventid_till')) == 0) {
-				$trigger['comments'] = CMacrosResolverHelper::resolveTriggerDescription($trigger + [
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					], ['events' => true]);
+				$trigger['comments'] = CMacrosResolverHelper::resolveEventDescriptions([$problem['eventid'] => [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'comments' => $trigger['comments'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				]])[$problem['eventid']]['comments'];
 			}
 		}
 		unset($problem);

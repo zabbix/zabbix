@@ -1157,6 +1157,14 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		{
 			char	*json_val, *dyn_error = NULL;
 
+			/* Meta (lastlogsize/mtime) comes from a log-reading item KEY like: log or eventlog. */
+			/* It is not dependent on the item's configured VALUE TYPE.                          */
+			if (0 == ZBX_ISSET_VALUE(result) && 0 == ZBX_ISSET_BIN(result))
+			{
+				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+				goto out;
+			}
+
 			if (ZBX_ISSET_JSON(result))
 			{
 				json_val = result->json;
@@ -1219,7 +1227,7 @@ out:
  * Purpose: send flush command to preprocessing manager                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_flush(void)
+size_t	zbx_preprocessor_flush(void)
 {
 	if (0 < preproc_offset)
 	{
@@ -1230,7 +1238,7 @@ void	zbx_preprocessor_flush(void)
 		zbx_free(preproc_data);
 	}
 
-	zbx_dc_flush_history();
+	return zbx_dc_flush_history();
 }
 
 /******************************************************************************

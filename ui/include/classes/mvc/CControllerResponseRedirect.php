@@ -16,27 +16,85 @@
 
 class CControllerResponseRedirect extends CControllerResponse {
 
-	protected $formData = [];
+	protected string $url;
 
-	/**
-	 * @param CUrl $location
-	 */
-	public function __construct(CUrl $location) {
-		$url = $location->getUrl();
-		$url_parts = parse_url($url);
+	protected array $form_data = [];
 
-		if (!$url_parts || array_key_exists('host', $url_parts) || !CHtmlUrlValidator::validateSameSite($url)) {
+	public function __construct(CUrl $redirect_to) {
+		$this->url = $redirect_to->getUrl();
+
+		if (!(new CFrontendActionValidator())->validate($this->url)) {
 			throw new CAccessDeniedException();
 		}
-
-		$this->location = $url;
 	}
 
-	public function setFormData(array $formData): void {
-		$this->formData = $formData;
+	public function setFormData(array $form_data): static {
+		$this->form_data = $form_data;
+
+		return $this;
 	}
 
 	public function getFormData(): array {
-		return $this->formData;
+		return $this->form_data;
+	}
+
+	public function redirect(): void {
+		CMessageHelper::restoreScheduleMessages();
+
+		$form_data = $this->getFormData();
+		$messages = $this->getMessages();
+
+		if (!$form_data && !$messages) {
+			redirect($this->url);
+		}
+
+		$data = ['form' => $form_data, 'messages' => $messages];
+
+		(new CHtmlPageHeader(_('Loading...'), CWebUser::getLang()))->show();
+
+		echo '<body>'.$this->autoSubmit($data).'</body></html>';
+
+		session_write_close();
+
+		exit;
+	}
+
+	protected function autoSubmit(array $data): string {
+		$form = (new CForm('post', $this->url, 'multipart/form-data'))->setName('auto-submit');
+
+		$data_str = json_encode($data);
+		$sign = CEncryptHelper::sign($data_str);
+
+		$form->addItem(new CInput('hidden', 'formdata', ''));
+		$form->addItem(new CInput('hidden', 'sign', base64_encode($sign)));
+		$form->addItem(new CInput('hidden', 'data', base64_encode($data_str)));
+
+		$script =
+			'<script>'.
+				'document.addEventListener("DOMContentLoaded", () => document.forms["auto-submit"].submit());'.
+			'</script>';
+
+		return $form->toString().$script;
+	}
+
+	protected function getMessages(): array {
+		$result = [];
+
+		if (($title = CMessageHelper::getTitle()) !== null) {
+			switch (CMessageHelper::getType()) {
+				case CMessageHelper::MESSAGE_TYPE_ERROR:
+					$result[CMessageHelper::MESSAGE_TYPE_ERROR] = $title;
+					break;
+				case CMessageHelper::MESSAGE_TYPE_SUCCESS:
+					$result[CMessageHelper::MESSAGE_TYPE_SUCCESS] = $title;
+					break;
+			}
+		}
+
+		if ($messages = CMessageHelper::getMessages()) {
+			$result['messages'] = $messages;
+		}
+
+		return $result;
 	}
 }

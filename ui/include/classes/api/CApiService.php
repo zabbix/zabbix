@@ -273,24 +273,17 @@ class CApiService {
 	 */
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
-		$extraFields = [];
+		$extra_fields = [];
 		foreach ($fields as $field) {
 			if (!$this->outputIsRequested($field, $output)) {
-				$extraFields[] = $field;
+				$extra_fields[$field] = true;
 			}
 		}
 
 		// unset these fields
-		if ($extraFields) {
-			foreach ($objects as &$object) {
-				foreach ($extraFields as $field) {
-					unset($object[$field]);
-				}
-			}
-			unset($object);
-		}
-
-		return $objects;
+		return $extra_fields
+			? array_map(static fn (array $row) => array_diff_key($row, $extra_fields), $objects)
+			: $objects;
 	}
 
 	/**
@@ -825,11 +818,11 @@ class CApiService {
 	/**
 	 * Throws an API exception.
 	 *
-	 * @param int    $code
-	 * @param string $error
+	 * @throws APIException
 	 */
-	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
-		throw new APIException($code, $error);
+	protected static function exception(int $code = ZBX_API_ERROR_INTERNAL, string $error = '',
+			string $debug_message = '') {
+		throw new APIException($code, $error, $debug_message);
 	}
 
 	/**

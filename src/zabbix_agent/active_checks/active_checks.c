@@ -432,12 +432,16 @@ static void	add_command(const char *key, zbx_uint64_t id, int timeout)
  *     config_revision_local - [IN/OUT] revision of processed configuration     *
  *     config_timeout        - [IN] global timeout value for checks without     *
  *                                  timeouts                                    *
+ *     config_hostname       - [IN]                                             *
+ *     addrs                 - [IN]                                             *
+ *     config_tls            - [IN]                                             *
+ *     config_source_ip      - [IN]                                             *
+ *     config_buffer_send    - [IN]                                             *
+ *     config_buffer_size    - [IN]                                             *
+ *     debug_level           - [IN]                                             *
  *                                                                              *
- * Comments:                                                                    *
- *    String is represented as "ZBX_EOF" termination list, with '\n'            *
- *    delimiter between elements.                                               *
- *    Each element represented as:                                              *
- *           <key>:<refresh time>:<last log size>:<modification time>           *
+ * Return value: SUCCEED     - list of active checks parsed successfully        *
+ *               FAIL        - error occurred                                   *
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
@@ -1923,9 +1927,11 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
+#	define RETRY_INTERVAL_MIN	2
+#	define RETRY_INTERVAL_MAX	60
 	zbx_thread_activechk_args	activechk_args, *activechks_args_in;
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
-					heartbeat_nextcheck = 0, lash_cmd_hash_check = 0;
+					heartbeat_nextcheck = 0, lash_cmd_hash_check = 0, retry_after = 0;
 	zbx_uint32_t			config_revision_local = 0;
 	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
@@ -2009,16 +2015,29 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					activechks_args_in->config_buffer_send,
 					activechks_args_in->config_buffer_size))
 			{
-				nextrefresh = time(NULL) + 60;
+				retry_after = 0 == retry_after ? RETRY_INTERVAL_MIN : retry_after * 2;
+
+				if (retry_after > RETRY_INTERVAL_MAX)
+					retry_after = RETRY_INTERVAL_MAX;
+
+				nextrefresh = time(NULL) + retry_after;
 			}
 			else
 			{
 				nextrefresh = time(NULL) + activechks_args_in->config_refresh_active_checks;
 				nextcheck = 0;
+
+				if (0 != retry_after)
+					retry_after = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);
 #endif
+		}
+		else if (ZBX_HISTORY_UPLOAD_DISABLED == history_upload && nextrefresh > now + RETRY_INTERVAL_MAX)
+		{
+			retry_after = RETRY_INTERVAL_MIN;
+			nextrefresh = now + retry_after;
 		}
 
 		if (0 != active_commands.values_num)
@@ -2048,7 +2067,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
-				nextcheck = time(NULL) + 60;
+				nextcheck = time(NULL) + RETRY_INTERVAL_MAX;
 		}
 		else
 		{
@@ -2091,6 +2110,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #else
 	exit(EXIT_SUCCESS);
 #endif
+#	undef RETRY_INTERVAL_MIN
+#	undef RETRY_INTERVAL_MAX
 }
 
 static void	send_back_unsupported_item(zbx_uint64_t itemid, const char *key, char *error, const char *config_hostname,

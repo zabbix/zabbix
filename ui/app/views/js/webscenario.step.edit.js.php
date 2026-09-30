@@ -90,7 +90,7 @@ window.webscenario_step_edit_popup = new class {
 	#updateSortOrder(table, name_field) {
 		table.querySelectorAll('.form_row').forEach((row, index) => {
 			for (const field of row.querySelectorAll(`[name^="${name_field}["]`)) {
-				field.setAttribute('name', field.getAttribute('name').replace(/\[\d+]/g, `[${index}]`));
+				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
 			}
 		});
 	}
@@ -256,7 +256,7 @@ window.webscenario_step_edit_popup = new class {
 	}
 
 	#showErrorDialog(message, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup',
 			content: jQuery('<span>').html(message),
@@ -270,6 +270,9 @@ window.webscenario_step_edit_popup = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element: jQuery(trigger_element)
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#updateForm() {

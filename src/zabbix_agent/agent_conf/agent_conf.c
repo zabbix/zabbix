@@ -114,7 +114,15 @@ int	load_user_parameters(char **lines, char **err)
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg)
 {
-	unsigned char	rule_type;
+	int	rule_type = FAIL;
+
+	if (0 == strcmp(cfg->parameter, "AllowKeyRegexp"))
+		rule_type = ZBX_KEY_ACCESS_ALLOW;
+	else if (0 == strcmp(cfg->parameter, "DenyKeyRegexp"))
+		rule_type = ZBX_KEY_ACCESS_DENY;
+
+	if (FAIL != rule_type)
+		return zbx_add_key_access_rule_regexp(cfg->parameter, (char *)value, rule_type);
 
 	if (0 == strcmp(cfg->parameter, "AllowKey"))
 		rule_type = ZBX_KEY_ACCESS_ALLOW;

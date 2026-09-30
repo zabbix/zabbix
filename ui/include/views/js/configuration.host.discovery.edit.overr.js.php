@@ -17,124 +17,124 @@
 /**
  * @var CView $this
  */
-?>
-<script type="text/x-jquery-tmpl" id="lldoverride-row-readonly">
-	<?= (new CRow([
-			'',
-			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')))),
-			'#{stop_verbose}',
-			(new CCol(
-				(new CButtonLink(_('Remove')))
-					->addClass('element-table-remove')
-					->setEnabled(false)
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="lldoverride-row">
-	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CCol((new CSpan('1:'))->setAttribute('data-row-num', '')))
-				->setWidth('15'),
-			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});'))))
-				->setWidth('350'),
-			(new CCol('#{stop_verbose}'))
-				->setWidth('100'),
-			(new CCol(
-				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-			))
-				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth('50')
-		]))
-			->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="override-filters-row">
-	<?=
-		(new CRow([[
-				new CSpan('#{formulaId}'),
-				new CVar('overrides_filters[#{rowNum}][formulaid]', '#{formulaId}')
-			],
-			(new CTextBox('overrides_filters[#{rowNum}][macro]', '', false,
-					DB::getFieldLength('lld_override_condition', 'macro')))
+
+(new CTemplateTag('lldoverride-row-readonly-tmpl',
+	(new CRow([
+		'',
+		(new CSpan('1:'))->setAttribute('data-row-num', ''),
+		(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')))),
+		'#{stop_verbose}',
+		(new CCol(
+			(new CButtonLink(_('Remove')))
+				->addClass('element-table-remove')
+				->setEnabled(false)
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+))->show();
+
+(new CTemplateTag('lldoverride-row-tmpl',
+	(new CRow([
+		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+		(new CCol((new CSpan('1:'))->setAttribute('data-row-num', '')))
+			->setWidth('15'),
+		(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});'))))
+			->setWidth('350'),
+		(new CCol('#{stop_verbose}'))
+			->setWidth('100'),
+		(new CCol(
+			(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+		))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->setWidth('50')
+	]))
+))->show();
+
+(new CTemplateTag('override-filters-row-tmpl',
+	(new CRow([[
+			new CSpan('#{formulaId}'),
+			new CVar('overrides_filters[#{rowNum}][formulaid]', '#{formulaId}')
+		],
+		(new CCol(
+			(new CTextAreaFlexible('overrides_filters[#{rowNum}][macro]', ''))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->setMaxlength(DB::getFieldLength('lld_override_condition', 'macro'))
 				->addClass(ZBX_STYLE_UPPERCASE)
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
-				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CSelect('overrides_filters[#{rowNum}][operator]'))
-				->setValue(CONDITION_OPERATOR_REGEXP)
-				->addClass('js-operator')
-				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_OPERATOR_REGEXP => _('matches'),
-					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
-					CONDITION_OPERATOR_EXISTS => _('exists'),
-					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
-				])),
+				->setAttribute('data-formulaid', '#{formulaId}')
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
+		(new CSelect('overrides_filters[#{rowNum}][operator]'))
+			->setValue(CONDITION_OPERATOR_REGEXP)
+			->addClass('js-operator')
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_OPERATOR_REGEXP => _('matches'),
+				CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+				CONDITION_OPERATOR_EXISTS => _('exists'),
+				CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+			])),
+		(new CCol(
 			(new CDiv(
-				(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
-					DB::getFieldLength('lld_override_condition', 'value')))
-						->addClass('js-value')
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-						->setAttribute('placeholder', _('regular expression'))
-			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
-			(new CCol(
-				(new CButton('overrides_filters#{rowNum}_remove', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="lldoverride-operation-row-readonly">
-	<?= (new CRow([
-			['#{condition_object} #{condition_operator} ', italic('#{value}')],
-			(new CCol(
-				(new CButtonLink(_('View')))
-					->addClass('element-table-open')
-					->onClick('lldoverrides.operations.open(#{no});')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="lldoverride-operation-row">
-	<?= (new CRow([
-			['#{condition_object} #{condition_operator} ', italic('#{value}')],
-			(new CHorList([
-				(new CButtonLink(_('Edit')))
-					->addClass('element-table-open')
-					->onClick('lldoverrides.operations.open(#{no});'),
-				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-			]))->addClass(ZBX_STYLE_NOWRAP)
-		]))->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="lldoverride-custom-intervals-row">
-	<?= (new CRow([
-			(new CRadioButtonList('opperiod[delay_flex][#{rowNum}][type]', 0))
-				->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
-				->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
-				->setModern(true),
-			[
-				(new CTextBox('opperiod[delay_flex][#{rowNum}][delay]'))
-					->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
-				(new CTextBox('opperiod[delay_flex][#{rowNum}][schedule]'))
-					->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-					->setAttribute('style', 'display: none;')
-			],
-			(new CTextBox('opperiod[delay_flex][#{rowNum}][period]'))
-				->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
-			(new CButton('opperiod[delay_flex][#{rowNum}][remove]', _('Remove')))
+				(new CTextAreaFlexible('overrides_filters[#{rowNum}][value]', ''))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setMaxlength(DB::getFieldLength('lld_override_condition', 'value'))
+					->addClass('js-value')
+					->setAttribute('placeholder', _('regular expression'))
+			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
+		(new CCol(
+			(new CButton('overrides_filters#{rowNum}_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+))->show();
+
+(new CTemplateTag('lldoverride-operation-row-readonly-tmpl',
+	(new CRow([
+		['#{condition_object} #{condition_operator} ', italic('#{value}')],
+		(new CCol(
+			(new CButtonLink(_('View')))
+				->addClass('element-table-open')
+				->onClick('lldoverrides.operations.open(#{no});')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+))->show();
+
+(new CTemplateTag('lldoverride-operation-row-tmpl',
+	(new CRow([
+		['#{condition_object} #{condition_operator} ', italic('#{value}')],
+		(new CHorList([
+			(new CButtonLink(_('Edit')))
+				->addClass('element-table-open')
+				->onClick('lldoverrides.operations.open(#{no});'),
+			(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+		]))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+))->show();
+
+(new CTemplateTag('lldoverride-custom-intervals-row-tmpl',
+	(new CRow([
+		(new CRadioButtonList('opperiod[delay_flex][#{rowNum}][type]', 0))
+			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+			->setModern(true),
+		[
+			(new CTextBox('opperiod[delay_flex][#{rowNum}][delay]'))
+				->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
+			(new CTextBox('opperiod[delay_flex][#{rowNum}][schedule]'))
+				->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+				->setAttribute('style', 'display: none;')
+		],
+		(new CTextBox('opperiod[delay_flex][#{rowNum}][period]'))
+			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
+		(new CButton('opperiod[delay_flex][#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))
+		->addClass('form_row')
+))->show();
+?>
 
 <?php
 (new CTemplateTag('lldoverride-tag-row',
@@ -160,17 +160,28 @@
 				does_not_contain:           <?= json_encode(_('does not contain')) ?>,
 				matches:                    <?= json_encode(_('matches')) ?>,
 				does_not_match:             <?= json_encode(_('does not match')) ?>
+			},
+			appendFormData: function (form_element) {
+				var hidden_form = form_element.querySelector('#hidden-form');
+
+				hidden_form && hidden_form.remove();
+				hidden_form = document.createElement('div');
+				hidden_form.id = 'hidden-form';
+
+				hidden_form.appendChild(lldoverrides.overrides.toFragment());
+
+				form_element.appendChild(hidden_form);
 			}
 		};
 
 		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.readonly
-			? '#lldoverride-row-readonly'
-			: '#lldoverride-row'
+			? '#lldoverride-row-readonly-tmpl'
+			: '#lldoverride-row-tmpl'
 		).html());
 
 		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.readonly
-			? '#lldoverride-operation-row-readonly'
-			: '#lldoverride-operation-row'
+			? '#lldoverride-operation-row-readonly-tmpl'
+			: '#lldoverride-operation-row-tmpl'
 		).html());
 
 		window.lldoverrides.overrides = new Overrides($('#overridesTab'),
@@ -180,17 +191,13 @@
 			'optag', 'optemplate', 'opinventory'
 		];
 
-		window.lldoverrides.$form = $('form[name="itemForm"]').on('submit', function(e) {
-			var hidden_form = this.querySelector('#hidden-form');
-
-			hidden_form && hidden_form.remove();
-			hidden_form = document.createElement('div');
-			hidden_form.id = 'hidden-form';
-
-			hidden_form.appendChild(lldoverrides.overrides.toFragment());
-
-			this.appendChild(hidden_form);
-		});
+		ZABBIX.EventHub.publish(new CEventHubEvent({
+			data: {},
+			descriptor: {
+				context: 'configuration.host.discovery.edit.overr',
+				action: 'ready'
+			}
+		}));
 	});
 
 	/**
@@ -224,6 +231,7 @@
 		var input = window.document.createElement('input');
 
 		input.type = 'hidden';
+		input.setAttribute('data-field-type', 'hidden');
 		input.value = value;
 		input.name = prefix ? prefix + '[' + name + ']' : name;
 
@@ -467,8 +475,11 @@
 	 * @return {object}  Returns DocumentFragment object.
 	 */
 	Overrides.prototype.toFragment = function() {
-		var frag = document.createDocumentFragment(),
-			iter_step = 0;
+		const frag = window.document.createElement('div');
+		frag.setAttribute('data-field-type', 'set');
+		frag.setAttribute('data-field-name', 'overrides');
+
+		let iter_step = 0;
 
 		this.sort_index.forEach(function(id) {
 			var override = this.data[id],
@@ -712,9 +723,21 @@
 	OverrideEditForm.prototype.filterDynamicRows = function() {
 		var that = this;
 
+		const toggleConditionValue = function(target) {
+			const value_input = target.closest('.form_row').querySelector('.js-value');
+			const show_value = (target.value == <?= CONDITION_OPERATOR_REGEXP ?>
+				|| target.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+
+			value_input.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
+
+			if (!show_value) {
+				value_input.value = '';
+			}
+		}
+
 		jQuery('#overrides_filters')
 			.dynamicRows({
-				template: '#override-filters-row',
+				template: '#override-filters-row-tmpl',
 				counter: this.override.filter_counter,
 				allow_empty: true,
 				dataCallback: function(data) {
@@ -739,7 +762,7 @@
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', view.toggleConditionValue);
+					.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
@@ -761,7 +784,7 @@
 		jQuery('#overrides-evaltype').trigger('change');
 
 		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
-			elem.addEventListener('change', view.toggleConditionValue);
+			elem.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 		});
 	};
 
@@ -775,13 +798,13 @@
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['input[type="text"]']);
+		this.$form.trimValues(['input[type="text"]', 'textarea', 'z-textarea-flexible']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serializeJSON(),
+			data: getFormFields(this.$form[0]),
 			dataType: 'json',
 			type: 'post'
 		})
@@ -1023,7 +1046,7 @@
 			}
 		});
 
-		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row', allow_empty: true});
+		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row-tmpl', allow_empty: true});
 
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {

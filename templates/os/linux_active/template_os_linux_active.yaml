@@ -34,7 +34,7 @@ zabbix_export:
         - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-2
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -69,9 +69,26 @@ zabbix_export:
               priority: AVERAGE
               description: 'For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
+              dependencies:
+                - name: 'Linux: Active checks are not available'
+                  expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               tags:
                 - tag: scope
                   value: availability
+        - uuid: e9da558a20e54e6188751700ae80c5b3
+          name: 'Zabbix agent variant'
+          type: ZABBIX_ACTIVE
+          key: agent.variant
+          delay: 1h
+          value_type: CHAR
+          description: 'The variant of Zabbix agent (Zabbix agent or Zabbix agent 2).'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: application
         - uuid: 91dbe302bd8e4954b91e9ce3a795b4eb
           name: 'Version of Zabbix agent running'
           type: ZABBIX_ACTIVE
@@ -101,9 +118,12 @@ zabbix_export:
           triggers:
             - uuid: a7716b62422243b991a2697752d7cb1f
               expression: 'last(/Linux by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}'
-              name: 'Linux: Configured max number of open filedescriptors is too low'
-              event_name: 'Linux: Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
+              name: 'Linux: Configured max number of open file descriptors is too low'
+              event_name: 'Linux: Configured max number of open file descriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
+              dependencies:
+                - name: 'Linux: Getting closer to file descriptors limit'
+                  expression: 'min(/Linux by Zabbix agent active/kernel.openfiles,5m)/last(/Linux by Zabbix agent active/kernel.maxfiles)*100>80'
               tags:
                 - tag: scope
                   value: performance
@@ -132,6 +152,29 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+        - uuid: 7c3efb496a56435a859142c624992522
+          name: 'Number of open file descriptors'
+          type: ZABBIX_ACTIVE
+          key: kernel.openfiles
+          description: 'The number of currently open file descriptors.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: system
+        - uuid: 229612ee73c64e7d89bf70e2d811b029
+          name: 'Get network interfaces'
+          type: ZABBIX_ACTIVE
+          key: net.if.get
+          delay: 3m
+          history: '0'
+          value_type: TEXT
+          description: 'The `net.if.get` key acquires raw information set about the network interfaces. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: ccb6fdbe1267475780e978c0c5de986c
           name: 'Number of processes'
           type: ZABBIX_ACTIVE
@@ -532,6 +575,17 @@ zabbix_export:
           tags:
             - tag: component
               value: environment
+        - uuid: 6899543a993a4d60ac967645aaee98cb
+          name: 'Get block devices'
+          type: ZABBIX_ACTIVE
+          key: 'vfs.dev.get[disk_stats,.*]'
+          delay: 3m
+          history: '0'
+          value_type: TEXT
+          description: 'The `vfs.dev.get` key acquires raw information set about the block devices. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 87f35de24ba74a8d8f70430c8da85261
           name: 'Checksum of /etc/passwd'
           type: ZABBIX_ACTIVE
@@ -605,7 +659,7 @@ zabbix_export:
         - uuid: 07e60e812d32443ba8e8b0eb27166b98
           name: 'Memory utilization'
           type: DEPENDENT
-          key: vm.memory.utilization
+          key: vm.memory.util
           value_type: FLOAT
           units: '%'
           description: 'The percentage of used memory is calculated as `100-pavailable`.'
@@ -620,7 +674,7 @@ zabbix_export:
               value: memory
           triggers:
             - uuid: fb368aa704064a44b9a4ed8c129cf3e8
-              expression: 'min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Linux by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               name: 'Linux: High memory utilization'
               event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -663,9 +717,8 @@ zabbix_export:
       discovery_rules:
         - uuid: 0b47631fb1334f78a7fe5207194a5476
           name: 'Network interface discovery'
-          type: ZABBIX_ACTIVE
-          key: net.if.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: net.if.get.discovery
           filter:
             evaltype: AND
             conditions:
@@ -676,13 +729,37 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           description: 'The discovery of network interfaces.'
           item_prototypes:
+            - uuid: 52f04394d1ba4bad9c117586ddbf6fa4
+              name: 'Interface {#IFNAME}: Get config data'
+              type: DEPENDENT
+              key: 'net.if.get.config["{#IFNAME}"]'
+              history: '0'
+              value_type: TEXT
+              description: 'Intermediate configuration data of the `{#IFNAME}` network interface.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.config[?(@.name=="{#IFNAME}")].first()'
+              master_item:
+                key: net.if.get
+              tags:
+                - tag: component
+                  value: network
+                - tag: component
+                  value: raw
+                - tag: interface
+                  value: '{#IFNAME}'
             - uuid: f1a4f18b78754e669d1ddc593765f2e4
               name: 'Interface {#IFNAME}: Inbound packets discarded'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.in["{#IFNAME}",dropped]'
-              delay: 3m
+              type: DEPENDENT
+              key: 'net.if.get.in.dropped["{#IFNAME}"]'
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.in.dropped
                 - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
@@ -690,11 +767,15 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: f0eb218780ce44128117d73d65d412a9
               name: 'Interface {#IFNAME}: Inbound packets with errors'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.in["{#IFNAME}",errors]'
-              delay: 3m
+              type: DEPENDENT
+              key: 'net.if.get.in.errors["{#IFNAME}"]'
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.in.errors
                 - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
@@ -702,55 +783,19 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 37dd13afa2b84b0e906a80016b9b2bf5
               name: 'Interface {#IFNAME}: Bits received'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.in["{#IFNAME}"]'
-              delay: 3m
+              type: DEPENDENT
+              key: 'net.if.get.in["{#IFNAME}"]'
               units: bps
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.in.bytes
                 - type: CHANGE_PER_SECOND
                 - type: MULTIPLIER
                   parameters:
                     - '8'
-              tags:
-                - tag: component
-                  value: network
-                - tag: interface
-                  value: '{#IFNAME}'
-            - uuid: 12a56bb72eef43648293ce1d6c8f9c42
-              name: 'Interface {#IFNAME}: Outbound packets discarded'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.out["{#IFNAME}",dropped]'
-              delay: 3m
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-              tags:
-                - tag: component
-                  value: network
-                - tag: interface
-                  value: '{#IFNAME}'
-            - uuid: 90362d020e82429d87b0b1688355831d
-              name: 'Interface {#IFNAME}: Outbound packets with errors'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.out["{#IFNAME}",errors]'
-              delay: 3m
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-              tags:
-                - tag: component
-                  value: network
-                - tag: interface
-                  value: '{#IFNAME}'
-            - uuid: 63616a66fb5e4fd7a725c5186b47e516
-              name: 'Interface {#IFNAME}: Bits sent'
-              type: ZABBIX_ACTIVE
-              key: 'net.if.out["{#IFNAME}"]'
-              delay: 3m
-              units: bps
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                - type: MULTIPLIER
-                  parameters:
-                    - '8'
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
@@ -758,42 +803,32 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 83b33479fd774915b100b69c527519c8
               name: 'Interface {#IFNAME}: Operational status'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]'
+              type: DEPENDENT
+              key: 'net.if.get.operstate["{#IFNAME}"]'
               trends: '0'
               description: 'Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt'
               valuemap:
                 name: ifOperStatus
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.operational_state
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var newvalue;
-                      switch(value) {
-                        case "unknown":
-                      	newvalue = 0;
-                      	break;
-                        case "notpresent":
-                      	newvalue = 1;
-                      	break;
-                        case "down":
-                      	newvalue = 2;
-                      	break;
-                        case "lowerlayerdown":
-                      	newvalue = 3;
-                      	break;
-                        case "testing":
-                      	newvalue = 4;
-                      	break;
-                        case "dormant":
-                      	newvalue = 5;
-                      	break;
-                        case "up":
-                      	newvalue = 6;
-                      	break;  default:
-                      	newvalue = "Problem parsing interface operstate in JS";
-                      }
-                      return newvalue;
+                      var idx = {
+                        unknown: 0,
+                        notpresent: 1,
+                        down: 2,
+                        lowerlayerdown: 3,
+                        testing: 4,
+                        dormant: 5,
+                        up: 6
+                      };
+                      
+                      return typeof idx[value] === 'undefined' ? 'Problem parsing interface operstate in JS' : idx[value];
+              master_item:
+                key: 'net.if.get.config["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
@@ -801,15 +836,17 @@ zabbix_export:
                   value: '{#IFNAME}'
               trigger_prototypes:
                 - uuid: 1b8e42925e1b48969f35d91800fe5229
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])=2
+                    and (last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#1)<>last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#2))
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Linux: Interface {#IFNAME}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the operations status is down.
+                    1. It can be triggered if the operational status is down.
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
                     3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
@@ -818,25 +855,82 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
+            - uuid: 12a56bb72eef43648293ce1d6c8f9c42
+              name: 'Interface {#IFNAME}: Outbound packets discarded'
+              type: DEPENDENT
+              key: 'net.if.get.out.dropped["{#IFNAME}"]'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.out.dropped
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
+              tags:
+                - tag: component
+                  value: network
+                - tag: interface
+                  value: '{#IFNAME}'
+            - uuid: 90362d020e82429d87b0b1688355831d
+              name: 'Interface {#IFNAME}: Outbound packets with errors'
+              type: DEPENDENT
+              key: 'net.if.get.out.errors["{#IFNAME}"]'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.out.errors
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
+              tags:
+                - tag: component
+                  value: network
+                - tag: interface
+                  value: '{#IFNAME}'
+            - uuid: 63616a66fb5e4fd7a725c5186b47e516
+              name: 'Interface {#IFNAME}: Bits sent'
+              type: DEPENDENT
+              key: 'net.if.get.out["{#IFNAME}"]'
+              units: bps
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.out.bytes
+                - type: CHANGE_PER_SECOND
+                - type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'net.if.get.values["{#IFNAME}"]'
+              tags:
+                - tag: component
+                  value: network
+                - tag: interface
+                  value: '{#IFNAME}'
             - uuid: 86dd61015ecc43428803b309bdfa9691
               name: 'Interface {#IFNAME}: Speed'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]'
-              delay: 5m
+              type: DEPENDENT
+              key: 'net.if.get.speed["{#IFNAME}"]'
               trends: '0'
               units: bps
               description: |
-                It indicates the latest or current speed value of the interface. The value is an integer representing the link speed expressed in bits/sec.
+                The latest or current speed value of the interface, expressed in bits/sec.
                 This attribute is only valid for the interfaces that implement the ethtool `get_link_ksettings` method (mostly Ethernet).
                 
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.speed
+                  error_handler: DISCARD_VALUE
                 - type: MULTIPLIER
                   parameters:
                     - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: 'net.if.get.config["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
@@ -844,37 +938,69 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: e675114e23414b9dbc2d19d00f32bc70
               name: 'Interface {#IFNAME}: Interface type'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/type"]'
-              delay: 1h
+              type: DEPENDENT
+              key: 'net.if.get.type["{#IFNAME}"]'
               trends: '0'
               description: |
-                It indicates the interface protocol type as a decimal value.
-                See `include/uapi/linux/if_arp.h` for all possible values.
+                The interface protocol type.
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
               valuemap:
                 name: 'Linux::Interface protocol types'
               preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.type
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var idx = {
+                        physical: 0,
+                        virtual: 1,
+                        loopback: 2
+                      };
+                      
+                      return typeof idx[value] === 'undefined' ? 3 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: 'net.if.get.config["{#IFNAME}"]'
               tags:
                 - tag: component
                   value: network
                 - tag: interface
                   value: '{#IFNAME}'
+            - uuid: 0a0cf7332714462db1d2f1380317f3b7
+              name: 'Interface {#IFNAME}: Get values data'
+              type: DEPENDENT
+              key: 'net.if.get.values["{#IFNAME}"]'
+              history: '0'
+              value_type: TEXT
+              description: 'Intermediate statistics data of the `{#IFNAME}` network interface.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name=="{#IFNAME}")].first()'
+              master_item:
+                key: net.if.get
+              tags:
+                - tag: component
+                  value: network
+                - tag: component
+                  value: raw
+                - tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             - uuid: c0fd4630351f424aa6c8b7f2e85f0f9e
               expression: |
-                change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])<0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
+                change(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])<0 and last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])>0
+                and last(/Linux by Zabbix agent active/net.if.get.type["{#IFNAME}"])=0
                 and
-                (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6 or last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
-                and
-                (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2)
+                (last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"],#2)>0) or
-                (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2)
+                (change(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])>0 and last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"],#2)>0) or
+                last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])=2
               name: 'Linux: Interface {#IFNAME}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -882,20 +1008,22 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Linux: Interface {#IFNAME}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
-                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])=2
+                    and (last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#1)<>last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#2))
+                  recovery_expression: 'last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 5370cb085c454077a2dd6c39890f706a
               expression: |
-                (avg(/Linux by Zabbix agent active/net.if.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) or
-                avg(/Linux by Zabbix agent active/net.if.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])) and
-                last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
+                (avg(/Linux by Zabbix agent active/net.if.get.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"]) or
+                avg(/Linux by Zabbix agent active/net.if.get.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])) and
+                last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Linux by Zabbix agent active/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) and
-                avg(/Linux by Zabbix agent active/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])
+                avg(/Linux by Zabbix agent active/net.if.get.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"]) and
+                avg(/Linux by Zabbix agent active/net.if.get.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/net.if.get.speed["{#IFNAME}"])
               name: 'Linux: Interface {#IFNAME}: High bandwidth usage'
               event_name: 'Linux: Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -904,19 +1032,21 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Linux: Interface {#IFNAME}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
-                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])=2
+                    and (last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#1)<>last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#2))
+                  recovery_expression: 'last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 58f4ba4b2795407896752da57462629d
               expression: |
-                min(/Linux by Zabbix agent active/net.if.in["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Linux by Zabbix agent active/net.if.out["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Linux by Zabbix agent active/net.if.get.in.errors["{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Linux by Zabbix agent active/net.if.get.out.errors["{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Linux by Zabbix agent active/net.if.in["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Linux by Zabbix agent active/net.if.out["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Linux by Zabbix agent active/net.if.get.in.errors["{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Linux by Zabbix agent active/net.if.get.out.errors["{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Linux: Interface {#IFNAME}: High error rate'
               event_name: 'Linux: Interface {#IFNAME}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -925,8 +1055,10 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Linux: Interface {#IFNAME}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
-                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])=2
+                    and (last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#1)<>last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"],#2))
+                  recovery_expression: 'last(/Linux by Zabbix agent active/net.if.get.operstate["{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: availability
@@ -940,42 +1072,53 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.in["{#IFNAME}"]'
+                    key: 'net.if.get.in["{#IFNAME}"]'
                 - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.out["{#IFNAME}"]'
+                    key: 'net.if.get.out["{#IFNAME}"]'
                 - sortorder: '2'
                   color: 00611C
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.out["{#IFNAME}",errors]'
+                    key: 'net.if.get.out.errors["{#IFNAME}"]'
                 - sortorder: '3'
                   color: F7941D
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.in["{#IFNAME}",errors]'
+                    key: 'net.if.get.in.errors["{#IFNAME}"]'
                 - sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.out["{#IFNAME}",dropped]'
+                    key: 'net.if.get.out.dropped["{#IFNAME}"]'
                 - sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'net.if.in["{#IFNAME}",dropped]'
+                    key: 'net.if.get.in.dropped["{#IFNAME}"]'
+          master_item:
+            key: net.if.get
+          lld_macro_paths:
+            - lld_macro: '{#IFNAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.config
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: ff825e7028c24138a7ea6625353a1790
           name: 'Block devices discovery'
-          type: ZABBIX_ACTIVE
-          key: vfs.dev.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.dev.dependent.discovery
           filter:
             evaltype: AND
             conditions:
@@ -984,8 +1127,7 @@ zabbix_export:
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-              - macro: '{#DEVTYPE}'
-                value: disk
+          description: 'The discovery of block devices.'
           item_prototypes:
             - uuid: 9a0448cf8a184d52a7872df410f25d6b
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
@@ -1031,10 +1173,10 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[0]'
+                    - $.stats.reads_completed
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'vfs.file.contents[/sys/block/{#DEVNAME}/stat]'
+                key: 'vfs.dev.stats["{#DEVNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -1061,6 +1203,45 @@ zabbix_export:
                   value: storage
                 - tag: disk
                   value: '{#DEVNAME}'
+            - uuid: 1e4c11c6d06a48c7b6955dbf8d40b946
+              name: '{#DEVNAME}: Disk read throughput'
+              type: DEPENDENT
+              key: 'vfs.dev.read[{#DEVNAME}]'
+              value_type: FLOAT
+              units: Bps
+              description: 'The number of bytes read from the device per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.stats.bytes_read
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.stats["{#DEVNAME}"]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: 0b2e723c1f2944cbbbfd0524542690f1
+              name: '{#DEVNAME}: Get stats data'
+              type: DEPENDENT
+              key: 'vfs.dev.stats["{#DEVNAME}"]'
+              history: '0'
+              value_type: TEXT
+              description: 'Intermediate statistics data of the `{#DEVNAME}` block device.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.values[?(@.name=="{#DEVNAME}")].first()'
+              master_item:
+                key: 'vfs.dev.get[disk_stats,.*]'
+              tags:
+                - tag: component
+                  value: raw
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
             - uuid: 72546bd5eefb4ac7a0b2992a25e5f0c5
               name: '{#DEVNAME}: Disk utilization'
               type: DEPENDENT
@@ -1071,13 +1252,13 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[9]'
+                    - $.stats.io_time_ms
                 - type: CHANGE_PER_SECOND
                 - type: MULTIPLIER
                   parameters:
                     - '0.1'
               master_item:
-                key: 'vfs.file.contents[/sys/block/{#DEVNAME}/stat]'
+                key: 'vfs.dev.stats["{#DEVNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -1106,10 +1287,10 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[4]'
+                    - $.stats.writes_completed
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'vfs.file.contents[/sys/block/{#DEVNAME}/stat]'
+                key: 'vfs.dev.stats["{#DEVNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -1131,6 +1312,25 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: 'vfs.file.contents[/sys/block/{#DEVNAME}/stat]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: disk
+                  value: '{#DEVNAME}'
+            - uuid: c8473c7ed15e4bf2aee6c574e84ad168
+              name: '{#DEVNAME}: Disk write throughput'
+              type: DEPENDENT
+              key: 'vfs.dev.write[{#DEVNAME}]'
+              value_type: FLOAT
+              units: Bps
+              description: 'The number of bytes written to the device per second.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.stats.bytes_written
+                - type: CHANGE_PER_SECOND
+              master_item:
+                key: 'vfs.dev.stats["{#DEVNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -1188,6 +1388,19 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.dev.write.rate[{#DEVNAME}]'
+            - uuid: ea55654ee0a84b4996aee2409503490a
+              name: '{#DEVNAME}: Disk read/write throughput'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'Linux by Zabbix agent active'
+                    key: 'vfs.dev.read[{#DEVNAME}]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Linux by Zabbix agent active'
+                    key: 'vfs.dev.write[{#DEVNAME}]'
             - uuid: 8863772fb82b49a891ea50cbec5cdd05
               name: '{#DEVNAME}: Disk utilization and queue'
               graph_items:
@@ -1202,6 +1415,18 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.dev.util[{#DEVNAME}]'
+          master_item:
+            key: 'vfs.dev.get[disk_stats,.*]'
+          lld_macro_paths:
+            - lld_macro: '{#DEVNAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.config
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 5c9b5dbed44c4af0957ff9316f8fb761
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
@@ -1245,7 +1470,7 @@ zabbix_export:
                 - uuid: 98e196ffb6f0422baf007fcff5f45b60
                   expression: 'min(/Linux by Zabbix agent active/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: 'Linux: FS [{#FSNAME}]: Running out of free inodes'
-                  event_name: 'Linux: {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  event_name: 'Linux: FS [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
@@ -1386,7 +1611,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
-              history: 1h
+              history: '0'
               value_type: TEXT
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
@@ -1493,14 +1718,13 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var filesystems = JSON.parse(value);
-                  
-                  result = filesystems.map(function (filesystem) {
-                  	return {
-                  		'fsname': filesystem.fsname,
-                  		'fstype': filesystem.fstype
-                  	};
-                  });
+                  var filesystems = JSON.parse(value),
+                  	result = filesystems.map(function (filesystem) {
+                  		return {
+                  			fsname: filesystem.fsname,
+                  			fstype: filesystem.fstype
+                  		};
+                  	});
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1555,7 +1779,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '18'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -1565,7 +1789,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '17'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1575,23 +1799,25 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '20'
+            priority: '16'
             label: 'Interfaces control'
-            description: 'Control for operational state "link down" of interfaces.'
+            description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
               - checked: '1'
                 unchecked: '0'
         - macro: '{$KERNEL.MAXFILES.MIN}'
           value: '256'
+          description: 'Configured max number of open file descriptors. No less than 0.'
           config:
             type: TEXT
             priority: '26'
             section_name: Thresholds
-            label: 'Number of open filedescriptors'
-            description: 'Configured max number of open filedescriptors. No less than 0.'
+            label: 'Number of open file descriptors'
+            description: 'Configured max number of open file descriptors. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$KERNEL.MAXPROC.MIN}'
           value: '1024'
+          description: 'Configured max number of processes. No less than 0.'
           config:
             type: TEXT
             priority: '25'
@@ -1611,19 +1837,19 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.AVAILABLE.MIN}'
           value: 20M
-          description: 'Used as a thresholdin the memory available trigger.'
+          description: 'Used as a threshold in the available memory trigger.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '6'
             section_name: Thresholds
             label: 'Threshold in the available memory'
             description: 'Used as a threshold in the available memory trigger.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
-          description: 'Used as a thresholdin the memory utilization trigger.'
+          description: 'Used as a threshold in the memory utilization trigger.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '5'
             section_name: Thresholds
             label: 'Threshold in the memory utilization'
             description: 'Used as a threshold in the memory utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1633,25 +1859,25 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '19'
             section_name: Filters
-            label: 'Network interface discovery'
-            description: 'Network interface discovery.'
+            label: 'Filter for network interface by name (include)'
+            description: 'Regex string to include discovered interface by name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '20'
             section_name: Filters
-            label: 'Filter for network interface by name.'
+            label: 'Filter for network interface by name (exclude)'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
           description: 'The warning threshold of the minimum free swap.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '7'
             section_name: Thresholds
             label: 'Threshold of the minimum free swap'
             description: 'Warning threshold of the minimum free swap. In the range from 0 to 100 inclusive.'
@@ -1661,25 +1887,25 @@ zabbix_export:
           description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '14'
             section_name: Filters
-            label: 'Filter for block device discovery'
-            description: 'Block device discovery.'
+            label: 'Filter for block device discovery (include)'
+            description: 'Regex string to include discovered block device.'
         - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
           description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '15'
             section_name: Filters
             label: 'Filter for block device discovery (exclude)'
-            description: 'Block device discovery.'
+            description: 'Regex string to exclude discovered block device.'
         - macro: '{$VFS.DEV.READ.AWAIT.WARN}'
           value: '20'
           description: 'The average response time (in ms) of disk read before the trigger fires.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '23'
             section_name: Thresholds
             label: 'The average read time (in ms)'
             description: 'Average response time (in ms) of disk read before the trigger fires. No less than 0.'
@@ -1689,7 +1915,7 @@ zabbix_export:
           description: 'The average response time (in ms) of disk write before the trigger fires.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '24'
             section_name: Thresholds
             label: 'The average write time (in ms)'
             description: 'Average response time (in ms) of disk write before the trigger fires. No less than 0.'
@@ -1699,43 +1925,43 @@ zabbix_export:
           description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '12'
             section_name: Filters
-            label: 'Filter filesystem by name'
-            description: 'Filesystem discovery.'
+            label: 'Filter filesystem by name (include)'
+            description: 'Regex string to include discovered filesystem by name.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
           description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '13'
             section_name: Filters
             label: 'Filter filesystem by name (exclude)'
-            description: 'Filesystem discovery.'
+            description: 'Regex string to exclude discovered filesystem by name.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
           description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '21'
             section_name: Filters
-            label: 'Filter filesystem by type'
-            description: 'Filesystem discovery.'
+            label: 'Filter filesystem by type (include)'
+            description: 'Regex string to include discovered filesystem by type.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
           description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '22'
             section_name: Filters
-            label: 'Filter filesystem by name (exclude)'
-            description: 'Filesystem discovery.'
+            label: 'Filter filesystem by type (exclude)'
+            description: 'Regex string to exclude discovered filesystem by type.'
         - macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
           value: '10'
           description: 'The critical threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '11'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization (critical)'
             description: 'Critical threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -1745,7 +1971,7 @@ zabbix_export:
           description: 'The warning threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '10'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization'
             description: 'Warning threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -1755,7 +1981,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '9'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization (critical)'
             description: 'Critical threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
@@ -1765,204 +1991,848 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '8'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization'
             description: 'Warning threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
-        - uuid: 9dca5f83cd664db1ba41b8751ce3d055
-          name: Filesystems
-          pages:
-            - name: Overview
-              widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
-                    - type: STRING
-                      name: reference
-                      value: AAAEB
-                - type: graphprototype
-                  'y': '5'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
-                    - type: STRING
-                      name: reference
-                      value: AAAEC
-        - uuid: 6d179c1f45c2438e9e6a3aa567d46b0c
-          name: 'Network interfaces'
-          pages:
-            - name: Overview
-              widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'Interface {#IFNAME}: Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAJ
         - uuid: 3e6ceed431734cc29836019e93b5f89e
-          name: 'System performance'
+          name: 'Linux Dashboard'
           pages:
-            - widgets:
-                - type: graph
-                  width: '36'
-                  height: '5'
+            - name: Overview
+              widgets:
+                - type: item
+                  width: '49'
+                  height: '1'
+                  hide_header: 'YES'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Zabbix agent active'
-                        name: 'Linux: System load'
-                    - type: STRING
-                      name: reference
-                      value: AAAAA
-                - type: graph
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'Linux: Memory usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAC
-                - type: graphprototype
-                  'y': '10'
-                  width: '72'
-                  height: '5'
+                        key: system.uname
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
+                - type: gauge
+                  'y': '1'
+                  width: '10'
+                  height: '3'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: system.cpu.util
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
                       value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: gauge
+                  'y': '4'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Zabbix agent active'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                        key: vm.memory.util
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: itemnavigator
+                  name: 'Disk performance'
+                  'y': '7'
+                  width: '10'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: group_by.0.attribute
+                      value: '3'
+                    - type: STRING
+                      name: group_by.0.tag_name
+                      value: disk
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: storage
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: disk
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAEA
-                - type: graphprototype
-                  'y': '15'
-                  width: '72'
+                      value: PBTWV
+                    - type: INTEGER
+                      name: show_lines
+                      value: '500'
+                - type: svggraph
+                  name: CPU
+                  x: '10'
+                  'y': '1'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 4FC3F7
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: system.cpu.util
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: EF5350
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'system.cpu.util[,user]'
+                    - type: INTEGER
+                      name: ds.1.pointsize
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '2'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: PPZRN
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Memory
+                  x: '10'
+                  'y': '4'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 2196F3
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: vm.memory.util
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: QTGYC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Disk
+                  x: '10'
+                  'y': '7'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7CB342
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: PBTWV._itemid
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GTYHI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Network
+                  x: '10'
+                  'y': '10'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Bits sent'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '6'
+                    - type: INTEGER
+                      name: ds.0.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Interface*Bits sent'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '5'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Bits received'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '6'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Interface*Bits received'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: FPGPW
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: item
+                  x: '49'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: system.cpu.num
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: system.cpu.switches
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'system.cpu.load[all,avg1]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: item
+                  x: '49'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'vm.memory.size[available]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: piechart
+                  name: 'Used storage'
+                  x: '49'
+                  'y': '8'
+                  width: '16'
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: draw_type
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '11'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Available
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'FS [*]: Space: Available'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Used
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'FS [*]: Space: Used'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '8'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '10'
+                    - type: INTEGER
+                      name: stroke
+                      value: '10'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                - type: item
+                  name: 'Agent version'
+                  x: '57'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Zabbix agent active'
-                        name: '{#DEVNAME}: Disk read/write rates'
+                        key: agent.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '2'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: system.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                     - type: STRING
-                      name: reference
-                      value: AAAAF
-                - type: graphprototype
-                  'y': '20'
-                  width: '72'
-                  height: '5'
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '600'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3600'
+                - type: item
+                  x: '57'
+                  'y': '4'
+                  width: '8'
                   fields:
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Zabbix agent active'
-                        name: '{#DEVNAME}: Disk average waiting time'
+                        key: proc.num
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
                     - type: STRING
-                      name: reference
-                      value: AAAAG
-                - type: graphprototype
-                  'y': '25'
-                  width: '72'
-                  height: '5'
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '6'
+                  width: '8'
                   fields:
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Zabbix agent active'
-                        name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: STRING
-                      name: reference
-                      value: AAAAH
-                - type: graphprototype
-                  'y': '30'
-                  width: '72'
-                  height: '5'
+                        key: 'vm.memory.size[total]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '4'
+                  width: '7'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'proc.num[,,run]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '6'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'system.swap.size[,total]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '8'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'system.swap.size[,free]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '10'
+                  width: '7'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Zabbix agent active'
+                        key: 'system.swap.size[,pfree]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+            - name: Problems
+              widgets:
+                - type: problems
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: YHGQK
+                    - type: INTEGER
+                      name: show_opdata
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'Interface {#IFNAME}: Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAI
-                - type: graph
-                  x: '36'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'Linux: CPU usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAB
-                - type: graph
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Zabbix agent active'
-                        name: 'Linux: Swap usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAD
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
+                    - type: INTEGER
+                      name: show_symptoms
+                      value: '1'
+                - type: toptriggers
+                  'y': '6'
+                  width: '72'
+                  height: '7'
       valuemaps:
         - uuid: 276914b5aee2435da609d3112ecd359d
           name: ifOperStatus
@@ -1985,133 +2855,13 @@ zabbix_export:
           name: 'Linux::Interface protocol types'
           mappings:
             - value: '0'
-              newvalue: 'from KA9Q: NET/ROM pseudo'
+              newvalue: physical
             - value: '1'
-              newvalue: Ethernet
+              newvalue: virtual
             - value: '2'
-              newvalue: 'Experimental Ethernet'
+              newvalue: loopback
             - value: '3'
-              newvalue: 'AX.25 Level 2'
-            - value: '4'
-              newvalue: 'PROnet token ring'
-            - value: '5'
-              newvalue: Chaosnet
-            - value: '6'
-              newvalue: 'IEEE 802.2 Ethernet/TR/TB'
-            - value: '7'
-              newvalue: ARCnet
-            - value: '8'
-              newvalue: APPLEtalk
-            - value: '15'
-              newvalue: 'Frame Relay DLCI'
-            - value: '19'
-              newvalue: ATM
-            - value: '23'
-              newvalue: 'Metricom STRIP (new IANA id)'
-            - value: '24'
-              newvalue: 'IEEE 1394 IPv4 - RFC 2734'
-            - value: '27'
-              newvalue: EUI-64
-            - value: '32'
-              newvalue: InfiniBand
-            - value: '256'
-              newvalue: ARPHRD_SLIP
-            - value: '257'
-              newvalue: ARPHRD_CSLIP
-            - value: '258'
-              newvalue: ARPHRD_SLIP6
-            - value: '259'
-              newvalue: ARPHRD_CSLIP6
-            - value: '260'
-              newvalue: 'Notional KISS type'
-            - value: '264'
-              newvalue: ARPHRD_ADAPT
-            - value: '270'
-              newvalue: ARPHRD_ROSE
-            - value: '271'
-              newvalue: 'CCITT X.25'
-            - value: '272'
-              newvalue: 'Boards with X.25 in firmware'
-            - value: '280'
-              newvalue: 'Controller Area Network'
-            - value: '512'
-              newvalue: ARPHRD_PPP
-            - value: '513'
-              newvalue: 'Cisco HDLC'
-            - value: '516'
-              newvalue: LAPB
-            - value: '517'
-              newvalue: 'Digital''s DDCMP protocol'
-            - value: '518'
-              newvalue: 'Raw HDLC'
-            - value: '519'
-              newvalue: 'Raw IP'
-            - value: '768'
-              newvalue: 'IPIP tunnel'
-            - value: '769'
-              newvalue: 'IP6IP6 tunnel'
-            - value: '770'
-              newvalue: 'Frame Relay Access Device'
-            - value: '771'
-              newvalue: 'SKIP vif'
-            - value: '772'
-              newvalue: 'Loopback device'
-            - value: '773'
-              newvalue: 'Localtalk device'
-            - value: '774'
-              newvalue: 'Fiber Distributed Data Interface'
-            - value: '775'
-              newvalue: 'AP1000 BIF'
-            - value: '776'
-              newvalue: 'sit0 device - IPv6-in-IPv4'
-            - value: '777'
-              newvalue: 'IP over DDP tunneller'
-            - value: '778'
-              newvalue: 'GRE over IP'
-            - value: '779'
-              newvalue: 'PIMSM register interface'
-            - value: '780'
-              newvalue: 'High Performance Parallel Interface'
-            - value: '781'
-              newvalue: 'Nexus 64Mbps Ash'
-            - value: '782'
-              newvalue: 'Acorn Econet'
-            - value: '783'
-              newvalue: Linux-IrDA
-            - value: '784'
-              newvalue: 'Point to point fibrechannel'
-            - value: '785'
-              newvalue: 'Fibrechannel arbitrated loop'
-            - value: '786'
-              newvalue: 'Fibrechannel public loop'
-            - value: '787'
-              newvalue: 'Fibrechannel fabric'
-            - value: '800'
-              newvalue: 'Magic type ident for TR'
-            - value: '801'
-              newvalue: 'IEEE 802.11'
-            - value: '802'
-              newvalue: 'IEEE 802.11 + Prism2 header'
-            - value: '803'
-              newvalue: 'IEEE 802.11 + radiotap header'
-            - value: '804'
-              newvalue: ARPHRD_IEEE802154
-            - value: '805'
-              newvalue: 'IEEE 802.15.4 network monitor'
-            - value: '820'
-              newvalue: 'PhoNet media type'
-            - value: '821'
-              newvalue: 'PhoNet pipe header'
-            - value: '822'
-              newvalue: 'CAIF media type'
-            - value: '823'
-              newvalue: 'GRE over IPv6'
-            - value: '824'
-              newvalue: 'Netlink header'
-            - value: '825'
-              newvalue: 'IPv6 over LoWPAN'
-            - value: '826'
-              newvalue: 'Vsock monitor header'
+              newvalue: unknown
         - uuid: d4a5821461a243c9bf320ea58be1af23
           name: zabbix.host.active_agent.available
           mappings:
@@ -2127,6 +2877,15 @@ zabbix_export:
             - value: '1'
               newvalue: Up
   triggers:
+    - uuid: 103ca5c4800e48ce9c72c0d586b4d695
+      expression: 'min(/Linux by Zabbix agent active/kernel.openfiles,5m)/last(/Linux by Zabbix agent active/kernel.maxfiles)*100>80'
+      name: 'Linux: Getting closer to file descriptors limit'
+      event_name: 'Linux: Getting closer to file descriptors limit (over 80% used)'
+      opdata: '{ITEM.LASTVALUE1} open, {ITEM.LASTVALUE2} limit.'
+      priority: WARNING
+      tags:
+        - tag: scope
+          value: performance
     - uuid: fa21b02aebe143b192a20cd9403a68d0
       expression: 'last(/Linux by Zabbix agent active/proc.num)/last(/Linux by Zabbix agent active/kernel.maxproc)*100>80'
       name: 'Linux: Getting closer to process limit'
@@ -2145,7 +2904,7 @@ zabbix_export:
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
         - name: 'Linux: High memory utilization'
-          expression: 'min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
+          expression: 'min(/Linux by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
         - name: 'Linux: Lack of available memory'
           expression: 'max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0'
       tags:
@@ -2187,6 +2946,7 @@ zabbix_export:
             host: 'Linux by Zabbix agent active'
             key: system.cpu.switches
         - sortorder: '1'
+          drawtype: GRADIENT_LINE
           color: F63100
           item:
             host: 'Linux by Zabbix agent active'
@@ -2275,7 +3035,7 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'Linux by Zabbix agent active'
-            key: vm.memory.utilization
+            key: vm.memory.util
     - uuid: 60078a7b24494a41a3595650b113ee1d
       name: 'Linux: Processes'
       graph_items:

@@ -21,21 +21,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Queue details'))
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => [
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview')
-					->getUrl() => _('Queue overview'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview.proxy')
-					->getUrl() => _('Queue overview by proxy'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.details')
-					->getUrl() => _('Queue details')
-			]
-		]
-	])
+	->setTitleSubmenu(getAdministrationQueueSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_DETAILS));
 
 $table = (new CTableInfo())->setHeader([
@@ -85,9 +71,9 @@ $html_page->addItem($table);
 if ($data['total_count'] != 0) {
 	$html_page->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_TABLE_PAGING)
+			->addClass(ZBX_STYLE_PAGER)
 			->addItem((new CDiv())
-				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				->addClass(ZBX_STYLE_PAGER_CONTAINER)
 				->addItem((new CDiv())
 					->addClass(ZBX_STYLE_TABLE_STATS)
 					->addItem(_s('Displaying %1$s of %2$s found', $table->getNumRows(), $data['total_count']))

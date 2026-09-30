@@ -16,6 +16,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CTest.php';
+require_once __DIR__.'/helpers/CTestDataHelper.php';
 
 /**
  * Base class for Zabbix API tests.
@@ -64,13 +65,14 @@ class CAPITest extends CTest {
 	 *
 	 * @param mixed  $data       String containing request data as json.
 	 * @param string $sessionid  Authorization token.
+	 * @param string $dpop_jwt   DPoP token.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public function callRaw($data, ?string $sessionid = null) {
-		return CAPIHelper::callRaw($data, $sessionid);
+	public function callRaw($data, ?string $sessionid = null, ?string $dpop_jwt = null) {
+		return CAPIHelper::callRaw($data, $sessionid, $dpop_jwt);
 	}
 
 	/**
@@ -98,13 +100,14 @@ class CAPITest extends CTest {
 	 */
 	public static function enableAuthorization() {
 		CAPIHelper::setSessionId(null);
+		CAPIHelper::enableAuth();
 	}
 
 	/**
 	 * Disable authorization/session for the following API calls.
 	 */
-	public static function disableAuthorization() {
-		CAPIHelper::setSessionId(false);
+	public static function disableAuthorization(): void {
+		CAPIHelper::disableAuth();
 	}
 
 	/**

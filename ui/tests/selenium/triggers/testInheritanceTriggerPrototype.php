@@ -110,7 +110,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 				$this->discoveryRuleId);
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->zbxTestInputTypeByXpath("//input[@name='name']", $data['description']);
+		$dialog->query('id:name')->waitUntilVisible()->one()->fill($data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
 		$dialog->getFooter()->query('button:Add')->one()->click();
 

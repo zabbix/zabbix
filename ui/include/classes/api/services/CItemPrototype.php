@@ -45,7 +45,7 @@ class CItemPrototype extends CItemGeneral {
 		ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-		ITEM_TYPE_BROWSER
+		ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 	];
 
 	/**
@@ -323,6 +323,29 @@ class CItemPrototype extends CItemGeneral {
 		$items = $this->unsetExtraFields($items, ['name_upper']);
 
 		self::prepareItemsForApi($items, false);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('query', $item) && $item['query']) {
+				$item['query']['signal_type'] = (string) $item['query']['signal_type'];
+				$item['query']['metric_point_type'] = (string) $item['query']['metric_point_type'];
+				$item['query']['filter']['evaltype'] = (string) $item['query']['filter']['evaltype'];
+
+				foreach ($item['query']['aggregated_columns'] as &$column) {
+					$column['function'] = (string) $column['function'];
+				}
+				unset($column);
+
+				foreach ($item['query']['filter']['conditions'] as &$condition) {
+					$condition['operator'] = (string) $condition['operator'];
+				}
+				unset($condition);
+
+				$item['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($item['query']);
+			}
+			// Make telemetry query field storage_mode inaccessible.
+			unset($item['storage_mode']);
+		}
+		unset($item);
 	}
 
 	/**
@@ -888,18 +911,23 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $hostids
 	 */
 	public function linkTemplateObjects(array $ruleids, array $hostids): void {
-		$db_items = $this->get([
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
-			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
-			'discoveryids' => $ruleids,
-			'preservekeys' => true
-		]);
+		$output = array_merge(['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+				'logtimefmt', 'description', 'status', 'discover'
+			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
+		);
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.'.implode(',i.', $output).
+			' FROM items i'.
+			' JOIN item_discovery id ON i.itemid=id.itemid'.
+			' WHERE '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]).
+				' AND '.dbConditionId('id.lldruleid', $ruleids)
+		), 'itemid');
 
 		if (!$db_items) {
 			return;
 		}
 
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -1024,6 +1052,7 @@ class CItemPrototype extends CItemGeneral {
 			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $db_items, $_upd_db_items);
 
 			self::checkDuplicates($_upd_items, $_upd_db_items);
+			self::validateInheritedTelemetryQueryItems($_upd_items, $_upd_db_items);
 
 			$upd_items = array_merge($upd_items, $_upd_items);
 			$upd_db_items += $_upd_db_items;

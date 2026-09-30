@@ -13,13 +13,15 @@
 **/
 
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbx_trigger_constants.h"
 
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbx_host_constants.h"
+#include "zbx_bridge_adapter_constants.h"
 #include "zbxalgo.h"
-#include "zbxdb.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -30,10 +32,12 @@
 #endif
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+ZBX_VECTOR_IMPL(db_event_recovery, zbx_db_event_recovery_t)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
+ZBX_VECTOR_LITE_IMPL(db_event_suppress, zbx_db_event_suppress_t)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -80,21 +84,9 @@ void	zbx_db_flush_version_requirements(const char *version)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
- *          and configuration                                                    *
- *                                                                               *
- * Parameters: info              - [IN] DB version information                   *
- *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
- *             program_type      - [IN]                                          *
- *                                                                               *
- *********************************************************************************/
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type)
 {
-	zbx_db_extract_version_info(info);
-
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
 			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
 	{
@@ -108,7 +100,7 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 
 		if (0 == allow_unsupported || 0 != server_db_deprecated)
 		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
 					" version (%s).", program_type_s, info->database,
 					info->friendly_current_version);
@@ -133,7 +125,7 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 						" in Zabbix %s configuration file at your own risk.", program_type_s);
 			}
 
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 
 			return FAIL;
 		}
@@ -164,11 +156,23 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 	return SUCCEED;
 }
 
-void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
+ *          and configuration                                                    *
+ *                                                                               *
+ * Parameters: info              - [IN] DB version information                   *
+ *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *             program_type      - [IN]                                          *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type)
 {
-	zbx_free(version_info->friendly_current_version);
-	zbx_free(version_info->extension);
-	zbx_free(version_info->ext_friendly_current_version);
+	if (SUCCEED != zbx_db_extract_version_info(info))
+		return FAIL;
+
+	return zbx_db_verify_version_info(info, allow_unsupported, program_type);
 }
 
 static char	buf_string[640];
@@ -605,48 +609,84 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate that token is not expired and is active and then get     *
- *          associated user data                                              *
+ * Purpose: validate a token for the given lookup mode and get associated     *
+ *          user data                                                         *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             user                      - [OUT] user information             *
+ *             mode                      - [IN] which token schemes to        *
+ *                                              accept - see                  *
+ *                                              zbx_auth_lookup_mode_t        *
+ *             device_uuid               - [IN] (optional) device DPoP-       *
+ *                                              scheme token must bind to;    *
+ *                                              required in device.offboard   *
+ *                                              lookup mode, unused otherwise *
+ *             user                      - [OUT]                              *
  *                                                                            *
- * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ * Return value:  SUCCEED - a token matching an accepted scheme was found     *
+ *                          (a DPoP-scheme match additionally requires it     *
+ *                          to be bound to device_uuid)                       *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_lookup_mode_t mode,
+		const char *device_uuid, zbx_user_t *user)
 {
+	char		*formatted_auth_token_hash_esc = NULL, *device_uuid_esc = NULL;
 	int		ret = FAIL;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
 	time_t		t;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
-
-	t = time(NULL);
-
-	if ((time_t) - 1 == t)
+	if ((time_t) - 1 == (t = time(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
 		goto out;
 	}
 
-	if (NULL == (result = zbx_db_select(
-			"select u.userid,u.roleid,u.username,r.type"
-				" from token t,users u,role r"
-			" where t.userid=u.userid"
-				" and t.token='%s'"
-				" and u.roleid=r.roleid"
-				" and t.status=%d"
-				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+	formatted_auth_token_hash_esc = zbx_db_dyn_escape_string(formatted_auth_token_hash);
+
+	switch (mode)
 	{
-		goto out;
+		case ZBX_AUTH_LOOKUP_GENERIC:
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and t.auth_scheme=%d"
+						" and (t.expires_at=%d or t.expires_at>%lu)",
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
+			break;
+		case ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD:
+			device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and (t.expires_at=%d or t.expires_at>%lu)"
+						" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
+							"select null from token_device td,device d"
+							" where td.tokenid=t.tokenid"
+								" and td.deviceid=d.deviceid"
+								" and d.uuid='%s'"
+								" and d.userid=t.userid"
+								" and d.status=%d)))",
+					formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_SCHEME_DPOP, device_uuid_esc, ZBX_DEVICE_STATUS_ACTIVATED);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected auth lookup mode:%d", (int)mode);
+			goto out;
 	}
 
-	if (NULL == (row = zbx_db_fetch(result)))
+	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
@@ -656,6 +696,65 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(formatted_auth_token_hash_esc);
+	zbx_free(device_uuid_esc);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that token is not expired and is active and then get     *
+ *          associated user data                                              *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             user                      - [OUT]                              *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_GENERIC, NULL, user);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate a token for device.offboard and get associated user      *
+ *          data, in a single query                                           *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             device_uuid               - [IN]                               *
+ *             user                      - [OUT]                              *
+ *                                                                            *
+ * Comments: a Bearer-scheme token is accepted unconditionally, the same as   *
+ *           for any other trapper request. A DPoP-scheme token is accepted   *
+ *           only if it is bound (via token_device) to the given active       *
+ *           device.                                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid (and, if DPoP-scheme, bound to     *
+ *                          the device)                                       *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_user_by_offboard_token(const char *formatted_auth_token_hash, const char *device_uuid,
+		zbx_user_t *user)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s device uuid:%s", __func__,
+			formatted_auth_token_hash, device_uuid);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD, device_uuid, user);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -744,6 +843,224 @@ int	zbx_db_update_software_update_checkid(void)
 		ret = FAIL;
 	}
 	zbx_db_free_result(result);
+
+	return ret;
+}
+
+zbx_db_event	*zbx_create_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+	int clock, int ns, int value)
+{
+	zbx_db_event	*event;
+
+	event = zbx_malloc(NULL, sizeof(zbx_db_event));
+	memset(event, 0, sizeof(zbx_db_event));
+
+	event->source = source;
+	event->object = object;
+	event->objectid = objectid;
+	event->clock = clock;
+	event->ns = ns;
+	event->value = value;
+	event->acknowledged = EVENT_NOT_ACKNOWLEDGED;
+	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+
+	return event;
+}
+
+zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size)
+{
+	zbx_vector_db_event_suppress_t	*suppress;
+
+	suppress = (zbx_vector_db_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_vector_db_event_suppress_t));
+	zbx_vector_db_event_suppress_create(suppress);
+	if (0 != size)
+		zbx_vector_db_event_suppress_reserve(suppress, (size_t)size);
+
+	return suppress;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
+{
+	zbx_db_result_t	result;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+				"on the first try");
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		char	*uuid7 = zbx_gen_uuid7_hyphenated();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			/* INSERT may fail if a concurrent HA node has already inserted the   */
+			/* serverid row. Re-verify the row exists before treating this as     */
+			/* fatal.                                                             */
+			zbx_db_free_result(result);
+
+			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+						"after trying to insert");
+				zbx_free(uuid7);
+				ret = FAIL;
+				goto out;
+			}
+
+			if (NULL == zbx_db_fetch(result))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				ret = FAIL;
+			}
+		}
+
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set settings value in database                                    *
+ *                                                                            *
+ * Parameters: name  - [IN] setting name                                      *
+ *             value - [IN] setting value                                     *
+ *             type  - [IN] setting value type (ZBX_SETTING_TYPE_*)           *
+ *                                                                            *
+ * Return value: SUCCEED - setting value was set successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: The settings value will be either inserted or updated.           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_settings_set_value(const char *name, const void *value, int type)
+{
+	const char	*fields[] = {NULL, "value_str", "value_int", "value_usrgrpid", "value_hostgroupid",
+					"value_userdirectoryid", "value_mfaid"};
+	char		*name_esc;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	int		ret = FAIL, old_type = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s", __func__, name);
+
+	if (ZBX_SETTING_TYPE_STR > type || ZBX_SETTING_TYPE_MAX <= type)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Invalid setting value type %d", type);
+		exit(EXIT_FAILURE);
+	}
+
+	name_esc = zbx_db_dyn_escape_string(name);
+
+	result = zbx_db_select("select type from settings where name='%s'", name_esc);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_db_insert_prepare(&db_insert, "settings", "name", fields[type], "type", NULL);
+
+		switch (type)
+		{
+			case ZBX_SETTING_TYPE_STR:
+				zbx_db_insert_add_values(&db_insert, name, (const char *)value, type);
+				break;
+			case ZBX_SETTING_TYPE_INT:
+				zbx_db_insert_add_values(&db_insert, name, *(const int *)value, type);
+				break;
+			default:
+				zbx_db_insert_add_values(&db_insert, name, *(const zbx_uint64_t *)value, type);
+				break;
+		}
+
+		ret = zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+	else
+		old_type = atoi(row[0]);
+
+	if (SUCCEED != ret)
+	{
+		char	*value_esc, *sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set %s=", fields[type]);
+
+		switch (type)
+		{
+			case ZBX_SETTING_TYPE_STR:
+				value_esc = zbx_db_dyn_escape_string((const char *)value);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", value_esc);
+				zbx_free(value_esc);
+				break;
+			case ZBX_SETTING_TYPE_INT:
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", *(const int *)value);
+				break;
+			default:
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64,
+						*(const zbx_uint64_t *)value);
+		}
+
+		if (old_type != type)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",type=%d", type);
+
+			switch (old_type)
+			{
+				case ZBX_SETTING_TYPE_STR:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=''", fields[old_type]);
+					break;
+				case ZBX_SETTING_TYPE_INT:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=0", fields[old_type]);
+					break;
+				case ZBX_SETTING_TYPE_USRGRPID:
+				case ZBX_SETTING_TYPE_HOSTGROUPID:
+				case ZBX_SETTING_TYPE_USRDIRID:
+				case ZBX_SETTING_TYPE_MFAID:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=null", fields[old_type]);
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_WARNING, "invalid old setting \"%s\" type %d", name,
+							old_type);
+					break;
+			}
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where name='%s'", name_esc);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to set %s", name);
+		else
+			ret = SUCCEED;
+
+		zbx_free(sql);
+	}
+
+	zbx_db_free_result(result);
+	zbx_free(name_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

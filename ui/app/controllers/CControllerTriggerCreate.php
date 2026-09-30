@@ -24,7 +24,7 @@ class CControllerTriggerCreate extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'name' => ['db triggers.description', 'required', 'not_empty'],
-			'event_name' => ['db triggers.event_name'],
+			'event_name' => ['db triggers.event_name', 'use' => [CEventNameValidator::class]],
 			'opdata' => ['db triggers.opdata'],
 			'priority' => ['db triggers.priority', 'required', 'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED,
 				TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
@@ -53,7 +53,10 @@ class CControllerTriggerCreate extends CController {
 				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			]],
 			'url_name' => ['db triggers.url_name'],
-			'url' => ['db triggers.url', 'use' => [CUrlValidator::class, []]],
+			'url' => ['db triggers.url', 'use' => [CUrlValidator::class, [
+				'user_macro' => true,
+				'schemes' => CSettingsHelper::getAllowedUriSchemes()
+			]]],
 			'description' => ['db triggers.comments'],
 			'status' => ['db triggers.status', 'in' => [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]],
 			'tags' => ['objects', 'uniq' => ['tag', 'value'],
