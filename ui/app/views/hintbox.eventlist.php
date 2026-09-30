@@ -42,9 +42,7 @@ if (array_key_exists('problems', $data)) {
 		$link = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
 			? new CLink($data['trigger']['url'], $data['trigger']['url'])
 			: (new CLink($data['trigger']['url']))
-				->setAttribute('data-error',
-					json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url']))
-				)
+				->setAttribute('data-error', _s('Provided URL "%1$s" is invalid.', $data['trigger']['url']))
 				->onClick('alert(event.target.dataset.error);');
 
 		$div->addItem(
