@@ -193,11 +193,8 @@
 				.setCellRenderer('name', ({cell_data, cell}) => {
 					const [hostid, name, status, maintenance] = cell_data;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'host',
 						data: {hostid}
@@ -208,7 +205,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					flex_wrapper.appendChild(name_link);
+					cell.appendChild(name_link);
 
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -239,10 +236,8 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(maintenance_icon);
+						cell.appendChild(maintenance_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('interface', ({cell_data, cell}) => {
 					const [host_port] = cell_data;

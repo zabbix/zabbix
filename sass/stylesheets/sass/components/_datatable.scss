@@ -45,6 +45,10 @@
 				.flex-wrapper {
 					flex-wrap: nowrap;
 					column-gap: 0;
+
+					& > .link-action {
+						@extend %overflow-ellipsis;
+					}
 				}
 
 				.tags-wrapper {

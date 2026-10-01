@@ -301,11 +301,8 @@
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {
@@ -320,7 +317,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					flex_wrapper.appendChild(name_link);
+					cell.appendChild(name_link);
 
 					if (description_expanded) {
 						const description_icon = document.createElement('button');
@@ -334,24 +331,17 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(description_icon);
+						cell.appendChild(description_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 
 					const {show_item_key} = column.getColumnOptions();
 
 					if (show_item_key == 1) {
-						const overflow_ellipsis = document.createElement('div');
-						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-
-						const item_key = document.createElement('span');
-						item_key.classList.add(ZBX_STYLE_GREEN);
+						const item_key = document.createElement('div');
+						item_key.classList.add(ZBX_STYLE_WORDBREAK, ZBX_STYLE_GREEN);
 						item_key.textContent = key_expanded;
 
-						overflow_ellipsis.appendChild(item_key);
-
-						cell.appendChild(overflow_ellipsis);
+						cell.appendChild(item_key);
 					}
 				})
 				.setCellRenderer('type', ({cell_data, cell}) => {
