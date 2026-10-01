@@ -1722,6 +1722,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	s->max_len_limit = 0;
+
 	zbx_socket_set_deadline(s, 0);
 
 	ret = SUCCEED;
@@ -2000,11 +2002,22 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 	tcp_recv_context->expected_len = 16 * ZBX_MEBIBYTE;
 	tcp_recv_context->reserved = 0;
 	tcp_recv_context->expect = ZBX_TCP_EXPECT_HEADER;
+
+	if (0 != s->max_len_limit)
+	{
+		tcp_recv_context->max_len = s->max_len_limit;
+	}
 #if defined(_WINDOWS)
-	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #else
-	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
-			ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ?
+				ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 	zbx_socket_free(s);
 	tcp_recv_context->allocated = 0;
