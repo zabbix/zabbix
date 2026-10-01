@@ -40,8 +40,9 @@
 #include "zbxresolver.h"
 #endif
 
-static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args, int *vault_ret)
+static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_size,
+		zbx_synced_new_config_t *synced, const zbx_thread_info_t *thread_info,
+		zbx_thread_proxyconfig_args *args, int *vault_ret)
 {
 	zbx_socket_t			sock;
 	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
@@ -133,14 +134,17 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		goto error;
 	}
 
-	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &status, &error)))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(dbpool, sock.peer, &jp, &status, &error)))
 	{
 		zbx_vector_uint64_t	deleted_itemids;
 
 		zbx_vector_uint64_create(&deleted_itemids);
 
-		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, &deleted_itemids, args->config_vault,
+		zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+		zbx_dc_sync_configuration(db, ZBX_DBSYNC_UPDATE, *synced, &deleted_itemids, args->config_vault,
 				args->config_proxyconfig_frequency);
+		zbx_dbconn_pool_release_connection(dbpool, db);
+
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
@@ -184,7 +188,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	proxyconfig_remove_unused_templates(void)
+static void	proxyconfig_remove_unused_templates(zbx_dbconn_t *db)
 {
 	zbx_vector_uint64_t	hostids, templateids;
 	zbx_hashset_t		templates;
@@ -198,7 +202,7 @@ static void	proxyconfig_remove_unused_templates(void)
 	zbx_vector_uint64_create(&templateids);
 	zbx_hashset_create(&templates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	result = zbx_db_select("select hostid,status from hosts");
+	result = zbx_dbconn_select(db, "select hostid,status from hosts");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -222,29 +226,29 @@ static void	proxyconfig_remove_unused_templates(void)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_db_begin();
+		zbx_dbconn_begin(db);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
 			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
 			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
 			goto fail;
 fail:
-		zbx_db_commit();
+		zbx_dbconn_commit(db);
 
 		zbx_free(sql);
 	}
@@ -311,11 +315,15 @@ void	*zbx_proxyconfig_thread(void *args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_VAULT_NEW_TOKEN,
 							ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 	time_t				nextcheck;
+	zbx_dbconn_pool_t		*dbpool = unit_args->shared->dbpool;
+	zbx_dbconn_t			*db;
 
 	zbx_supervisor_update_activity("%s starting", unit_args->name);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+	zbx_dc_config_local_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
@@ -327,16 +335,14 @@ void	*zbx_proxyconfig_thread(void *args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_supervisor_update_activity("%s [connecting to the database]", unit_args->name);
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	zbx_supervisor_update_activity("%s [syncing configuration]", unit_args->name);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
 
-	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
-			proxyconfig_args_in->config_proxyconfig_frequency);
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
+	zbx_dc_sync_configuration(db, ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL,
+			proxyconfig_args_in->config_vault, proxyconfig_args_in->config_proxyconfig_frequency);
+	zbx_dbconn_pool_release_connection(dbpool, db);
 
 	proxyconfig_update_vault_macros(proxyconfig_args_in, NULL);
 
@@ -399,9 +405,11 @@ void	*zbx_proxyconfig_thread(void *args)
 
 				zbx_vector_uint64_create(&deleted_itemids);
 
-				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, &deleted_itemids,
+				db = zbx_dbconn_pool_acquire_connection(dbpool);
+				zbx_dc_sync_configuration(db, ZBX_DBSYNC_UPDATE, synced, &deleted_itemids,
 						proxyconfig_args_in->config_vault,
 						proxyconfig_args_in->config_proxyconfig_frequency);
+
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
@@ -421,9 +429,10 @@ void	*zbx_proxyconfig_thread(void *args)
 
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 				{
-					proxyconfig_remove_unused_templates();
+					proxyconfig_remove_unused_templates(db);
 					last_template_cleanup_sec = sec;
 				}
+				zbx_dbconn_pool_release_connection(dbpool, db);
 
 				zbx_vector_uint64_destroy(&deleted_itemids);
 				zbx_supervisor_update_activity("%s [synced config in " ZBX_FS_DBL " sec]",
@@ -438,7 +447,7 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		zbx_supervisor_update_activity("%s [loading configuration]", unit_args->name);
 
-		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in, &vault_ret);
+		process_configuration_sync(dbpool, &data_size, &synced, info, proxyconfig_args_in, &vault_ret);
 		proxyconfig_update_vault_macros(proxyconfig_args_in, &vault_ret);
 
 		interval = zbx_time() - sec;
@@ -452,7 +461,10 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 		{
-			proxyconfig_remove_unused_templates();
+			db = zbx_dbconn_pool_acquire_connection(dbpool);
+			proxyconfig_remove_unused_templates(db);
+			zbx_dbconn_pool_release_connection(dbpool, db);
+
 			last_template_cleanup_sec = sec;
 		}
 
@@ -467,7 +479,6 @@ void	*zbx_proxyconfig_thread(void *args)
 	}
 stop:
 	zbx_deinit_regexp_env();
-
 	zbx_prof_destroy();
 
 	zbx_history_cache_destroy_local_cache();
@@ -476,7 +487,8 @@ stop:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
-	zbx_db_close();
+	zbx_dc_config_local_release();
+
 	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 
 	zbx_free(args);

@@ -23,29 +23,9 @@
 #	include "zbxstr.h"
 #endif
 
-/******************************************************************************
- *                                                                            *
- * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stores DBMS version as integer: MMmmuu                            *
- *          M = major version part                                            *
- *          m = minor version part                                            *
- *          u = patch version part                                            *
- *                                                                            *
- * Example: if the original DB version was 1.2.34 then 10234 is set           *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint32_t	ZBX_DB_SVERSION = ZBX_DBVERSION_UNDEFINED;
-
-zbx_uint32_t	db_get_server_version(void)
-{
-	return ZBX_DB_SVERSION;
-}
-
 #if defined(HAVE_POSTGRESQL)
 static int 	ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
 static int	ZBX_TSDB_VERSION = -1;
-#elif defined (HAVE_MYSQL)
-static int	ZBX_MARIADB_SFORK = OFF;
 #endif
 
 /*********************************************************************************
@@ -181,6 +161,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
  **************************************************************************************************************/
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
+	zbx_uint32_t	version = ZBX_DBVERSION_UNDEFINED;
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 #if defined(HAVE_MYSQL)
 	int		client_major_version, client_minor_version, client_release_version, server_major_version,
@@ -192,26 +173,28 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	if (NULL != (info = mysql_get_server_info(db->conn)) && NULL != strstr(info, "MariaDB"))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB fork detected");
-		ZBX_MARIADB_SFORK = ON;
+		version_info->mariadb_fork = ON;
 	}
+	else
+		version_info->mariadb_fork = OFF;
 
-	if (ON == ZBX_MARIADB_SFORK && NULL != info && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB",
+	if (ON == version_info->mariadb_fork && NULL != info && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB",
 			&client_major_version, &client_minor_version, &client_release_version, &server_major_version,
 			&server_minor_version, &server_release_version))
 	{
-		ZBX_DB_SVERSION = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +
+		version = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +
 				server_release_version);
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB subversion detected");
 	}
 	else
-		ZBX_DB_SVERSION = (zbx_uint32_t)mysql_get_server_version(db->conn);
+		version = (zbx_uint32_t)mysql_get_server_version(db->conn);
 
-	version_info->current_version = ZBX_DB_SVERSION;
+	version_info->current_version = version;
 	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d",
-			RIGHT2(ZBX_DB_SVERSION/10000), RIGHT2(ZBX_DB_SVERSION/100),
-			RIGHT2(ZBX_DB_SVERSION));
+			RIGHT2(version/10000), RIGHT2(version/100),
+			RIGHT2(version));
 
-	if (ZBX_MARIADB_SFORK)
+	if (version_info->mariadb_fork)
 	{
 		version_info->database = "MariaDB";
 
@@ -243,13 +226,13 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	zbx_uint32_t major;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	ZBX_DB_SVERSION = (zbx_uint32_t)PQserverVersion(db->conn);
+	version = (zbx_uint32_t)PQserverVersion(db->conn);
 
-	major = ZBX_DB_SVERSION/10000;
+	major = version/10000;
 
 	version_info->database = "PostgreSQL";
 
-	version_info->current_version = ZBX_DB_SVERSION;
+	version_info->current_version = version;
 	version_info->min_version = ZBX_POSTGRESQL_MIN_VERSION;
 	version_info->max_version = ZBX_POSTGRESQL_MAX_VERSION;
 	version_info->min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION;
@@ -257,12 +240,12 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	if (10 > major)
 	{
 		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d.%d", major,
-				RIGHT2(ZBX_DB_SVERSION/100), RIGHT2(ZBX_DB_SVERSION));
+				RIGHT2(version/100), RIGHT2(version));
 	}
 	else
 	{
 		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d", major,
-				RIGHT2(ZBX_DB_SVERSION));
+				RIGHT2(version));
 	}
 
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
@@ -278,7 +261,14 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	version_info->flag = DB_VERSION_SUPPORTED;
 	version_info->friendly_current_version = NULL;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)ZBX_DB_SVERSION);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)version);
+}
+
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
+{
+	zbx_free(version_info->friendly_current_version);
+	zbx_free(version_info->extension);
+	zbx_free(version_info->ext_friendly_current_version);
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -376,13 +366,6 @@ int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db)
 
 	if (-1 == ZBX_TSDB_VERSION)
 	{
-		/* catalog pg_extension not available */
-		if (90001 > ZBX_DB_SVERSION)
-		{
-			ver = ZBX_TSDB_VERSION = 0;
-			goto out;
-		}
-
 		result = zbx_dbconn_select(db, "select extversion from pg_extension where extname = 'timescaledb'");
 
 		/* database down, can re-query in the next call */
@@ -446,19 +429,4 @@ int	zbx_tsdb_get_compression_availability(void)
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
 }
 
-#endif
-
-#if defined(HAVE_MYSQL)
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves MariaDB fork info                                       *
- *                                                                            *
- * Return value: 0 (OFF): MySQL detected                                      *
- *               1 (ON):  MariaDB fork detected                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_mariadb_fork_get(void)
-{
-	return ZBX_MARIADB_SFORK;
-}
 #endif

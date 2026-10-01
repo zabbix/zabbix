@@ -57,7 +57,7 @@ const view = new class {
 	}
 
 	#confirmForceDelete(target, data) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Remove device?')) ?>,
 			content: document.createElement('span').innerText = <?= json_encode(
 				_('Device not found. Remove device from the database?')
@@ -84,6 +84,9 @@ const view = new class {
 			position: Overlay.prototype.POSITION_CENTER_TOP,
 			trigger_element: target
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	#post(urlparams, data, force_delete_callback) {

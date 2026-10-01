@@ -19,10 +19,11 @@
  */
 
 ?>
+
 <script>
 	const view = new class {
 		#layout_mode = null;
-		#refresh_interval = null;
+		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#filter_defaults = {};
 		#filter = null;
@@ -132,11 +133,12 @@
 		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
 				user_configs}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'host.view.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'host.view.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			this.#datatable = new CDataTable(document.getElementById('datatable-hosts'), data_provider)
 				.setColumns([
@@ -151,8 +153,7 @@
 						.setFields(['interface'])
 						.setRenderer('interface'),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
-						.setFields(['availability', 'active_available'])
-						.setRenderer('availability'),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
@@ -217,9 +218,10 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
-								? <?= json_encode(_('Maintenance without data collection')); ?>
-								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
+							let hint = `${escapeHtml(maintenance.name)} [${
+								maintenance.type == MAINTENANCE_TYPE_NODATA
+									? <?= json_encode(_('Maintenance without data collection')); ?>
+									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + escapeHtml(maintenance.description);
@@ -247,18 +249,13 @@
 
 					const overflow_ellipsis = document.createElement('span');
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.innerHTML = host_port;
+					overflow_ellipsis.textContent = host_port;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
 					flex_wrapper.appendChild(overflow_ellipsis);
 
 					cell.appendChild(flex_wrapper);
-				})
-				.setCellRenderer('availability', ({cell_data, cell}) => {
-					const [availability] = cell_data;
-
-					cell.innerHTML = availability;
 				})
 				.setCellRenderer('status', ({cell_data, cell}) => {
 					const [status] = cell_data;
@@ -427,10 +424,8 @@
 		}
 
 		#removeRefreshMessage() {
-			if (this.#refresh_message_box !== null) {
-				this.#refresh_message_box.remove();
-				this.#refresh_message_box = null;
-			}
+			this.#refresh_message_box?.remove();
+			this.#refresh_message_box = null;
 		}
 
 		#addPopupMessage(message_box) {
@@ -449,12 +444,12 @@
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 
@@ -478,13 +473,13 @@
 					check_changes: false,
 					force_load: true,
 					loading_fadein,
-					onSuccess: response => this.#onDataDone(response),
+					onSuccess: response => this.#onSuccess(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
 		#refreshCounters(response) {
-			if (this.#layout_mode === <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.#layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 				return;
 			}
 
@@ -493,7 +488,7 @@
 			}
 		}
 
-		#onDataDone(response) {
+		#onSuccess(response) {
 			this.#removeRefreshMessage();
 
 			if ('messages' in response) {
@@ -516,10 +511,12 @@
 				return;
 			}
 
-			const loading_fadein = true;
-
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
+
+			this.#refresh_interval_id = setInterval(
+				() => this.#refresh({loading_fadein: true}),
+				this.#refresh_interval
+			);
 		}
 
 		#unscheduleRefresh() {

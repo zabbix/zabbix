@@ -35,7 +35,6 @@ ZBX_VECTOR_IMPL(rtc_msg, zbx_rtc_msg_t)
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
-static zbx_get_config_forks_f		get_config_forks;
 static zbx_get_process_info_by_thread_f	get_process_info_by_thread;
 static zbx_get_threads_f		get_threads;
 static zbx_get_config_int_f		get_threads_num;
@@ -169,7 +168,7 @@ static void	rtc_change_service_loglevel(zbx_uint32_t code)
  ******************************************************************************/
 static int	rtc_process_validate_target(int proc_type, int proc_num, char **result)
 {
-	int	runing_num = get_config_forks(proc_type);
+	int	runing_num = zbx_supervisor_get_process_count(proc_type);
 
 	if (0 == runing_num || runing_num < proc_num)
 	{
@@ -1096,12 +1095,10 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t c
  *                                                                            *
  ******************************************************************************/
 int	zbx_rtc_init(zbx_rtc_t *rtc, zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb,
-		zbx_get_config_forks_f get_config_forks_cb,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb, char **error)
 {
 	get_threads = get_threads_cb;
 	get_threads_num = get_threads_num_cb;
-	get_config_forks = get_config_forks_cb;
 	get_process_info_by_thread = get_process_info_by_thread_cb;
 
 	zbx_vector_rtc_sub_create(&rtc->subs);

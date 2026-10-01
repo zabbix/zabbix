@@ -1,5 +1,5 @@
 
-# MikroTik RB5009UGSIN by SNMP
+# MikroTik RB5009UG+S+IN by SNMP
 
 ## Overview
 

@@ -38,11 +38,11 @@ $page['scripts'] = ['qrcode.js'];
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 $request = getRequest('request', '');
 
-if ($request != '' && !CHtmlUrlValidator::validateSameSite($request)) {
+if ($request !== '' && !(new CFrontendActionValidator())->validate($request)) {
 	$request = '';
 }
 
-if ($request != '') {
+if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 
@@ -119,8 +119,21 @@ try {
 				'auth' => CWebUser::$data['sessionid']
 			];
 
-			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
-			redirect(reset($redirect));
+			CMessageHelper::clear();
+
+			$redirect = CWebUser::getRedirectUrl();
+
+			if ($redirect['error']) {
+				CMessageHelper::addError(_('Invalid redirect URL.'));
+			}
+
+			$redirect = array_filter([$request, $redirect['url'], CMenuHelper::getFirstUrl()]);
+
+			$response = new CControllerResponseRedirect(
+				new CUrl(reset($redirect))
+			);
+
+			$response->redirect();
 		}
 	}
 }

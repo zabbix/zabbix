@@ -95,7 +95,13 @@ class CBanner {
 					this.#getCurrentData();
 				}
 			})
-			.catch(error => console.log('Could not get saved data.', error))
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				console.log('Could not get saved data.', error);
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;
@@ -126,6 +132,10 @@ class CBanner {
 				this.#updateData(response.banners);
 			})
 			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
 				console.log('Could not get current banner data.', error);
 
 				if (this.#number_of_attempts === CBanner.NUMBER_OF_ATTEMPTS) {
@@ -150,6 +160,9 @@ class CBanner {
 
 		this.#content.innerHTML = content;
 		this.#content.querySelectorAll('a[href]').forEach(link => link.setAttribute('target', '_blank'));
+
+		const banner_size = Math.ceil(this.#container.getBoundingClientRect().height + 1);
+		document.body.style.setProperty('--banner-size', `${banner_size}px`);
 	}
 
 	#createBanner() {
@@ -233,6 +246,8 @@ class CBanner {
 			this.#container = null;
 			this.#content = null;
 			this.#active_banner_id = null;
+
+			document.body.style.removeProperty('--banner-size');
 
 			return;
 		}
@@ -340,7 +355,13 @@ class CBanner {
 
 				this.#displayActiveBanner();
 			})
-			.catch(error => console.log('Could not update banner data.', error))
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				console.log('Could not update banner data.', error);
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;
