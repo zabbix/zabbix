@@ -769,6 +769,12 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
+		$response = $this->call('hostinterface.get', [
+			'output' => ['interfaceid'],
+			'hostids' => [self::$hostid]
+		]);
+		$this->assertCount(8, $response['result']);
+
 		$this->startComponent(self::COMPONENT_SERVER);
 
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
