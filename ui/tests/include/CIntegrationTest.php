@@ -30,6 +30,9 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATIONS			= 60;
 	const WAIT_ITERATIONS_STARTUP		= 15;
 
+	// Used when the build combines LeakSanitizer, AddressSanitizer and UndefinedBehaviorSanitizer.
+	const WAIT_ITERATIONS_SHUTDOWN_SANITIZED	= 180;
+
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
@@ -490,6 +493,32 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Check whether the components under test were built using the sanitizer profile selected by
+	 * SANITIZER=MEMORY (share/config.site.d/clang-debug-sanitize-memory), which in practice combines
+	 * AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer rather than Clang's MemorySanitizer.
+	 *
+	 * @return bool
+	 */
+	private static function isSanitizedShutdownBuild(): bool {
+		return strtoupper((string) getenv('SANITIZER')) === 'MEMORY';
+	}
+
+	/**
+	 * Number of iterations to wait for a component's pid file to disappear after it was asked to stop. This is
+	 * extended for the sanitizer build combining AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer:
+	 * every forked worker process pays extra instrumentation overhead on top of an additional leak scan that
+	 * only that build runs as each process exits, so an otherwise ordinary shutdown of the whole process tree
+	 * can take noticeably longer than the default wait budget allows for.
+	 *
+	 * @return int
+	 */
+	private static function shutdownWaitIterations(): int {
+		return self::isSanitizedShutdownBuild()
+			? self::WAIT_ITERATIONS_SHUTDOWN_SANITIZED
+			: self::WAIT_ITERATIONS;
+	}
+
+	/**
 	 * Checks absence of pid file after kill.
 	 *
 	 * @param string $parent_pid
@@ -497,7 +526,7 @@ class CIntegrationTest extends CAPITest {
 	private static function waitComponentStopped($parent_pid) {
 		$usleep_total = 0;
 
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+		for ($i = 0; $i < self::shutdownWaitIterations(); $i++) {
 			if (!posix_kill($parent_pid, 0)) {
 				return;
 			}

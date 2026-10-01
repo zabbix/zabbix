@@ -287,6 +287,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	int	saved_errno = errno;
+
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	pid_t	pid;
@@ -295,11 +297,11 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
 	{
 		if (FAIL == zbx_child_cleanup(pid, child_pids, child_pid_count))
-			return;
+			goto out;
 	}
 
 	if (0 >= pid)
-		return;
+		goto out;
 
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
@@ -318,6 +320,8 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		zbx_tls_free_on_signal();
 #endif
 	}
+out:
+	errno = saved_errno;
 }
 
 #undef ZBX_EXIT_NONE
