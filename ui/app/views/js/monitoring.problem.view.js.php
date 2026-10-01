@@ -863,10 +863,6 @@
 		}
 
 		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
-			if (this.#datatable.isUserInteracting()) {
-				return;
-			}
-
 			this.#unscheduleRefresh();
 
 			const search_params = new URLSearchParams(location.search.substring(1));
