@@ -1728,12 +1728,6 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 	return res;
 }
 
-#define ZBX_TCP_EXPECT_HEADER		1
-#define ZBX_TCP_EXPECT_VERSION		2
-#define ZBX_TCP_EXPECT_VERSION_VALIDATE	3
-#define ZBX_TCP_EXPECT_LENGTH		4
-#define ZBX_TCP_EXPECT_SIZE		5
-
 /******************************************************************************
  *                                                                            *
  * Purpose: receive data                                                      *
@@ -1755,10 +1749,22 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0, max_len;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
+
+	if (0 != s->max_len_limit)
+	{
+		max_len = s->max_len_limit;
+	}
 #if defined(_WINDOWS)
-	max_len = ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #else
-	max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		max_len = 0 != (flags & ZBX_TCP_LARGE) ?
+				ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 
 	if (0 != timeout)

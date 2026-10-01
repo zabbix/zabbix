@@ -31,6 +31,7 @@ import (
 
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/errs"
 )
 
 const (
@@ -216,14 +217,6 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		}
 	}
 
-	if reservedSize > maxRecvDataSize {
-		return nil, errs.Errorf(
-			"message size %d exceeds the maximum size %d bytes",
-			reservedSize,
-			maxRecvDataSize,
-		)
-	}
-
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {
 			return c.uncompress(s[headerSize:total], reservedSize)
@@ -325,11 +318,6 @@ func (c *Connection) Close() (err error) {
 func (c *Connection) SetCompress(compress bool) {
 	c.compress = compress
 }
-
-<<<<<<< HEAD
-func (c *Listener) Close() (err error) {
-	return c.listener.Close()
-=======
 // SetMaxRecvSize sets the maximum size of data that the connection can receive.
 func (c *Connection) SetMaxRecvSize(maxSize uint32) {
 	c.maxRecvSize = maxSize
@@ -368,15 +356,8 @@ func (*Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-// Close stops the listener.
-func (l *Listener) Close() error {
-	err := l.listener.Close()
-	if err != nil {
-		return errs.Wrap(err, "failed to close listener")
-	}
-
-	return nil
->>>>>>> fcb1dd53e51 (...G...... [DEV-4861] fixed remote memory exhaustion in Zabbix agent and Zabbix agent2 passive checks)
+func (c *Listener) Close() (err error) {
+	return c.listener.Close()
 }
 
 // Failover rotates addresses on HA failover.
