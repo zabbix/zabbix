@@ -845,7 +845,11 @@ window.widget_form = new class extends CWidgetForm {
 			lefty_checkbox.checked = true;
 		}
 
-		for (const element of document.querySelectorAll('#lefty_scale, #lefty_min, #lefty_max, #lefty_units')) {
+		const lefty_inputs = document.querySelectorAll(
+			'#lefty_scale, #lefty_min, #lefty_max, #lefty_units, #lefty_unsigned'
+		);
+
+		for (const element of lefty_inputs) {
 			element.disabled = !lefty_on;
 		}
 
@@ -861,7 +865,11 @@ window.widget_form = new class extends CWidgetForm {
 			righty_checkbox.checked = true;
 		}
 
-		for (const element of document.querySelectorAll('#righty_scale, #righty_min, #righty_max, #righty_units')) {
+		const righty_inputs = document.querySelectorAll(
+			'#righty_scale, #righty_min, #righty_max, #righty_units, #righty_unsigned'
+		);
+
+		for (const element of righty_inputs) {
 			element.disabled = !righty_on;
 		}
 
