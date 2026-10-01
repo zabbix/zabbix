@@ -281,7 +281,7 @@ class CTestDataHelper {
 			return;
 		}
 
-		self::convertUsertMacroReferences($user_macro);
+		self::convertUserMacroReferences($user_macro);
 
 		$result = CDataHelper::call('usermacro.create', $user_macro);
 
@@ -290,7 +290,7 @@ class CTestDataHelper {
 		}
 	}
 
-	public static function convertUsertMacroReferences(array &$host_macro): void {
+	public static function convertUserMacroReferences(array &$host_macro): void {
 		self::convertPropertyReference($host_macro, 'hostmacroid');
 		self::convertPropertyReference($host_macro, 'hostid');
 	}
