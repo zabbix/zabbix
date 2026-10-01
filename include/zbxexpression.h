@@ -118,6 +118,8 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
+int	zbx_substitute_script_macros(char **data, char *error, size_t maxerrlen, const char *manualinput);
+
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
