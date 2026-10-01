@@ -14,10 +14,10 @@
 
 	<!-- Initialize sanitizer build profile based on the SANITIZER variable: none (default), memory, or thread -->
 	<condition property="config.site" value="share/config.site.d/clang-debug-sanitize-memory">
-		<equals arg1="${SANITIZER}" arg2="MEMORY" casesensitive="false"/>
+		<equals arg1="${SANITIZER}" arg2="memory"/>
 	</condition>
 	<condition property="config.site" value="share/config.site.d/clang-debug-sanitize-thread">
-		<equals arg1="${SANITIZER}" arg2="THREAD" casesensitive="false"/>
+		<equals arg1="${SANITIZER}" arg2="thread"/>
 	</condition>
 	<property name="config.site" value="share/config.site.d/clang-debug"/>
 

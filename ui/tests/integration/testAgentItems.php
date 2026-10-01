@@ -1126,7 +1126,7 @@ class testAgentItems extends CIntegrationTest {
 	 * @return bool
 	 */
 	public static function isThreadSanitizerBuild(): bool {
-		return strtoupper((string) getenv('SANITIZER')) === 'THREAD';
+		return getenv('SANITIZER') === 'thread';
 	}
 
 	/**

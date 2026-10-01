@@ -494,13 +494,13 @@ class CIntegrationTest extends CAPITest {
 
 	/**
 	 * Check whether the components under test were built using the sanitizer profile selected by
-	 * SANITIZER=MEMORY (share/config.site.d/clang-debug-sanitize-memory), which in practice combines
+	 * SANITIZER=memory (share/config.site.d/clang-debug-sanitize-memory), which in practice combines
 	 * AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer rather than Clang's MemorySanitizer.
 	 *
 	 * @return bool
 	 */
 	private static function isSanitizedShutdownBuild(): bool {
-		return strtoupper((string) getenv('SANITIZER')) === 'MEMORY';
+		return getenv('SANITIZER') === 'memory';
 	}
 
 	/**
