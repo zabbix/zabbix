@@ -35,6 +35,7 @@ void	zbx_dc_config_local_init(void)
 
 	config_local->cep_config = cep_config_create();
 	config_local->correlation_config = correlation_config_create();
+	config_local->apm_config = NULL;
 
 	atomic_fetch_add(&config_local_refcount, 1);
 }
@@ -66,6 +67,8 @@ void	zbx_dc_config_local_release(void)
 	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
+	zbx_free(config_local->apm_config);
+
 	cep_config_destroy(config_local->cep_config);
 	zbx_free(config_local);
 }

@@ -364,6 +364,7 @@ final class CItemData {
 			'snmptrap[<regex>]'
 		],
 		ITEM_TYPE_INTERNAL => [
+			'zabbix[apm,<type>]',
 			'zabbix[boottime]',
 			'zabbix[connector_queue]',
 			'zabbix[db,pool]',
@@ -2831,6 +2832,13 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#zabbix.stats',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#zabbix.stats'
+				]
+			],
+			'zabbix[apm,<type>]' => [
+				'description' => _('APM statistics for <type>. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#apm'
 				]
 			],
 			'zabbix[boottime]' => [

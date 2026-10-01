@@ -64,6 +64,24 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
+					'section' => 'APM',
+					'page' => 'Traces'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Metrics'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Logs'
+				]
+			],
+			[
+				[
 					'section' => 'Services',
 					'page' => 'Services'
 				]
