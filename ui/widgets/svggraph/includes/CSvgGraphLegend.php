@@ -111,21 +111,19 @@ class CSvgGraphLegend extends CDiv {
 
 			if ($this->show_statistic) {
 				if (array_key_exists('units', $item)) {
-					$multiplier = $item['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
-
 					$this->addItem([
 						(new CDiv(convertUnits([
-							'value' => $multiplier * $item['min'],
+							'value' => $item['min'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
 						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE),
 						(new CDiv(convertUnits([
-							'value' => $multiplier * $item['avg'],
+							'value' => $item['avg'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
 						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE),
 						(new CDiv(convertUnits([
-							'value' => $multiplier * $item['max'],
+							'value' => $item['max'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
 						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE)

@@ -13,13 +13,144 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+
+require_once __DIR__.'/traitItemTelemetryQueryTests.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @backup items
+ * @onBefore prepareTestData
  */
 class testItemPrototype extends CAPITest {
+
+	use traitItemTelemetryQueryTests;
+
+	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryCreate
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testHostItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':host:telemetry_query_host',
+			'ruleid' => ':lld_rule:host_lld_telemetry_query',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_host_create_'.$i.'[{#M}]',
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$item['ruleid'] = CTestDataHelper::getConvertedValueReference($item['ruleid']);
+		$i++;
+
+		$this->call('itemprototype.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryCreate
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testTemplateItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':template:telemetry_query_template',
+			'ruleid' => ':lld_rule:template_lld_telemetry_query',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_template_create_'.$i.'[{#M}]',
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$item['ruleid'] = CTestDataHelper::getConvertedValueReference($item['ruleid']);
+		$i++;
+
+		$this->call('itemprototype.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryUpdate
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testHostItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item_prototype:host_item_prototype_telemetry_query[{#M}]'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('itemprototype.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryUpdate
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testTemplateItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item_prototype:template_item_prototype_telemetry_query[{#M}]'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('itemprototype.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderItemDiscoveredTelemetryQueryUpdate
+	 */
+	public function testItemDiscoveredTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':discovered_item:host_discovered_telemetry_query[A]'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	public function testTemplateItemPrototypeTelemetryQueryUpdateConflictingWithInheritedItem(): void {
+		$template_itemid = CTestDataHelper::getConvertedValueReference(':item_prototype:template_item_prototype_telemetry_query[{#M}]');
+		$hostid = CTestDataHelper::getConvertedValueReference(':host:telemetry_query_host');
+
+		$this->call('itemprototype.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '10m',
+			'granularity' => '1m'
+		]);
+
+		['result' => $result] = $this->call('itemprototype.get', [
+			'output' => ['itemid'],
+			'hostids' => $hostid,
+			'filter' => ['key_' => 'template_item_prototype_telemetry_query[{#M}]'],
+			'inherited' => true
+		]);
+		$this->assertCount(1, $result);
+		$inherited_itemid = $result[0]['itemid'];
+
+		$this->call('itemprototype.update', [
+			'itemid' => $inherited_itemid,
+			'granularity' => '5m'
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '2m'
+		], 'Cannot update inherited item prototype with key "template_item_prototype_telemetry_query[{#M}]" on host "telemetry_query_host" because granularity cannot be greater than lookback limit.');
+
+		['result' => $result] = $this->call('itemprototype.get', [
+			'output' => ['lookback_limit', 'granularity'],
+			'itemids' => [$template_itemid, $inherited_itemid],
+			'preservekeys' => true
+		]);
+
+		$this->assertSame('10m', $result[$template_itemid]['lookback_limit']);
+		$this->assertSame('1m', $result[$template_itemid]['granularity']);
+		$this->assertSame('10m', $result[$inherited_itemid]['lookback_limit']);
+		$this->assertSame('5m', $result[$inherited_itemid]['granularity']);
+	}
 
 	public static function getItemPrototypeCreateData() {
 		$valid_item_types = [
@@ -205,7 +336,7 @@ class testItemPrototype extends CAPITest {
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT,
-					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 				]).'.'
 			],
 			// Test update interval for mqtt key of the Agent item type.
@@ -404,5 +535,9 @@ class testItemPrototype extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public function prepareTestData() {
+		self::initItemPrototypeTestsData();
 	}
 }
