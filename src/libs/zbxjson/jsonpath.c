@@ -19,7 +19,6 @@
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxnum.h"
-#include "zbxexpr.h"
 #include "jsonobj.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
@@ -2688,9 +2687,11 @@ static int	jsonpath_apply_functions(zbx_jsonpath_context_t *ctx, int path_depth,
  *               FAIL    - invalid result data (internal json error)          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_format_query_result(const zbx_vector_jsonobj_ref_t *objects, int definite_path, char **output)
+static int	jsonpath_format_query_result_str(const zbx_vector_jsonobj_ref_t *objects, int definite_path,
+		void *output)
 {
-	size_t	output_offset = 0, output_alloc;
+	char	**output_str = (char **)output;
+	size_t	output_offset = 0, output_alloc = 0;
 	int	i;
 	char	delim;
 
@@ -2698,24 +2699,51 @@ static int	jsonpath_format_query_result(const zbx_vector_jsonobj_ref_t *objects,
 		return SUCCEED;
 
 	if (1 == definite_path)
-		return jsonpath_str_copy_value(output, &output_alloc, &output_offset, objects->values[0].value);
+		return jsonpath_str_copy_value(output_str, &output_alloc, &output_offset, objects->values[0].value);
 
 	/* reserve 32 bytes per returned object plus array start/end [] and terminating zero */
 	output_alloc = (size_t)objects->values_num * 32 + 3;
-	*output = (char *)zbx_malloc(NULL, output_alloc);
+	*output_str = (char *)zbx_malloc(NULL, output_alloc);
 
 	delim = '[';
 
 	for (i = 0; i < objects->values_num; i++)
 	{
-		zbx_chrcpy_alloc(output, &output_alloc, &output_offset, delim);
-		zbx_jsonobj_to_string(output, &output_alloc, &output_offset, objects->values[i].value);
+		zbx_chrcpy_alloc(output_str, &output_alloc, &output_offset, delim);
+		zbx_jsonobj_to_string(output_str, &output_alloc, &output_offset, objects->values[i].value);
 		delim = ',';
 	}
 
-	zbx_chrcpy_alloc(output, &output_alloc, &output_offset, ']');
+	zbx_chrcpy_alloc(output_str, &output_alloc, &output_offset, ']');
 
 	return SUCCEED;
+}
+
+static int	jsonpath_format_query_result_vector_str(const zbx_vector_jsonobj_ref_t *objects, int definite_path,
+		void *output)
+{
+	zbx_vector_str_t	*output_vec = (zbx_vector_str_t *)output;
+
+	ZBX_UNUSED(definite_path);
+
+	zbx_vector_str_reserve(output_vec, objects->values_num);
+
+	for (int i = 0; i < objects->values_num; i++)
+	{
+		char	*str = NULL;
+		size_t	str_alloc = 0, str_offset = 0;
+
+		if (SUCCEED != jsonpath_str_copy_value(&str, &str_alloc, &str_offset, objects->values[i].value))
+			goto fail;
+
+		zbx_vector_str_append(output_vec, str);
+	}
+
+	return SUCCEED;
+fail:
+	zbx_vector_str_clear_ext(output_vec, zbx_str_free);
+
+	return FAIL;
 }
 
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath)
@@ -2870,32 +2898,18 @@ static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx)
 	zbx_vector_jsonobj_ref_destroy(&ctx->objects);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: perform jsonpath query on the specified json object               *
- *                                                                            *
- * Parameters: obj    - [IN] json object                                      *
- *             index  - [IN] jsonpath index (optional)                        *
- *             path   - [IN] jsonpath                                         *
- *             output - [OUT] output value                                    *
- *                                                                            *
- * Return value: SUCCEED - the query was performed successfully (empty result *
- *                         being counted as successful query)                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output)
+typedef int	(*jsonpath_format_query_result_func_t)(const zbx_vector_jsonobj_ref_t *objects, int definite_path,
+		void *output);
+
+static int	jsonobj_query_ext_precompiled(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
+		zbx_jsonpath_t *jsonpath, jsonpath_format_query_result_func_t query_result_format_func, void *output)
 {
 	zbx_jsonpath_context_t	ctx;
-	zbx_jsonpath_t		jsonpath;
 	int			ret = SUCCEED;
-
-	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
-		return FAIL;
 
 	ctx.found = 0;
 	ctx.root = obj;
-	ctx.path = &jsonpath;
+	ctx.path = jsonpath;
 	zbx_vector_jsonobj_ref_create(&ctx.objects);
 	ctx.index = index;
 
@@ -2914,30 +2928,88 @@ int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
 	if (SUCCEED == ret)
 	{
 		zbx_vector_jsonobj_ref_t	out;
-		int				definite_path = jsonpath.definite, path_depth;
+		int				definite_path = jsonpath->definite, path_depth;
 
 		zbx_vector_jsonobj_ref_create(&out);
 
-		path_depth = jsonpath.segments_num;
-		while (0 < path_depth && ZBX_JSONPATH_SEGMENT_FUNCTION == jsonpath.segments[path_depth - 1].type)
+		path_depth = jsonpath->segments_num;
+		while (0 < path_depth && ZBX_JSONPATH_SEGMENT_FUNCTION == jsonpath->segments[path_depth - 1].type)
 			path_depth--;
 
-		if (path_depth < jsonpath.segments_num)
+		if (path_depth < jsonpath->segments_num)
 		{
 			if (SUCCEED == (ret = jsonpath_apply_functions(&ctx, path_depth, &definite_path, &out)))
-				ret = jsonpath_format_query_result(&out, definite_path, output);
+				ret = query_result_format_func(&out, definite_path, output);
 		}
 		else
-			ret = jsonpath_format_query_result(&ctx.objects, definite_path, output);
+			ret = query_result_format_func(&ctx.objects, definite_path, output);
 
 		jsonobj_clear_ref_vector(&out);
 		zbx_vector_jsonobj_ref_destroy(&out);
 	}
 
 	jsonpath_ctx_clear(&ctx);
+
+	return ret;
+}
+
+static int	jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path,
+		jsonpath_format_query_result_func_t query_result_format_func, void *output)
+{
+	int		ret;
+	zbx_jsonpath_t	jsonpath;
+
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+		return FAIL;
+
+	ret = jsonobj_query_ext_precompiled(obj, index, &jsonpath, query_result_format_func, output);
+
 	zbx_jsonpath_clear(&jsonpath);
 
 	return ret;
+}
+
+int	zbx_jsonobj_query_ext_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path,
+		zbx_vector_str_t *output)
+{
+	return jsonobj_query_ext(obj, index, path, jsonpath_format_query_result_vector_str, (void *)output);
+}
+
+int	zbx_jsonobj_query_vector_str(const zbx_jsonobj_t *obj, const char *path, zbx_vector_str_t *output)
+{
+	return zbx_jsonobj_query_ext_vector_str(obj, NULL, path, output);
+}
+
+int	zbx_jsonobj_query_ext_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
+		zbx_jsonpath_t *jsonpath, zbx_vector_str_t *output)
+{
+	return jsonobj_query_ext_precompiled(obj, index, jsonpath, jsonpath_format_query_result_vector_str,
+			(void *)output);
+}
+
+int	zbx_jsonobj_query_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_t *jsonpath,
+		zbx_vector_str_t *output)
+{
+	return zbx_jsonobj_query_ext_precompiled_vector_str(obj, NULL, jsonpath, output);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: perform jsonpath query on the specified json object               *
+ *                                                                            *
+ * Parameters: obj    - [IN] json object                                      *
+ *             index  - [IN] jsonpath index (optional)                        *
+ *             path   - [IN] jsonpath                                         *
+ *             output - [OUT] output value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the query was performed successfully (empty result *
+ *                         being counted as successful query)                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output)
+{
+	return jsonobj_query_ext(obj, index, path, jsonpath_format_query_result_str, (void *)output);
 }
 
 int	zbx_jsonobj_query(const zbx_jsonobj_t *obj, const char *path, char **output)

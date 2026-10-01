@@ -1219,13 +1219,13 @@ int	zbx_config_option_parse_options(const char *text, zbx_vector_config_option_t
 			goto out;
 		}
 
-		if (FAIL == zbx_str_extract(key, key_len, &option.name))
+		if (FAIL == zbx_str_extract(key, (size_t)key_len, &option.name))
 		{
 			*error = zbx_dsprintf(NULL, "invalid option name starting with \"%s\"", key);
 			goto out;
 		}
 
-		if (FAIL == zbx_str_extract(ptr, value_len, &option.value))
+		if (FAIL == zbx_str_extract(ptr, (size_t)value_len, &option.value))
 		{
 			zbx_free(option.name);
 			*error = zbx_dsprintf(NULL, "invalid option value starting with \"%s\"", ptr);

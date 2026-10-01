@@ -270,7 +270,7 @@ static void	recv_senderhistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, 
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	char		*error = NULL;
-	zbx_dc_proxy_t	proxy;
+	zbx_dc_proxy_t	proxy = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -292,6 +292,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			" are deprecated", proxy.name, sock->peer);
 out:
 	zbx_free(error);
+	zbx_dc_proxy_clear(&proxy);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
