@@ -20,7 +20,7 @@ Community Edition and Backup Starter do not provide Enterprise Manager functiona
 
 ***NOTE:*** Veeam Backup & Replication v13 also provides a native REST API on port 9419, separate from the Enterprise Manager REST API used by this template.
 
-A different Veeam Backup and Replication by HTTP template is required for monitoring the native VBR REST API.
+A different Veeam Backup & Replication by HTTP template is required for monitoring the native VBR REST API.
 
 > See [Veeam Data Platform Feature Comparison](https://www.veeam.com/licensing-pricing.html) for more details.
 
@@ -31,7 +31,7 @@ Zabbix version: 7.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Veeam Backup and Replication, version 13.1.1.18
+- Veeam Backup & Replication, version 13.1.1.18
 
 ## Configuration
 

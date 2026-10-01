@@ -1,9 +1,9 @@
 
-# Veeam Backup and Replication by HTTP
+# Veeam Backup & Replication by HTTP
 
 ## Overview
 
-This template is designed to monitor Veeam Backup and Replication.
+This template is designed to monitor Veeam Backup & Replication.
 It works without any external scripts and uses the script item.
 
 ***NOTE:*** The native Veeam Backup & Replication REST API (port 9419) is available only in editions that include REST API functionality.
@@ -31,7 +31,7 @@ Zabbix version: 7.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Veeam Backup and Replication, version 13.1.1.18
+- Veeam Backup & Replication, version 13.1.1.18
 
 ## Configuration
 
@@ -52,9 +52,9 @@ This template has been tested on:
 |{$VEEAM.API.URL}|<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p>|`https://localhost:9419`|
 |{$VEEAM.API.VERSION}|<p>The REST API revision.</p>|`1.3-rev2`|
 |{$VEEAM.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
-|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.</p>|`full`|
-|{$VEEAM.PASSWORD}|<p>The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
-|{$VEEAM.USER}|<p>The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup & Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup & Replication"}.</p>|`full`|
+|{$VEEAM.PASSWORD}|<p>The `password` of the Veeam Backup & Replication account. It is used to obtain an access token.</p>||
+|{$VEEAM.USER}|<p>The `username` of the Veeam Backup & Replication account. It is used to obtain an access token.</p>||
 |{$VEEAM.DATA.FREQUENCY}|<p>The update interval for the get metrics item.</p>|`1m`|
 |{$VEEAM.SECURITY.DATA.FREQUENCY}|<p>The update interval for the security analyzer best practices item.</p>|`4h`|
 |{$VEEAM.DATA.TIMEOUT}|<p>A response timeout for the API.</p>|`30`|

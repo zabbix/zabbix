@@ -2097,13 +2097,17 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 	tcp_recv_context->expected_len = 16 * ZBX_MEBIBYTE;
 	tcp_recv_context->reserved = 0;
 	tcp_recv_context->expect = ZBX_TCP_EXPECT_HEADER;
-#if defined(_WINDOWS)
-	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
-#else
+
 	if (0 != s->max_len_limit)
 	{
 		tcp_recv_context->max_len = s->max_len_limit;
 	}
+#if defined(_WINDOWS)
+	else
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
+#else
 	else if (0 != (flags & ZBX_TCP_LARGE))
 	{
 		tcp_recv_context->max_len = ZBX_MAX_RECV_LARGE_DATA_SIZE;
