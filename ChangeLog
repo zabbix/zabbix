@@ -1,6 +1,7 @@
 Changes for 8.0.0rc1
 
 New features:
+..F.....S. [ZBXNEXT-10248] added jsonpath and xmlxpath macro and history functions; added contains and substring string functions (kastafjevs, mkorotkov)
 A.F....P.. [ZBXNEXT-10084] added open telemetry collector to proxy (gklavins, katkuzmina, vmaksimovs, wiper)
 ..F....... [ZBXNEXT-10083] implemented OpenTelemetry trace visualization (ashubin, averza, dfofanovs, gklavins)
 .........T [ZBXNEXT-10728] switched filesystem monitoring in OS templates to vfs.fs.get[short|full] (egordymov)
