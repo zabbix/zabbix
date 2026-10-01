@@ -36,7 +36,7 @@ zabbix_export:
         Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -1726,7 +1726,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.metrics.repl.buffer.count
+                    - $.metrics.repl.buffer.apply.count
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -1743,7 +1743,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.metrics.repl.buffer.maxSizeBytes
+                    - $.metrics.repl.buffer.apply.maxSizeBytes
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -1760,7 +1760,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.metrics.repl.buffer.sizeBytes
+                    - $.metrics.repl.buffer.apply.sizeBytes
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2203,7 +2203,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.wiredTiger.cache[''maximum page size at eviction'']'
+                    - '$.wiredTiger.cache[''maximum page size seen at eviction'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2236,7 +2236,8 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.wiredTiger.cache.[''pages evicted by application threads'']'
+                    - '$.wiredTiger.cache[''page evict attempts by application threads'']'
+                - type: CHANGE_PER_SECOND
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2349,7 +2350,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.read.available
+                    - $.queues.execution.read.available
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2377,7 +2378,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.read.out
+                    - $.queues.execution.read.out
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2393,7 +2394,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.read.totalTickets
+                    - $.queues.execution.read.totalTickets
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2409,7 +2410,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.write.available
+                    - $.queues.execution.write.available
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2437,7 +2438,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.write.out
+                    - $.queues.execution.write.out
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:
@@ -2453,7 +2454,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.wiredTiger.concurrentTransactions.write.totalTickets
+                    - $.queues.execution.write.totalTickets
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
               tags:

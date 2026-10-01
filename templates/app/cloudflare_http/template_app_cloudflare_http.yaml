@@ -25,7 +25,7 @@ zabbix_export:
             Zone ID is available in your Cloudflare account under Account Home > Site.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -183,6 +183,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Cloudflare = {
             	params: {},
             
@@ -200,11 +225,14 @@ zabbix_export:
             				Cloudflare.params.api_endpoint += '/';
             			}
             		}
+            
+            		Cloudflare.tls = new CTlsConfig(params.tls_verify);
+            		Cloudflare.tls.checkURL(Cloudflare.params.api_endpoint);
             	},
             
             	request: function (method, query, data) {
             		var response,
-            			request = new HttpRequest(),
+            			request = new HttpRequest(Cloudflare.tls.options),
             			url = Cloudflare.params.api_endpoint + query;
             
             		request.addHeader('Content-Type: application/json');
@@ -400,6 +428,8 @@ zabbix_export:
           parameters:
             - name: api_endpoint
               value: '{$CLOUDFLARE.API.URL}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cloudflare"}'
             - name: token
               value: '{$CLOUDFLARE.API.TOKEN}'
             - name: zone
@@ -674,7 +704,7 @@ zabbix_export:
           description: 'Your Cloudflare API Token.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             label: 'Cloudflare API token'
             description: 'Your Cloudflare API Token.'
             required: 'YES'
@@ -683,7 +713,7 @@ zabbix_export:
           description: 'The URL of Cloudflare API endpoint.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: 'Cloudflare API URL'
             description: 'The URL of Cloudflare API endpoint.'
             required: 'YES'
@@ -692,7 +722,7 @@ zabbix_export:
           description: 'Minimum of cached bandwidth in %.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Min cached bandwidth (%)'
             description: 'Minimum of cached bandwidth in %.'
@@ -702,7 +732,7 @@ zabbix_export:
           description: 'Maximum responses with errors in %.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'Max error responses (%)'
             description: 'Maximum responses with errors in %.'
@@ -712,10 +742,26 @@ zabbix_export:
           description: 'Your Cloudflare Site Zone ID.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'Cloudflare zone ID'
             description: 'Your Cloudflare Site Zone ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cloudflare", e.g. {$HTTP.TLS.VERIFY:"Cloudflare"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 51f1013e8a3d492faed27fe80b68fc53
           name: Overview

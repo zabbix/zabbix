@@ -156,7 +156,7 @@ window.valuemap_edit_popup = {
 				select.getOptionByValue(<?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>).disabled = (default_select
 					&& select !== default_select
 				);
-				textarea.classList.toggle('visibility-hidden', select === default_select);
+				textarea.classList.toggle('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', select === default_select);
 				textarea.disabled = select === default_select;
 				textarea.placeholder = this.type_placeholder[select.value] || '';
 			}

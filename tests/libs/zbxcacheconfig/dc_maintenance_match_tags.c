@@ -50,9 +50,9 @@ static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tag
 		tag->value = value;
 
 		if (0 == strcmp(op, "like"))
-			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_LIKE;
+			tag->op = ZBX_CONDITION_OPERATOR_LIKE;
 		else if (0 == strcmp(op, "equal"))
-			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL;
+			tag->op = ZBX_CONDITION_OPERATOR_EQUAL;
 		else
 			fail_msg("unknown maintenance tag operator '%s'", op);
 
@@ -91,9 +91,9 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 	tags_evaltype = zbx_mock_get_parameter_string("in.maintenance.tags_evaltype");
 
 	if (0 == strcasecmp(tags_evaltype, "AND/OR"))
-		maintenance->tags_evaltype = ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR;
+		maintenance->tags_evaltype = ZBX_CONDITION_EVAL_TYPE_AND_OR;
 	else if (0 == strcasecmp(tags_evaltype, "OR"))
-		maintenance->tags_evaltype = ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR;
+		maintenance->tags_evaltype = ZBX_CONDITION_EVAL_TYPE_OR;
 	else
 		fail_msg("unknown tags_evaltype value '%s'", tags_evaltype);
 

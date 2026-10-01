@@ -34,7 +34,7 @@ zabbix_export:
         - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -613,16 +613,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: security
-        - uuid: 6c1de983421846c9acef8f465ff2f196
-          name: 'Get filesystems'
-          type: ZABBIX_ACTIVE
-          key: vfs.fs.get
-          history: '0'
-          value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
-          tags:
-            - tag: component
-              value: raw
         - uuid: 5bf94ec3debc459fa3e13449199052ee
           name: 'Available memory'
           type: ZABBIX_ACTIVE
@@ -1429,8 +1419,9 @@ zabbix_export:
                 - 1h
         - uuid: 5c9b5dbed44c4af0957ff9316f8fb761
           name: 'Mounted filesystem discovery'
-          type: DEPENDENT
-          key: vfs.fs.dependent.discovery
+          type: ZABBIX_ACTIVE
+          key: 'vfs.fs.get[short]'
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
@@ -1458,7 +1449,7 @@ zabbix_export:
                   parameters:
                     - $.inodes.pfree
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -1505,7 +1496,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.free
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -1525,7 +1516,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.pused
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -1580,7 +1571,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.total
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -1599,30 +1590,8 @@ zabbix_export:
                   parameters:
                     - $.bytes.used
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
-                - tag: component
-                  value: storage
-                - tag: filesystem
-                  value: '{#FSNAME}'
-                - tag: fstype
-                  value: '{#FSTYPE}'
-            - uuid: 7eb5cb610b1e4c438af380383c75047f
-              name: 'FS [{#FSNAME}]: Get data'
-              type: DEPENDENT
-              key: 'vfs.fs.dependent[{#FSNAME},data]'
-              history: '0'
-              value_type: TEXT
-              description: 'Intermediate data of `{#FSNAME}` filesystem.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
-              master_item:
-                key: vfs.fs.get
-              tags:
-                - tag: component
-                  value: raw
                 - tag: component
                   value: storage
                 - tag: filesystem
@@ -1646,7 +1615,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -1668,6 +1637,24 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+            - uuid: 7eb5cb610b1e4c438af380383c75047f
+              name: 'FS [{#FSNAME}]: Get data'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.get[full,{#FSNAME}]'
+              history: '0'
+              value_type: TEXT
+              description: 'The `vfs.fs.get[full,{#FSNAME}]` key acquires disk space and inode statistics for the `{#FSNAME}` filesystem only. Later to be extracted by preprocessing in dependent items.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[0]'
+              tags:
+                - tag: component
+                  value: raw
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
           graph_prototypes:
             - uuid: 7af98afdf5ad43c9b77dddbe4e68b84f
               name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
@@ -1707,29 +1694,15 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
-          master_item:
-            key: vfs.fs.get
           lld_macro_paths:
             - lld_macro: '{#FSNAME}'
               path: $.fsname
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var filesystems = JSON.parse(value),
-                  	result = filesystems.map(function (filesystem) {
-                  		return {
-                  			fsname: filesystem.fsname,
-                  			fstype: filesystem.fstype
-                  		};
-                  	});
-                  
-                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 6h
           overrides:
             - name: 'Skip metadata collection for dynamic FS'
               step: '1'

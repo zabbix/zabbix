@@ -57,7 +57,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -68,6 +68,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -79,11 +104,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -205,6 +231,8 @@ zabbix_export:
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
               value: '{$NUTANIX.CLUSTER.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Cluster Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -1442,6 +1470,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -1453,11 +1506,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -1581,6 +1635,8 @@ zabbix_export:
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
               value: '{$NUTANIX.CLUSTER.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Cluster Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -2362,12 +2418,28 @@ zabbix_export:
         - tag: target
           value: prism-element
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Cluster Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Cluster Prism Element"}.'
+          config:
+            type: LIST
+            priority: '6'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable Nutanix alerts by name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Alerts filter by name (include)'
             description: 'Filter of discoverable Nutanix alerts by name.'
@@ -2376,7 +2448,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Alerts filter by name (exclude)'
             description: 'Filter to exclude discovered Nutanix alerts by name.'
@@ -2385,7 +2457,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in the range 0-2. "0" - Info, "1" - Warning, "2" - Critical.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alerts filter by severity (include)'
             description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in the range 0-2. "0" - Info, "1" - Warning, "2" - Critical.'
@@ -2394,7 +2466,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filtering only problem alerts or "0" for resolved ones.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alerts filter by state (include)'
             description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filtering only problem alerts or "0" for resolved ones.'
@@ -2402,7 +2474,7 @@ zabbix_export:
           description: 'UUID of the cluster.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'Cluster UUID'
             description: 'UUID of the cluster.'
             required: 'YES'
@@ -2446,7 +2518,7 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'API response timeout'
             description: 'API response timeout.'
@@ -4662,7 +4734,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -4673,6 +4745,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -4684,11 +4781,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -4810,6 +4908,8 @@ zabbix_export:
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
               value: '{$NUTANIX.HOST.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Host Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -5096,6 +5196,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -5107,11 +5232,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -5238,6 +5364,8 @@ zabbix_export:
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
               value: '{$NUTANIX.HOST.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Host Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -6518,6 +6646,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -6529,11 +6682,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -6657,6 +6811,8 @@ zabbix_export:
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
               value: '{$NUTANIX.HOST.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Host Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -7687,12 +7843,28 @@ zabbix_export:
         - tag: target
           value: prism-element
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Host Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Host Prism Element"}.'
+          config:
+            type: LIST
+            priority: '6'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable Nutanix alerts by name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Alerts filter by name (include)'
             description: 'Filter of discoverable Nutanix alerts by name.'
@@ -7701,7 +7873,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Alerts filter by name (exclude)'
             description: 'Filter to exclude discovered Nutanix alerts by name.'
@@ -7710,7 +7882,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in the range 0-2. "0" - Info, "1" - Warning, "2" - Critical.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alerts filter by severity (include)'
             description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in the range 0-2. "0" - Info, "1" - Warning, "2" - Critical.'
@@ -7719,7 +7891,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filtering only problem alerts or "0" for resolved ones.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alerts filter by state (include)'
             description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filtering only problem alerts or "0" for resolved ones.'
@@ -7727,7 +7899,7 @@ zabbix_export:
           description: 'UUID of the host.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             label: 'Host UUID'
             description: 'UUID of the host.'
             required: 'YES'
@@ -7771,7 +7943,7 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'API response timeout'
             description: 'API response timeout.'
@@ -10557,7 +10729,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -10569,6 +10741,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -10580,11 +10777,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -10704,6 +10902,8 @@ zabbix_export:
               value: '{$NUTANIX.PASSWORD}'
             - name: proxy
               value: '{$NUTANIX.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -10745,6 +10945,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -10756,11 +10981,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -10880,6 +11106,8 @@ zabbix_export:
               value: '{$NUTANIX.PASSWORD}'
             - name: proxy
               value: '{$NUTANIX.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -10921,6 +11149,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Nutanix = {
             	params: {},
             
@@ -10932,11 +11185,12 @@ zabbix_export:
             		});
             
             		Nutanix.params = allParams;
+            		Nutanix.tls = new CTlsConfig(allParams.tls_verify);
             	},
             
             	request: function (url) {
             
-            		var request = new HttpRequest();
+            		var request = new HttpRequest(Nutanix.tls.options);
             
             		if (typeof Nutanix.params.proxy !== 'undefined' && Nutanix.params.proxy !== '') {
             			request.setProxy(Nutanix.params.proxy);
@@ -11061,6 +11315,8 @@ zabbix_export:
               value: '{$NUTANIX.PASSWORD}'
             - name: proxy
               value: '{$NUTANIX.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Nutanix Prism Element"}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -11329,12 +11585,28 @@ zabbix_export:
         - tag: target
           value: prism-element
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Prism Element"}.'
+          config:
+            type: LIST
+            priority: '6'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$NUTANIX.CLUSTER.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable Nutanix clusters by name.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Clusters filter (include)'
             description: 'Filter of discoverable Nutanix clusters by name.'
@@ -11343,7 +11615,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix clusters by name.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Clusters filter (exclude)'
             description: 'Filter to exclude discovered Nutanix clusters by name.'
@@ -11352,7 +11624,7 @@ zabbix_export:
           description: 'Filter of discoverable Nutanix hosts by name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Hosts filter (include)'
             description: 'Filter of discoverable Nutanix hosts by name.'
@@ -11361,7 +11633,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Nutanix hosts by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Hosts filter (exclude)'
             description: 'Filter to exclude discovered Nutanix hosts by name.'
@@ -11405,7 +11677,7 @@ zabbix_export:
           description: 'Filter of discoverable storage containers by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Storage containers filter (include)'
             description: 'Filter of discoverable storage containers by name.'
@@ -11414,7 +11686,7 @@ zabbix_export:
           description: 'Filter to exclude discovered storage containers by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Storage containers filter (exclude)'
             description: 'Filter to exclude discovered storage containers by name.'

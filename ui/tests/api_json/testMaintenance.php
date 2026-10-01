@@ -63,6 +63,35 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => null
 			],
+			// Success. Created maintenance with condition operators.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag1',
+							'operator' => 0, // MAINTENANCE_TAG_OPERATOR_EQUAL
+							'value' => 'value1'
+						],
+						[
+							'tag' => 'tag2',
+							'operator' => 1, // MAINTENANCE_TAG_OPERATOR_NOT_EQUAL
+							'value' => 'value2'
+						],
+						[
+							'tag' => 'tag3',
+							'operator' => 2, // MAINTENANCE_TAG_OPERATOR_LIKE
+							'value' => 'value3'
+						],
+						[
+							'tag' => 'tag4',
+							'operator' => 3, // MAINTENANCE_TAG_OPERATOR_NOT_LIKE
+							'value' => 'value4'
+						]
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
 			// Success. Created maintenance with one tag.
 			[
 				'request_data' => [
@@ -358,7 +387,8 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/1/tags/1/operator": an integer is expected.'
 			],
-			// Fail. Possible values for "operator" are 0 (Equals) and 2 (Contains).
+			// Fail. Possible values for "operator" are 0 (Equals), 1 (Does not equal), 2 (Contains) and
+			// 3 (Does not contain).
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
@@ -369,7 +399,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/tags/1/operator": value must be one of 0, 2.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/operator": value must be one of 0, 1, 2, 3.'
 			],
 			// Fail. Condition operator must be of type integer.
 			[
@@ -571,13 +601,126 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/1/hosts/3": value (hostid)=(999) already exists.'
 			],
+			// Success. Created maintenance with triggers as its only target.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'triggers' => [
+						['triggerid' => 134000]
+					]
+				] + array_diff_key($def_options, array_flip(['groups'])),
+				'expected_error' => null
+			],
+			// Fail. Trigger ID is mandatory.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'triggers' => [[]]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/triggers/1": the parameter "triggerid" is missing.'
+			],
+			// Fail. Trigger objects may contain only triggerid.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'triggers' => [
+						[
+							'triggerid' => 134000,
+							'description' => 'unexpected'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/triggers/1": unexpected parameter "description".'
+			],
+			// Fail. Duplicate triggers are not allowed.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'triggers' => [
+						['triggerid' => 134000],
+						['triggerid' => 134000]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/triggers/2": value (triggerid)=(134000) already exists.'
+			],
+			// Fail. Trigger must exist and be editable.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'triggers' => [
+						['triggerid' => 999999]
+					]
+				] + $def_options,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Triggers are not supported without data collection.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'maintenance_type' => 1,
+					'triggers' => [
+						['triggerid' => 134000]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/triggers": should be empty.'
+			],
+			// Success. Created maintenance with event name conditions.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'event_names' => [
+						['value' => 'Database unavailable'],
+						['operator' => 3, 'value' => 'Test event']	// MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Fail. Event name value is mandatory.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'event_names' => [[]]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/event_names/1": the parameter "value" is missing.'
+			],
+			// Fail. Event name value cannot be empty.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'event_names' => [
+						['value' => '']
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/event_names/1/value": cannot be empty.'
+			],
+			// Fail. Event name operator must be Contains or Does not contain.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'event_names' => [
+						['operator' => 0, 'value' => 'Problem']
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/event_names/1/operator": value must be one of 2, 3.'
+			],
+			// Fail. Event name conditions are not supported without data collection.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'maintenance_type' => 1,
+					'event_names' => [
+						['value' => 'Problem']
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/event_names": should be empty.'
+			],
 			// Fail. Empty groups.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
 					'groups' => []
 				] + $def_options,
-				'expected_error' => 'At least one host group or host must be selected.'
+				'expected_error' => 'At least one host group, host or trigger must be selected.'
 			],
 			// Fail. Empty hosts.
 			[
@@ -585,7 +728,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'hosts' => []
 				] + array_diff_key($def_options, array_flip(['groups'])),
-				'expected_error' => 'At least one host group or host must be selected.'
+				'expected_error' => 'At least one host group, host or trigger must be selected.'
 			],
 			// Fail. Empty groups and hosts.
 			[
@@ -594,7 +737,7 @@ class testMaintenance extends CAPITest {
 					'groups' => [],
 					'hosts' => []
 				] + $def_options,
-				'expected_error' => 'At least one host group or host must be selected.'
+				'expected_error' => 'At least one host group, host or trigger must be selected.'
 			],
 			// Fail. No groups and hosts.
 			[
@@ -612,7 +755,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'At least one host group or host must be selected.'
+				'expected_error' => 'At least one host group, host or trigger must be selected.'
 			],
 			// Fail. Same name.
 			[
@@ -1750,6 +1893,41 @@ class testMaintenance extends CAPITest {
 	 */
 	public function testMaintenance_Create($request_data, $expected_error = null) {
 		$this->call('maintenance.create', $request_data, $expected_error);
+	}
+
+	public static function getMaintenanceUpdateValidationData(): array {
+		return [
+			'Non-empty triggers when changing to no data collection' => [
+				'request_data' => [
+					'maintenanceid' => 60003,
+					'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+					'triggers' => [['triggerid' => 134000]]
+				],
+				'expected_error' => 'Invalid parameter "/1/triggers": should be empty.'
+			],
+			'Non-empty event names when changing to no data collection' => [
+				'request_data' => [
+					'maintenanceid' => 60003,
+					'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+					'event_names' => [['value' => 'Problem']]
+				],
+				'expected_error' => 'Invalid parameter "/1/event_names": should be empty.'
+			],
+			'No host group or host when changing trigger-only maintenance to no data collection' => [
+				'request_data' => [
+					'maintenanceid' => 60006,
+					'maintenance_type' => MAINTENANCE_TYPE_NODATA
+				],
+				'expected_error' => 'At least one host group or host must be selected.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMaintenanceUpdateValidationData
+	 */
+	public function testMaintenance_UpdateValidation(array $request_data, string $expected_error): void {
+		$this->call('maintenance.update', $request_data, $expected_error);
 	}
 
 	public static function getMaintenanceGetData() {

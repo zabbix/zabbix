@@ -103,7 +103,7 @@ $html_page = (new CHtmlPage())
 							->addValue(_('Any'), -1)
 							->addValue(_('New'), ZBX_DEVICE_STATUS_NEW)
 							->addValue(_('Active'), ZBX_DEVICE_STATUS_ACTIVATED)
-							->addValue(_('Orphaned'), ZBX_DEVICE_STATUS_ORPHANED)
+							->addValue(_('Unassigned'), ZBX_DEVICE_STATUS_UNASSIGNED)
 							->setModern()
 					)
 				])
@@ -120,7 +120,7 @@ $deviceTable = (new CTableInfo())
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('User'), 'user_fullname', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('User role'), 'user_role', $data['sort'], $data['sortorder'], $data['url']),
-		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Added on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $data['url']),
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] ? '' : null
@@ -139,7 +139,10 @@ foreach ($data['devices'] as $device) {
 		$device['user_role'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
-		$data['device_statuses'][$device['status']],
+		$device['status'] == ZBX_DEVICE_STATUS_NEW && $device['enrollment_token_expires_at'] < time()
+			? (new CSpan($data['device_statuses'][$device['status']].' ('._('Token expired').')'))
+				->addClass(ZBX_STYLE_RED)
+			: $data['device_statuses'][$device['status']],
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] && $can_manage
 			? (new CButton('', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
