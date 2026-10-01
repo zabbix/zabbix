@@ -325,10 +325,11 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons,
 			? getHostNavigation('items', $data['hostid'])
 			: null
 	)
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
 	->addItem($filter)
 	->addItem($form)
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 $confirm_messages = [
 	'item.enable' => [_('Enable selected item?'), _('Enable selected items?')],

@@ -146,10 +146,11 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 (new CHtmlPage())
 	->setTitle(_('Top 100 triggers'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_TOPTRIGGERS))
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
 	->addItem($filter)
 	->addItem($table)
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

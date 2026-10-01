@@ -192,10 +192,11 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
 	->addItem($filter)
 	->addItem($form)
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('
 	view.init();

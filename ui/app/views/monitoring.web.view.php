@@ -37,7 +37,6 @@ $web_layout_mode = $this->getLayoutMode();
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'web.view'))
 		->setProfile($data['profileIdx'])
@@ -91,6 +90,8 @@ $web_layout_mode = $this->getLayoutMode();
 	)
 	->addItem($data['screen_view'])
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()

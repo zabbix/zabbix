@@ -114,9 +114,7 @@ if (!empty($this->data['hostid'])) {
 	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
-$html_page
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
-	->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])
@@ -266,6 +264,8 @@ $httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptesti
 $html_page
 	->addItem($httpForm)
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 zbx_add_post_js("history.replaceState({}, '');");
 

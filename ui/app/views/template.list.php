@@ -118,9 +118,7 @@ $filter = (new CFilter())
 			->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
 	]);
 
-$html_page
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
-	->addItem($filter);
+$html_page->addItem($filter);
 
 $csrf_token = CCsrfTokenHelper::get('template');
 
@@ -166,6 +164,8 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 $html_page->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

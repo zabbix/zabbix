@@ -384,7 +384,7 @@ class LinkForm {
 				return;
 			}
 
-			const color_picker = this.domNode[2].querySelector(
+			const color_picker = this.domNode[1].querySelector(
 				`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${name}"]`
 			);
 
@@ -531,7 +531,7 @@ class LinkForm {
 	 * @returns {string}
 	 */
 	#getNextColor() {
-		const color_pickers = this.domNode[2].querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}:not([disabled])`);
+		const color_pickers = this.domNode[1].querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}:not([disabled])`);
 		const used_colors = [];
 
 		for (const color_picker of color_pickers) {

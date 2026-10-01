@@ -199,9 +199,7 @@ $filter = (new CFilter())
 			])
 	]);
 
-$html_page
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
-	->addItem($filter);
+$html_page->addItem($filter);
 
 $current_time = time();
 $csrf_token = CCsrfTokenHelper::get('host');
@@ -250,6 +248,8 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 $html_page->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

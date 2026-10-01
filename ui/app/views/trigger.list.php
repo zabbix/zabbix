@@ -188,9 +188,7 @@ if ($data['single_selected_hostid'] != 0) {
 	$html_page->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
-$html_page
-	->addItem(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))
-	->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'trigger.list')
@@ -420,6 +418,8 @@ $triggers_form->addItem([
 $html_page
 	->addItem($triggers_form)
 	->show();
+
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
