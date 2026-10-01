@@ -1108,8 +1108,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 8,
-						'Latest data' => 291,
+						'Dashboards' => 6,
+						'Latest data' => 302,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1176,7 +1176,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Proxy' => 'Proxy for host card widget'
 					],
 					'Monitoring' => [
-						'Dashboards' => 4,
+						'Dashboards' => 2,
 						'Latest data' => 0,
 						'Graphs' => 8,
 						'Web' => 0
@@ -1247,8 +1247,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 4,
-						'Latest data' => 125,
+						'Dashboards' => 2,
+						'Latest data' => 126,
 						'Graphs' => 8,
 						'Web' => 0
 					]

@@ -487,7 +487,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD number 8',
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
-						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
