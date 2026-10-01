@@ -47,6 +47,9 @@ static void	process_listener(zbx_socket_t *s)
 	char		**value = NULL;
 	int		ret;
 
+	if (0 == s->max_len_limit)
+		s->max_len_limit = ZBX_MAX_PASSIVE_CHECK_DATA_SIZE;
+
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, CONFIG_TIMEOUT)))
 	{
 		zbx_rtrim(s->buffer, "\r\n");

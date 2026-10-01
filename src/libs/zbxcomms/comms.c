@@ -1494,6 +1494,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	s->max_len_limit = 0;
+
 	ret = SUCCEED;
 out:
 	zbx_socket_timeout_cleanup(s);
@@ -1747,10 +1749,22 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0, max_len;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
+
+	if (0 != s->max_len_limit)
+	{
+		max_len = s->max_len_limit;
+	}
 #if defined(_WINDOWS)
-	max_len = ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #else
-	max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	else
+	{
+		max_len = 0 != (flags & ZBX_TCP_LARGE) ?
+				ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 
 	if (0 != timeout)

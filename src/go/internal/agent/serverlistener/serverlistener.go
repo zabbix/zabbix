@@ -130,6 +130,8 @@ func (sl *ServerListener) run() {
 				break
 			}
 		}
+
+		conn.SetMaxRecvSize(zbxcomms.MaxPassiveCheckDataSize)
 	}
 
 	log.Debugf("listener has been stopped")

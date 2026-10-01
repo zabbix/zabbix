@@ -98,6 +98,9 @@ typedef struct
 	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
 	char				peer[MAX_ZBX_DNSNAME_LEN + 1];
 	int				protocol;
+
+	/* limits tcp received packet size, overrides flags limits */
+	zbx_uint64_t			max_len_limit;
 }
 zbx_socket_t;
 
