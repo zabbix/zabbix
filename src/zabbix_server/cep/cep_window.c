@@ -33,6 +33,16 @@
 ZBX_PTR_VECTOR_LITE_IMPL(cep_window_ptr, zbx_cep_window_t *)
 ZBX_VECTOR_LITE_IMPL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
 
+typedef struct
+{
+	zbx_cep_event_handle_t	hevent;
+	zbx_uint64_t		index;
+}
+zbx_cep_event_handle_index_t;
+
+ZBX_VECTOR_LITE_DECL(cep_event_handle_index, zbx_cep_event_handle_index_t)
+ZBX_VECTOR_LITE_IMPL(cep_event_handle_index, zbx_cep_event_handle_index_t)
+
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
 	const zbx_cep_window_ref_t	*ref = (const zbx_cep_window_ref_t *)a;
@@ -1663,16 +1673,6 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() windows:%d", __func__, pool->windows.num_data);
 }
 
-typedef struct
-{
-	zbx_cep_event_handle_t	hevent;
-	zbx_uint64_t		index;
-}
-zbx_cep_event_handle_index_t;
-
-ZBX_VECTOR_LITE_DECL(cep_event_handle_index, zbx_cep_event_handle_index_t)
-ZBX_VECTOR_LITE_IMPL(cep_event_handle_index, zbx_cep_event_handle_index_t)
-
 static int	cep_event_handle_index_compare(const void *a1, const void *a2)
 {
 	const zbx_cep_event_handle_index_t	*i1 = (const zbx_cep_event_handle_index_t*)a1;
@@ -1732,15 +1732,41 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
 	zbx_cep_db_window_t			*window = NULL;
 	zbx_uint64_t				events_num = 0;
 	zbx_vector_cep_event_handle_index_t	events;
+	zbx_vector_uint64_t			eventids;
+	zbx_vector_cep_event_handle_t		handles;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_cep_event_handle_index_create(&events);
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_cep_event_handle_create(&handles);
+
+	cep_cache_acquire(&cep);
+
+	result = zbx_dbconn_select(db, "select distinct eventid from cep_window_event");
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		if (SUCCEED == cep_is_event_cached(cep, eventid))
+			continue;
+
+		zbx_vector_uint64_append(&eventids, eventid);
+	}
+	zbx_db_free_result(result);
+
+	if (0 != eventids.values_num)
+	{
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		cep_load_problems_by_eventids(cep, db, &eventids, &handles);
+	}
+
+	zbx_vector_uint64_destroy(&eventids);
 
 	result = zbx_dbconn_select(db, "select cep_windowid,eventid,event_index from cep_window_event"
 					" order by cep_windowid,eventid");
-
-	cep_cache_acquire(&cep);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1762,22 +1788,28 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
 		}
 
 		ZBX_STR2UINT64(eventid, row[1]);
+		ZBX_STR2UINT64(index_local.index, row[2]);
+
 		if (NULL == (index_local.hevent = cep_acquire_event_handle_by_eventid(cep, eventid)))
 		{
 			zbx_vector_uint64_append(delete_eventids, eventid);
 			continue;
 		}
 
-		ZBX_STR2UINT64(index_local.index, row[2]);
 		zbx_vector_cep_event_handle_index_append(&events, index_local);
 		events_num++;
 	}
 	zbx_db_free_result(result);
 
+	cep_cache_release(&cep);
+
 	if (NULL != window)
 		cep_window_load_events(window->window, &events);
 
-	cep_cache_release(&cep);
+	for (int i = 0; i < handles.values_num; i++)
+		zbx_cep_event_handle_release(handles.values[i]);
+	zbx_vector_cep_event_handle_destroy(&handles);
+
 	zbx_vector_cep_event_handle_index_destroy(&events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events:" ZBX_FS_UI64, __func__, events_num);
