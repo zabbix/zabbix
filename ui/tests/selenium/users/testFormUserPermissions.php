@@ -389,7 +389,8 @@ class testFormUserPermissions extends CWebTest {
 
 					// API gets disabled.
 					if ($api_status_field === 'Disabled') {
-						$form->fill(['Enabled' => false]);
+						// Field ID is used, since two 'Enalbed' labels are present in the user role form.
+						$form->fill(['id:api-access' => false]);
 					}
 					else {
 						// Change Deny to Allow list and add request. Now they became green on permission page.
