@@ -325,4 +325,50 @@ in:
 out:
   result: SUCCEED
   value: 2
+---
+test case: Expression 'avg(err())'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'avg(err())'
+  callbacks:
+  - name: err
+    args_num: 0
+    error: 'forced return error'
+out:
+  result: FAIL
+---
+test case: Expression 'avg(err()) or 1'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'avg(err()) or 1'
+  callbacks:
+  - name: err
+    args_num: 0
+    error: 'forced return error'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'count(err())'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'count(err())'
+  callbacks:
+  - name: err
+    args_num: 0
+    error: 'forced return error'
+out:
+  result: FAIL
+---
+test case: Expression 'count(err()) or 1'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'count(err()) or 1'
+  callbacks:
+  - name: err
+    args_num: 0
+    error: 'forced return error'
+out:
+  result: SUCCEED
+  value: 1
 ...

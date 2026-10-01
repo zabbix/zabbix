@@ -23,8 +23,11 @@ class CSvgGraph extends CSvg {
 	public const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
 
 	public const SVG_GRAPH_X_AXIS_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 10;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 16;
 	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER = 5;
+	public const SVG_GRAPH_LABEL_STEP_WIDTH = 16;
+
+	public const SVG_GRAPH_MIN_GRID_WIDTH = 150;
 
 	private $canvas_x;
 	private $canvas_y;
@@ -114,6 +117,7 @@ class CSvgGraph extends CSvg {
 	private $left_y_power;
 	private $left_y_empty = true;
 	private $left_y_zero;
+	private $left_y_unsigned;
 
 	private $show_right_y_axis;
 	private $right_y_scale;
@@ -138,6 +142,7 @@ class CSvgGraph extends CSvg {
 	private $right_y_power;
 	private $right_y_empty = true;
 	private $right_y_zero;
+	private $right_y_unsigned;
 
 	private $show_x_axis;
 
@@ -163,14 +168,11 @@ class CSvgGraph extends CSvg {
 	 */
 	private $offset_right = 20;
 
-	/**
-	 * Maximum width of container for every Y axis.
-	 *
-	 * @var int
-	 */
-	private $max_yaxis_width = 120;
-
 	private $cell_height_min = 30;
+
+	private $yaxis_font_size = 7;
+
+	private $is_yaxis_width_changed = false;
 
 	/**
 	 * Height for X axis container.
@@ -206,6 +208,7 @@ class CSvgGraph extends CSvg {
 		$this->left_y_units = $options['axes']['left_y_units'] !== null
 			? trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units']))
 			: null;
+		$this->left_y_unsigned = $options['axes']['left_y_unsigned'];
 
 		$this->show_right_y_axis = $options['axes']['show_right_y_axis'];
 		$this->right_y_scale = $options['axes']['right_y_scale'];
@@ -214,6 +217,7 @@ class CSvgGraph extends CSvg {
 		$this->right_y_units = $options['axes']['right_y_units'] !== null
 			? trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units']))
 			: null;
+		$this->right_y_unsigned = $options['axes']['right_y_unsigned'];
 
 		$this->show_x_axis = $options['axes']['show_x_axis'];
 
@@ -1049,12 +1053,11 @@ class CSvgGraph extends CSvg {
 				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize($this->yaxis_font_size, 0, $value)['width']);
 				}
 
-				$this->offset_left = min($this->max_yaxis_width,
-					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
-				);
+				$this->offset_left = max($this->offset_left,
+					self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width);
 			}
 		}
 
@@ -1065,13 +1068,37 @@ class CSvgGraph extends CSvg {
 				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize($this->yaxis_font_size, 0, $value)['width']);
 				}
 
-				$this->offset_right = min($this->max_yaxis_width,
-					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
-				);
+				$this->offset_right = max($this->offset_right,
+					self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width);
 			}
+		}
+
+		if ($this->width - $this->offset_left - $this->offset_right < self::SVG_GRAPH_MIN_GRID_WIDTH) {
+			$remaining_width = $this->width  - self::SVG_GRAPH_MIN_GRID_WIDTH;
+			$scale = $remaining_width / ($this->offset_left + $this->offset_right);
+			$max_left_width = ceil($scale * $this->offset_left);
+			$max_right_width = ceil($scale * $this->offset_right);
+
+			$max_left_width = ceil($max_left_width / self::SVG_GRAPH_LABEL_STEP_WIDTH)
+				* self::SVG_GRAPH_LABEL_STEP_WIDTH;
+			$max_right_width = ceil($max_right_width / self::SVG_GRAPH_LABEL_STEP_WIDTH)
+				* self::SVG_GRAPH_LABEL_STEP_WIDTH;
+
+			if ($max_left_width < self::SVG_GRAPH_LABEL_STEP_WIDTH + self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER
+				|| $max_right_width < self::SVG_GRAPH_LABEL_STEP_WIDTH + self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER) {
+				$max_left_width = max($max_left_width, self::SVG_GRAPH_LABEL_STEP_WIDTH
+					+ self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER);
+				$max_right_width = max($max_right_width, self::SVG_GRAPH_LABEL_STEP_WIDTH
+					+ self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER);
+			}
+
+			$this->offset_left = $max_left_width;
+			$this->offset_right = $max_right_width;
+
+			$this->is_yaxis_width_changed = true;
 		}
 
 		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
@@ -1531,8 +1558,19 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function drawYAxes(): void {
+		$ellipsis_width = imageTextSize($this->yaxis_font_size, 0, '...')['width'];
+
 		if ($this->show_left_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
+
+			if ($this->is_yaxis_width_changed) {
+				foreach ($grid_values as &$val) {
+					$val = $this->truncateTextByMaxWidth($this->yaxis_font_size, $val,
+						$this->offset_left - self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER, $ellipsis_width);
+				}
+				unset($val);
+			}
+
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
 					->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
@@ -1544,6 +1582,14 @@ class CSvgGraph extends CSvg {
 
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+			if ($this->is_yaxis_width_changed) {
+				foreach ($grid_values as &$val) {
+					$val = $this->truncateTextByMaxWidth($this->yaxis_font_size, $val,
+						$this->offset_right - self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER, $ellipsis_width);
+				}
+				unset($val);
+			}
 
 			$this->addItem(
 				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
@@ -1723,6 +1769,7 @@ class CSvgGraph extends CSvg {
 			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
 				$percent = $this->percentile_left_value;
 				$units = $this->left_y_units;
+				$unsigned = $this->left_y_unsigned;
 				$color = $this->graph_theme['leftpercentilecolor'];
 				$scale = $this->left_y_scale;
 
@@ -1741,6 +1788,7 @@ class CSvgGraph extends CSvg {
 			else {
 				$percent = $this->percentile_right_value;
 				$units = $this->right_y_units;
+				$unsigned = $this->right_y_unsigned;
 				$color = $this->graph_theme['rightpercentilecolor'];
 				$scale = $this->right_y_scale;
 
@@ -1762,7 +1810,7 @@ class CSvgGraph extends CSvg {
 
 				$value = $points[((int) ceil($percent / 100 * count($points))) - 1];
 				$label = convertUnits([
-					'value' => $value,
+					'value' => $unsigned ? abs($value) : $value,
 					'units' => $units
 				]);
 
@@ -1936,18 +1984,20 @@ class CSvgGraph extends CSvg {
 		$lower_power_shift = 0;
 		$upper_power_shift = 0;
 		$scale = SVG_GRAPH_AXIS_SCALE_LINEAR;
+		$unsigned = false;
 
 		if (!$empty_set) {
 			if ($side === GRAPH_YAXIS_SIDE_LEFT) {
 				$scale = $this->left_y_scale;
 				$min = $this->left_y_min;
 				$max = $this->left_y_max;
-				$min_calculated = $this->left_y_min_calculated;
-				$max_calculated = $this->left_y_max_calculated;
 				$interval = $this->left_y_interval;
 				$units = $this->left_y_units;
+				$unsigned = $this->left_y_unsigned;
 
 				if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+					$min_calculated = $this->left_y_min_calculated;
+					$max_calculated = $this->left_y_max_calculated;
 					$min_positive_power = $this->left_y_min_positive_power;
 					$max_positive_power = $this->left_y_max_positive_power;
 					$min_negative_power = $this->left_y_min_negative_power;
@@ -1964,12 +2014,13 @@ class CSvgGraph extends CSvg {
 				$scale = $this->right_y_scale;
 				$min = $this->right_y_min;
 				$max = $this->right_y_max;
-				$min_calculated = $this->right_y_min_calculated;
-				$max_calculated = $this->right_y_max_calculated;
 				$interval = $this->right_y_interval;
 				$units = $this->right_y_units;
+				$unsigned = $this->right_y_unsigned;
 
 				if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+					$min_calculated = $this->right_y_min_calculated;
+					$max_calculated = $this->right_y_max_calculated;
 					$min_positive_power = $this->right_y_min_positive_power;
 					$max_positive_power = $this->right_y_max_positive_power;
 					$min_negative_power = $this->right_y_min_negative_power;
@@ -1987,13 +2038,11 @@ class CSvgGraph extends CSvg {
 		if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
 			$relative_values = calculateLogarithmicGraphScaleValues($min_negative_power, $max_negative_power,
 				$min_positive_power, $max_positive_power, $has_zero, $min_calculated, $max_calculated, $interval,
-				$units, 14, $lower_power_shift, $upper_power_shift
+				$units, 14, $lower_power_shift, $upper_power_shift, $unsigned
 			);
 		}
 		else {
-			$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval,
-				$units, $power, 14
-			);
+			$relative_values = calculateGraphScaleValues($min, $max, $interval, $units, $power, 14, $unsigned);
 		}
 
 		$absolute_values = [];
@@ -2054,5 +2103,34 @@ class CSvgGraph extends CSvg {
 		}
 
 		return $grid_values;
+	}
+
+	/**
+	 * Truncates a string to the specified maximum width in pixels and appends an ellipsis.
+	 *
+	 * @param int    $font_size 		Font size used to calculate text width.
+	 * @param string $text 				Text to truncate.
+	 * @param int    $max_width 		Maximum allowed text width in pixels.
+	 * @param int    $ellipsis_width 	Width of the ellipsis in pixels.
+	 *
+	 * @return string
+	 */
+	function truncateTextByMaxWidth(int $font_size, string $text, int $max_width, int $ellipsis_width): string {
+		$text_width = imageTextSize($font_size, 0, $text)['width'];
+
+		if ($text_width <= $max_width || $max_width < $ellipsis_width) {
+			return $text;
+		}
+
+		$target_width = $max_width - $ellipsis_width;
+		$text_length = mb_strlen($text);
+		$cut_length = (int) floor($text_length * ($target_width / $text_width));
+		$text = mb_substr($text, 0, $cut_length);
+
+		while (imageTextSize($font_size, 0, $text)['width'] > $target_width) {
+			$text = trim(mb_substr($text, 0, -1));
+		}
+
+		return $text.'...';
 	}
 }

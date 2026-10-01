@@ -803,13 +803,8 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$is_macro = false;
-
-		if (is_string($data)
-				&& ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
-					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data)))) {
-			$is_macro = true;
-		}
+		$is_macro = is_string($data) && ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+				|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data)));
 
 		if ((!is_int($data) && !is_string($data))
 				|| (!$is_macro && !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data)))) {
@@ -2688,6 +2683,10 @@ class CApiInputValidator {
 		}
 		else {
 			$options['schemes'] = CSettingsHelper::getAllowedUriSchemes();
+		}
+
+		if (array_key_exists('require_scheme', $rule)) {
+			$options['require_scheme'] = $rule['require_scheme'];
 		}
 
 		$validator = new CUrlValidator($options);

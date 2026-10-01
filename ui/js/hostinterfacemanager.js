@@ -153,13 +153,17 @@ class HostInterfaceManager {
 			{
 				[HostInterfaceManager.SNMP_V1]: [
 					`snmp_community_label_${iface.interfaceid}`,
-					`snmp_community_field_${iface.interfaceid}`
+					`snmp_community_field_${iface.interfaceid}`,
+					`snmp_retries_label_${iface.interfaceid}`,
+					`snmp_retries_field_${iface.interfaceid}`
 				],
 				[HostInterfaceManager.SNMP_V2C]: [
 					`snmp_community_label_${iface.interfaceid}`,
 					`snmp_community_field_${iface.interfaceid}`,
 					`snmp_repetition_count_label_${iface.interfaceid}`,
-					`snmp_repetition_count_field_${iface.interfaceid}`
+					`snmp_repetition_count_field_${iface.interfaceid}`,
+					`snmp_retries_label_${iface.interfaceid}`,
+					`snmp_retries_field_${iface.interfaceid}`
 				],
 				[HostInterfaceManager.SNMP_V3]: [
 					`snmpv3_contextname_label_${iface.interfaceid}`,
@@ -177,7 +181,9 @@ class HostInterfaceManager {
 					`snmpv3_privpassphrase_label_${iface.interfaceid}`,
 					`snmpv3_privpassphrase_field_${iface.interfaceid}`,
 					`snmp_repetition_count_label_${iface.interfaceid}`,
-					`snmp_repetition_count_field_${iface.interfaceid}`
+					`snmp_repetition_count_field_${iface.interfaceid}`,
+					`snmp_retries_label_${iface.interfaceid}`,
+					`snmp_retries_field_${iface.interfaceid}`
 				]
 			}
 		);
@@ -232,6 +238,7 @@ class HostInterfaceManager {
 				version: HostInterfaceManager.SNMP_V2C,
 				community: '{$SNMP_COMMUNITY}',
 				max_repetitions: 10,
+				retries: 5,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,

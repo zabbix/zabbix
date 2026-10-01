@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -845,6 +845,36 @@ zabbix_export:
               event_name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: bd446ebadbec4dbbbcb897f4d4372365
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes telemetry query poller not started'
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: a8c120615c7e4c25bec4bbcdb47b0d3f
+              expression: 'avg(/Remote Zabbix proxy health/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix proxy: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of telemetry query poller processes over {$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -1984,6 +2014,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -2002,6 +2035,11 @@ zabbix_export:
                       value:
                         host: 'Remote Zabbix proxy health'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Remote Zabbix proxy health'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -2010,7 +2048,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -2426,7 +2464,7 @@ zabbix_export:
         Link this template to the local Zabbix proxy host.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -3055,6 +3093,28 @@ zabbix_export:
               event_name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: f6fd08637087444ba20bd6e1052cd306
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,telemetry query poller,avg,busy]'
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: cc4fd0229d074155bb58e87d48e8adad
+              expression: 'avg(/Zabbix proxy health/zabbix[process,telemetry query poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,telemetry query poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix proxy: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of telemetry query poller processes over {$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -4056,6 +4116,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -4074,6 +4137,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix proxy health'
                         key: 'zabbix[process,snmp poller,avg,busy]'
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix proxy health'
+                        key: 'zabbix[process,telemetry query poller,avg,busy]'
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -4082,7 +4150,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -4498,7 +4566,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -5319,6 +5387,36 @@ zabbix_export:
               event_name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: bab72cae89404ba0be1fd79368bf25ec
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes telemetry query poller not started'
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: 0ac33d10bfa24cf0b669d0ffac7901c0
+              expression: 'avg(/Zabbix proxy health by Zabbix agent/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health by Zabbix agent/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix proxy: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of telemetry query poller processes over {$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -6455,6 +6553,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -6473,6 +6574,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix proxy health by Zabbix agent'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix proxy health by Zabbix agent'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -6481,7 +6587,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -6897,7 +7003,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -7718,6 +7824,36 @@ zabbix_export:
               event_name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: b813a00fd0a04bb9b87e4288928c1d4e
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes telemetry query poller not started'
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: 6c8648c810744a9599446d8075708b3e
+              expression: 'avg(/Zabbix proxy health by Zabbix agent active/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health by Zabbix agent active/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix proxy: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of telemetry query poller processes over {$ZABBIX.PROXY.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -8857,6 +8993,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -8875,6 +9014,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix proxy health by Zabbix agent active'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix proxy health by Zabbix agent active'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -8883,7 +9027,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'

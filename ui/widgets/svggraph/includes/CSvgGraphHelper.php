@@ -262,14 +262,30 @@ class CSvgGraphHelper {
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = array_key_exists('color', $data_set)
-				? CColorPicker::getColorVariations($data_set['color'], count($items))
-				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
+			if ($data_set['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
+				$colors = array_key_exists('color', $data_set)
+					? CColorPicker::getColorVariations($data_set['color'], count($items))
+					: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
-			foreach ($items as $item) {
-				$data_set['color'] = array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-				$max_metrics--;
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$data_set['color'] = array_shift($colors);
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
+			}
+			else {
+				$data_set['color'] = array_key_exists('color', $data_set)
+					? '#'.$data_set['color']
+					: CColorPicker::getPaletteColors($data_set['color_palette'], 1)[0];
+
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
 			}
 		}
 	}
@@ -1105,13 +1121,21 @@ class CSvgGraphHelper {
 						$max_values = $avg_values;
 				}
 
-				$item += [
-					'units' => $metric['units'],
-					'min' => min($min_values),
-					'avg' => array_sum($avg_values) / count($avg_values),
-					'max' => max($max_values),
-					'invert_values' => $metric['options']['invert_values']
-				];
+				$avg = array_sum($avg_values) / count($avg_values);
+
+				$item += $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON
+					? [
+						'units' => $metric['units'],
+						'min' => -max($min_values),
+						'avg' => -$avg,
+						'max' => -min($max_values)
+					]
+					: [
+						'units' => $metric['units'],
+						'min' => min($min_values),
+						'avg' => $avg,
+						'max' => max($max_values)
+					];
 			}
 
 			$items[] = $item;

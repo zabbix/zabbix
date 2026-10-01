@@ -125,6 +125,7 @@ window.host_wizard_edit = new class {
 					version: <?= SNMP_V2C ?>,
 					community: '{$SNMP_COMMUNITY}',
 					max_repetitions: 10,
+					retries: 5,
 					contextname: '',
 					securityname: '',
 					securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
@@ -945,6 +946,29 @@ window.host_wizard_edit = new class {
 									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V3 ?>
 								}
 							}
+						}),
+						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
+							[`interfaces.${row_index}.details.max_repetitions`]: {
+								row_index,
+								type: 'integer',
+								required: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
+								},
+								min: 1,
+								max: <?= ZBX_MAX_INT32 ?>,
+								is_enabled: (row_index) => {
+									return Number(this.#data.interfaces[row_index].details.version) !== <?= SNMP_V1 ?>
+								}
+							}
+						}),
+						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
+							[`interfaces.${row_index}.details.retries`]: {
+								row_index,
+								type: 'integer',
+								required: true,
+								min: <?= SNMP_RETRIES_MIN ?>,
+								max: <?= SNMP_RETRIES_MAX ?>
+							}
 						})
 					}
 				});
@@ -1374,6 +1398,7 @@ window.host_wizard_edit = new class {
 						const visible_fields = {
 							'js-snmp-community': false,
 							'js-snmp-repetition-count': false,
+							'js-snmp-retries': false,
 							'js-snmpv3-contextname': false,
 							'js-snmpv3-securityname': false,
 							'js-snmpv3-securitylevel': false,
@@ -1386,11 +1411,13 @@ window.host_wizard_edit = new class {
 						switch (Number(field.details.version)) {
 							case <?= SNMP_V1 ?>:
 								visible_fields['js-snmp-community'] = true;
+								visible_fields['js-snmp-retries'] = true;
 								break;
 
 							case <?= SNMP_V2C ?>:
 								visible_fields['js-snmp-community'] = true;
 								visible_fields['js-snmp-repetition-count'] = true;
+								visible_fields['js-snmp-retries'] = true;
 								break;
 
 							case <?= SNMP_V3 ?>:
@@ -1398,6 +1425,7 @@ window.host_wizard_edit = new class {
 								visible_fields['js-snmpv3-securityname'] = true;
 								visible_fields['js-snmpv3-securitylevel'] = true;
 								visible_fields['js-snmp-repetition-count'] = true;
+								visible_fields['js-snmp-retries'] = true;
 
 								switch (Number(field.details.securitylevel)) {
 									case <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>:
@@ -2103,6 +2131,10 @@ window.host_wizard_edit = new class {
 	#validateField(path) {
 		const validate = (rule, value) => {
 			rule = {type: 'string', active: false, required: false, ...rule};
+
+			if (rule.is_enabled !== undefined && rule.is_enabled(rule.row_index ?? null) === false) {
+				return null;
+			}
 
 			const required = (typeof rule.required === 'function')
 				? rule.required(rule.row_index ?? null)

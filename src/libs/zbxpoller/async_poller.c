@@ -436,7 +436,9 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 	for (int j = 0; j < poller_items.values_num; j++)
 	{
 		int		num;
-		unsigned char 	poller_type;
+		unsigned char	poller_type;
+
+		const zbx_apm_db_config_t	*apm_db_config = poller_items.values[j]->apm_db_config;
 
 		items = poller_items.values[j]->items;
 		poller_type = poller_items.values[j]->poller_type;
@@ -467,7 +469,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			else if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 			{
 				errcodes[i] = zbx_async_check_telemetry_query(&items.telemetry_query_items[i],
-						&results[i], poller_config);
+						&results[i], poller_config, apm_db_config);
 			}
 			else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 			{
@@ -484,8 +486,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				errcodes[i] = zbx_async_check_snmp(&items.snmp_items[i], &results[i],
 						process_snmp_result, poller_config, poller_config,
 						poller_config->base, poller_config->channel, poller_config->dnsbase,
-						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO,
-						ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
+						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 #else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
@@ -679,7 +680,6 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 	poller_config->config_max_concurrent_checks_per_poller =
 			poller_args_in->config_max_concurrent_checks_per_poller;
-	poller_config->apm_db_config = poller_args_in->apm_db_config;
 	poller_config->clear_cache = 0;
 	poller_config->process_num = process_num;
 	poller_config->channel = NULL;

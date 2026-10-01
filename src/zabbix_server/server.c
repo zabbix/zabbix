@@ -299,6 +299,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	10, /* ZBX_PROCESS_TYPE_CEP_WORKER */
 	1, /* ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER */
+	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
+	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -371,7 +373,7 @@ static char	*CONFIG_USER		= NULL;
 static char	**config_history_providers = NULL;
 
 static char			**config_telemetry_providers = NULL;
-static zbx_apm_db_config_t	apm_db_config;
+static zbx_apm_db_config_t	config_apm_db_config;
 
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
@@ -412,10 +414,8 @@ static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* bridge adapter config */
-static int	config_enable_mobile_devices		= 0;
+static int	config_enable_mobile_devices		= 1;
 static char	*config_bridge_adapter_url = NULL;
-static char	*config_bridge_adapter_connect_to = NULL;
-static char	*config_bridge_adapter_curl_connect_to = NULL;
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -955,24 +955,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != config_bridge_adapter_connect_to &&
-			(NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"BridgeAdapterURL\" configuration parameter must be specified"
-				" when \"BridgeAdapterConnectTo\" is set.");
-		err = 1;
-	}
-	else if (NULL != config_bridge_adapter_url && '\0' != *config_bridge_adapter_url &&
+	if (NULL != config_bridge_adapter_url && '\0' != *config_bridge_adapter_url &&
 			SUCCEED != zbx_cfg_validate_bridge_adapter_url(config_bridge_adapter_url, &ch_error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "%s", ch_error);
-		zbx_free(ch_error);
-		err = 1;
-	}
-	else if (NULL != config_bridge_adapter_connect_to &&
-			SUCCEED != zbx_cfg_prepare_bridge_adapter_connect_to(config_bridge_adapter_url,
-					config_bridge_adapter_connect_to, &config_bridge_adapter_curl_connect_to,
-					&ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s", ch_error);
 		zbx_free(ch_error);
@@ -1295,8 +1279,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"EnableMobileDevices",		&config_enable_mobile_devices,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"BridgeAdapterURL",		&config_bridge_adapter_url,		ZBX_CFG_TYPE_STRING,
-				ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TelemetryProvider",		&config_telemetry_providers,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
@@ -1721,7 +1703,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
-			.apm_db_config = &apm_db_config
+			.config_apm_db_config = &config_apm_db_config
 		};
 
 	zbx_thread_trapper_args		trapper_args =
@@ -1743,12 +1725,11 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
-			.apm_db_config = &apm_db_config,
+			.config_apm_db_config = &config_apm_db_config,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip,
-			.config_bridge_adapter_url = config_bridge_adapter_url,
-			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
+			.config_bridge_adapter_url = config_bridge_adapter_url
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -1858,8 +1839,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_bridge_adapter_ca_file = zbx_config_tls->ca_file,
 			.config_bridge_adapter_crl_file = zbx_config_tls->crl_file,
 			.config_bridge_adapter_cert_file = zbx_config_tls->cert_file,
-			.config_bridge_adapter_key_file = zbx_config_tls->key_file,
-			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
+			.config_bridge_adapter_key_file = zbx_config_tls->key_file
 		};
 
 	zbx_thread_pinger_args		pinger_args =
@@ -2798,9 +2778,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_apm_db_config_init(&apm_db_config, config_telemetry_providers, zbx_config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault,
-			&error))
+	if (SUCCEED != zbx_apm_db_config_init_local_config(&config_apm_db_config, config_telemetry_providers,
+			zbx_config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize APM database configuration: %s", error);
 		zbx_free(error);
@@ -3048,7 +3028,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_apm_db_config_clear(&apm_db_config);
+	zbx_apm_db_config_clear(&config_apm_db_config);
 
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
