@@ -246,6 +246,8 @@ void	zbx_log_exit_signal(void)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	int	saved_errno = errno;
+
 	ZBX_UNUSED(context);
 
 	if (!SIG_PARENT_PROCESS)
@@ -278,6 +280,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zbx_on_exit_cb(FAIL, zbx_on_exit_args);
 		}
 	}
+
+	errno = saved_errno;
 }
 
 /******************************************************************************
