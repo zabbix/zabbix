@@ -30,7 +30,7 @@ type options struct {
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]session `conf:"optional"`
 	// Default stores default connection parameter values from configuration file
-	Default *session `conf:"optional"`
+	Default session `conf:"optional"`
 }
 
 type session struct {
@@ -98,7 +98,7 @@ func (*Plugin) Validate(opts any) error {
 		}
 	}
 
-	if o.Default != nil && o.Default.ConnectionTimeout != "" {
+	if o.Default.ConnectionTimeout != "" {
 		t, err := strconv.Atoi(o.Default.ConnectionTimeout)
 		if err != nil {
 			return errs.Errorf(
