@@ -507,6 +507,11 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: does NOT always write an error message into error on FAIL        *
+ *                                                                            *
+ ******************************************************************************/
 static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	/* in case of an error the query is cleaned by the calling function */
@@ -883,20 +888,18 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses json_str contents and stores them into query and validates *
- *          it                                                                *
+ * Purpose: parses json_str contents and stores them into query, does not set *
+*           col_info or formula_ctx, does not expand macros, does not         *
+ *          validate any field presence or values                             *
  *                                                                            *
- * Parameters: query            - [OUT] parsed query, must not be initialized *
- *                                     beforehand                             *
- *             query_json       - [IN]                                        *
- *             macro_expand_cb  - [IN] NULL or callback called on every field *
- *                                     in query where macros are supported    *
- *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
- *             error            - [OUT]                                       *
- *             max_error_len    - [IN]                                        *
+ * Parameters: query         - [OUT] parsed query, must not be initialized    *
+ *                                   beforehand                               *
+ *             query_json    - [IN]                                           *
+ *             error         - [OUT]                                          *
+ *             max_error_len - [IN]                                           *
  *                                                                            *
- * Return value: SUCCEED - json_str parsed successfully, query is valid;      *
- *                         query must be cleaned after use                    *
+ * Return value: SUCCEED - json_str parsed successfully, query must be        *
+ *                         cleaned after use                                  *
  *               FAIL    - otherwise; query is not initialized                *
  *                                                                            *
  ******************************************************************************/
@@ -919,7 +922,83 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *erro
 		goto out;
 	}
 
-	if (FAIL == tq_parse_query(&jp, query, error, max_error_len))
+	ret = tq_parse_query(&jp, query, error, max_error_len);
+out:
+	if (FAIL == ret)
+		zbx_tq_query_clean(query);
+
+	if (FAIL == ret && 0 != max_error_len && '\0' == error[0])
+		zbx_snprintf(error, max_error_len, "Failed to parse query");
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%d", __func__, ret);
+
+	return ret;
+}
+
+static int	tq_expand_macros_field(char **text, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx,
+		const char *tag, char *error, size_t max_error_len)
+{
+	if (NULL == *text)
+		return SUCCEED;
+
+	if (SUCCEED != macro_expand_cb(text, macro_expand_ctx))
+	{
+		zbx_snprintf(error, max_error_len, "Failed to expand macros in \"%s\"", tag);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+		void *macro_expand_ctx, char *error, size_t max_error_len)
+{
+	if (NULL != macro_expand_cb)
+	{
+		for (int i = 0; i < query->conditions.values_num; i++) {
+			if (SUCCEED != tq_expand_macros_field(&query->conditions.values[i].attribute_key,
+					macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY,
+					error, max_error_len))
+			{
+				return FAIL;
+			}
+
+			if (SUCCEED != tq_expand_macros_field(&query->conditions.values[i].value,
+					macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_VALUE,
+					error, max_error_len))
+			{
+				return FAIL;
+			}
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expands macros in query, sets col_info and formula_ctx, validates *
+ *          field presence and values in query                                *
+ *                                                                            *
+ * Parameters: query            - [IN/OUT]                                    *
+ *             macro_expand_cb  - [IN] NULL or callback called on every field *
+ *                                     in query where macros are supported    *
+ *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
+ *             error            - [OUT]                                       *
+ *             max_error_len    - [IN]                                        *
+ *                                                                            *
+ * Return value: SUCCEED - macros were expanded successfully, query is valid  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tq_prepare_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx,
+		char *error, size_t max_error_len)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	if (SUCCEED != tq_expand_macros_query(query, macro_expand_cb, macro_expand_ctx, error, max_error_len))
 		goto out;
 
 	tq_set_column_info(query);
@@ -942,20 +1021,98 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *erro
 		}
 	}
 
-	if (FAIL == tq_validate_query(query, error, max_error_len))
+	if (SUCCEED != tq_validate_query(query, error, max_error_len))
 		goto out;
 
 	ret = SUCCEED;
 out:
-	if (FAIL == ret)
-		zbx_tq_query_clean(query);
-
-	if (FAIL == ret && 0 != max_error_len && '\0' == error[0])
-		zbx_snprintf(error, max_error_len, "Failed to parse query");
-
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: query must be validated, all fields must be set (not NULL)       *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
+{
+	struct zbx_json	j;
+	char		*str;
+
+	/* assuming that none of the field values are NULL, since query has to have been validated */
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE, query->signal_type);
+
+	if (ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN != query->metric_point_type)
+		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, query->metric_point_type);
+
+	zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_COLUMNS);
+
+	for (int i = 0; i < query->columns.values_num; i++)
+	{
+		const zbx_tq_column_t	*col = &query->columns.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, col->column, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, col->attribute_key, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* columns */
+
+	zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS);
+
+	for (int i = 0; i < query->aggregated_columns.values_num; i++)
+	{
+		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, aggr_col->column, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_FUNCTION, aggr_col->function);
+
+		zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_PARAMETERS);
+
+		for (int ii = 0; ii < aggr_col->parameters.values_num; ii++)
+			zbx_json_addstring(&j, NULL, aggr_col->parameters.values[ii], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j); /* parameters */
+
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ALIAS, aggr_col->alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* aggregated_columns */
+
+	zbx_json_addobject(&j, ZBX_TQ_QUERY_TAG_FILTER);
+	zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_EVALTYPE, query->evaltype);
+	zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_FORMULA, query->formula, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_CONDITIONS);
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, cond->column, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, cond->attribute_key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_OPERATOR, cond->operator);
+		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_VALUE, cond->value, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* conditions */
+	zbx_json_close(&j); /* filter */
+
+	str = zbx_strdup(NULL, j.buffer);
+	zbx_json_free(&j);
+
+	return str;
 }
 
 static int tq_validate_time_param(const char *str, int *out, int min, int max, const char *error_name, char *error,

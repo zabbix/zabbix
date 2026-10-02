@@ -219,8 +219,14 @@ zbx_tq_query_t;
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
+typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
+
 int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len);
+int	zbx_tq_prepare_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx,
+		char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
+
+char	*zbx_tq_serialize_query(const zbx_tq_query_t *query);
 
 int	zbx_tq_validate_time_shift(const char *time_shift_str, int *time_shift_out, char *error,
 		size_t max_error_len);

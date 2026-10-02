@@ -16,6 +16,7 @@
 
 #include "zbxexpr.h"
 #include "zbxeval.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxvariant.h"
@@ -875,6 +876,64 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_
 clean:
 	zbx_json_free(&json);
 exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
+{
+	const zbx_lld_entry_t *lld_obj = (const zbx_lld_entry_t *)ctx;
+
+	zbx_substitute_lld_macros(text, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+
+	return SUCCEED;
+}
+
+int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, char *error,
+		int maxerrlen)
+{
+	int			ret = FAIL;
+	zbx_tq_query_t		query;
+	const zbx_db_table_t	*table = NULL;
+	const zbx_db_field_t	*field;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL == (table = zbx_db_get_table("items")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("%s(): cannot find table 'items'", __func__);
+		return FAIL;
+	}
+
+	if (NULL == (field = zbx_db_get_field(table, "query")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("%s(): cannot find field 'query' in table 'items'", __func__);
+		return FAIL;
+	}
+
+	if (NULL != field->default_value && 0 == strcmp(*data, field->default_value))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != zbx_tq_parse_query(&query, *data, error, maxerrlen))
+		goto out;
+
+	if (SUCCEED != zbx_tq_prepare_query(&query, telemetry_query_lld_macro_expand_cb, (void *)lld_obj, error,
+			maxerrlen))
+	{
+		goto clean;
+	}
+
+	zbx_free(*data);
+	*data = zbx_tq_serialize_query(&query);
+
+	ret = SUCCEED;
+clean:
+	zbx_tq_query_clean(&query);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
