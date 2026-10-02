@@ -270,11 +270,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Enable all LLDs, so Execute now can be sent successfully.
 		$this->massChangeStatus('Enable');
 		$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
+		$table = $this->getTable(self::SELECTOR);
 
 		switch (CTestArrayHelper::get($data, 'type')) {
 			case 'disabled':
 				$this->query('button:Disable')->one()->click();
 				$this->page->acceptAlert();
+				$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
+				$table->waitUntilStalled();
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
@@ -286,6 +289,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				break;
 			default:
 				$this->query('button:Execute now')->one()->click();
+				$table->waitUntilStalled();
 				$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 		}
 
