@@ -79,6 +79,9 @@ const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
+const HOST_MAINTENANCE_STATUS_OFF = 0;
+const HOST_MAINTENANCE_STATUS_ON = 1;
+
 const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
 const TRIGGER_SEVERITY_INFORMATION = 1;
 const TRIGGER_SEVERITY_WARNING = 2;

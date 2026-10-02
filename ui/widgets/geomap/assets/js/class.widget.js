@@ -542,7 +542,7 @@ class CWidgetGeoMap extends CWidget {
 		const makeMaintenanceInfo = (host) => {
 			const maintenance = host.properties.maintenance;
 
-			if (maintenance.status === '0') {
+			if (maintenance.status == HOST_MAINTENANCE_STATUS_OFF) {
 				return null;
 			}
 
