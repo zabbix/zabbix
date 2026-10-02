@@ -236,8 +236,8 @@ $toc-title-bg-color: #003a7a;
 // Datatable.
 $datatable-resizer-border-color: #0066d9;
 $datatable-scrollbar-thumb-bg-color: #004fa8;
-$datatable-sticky-hover-bg-color: mix(opacify($ui-hover-bg-color, 1), $ui-bg-color, alpha($ui-hover-bg-color) * 100%);
-$datatable-sticky-selected-bg-color: mix(opacify($lighter-yellow, 1), $ui-bg-color, alpha($lighter-yellow) * 100%);
+$datatable-sticky-hover-bg-color: #002856;
+$datatable-sticky-selected-bg-color: #002d5e;
 // Important! @import string should come after variables
 @import 'screen';
 
