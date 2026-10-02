@@ -30,7 +30,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
