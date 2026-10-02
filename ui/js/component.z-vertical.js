@@ -42,7 +42,8 @@ class ZVertical extends HTMLElement {
 			position: 'absolute',
 			bottom: 0,
 			left: 0,
-			transform: 'rotate(270deg)'
+			transform: 'rotate(270deg)',
+			willChange: 'transform'
 		});
 
 		const slot = document.createElement('slot');
