@@ -1247,27 +1247,5 @@ int	zbx_dc_config_get_item_format(zbx_uint64_t itemid, unsigned char *value_type
 
 	return ret;
 }
-/******************************************************************************
- *                                                                            *
- * Purpose: get host information by name                                      *
- *                                                                            *
- * Parameters: host     - [IN] host name                                      *
- *             sock     - [IN] connection socket                              *
- *             hostinfo - [OUT]                                               *
- *             redirect - [OUT] host redirection data (optional)              *
- *                                                                            *
- * Return value: SUCCEED         - host found                                 *
- *               SUCCEED_PARTIAL - redirection data was specified and host is *
- *                                 not monitored by this instance             *
- *               FAIL            - host not found                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_config_get_hostinfo(const char *host, const zbx_socket_t *sock,
-		zbx_history_recv_host_t *hostinfo, zbx_comms_redirect_t *redirect)
-{
-	return dc_config_get_host_by_name(host, sock,
-		ZBX_ITEM_GET_HOSTINFO | ZBX_ITEM_GET_HOST, hostinfo, redirect);
-}
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
-

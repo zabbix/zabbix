@@ -42,12 +42,6 @@ typedef enum
 }
 zbx_user_role_permission_t;
 
-typedef enum
-{
-	ZBX_HOST_AUTHENTICATED_FAIL = 0,
-	ZBX_HOST_AUTHENTICATED_SUCCESS = 1
-} zbx_host_authenticated_t;
-
 typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
 		const char *, const zbx_timespec_t *, zbx_history_selector_t *selector, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
@@ -82,7 +76,7 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 		int pending_history, zbx_uint64_t flags_add);
 
 int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
-		zbx_timespec_t *ts, char **info, zbx_host_authenticated_t *auth);
+		zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
 		zbx_timespec_t *ts, char **info);
 int	zbx_process_proxy_data(zbx_ipc_async_socket_t *rtc, const zbx_dc_proxy_t *proxy,

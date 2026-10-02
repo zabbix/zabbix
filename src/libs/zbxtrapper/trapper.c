@@ -185,7 +185,6 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 {
 	char				*info = NULL, *ext = NULL;
 	int				ret;
-	zbx_host_authenticated_t	authenticated = ZBX_HOST_AUTHENTICATED_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -196,7 +195,7 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		info = zbx_strdup(info, "data collection is paused");
 		ret = FAIL;
 	}
-	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info, &authenticated)))
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -215,8 +214,24 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
-	if (ZBX_HOST_AUTHENTICATED_SUCCESS == authenticated)
-		zbx_process_command_results(jp);
+	struct zbx_json_parse	jp_commands;
+	char			host[MAX_STRING_LEN], *error = NULL;
+	zbx_uint64_t		hostid = 0, revision = 0;
+	unsigned char		status = 0, monitored_by = 0;
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands) &&
+			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
+	{
+		if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+				&revision, NULL, ZBX_AUTOREG_NO_CHANGES, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process command results from \"%s\": %s", sock->peer,
+					error);
+			zbx_free(error);
+		}
+		else if (0 != hostid)
+			zbx_process_command_results(jp, hostid);
+	}
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 

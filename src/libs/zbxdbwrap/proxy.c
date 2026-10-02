@@ -1682,27 +1682,25 @@ static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, s
  *             ts           - [IN] connection timestamp                       *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
- *             auth         - [OUT] connection passed TLS/PSK permissions     *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
-		zbx_timespec_t *ts, char **info, zbx_host_authenticated_t *auth)
+		zbx_timespec_t *ts, char **info)
 {
 	zbx_comms_redirect_t	redirect;
 	struct zbx_json_parse	jp_data;
 	int			ret = FAIL, version;
-	char			*token = NULL, *error = NULL;
+	char			*token = NULL;
 	zbx_session_t		*session;
+	zbx_uint64_t		hostid;
 	size_t			token_alloc = 0;
 	zbx_host_rights_t	rights = {0};
-	zbx_history_recv_host_t	hostinfo;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	*auth = ZBX_HOST_AUTHENTICATED_FAIL;
 	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
@@ -1748,7 +1746,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_hostinfo(tmp, sock, &hostinfo, &redirect)))
+	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name(tmp, sock, &hostid, &redirect)))
 	{
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
 		/* send success response so agent will not retry upload with the same non-existing host */
@@ -1768,25 +1766,12 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		goto out;
 	}
 
-	if (FAIL == zbx_host_check_permissions(&hostinfo, sock, &error))
-	{
-		if (NULL != error)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-			zbx_free(error);
-		}
-		ret = SUCCEED;
-		goto out;
-	}
-
-	*auth = ZBX_HOST_AUTHENTICATED_SUCCESS;
-
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) <= version)
 	{
 		if (NULL == token)
 			session = NULL;
 		else
-			session = zbx_dc_get_or_create_session(hostinfo.hostid, token, ZBX_SESSION_TYPE_DATA);
+			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		ret = process_history_data_by_itemids(rtc, sock, agent_item_validator, &rights, &jp_data, session, NULL,
 				info, ZBX_ITEM_GET_DEFAULT, "agent");

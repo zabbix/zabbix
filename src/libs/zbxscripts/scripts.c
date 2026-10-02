@@ -180,7 +180,7 @@ static void	commands_unlock(void)
 	zbx_mutex_unlock(remote_commands_lock);
 }
 
-static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err_msg)
+static int	remote_commands_insert_result(zbx_uint64_t id, zbx_uint64_t hostid, char *value, char *err_msg)
 {
 	int			ret = SUCCEED;
 	zbx_rc_command_t	*command, command_loc;
@@ -191,7 +191,7 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 	command_loc.id = id;
 
 	if (NULL != (command = (zbx_rc_command_t *)zbx_hashset_search(&remote_commands->commands,
-			&command_loc)))
+			&command_loc)) && hostid == command->hostid && 0 == (command->flag & REMOTE_COMMAND_COMPLETED))
 	{
 		if (NULL != value && NULL == (command->value = remote_commands_shared_strdup(value)))
 		{
@@ -214,7 +214,7 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 	return ret;
 }
 
-void	zbx_process_command_results(struct zbx_json_parse *jp)
+void	zbx_process_command_results(struct zbx_json_parse *jp, zbx_uint64_t hostid)
 {
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
@@ -260,7 +260,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		}
 
 		values_num++;
-		if (SUCCEED == remote_commands_insert_result(id, value, error))
+		if (SUCCEED == remote_commands_insert_result(id, hostid, value, error))
 			results_num++;
 	}
 out:
