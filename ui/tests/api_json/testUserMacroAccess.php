@@ -246,7 +246,7 @@ class testUserMacroAccess extends CAPITest {
 	 * @dataProvider getProvider
 	 */
 	public function testUserMacroAccessGet(array $login, array $request, array $expected): void {
-		CTestDataHelper::convertUsertMacroReferences($expected);
+		CTestDataHelper::convertUserMacroReferences($expected);
 
 		if (array_key_exists('hostids', $request)) {
 			CTestDataHelper::convertValueReferences($request['hostids']);
