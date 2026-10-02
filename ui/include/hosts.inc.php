@@ -1323,7 +1323,7 @@ function getSanitizedHostPrototypeInterfacesFields(array $interfaces): array {
  * @return array
  */
 function getSanitizedHostPrototypeInterfaceDetailsFields(array $details): array {
-	$field_names = ['version', 'bulk'];
+	$field_names = ['version', 'bulk', 'retries'];
 
 	switch ($details['version']) {
 		case SNMP_V1:

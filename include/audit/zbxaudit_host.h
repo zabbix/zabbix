@@ -24,7 +24,7 @@ void	zbx_audit_##funcname##_update_json_add_snmp_interface(int audit_context_mod
 		zbx_uint64_t version, zbx_uint64_t bulk, const char *community, const char *securityname,	\
 		zbx_uint64_t securitylevel, const char *authpassphrase, const char *privpassphrase,		\
 		zbx_uint64_t authprotocol, zbx_uint64_t privprotocol, const char *contextname,			\
-		int max_repetitions, zbx_uint64_t interfaceid);							\
+		const char *max_repetitions, zbx_uint64_t interfaceid, const char *retries);			\
 void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_mode, zbx_uint64_t hostid,	\
 		zbx_uint64_t version_old, zbx_uint64_t version_new, zbx_uint64_t bulk_old,			\
 		zbx_uint64_t bulk_new, const char *community_old, const char *community_new,			\
@@ -32,8 +32,7 @@ void	zbx_audit_##funcname##_update_json_update_snmp_interface(int audit_context_
 		zbx_uint64_t securitylevel_new, const char *authpassphrase_old,	const char *authpassphrase_new,	\
 		const char *privpassphrase_old, const char *privpassphrase_new,	zbx_uint64_t authprotocol_old,	\
 		zbx_uint64_t authprotocol_new, zbx_uint64_t privprotocol_old, zbx_uint64_t privprotocol_new,	\
-		const char *contextname_old, const char *contextname_new, int max_repetitions_old,		\
-		int max_repetitions_new, zbx_uint64_t interfaceid);						\
+		const char *contextname_old, const char *contextname_new, zbx_uint64_t interfaceid);		\
 
 PREPARE_AUDIT_SNMP_INTERFACE_H(host)
 PREPARE_AUDIT_SNMP_INTERFACE_H(host_prototype)
@@ -77,7 +76,8 @@ PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privpassphrase, const char*)						\
 PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authprotocol, zbx_uint64_t)						\
 PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privprotocol, zbx_uint64_t)						\
 PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, max_repetitions, int)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, max_repetitions, const char*)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, retries, const char*)							\
 
 PREPARE_AUDIT_HOST_H(host, ZBX_AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST_H(host_prototype, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE)
@@ -250,7 +250,7 @@ void	zbx_audit_host_update_json_add_interface(zbx_audit_entry_t *audit_entry, zb
 void	zbx_audit_entry_host_update_json_add_snmp_interface(zbx_audit_entry_t *audit_entry, int version,
 		int bulk, const char *community, const char *securityname, int securitylevel,
 		const char *authpassphrase, const char *privpassphrase, int authprotocol, int privprotocol,
-		const char *contextname, int max_repetitions, zbx_uint64_t interfaceid);
+		const char *contextname, const char *max_repetitions, zbx_uint64_t interfaceid, const char *retries);
 void	zbx_audit_entry_hostgroup_update_json_add_group(zbx_audit_entry_t *audit_entry, zbx_uint64_t hostid,
 		zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_entry_host_update_json_add_hostmacro(zbx_audit_entry_t *audit_entry, zbx_uint64_t macroid,

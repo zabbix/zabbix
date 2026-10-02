@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/../../include/classes/api/helpers/CApiTokenHelp
  */
 class testBridgeAdapter extends CIntegrationTest {
 	private const ADAPTER_HOST = '127.0.0.1';
-	private const ADAPTER_URL_HOST = 'bridge.example.com';
 	private const ADAPTER_SCRIPT = __DIR__.'/data/bridge_adapter_mock.py';
 	private const INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000101';
 	private const NOTIFY_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000102';
@@ -38,31 +37,31 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const REAL_NOTIFY_SUBJECT = 'Bridge adapter real notification';
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
 	private const MEDIA_SEVERITY_ALL = 63;
-	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver notification, device id is not known.';
+	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot send notification to device: unknown device.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
-		'Cannot deliver notification, target device is not in Active state.';
+		'Cannot send notification to device: device must have "Active" status.';
 	private const PUSH_TEST_ERROR_DEVICE_NOT_FOUND = 'Cannot find enabled device for push media type test.';
 	private const PUSH_ERROR_NOT_CONFIGURED =
-		'Cannot deliver mobile device notification, bridge-adapter is not configured.';
+		'Cannot send notification to device: bridge adapter is not configured.';
 	private const PUSH_ERROR_CANNOT_CONNECT =
-		'Cannot deliver mobile device notification, cannot connect to bridge-adapter.';
+		'Cannot send notification to device: cannot connect to bridge adapter.';
 	private const PUSH_ERROR_INVALID_RESPONSE =
-		'Cannot deliver mobile device notification, bridge-adapter returned an invalid response.';
+		'Cannot send notification to device: bridge adapter returned an invalid response.';
 	private const PUSH_ERROR_RETURNED_ERROR =
-		'Cannot deliver mobile device notification, bridge-adapter returned an error.';
+		'Cannot send notification to device: bridge adapter returned an error.';
 	private const DEVICE_INIT_ERROR_NOT_CONFIGURED =
-		'Cannot initialize mobile device, bridge-adapter is not configured.';
+		'Cannot add device: bridge adapter is not configured.';
 	private const DEVICE_INIT_ERROR_INVALID_RESPONSE =
-		'Cannot initialize mobile device, bridge-adapter returned an invalid response.';
+		'Cannot add device: bridge adapter returned an invalid response.';
 	private const DEVICE_INIT_ERROR_RETURNED_ERROR =
-		'Cannot initialize mobile device, bridge-adapter returned an error.';
+		'Cannot add device: bridge adapter returned an error.';
 	private const DEVICE_INIT_ERROR_DEVICE_LIMIT_EXCEEDED =
 		'Cannot add device because the device limit has been reached. Please remove redundant devices, or '.
 		'contact your system administrator.';
 	private const DEVICE_OFFBOARD_ERROR_NOT_CONFIGURED =
-		'Cannot remove mobile device, bridge-adapter is not configured.';
+		'Cannot remove device: bridge adapter is not configured.';
 	private const DEVICE_OFFBOARD_ERROR_INVALID_RESPONSE =
-		'Cannot remove mobile device, bridge-adapter returned an invalid response.';
+		'Cannot remove device: bridge adapter returned an invalid response.';
 	private const DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND =
 		'Cannot unlink device. Please contact your system administrator.';
 	private const ERROR_MOBILE_DEVICES_DISABLED = 'Mobile devices are disabled.';
@@ -84,6 +83,17 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY =
 		'bridge-adapter returned too large response body for device.notify request';
 	private const LOG_ADAPTER_INCOMPLETE_ERROR = 'incomplete error in bridge-adapter response body';
+	private const LOG_ADAPTER_INIT_ERROR_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected init data: "device.init mock failure"';
+	private const LOG_ADAPTER_NOTIFY_ERROR_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected notification data: "device.notify mock failure"';
+	private const LOG_ADAPTER_OFFBOARD_ERROR_DETAIL_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected offboard data: {"details":[{"@type":"bridge_jsonrpc.ErrorInfo",'.
+		'"reason":"DEVICE_NOT_FOUND","domain":"bridge.device"}]}';
+	private const LOG_ADAPTER_INIT_ERROR_DETAIL_DATA = 'Bridge-adapter returned code: bridge.adapter.error, '.
+		'message: Mock bridge-adapter rejected init data: {"details":[{"@type":"bridge_jsonrpc.ErrorInfo",'.
+		'"reason":"DEVICE_LIMIT_EXCEEDED","domain":"bridge.device",'.
+		'"detailed_message":"Mock bridge-adapter device limit exceeded"}]}';
 	private const LOG_ADAPTER_MISSING_RESULT = 'missing result in bridge-adapter response body';
 	private const LOG_ADAPTER_MISSING_RESULT_FIELDS =
 		'missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter';
@@ -135,6 +145,11 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static array $severity_actionids = [];
 	private static array $auth_scheme_test_tokenids = [];
 	private static array $bearer_auth_test_tokenids = [];
+	private array $non_trigger_actionids = [];
+	private array $non_trigger_mediatypeids = [];
+	private ?array $non_trigger_templates = null;
+	private ?array $non_trigger_medias = null;
+	private ?string $non_trigger_host = null;
 
 	public function serverConfigurationProvider(): array {
 		if (self::detectTLSLibrary() === 'none') {
@@ -142,7 +157,6 @@ class testBridgeAdapter extends CIntegrationTest {
 				self::COMPONENT_SERVER => [
 					'DebugLevel' => 4,
 					'LogFileSize' => 20,
-					'EnableMobileDevices' => 1,
 					'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 				]
 			];
@@ -155,12 +169,10 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'TLSCAFile' => $base_dir.'zabbix_ca_file.crt',
 				'TLSCertFile' => $base_dir.'zabbix_server.crt',
 				'TLSKeyFile' => $base_dir.'zabbix_server.key',
-				'BridgeAdapterURL' => 'https://'.self::ADAPTER_URL_HOST.':443/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort()
+				'BridgeAdapterURL' => 'https://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 			]
 		];
 	}
@@ -950,7 +962,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		$adapter_cert = $base_dir.'bridge_adapter.crt';
 		$adapter_ext = $base_dir.'bridge_adapter.ext';
 
-		file_put_contents($adapter_ext, "subjectAltName=DNS:".self::ADAPTER_URL_HOST."\n");
+		file_put_contents($adapter_ext, "subjectAltName=IP:".self::ADAPTER_HOST."\n");
 
 		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($ca_key).' 4096');
 		self::executeOpenSsl('openssl req -x509 -new -nodes -key '.escapeshellarg($ca_key).
@@ -965,7 +977,7 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($adapter_key).' 2048');
 		self::executeOpenSsl('openssl req -new -key '.escapeshellarg($adapter_key).' -out '.
-				escapeshellarg($adapter_csr).' -subj '.escapeshellarg('/CN='.self::ADAPTER_URL_HOST));
+				escapeshellarg($adapter_csr).' -subj '.escapeshellarg('/CN='.self::ADAPTER_HOST));
 		self::executeOpenSsl('openssl x509 -req -in '.escapeshellarg($adapter_csr).' -CA '.
 				escapeshellarg($ca_cert).' -CAkey '.escapeshellarg($ca_key).' -CAcreateserial -out '.
 				escapeshellarg($adapter_cert).' -days 1 -sha256 -extfile '.escapeshellarg($adapter_ext));
@@ -1510,6 +1522,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::INIT_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INIT_ERROR_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
 			120, 1
 		);
@@ -1534,6 +1547,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::INIT_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INIT_ERROR_DETAIL_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
 			120, 1
 		);
@@ -1733,22 +1747,11 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
-	public function mobileDevicesEnabledConfigurationProvider(): array {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'EnableMobileDevices' => 1
-			]
-		];
-	}
-
 	public function noBridgeAdapterUrlConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'EnableMobileDevices' => 1,
-				'BridgeAdapterURL' => null,
-				'BridgeAdapterConnectTo' => null
+				'BridgeAdapterURL' => null
 			]
 		];
 	}
@@ -1772,9 +1775,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertSame(self::DEVICE_INIT_ERROR_NOT_CONFIGURED, $client->getError());
 	}
 
-	/**
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
-	 */
 	public function testBridgeAdapter_initPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
 
@@ -1802,8 +1802,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	 * device_check_permissions()'s immediate deny branch (no role_rule lookup at all), which differs from
 	 * testBridgeAdapter_initPermissionDenied() above (restricted user managing their OWN device, denied via
 	 * the "devices.actions.default_access" role rule lookup).
-	 *
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
 	 */
 	public function testBridgeAdapter_initManageOtherUserDenied(): void {
 		[$client] = $this->getServerClientAndSid();
@@ -2046,6 +2044,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'message' => 'Bridge adapter integration test message'
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_NOTIFY_ERROR_DATA, true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertFalse($result);
@@ -2219,9 +2218,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.$closed_port.'/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.$closed_port,
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
 				'TLSKeyFile' => null
@@ -2318,6 +2315,9 @@ class testBridgeAdapter extends CIntegrationTest {
 			'uuid' => self::OFFBOARD_DEVICE_UUID
 		], $sid);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_OFFBOARD_ERROR_DETAIL_DATA, true,
+			120, 1
+		);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
 			120, 1
 		);
@@ -2357,9 +2357,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_URL_HOST.':80/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort(),
+				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc',
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
 				'TLSKeyFile' => null
@@ -2371,8 +2369,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	 * OFFBOARD_DEVICE_UUID belongs to userid=1, not the restricted user, so this already exercises
 	 * device_check_permissions()'s immediate deny branch (non-super-admin managing someone else's
 	 * device) - the offboard-side counterpart of testBridgeAdapter_initManageOtherUserDenied() above.
-	 *
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
 	 */
 	public function testBridgeAdapter_offboardPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
@@ -2443,64 +2439,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_MISSING_UUID, true, 120, 1);
 
 		$this->assertFalse($offboard_response);
-	}
-
-	public function noConnectToConfigurationProvider(): array {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'EnableMobileDevices' => 1,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
-			]
-		];
-	}
-
-	/**
-	 * @configurationDataProvider noConnectToConfigurationProvider
-	 */
-	public function testBridgeAdapter_noConnectTo(): void {
-		self::startBridgeAdapterMockNoTls();
-
-		try {
-			[$client, $sid] = $this->getServerClientAndSid();
-
-			$init_response = $client->initDevice([
-				'userid' => 1,
-				'uuid' => self::INIT_DEVICE_UUID
-			], $sid);
-
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
-				120, 1
-			);
-
-			$this->assertNotFalse($init_response, $client->getError() ?? '');
-
-			$this->assertAdapterRequest('device.init', static function (array $request): bool {
-				return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
-			});
-
-			$mediatypeid = self::$push_mediatypeid;
-
-			$notify_result = $client->testMediaType([
-				'mediatypeid' => $mediatypeid,
-				'sendto' => self::NOTIFY_DEVICE_UUID,
-				'subject' => 'Bridge adapter integration test',
-				'message' => 'Bridge adapter integration test message'
-			], $sid);
-
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true,
-				120, 1
-			);
-
-			$this->assertNotFalse($notify_result, $client->getError() ?? '');
-
-			$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-				return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
-			});
-		} finally {
-			self::stopBridgeAdapterMock();
-		}
 	}
 
 	/**
@@ -2591,6 +2529,217 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertSame(0, CDBHelper::getCount(
 			'SELECT NULL FROM dpop_jti_cache WHERE jti='.zbx_dbstr(self::HOUSEKEEPER_TEST_JTI)
 		));
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushCustomMessage(): void {
+		$this->checkNonTriggerNotification('push', false, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableCustomMessage(): void {
+		$this->checkNonTriggerNotification('all', false, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushDefaultMessage(): void {
+		$this->checkNonTriggerNotification('push', true, true);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableDefaultMessage(): void {
+		$this->checkNonTriggerNotification('all', true, true);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerPushMissingTemplate(): void {
+		$this->checkNonTriggerNotification('push', true, false);
+	}
+
+	/**
+	 * @onBefore startBridgeAdapterMock
+	 * @onAfter clearNonTriggerNotificationData
+	 */
+	public function testBridgeAdapter_nonTriggerAllAvailableMissingTemplate(): void {
+		$this->checkNonTriggerNotification('all', true, false);
+	}
+
+	private function checkNonTriggerNotification(string $target, bool $default_message,
+			bool $with_template): void {
+		$host = 'bridge_adapter_autoreg_'.bin2hex(random_bytes(8));
+		$this->non_trigger_host = $host;
+		$response = $this->call('mediatype.get', [
+			'mediatypeids' => [self::$push_mediatypeid],
+			'output' => ['mediatypeid'],
+			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message']
+		]);
+		$this->non_trigger_templates = $response['result'][0]['message_templates'];
+		$templates = array_values(array_filter($this->non_trigger_templates,
+			static fn(array $template): bool => (int) $template['eventsource'] !== EVENT_SOURCE_AUTOREGISTRATION
+		));
+		if ($with_template) {
+			$templates[] = [
+				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+				'recovery' => ACTION_OPERATION,
+				'subject' => 'Non-trigger push notification',
+				'message' => 'Non-trigger push notification body'
+			];
+		}
+		$this->call('mediatype.update', [
+			'mediatypeid' => self::$push_mediatypeid,
+			'message_templates' => $templates
+		]);
+
+		$response = $this->call('mediatype.create', [
+			'name' => $host,
+			'type' => MEDIA_TYPE_EXEC,
+			'exec_path' => 'unused_non_trigger_control',
+			'status' => MEDIA_TYPE_STATUS_DISABLED
+		]);
+		$this->non_trigger_mediatypeids = $response['result']['mediatypeids'];
+		$control_mediatypeid = $this->non_trigger_mediatypeids[0];
+		$response = $this->call('user.get', [
+			'userids' => [1],
+			'output' => ['userid'],
+			'selectMedias' => ['mediatypeid', 'sendto', 'active', 'severity', 'period']
+		]);
+		$this->non_trigger_medias = $response['result'][0]['medias'];
+		$medias = $this->non_trigger_medias;
+		$medias[] = [
+			'mediatypeid' => $control_mediatypeid,
+			'sendto' => ['non-trigger-control'],
+			'active' => MEDIA_STATUS_ACTIVE,
+			'severity' => self::MEDIA_SEVERITY_ALL,
+			'period' => '1-7,00:00-24:00'
+		];
+		$this->call('user.update', ['userid' => 1, 'medias' => $medias]);
+
+		$operations = [];
+		$opmessage = [
+			'default_msg' => (int) $default_message,
+			'mediatypeid' => $target === 'push' ? self::$push_mediatypeid : 0
+		];
+		if (!$default_message) {
+			$opmessage += [
+				'subject' => 'Non-trigger push notification',
+				'message' => 'Non-trigger push notification body'
+			];
+		}
+		$operations[] = [
+			'operationtype' => OPERATION_TYPE_MESSAGE,
+			'opmessage' => $opmessage,
+			'opmessage_usr' => [['userid' => 1]]
+		];
+
+		$operations[] = [
+			'operationtype' => OPERATION_TYPE_MESSAGE,
+			'opmessage' => [
+				'default_msg' => 0,
+				'mediatypeid' => $control_mediatypeid,
+				'subject' => 'Escalation processed',
+				'message' => 'Control operation'
+			],
+			'opmessage_usr' => [['userid' => 1]]
+		];
+		$response = $this->call('action.create', [
+			'name' => $host,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [[
+					'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
+					'operator' => CONDITION_OPERATOR_LIKE,
+					'value' => $host
+				]]
+			],
+			'operations' => $operations
+		]);
+		$actionids = $response['result']['actionids'];
+		$this->non_trigger_actionids = $actionids;
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->getClient(self::COMPONENT_SERVER)->getActiveChecks($host);
+		$this->callUntilDataIsPresent('alert.get', [
+			'output' => ['alertid'],
+			'actionids' => $actionids,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'eventobject' => EVENT_OBJECT_AUTOREGHOST,
+			'filter' => ['mediatypeid' => $control_mediatypeid],
+			'search' => ['subject' => 'Escalation processed']
+		], 30, 1, static function (array $response) use ($actionids): bool {
+			return DB::select('escalations', [
+				'output' => ['escalationid'],
+				'filter' => ['actionid' => $actionids]
+			]) === [];
+		});
+
+		$response = $this->call('alert.get', [
+			'output' => ['status', 'error'],
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'eventobject' => EVENT_OBJECT_AUTOREGHOST,
+			'actionids' => $actionids,
+			'filter' => ['mediatypeid' => self::$push_mediatypeid]
+		]);
+		$push_alerts = $response['result'];
+		$notify_requests = array_values(array_filter($this->readAdapterRequests(),
+			static fn(array $request): bool => $request['method'] === 'device.notify'
+		));
+		$this->assertSame([], $notify_requests, 'Non-trigger actions must not send device.notify.');
+
+		if ($target === 'push') {
+			$this->assertNotEmpty($push_alerts, 'Explicit Push must produce a failed Action Log entry.');
+			foreach ($push_alerts as $alert) {
+				$this->assertSame(ALERT_STATUS_FAILED, (int) $alert['status']);
+				$this->assertSame('Cannot send notification to device: '.
+					'push notifications are supported only for trigger actions.', $alert['error']);
+			}
+		}
+		else {
+			$this->assertSame([], $push_alerts, 'All available must skip Push without an Action Log entry.');
+		}
+	}
+
+	public function clearNonTriggerNotificationData(): void {
+		if ($this->non_trigger_actionids) {
+			$this->call('action.delete', $this->non_trigger_actionids);
+			$this->non_trigger_actionids = [];
+		}
+		if ($this->non_trigger_medias !== null) {
+			$this->call('user.update', ['userid' => 1, 'medias' => $this->non_trigger_medias]);
+			$this->non_trigger_medias = null;
+		}
+		if ($this->non_trigger_mediatypeids) {
+			$this->call('mediatype.delete', $this->non_trigger_mediatypeids);
+			$this->non_trigger_mediatypeids = [];
+		}
+		if ($this->non_trigger_templates !== null) {
+			$this->call('mediatype.update', [
+				'mediatypeid' => self::$push_mediatypeid,
+				'message_templates' => $this->non_trigger_templates
+			]);
+			$this->non_trigger_templates = null;
+		}
+		if ($this->non_trigger_host !== null) {
+			DB::delete('autoreg_host', ['host' => $this->non_trigger_host]);
+			$this->non_trigger_host = null;
+		}
+		self::stopBridgeAdapterMock();
 	}
 
 }

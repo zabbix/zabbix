@@ -1,0 +1,112 @@
+.details-panel {
+	--details-panel-border-color: #{$ui-border-color};
+	--details-panel-background-color: #{$ui-bg-color};
+	--details-panel-padding: 10px;
+	--details-panel-header-height: 38px;
+
+	display: grid;
+	grid-template-rows: var(--details-panel-header-height) minmax(0, 1fr);
+	box-sizing: border-box;
+	block-size: 100%;
+	background: var(--details-panel-background-color);
+
+	.details-panel-header {
+		grid-row: 1;
+		display: flex;
+		align-items: center;
+		block-size: var(--details-panel-header-height);
+		border-block-end: 1px solid var(--details-panel-border-color);
+		box-sizing: border-box;
+		min-inline-size: 0;
+		padding-inline: var(--details-panel-padding);
+		gap: 8px;
+	}
+
+	.details-panel-title {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+		font-weight: 700;
+	}
+
+	.details-panel-groups {
+		grid-row: 2;
+		min-inline-size: 0;
+		min-block-size: 0;
+	}
+
+	.details-group {
+		border-block-end: 1px solid var(--details-panel-border-color);
+
+		&[collapsed] {
+			.details-group-content {
+				display: none;
+			}
+		}
+	}
+
+	.details-group-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		box-sizing: border-box;
+		block-size: var(--details-panel-header-height);
+		inline-size: 100%;
+		min-inline-size: 0;
+		padding: 12px var(--details-panel-padding);
+		border: 0;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-weight: 700;
+		text-align: start;
+		gap: 8px;
+	}
+
+	.details-group-title {
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.details-group-toggle {
+		flex: 0 0 auto;
+	}
+
+	.details-group-content {
+		padding: 4px var(--details-panel-padding) 12px;
+
+		.details-group {
+			border: 1px solid var(--details-panel-border-color);
+
+			& + .details-group {
+				margin-block-start: var(--details-panel-padding);
+			}
+		}
+
+		.details-item + .details-group {
+			margin-block-start: var(--details-panel-padding);
+		}
+	}
+
+	.details-item {
+		display: flex;
+		align-items: flex-start;
+		min-inline-size: 0;
+		padding-block: 4px;
+		gap: 12px;
+	}
+
+	.details-item-name {
+		flex: 0 1 auto;
+		max-inline-size: 50%;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.details-item-value {
+		flex: 1 1 0;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+		text-align: end;
+	}
+}

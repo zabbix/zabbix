@@ -1513,7 +1513,6 @@ fi
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
-
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
 	if test "x$want_mysql" = "xyes"; then
@@ -1746,6 +1745,25 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_ERROR([Unable to use libpthread (libpthread check failed)])
 	fi
 fi
+
+have_apm="no"
+want_apm="no"
+
+if test "x$proxy" = "xyes"; then
+	dnl *****************************************************************
+	dnl * OTLP/gRPC event collector (proxy only)                        *
+	dnl *****************************************************************
+	APM_CHECK_CONFIG()
+	if test "x$want_apm" = "xyes"; then
+		if test "x$found_apm" != "xyes"; then
+			AC_MSG_ERROR([Unable to use APM collector (APM check failed)])
+		fi
+		have_apm="yes"
+		AC_DEFINE([HAVE_APM], [1], [Define to 1 if built with OTLP/gRPC event collector support])
+	fi
+fi
+
+AM_CONDITIONAL([HAVE_APM], [test "x$have_apm" = "xyes"])
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
@@ -2193,6 +2211,7 @@ AC_CONFIG_FILES([
 	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxalgo/Makefile
+	src/libs/zbxapm_client/Makefile
 	src/libs/zbxasyncpoller/Makefile
 	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
@@ -2317,6 +2336,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
+	src/zabbix_proxy/apm/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
 	src/zabbix_proxy/poller/Makefile
@@ -2471,6 +2491,10 @@ if test "x$LIBEVENT_CFLAGS" != "x"; then
 	echo "    libevent:              ${LIBEVENT_CFLAGS}"
 fi
 
+if test "x$APM_CFLAGS" != "x"; then
+	echo "    APM:                   ${APM_CFLAGS}"
+fi
+
 echo "
   Enable server:         ${server}"
 
@@ -2518,6 +2542,7 @@ echo "    SNMP:                  ${have_snmp}
     SSH:                   ${have_ssh}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
+    APM:                   ${have_apm}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
     Configuration file:    ${PROXY_CONFIG_FILE}
