@@ -1113,11 +1113,27 @@ static int	DBpatch_7050085(void)
 static int	DBpatch_7050086(void)
 {
 	zbx_db_insert_t	db_insert;
+	zbx_db_result_t	result;
 	zbx_uint64_t	mediatypeid;
-	int		ret;
+	int		ret, exists = FAIL;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select null from media_type where name='Push notification'")))
+		return FAIL;
+
+	if (NULL != zbx_db_fetch(result))
+		exists = SUCCEED;
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == exists)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): media type \"Push notification\" already exists,"
+				" skipping its creation", __func__);
+		return SUCCEED;
+	}
 
 	mediatypeid = zbx_db_get_maxid("media_type");
 

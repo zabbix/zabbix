@@ -1,1 +1,1 @@
-....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already graph theme with same name (arimdjonoks)
+....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
