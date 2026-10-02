@@ -213,7 +213,7 @@
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change'])
-						.setRenderer('change'),
+						.setRenderer(CDataTableColumn.RENDERER_TEXT),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setColumnOptions({
 							object_type: ZBX_TAG_OBJECT_ITEM
