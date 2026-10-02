@@ -375,7 +375,7 @@ int	permission_ugsets_add(zbx_vector_uint64_t *ids)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: Existing theme (e.g. custom one added manually) is left intact,  *
- *           and its creation is skipped with a critical log message.         *
+ *           and its creation is skipped with an informational log message.   *
  *                                                                            *
 ******************************************************************************/
 int	add_graph_theme(const char *theme, const char *colors)
@@ -393,8 +393,8 @@ int	add_graph_theme(const char *theme, const char *colors)
 
 	if (SUCCEED == exists)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "%s(): graph theme \"%s\" already exists, skipping its creation", __func__,
-				theme);
+		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): graph theme \"%s\" already exists, skipping its creation",
+				__func__, theme);
 		return SUCCEED;
 	}
 
