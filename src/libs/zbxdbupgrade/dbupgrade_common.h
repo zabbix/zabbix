@@ -25,4 +25,6 @@ int	drop_c_problem_2_index(void);
 
 int	permission_hgsets_add(zbx_vector_uint64_t *ids, zbx_vector_uint64_t *hgsetids);
 int	permission_ugsets_add(zbx_vector_uint64_t *ids);
+
+int	add_graph_theme(const char *theme, const char *colors);
 #endif
