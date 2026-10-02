@@ -861,7 +861,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// AIX by Zabbix agent, Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=66316',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=71781',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -869,7 +869,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Item prototype => FS [{#FSNAME}]: Get data.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=66319&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=71782&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -914,7 +914,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -922,7 +922,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger => AIX: FS [{#FSNAME}]: Space is low.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&triggerid=31082&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&triggerid=33103&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
