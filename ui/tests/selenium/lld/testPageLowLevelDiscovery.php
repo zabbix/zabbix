@@ -289,7 +289,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 				break;
 			default:
 				$this->query('button:Execute now')->one()->click();
-				$table->waitUntilStalled();
 				$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 		}
 
