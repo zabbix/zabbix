@@ -30,8 +30,8 @@ import (
 	"time"
 
 	"golang.zabbix.com/agent2/pkg/tls"
-	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (
@@ -318,6 +318,7 @@ func (c *Connection) Close() (err error) {
 func (c *Connection) SetCompress(compress bool) {
 	c.compress = compress
 }
+
 // SetMaxRecvSize sets the maximum size of data that the connection can receive.
 func (c *Connection) SetMaxRecvSize(maxSize uint32) {
 	c.maxRecvSize = maxSize
