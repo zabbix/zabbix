@@ -33,6 +33,9 @@ A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprih
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 
@@ -50,6 +53,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
 ..F....... [ZBX-27603] fixed issue with updating existing LDAP settings after LDAP host change (kkuzmina)
 A......... [ZBX-27306] prevented deletion of httptest item tags when "tags" parameter hasn't been passed to httptest.update API method (aluchko)
 
