@@ -363,6 +363,21 @@ int	permission_ugsets_add(zbx_vector_uint64_t *ids)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds graph theme unless theme with the same name already exists   *
+ *                                                                            *
+ * Parameters: theme  - [IN] theme name                                       *
+ *             colors - [IN] quoted, comma-separated values of graph_theme    *
+ *                           columns following theme column                   *
+ *                                                                            *
+ * Return value: SUCCEED - graph theme added successfully or already exists   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Existing theme (e.g. custom one added manually) is left intact,  *
+ *           and its creation is skipped with a critical log message.         *
+ *                                                                            *
+******************************************************************************/
 int	add_graph_theme(const char *theme, const char *colors)
 {
 	zbx_db_result_t	result;
