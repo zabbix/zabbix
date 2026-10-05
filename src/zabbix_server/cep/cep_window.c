@@ -43,6 +43,17 @@ zbx_cep_event_handle_index_t;
 ZBX_VECTOR_LITE_DECL(cep_event_handle_index, zbx_cep_event_handle_index_t)
 ZBX_VECTOR_LITE_IMPL(cep_event_handle_index, zbx_cep_event_handle_index_t)
 
+typedef struct
+{
+	zbx_uint64_t	windowid;
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	index;
+}
+zbx_cep_window_event_t;
+
+ZBX_VECTOR_LITE_DECL(cep_window_event, zbx_cep_window_event_t)
+ZBX_VECTOR_LITE_IMPL(cep_window_event, zbx_cep_window_event_t)
+
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
 	const zbx_cep_window_ref_t	*ref = (const zbx_cep_window_ref_t *)a;
@@ -1719,8 +1730,7 @@ static void	cep_window_load_events(zbx_cep_window_t *window, zbx_vector_cep_even
  *                                       delete                               *
  *             delete_eventids  - [OUT] ids of orphaned events to delete      *
  *                                                                            *
- * Comments: Rows referencing a group id not present in groups, or an         *
- *           eventid with no corresponding event handle, are skipped.         *
+ * Comments: Rows referencing a not cached window are skipped.                *
  *                                                                            *
  ******************************************************************************/
 static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
@@ -1734,72 +1744,72 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
 	zbx_vector_cep_event_handle_index_t	events;
 	zbx_vector_uint64_t			eventids;
 	zbx_vector_cep_event_handle_t		handles;
+	zbx_vector_cep_window_event_t		win_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_cep_event_handle_index_create(&events);
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_cep_event_handle_create(&handles);
+	zbx_vector_cep_window_event_create(&win_events);
+	zbx_vector_cep_window_event_reserve(&win_events, (ZBX_KIBIBYTE * 64) / sizeof(zbx_cep_window_event_t));
 
 	cep_cache_acquire(&cep);
 
-	result = zbx_dbconn_select(db, "select distinct eventid from cep_window_event");
+	result = zbx_dbconn_select(db, "select cep_windowid,eventid,event_index from cep_window_event"
+			" order by cep_windowid,eventid");
+
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t	eventid;
+		zbx_cep_window_event_t	win_event;
 
-		ZBX_STR2UINT64(eventid, row[0]);
+		ZBX_STR2UINT64(win_event.windowid, row[0]);
+		ZBX_STR2UINT64(win_event.eventid, row[1]);
+		ZBX_STR2UINT64(win_event.index, row[2]);
 
-		if (SUCCEED == cep_is_event_cached(cep, eventid))
-			continue;
+		zbx_vector_cep_window_event_append(&win_events, win_event);
 
-		zbx_vector_uint64_append(&eventids, eventid);
+		if (SUCCEED != cep_is_event_cached(cep, win_event.eventid))
+			zbx_vector_uint64_append(&eventids, win_event.eventid);
 	}
 	zbx_db_free_result(result);
 
 	if (0 != eventids.values_num)
 	{
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		cep_load_problems_by_eventids(cep, db, &eventids, &handles);
 	}
 
 	zbx_vector_uint64_destroy(&eventids);
 
-	result = zbx_dbconn_select(db, "select cep_windowid,eventid,event_index from cep_window_event"
-					" order by cep_windowid,eventid");
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	for (int i = 0; i < win_events.values_num; i++)
 	{
-		zbx_uint64_t			windowid, eventid;
 		zbx_cep_event_handle_index_t	index_local;
+		zbx_cep_window_event_t		*win_event = &win_events.values[i];
 
-		ZBX_STR2UINT64(windowid, row[0]);
-
-		if (NULL == window || window->windowid != windowid)
+		if (NULL == window || window->windowid != win_event->windowid)
 		{
 			if (NULL != window)
 				cep_window_load_events(window->window, &events);
 
-			if (NULL == (window = zbx_hashset_search(groups, &windowid)))
+			if (NULL == (window = zbx_hashset_search(groups, &win_event->windowid)))
 			{
-				zbx_vector_uint64_append(delete_windowids, windowid);
+				zbx_vector_uint64_append(delete_windowids, win_event->windowid);
 				continue;
 			}
 		}
 
-		ZBX_STR2UINT64(eventid, row[1]);
-		ZBX_STR2UINT64(index_local.index, row[2]);
-
-		if (NULL == (index_local.hevent = cep_acquire_event_handle_by_eventid(cep, eventid)))
+		if (NULL == (index_local.hevent = cep_acquire_event_handle_by_eventid(cep, win_event->eventid)))
 		{
-			zbx_vector_uint64_append(delete_eventids, eventid);
+			zbx_vector_uint64_append(delete_eventids, win_event->eventid);
 			continue;
 		}
+		index_local.index = win_event->index;
 
 		zbx_vector_cep_event_handle_index_append(&events, index_local);
 		events_num++;
 	}
-	zbx_db_free_result(result);
 
 	cep_cache_release(&cep);
 
@@ -1811,6 +1821,7 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
 	zbx_vector_cep_event_handle_destroy(&handles);
 
 	zbx_vector_cep_event_handle_index_destroy(&events);
+	zbx_vector_cep_window_event_destroy(&win_events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events:" ZBX_FS_UI64, __func__, events_num);
 }
