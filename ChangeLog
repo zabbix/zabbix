@@ -3,6 +3,14 @@ Changes for 7.0.32rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
+........S. [ZBX-27673] fixed browser item timeout (sboidenko)
+.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
+..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
+A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
+..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
+..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
 ...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
 ..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
@@ -122,6 +130,9 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
+.......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
 ...G...... [ZBX-27495] fixed excessive history upload delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27883] fixed inability to copy trigger prototypes that depend on same trigger prototype when cloning template or host (vmaksimovs)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
@@ -151,6 +162,7 @@ Changes for 7.0.27
 Changes for 7.0.27rc1
 
 Bug fixes:
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations Update interval, History, and Trends (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -215,6 +227,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
 .........T [ZBX-27662] renamed GLPI media type (mruszczyk)
 ...G...... [ZBX-27542] fixed memory leak in Zabbix Agent 2 scheduler (mkorotkov)
 .D........ [ZBX-27179] fixed incorrect man page for Zabbix agent 2 (dbriedis)
@@ -4269,6 +4282,9 @@ A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprih
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 
@@ -4286,6 +4302,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
 ..F....... [ZBX-27603] fixed issue with updating existing LDAP settings after LDAP host change (kkuzmina)
 A......... [ZBX-27306] prevented deletion of httptest item tags when "tags" parameter hasn't been passed to httptest.update API method (aluchko)
 

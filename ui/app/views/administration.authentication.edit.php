@@ -76,7 +76,7 @@ $auth_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Minimum password length'), 'passwd_min_length'),
 		new CFormField(
-			(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false, false))
+			(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
 	])
