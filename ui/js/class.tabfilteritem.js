@@ -183,7 +183,14 @@ class CTabFilterItem extends CBaseComponent {
 
 		edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, TABFILTERITEM_STYLE_BTN_EDIT);
 		edit.setAttribute('aria-label', t('Edit filter properties'));
+		edit.setAttribute('tabindex', '0');
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
+		edit.addEventListener('keydown', e => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				this.openPropertiesDialog({}, this._target);
+			}
+		});
 
 		this._target.parentNode.appendChild(edit);
 	}

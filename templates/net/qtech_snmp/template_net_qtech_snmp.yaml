@@ -32,7 +32,7 @@ zabbix_export:
             IF-MIB
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -959,6 +959,21 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
               - macro: '{#SNMPVALUE}'

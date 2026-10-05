@@ -649,6 +649,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 									'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 									'community' =>				['type' => XML_STRING, 'default' => ''],
 									'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
+									'retries' => 				['type' => XML_STRING, 'default' => '5'],
 									'contextname' =>			['type' => XML_STRING, 'default' => ''],
 									'securityname' =>			['type' => XML_STRING, 'default' => ''],
 									'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
@@ -1466,6 +1467,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
 																					['else' => true, 'type' => XML_IGNORE_TAG]
 														]],
+														'retries' => 			['type' => XML_STRING, 'default' => '5'],
 														'contextname' =>		['type' => XML_MULTIPLE, 'rules' => [
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
 																					['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2731,6 +2733,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
 																					['else' => true, 'type' => XML_IGNORE_TAG]
 														]],
+														'retries' => 			['type' => XML_STRING, 'default' => '5'],
 														'contextname' =>		['type' => XML_MULTIPLE, 'rules' => [
 																					['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => ''],
 																					['else' => true, 'type' => XML_IGNORE_TAG]

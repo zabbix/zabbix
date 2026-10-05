@@ -422,7 +422,9 @@
 #endif
 
 #ifdef HAVE_STDATOMIC_H
-#	include <stdatomic.h>
+#	if !defined(__cplusplus)
+#		include <stdatomic.h>
+#	endif
 #endif
 
 #ifdef HAVE_SETJMP_H

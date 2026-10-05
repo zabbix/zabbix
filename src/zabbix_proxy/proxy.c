@@ -82,6 +82,10 @@
 #include "zbxipmi.h"
 #endif
 
+#ifdef HAVE_APM
+#include "zabbix_proxy/apm/zbx_apm.h"
+#endif
+
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 static const char	title_message[] = "zabbix_proxy";
@@ -131,8 +135,8 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, browser poller, configuration syncer,",
-	"                                 data sender, discovery manager, history syncer,",
+	"                                 (apm manager, apm worker, availability manager, browser poller,",
+	"                                 configuration syncer, data sender, discovery manager, history syncer,",
 	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker,",
@@ -259,6 +263,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	0, /* ZBX_PROCESS_TYPE_CEP_WORKER */
 	1, /* ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER */
+	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
+	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -333,6 +339,12 @@ static char	*config_ssl_key_location = NULL;
 
 /* browser item */
 static char	*config_webdriver_url = NULL;
+
+static char	*config_apm_listen_ip = NULL;
+static int	config_apm_port = 0;
+static char	*config_apm_ca_file = NULL;
+static char	*config_apm_cert_file = NULL;
+static char	*config_apm_key_file = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_db_config_t		*zbx_db_config = NULL;
@@ -523,6 +535,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_APM_MANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_APM_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_APM_MANAGER];
+	}
 	else
 		return FAIL;
 
@@ -639,6 +656,11 @@ static void	zbx_set_defaults(void)
 		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is deprecated"
 				", please specify port in Server parameter (e.g. 127.0.0.1:10052)");
 	}
+
+#ifdef HAVE_APM
+	if (0 == config_apm_port)
+		config_apm_port = 4317;
+#endif
 }
 
 /******************************************************************************
@@ -859,6 +881,58 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
+
+#if defined(HAVE_APM)
+	if (NULL != config_apm_listen_ip && SUCCEED != zbx_is_supported_ip(config_apm_listen_ip))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"APMListenIP\" configuration parameter: '%s'",
+				config_apm_listen_ip);
+		err = 1;
+	}
+
+	if (NULL != config_apm_ca_file && '\0' == *config_apm_ca_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSCAFile is defined but empty");
+		err = 1;
+	}
+
+	if (NULL != config_apm_cert_file && '\0' == *config_apm_cert_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSCertFile is defined but empty");
+		err = 1;
+	}
+
+	if (NULL != config_apm_key_file && '\0' == *config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter APMTLSKeyFile is defined but empty");
+		err = 1;
+	}
+
+	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
+				" APMTLSCAFile configuration parameter");
+		err = 1;
+	}
+	if (NULL == config_apm_cert_file && NULL != config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSKeyFile configuration parameter must be used with APMTLSCertFile"
+				" configuration parameter");
+		err = 1;
+	}
+	if (NULL != config_apm_cert_file && NULL == config_apm_key_file)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile configuration parameter must be used with APMTLSKeyFile"
+				" configuration parameter");
+		err = 1;
+	}
+#else
+	err |= (FAIL == zbx_check_cfg_feature_str("APMListenIP", config_apm_listen_ip, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_int("APMListenPort", config_apm_port, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCAFile", config_apm_ca_file, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSCertFile", config_apm_cert_file, "APM support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("APMTLSKeyFile", config_apm_key_file, "APM support"));
+#endif
 
 	if (0 != err)
 		zbx_exit(EXIT_FAILURE);
@@ -1147,8 +1221,22 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",			&config_telemetry_providers,	ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMListenIP",			&config_apm_listen_ip,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMListenPort",		&config_apm_port,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			32767},
+		{"APMTLSCAFile",		&config_apm_ca_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMTLSCertFile",		&config_apm_cert_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"APMTLSKeyFile",		&config_apm_key_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+
+
 		{0}
 	};
 
@@ -1717,6 +1805,25 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.args = &proxyconfig_args
 	};
 
+#ifdef HAVE_APM
+	zbx_thread_apm_manager_args_t	apm_args =
+	{
+		.config_timeout = zbx_config_timeout,
+		.export_config = &config_apm_db_config,
+		.ca_location = config_ssl_ca_location,
+		.source_ip = zbx_config_source_ip,
+		.apm_port = config_apm_port,
+		.apm_ca_file = config_apm_ca_file,
+		.apm_cert_file = config_apm_cert_file,
+		.apm_key_file = config_apm_key_file,
+		.apm_listen_ip = config_apm_listen_ip
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_apm_manager_thread,
+		.args = &apm_args
+	};
+#endif
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
 
@@ -1963,6 +2070,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define TLS_FEATURE_STATUS	" NO"
 #endif
+#if defined(HAVE_APM)
+#	define APM_FEATURE_STATUS	"YES"
+#else
+#	define APM_FEATURE_STATUS	" NO"
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
 			ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
@@ -1977,6 +2089,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:           " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "APM support:           " APM_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
