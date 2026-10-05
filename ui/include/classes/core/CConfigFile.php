@@ -553,8 +553,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 // \'password\'   - Database password. Can be empty.
 // \'vault_path\' - Vault path if vault is used for credentials, cannot be set with username or password. Can be empty.
 // Additional parameters for ClickHouse url with \'https\' scheme:
-// \'ssl_verity_peer\' - Verify peer. Default: false.
-// \'ssl_verity_host\' - Verify host. Only supported if \'ssl_verify_peer\' is set to true. Default: false.
+// \'ssl_verify_peer\' - Verify peer. Default: false.
+// \'ssl_verify_host\' - Verify host. Only supported if \'ssl_verify_peer\' is set to true. Default: false.
 // \'ssl_cert_file\' - Client certificate file path. Can be empty.
 // \'ssl_key_file\' - Client private key file path. Can be empty.
 // \'ssl_key_password\' - Client private key password. Can be empty.
@@ -568,6 +568,9 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 //	\'username\' => \'zabbix\',
 //	\'password\' => \'zabbix\'
 //];
+// Uncomment to set the desired default values for all global APM data source configuration providers.
+//$APM_CA_LOCATION = \'\';
+//$APM_CA_FILE = \'\';
 ';
 	}
 
@@ -869,7 +872,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				foreach (['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_ca_location', 'ssl_ca_file']
 						as $ssl_key) {
 					if (!is_string($provider[$ssl_key])) {
-						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$field,
+						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$ssl_key,
 							_s('a string is expected')
 						));
 					}

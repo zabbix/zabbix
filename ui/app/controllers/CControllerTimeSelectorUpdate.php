@@ -19,13 +19,13 @@
  */
 class CControllerTimeSelectorUpdate extends CController {
 
-	public static $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
+	public static array $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
 		'web.problem.filter', 'web.auditlog.filter', 'web.actionlog.filter', 'web.item.graph.filter',
 		'web.toptriggers.filter', 'web.availabilityreport.filter', 'web.monitoring.hosts',
-		'web.monitoring.problem'
+		'web.monitoring.problem', 'web.apm.trace.filter', 'web.apm.metric.filter', 'web.apm.log.filter'
 	];
 
-	public function init() {
+	public function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -74,7 +74,7 @@ class CControllerTimeSelectorUpdate extends CController {
 		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$range_time_parser = new CRangeTimeParser();
 
 		$time_period = [
