@@ -439,7 +439,7 @@ static void	*permissions_rebuild_entry(void *args)
 
 	ZBX_UNUSED(args);
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [permissions rebuild]");
 
