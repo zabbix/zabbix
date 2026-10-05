@@ -187,6 +187,9 @@ class testPageMonitoringWebDetails extends CWebTest {
 			);
 		}
 
+		// Wait for the time control to finish updating the zoom button states after applying the time range.
+		$this->page->waitUntilReady();
+
 		// Check Zoom buttons.
 		foreach ($data['zoom_buttons'] as $button => $state) {
 			$this->assertTrue($this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($button).

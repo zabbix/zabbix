@@ -1452,6 +1452,8 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 			alarm->entity_type = NULL;
 		}
 
+		alarm->entity_uuid = NULL;
+		alarm->entity_name = NULL;
 		zbx_vector_vmware_alarm_ptr_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
 	}
@@ -1496,9 +1498,6 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 	for (i = 0; i < data->alarms.values_num; i++)
 	{
 		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
-
-		alarm->entity_uuid = NULL;	/* we can't guarantee that we will find any uuid */
-		alarm->entity_name = NULL;
 
 		if (NULL == alarm->entity_id)
 			continue;
@@ -3260,14 +3259,14 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
 {
-	int	req_flag = 0x1, jobs_req = ((service->jobs_flag & ZBX_VMWARE_REQ_MASK) >> ZBX_VMWARE_REQ);
+	int	req_flag = 0x1, jobs_req = ZBX_VMWARE_FOM_REQ(service->jobs_flag);
 
 	while (0 != jobs_req)
 	{
 		if (0 != (jobs_req & req_flag))
 		{
 			zbx_vmware_job_create(vmw, service, req_flag);
-			service->jobs_flag &= ~ (req_flag << ZBX_VMWARE_REQ);
+			service->jobs_flag &= ~ ZBX_VMWARE_TO_REQ(req_flag);
 			jobs_req &= ~ req_flag;
 		}
 

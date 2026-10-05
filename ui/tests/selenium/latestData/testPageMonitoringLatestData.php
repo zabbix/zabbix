@@ -630,12 +630,15 @@ class testPageMonitoringLatestData extends CWebTest {
 			: 'zabbix.php?action=latest.view&name=item';
 
 		$this->page->login()->open($link)->waitUntilReady();
+		$results_table = $this->query('xpath://form/table')->waitUntilPresent()->asTable()->one();
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
+				$results_table->waitUntilReloaded();
+				$results_table->invalidate();
 			}
 		}
 
@@ -870,7 +873,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
+			$overlay = $this->query('css:div.overlay-dialogue.wordbreak')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());
@@ -884,7 +887,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			}
 
 			// Verify that the tool-tip can be closed.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$overlay->query('xpath:.//button[@title="Close"]')->one()->click();
 			$this->assertFalse($overlay->isDisplayed());
 		}
 		// If the item has no description the description icon should not be there.

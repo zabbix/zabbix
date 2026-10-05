@@ -249,9 +249,9 @@ class testFormServicesServices extends CWebTest {
 
 		// Check hint-box.
 		$form->query('id:algorithm-not-applicable-warning')->one()->click();
-		$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilVisible()->one();
 		$hintbox = 'Status calculation rule and additional rules are only applicable if child services exist.';
-		$this->assertEquals($hintbox, $hint->one()->getText());
+		$this->assertEquals($hintbox, $hint->getText());
 
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();

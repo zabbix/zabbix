@@ -10,6 +10,8 @@ This template set is designed for the effortless deployment of VMware vCenter an
 
 For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.0/manual/vm_monitoring).
 
+**Note:** VMware alarm item/trigger prototype names include the alarm entity name since template version 7.0.26. The entity name value itself is only returned by Zabbix server 7.0.28 and higher - on earlier servers, `{#VMWARE.ALARMS.ENTITY.NAME}` will remain unresolved.
+
 ## Requirements
 
 Zabbix version: 7.0 and higher.
@@ -51,6 +53,7 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware FQDN", e.g. {$HTTP.TLS.VERIFY:"VMware FQDN"}.</p>|`full`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to be allowed in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|

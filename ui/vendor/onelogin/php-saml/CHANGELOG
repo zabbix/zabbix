@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+v4.3.2
+* Update xmlseclibs version requirement to 3.1.5 due [CVE-2026-32313](https://github.com/robrichards/xmlseclibs/security/advisories/GHSA-4v26-v6cg-g6f9)
+
 v4.3.1
 * Update xmlseclibs version requirement to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
 

@@ -623,6 +623,8 @@ func Test_ValidateOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			tt.args.options.ProfilerDir = "profiles"
+
 			err := ValidateOptions(tt.args.options)
 
 			if (err != nil) != tt.wantErr {
@@ -634,6 +636,41 @@ func Test_ValidateOptions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestProfilerDirConfiguration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("default", func(t *testing.T) {
+		t.Parallel()
+
+		var options AgentOptions
+
+		err := conf.UnmarshalStrict([]byte{}, &options)
+		if err != nil {
+			t.Fatalf("cannot create default configuration: %s", err)
+		}
+
+		if options.ProfilerDir == "" {
+			t.Fatal("default ProfilerDir is empty")
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		t.Parallel()
+
+		var options AgentOptions
+
+		err := conf.UnmarshalStrict([]byte("ProfilerDir="), &options)
+		if err != nil {
+			t.Fatalf("cannot parse configuration: %v", err)
+		}
+
+		err = ValidateOptions(&options)
+		if err == nil || err.Error() != "ProfilerDir cannot be empty" {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
 
 func TestParseServerActive(t *testing.T) {
