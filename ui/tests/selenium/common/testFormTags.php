@@ -810,7 +810,7 @@ class testFormTags extends CWebTest {
 		$tags = $element->getValue();
 
 		// Click Clone button.
-		$this->query('button', 'Clone')->one()->click();
+		$this->query('button', 'Clone')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 
 		if ($object === 'discovered host') {
@@ -1155,8 +1155,10 @@ class testFormTags extends CWebTest {
 			$this->query('button:Reset')->one()->click();
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$filter->fill(['Name' => $parent]);
+			$table = $this->query('class:list-table')->asTable()->one();
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
+			$table->waitUntilReloaded();
+			$table->findRow('Name', $parent)
 					->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
 
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
