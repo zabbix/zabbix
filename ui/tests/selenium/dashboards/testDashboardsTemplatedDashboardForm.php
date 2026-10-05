@@ -3450,8 +3450,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'Template graph prototype {#KEY}',
-						'Columns' => '',
-						'Rows' => ''
+						'Columns' => 0,
+						'Rows' => 0
 					],
 					'swap_expected' => [
 						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
@@ -3589,10 +3589,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Item value with missing field values',
 						'Advanced configuration' => true,
 						'id:description' => '',
-						'id:desc_size' => '',
-						'id:decimal_size' => '',
-						'id:value_size' => '',
-						'id:units_size' => '',
+						'id:desc_size' => 0,
+						'id:decimal_size' => 0,
+						'id:value_size' => 0,
+						'id:units_size' => 0,
 						'Aggregation function' => 'min',
 						'Time period' => 'Custom',
 						'id:time_period_from' => '',
@@ -3832,7 +3832,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
 						'Name' => 'Item history widget with empty Items',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => [
 						'Invalid parameter "Items": cannot be empty.',
@@ -3955,7 +3955,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
 						'Name' => 'Problems widget with empty Show lines',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
@@ -4266,7 +4266,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
 						'Name' => 'Top triggers widget with empty Trigger limit',
-						'Trigger limit' => ''
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
