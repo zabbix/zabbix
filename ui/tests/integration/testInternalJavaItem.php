@@ -20,11 +20,12 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @hosts java_host
- * @backup hosts
+ * @onAfter clearData
  *
  */
 class testInternalJavaItem extends CIntegrationTest {
 
+	private static $hostid;
 	private static $items = [
 		'zbx_java_ping_test' => [
 			'name' => 'zbx_java_ping_test',
@@ -61,7 +62,7 @@ class testInternalJavaItem extends CIntegrationTest {
 
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		$hostid = $response['result']['hostids'][0];
+		self::$hostid = $response['result']['hostids'][0];
 
 		// Create item
 		foreach (self::$items as $key => $item) {
@@ -69,7 +70,7 @@ class testInternalJavaItem extends CIntegrationTest {
 				'name' => $key,
 				'key_' => $item['key'],
 				'type' => $item['type'],
-				'hostid' => $hostid,
+				'hostid' => self::$hostid,
 				'interfaceid' => 0,
 				'value_type' => $item['value_type'],
 				'delay' => '1s',
@@ -152,6 +153,15 @@ class testInternalJavaItem extends CIntegrationTest {
 				'JavaGatewayPort' => 10050
 			]
 		];
+	}
+
+	/**
+	 * Delete data objects created for this test suite
+	 *
+	 */
+	public static function clearData(): void {
+		// Triggers, items, and user macros should be cascade deleted.
+		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 
 	/**
