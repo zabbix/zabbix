@@ -251,7 +251,7 @@ final class CModuleManager {
 					'class' => implode('\\', [$module->getNamespace(), 'Actions',
 						str_replace('/', '\\', $data['class'])
 					]),
-					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
+					'layout' => array_key_exists('layout', $data) ? $data['layout'] : ZBX_LAYOUT_HTMLPAGE,
 					'view' => array_key_exists('view', $data) ? $data['view'] : null
 				];
 			}

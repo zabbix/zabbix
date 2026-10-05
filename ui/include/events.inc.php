@@ -76,6 +76,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['eventid']                   Event ID.
  * @param string $event['r_eventid']                 OK event ID.
  * @param string $event['cause_eventid']             Cause event ID.
+ * @param string $event['cep_ruleid']                OK Event CEP rule ID.
  * @param string $event['correlationid']             OK Event correlation ID.
  * @param string $event['userid']                    User ID who generated the OK event.
  * @param string $event['name']                      Event name.
@@ -83,7 +84,13 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param CCOl   $event['opdata']                    Operational data with expanded macros.
  * @param string $event['comments']                  Trigger description with expanded macros.
  * @param array  $allowed                            An array of user role rules.
- * @param bool   $allowed['ui_correlation']          Whether user is allowed to visit event correlation page.
+ * @param bool   $allowed['event_processing']        Authorized `CRoleHelper::UI_CONFIGURATION_CEPRULES`.
+ * @param bool   $allowed['add_comments']            Authorized `CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS`.
+ * @param bool   $allowed['change_severity']         Authorized `CRoleHelper::ACTIONS_CHANGE_SEVERITY`.
+ * @param bool   $allowed['acknowledge']             Authorized `CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS`.
+ * @param bool   $allowed['suppress_problems']       Authorized `CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS`.
+ * @param bool   $allowed['close']                   Authorized `CRoleHelper::ACTIONS_CLOSE_PROBLEMS`.
+ * @param bool   $allowed['rank_change']             Authorized `CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING`.
  *
  * @return CTableInfo
  */
@@ -115,14 +122,40 @@ function make_event_details(array $event, array $allowed) {
 		]);
 
 	if ($event['r_eventid'] != 0) {
-		if ($event['correlationid'] != 0) {
+		if ($event['cep_ruleid'] != 0) {
+			$cep_rules = API::CepRule()->get([
+				'output' => ['cep_ruleid', 'name'],
+				'cep_ruleids' => [$event['cep_ruleid']]
+			]);
+
+			if ($cep_rules) {
+				if ($allowed['event_processing']) {
+					$cep_rule_name = (new CLink($cep_rules[0]['name'],
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'popup')
+							->setArgument('popup', 'ceprule.edit')
+							->setArgument('cepruleid', $cep_rules[0]['cep_ruleid'])
+							->getUrl()
+					))->addClass(ZBX_STYLE_LINK_ALT);
+				}
+				else {
+					$cep_rule_name = $cep_rules[0]['name'];
+				}
+			}
+			else {
+				$cep_rule_name = _('Complex event processing rule.');
+			}
+
+			$table->addRow([_('Resolved by'), $cep_rule_name]);
+		}
+		elseif ($event['correlationid'] != 0) {
 			$correlations = API::Correlation()->get([
 				'output' => ['correlationid', 'name'],
 				'correlationids' => [$event['correlationid']]
 			]);
 
 			if ($correlations) {
-				if ($allowed['ui_correlation']) {
+				if ($allowed['event_processing']) {
 					$correlation_name = (new CLink($correlations[0]['name'],
 						(new CUrl('zabbix.php'))
 							->setArgument('action', 'popup')

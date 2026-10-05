@@ -154,6 +154,13 @@ class CDefaultDataProvider extends CDataProvider {
 
 				return response;
 			})
+			.catch(error => {
+				if (abort_controller.signal.aborted || error.name === 'TypeError') {
+					return;
+				}
+
+				throw error;
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;

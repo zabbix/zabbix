@@ -210,9 +210,86 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 	return FAIL;
 }
 
+static int	parse_proc_mounts_line(char *line, zbx_fsname_t *fsname, char **mntopts)
+{
+	char	*p;
+
+	if (NULL == (p = strchr(line, ' ')))
+		return FAIL;
+
+	fsname->mpoint = ++p;
+
+	if (NULL == (p = strchr(fsname->mpoint, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	fsname->type = ++p;
+
+	if (NULL == (p = strchr(fsname->type, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	*mntopts = ++p;
+
+	if (NULL == (p = strchr(*mntopts, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	return SUCCEED;
+}
+
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
+
+static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
+{
+	char		line[MAX_STRING_LEN], *mntopts;
+	FILE		*f;
+	struct zbx_json	j;
+	zbx_fsname_t	fsname;
+
+	if (NULL == (f = fopen("/proc/mounts", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
+			continue;
+
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+			continue;
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, fsname.type, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntopts, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_fclose(f);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			line[MAX_STRING_LEN], *p, *mntopts, *error;
+	char			*mode, *mountpoint, line[MAX_STRING_LEN], *mntopts, *error;
 	FILE			*f;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
 	double			pfree, pused, ipfree, ipused;
@@ -222,7 +299,29 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fsname_t		fsname;
 	int			ret = SYSINFO_RET_FAIL;
 
-	ZBX_UNUSED(request);
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			return vfs_fs_get_short(mountpoint, result);
+
+		if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
 
 	if (NULL == (f = fopen("/proc/mounts", "r")))
 	{
@@ -234,35 +333,18 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (NULL == (p = strchr(line, ' ')))
+		if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
 			continue;
 
-		fsname.mpoint = ++p;
-
-		if (NULL == (p = strchr(fsname.mpoint, ' ')))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
-
-		*p = '\0';
-
-		fsname.type = ++p;
-
-		if (NULL == (p = strchr(fsname.type, ' ')))
-			continue;
-
-		*p = '\0';
-
-		mntopts = ++p;
-
-		if (NULL == (p = strchr(mntopts, ' ')))
-			continue;
-
-		*p = '\0';
 
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
 		}
+
 		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
 				"pused", &error))
 		{
@@ -294,28 +376,18 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
 		goto out;
 	}
+
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
 		int idx;
 
-		if (NULL == (p = strchr(line, ' ')))
+		if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
 			continue;
 
-		fsname.mpoint = ++p;
-
-		if (NULL == (p = strchr(fsname.mpoint, ' ')))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
-
-		*p = '\0';
-
-		fsname.type = ++p;
-
-		if (NULL == (p = strchr(fsname.type, ' ')))
-			continue;
-
-		*p = '\0';
 
 		if (FAIL != (idx = zbx_vector_mpoint_ptr_search_fsname(&mpoints, &fsname)))
 		{

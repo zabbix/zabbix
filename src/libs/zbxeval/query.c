@@ -14,7 +14,6 @@
 
 #include "eval.h"
 
-#include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxeval.h"

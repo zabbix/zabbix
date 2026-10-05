@@ -30,7 +30,9 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'status', 'activated_at', 'lastaccess'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'status', 'activated_at', 'lastaccess',
+		'enrollment_token_expires_at'
+	];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
@@ -121,12 +123,29 @@ class CDevice extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput'] && in_array('lastaccess', $options['output'])) {
-			$sql_parts = $this->addQuerySelect(dbConditionCoalesce('t.lastaccess', 0, 'lastaccess'), $sql_parts);
-			$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'token_device', 'using' => 'deviceid'];
-			$sql_parts['join']['t'] = ['type' => 'left', 'left_table' => 'td', 'table' => 'token',
-				'using' => 'tokenid'
-			];
+		if (!$options['countOutput']) {
+			if (in_array('lastaccess', $options['output'])) {
+				$sql_parts = $this->addQuerySelect(
+					dbConditionCoalesce('t.lastaccess', DB::getDefault('token', 'lastaccess'), 'lastaccess'),
+					$sql_parts
+				);
+				$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'token_device', 'using' => 'deviceid'];
+				$sql_parts['join']['t'] = ['type' => 'left', 'left_table' => 'td', 'table' => 'token',
+					'using' => 'tokenid'
+				];
+			}
+
+			if (in_array('enrollment_token_expires_at', $options['output'])) {
+				$sql_parts = $this->addQuerySelect(
+					dbConditionCoalesce('det.expires_at', DB::getDefault('device_enrollment_token', 'expires_at'),
+						'enrollment_token_expires_at'
+					),
+					$sql_parts
+				);
+				$sql_parts['join']['det'] = ['type' => 'left', 'table' => 'device_enrollment_token',
+					'using' => 'deviceid'
+				];
+			}
 		}
 
 		return $sql_parts;

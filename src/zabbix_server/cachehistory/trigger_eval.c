@@ -913,31 +913,30 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 			continue;
 		}
 
-		/* otherwise try to recover trigger by setting OK value */
-		if (TRIGGER_VALUE_PROBLEM == tr->value && TRIGGER_RECOVERY_MODE_NONE != tr->recovery_mode)
+		switch (tr->recovery_mode)
 		{
-			if (TRIGGER_RECOVERY_MODE_EXPRESSION == tr->recovery_mode)
-			{
+			case TRIGGER_RECOVERY_MODE_EXPRESSION:
 				tr->new_value = TRIGGER_VALUE_OK;
 				continue;
-			}
-
-			/* processing recovery expression mode */
-			if (SUCCEED != evaluate_expression(tr->eval_ctx_r, &tr->timespec, &expr_result, &tr->new_error))
-			{
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			case TRIGGER_RECOVERY_MODE_NONE:
+				tr->new_value = TRIGGER_VALUE_NONE;
 				continue;
-			}
-
-			if (SUCCEED != zbx_double_compare(expr_result, 0.0))
-			{
-				tr->new_value = TRIGGER_VALUE_OK;
-				continue;
-			}
 		}
 
-		/* no changes, keep the old value */
-		tr->new_value = TRIGGER_VALUE_NONE;
+		/* processing recovery expression mode */
+		if (SUCCEED != evaluate_expression(tr->eval_ctx_r, &tr->timespec, &expr_result, &tr->new_error))
+		{
+			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			continue;
+		}
+
+		if (SUCCEED != zbx_double_compare(expr_result, 0.0))
+		{
+			tr->new_value = TRIGGER_VALUE_OK;
+			continue;
+		}
+		else
+			tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))

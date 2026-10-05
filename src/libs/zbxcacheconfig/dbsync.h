@@ -51,30 +51,37 @@
 /* This list includes virtual objects that are not written into  */
 /* changelog table, but the insert/updates/deletes are copied    */
 /* from the associated object changelog                          */
-#define ZBX_DBSYNC_OBJ_HOST		1
-#define ZBX_DBSYNC_OBJ_HOST_TAG		2
-#define ZBX_DBSYNC_OBJ_ITEM		3
-#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
-#define ZBX_DBSYNC_OBJ_TRIGGER		5
-#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
-#define ZBX_DBSYNC_OBJ_FUNCTION		7
-#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
-#define ZBX_DBSYNC_OBJ_DRULE		9
-#define ZBX_DBSYNC_OBJ_DCHECK		10
-#define ZBX_DBSYNC_OBJ_HTTPTEST		11
-#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
-#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
-#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
-#define ZBX_DBSYNC_OBJ_CONNECTOR	17
-#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
-#define ZBX_DBSYNC_OBJ_PROXY		19
-#define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
-#define ZBX_DBSYNC_OBJ_HOST_PROXY	21
-#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	22	/* virtual object */
+#define ZBX_DBSYNC_OBJ_HOST			1
+#define ZBX_DBSYNC_OBJ_HOST_TAG			2
+#define ZBX_DBSYNC_OBJ_ITEM			3
+#define ZBX_DBSYNC_OBJ_ITEM_TAG			4
+#define ZBX_DBSYNC_OBJ_TRIGGER			5
+#define ZBX_DBSYNC_OBJ_TRIGGER_TAG		6
+#define ZBX_DBSYNC_OBJ_FUNCTION			7
+#define ZBX_DBSYNC_OBJ_ITEM_PREPROC		8
+#define ZBX_DBSYNC_OBJ_DRULE			9
+#define ZBX_DBSYNC_OBJ_DCHECK			10
+#define ZBX_DBSYNC_OBJ_HTTPTEST			11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD		12
+#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM		13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP			14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD		15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM		16
+#define ZBX_DBSYNC_OBJ_CONNECTOR		17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG		18
+#define ZBX_DBSYNC_OBJ_PROXY			19
+#define ZBX_DBSYNC_OBJ_PROXY_GROUP		20
+#define ZBX_DBSYNC_OBJ_HOST_PROXY		21
+#define ZBX_DBSYNC_OBJ_TRIGGER_DEP		22
+#define ZBX_DBSYNC_OBJ_CEP_RULE			23
+#define ZBX_DBSYNC_OBJ_CEP_CONDITION		24
+#define ZBX_DBSYNC_OBJ_CEP_WINDOW		25
+#define ZBX_DBSYNC_OBJ_CEP_OPERATION		26
+#define ZBX_DBSYNC_OBJ_CEP_OPERATION_CONDITION	27
+
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	29	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		22
+#define ZBX_DBSYNC_OBJ_COUNT		29
 
 /******************************************************************************
  *                                                                            *
@@ -131,6 +138,9 @@ struct zbx_dbsync
 
 	/* the preprocessed columns  */
 	zbx_vector_ptr_t		columns;
+
+	/* database connection */
+	zbx_dbconn_t			*db;
 
 	/* statistics */
 	const char	*from;
@@ -190,14 +200,14 @@ zbx_dbsync_env_t;
 
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
 void	zbx_dbsync_env_destroy(void);
-int	zbx_dbsync_env_prepare(unsigned char mode);
+int	zbx_dbsync_env_prepare(zbx_dbconn_t *db, unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
-void	zbx_dbsync_env_clear(void);
+void	zbx_dbsync_env_clear(zbx_dbconn_t *db);
 int	zbx_dbsync_env_changelog_num(void);
 int	zbx_dbsync_env_changelog_dbsyncs_new_records(void);
 
-void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode);
-void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode);
+void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode, zbx_dbconn_t *db);
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode, zbx_dbconn_t *db);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
@@ -233,9 +243,11 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_eventnames(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_triggers(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_settings(zbx_dbsync_t *sync);
 
@@ -257,6 +269,14 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char p
 
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_rule_window(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync);
+
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);
 void	zbx_dcsync_sync_start(zbx_dbsync_t *sync, zbx_uint64_t used_size);

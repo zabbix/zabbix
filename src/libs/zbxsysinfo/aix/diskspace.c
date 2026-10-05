@@ -285,19 +285,17 @@ error:
 	return ret;
 }
 
-static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	match_mountpoint(const char *current, const char *requested)
 {
-	int			rc, sz, i, ret = SYSINFO_RET_FAIL;
-	struct vmount		*vms = NULL, *vm;
-	struct zbx_json		j;
-	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
-	double			pfree, pused, ipfree, ipused;
-	char			*error;
-	zbx_vector_ptr_t	mntpoints;
-	zbx_mpoint_t		*mntpoint;
-	zbx_fsname_t		fsname;
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
 
-	ZBX_UNUSED(request);
+static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
+{
+	int		rc, sz, i;
+	struct vmount	*vms = NULL, *vm;
+	struct zbx_json	j;
+	const char	*mpoint, *mntopts;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -306,18 +304,106 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_vector_ptr_create(&mntpoints);
+	sz *= 2;
+	vms = zbx_malloc(vms, (size_t)sz);
+
+	/* get the list of mounted filesystems */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		zbx_free(vms);
+
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0, vm = vms; i < rc; i++)
+	{
+		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
+
+		if (FAIL != match_mountpoint(mpoint, mountpoint))
+		{
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, zbx_get_vfs_name_by_type(vm->vmt_gfstype),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntopts, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		/* go to the next vmount structure */
+		vm = (struct vmount *)((char *)vm + vm->vmt_length);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+	zbx_free(vms);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			rc, sz, i, ret = SYSINFO_RET_FAIL;
+	struct vmount		*vms = NULL, *vm;
+	struct zbx_json		j;
+	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
+	double			pfree, pused, ipfree, ipused;
+	char			*mode, *mountpoint, *error;
+	zbx_vector_ptr_t	mntpoints;
+	zbx_mpoint_t		*mntpoint;
+	zbx_fsname_t		fsname;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			return vfs_fs_get_short(mountpoint, result);
+
+		if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	/* check how many bytes to allocate for the mounted filesystems */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
 
 	sz *= 2;
 	vms = zbx_malloc(vms, (size_t)sz);
 
 	/* get the list of mounted filesystems */
-	/* return code is number of filesystems returned */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vms)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
-		goto out;
+		zbx_free(vms);
+
+		return SYSINFO_RET_FAIL;
 	}
+
+	zbx_vector_ptr_create(&mntpoints);
+
 	for (i = 0, vm = vms; i < rc; i++)
 	{
 		char	*mntopts;
@@ -325,15 +411,27 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
 		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+		{
+			/* go to the next vmount structure */
+			vm = (struct vmount *)((char *)vm + vm->vmt_length);
+			continue;
+		}
+
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
+			/* go to the next vmount structure */
+			vm = (struct vmount *)((char *)vm + vm->vmt_length);
 			continue;
 		}
-		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
-				&error))
+
+		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
+				"pused", &error))
 		{
 			zbx_free(error);
+			/* go to the next vmount structure */
+			vm = (struct vmount *)((char *)vm + vm->vmt_length);
 			continue;
 		}
 
@@ -374,6 +472,13 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
 		zbx_strlcpy(type, zbx_get_vfs_name_by_type(vm->vmt_gfstype), MAX_STRING_LEN);
 		fsname.type = type;
+
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+		{
+			/* go to the next vmount structure */
+			vm = (struct vmount *)((char *)vm + vm->vmt_length);
+			continue;
+		}
 
 		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
