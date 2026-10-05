@@ -393,7 +393,7 @@ int	add_graph_theme(const char *theme, const char *colors)
 
 	if (SUCCEED == exists)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): graph theme \"%s\" already exists, skipping its creation",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): graph theme \"%s\" already exists, skipping its creation",
 				__func__, theme);
 		return SUCCEED;
 	}

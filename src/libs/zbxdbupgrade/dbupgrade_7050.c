@@ -1130,7 +1130,7 @@ static int	DBpatch_7050086(void)
 
 	if (SUCCEED == exists)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): media type \"Push notification\" already exists,"
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): media type \"Push notification\" already exists,"
 				" skipping its creation", __func__);
 		return SUCCEED;
 	}
