@@ -2768,7 +2768,7 @@ class testCepRule extends CAPITest {
 			],
 			'Window tags accepts default value if group_by_tags=no' => [
 				'request' => [
-					'name' => 'ceprule',
+					'name' => 'ceprule.default.group_by_tags.no',
 					'sortorder' => 1,
 					'operations' => [
 						[
