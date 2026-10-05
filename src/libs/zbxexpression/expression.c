@@ -30,8 +30,6 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 
-#define MVAR_MANUALINPUT	"{MANUALINPUT}"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: formats full user name from name, surname and alias.              *
@@ -2742,30 +2740,4 @@ int	zbx_expr_macro_index(const char *macro)
 		return func_num;
 
 	return -1;
-}
-
-static int	macro_manualinput_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
-		char **data, char *error, size_t maxerrlen)
-{
-	const char	*manualinput = va_arg(args, const char *);
-
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-
-	if (0 == p->indexed && NULL != p->macro && NULL != manualinput &&
-			0 == strcmp(p->macro, MVAR_MANUALINPUT))
-	{
-		*replace_to = zbx_strdup(*replace_to, manualinput);
-	}
-
-	return SUCCEED;
-}
-
-int	zbx_substitute_script_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
-{
-	if (NULL == manualinput || NULL == data || NULL == *data || '\0' == **data)
-		return SUCCEED;
-
-	return zbx_substitute_macros(data, error, maxerrlen, &macro_manualinput_resolv, manualinput);
 }

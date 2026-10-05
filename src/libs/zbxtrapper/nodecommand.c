@@ -33,6 +33,63 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_expression_constants.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: callback function to resolve the {MANUALINPUT} macro              *
+ *                                                                            *
+ * Parameters: p           - [IN] macro resolution data                       *
+ *             args        - [IN] variable argument list containing           *
+ *                                validated raw manual input string           *
+ *             replace_to  - [OUT] dynamically allocated string with          *
+ *                                 resolved macro value                       *
+ *             data        - unused                                           *
+ *             error       - unused                                           *
+ *             maxerrlen   - unused                                           *
+ *                                                                            *
+ * Return value:  SUCCEED - resolved successfully                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen)
+{
+	const char	*manualinput = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput &&
+			0 == strcmp(p->macro, MVAR_MANUALINPUT))
+	{
+		*replace_to = zbx_strdup(*replace_to, manualinput);
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: substitutes {MANUALINPUT} macro in data string with real value    *
+ *                                                                            *
+ * Parameters: data        - [IN/OUT] pointer to data where the macro should  *
+ *                                    be resolved                             *
+ *             error       - [OUT] pre-allocated buffer for error message     *
+ *             maxerrlen   - [IN] size of pre-allocated error message buffer  *
+ *             manualinput - [IN] validated raw manual input, or NULL         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully (even if macro is absent)  *
+ *                FAIL    - error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_webhook_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
+{
+	if (NULL == manualinput || NULL == data || NULL == *data || '\0' == **data)
+		return SUCCEED;
+
+	return zbx_substitute_macros(data, error, maxerrlen, &macro_webhook_resolv, manualinput);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -539,9 +596,11 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
 				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
 				sizeof(error)))
+		{
 			goto fail;
+		}
 
-		if (SUCCEED != zbx_substitute_script_macros(&script.command, error, sizeof(error), manualinput))
+		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
 			goto fail;
 
 		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
@@ -552,12 +611,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_script_macros(&script.command_orig, error, sizeof(error), manualinput))
+		if (SUCCEED != substitute_webhook_macros(&script.command_orig, error, sizeof(error), manualinput))
 			goto fail;
 	}
 	else
 	{
-		if (SUCCEED != zbx_substitute_script_macros(&script.command, error, sizeof(error), manualinput))
+		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
 			goto fail;
 
 		for (int i = 0; i < webhook_params.values_num; i++)
@@ -565,11 +624,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
 					(char **)&webhook_params.values[i].second, macro_type, error, sizeof(error)))
+			{
 				goto fail;
+			}
 
-			if (SUCCEED != zbx_substitute_script_macros((char **)&webhook_params.values[i].second, error,
+			if (SUCCEED != substitute_webhook_macros((char **)&webhook_params.values[i].second, error,
 					sizeof(error), manualinput))
+			{
 				goto fail;
+			}
 		}
 
 		zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
