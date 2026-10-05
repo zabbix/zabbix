@@ -142,7 +142,12 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 				->addClass(ZBX_STYLE_CELL)
 				->addClass(ZBX_STYLE_CELL_EXPRESSION)
 		]))
-		->addItem(new CLabel(_('Conditions'), 'ceprule-operation-filter-conditions'))
+		->addItem(
+			(new CLabel(_('Conditions'), 'ceprule-operation-filter-conditions'))
+				->addItem(makeHelpIcon(
+					_('Operations are applied to all events in the window by default, except "Event occurred".')
+				))
+		)
 		->addItem((new CFormField())
 			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')

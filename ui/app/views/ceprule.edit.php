@@ -182,7 +182,7 @@ $form = (new CForm())
 				_('2) "Event added to window"').PHP_EOL,
 				_('3) "Event evicted"').PHP_EOL,
 				''.PHP_EOL,
-				_('Note: "Window closed" and "Pattern matched" operate independently and are not affected by this execution order.')
+				_('Note: "Event closed", "Window closed" and "Pattern matched" operate independently and are not affected by this execution order.')
 			]))
 		)
 		->addItem((new CFormField())
