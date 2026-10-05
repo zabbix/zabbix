@@ -178,21 +178,28 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'type' => [
 					[
 						'integer', 'required', 'in' => [
-							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
-							ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
-							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+							ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
+							ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED,
+							ZBX_CONDITION_TYPE_EVENT_CURRENT
 						],
-						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
 						'messages' => ['in' => _('Invalid value.')]
 					],
 					[
-						'integer', 'required', 'in' => [
-							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
-							ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+						'integer', 'not_in' => [
+							ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST,
+							ZBX_CONDITION_TYPE_EVENT_CURRENT
 						],
-						'when' => ['../../execute_when', 'not_in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
-						'messages' => ['in' => _('Invalid value.')]
+						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+						'messages' => ['not_in' => _('Invalid value.')]
+					],
+					[
+						'integer', 'not_in' => [ZBX_CONDITION_TYPE_EVENT_CURRENT],
+						'when' => ['../../execute_when', 'in' => [
+							CCepRuleHelper::WHEN_WINDOW_CLOSED, CCepRuleHelper::WHEN_PATTERN_MATCHED
+						]],
+						'messages' => ['not_in' => _('Invalid value.')]
 					]
 				],
 				'operator' => [
@@ -200,7 +207,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 						'in' => [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO],
 						'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
 							ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED,
+							ZBX_CONDITION_TYPE_EVENT_CURRENT
 						]]
 					],
 					['db cep_operation_condition.operator', 'required',

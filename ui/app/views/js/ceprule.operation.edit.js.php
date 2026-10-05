@@ -219,6 +219,7 @@ window.ceprule_operation_edit_popup = new class {
 			case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
 			case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
 			case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>:
 				description_template = this.#condition_row_template_property;
 				description_view.text = descriptions[condition.type][condition.operator];
 				break;

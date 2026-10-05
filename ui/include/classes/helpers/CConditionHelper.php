@@ -457,7 +457,8 @@ class CConditionHelper {
 				ZBX_CONDITION_TYPE_EVENT_LAST,
 				ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
 				ZBX_CONDITION_TYPE_EVENT_COPIED,
-				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => ['operator']
+				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED,
+				ZBX_CONDITION_TYPE_EVENT_CURRENT => ['operator']
 			};
 
 			foreach ($field_names as $field_name) {

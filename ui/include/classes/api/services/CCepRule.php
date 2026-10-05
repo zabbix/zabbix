@@ -724,7 +724,8 @@ class CCepRule extends CApiService {
 			['type' => [ZBX_CONDITION_TYPE_EVENT_LAST]],
 			['type' => [ZBX_CONDITION_TYPE_EVENT_SYMPTOM]],
 			['type' => [ZBX_CONDITION_TYPE_EVENT_COPIED]],
-			['type' => [ZBX_CONDITION_TYPE_EVENT_SUPPRESSED]]
+			['type' => [ZBX_CONDITION_TYPE_EVENT_SUPPRESSED]],
+			['type' => [ZBX_CONDITION_TYPE_EVENT_CURRENT]]
 		];
 
 		return ['type' => API_OBJECT, 'fields' => [
@@ -751,7 +752,7 @@ class CCepRule extends CApiService {
 			'operator' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])],
-								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO])]
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED, ZBX_CONDITION_TYPE_EVENT_CURRENT])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO])]
 			]],
 			'tag' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_condition', 'tag')],

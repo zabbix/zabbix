@@ -563,7 +563,7 @@ window.ceprule_edit_popup = new class {
 				sortorder: this.#getNextSortorder(),
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
-				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
+				type: <?= CCepRuleHelper::OP_SET_NAME ?>,
 				suppress_time_option: '<?= ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE ?>',
 				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
@@ -575,13 +575,7 @@ window.ceprule_edit_popup = new class {
 				filter: {
 					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
 					formula: '',
-					conditions: [{
-						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
-						operator: <?= CONDITION_OPERATOR_YES ?>,
-						tag: '',
-						tag_name: '',
-						tag_value: ''
-					}]
+					conditions: []
 				}
 			};
 		}
@@ -822,6 +816,7 @@ window.ceprule_edit_popup = new class {
 				case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
 				case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
 				case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>:
 					description_template = this.#template_operation_table_condition_property;
 					description_view.text = descriptions[condition.type][condition.operator];
 					break;
