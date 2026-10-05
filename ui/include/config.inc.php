@@ -32,20 +32,10 @@ catch (ConfigFileException $e) {
 	switch ($e->getCode()) {
 		case CConfigFile::CONFIG_NOT_FOUND:
 			redirect('setup.php');
-			exit;
 
 		case CConfigFile::CONFIG_ERROR:
 			echo (new CView('general.warning', [
 				'header' => 'Configuration file error',
-				'messages' => [$e->getMessage()],
-				'theme' => ZBX_DEFAULT_THEME
-			]))->getOutput();
-
-			exit;
-
-		case CConfigFile::CONFIG_VAULT_ERROR:
-			echo (new CView('general.warning', [
-				'header' => _('Vault connection failed.'),
 				'messages' => [$e->getMessage()],
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();

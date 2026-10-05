@@ -18,7 +18,6 @@ class CConfigFile {
 
 	const CONFIG_NOT_FOUND = 1;
 	const CONFIG_ERROR = 2;
-	const CONFIG_VAULT_ERROR = 3;
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
