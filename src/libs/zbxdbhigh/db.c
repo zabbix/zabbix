@@ -616,6 +616,7 @@ out:
  ******************************************************************************/
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
+	char		*formatted_auth_token_hash_esc = NULL;
 	int		ret = FAIL;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
@@ -631,6 +632,8 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 		goto out;
 	}
 
+	formatted_auth_token_hash_esc = zbx_db_dyn_escape_string(formatted_auth_token_hash);
+
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
 				" from token t,users u,role r"
@@ -639,8 +642,8 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-			(unsigned long)t)))
+			formatted_auth_token_hash_esc, ZBX_AUTH_TOKEN_ENABLED,
+			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t)))
 	{
 		goto out;
 	}
@@ -655,6 +658,7 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(formatted_auth_token_hash_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -1,5 +1,5 @@
 
-# MikroTik CRS354-48P-4S2QRM by SNMP
+# MikroTik CRS354-48P-4S+2Q+RM by SNMP
 
 ## Overview
 

@@ -37,7 +37,7 @@
 		});
 
 		$("#resetDefaults").click(function() {
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				title: <?= json_encode(_('Reset confirmation')) ?>,
 				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
 				buttons: [
@@ -143,6 +143,9 @@
 				position: Overlay.prototype.POSITION_CENTER,
 				trigger_element: this
 			});
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$head.$close_button.show();
 		});
 	});
 </script>

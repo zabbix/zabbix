@@ -35,7 +35,7 @@
 			this.tile_providers = tile_providers;
 			this.defaults = {
 				geomaps_tile_url: '',
-				geomaps_max_zoom: ''
+				geomaps_max_zoom: '0'
 			};
 
 			document.querySelector('[name="geomaps_tile_provider"]')

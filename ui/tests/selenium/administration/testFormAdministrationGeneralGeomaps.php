@@ -72,7 +72,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Tile provider' => 'Other',
 					'Tile URL' => '',
 					'Attribution text' => '',
-					'Max zoom level' => ''
+					'Max zoom level' => 0
 				]
 			]
 		];

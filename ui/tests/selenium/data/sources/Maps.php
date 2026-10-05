@@ -290,9 +290,8 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host_1']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
-						'label_location' => MAP_LABEL_LOC_TOP,
 						'x' => 139,
-						'y' => 27,
+						'y' => 69,
 						'zindex' => 0
 					],
 					// Host 2.
@@ -301,8 +300,8 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host_2']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 151,
-						'x' => 139,
-						'y' => 377,
+						'x' => 339,
+						'y' => 27,
 						'zindex' => 1
 					],
 					// Image.
