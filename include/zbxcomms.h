@@ -203,6 +203,9 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
+
+	/* limits tcp received packet size, overrides flags limits */
+	zbx_uint64_t			max_len_limit;
 }
 zbx_socket_t;
 
