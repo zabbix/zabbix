@@ -17093,6 +17093,30 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: queue httptest that could not be processed according to its       *
+ *          current delay                                                     *
+ *                                                                            *
+ * Parameter: now        - [IN] the current timestamp                         *
+ *            httptestid - [IN] the id of httptest to be queued               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+	{
+		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+		dc_httptest_queue(httptest);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get the configuration revision received from server               *
  *                                                                            *
  * Comments: The revision is accessed without locking because no other process*
