@@ -76,6 +76,30 @@ class CMenuHelper {
 			);
 		}
 
+		$submenu_apm = array_filter([
+			CWebUser::checkAccess(CRoleHelper::UI_APM_TRACES)
+				? (new CMenuItem(_('Traces')))
+					->setAction('apm.trace.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_APM_METRICS)
+				? (new CMenuItem(_('Metrics')))
+					->setAction('apm.metric.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_APM_LOGS)
+				? (new CMenuItem(_('Logs')))
+					->setAction('apm.log.list')
+				: null
+		]);
+
+		if ($submenu_apm) {
+			$menu->add(
+				(new CMenuItem(_('APM')))
+					->setId('apm')
+					->setIcon(ZBX_ICON_APM)
+					->setSubMenu(new CMenu($submenu_apm))
+			);
+		}
+
 		$submenu_services = [
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SERVICES)
 				? (new CMenuItem(_('Services')))

@@ -23,7 +23,7 @@ class CApmTrace extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'timestamp'				=> 'Timestamp',
 		'traceid'				=> 'TraceId',
 		'spanid'				=> 'SpanId',
@@ -44,7 +44,7 @@ class CApmTrace extends CApmGeneral {
 		'error_count'			=> 'error_count'
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Timestamp'				=> 'timestamp',
 		'TraceId'				=> 'traceid',
 		'SpanId'				=> 'spanid',
@@ -83,35 +83,34 @@ class CApmTrace extends CApmGeneral {
 			'time_from' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'traceids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'parent_spanids' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
 			'span_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
 			'min_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'max_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'status_code', 'status_message']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['trace_state', 'span_name', 'service_name', 'scope_name', 'scope_version', 'status_message']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
-			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -124,14 +123,34 @@ class CApmTrace extends CApmGeneral {
 	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
-		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
 
-		$inner_query = (new CClickHouseQuery())
-			->from('otel_traces', 'ti')
-			->select('ti.TraceId')
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
+
+		$use_span_filtering = $options['filter'] || $options['search']
+			|| ($options['resource_attributes'] !== null
+				&& array_filter($options['resource_attributes'],
+					static fn (array $attribute) => $attribute['key'] !== ''
+				)
+			)
+			|| ($options['span_attributes'] !== null
+				&& array_filter($options['span_attributes'],
+					static fn (array $attribute) => $attribute['key'] !== ''
+				)
+			);
+
+		$inner_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'ti', $db_schema, [
+			'sortfield' => !$use_span_filtering && !$options['countOutput'] ? $options['sortfield'] : [],
+			'sortorder' => !$use_span_filtering && !$options['countOutput'] ? $options['sortorder'] : []
+		]))
+			->select('DISTINCT ti.TraceId')
 			->where('ti.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
 			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']])
-			->group('ti.TraceId');
+			->where('ti.ParentSpanId=\'\'');
 
 		if ($options['traceids'] !== null) {
 			$inner_query->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
@@ -145,17 +164,15 @@ class CApmTrace extends CApmGeneral {
 			$inner_query->where('ti.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
 		}
 
-		if ($options['filter'] || $options['search']
-				|| $options['resource_attributes'] !== null || $options['span_attributes'] !== null) {
-			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema, [
-				'output' => ['TraceId'],
-				...array_intersect_key($options, array_flip(
-					['filter', 'search', 'searchByAny', 'startSearch', 'excludeSearch', 'searchWildcardsEnabled']
-				))
-			]))
+		if ($use_span_filtering) {
+			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema,
+				array_intersect_key($options, array_flip(['filter', 'search', 'searchByAny', 'startSearch',
+					'excludeSearch', 'searchWildcardsEnabled', 'sortfield', 'sortorder'
+				]))
+			))
 				->linkQuery($inner_query)
-				->where('to.TraceId IN ('.$inner_query->getSql().')')
-				->group('to.TraceId');
+				->select('DISTINCT to.TraceId')
+				->where('to.TraceId IN ('.$inner_query->getSql().')');
 
 			if ($options['resource_attributes'] !== null) {
 				CClickHouseHelper::addAttributeFilter($outer_query, 'to.ResourceAttributes',
@@ -173,38 +190,48 @@ class CApmTrace extends CApmGeneral {
 			$outer_query = $inner_query;
 		}
 
-		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema,
-			array_intersect_key($options, array_flip(['countOutput', 'limit']))
-		))
-			->linkQuery($outer_query)
-			->where('t.TraceId IN ('.$outer_query->getSql().')')
-			->group('t.TraceId');
-
-		foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
-			$query->select(match($field) {
-				'TraceId' => 't.TraceId',
-				'span_count' => 'count()',
-				'error_count' => 'countIf(t.StatusCode=\'Error\')',
-				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-			}, $field);
+		if (!$options['countOutput']) {
+			$outer_query
+				->limit($options['limit'])
+				->offset($options['offset']);
 		}
 
-		foreach ($options['sortfield'] as $i => $field) {
-			$order_by = match($field) {
-				'TraceId' => 't.TraceId',
-				'span_count' => 't.span_count',
-				'error_count' => 't.error_count',
-				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-			};
+		$query = (new CClickHouseQuery())
+			->linkQuery($outer_query)
+			->from('otel_traces', 't')
+			->where('t.TraceId IN ('.$outer_query->getSql().')');
 
-			$sort_order = $options['sortorder'];
-			$sort_order = match(true) {
-				is_string($sort_order) => $sort_order,
-				is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
-				default => ZBX_SORT_UP
-			};
+		if ($options['countOutput']) {
+			$query->select('count(DISTINCT t.TraceId) as rowscount');
+		}
+		else {
+			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
+				$query->select(match($field) {
+					'TraceId' => 't.TraceId',
+					'Timestamp' => 'anyIf(toUnixTimestamp64Nano(t.Timestamp),t.ParentSpanId=\'\')',
+					'span_count' => 'count()',
+					'error_count' => 'countIf(t.StatusCode=\'Error\')',
+					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
+				}, $field);
+			}
 
-			$query->order($order_by, $sort_order);
+			foreach ($options['sortfield'] as $i => $field) {
+				$order_by = match($field) {
+					'TraceId' => 't.TraceId',
+					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
+				};
+
+				$sort_order = $options['sortorder'];
+				$sort_order = match(true) {
+					is_string($sort_order) => $sort_order,
+					is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
+					default => ZBX_SORT_UP
+				};
+
+				$query->order($order_by, $sort_order);
+			}
+
+			$query->group('t.TraceId');
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
@@ -213,10 +240,10 @@ class CApmTrace extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
 			}
 
-			$db_traces[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
+			$db_traces[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
 		}
 
 		return $db_traces;

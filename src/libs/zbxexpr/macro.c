@@ -15,6 +15,7 @@
 #include "zbxexpr.h"
 
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbx_expression_constants.h"
 
 int	zbx_is_strict_macro(const char *macro)

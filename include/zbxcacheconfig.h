@@ -18,6 +18,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxeval.h"
+#include "zbxexpr.h"
 #include "zbxavailability.h"
 #include "zbxtelemetry.h"
 #include "zbxtime.h"
@@ -208,7 +209,6 @@ typedef struct
 	zbx_vector_ptr_pair_t 	script_params;
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
-	int			snmp_max_repetitions;
 	char			*query;
 	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
 	int			time_shift;
@@ -217,6 +217,10 @@ typedef struct
 	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
 	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
+	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
+	int			snmp_max_repetitions;
+	char			snmp_retries_orig[ZBX_ITEM_SNMP_RETRIES_LEN_MAX];
+	int			snmp_retries;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -261,7 +265,10 @@ typedef struct
 	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
+	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
 	int			snmp_max_repetitions;
+	char			snmp_retries_orig[ZBX_ITEM_SNMP_RETRIES_LEN_MAX];
+	int			snmp_retries;
 	unsigned char		preprocessing;
 }
 zbx_dc_snmp_item_t;
@@ -532,6 +539,8 @@ typedef struct
 	time_t				last_version_error_time;
 
 	int				pending_history;
+
+	char				*apm;
 }
 zbx_dc_proxy_t;
 
@@ -1108,6 +1117,8 @@ void	*zbx_dc_config_get_stats(int request);
 int	zbx_dc_config_get_last_sync_time(void);
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts);
 int	zbx_dc_config_get_proxypoller_nextcheck(void);
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy);
 
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
@@ -1788,13 +1799,17 @@ void	zbx_dc_config_local_release(void);
 void	zbx_dc_local_set_itservices_num(int num);
 int	zbx_dc_local_get_itservices_num(void);
 
-
 typedef struct zbx_correlation_config_handle *	zbx_correlation_config_handle_t;
 
 zbx_correlation_config_handle_t	zbx_correlation_config_open(void);
 void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
+
+/* APM */
+#define ZBX_SETTINGS_APM		"apm"
+
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 
 /* CEP */
 
