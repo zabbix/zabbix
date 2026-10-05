@@ -717,6 +717,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
+int	zbx_db_insert_execute_once(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);

@@ -60,6 +60,8 @@
 
 #define ZBX_MAX_IDS	950
 
+typedef int (*zbx_db_execute_f)(const char *fmt, ...);
+
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
@@ -1803,7 +1805,8 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause)
+static int	db_execute_overflowed_sql_impl(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause,
+		zbx_db_execute_f db_execute_func)
 {
 	int	ret = SUCCEED;
 
@@ -1839,7 +1842,7 @@ static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
-		if (ZBX_DB_OK > zbx_db_execute("%s", *sql + ZBX_SQL_EXEC_FROM))
+		if (ZBX_DB_OK > db_execute_func("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
 
 		*sql_offset = 0;
@@ -1848,6 +1851,11 @@ static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_
 	}
 
 	return ret;
+}
+
+static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause)
+{
+	return db_execute_overflowed_sql_impl(sql, sql_alloc, sql_offset, clause, zbx_db_execute);
 }
 
 /******************************************************************************
@@ -3099,17 +3107,7 @@ static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
 }
 #endif
 
-/******************************************************************************
- *                                                                            *
- * Purpose: executes the prepared database bulk insert operation              *
- *                                                                            *
- * Parameters: self - [IN] the bulk insert data                               *
- *                                                                            *
- * Return value: SUCCEED if the operation completed successfully or           *
- *               FAIL otherwise.                                              *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_insert_execute(zbx_db_insert_t *self)
+static int	db_insert_execute_impl(zbx_db_insert_t *self, int execute_once)
 {
 	int			ret = FAIL, i, j;
 	const zbx_db_field_t	*field;
@@ -3117,8 +3115,9 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	size_t			sql_command_alloc = 512, sql_command_offset = 0;
 
 #ifndef HAVE_ORACLE
-	char		*sql;
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	char			*sql;
+	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_db_execute_f	db_execute_func = (0 == execute_once ? zbx_db_execute : zbx_db_execute_once);
 
 #	ifdef HAVE_MYSQL
 	char		*sql_values = NULL;
@@ -3266,7 +3265,7 @@ retry_oracle:
 	for (j = 0; j < self->fields.values_num; j++)
 		zbx_db_clean_bind_context(&contexts[j]);
 
-	if (ZBX_DB_DOWN == rc)
+	if (ZBX_DB_DOWN == rc && 0 == execute_once)
 	{
 		if (0 < tries++)
 		{
@@ -3361,8 +3360,11 @@ retry_oracle:
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset, self->clause)))
+		if (SUCCEED != (ret = db_execute_overflowed_sql_impl(&sql, &sql_alloc, &sql_offset, self->clause,
+				db_execute_func)))
+		{
 			goto out;
+		}
 	}
 
 	if (16 < sql_offset)
@@ -3379,7 +3381,7 @@ retry_oracle:
 #	endif
 		zbx_db_end_multiple_update(sql, sql_alloc, sql_offset);
 
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > db_execute_func("%s", sql))
 			ret = FAIL;
 	}
 #endif
@@ -3397,6 +3399,50 @@ out:
 	zbx_free(contexts);
 #endif
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: executes the prepared database bulk insert operation              *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ * Return value: SUCCEED if the operation completed successfully or           *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: insert statements are retried until DB is up.                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_execute(zbx_db_insert_t *self)
+{
+	return db_insert_execute_impl(self, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: executes the prepared database bulk insert operation              *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ * Return value: SUCCEED if the operation completed successfully or           *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ * Comments: intended for connections opened with ZBX_DB_CONNECT_ONCE.        *
+ *           Insert statements are not retried if DB is down.                 *
+ *           Autoincrement is not implemented because zbx_db_get_maxid_num()  *
+ *           runs its own queries that retry until DB is up; ids must be set  *
+ *           by the caller.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_execute_once(zbx_db_insert_t *self)
+{
+	if (-1 != self->autoincrement)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	return db_insert_execute_impl(self, 1);
 }
 
 /******************************************************************************

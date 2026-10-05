@@ -138,7 +138,7 @@ out:
  ******************************************************************************/
 static int	set_group_nextid(const char *tablename, int num)
 {
-	zbx_db_result_t		result;
+	zbx_db_result_t		result = NULL;
 	int			ret = SUCCEED;
 	const zbx_db_table_t	*table;
 
@@ -165,15 +165,12 @@ static int	set_group_nextid(const char *tablename, int num)
 
 	if (NULL != zbx_db_fetch(result))
 	{
-		zbx_db_free_result(result);
-
 		if (ZBX_DB_OK > zbx_db_execute_once("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and"
 				" field_name='%s'", (zbx_uint64_t) num, table->table, table->recid))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot update nextid for table %s and field name from %s",
 					table->table, table->recid);
 			ret = FAIL;
-			goto out;
 		}
 	}
 	else if (ZBX_DB_OK > zbx_db_execute_once("insert into ids (table_name,field_name,nextid)"
@@ -182,14 +179,15 @@ static int	set_group_nextid(const char *tablename, int num)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot insert nextid for table %s and field name from %s", table->table,
 				table->recid);
 		ret = FAIL;
-		goto out;
 	}
+
+	zbx_db_free_result(result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s table:'%s' recid:'%s'", __func__, zbx_result_string(ret),
-			table->table, table->recid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s tablename:'%s'", __func__, zbx_result_string(ret), tablename);
 
 	return ret;
 }
+
 /******************************************************************************
  *                                                                            *
  * Comments: This function is used only for the hgset and ugset tables. Since *
@@ -231,9 +229,9 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 		gsetid++;
 	}
 
-	if (FAIL == zbx_db_insert_execute(db_gset) ||
-			FAIL == zbx_db_insert_execute(db_gset_groups) ||
-			FAIL == zbx_db_insert_execute(db_gset_parents))
+	if (FAIL == zbx_db_insert_execute_once(db_gset) ||
+			FAIL == zbx_db_insert_execute_once(db_gset_groups) ||
+			FAIL == zbx_db_insert_execute_once(db_gset_parents))
 	{
 		return FAIL;
 	}
@@ -480,7 +478,7 @@ static void	permissions_rebuild_task(void)
 	}
 	zbx_db_free_result(result);
 
-	res = zbx_db_insert_execute(&db_insert);
+	res = zbx_db_insert_execute_once(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED != res)
@@ -500,7 +498,7 @@ skip:
 	zbx_db_close();
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_WARNING, "permissions rebuild: %s", zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_INFORMATION, "permissions rebuild: %s", zbx_result_string(res));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -540,7 +538,7 @@ void	zbx_permissions_rebuild_start(void)
 			exit(EXIT_SUCCESS);
 		default: /* parent */
 			rebuild_pid = pid;
-			zabbix_log(LOG_LEVEL_WARNING, "process started [permissions rebuild]");
+			zabbix_log(LOG_LEVEL_INFORMATION, "process started [permissions rebuild]");
 	}
 
 	(void)zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -565,7 +563,7 @@ void	zbx_permissions_rebuild_poll(void)
 
 	rebuild_pid = ZBX_THREAD_HANDLE_NULL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "process finished [permissions rebuild]");
+	zabbix_log(LOG_LEVEL_INFORMATION, "process finished [permissions rebuild]");
 }
 
 /******************************************************************************
@@ -601,5 +599,5 @@ void	zbx_permissions_rebuild_stop(void)
 				zbx_strerror(errno));
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "process terminated [permissions rebuild]");
+	zabbix_log(LOG_LEVEL_INFORMATION, "process terminated [permissions rebuild]");
 }
