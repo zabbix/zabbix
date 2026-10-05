@@ -256,7 +256,6 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'template.dashboard.list')
 					->setArgument('templateid', $template['templateid'])
-					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['dashboards'])
 		],

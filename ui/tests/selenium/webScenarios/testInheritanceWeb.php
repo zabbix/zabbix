@@ -131,9 +131,9 @@ class testInheritanceWeb extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, $data['errors'][0], $data['errors'][1]);
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestCheckHeader('Web monitoring');
-				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
 	}

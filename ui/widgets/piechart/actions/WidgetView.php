@@ -241,7 +241,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($ds_items as $itemid => $ds_item) {
 			if (array_key_exists($itemid, $db_items)) {
-				$data_set['color'] = '#' . $ds_item['color'];
+				$data_set['color'] = '#'.$ds_item['color'];
 				$data_set['type'] = $ds_item['type'];
 
 				$metrics[] = $db_items[$itemid] + ['options' => $data_set];
@@ -320,14 +320,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 		}
 
-		$colors = getColorVariations('#'.$data_set['color'], count($items));
+		unset($data_set['hosts'], $data_set['items']);
 
-		unset($data_set['hosts'], $data_set['items'], $data_set['color']);
+		if ($data_set['dataset_aggregation'] == AGGREGATE_NONE) {
+			$colors = getColorVariations('#'.$data_set['color'], count($items));
 
-		foreach ($items as $item) {
-			$data_set['color'] = array_shift($colors);
-			$metrics[] = $item + ['options' => $data_set];
+			foreach ($items as $item) {
+				$data_set['color'] = array_shift($colors);
+				$metrics[] = $item + ['options' => $data_set];
+			}
 		}
+		else {
+			$data_set['color'] = '#'.$data_set['color'];
+
+			foreach ($items as $item) {
+				$metrics[] = $item + ['options' => $data_set];
+			}
+		}
+
+		unset($data_set['color']);
 
 		return $metrics;
 	}
