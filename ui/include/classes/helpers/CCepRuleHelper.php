@@ -376,7 +376,7 @@ class CCepRuleHelper {
 			],
 			ZBX_CONDITION_TYPE_EVENT_CURRENT => [
 				CONDITION_OPERATOR_YES => _('Current event'),
-				CONDITION_OPERATOR_NO => _('All events (except current)')
+				CONDITION_OPERATOR_NO => _('Not current event')
 			]
 		];
 	}
