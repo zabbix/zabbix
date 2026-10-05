@@ -128,7 +128,7 @@ class testUserMacroAccess extends CAPITest {
 		CTestDataHelper::cleanUp();
 	}
 
-	public static function getProvider() {
+	public static function getProvider(): iterable {
 		yield 'no filtering for "usermacro.access.user.1" return macros only for host user have access' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
@@ -312,7 +312,7 @@ class testUserMacroAccess extends CAPITest {
 		$this->assertSame($expected, $result['result']);
 	}
 
-	public static function updateProvider() {
+	public static function updateProvider(): iterable {
 		yield 'user permission "usermacro.access.user.1" fail' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
