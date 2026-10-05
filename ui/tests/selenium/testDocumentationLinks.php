@@ -861,7 +861,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// AIX by Zabbix agent, Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=66316',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=71781',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -869,7 +869,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Item prototype => FS [{#FSNAME}]: Get data.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=66319&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=71782&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -914,7 +914,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -922,7 +922,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger => AIX: FS [{#FSNAME}]: Space is low.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&triggerid=31082&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&triggerid=33103&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -2630,7 +2630,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
 			],
-			// #249 Start creating Item Card widget.
+			// #250 Start creating Item Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2646,6 +2646,34 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Item card',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
+				]
+			],
+			// #251 Administration -> Data source -> APM view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.db.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
+				]
+			],
+			// #252 APM -> Traces view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.trace.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/traces'
+				]
+			],
+			// #253 APM -> Metrics view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.metric.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/metrics'
+				]
+			],
+			// #254 APM -> Logs view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.log.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/logs'
 				]
 			]
 		];

@@ -36,6 +36,11 @@ final class CSettingsSchema {
 		'alert_usrgrpid' => [
 			'column' => 'value_usrgrpid'
 		],
+		'apm_global_db' => [
+			'column' => 'value_str',
+			'default' => '{}',
+			'length' => 65535
+		],
 		'auditlog_enabled' => [
 			'column' => 'value_int',
 			'default' => 1
@@ -548,6 +553,11 @@ final class CSettingsSchema {
 			'length' => 255
 		],
 		'timeout_zabbix_agent' => [
+			'column' => 'value_str',
+			'default' => '3s',
+			'length' => 255
+		],
+		'timeout_telemetry_query' => [
 			'column' => 'value_str',
 			'default' => '3s',
 			'length' => 255

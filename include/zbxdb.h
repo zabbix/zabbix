@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #define ZBX_DBVERSION_UNDEFINED			0
 
@@ -220,6 +221,16 @@ typedef enum
 }
 zbx_db_ext_err_code_t;
 
+/*****************************************************************************
+*                                                                            *
+* Version format for PostgreSQL, MySQL and MariaDB: MMmmuu                   *
+*          M = major version part                                            *
+*          m = minor version part                                            *
+*          u = patch version part                                            *
+*                                                                            *
+* Example: if the original DB version was 1.2.34 then 10234 is set           *
+*                                                                            *
+******************************************************************************/
 struct zbx_db_version_info_t
 {
 	/* information about database server */
@@ -260,6 +271,10 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+
+#if defined(HAVE_MYSQL)
+	int			mariadb_fork;
+#endif
 };
 
 typedef enum
@@ -276,13 +291,13 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
-#elif defined(HAVE_MYSQL)
-int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
 void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info);
+
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DB_TIMESTAMP()	"unix_timestamp()"
@@ -326,6 +341,7 @@ void	zbx_init_library_db(zbx_db_config_t *config);
 void	zbx_deinit_library_db(zbx_db_config_t *config);
 
 zbx_dbconn_t	*zbx_dbconn_create(void);
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config);
 void	zbx_dbconn_free(zbx_dbconn_t *db);
 
 int	zbx_dbconn_set_connect_options(zbx_dbconn_t *db, int options);
@@ -356,8 +372,11 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t * const *fields, int fields_num);
-void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args);
+void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		va_list args);
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...);
+void	zbx_dbconn_prepare_insert_table(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *db_table,
+		...);
 void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
 int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
@@ -545,6 +564,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t **fields, int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_prepare_table(zbx_db_insert_t *self, const zbx_db_table_t *db_table, ...);
 int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 const char	*zbx_db_last_strerr(void);
 zbx_err_codes_t	zbx_db_last_errcode(void);
