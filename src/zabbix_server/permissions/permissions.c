@@ -244,7 +244,8 @@ static int	permission_ugsets_add(zbx_dbconn_t *db, zbx_vector_uint64_t *ids)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: sql - [IN] SQL statement                                       *
+ * Parameters: db  - [IN] database connection                                 *
+ *             sql - [IN] SQL statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *
  *                                                                            *
  * Comments: Checks select query result assuming a ZBX_DB_CONNECT_ONCE        *
@@ -292,7 +293,6 @@ static int	permissions_rebuild_task(void)
 	char			*sql = NULL;
 	static const char	*tables[] = {"user_ugset", "host_hgset", "permission", "ugset_group", "ugset",
 			"hgset_group", "hgset"};
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
