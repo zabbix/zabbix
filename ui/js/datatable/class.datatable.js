@@ -173,18 +173,18 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
-	 * The promise that resolves when the current column resize operation is completed.
+	 * Whether a reload has been requested while being delayed.
 	 *
-	 * @type {Promise|null}
+	 * @type {boolean}
 	 */
-	#resize_promise = null;
+	#reload_requested = false;
 
 	/**
-	 * The function used to resolve the current column resize promise.
+	 * Whether reload is currently delayed.
 	 *
-	 * @type {Function|null}
+	 * @type {boolean}
 	 */
-	#resolve_resize = null;
+	#reload_delayed = false;
 
 	/**
 	 * The reference to the custom scrollbar track element.
@@ -1298,19 +1298,14 @@ class CDataTable {
 	}
 
 	getData(params = {}) {
-		const get_data = () => {
-			params = this.#getDataProviderParams({check_changes: false, force_load: false, ...params});
+		params = this.#getDataProviderParams({check_changes: false, force_load: false, ...params});
 
-			return this.#data_provider.getData(params);
-		};
-
-		return this.#resize_promise !== null
-			? this.#resize_promise.then(get_data)
-			: get_data();
+		return this.#data_provider.getData(params);
 	}
 
 	onInit(e) {
 		this.#has_data = false;
+		this.#reload_requested = false;
 
 		const {loading, loading_fadein, check_changes, force_load, reset} = {
 			loading: true,
@@ -1413,9 +1408,7 @@ class CDataTable {
 	}
 
 	onColumnResizeStart(e) {
-		this.#resize_promise = new Promise((resolve) => {
-			this.#resolve_resize = resolve;
-		});
+		this.#reload_delayed = true;
 
 		const {x, column_index, id} = e.detail;
 
@@ -1464,9 +1457,11 @@ class CDataTable {
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 
-		this.#resolve_resize?.();
-		this.#resolve_resize = null;
-		this.#resize_promise = null;
+		this.#reload_delayed = false;
+
+		if (this.#reload_requested) {
+			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+		}
 	}
 
 	onDataSort(e) {
@@ -1605,7 +1600,12 @@ class CDataTable {
 		handle.classList.remove(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 		if (this.#options_popup.isForceLoadOnClose()) {
-			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			if (this.#reload_delayed) {
+				this.#reload_requested = true;
+			}
+			else {
+				this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			}
 		}
 
 		this.#options_popup = null;
