@@ -603,6 +603,11 @@ class testTriggerCEP extends CIntegrationTest {
 	// testTriggerCEP_CepWindowPatternCloseWindowAfterRecovery().
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_AFTER_RECOVERY = self::CEP_RULE_NAME_PREFIX
 		.'window pattern close window after recovery';
+	// The tag correlation flavour of the same, whose window is closed by the "up" event being added to it rather than
+	// by a pattern match: the recovered events it holds have to reach the window closed execution point all the same,
+	// see testTriggerCEP_CepWindowTagCloseWindowAfterRecovery().
+	const CEP_RULE_WINDOW_TAG_CLOSE_AFTER_RECOVERY = self::CEP_RULE_NAME_PREFIX
+		.'window tag close window after recovery';
 	const CEP_TAG_WINDOW_CLOSED = 'window_closed';
 	const CEP_TAG_WINDOW_CLOSED_VALUE = 'closed';
 	// Every one of those flavours except the discarding ones is additionally run over a single id, the first of the
@@ -3466,6 +3471,19 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the tag correlation flavour of the close window scenario once more, with every event tagged as it
+	 * reaches the window closed execution point: its problems are closed by the trigger recovering before any window
+	 * closes, so the tag is what shows the closing window still reached them, see
+	 * prepareDataCepWindowCloseWindowOperations() with $tag_on_close.
+	 */
+	public function prepareDataCepWindowTagCloseWindowAfterRecovery() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_AFTER_RECOVERY, CCepRuleHelper::WHEN_EVENT_ADDED, false, false, false,
+			false, false, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the tag correlation flavour of the close window scenario that performs its close window operation
 	 * when an "up" event is evicted, so the window is ended by an event that never entered it, see
 	 * prepareDataCepWindowCloseWindowOperations().
@@ -3654,6 +3672,28 @@ HEREDOC;
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED),
 			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
+	 * @see prepareDataCepWindowPatternCloseWindowAfterRecovery()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowAfterRecoverySingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AFTER_RECOVERY),
+			CCepRuleHelper::WHEN_PATTERN_MATCHED, false, true, false, false, false, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowSingleService()
+	 * @see prepareDataCepWindowTagCloseWindowAfterRecovery()
+	 */
+	public function prepareDataCepWindowTagCloseWindowAfterRecoverySingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AFTER_RECOVERY),
+			CCepRuleHelper::WHEN_EVENT_ADDED, false, true, false, false, false, false, false, true
 		);
 	}
 
@@ -11945,6 +11985,23 @@ HEREDOC;
 	}
 
 	/**
+	 * The single id variant of testTriggerCEP_CepWindowPatternCloseWindowAfterRecovery: the one window holds a "down"
+	 * event of every discovered trigger, all of them closed by the recovery of those triggers before the "up" value of
+	 * the id lets the script report a match, so the window closed point has that many recovered events to reach - see
+	 * runEventAssessmentTestCepWindowCloseWindow() with $single_service and $recover_first.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowAfterRecoverySingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowAfterRecoverySingleService() {
+		$this->prepareDataCepWindowPatternCloseWindowAfterRecoverySingleService();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AFTER_RECOVERY), false, true, false,
+			false, false, true
+		);
+	}
+
+	/**
 	 * The same close window scenario with the same pattern match window, whose close window operation is this
 	 * time performed when an event is added to it, restricted to the "up" events, while its script never reports
 	 * a match:
@@ -12249,6 +12306,45 @@ HEREDOC;
 		$this->prepareDataCepWindowTagCloseWindow();
 
 		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE);
+	}
+
+	/**
+	 * The same tag correlation close window scenario, with the trigger recovered once the windows are full: the
+	 * recovery closes every "down" problem while the windows keep holding the closed events. The server is then
+	 * stopped and started, unless the restarts are turned off, so the windows come back holding events that are no
+	 * longer open problems. Only then is every id sent its "up" value, which enters the window of its id and closes
+	 * it, and that window has to reach the closed events it held at the window closed point - which the
+	 * CEP_TAG_WINDOW_CLOSED tag added there shows. The window type and the execution point that ends the window are
+	 * all that differ from testTriggerCEP_CepWindowPatternCloseWindowAfterRecovery, so the outcome must be the same -
+	 * see runEventAssessmentTestCepWindowCloseWindow() with $recover_first.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowAfterRecovery$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowAfterRecovery() {
+		$this->prepareDataCepWindowTagCloseWindowAfterRecovery();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_AFTER_RECOVERY, false,
+			false, false, false, false, true
+		);
+	}
+
+	/**
+	 * The single id variant of testTriggerCEP_CepWindowTagCloseWindowAfterRecovery: one id sent a "down" value per
+	 * discovered trigger, so the one window correlates the events of that many triggers, and the recovery of every one
+	 * of those triggers closes all of them while the window keeps holding them - across a restart as well, unless the
+	 * restarts are turned off. The "up" value of that id then enters the window and closes it, and every one of the
+	 * recovered events the window held has to reach the window closed point, which the CEP_TAG_WINDOW_CLOSED tag added
+	 * there shows - see runEventAssessmentTestCepWindowCloseWindow() with $single_service and $recover_first.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowAfterRecoverySingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowAfterRecoverySingleService() {
+		$this->prepareDataCepWindowTagCloseWindowAfterRecoverySingleService();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AFTER_RECOVERY), false, true, false,
+			false, false, true
+		);
 	}
 
 	/**
