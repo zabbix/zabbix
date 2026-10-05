@@ -17067,11 +17067,12 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue httptest to be processed according to the delay             *
+ * Purpose: queue httptest to be processed according to supplied delay and    *
+ *          store that delay as its current delay                             *
  *                                                                            *
- * Parameter: now        - [IN] the current timestamp                         *
- *            httptestid - [IN] the id of httptest to be queued               *
- *            delay      - [IN] the number of seconds between httptest        *
+ * Parameter: now        - [IN] current timestamp                             *
+ *            httptestid - [IN] ID of httptest to be queued                   *
+ *            delay      - [IN] number of seconds between httptest            *
  *                              processing                                    *
  *                                                                            *
  ******************************************************************************/
@@ -17096,8 +17097,8 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
  * Purpose: queue httptest that could not be processed according to its       *
  *          current delay                                                     *
  *                                                                            *
- * Parameter: now        - [IN] the current timestamp                         *
- *            httptestid - [IN] the id of httptest to be queued               *
+ * Parameter: now        - [IN] current timestamp                             *
+ *            httptestid - [IN] ID of httptest to be queued                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid)
