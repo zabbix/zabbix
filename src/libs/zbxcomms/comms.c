@@ -191,6 +191,9 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	hints.ai_family = AF_INET;
 #endif
 
+	if (SUCCEED == zbx_is_ip(ip))
+		hints.ai_flags = AI_NUMERICHOST;
+
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 		host[0] = '\0';
@@ -283,6 +286,9 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
+
+	if (SUCCEED == zbx_is_ip(host))
+		hints.ai_flags = AI_NUMERICHOST;
 
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
@@ -1029,6 +1035,9 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_flags = 0;
 	hints.ai_socktype = SOCK_STREAM;
+
+	if (SUCCEED == zbx_is_ip(addr))
+		hints.ai_flags = AI_NUMERICHOST;
 
 	if (0 != (err = getaddrinfo(addr, NULL, &hints, &ai)))
 	{
@@ -2715,6 +2724,9 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
+
+		if (SUCCEED == zbx_is_ip(start))
+			hints.ai_flags = AI_NUMERICHOST;
 
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
 		{
