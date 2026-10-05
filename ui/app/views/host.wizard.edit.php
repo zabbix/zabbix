@@ -285,7 +285,7 @@ function stepSelectTemplate($old_template_count): array {
 		),
 		new CTemplateTag('host-wizard-template-tags-more',
 			(new CButtonIcon(ZBX_ICON_MORE))
-				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP)
+				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER)
 		)
 	];
 }
@@ -750,11 +750,28 @@ function stepAddHostInterface(): array {
 								(new CLabel([
 									_('Max repetition count'),
 									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
-								], 'interfaces[#{row_index}][details][max_repetitions]')),
-								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
-									false, false, false
-								)
+								], 'interfaces[#{row_index}][details][max_repetitions]'))
+									->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][details][max_repetitions]', 0,
+									false,
+									DB::getFieldLength('interface_snmp', 'max_repetitions')
+								))
+									->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+									->setAriaRequired()
 							]))->addClass('js-snmp-repetition-count'),
+							(new CFormField([
+								(new CLabel([
+									_('Retries'),
+									makeHelpIcon(_('Maximum number of retries after a timeout for walk[]/get[] items. For walk[], retries are shared across the entire walk. 0 disables retries.'))
+								], 'interfaces[#{row_index}][details][retries]'))
+									->setAsteriskMark(),
+								(new CTextBox('interfaces[#{row_index}][details][retries]', 0,
+									false,
+									DB::getFieldLength('interface_snmp', 'retries')
+								))
+									->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+									->setAriaRequired()
+							]))->addClass('js-snmp-retries'),
 							(new CFormField([
 								new CLabel(_('Context name'), 'interfaces[#{row_index}][details][contextname]'),
 								new CTextBox('interfaces[#{row_index}][details][contextname]', '', false,

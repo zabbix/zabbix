@@ -15,7 +15,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1037,7 +1037,7 @@ zabbix_export:
           description: 'Battery high temperature critical value'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'Battery maximum critical threshold'
             description: 'Battery high temperature critical value'
@@ -1047,7 +1047,7 @@ zabbix_export:
           description: 'Battery high temperature warning value'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Thresholds
             label: 'Battery maximum warning threshold'
             description: 'Battery high temperature warning value'
@@ -1057,7 +1057,7 @@ zabbix_export:
           description: 'Battery low temperature critical value'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'Battery minimum critical threshold'
             description: 'Battery low temperature critical value'
@@ -1067,7 +1067,7 @@ zabbix_export:
           description: 'Battery low temperature warning value'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             section_name: Thresholds
             label: 'Battery minimum warning threshold'
             description: 'Battery low temperature warning value'
@@ -1077,7 +1077,7 @@ zabbix_export:
           description: fault
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Other
             label: 'Charging critical status'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1086,7 +1086,7 @@ zabbix_export:
           description: disconnect
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Charging warning status'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1095,7 +1095,7 @@ zabbix_export:
           description: fault
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Other
             label: 'Load status critical (fault)'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1104,7 +1104,7 @@ zabbix_export:
           description: lvd
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Other
             label: 'Load status critical (lvd)'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1113,7 +1113,7 @@ zabbix_export:
           description: disconnect
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Other
             label: 'Load status warning (disconnect)'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1122,7 +1122,7 @@ zabbix_export:
           description: lvdWarning
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Other
             label: 'Load status warning (lvdWarning)'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1131,35 +1131,44 @@ zabbix_export:
           description: override
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Other
             label: 'Load status warning (override)'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '1'
+            section_name: Thresholds
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$VOLTAGE.MAX.CRIT}'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Voltage maximum critical threshold'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VOLTAGE.MAX.WARN}'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Voltage maximum warning threshold'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VOLTAGE.MIN.CRIT}'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Voltage minimum critical threshold'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VOLTAGE.MIN.WARN}'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Voltage minimum warning threshold'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1251,11 +1260,20 @@ zabbix_export:
               newvalue: NotUsed
   triggers:
     - uuid: fd5dcb256d4547da9c432c1b9c01b0ae
-      expression: '(last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)<10m)'
+      expression: |
+        (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>0 and change(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)<0 and last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime,#2)<42949672.96-(lastclock(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)-lastclock(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime,#2)))
+        or (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)=0 and change(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)<0 and last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime,#2)<42949672.96-(lastclock(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)-lastclock(/Morningstar SunSaver MPPT by SNMP/status.net.uptime,#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>{$SNMP.UPTIME.WARN}
+        or last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)>{$SNMP.UPTIME.WARN}
       name: 'Morningstar SunSaver MPPT: Status: Device has been restarted'
-      event_name: 'Morningstar SunSaver MPPT: Status: Device has been restarted (uptime < 10m)'
+      event_name: 'Morningstar SunSaver MPPT: Status: Device has been restarted'
       priority: INFO
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       tags:
         - tag: scope

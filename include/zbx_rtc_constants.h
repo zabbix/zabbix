@@ -40,6 +40,8 @@
 #define ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT		25
 #define ZBX_RTC_DBPOOL_STATUS			26
 #define ZBX_RTC_STATUS				27
+#define ZBX_RTC_MW_GET_WORKER_COUNT		28
+#define ZBX_RTC_MW_GET_WORKER_LOAD		29
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100

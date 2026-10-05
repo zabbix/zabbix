@@ -30,7 +30,6 @@ abstract class CControllerHost extends CController {
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'severities' => [],
-		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
 		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
 		'page' => null
 	];

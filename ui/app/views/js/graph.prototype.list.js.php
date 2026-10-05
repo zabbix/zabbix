@@ -86,7 +86,11 @@
 				callback: ({data, event}) => {
 					uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`, [], false);
 
-					if (data.submit.success?.action === 'delete') {
+					if (data.submit?.redirect_url) {
+						const url = new URL(data.submit.redirect_url, location.href);
+						event.setRedirectUrl(url.href);
+					}
+					else if (data.submit.success?.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
 						url.searchParams.set('action', 'graph.prototype.list');

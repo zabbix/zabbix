@@ -118,11 +118,6 @@
 		}
 	}
 
-	.table-forms-second-column {
-		float: right;
-		line-height: 24px;
-	}
-
 	&.modal {
 		position: fixed;
 		overflow: hidden;
@@ -155,12 +150,6 @@
 
 				.table-forms-row-with-second-field {
 					position: relative;
-
-					.table-forms-second-column {
-						position: absolute;
-						top: 5px;
-						right: 8px;
-					}
 				}
 			}
 

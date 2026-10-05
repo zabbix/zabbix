@@ -583,7 +583,7 @@ class CDBHelper {
 
 					if ($value == TRIGGER_VALUE_TRUE) {
 						DB::insert('problem', [$fields], false);
-						DB::update('triggers', [
+						DB::update('trigger_rtdata', [
 							'values' => [
 								'value' => TRIGGER_VALUE_TRUE,
 								'lastchange' => CTestArrayHelper::get($event_fields, 'clock', $time)
@@ -599,7 +599,7 @@ class CDBHelper {
 						));
 
 						if ($problems) {
-							DB::update('triggers', [
+							DB::update('trigger_rtdata', [
 								'values' => [
 									'value' => TRIGGER_VALUE_FALSE,
 									'lastchange' => CTestArrayHelper::get($event_fields, 'clock', $time)

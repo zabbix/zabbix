@@ -76,6 +76,30 @@ class CMenuHelper {
 			);
 		}
 
+		$submenu_apm = array_filter([
+			CWebUser::checkAccess(CRoleHelper::UI_APM_TRACES)
+				? (new CMenuItem(_('Traces')))
+					->setAction('apm.trace.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_APM_METRICS)
+				? (new CMenuItem(_('Metrics')))
+					->setAction('apm.metric.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_APM_LOGS)
+				? (new CMenuItem(_('Logs')))
+					->setAction('apm.log.list')
+				: null
+		]);
+
+		if ($submenu_apm) {
+			$menu->add(
+				(new CMenuItem(_('APM')))
+					->setId('apm')
+					->setIcon(ZBX_ICON_APM)
+					->setSubMenu(new CMenu($submenu_apm))
+			);
+		}
+
 		$submenu_services = [
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SERVICES)
 				? (new CMenuItem(_('Services')))
@@ -174,10 +198,10 @@ class CMenuHelper {
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
 						'trigger.list?context=template', 'graph.list?context=template',
-						'host_discovery.php?context=template', 'item.prototype.list?context=template',
+						'lldrule.list?context=template', 'item.prototype.list?context=template',
 						'trigger.prototype.list?context=template', 'graph.prototype.list?context=template',
 						'host.prototype.list?context=template', 'httpconf.php?context=template',
-						'host_discovery_prototypes.php?context=template'
+						'lldrule.prototype.list?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -185,19 +209,19 @@ class CMenuHelper {
 					->setAction('host.list')
 					->setAliases([
 						'item.list?context=host', 'trigger.list?context=host', 'graph.list?context=host',
-						'host_discovery.php?context=host', 'item.prototype.list?context=host',
+						'lldrule.list?context=host', 'item.prototype.list?context=host',
 						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
 						'host.prototype.list?context=host', 'httpconf.php?context=host',
-						'host_discovery_prototypes.php?context=host'
+						'lldrule.prototype.list?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
 				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
-				? (new CMenuItem(_('Event correlation')))
-					->setAction('correlation.list')
-					->setAliases(['correlation.edit'])
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES)
+				? (new CMenuItem(_('Event processing')))
+					->setAction('ceprule.list')
+					->setAliases(['ceprule.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))
@@ -337,6 +361,13 @@ class CMenuHelper {
 		}
 
 		$submenu_administration = [
+			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
+				? (new CMenuItem(_('Data source')))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('APM')))
+							->setAction('apm.db.edit')
+					]))
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
 					->setId('main-menu-general')
@@ -433,10 +464,10 @@ class CMenuHelper {
 			$lang = CWebUser::getLang();
 			$menu
 				->add(
-					(new CMenuItem(_('Support')))
-						->setIcon(ZBX_ICON_SUPPORT)
-						->setUrl(new CUrl(getSupportUrl($lang)))
-						->setTitle(_('Zabbix Technical Support'))
+					(new CMenuItem(_('Subscriptions')))
+						->setIcon(ZBX_ICON_SUBSCRIPTIONS)
+						->setUrl(new CUrl(getSubscriptionsUrl($lang)))
+						->setTitle(_('Zabbix Subscriptions'))
 						->setTarget('_blank')
 				)
 				->add(

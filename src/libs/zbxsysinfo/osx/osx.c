@@ -25,7 +25,7 @@ static zbx_metric_t	parameters_specific[] =
 	{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"/,free"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	vfs_fs_inode,		"/,free"},
 	{"vfs.fs.discovery",	0,		vfs_fs_discovery,	NULL},
-	{"vfs.fs.get",		0,		vfs_fs_get,		NULL},
+	{"vfs.fs.get",		CF_HAVEPARAMS,	vfs_fs_get,		NULL},
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 

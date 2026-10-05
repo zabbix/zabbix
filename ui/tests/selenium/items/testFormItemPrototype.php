@@ -633,7 +633,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'Calculated',
 				'Dependent item',
 				'Script',
-				'Browser'
+				'Browser',
+				'Telemetry query'
 			]);
 			if (isset($data['type'])) {
 				$type_field->select($data['type']);
@@ -2435,7 +2436,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->filterEntriesAndOpenDiscovery($this->host);
-			$this->zbxTestClickLinkTextWait($this->discoveryRule);
+			$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $this->discoveryRule)
+					->query('link:Item prototypes')->waitUntilClickable()->one()->click();
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 			$this->zbxTestCheckHeader('Item prototypes');
 
@@ -2529,8 +2531,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->filterEntriesAndOpenDiscovery($this->host);
-			$this->zbxTestClickLinkTextWait($this->discoveryRule);
-			$this->zbxTestClickLinkTextWait('Item prototypes');
+			$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $this->discoveryRule)
+					->query('link:Item prototypes')->waitUntilClickable()->one()->click();
 
 			$this->zbxTestCheckboxSelect("itemids_$itemId");
 			$this->query('button:Delete')->one()->click();

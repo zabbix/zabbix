@@ -63,7 +63,7 @@ zabbix_export:
         2. Set the hostname or IP address of the node_exporter host in the `The node_exporter host` parameter. You can also change the Prometheus endpoint port in the `TCP Port node_exporter` parameter if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -138,7 +138,7 @@ zabbix_export:
           name: 'Get node_exporter metrics'
           type: HTTP_AGENT
           key: node_exporter.get
-          history: 1h
+          history: '0'
           value_type: TEXT
           url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
@@ -188,7 +188,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -215,7 +215,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -242,7 +242,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -269,7 +269,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -314,7 +314,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -392,7 +392,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -435,7 +435,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -462,7 +462,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -507,7 +507,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -534,7 +534,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                  	return acc + parseFloat(obj['value'])
+                    return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
             - type: MULTIPLIER
@@ -1070,32 +1070,17 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var newvalue;
-                      switch(value) {
-                        case "unknown":
-                      	newvalue = 0;
-                      	break;
-                        case "notpresent":
-                      	newvalue = 1;
-                      	break;
-                        case "down":
-                      	newvalue = 2;
-                      	break;
-                        case "lowerlayerdown":
-                      	newvalue = 3;
-                      	break;
-                        case "testing":
-                      	newvalue = 4;
-                      	break;
-                        case "dormant":
-                      	newvalue = 5;
-                      	break;
-                        case "up":
-                      	newvalue = 6;
-                      	break;  default:
-                      	newvalue = "Problem parsing interface operstate in JS";
-                      }
-                      return newvalue;
+                      var idx = {
+                        unknown: 0,
+                        notpresent: 1,
+                        down: 2,
+                        lowerlayerdown: 3,
+                        testing: 4,
+                        dormant: 5,
+                        up: 6
+                      };
+                      
+                      return typeof idx[value] === 'undefined' ? 'Problem parsing interface operstate in JS' : idx[value];
               master_item:
                 key: node_exporter.get
               tags:
@@ -1580,7 +1565,7 @@ zabbix_export:
               key: 'vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]'
               value_type: FLOAT
               units: '%'
-              description: 'Free metadata space expressed as a percentage.'
+              description: 'Free metadata space expressed in %.'
               preprocessing:
                 - type: PROMETHEUS_TO_JSON
                   parameters:
@@ -1588,8 +1573,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var inode_free;
-                      var inode_total;
+                      var inode_free,
+                      	inode_total;
                       
                       JSON.parse(value).forEach(function (metric) {
                       	if (metric['name'] == 'node_filesystem_files') {
@@ -1664,6 +1649,7 @@ zabbix_export:
                       		available = parseFloat(metric['value']);
                       	}
                       });
+                      
                       if ((total - free + available) <= 0){
                       	return 0;
                       } else {
@@ -1752,8 +1738,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var free;
-                      var total;
+                      var free,
+                      	total;
                       
                       JSON.parse(value).forEach(function(metric) {
                       	if (metric['name'] == 'node_filesystem_size_bytes'){
@@ -1862,15 +1848,14 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var filesystems = JSON.parse(value);
-                  
-                  result = filesystems.map(function (filesystem) {
-                  	return {
-                  		'mountpoint': filesystem.labels.mountpoint,
-                  		'fstype': filesystem.labels.fstype,
-                  		'device': filesystem.labels.device
-                  	};
-                  });
+                  var filesystems = JSON.parse(value),
+                  	result = filesystems.map(function (filesystem) {
+                  		return {
+                  			mountpoint: filesystem.labels.mountpoint,
+                  			fstype: filesystem.labels.fstype,
+                  			device: filesystem.labels.device
+                  		};
+                  	});
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1908,7 +1893,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '16'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -1918,7 +1903,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '15'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1928,7 +1913,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '6'
+            priority: '14'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -1938,14 +1923,14 @@ zabbix_export:
           value: '256'
           config:
             type: TEXT
-            priority: '9'
+            priority: '19'
             section_name: Thresholds
             label: 'Number of open filedescriptors'
             description: 'Configured max number of open filedescriptors. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
           value: '1.5'
-          description: 'Load per CPU considered sustainable. Tune if needed.'
+          description: 'The CPU load per core is considered sustainable. If necessary, it can be tuned.'
           config:
             type: TEXT
             priority: '2'
@@ -1955,7 +1940,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.AVAILABLE.MIN}'
           value: 20M
-          description: 'Used as a threshold in the memory available trigger.'
+          description: 'Used as a threshold in the available memory trigger.'
           config:
             type: TEXT
             priority: '4'
@@ -1977,16 +1962,16 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '28'
             section_name: Filters
-            label: 'Filter network interface by alias'
+            label: 'Filter network interface by alias (include)'
             description: 'Regex string to include discovered interface by alias.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '29'
             section_name: Filters
             label: 'Filter network interface by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -1995,34 +1980,34 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '17'
             section_name: Filters
-            label: 'Filter for network interface by name'
+            label: 'Filter for network interface by name (include)'
             description: 'Regex string to include discovered interface by name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '18'
             section_name: Filters
-            label: 'Filter for network interface by name (exclude)'
+            label: 'Filter for network interface by name'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '26'
             section_name: Filters
-            label: 'Filter network interface by status'
+            label: 'Filter network interface by status (include)'
             description: 'Regex string to include discovered interface by status.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^notpresent$
           description: 'Ignore `notpresent(1)`.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '27'
             section_name: Filters
             label: 'Filter network interface by status (exclude)'
             description: 'Regex string to exclude discovered interface by status.'
@@ -2031,7 +2016,7 @@ zabbix_export:
           description: 'The hostname or IP address of the node_exporter host.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '22'
             label: 'The node_exporter host'
             description: 'Hostname or IP address of the node_exporter host.'
         - macro: '{$NODE_EXPORTER_PORT}'
@@ -2039,26 +2024,26 @@ zabbix_export:
           description: 'TCP Port node_exporter is listening on.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '23'
             label: 'TCP Port node_exporter'
             description: 'TCP Port node_exporter is listening on. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
-          description: 'Warning threshold of the minimum free swap.'
+          description: 'The warning threshold of the minimum free swap.'
           config:
             type: TEXT
             priority: '5'
             section_name: Thresholds
             label: 'Threshold of the minimum free swap'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Warning threshold of the minimum free swap. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
           value: 60s
           description: 'The upper threshold for difference of system time.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '21'
             section_name: Thresholds
             label: 'The upper threshold for difference of system time'
             description: 'Upper threshold for difference of system time.'
@@ -2067,25 +2052,25 @@ zabbix_export:
           description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '20'
             section_name: Thresholds
             label: 'The lower threshold for difference of system time'
             description: 'Lower threshold for difference of system time.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
-          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '12'
             section_name: Filters
-            label: 'Filter for block device discovery'
+            label: 'Filter for block device discovery (include)'
             description: 'Regex string to include discovered block device.'
         - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '13'
             section_name: Filters
             label: 'Filter for block device discovery (exclude)'
             description: 'Regex string to exclude discovered block device.'
@@ -2094,7 +2079,7 @@ zabbix_export:
           description: 'Disk read average response time (in ms) before the trigger fires.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '24'
             label: 'The average read time (in ms)'
             description: 'Average response time (in ms) of disk read before the trigger fires. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -2103,7 +2088,7 @@ zabbix_export:
           description: 'Disk write average response time (in ms) before the trigger fires.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '25'
             label: 'The average write time (in ms)'
             description: 'Average response time (in ms) of disk write before the trigger fires. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -2114,7 +2099,7 @@ zabbix_export:
             type: TEXT
             priority: '32'
             section_name: Filters
-            label: 'Filter filesystem for device'
+            label: 'Filter filesystem for device (include)'
             description: 'Regex string to include discovered filesystem by device.'
         - macro: '{$VFS.FS.FSDEVICE.NOT_MATCHES}'
           value: ^\s$
@@ -2127,22 +2112,22 @@ zabbix_export:
             description: 'Regex string to exclude discovered filesystem by device.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '10'
             section_name: Filters
-            label: 'Filter filesystem by name'
-            description: 'Regex string to exclude discovered filesystem by name.'
+            label: 'Filter filesystem by name (include)'
+            description: 'Regex string to include discovered filesystem by name.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '11'
             section_name: Filters
             label: 'Filter filesystem by name (exclude)'
-            description: 'Regex string to include discovered filesystem by name.'
+            description: 'Regex string to exclude discovered filesystem by name.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
@@ -2150,7 +2135,7 @@ zabbix_export:
             type: TEXT
             priority: '30'
             section_name: Filters
-            label: 'Filter filesystem by type'
+            label: 'Filter filesystem by type (include)'
             description: 'Regex string to include discovered filesystem by type.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
@@ -2166,7 +2151,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '9'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization (critical)'
             description: 'Critical threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -2176,7 +2161,7 @@ zabbix_export:
           description: 'The warning threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '8'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization'
             description: 'Warning threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -2186,7 +2171,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '7'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization (critical)'
             description: 'Critical threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
@@ -2196,203 +2181,833 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '6'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization'
             description: 'Warning threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
-        - uuid: d0966792c5d04c4a92d9422114a09385
-          name: Filesystems
+        - uuid: 558606056f464970a7c544ba75d544f2
+          name: 'Linux Dashboard'
           pages:
             - name: Overview
               widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
+                - type: item
+                  width: '49'
+                  height: '1'
+                  hide_header: 'YES'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.descr[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
+                - type: gauge
+                  'y': '1'
+                  width: '10'
+                  height: '3'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.cpu.util[node_exporter]'
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
                       value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
                     - type: STRING
-                      name: reference
-                      value: AAAEB
-                - type: graphprototype
-                  'y': '5'
-                  width: '72'
-                  height: '5'
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: gauge
+                  'y': '4'
+                  width: '10'
+                  height: '3'
                   fields:
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Prom'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+                        key: 'vm.memory.util[node_exporter]'
                     - type: STRING
-                      name: reference
-                      value: AAAEC
-        - uuid: 19dac6b780aa49558bf4a3782ba4b3b6
-          name: 'Network interfaces'
-          pages:
-            - widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: itemnavigator
+                  name: 'Disk performance'
+                  'y': '7'
+                  width: '10'
+                  height: '6'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: group_by.0.attribute
+                      value: '3'
+                    - type: STRING
+                      name: group_by.0.tag_name
+                      value: disk
+                    - type: INTEGER
+                      name: item_tags.0.operator
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: storage
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: disk
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAAJ
-        - uuid: 558606056f464970a7c544ba75d544f2
-          name: 'System performance'
-          pages:
-            - widgets:
-                - type: graph
-                  width: '36'
-                  height: '5'
+                      value: PBTWV
+                    - type: INTEGER
+                      name: show_lines
+                      value: '500'
+                - type: svggraph
+                  name: CPU
+                  x: '10'
+                  'y': '1'
+                  width: '39'
+                  height: '3'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 4FC3F7
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Linux by Prom'
-                        name: 'Linux: System load'
+                        key: 'system.cpu.util[node_exporter]'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: EF5350
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.cpu.user[node_exporter]'
+                    - type: INTEGER
+                      name: ds.1.pointsize
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '2'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
                     - type: STRING
                       name: reference
-                      value: AAAAA
-                - type: graph
-                  'y': '5'
-                  width: '36'
-                  height: '5'
+                      value: PPZRN
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Memory
+                  x: '10'
+                  'y': '4'
+                  width: '39'
+                  height: '3'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 2196F3
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Linux by Prom'
-                        name: 'Linux: Memory usage'
+                        key: 'vm.memory.util[node_exporter]'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
                     - type: STRING
                       name: reference
-                      value: AAAAC
-                - type: graphprototype
+                      value: QTGYC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Disk
+                  x: '10'
+                  'y': '7'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7CB342
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: PBTWV._itemid
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GTYHI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Network
+                  x: '10'
                   'y': '10'
-                  width: '72'
-                  height: '5'
+                  width: '39'
+                  height: '3'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: ds.0.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Bits sent'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '6'
+                    - type: INTEGER
+                      name: ds.0.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Interface *(*): Bits sent'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
                       value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: INTEGER
+                      name: ds.0.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '5'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Bits received'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '6'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Interface *(*): Bits received'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAEA
-                - type: graphprototype
-                  'y': '15'
-                  width: '72'
+                      value: FPGPW
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: item
+                  x: '49'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.name[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.cpu.switches[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.cpu.load.avg1[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: item
+                  x: '49'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'vm.memory.available[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: piechart
+                  name: 'Used storage'
+                  x: '49'
+                  'y': '8'
+                  width: '16'
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: draw_type
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '11'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Available
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'FS [*]: Space: Available'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Used
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'FS [*]: Space: Used'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '8'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '10'
+                    - type: INTEGER
+                      name: stroke
+                      value: '10'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                - type: item
+                  name: 'Node exporter version'
+                  x: '57'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Prom'
-                        name: '{#DEVNAME}: Disk read/write rates'
+                        key: 'agent.version[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '2'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.uptime[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
                     - type: STRING
-                      name: reference
-                      value: AAAAF
-                - type: graphprototype
-                  'y': '20'
-                  width: '72'
-                  height: '5'
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '600'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3600'
+                - type: item
+                  x: '57'
+                  'y': '4'
+                  width: '8'
                   fields:
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Prom'
-                        name: '{#DEVNAME}: Disk average waiting time'
-                    - type: STRING
-                      name: reference
-                      value: AAAAG
-                - type: graphprototype
-                  'y': '25'
-                  width: '72'
-                  height: '5'
+                        key: 'system.cpu.num[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '6'
+                  width: '8'
                   fields:
                     - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
                       value:
                         host: 'Linux by Prom'
-                        name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: STRING
-                      name: reference
-                      value: AAAAH
-                - type: graphprototype
-                  'y': '30'
-                  width: '72'
-                  height: '5'
+                        key: 'vm.memory.total[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '4'
+                  width: '7'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'fd.open[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '6'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.swap.total[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '8'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.swap.free[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '10'
+                  width: '7'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by Prom'
+                        key: 'system.swap.pfree[node_exporter]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+            - name: Problems
+              widgets:
+                - type: problems
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: YHGQK
+                    - type: INTEGER
+                      name: show_opdata
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAI
-                - type: graph
-                  x: '36'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'Linux: CPU usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAB
-                - type: graph
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by Prom'
-                        name: 'Linux: Swap usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAD
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
+                    - type: INTEGER
+                      name: show_symptoms
+                      value: '1'
+                - type: toptriggers
+                  'y': '6'
+                  width: '72'
+                  height: '7'
       valuemaps:
         - uuid: 4827063819f14d539f509552c84f5f94
           name: ifOperStatus

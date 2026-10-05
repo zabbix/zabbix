@@ -33,7 +33,7 @@ zabbix_export:
         Create a Vault service token and set it to the host wizard configuration field `Vault auth token`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -286,13 +286,41 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
             params['url'] = params.scheme + '://'
             	+ params.host + ':'
             	+ params.port + '/v1/auth/token/lookup-accessor';
             
-            var request = new HttpRequest(),
+            var tls = new CTlsConfig(params.tls_verify);
+            tls.checkURL(params.url);
+            
+            var request = new HttpRequest(tls.options),
             	output = [];
             
             request.addHeader('X-Vault-Token: ' + params.token);
@@ -353,6 +381,8 @@ zabbix_export:
               value: '{$VAULT.API.PORT}'
             - name: scheme
               value: '{$VAULT.API.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"HashiCorp Vault"}'
             - name: token
               value: '{$VAULT.TOKEN}'
           tags:
@@ -2317,12 +2347,28 @@ zabbix_export:
         - tag: target
           value: vault
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HashiCorp Vault", e.g. {$HTTP.TLS.VERIFY:"HashiCorp Vault"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$VAULT.API.PORT}'
           value: '8200'
           description: 'Vault port.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '2'
             label: Port
             description: 'Vault port. In the range from 1 to 65535 inclusive.'
             required: 'YES'
@@ -2332,7 +2378,7 @@ zabbix_export:
           description: 'Vault API scheme.'
           config:
             type: LIST
-            priority: '2'
+            priority: '3'
             label: Scheme
             description: 'Vault API scheme.'
             required: 'YES'
@@ -2345,7 +2391,7 @@ zabbix_export:
           description: 'Vault host name.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: Address
             description: 'Vault host name.'
             required: 'YES'
@@ -2354,7 +2400,7 @@ zabbix_export:
           description: 'Maximum number of Vault leadership losses.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Max leadership losses'
             description: 'Maximum number of Vault leadership losses.'
@@ -2364,7 +2410,7 @@ zabbix_export:
           description: 'Maximum number of Vault leadership setup failed.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Max leadership setup failures'
             description: 'Maximum number of Vault leadership setup failed.'
@@ -2374,7 +2420,7 @@ zabbix_export:
           description: 'Maximum number of Vault leadership step downs.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Max leadership step downs'
             description: 'Maximum number of Vault leadership step downs.'
@@ -2384,7 +2430,7 @@ zabbix_export:
           description: 'Filter of discoverable storage backends.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Storage backend filter (include)'
             description: 'Filter of discoverable storage backends.'
@@ -2393,7 +2439,7 @@ zabbix_export:
           description: 'Maximum percentage of used file descriptors for trigger expression.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'Max file descriptors used (%)'
             description: 'Maximum percentage of used file descriptors for trigger expression. In the range from 0 to 100 inclusive.'
@@ -2403,7 +2449,7 @@ zabbix_export:
           description: 'Vault auth token.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'Vault auth token'
             description: 'Vault auth token.'
             required: 'YES'
@@ -2411,7 +2457,7 @@ zabbix_export:
           description: 'Vault accessors separated by spaces for monitoring token expiration time.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'Token accessors for expiration'
             description: 'Vault accessors separated by spaces for monitoring token expiration time.'
             required: 'YES'
@@ -2420,7 +2466,7 @@ zabbix_export:
           description: 'Token TTL critical threshold.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Token TTL critical limit'
             description: 'Token TTL critical threshold.'
@@ -2429,7 +2475,7 @@ zabbix_export:
           description: 'Token TTL warning threshold.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Token TTL warning limit'
             description: 'Token TTL warning threshold.'

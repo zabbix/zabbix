@@ -600,8 +600,8 @@ class CControllerPopupGeneric extends CController {
 			'monitored_hosts' =>					'in 1',
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
-			'with_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
+			'without_proxy_group' =>				'in 1',
 			'with_graphs' =>						'in 1',
 			'with_hosts' =>							'in 1',
 			'with_templates' =>						'in 1',
@@ -1783,6 +1783,10 @@ class CControllerPopupGeneric extends CController {
 					'output' => ['proxyid', 'name']
 				];
 
+				if ($this->hasInput('without_proxy_group')) {
+					$options['proxy_groupids'] = 0;
+				}
+
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
@@ -1875,6 +1879,7 @@ class CControllerPopupGeneric extends CController {
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
 				$context = $this->getInput('context', '');
+				$include_hostname = !$hostids;
 
 				if ($context === '' || (!$hostids && !$this->groupids && !$this->template_groupids)) {
 					break;
@@ -1887,12 +1892,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($hostids) {
-					$hosts = $context === 'host'
-						? API::Host()->get($options + ['hostids' => $hostids])
-						: API::Template()->get($options + ['templateids' => $hostids]);
-				}
-				else {
+				if (!$hostids) {
 					$options['limit'] = $limit;
 
 					$hosts = $context === 'host'
@@ -1914,11 +1914,10 @@ class CControllerPopupGeneric extends CController {
 				foreach ($db_valuemaps as $db_valuemap) {
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
-						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_values($db_valuemap['mappings']),
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
-					];
+					] + ($include_hostname ? ['hostname' => $hosts[$db_valuemap['hostid']]['name']] : []);
 
 					$records[$db_valuemap['valuemapid']] = $valuemap;
 				}

@@ -22,7 +22,7 @@
 <script>
 	const view = new class {
 		#layout_mode = null;
-		#refresh_interval = null;
+		#refresh_interval = 0;
 		#refresh_interval_id = null;
 		#filter_defaults = {};
 		#filter = null;
@@ -78,7 +78,9 @@
 			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.#active_filter !== this.#filter._active_item) {
+				const tabfilter_changed = this.#active_filter !== this.#filter._active_item;
+
+				if (tabfilter_changed) {
 					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
@@ -86,7 +88,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh();
+				this.#refresh({tabfilter_changed});
 			});
 
 			// Tags must be activated also using the enter button on keyboard.
@@ -168,18 +170,20 @@
 		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
 				user_configs}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'latest.view.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'latest.view.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			this.#datatable = new CDataTable(document.getElementById('datatable-latest'), data_provider)
 				.setColumns([
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('host')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('auto'),
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setColumnOptions({
 							show_item_key: filter.show_item_key == 1
@@ -206,7 +210,8 @@
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value'])
+						.setFields(['value_type', 'last_value', 'last_history_value'])
+						.setRenderer('last_value')
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
@@ -233,11 +238,14 @@
 				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [host, maintenance] = cell_data;
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const host_link = document.createElement('a');
-					host_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					host_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'host',
 						data: {
@@ -250,7 +258,7 @@
 					host_link.setAttribute('href', 'javascript:void(0);');
 					host_link.textContent = host.name;
 
-					cell_inner.appendChild(host_link);
+					flex_wrapper.appendChild(host_link);
 
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -260,9 +268,10 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (host.maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
-								? <?= json_encode(_('Maintenance without data collection')); ?>
-								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
+							let hint = `${escapeHtml(maintenance.name)} [${
+								maintenance.maintenance_type == MAINTENANCE_TYPE_NODATA
+									? <?= json_encode(_('Maintenance without data collection')); ?>
+									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + escapeHtml(maintenance.description);
@@ -280,19 +289,23 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						cell_inner.appendChild(maintenance_icon);
+						flex_wrapper.appendChild(maintenance_icon);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('name', ({column, cell_data, cell_inner}) => {
+				.setCellRenderer('name', ({column, cell_data, cell}) => {
 					const [itemid, description_expanded, name, key_expanded] = cell_data;
+
+					cell.innerHTML = '';
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
-					const action_container = document.createElement('div');
-					action_container.classList.add(ZBX_STYLE_ACTION_CONTAINER);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
 
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {
@@ -307,7 +320,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					action_container.appendChild(name_link);
+					flex_wrapper.appendChild(name_link);
 
 					if (description_expanded) {
 						const description_icon = document.createElement('button');
@@ -321,23 +334,27 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						action_container.innerHTML += ' ';
-						action_container.appendChild(description_icon);
+						flex_wrapper.appendChild(description_icon);
 					}
 
-					cell_inner.appendChild(action_container);
+					cell.appendChild(flex_wrapper);
 
 					const {show_item_key} = column.getColumnOptions();
 
-					if (show_item_key) {
+					if (show_item_key == 1) {
+						const overflow_ellipsis = document.createElement('div');
+						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+
 						const item_key = document.createElement('span');
 						item_key.classList.add(ZBX_STYLE_GREEN);
 						item_key.textContent = key_expanded;
 
-						cell_inner.appendChild(item_key);
+						overflow_ellipsis.appendChild(item_key);
+
+						cell.appendChild(overflow_ellipsis);
 					}
 				})
-				.setCellRenderer('type', ({cell_data, cell_inner}) => {
+				.setCellRenderer('type', ({cell_data, cell}) => {
 					const [type, state] = cell_data;
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
@@ -345,13 +362,50 @@
 						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
-						cell_inner.appendChild(type_container);
+						cell.appendChild(type_container);
 					}
 					else {
-						cell_inner.textContent = type;
+						cell.textContent = type;
 					}
 				})
-				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
+				.setCellRenderer('last_value', ({cell_data, cell}) => {
+					const [value_type, last_value, last_history_value] = cell_data;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
+					if (value_type == ITEM_VALUE_TYPE_BINARY) {
+						const italic = document.createElement('i');
+						italic.classList.add(ZBX_STYLE_GREY);
+						italic.textContent = last_value;
+
+						flex_wrapper.appendChild(italic);
+					}
+					else {
+						const span = document.createElement('span');
+						span.classList.add(ZBX_STYLE_CURSOR_POINTER, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+						span.textContent = last_value;
+
+						const hint = document.createElement('span');
+						hint.classList.add(ZBX_STYLE_HINTBOX_RAW_DATA, ZBX_STYLE_HINTBOX_WRAP);
+						hint.textContent = last_history_value;
+
+						if (last_history_value !== null
+								&& Array.from(last_history_value).length === ZBX_HINTBOX_HTML_LIMIT) {
+							hint.classList.add(ZBX_STYLE_TRIMMED_CONTENT);
+						}
+
+						span.setAttribute('data-hintbox-html', hint.outerHTML);
+						span.setAttribute('data-hintbox', '1');
+						span.setAttribute('data-hintbox-static', '1');
+						span.setAttribute('aria-expanded', 'false');
+
+						flex_wrapper.appendChild(span);
+					}
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, show_link] = cell_data;
 
 					if (!show_link) {
@@ -372,12 +426,7 @@
 						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 
-					cell_inner.appendChild(data_link);
-				})
-				.setCellRenderer('info', ({cell_data, cell_inner}) => {
-					const [item_icons] = cell_data;
-
-					cell_inner.appendChild(item_icons);
+					cell.appendChild(data_link);
 				})
 				.setOptionsHandler('name', CDataTableOptionsPopupMonitoringLatestName)
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
@@ -439,10 +488,8 @@
 		}
 
 		#removeRefreshMessage() {
-			if (this.#refresh_message_box !== null) {
-				this.#refresh_message_box.remove();
-				this.#refresh_message_box = null;
-			}
+			this.#refresh_message_box?.remove();
+			this.#refresh_message_box = null;
 		}
 
 		#addPopupMessage(message_box) {
@@ -461,34 +508,42 @@
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 
-		#refresh() {
-			if (isUserInteracting()) {
+		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
+			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
+
+			this.#unscheduleRefresh();
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
 			const filter = {...this.#filter_defaults, ...current_filter};
 
+			if (!tabfilter_changed) {
+				this.#datatable.updateUserConfig();
+			}
+
 			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.#onDataDone(response)
+					loading_fadein,
+					onSuccess: response => this.#onSuccess(response),
+					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
 		#refreshCounters(response) {
-			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.#layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 				return;
 			}
 
@@ -519,7 +574,7 @@
 			this.#initListActions();
 		}
 
-		#onDataDone(response) {
+		#onSuccess(response) {
 			this.#removeRefreshMessage();
 
 			this.#doRefresh(response.subfilter || null);
@@ -534,12 +589,16 @@
 		}
 
 		#scheduleRefresh() {
-			if (this.#refresh_interval == 0) {
+			if (this.#refresh_interval === 0) {
 				return;
 			}
 
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+
+			this.#refresh_interval_id = setInterval(
+				() => this.#refresh({loading_fadein: true}),
+				this.#refresh_interval
+			);
 		}
 
 		#unscheduleRefresh() {

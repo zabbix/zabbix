@@ -31,7 +31,6 @@ class CControllerHostView extends CControllerHost {
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'severities' =>				'array',
-			'show_suppressed' =>		'in '.ZBX_PROBLEM_SUPPRESSED_FALSE.','.ZBX_PROBLEM_SUPPRESSED_TRUE,
 			'maintenance_status' =>		'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON,
 			'sort' =>					'in name,status',
 			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,

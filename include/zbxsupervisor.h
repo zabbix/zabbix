@@ -23,8 +23,10 @@
 #define ZBX_RUNLEVEL_UNKNOWN		-1
 #define ZBX_RUNLEVEL_SUPERVISOR		0
 #define ZBX_RUNLEVEL_CACHESYNC		1
-#define ZBX_RUNLEVEL_TASKMANAGER	2
-#define ZBX_RUNLEVEL_DEFAULT		3
+#define ZBX_RUNLEVEL_CEP		2
+#define ZBX_RUNLEVEL_POSTSYNC		3
+#define ZBX_RUNLEVEL_STARTUP		4
+#define ZBX_RUNLEVEL_DEFAULT		5
 
 typedef enum
 {
@@ -71,7 +73,7 @@ typedef struct
 }
 zbx_thread_supervisor_args_t;
 
-int	zbx_supervisor_get_process_count(const int *config_forks);
+int	zbx_supervisor_prepare(const int *config_forks);
 
 zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb);

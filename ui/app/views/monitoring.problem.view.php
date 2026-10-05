@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -60,7 +60,7 @@ foreach ($data['filter_tabs'] as $tab) {
 	$filter->addTemplatedTab($tab['filter_name'], $tab);
 }
 
-// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
+// Set JavaScript options for tab filter initialization in monitoring.problem.view.js.php file.
 $data['filter_options'] = $filter->options;
 
 $this->includeJsFile('monitoring.problem.view.js.php', $data);
@@ -113,6 +113,7 @@ $html_page->show();
 		'filter' => $data['filter'],
 		'filter_defaults' => $data['filter_defaults'],
 		'filter_options' => $data['filter_options'],
+		'highlight_row_enabled' => $data['highlight_row_enabled'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],

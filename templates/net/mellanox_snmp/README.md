@@ -62,6 +62,7 @@ Refer to the vendor documentation.
 |{$NET.IF.IFTYPE.MATCHES}||`.*`|
 |{$NET.IF.IFTYPE.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$ICMP.LOSS.WARN}||`20`|
 |{$ICMP.RESPONSE_TIME.WARN}||`0.15`|
 |{$VFS.FS.FREE.MIN.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`5G`|
@@ -91,7 +92,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Mellanox: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Mellanox by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Mellanox: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Mellanox: No SNMP data collection</li></ul>|
+|Mellanox: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0],#2))) or (last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Mellanox by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Mellanox by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Mellanox by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Mellanox by SNMP/system.net.uptime[sysUpTime.0],#2)))`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Mellanox: No SNMP data collection</li></ul>|
 |Mellanox: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Mellanox by SNMP/system.name,#1)<>last(/Mellanox by SNMP/system.name,#2) and length(last(/Mellanox by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Mellanox: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Mellanox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Mellanox: Unavailable by ICMP ping</li></ul>|
 |Mellanox: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Mellanox by SNMP/icmpping,#3)=0`|High||

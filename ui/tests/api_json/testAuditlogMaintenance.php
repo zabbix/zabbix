@@ -56,6 +56,12 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 						'operator' => 0,
 						'value' => 'details'
 					]
+				],
+				'triggers' => [
+					['triggerid' => 134000]
+				],
+				'event_names' => [
+					['operator' => 3, 'value' => 'audit event']
 				]
 			]
 		]);
@@ -66,6 +72,12 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 		);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.zbx_dbstr($resourceid));
+		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_trigger WHERE maintenanceid='.
+				zbx_dbstr($resourceid)
+		);
+		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventname WHERE maintenanceid='.
+				zbx_dbstr($resourceid)
+		);
 
 		$created = json_encode([
 			'maintenance.name' => ['add', 'audit_maintenance'],
@@ -86,6 +98,15 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.tags['.$tags['maintenancetagid'].'].operator' => ['add', '0'],
 			'maintenance.tags['.$tags['maintenancetagid'].'].value' => ['add', 'details'],
 			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].']' => ['add'],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].'].triggerid' => ['add', '134000'],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].'].maintenance_triggerid'
+				=> ['add', $trigger['maintenance_triggerid']],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].']' => ['add'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].operator' => ['add', '3'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].value' => ['add', 'audit event'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].maintenance_eventnameid'
+				=> ['add', $event_name['maintenance_eventnameid']],
 			'maintenance.maintenanceid' => ['add', $resourceid]
 		]);
 
@@ -119,6 +140,12 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 						'operator' => 0,
 						'value' => 'updated_details'
 					]
+				],
+				'triggers' => [
+					['triggerid' => 134001]
+				],
+				'event_names' => [
+					['operator' => 3, 'value' => 'updated audit event']
 				]
 			]
 		]);
@@ -130,6 +157,12 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
 				zbx_dbstr(self::MAINTENANCEID)
 		);
+		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_trigger WHERE maintenanceid='.
+				zbx_dbstr(self::MAINTENANCEID)
+		);
+		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventname WHERE maintenanceid='.
+				zbx_dbstr(self::MAINTENANCEID)
+		);
 
 		$updated = json_encode([
 			'maintenance.groups[1]' => ['delete'],
@@ -137,6 +170,8 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.groups['.$groupid['maintenance_groupid'].']' => ['add'],
 			'maintenance.timeperiods['.$timeperiod['timeperiodid'].']' => ['add'],
 			'maintenance.tags['.$tags['maintenancetagid'].']' => ['add'],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].']' => ['add'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].']' => ['add'],
 			'maintenance.name' => ['update', 'updated_maintenance', 'maintenance_has_only_group'],
 			'maintenance.active_since' => ['update', '1458844500', '1539723600'],
 			'maintenance.active_till' => ['update', '1490466900', '1539810000'],
@@ -153,7 +188,15 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.tags['.$tags['maintenancetagid'].'].tag' => ['add', 'updated_audit'],
 			'maintenance.tags['.$tags['maintenancetagid'].'].operator' => ['add', '0'],
 			'maintenance.tags['.$tags['maintenancetagid'].'].value' => ['add', 'updated_details'],
-			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']]
+			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].'].triggerid' => ['add', '134001'],
+			'maintenance.triggers['.$trigger['maintenance_triggerid'].'].maintenance_triggerid'
+				=> ['add', $trigger['maintenance_triggerid']],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].operator' => ['add', '3'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].value'
+				=> ['add', 'updated audit event'],
+			'maintenance.event_names['.$event_name['maintenance_eventnameid'].'].maintenance_eventnameid'
+				=> ['add', $event_name['maintenance_eventnameid']]
 		]);
 
 		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MAINTENANCEID, self::RESOURCE_TYPE);

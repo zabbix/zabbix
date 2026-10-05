@@ -22,7 +22,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -577,11 +577,16 @@ zabbix_export:
                   value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 6040422dc0b34863a90af558d72956ee
-                  expression: 'last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m'
+                  expression: 'change(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<0 and last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"],#2)<42949672.96-(lastclock(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])-lastclock(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])>{$SNMP.UPTIME.WARN}'
                   name: 'NetApp FAS3220: Node {#NODE.NAME}: Host has been restarted'
-                  event_name: 'NetApp FAS3220: Node {#NODE.NAME}: {HOST.NAME} has been restarted (uptime < 10m)'
+                  event_name: 'NetApp FAS3220: Node {#NODE.NAME}: {HOST.NAME} has been restarted'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes.'
+                  description: |
+                    The uptime counter has decreased, which indicates that the host has been restarted.
+                    A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                    The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1530,7 +1535,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -1540,7 +1545,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -1571,6 +1576,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: 868292f4d7f84b0f854938c27f7c911e
           name: 'NetApp FAS3220: Overview'
@@ -1772,11 +1786,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: d33ca3f0d2f14feca01dce7bdf476776
-      expression: '(last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'NetApp FAS3220: Host has been restarted'
-      event_name: 'NetApp FAS3220: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'NetApp FAS3220: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'NetApp FAS3220: No SNMP data collection'

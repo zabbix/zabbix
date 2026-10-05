@@ -130,6 +130,16 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem([
+				(new CLabel(_('Telemetry query'), 'timeout_telemetry_query'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('timeout_telemetry_query', $data['timeout_telemetry_query'], false,
+						CSettingsSchema::getFieldLength('timeout_telemetry_query')
+					))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				)
+			])
 	)
 	->addItem(
 		(new CFormFieldset(_('Network timeouts for UI')))

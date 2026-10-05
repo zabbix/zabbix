@@ -28,8 +28,9 @@ class CDatatableElement extends CElement {
 	 * @var array
 	 */
 	protected $selectors = [
-		'header' => 'xpath:./div[contains(@class, "datatable-header")]/div[contains(@class, "cell-header")]',
-		'row' => 'xpath:./div[@class="datatable-body"]/div[contains(@class, "row")]',
+		'header' => 'xpath:./div[contains(@class, "datatable-header")]/div[contains(@class, "datatable-cell-header")]',
+		'row' => 'xpath:./div[@class="datatable-body"]/div[contains(@class, "datatable-row")]'.
+				'[not(contains(@style, "visibility: hidden"))]',
 		'column' => 'xpath:./*'
 	];
 
@@ -94,8 +95,13 @@ class CDatatableElement extends CElement {
 	 * @return CElement
 	 */
 	public function getHeaderByText($text = '') {
-		return $this->query($this->selectors['header'].'//span[text()='.CXPathHelper::escapeQuotes($text).']/..')
-				->waitUntilVisible()->one();
+		$index = array_search($text, $this->getHeadersText(), true);
+
+		if ($index === false) {
+			throw new Exception('Failed to find datatable header "'.$text.'".');
+		}
+
+		return $this->getHeaders()->get($index);
 	}
 
 	/**
@@ -109,7 +115,17 @@ class CDatatableElement extends CElement {
 		}
 
 		if ($this->headers_text === null) {
-			$this->headers_text = $this->getHeaders()->asText();
+			try {
+				$this->headers_text = $this->getHeaders()->asText();
+			}
+			catch (Exception $exception) {
+				/*
+				 * Headers can become stale while the datatable is re-rendering. Such headers cannot be reloaded,
+				 * because they are selected as a part of multi-element selection, so get them again and retry.
+				 */
+				$this->invalidate();
+				$this->headers_text = $this->getHeaders()->asText();
+			}
 		}
 
 		return $this->headers_text;
@@ -203,7 +219,7 @@ class CDatatableElement extends CElement {
 			? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
 			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
 
-		return $this->query('xpath:.//div[@class="datatable-body"]/div[contains(@class,"row")]/div[contains(@class, "cell-data")]'.
+		return $this->query('xpath:.//div[@class="datatable-body"]/div[contains(@class, "datatable-row")]/div[contains(@class, "datatable-cell-data")]'.
 				$suffix)->asTableRow(['parent' => $this, 'column_selector' => $this->selectors['column']])->one(false);
 	}
 

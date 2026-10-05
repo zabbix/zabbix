@@ -818,21 +818,29 @@ class testDocumentationLinks extends CWebTest {
 			// #71 Template LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=template',
+					'url' => 'zabbix.php?action=lldrule.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
 			// #72 Template LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=15000&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=15000&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #73 Template LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=15011&context=template',
+
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&context=template&itemid=15011',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -853,7 +861,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// AIX by Zabbix agent, Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=66316',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&context=template&parent_discoveryid=71781',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -861,7 +869,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Item prototype => FS [{#FSNAME}]: Get data.
-					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=66319&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=item.prototype.edit&itemid=71782&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/item_prototypes'
 				]
 			],
@@ -906,7 +914,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Discovery rule => Mounted filesystem discovery.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -914,7 +922,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					// Trigger => AIX: FS [{#FSNAME}]: Space is low.
-					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=66316&triggerid=31082&context=template',
+					'url' => 'zabbix.php?action=popup&popup=trigger.prototype.edit&parent_discoveryid=71781&triggerid=33103&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
@@ -988,7 +996,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
@@ -996,17 +1004,22 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={templateid}'.
-						'&parent_discoveryid={template_discoveryid}&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #91 Template LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
@@ -1014,8 +1027,9 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1218,21 +1232,28 @@ class testDocumentationLinks extends CWebTest {
 			// #114 Host LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=host',
+					'url' => 'zabbix.php?action=lldrule.list&context=host&filter_rst=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
 			// #115 Host LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=40001&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=40001&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #116 Host LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=90001&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&itemid=90001&context=host',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1384,7 +1405,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
@@ -1392,17 +1413,22 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={hostid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #134 Host LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
@@ -1410,8 +1436,9 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1575,8 +1602,8 @@ class testDocumentationLinks extends CWebTest {
 			// #155 Event correlation list view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/correlation'
+					'url' => 'zabbix.php?action=ceprule.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/ceprules'
 				]
 			],
 			// #156 Create event correlation form view.
@@ -1589,7 +1616,7 @@ class testDocumentationLinks extends CWebTest {
 			// #157 Edit event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.list',
+					'url' => 'zabbix.php?action=ceprule.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -2603,7 +2630,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
 			],
-			// #249 Start creating Item Card widget.
+			// #250 Start creating Item Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2619,6 +2646,34 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Item card',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
+				]
+			],
+			// #251 Administration -> Data source -> APM view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.db.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
+				]
+			],
+			// #252 APM -> Traces view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.trace.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/traces'
+				]
+			],
+			// #253 APM -> Metrics view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.metric.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/metrics'
+				]
+			],
+			// #254 APM -> Logs view.
+			[
+				[
+					'url' => 'zabbix.php?action=apm.log.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/logs'
 				]
 			]
 		];

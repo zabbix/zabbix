@@ -1206,6 +1206,8 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from trigger_discovery where", "triggerid", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_depends where", "triggerid_down", triggerids);
+	zbx_db_execute_multiple_query("delete from trigger_depends where", "triggerid_up", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
 	if (0 != selementids.values_num)
@@ -2394,7 +2396,8 @@ typedef struct
 	unsigned char	privprotocol;
 	unsigned char	version;
 	unsigned char	bulk;
-	int		max_repetitions;
+	char		*max_repetitions;
+	char		*retries;
 }
 zbx_interface_prototype_snmp_t;
 
@@ -2479,6 +2482,8 @@ static void	DBhost_interface_free(zbx_interfaces_prototype_t *interface)
 		zbx_free(interface->data.snmp->authpassphrase);
 		zbx_free(interface->data.snmp->privpassphrase);
 		zbx_free(interface->data.snmp->contextname);
+		zbx_free(interface->data.snmp->max_repetitions);
+		zbx_free(interface->data.snmp->retries);
 		zbx_free(interface->data.snmp);
 	}
 
@@ -3352,6 +3357,12 @@ static int	host_prototype_interfaces_compare(const zbx_interfaces_prototype_t *i
 
 		if (0 != strcmp(ifold->data.snmp->contextname, ifnew->data.snmp->contextname))
 			return FAIL;
+
+		if (0 != strcmp(ifold->data.snmp->max_repetitions, ifnew->data.snmp->max_repetitions))
+			return FAIL;
+
+		if (0 != strcmp(ifold->data.snmp->retries, ifnew->data.snmp->retries))
+			return FAIL;
 	}
 
 	return SUCCEED;
@@ -3447,7 +3458,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,s.community,"
 				"s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,s.authprotocol,"
-				"s.privprotocol,s.contextname,s.max_repetitions"
+				"s.privprotocol,s.contextname,s.max_repetitions, s.retries"
 			" from interface hi"
 				" left join interface_snmp s"
 					" on hi.interfaceid=s.interfaceid"
@@ -3499,7 +3510,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
-			snmp->max_repetitions = atoi(row[17]);
+			snmp->max_repetitions = zbx_strdup(NULL, row[17]);
+			snmp->retries = zbx_strdup(NULL, row[18]);
 			interface->data.snmp = snmp;
 		}
 		else
@@ -3537,7 +3549,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.interfaceid,hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,"
 					"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,"
-					"s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname,s.max_repetitions"
+					"s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname,"
+					"s.max_repetitions,s.retries"
 				" from interface hi"
 					" left join interface_snmp s"
 						" on hi.interfaceid=s.interfaceid"
@@ -3585,7 +3598,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 				ZBX_STR2UCHAR(snmp->authprotocol, row[15]);
 				ZBX_STR2UCHAR(snmp->privprotocol, row[16]);
 				snmp->contextname = zbx_strdup(NULL, row[17]);
-				snmp->max_repetitions = atoi(row[18]);
+				snmp->max_repetitions = zbx_strdup(NULL, row[18]);
+				snmp->retries = zbx_strdup(NULL, row[19]);
 				interface->data.snmp = snmp;
 			}
 			else
@@ -3863,7 +3877,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	{
 		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
 				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-				"privprotocol", "contextname", "max_repetitions", (char *)NULL);
+				"privprotocol", "contextname", "max_repetitions", "retries", (char *)NULL);
 	}
 
 	if (0 != new_inventory_modes)
@@ -4151,7 +4165,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							(int)interface->data.snmp->authprotocol,
 							(int)interface->data.snmp->privprotocol,
 							interface->data.snmp->contextname,
-							interface->data.snmp->max_repetitions);
+							interface->data.snmp->max_repetitions,
+							interface->data.snmp->retries);
 
 					zbx_audit_host_prototype_update_json_add_snmp_interface(audit_context_mode,
 							host_prototype->hostid, interface->data.snmp->version,
@@ -4164,7 +4179,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							interface->data.snmp->privprotocol,
 							interface->data.snmp->contextname,
 							interface->data.snmp->max_repetitions,
-							interface->interfaceid);
+							interface->interfaceid,
+							interface->data.snmp->retries);
 				}
 			}
 		}
@@ -6421,18 +6437,19 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const zbx_uint64_t hostid, int audit_context_mode)
 {
 	char			*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc,
-				*contextname_esc;
+				*contextname_esc, *max_repetitions_esc, *retries_esc;
 	unsigned char		db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	static int		max_repetitions = 0;
+	const zbx_db_table_t	*tbl;
+	const char		*max_repetitions = NULL, *retries = NULL;
 	int			break_loop = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
 
 	result = zbx_db_select(
 			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
-			"authprotocol,privprotocol,contextname,max_repetitions"
+			"authprotocol,privprotocol,contextname"
 			" from interface_snmp"
 			" where interfaceid=" ZBX_FS_UI64,
 			interfaceid);
@@ -6491,18 +6508,16 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	privpassphrase_esc = zbx_db_dyn_escape_field("interface_snmp", "privpassphrase", privpassphrase);
 	contextname_esc = zbx_db_dyn_escape_field("interface_snmp", "contextname", contextname);
 
-	if (0 == max_repetitions)
+	if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
 	{
-		const zbx_db_table_t	*tbl;
-
-		if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_exit(EXIT_FAILURE);
-		}
-
-		max_repetitions = atoi(zbx_db_get_field(tbl, "max_repetitions")->default_value);
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_exit(EXIT_FAILURE);
 	}
+
+	max_repetitions = zbx_db_get_field(tbl, "max_repetitions")->default_value;
+	max_repetitions_esc = zbx_db_dyn_escape_field("interface_snmp", "max_repetitions", max_repetitions);
+	retries = zbx_db_get_field(tbl, "retries")->default_value;
+	retries_esc = zbx_db_dyn_escape_field("interface_snmp", "retries", retries);
 
 	if (NULL == row)
 	{
@@ -6516,7 +6531,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 
 		zbx_audit_host_update_json_add_snmp_interface(audit_context_mode, hostid, version, bulk, community_esc,
 				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,
-				privprotocol, contextname_esc, max_repetitions, interfaceid);
+				privprotocol, contextname_esc, max_repetitions_esc, interfaceid, retries_esc);
 	}
 	else
 	{
@@ -6540,8 +6555,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		zbx_audit_host_update_json_update_snmp_interface(audit_context_mode, hostid, db_version, version,
 				db_bulk, bulk, row[2], community_esc, row[3], securityname_esc, db_securitylevel,
 				securitylevel, row[5], authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol,
-				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc,
-				max_repetitions, max_repetitions, interfaceid);
+				authprotocol, db_privprotocol, privprotocol, row[9], contextname_esc, interfaceid);
 	}
 
 	zbx_free(community_esc);
@@ -6549,6 +6563,8 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	zbx_free(authpassphrase_esc);
 	zbx_free(privpassphrase_esc);
 	zbx_free(contextname_esc);
+	zbx_free(max_repetitions_esc);
+	zbx_free(retries_esc);
 out:
 	zbx_db_free_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

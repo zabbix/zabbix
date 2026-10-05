@@ -267,7 +267,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Input, radio and single checkboxes.
-		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'show_suppressed'].forEach((key) => {
+		['name', 'ip', 'dns', 'port', 'status', 'evaltype'].forEach((key) => {
 			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {
@@ -285,31 +285,12 @@ if (array_key_exists('render_html', $data)) {
 
 		// Initialize src_url.
 		this.resetUnsavedState();
-		this.on(TABFILTERITEM_EVENT_ACTION, update.bind(this));
 	}
 
-	function expand(data, container) {
+	function expand(data) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
 		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
-	}
-
-	/**
-	 * On filter apply or update buttons press update disabled UI fields.
-	 *
-	 * @param {CustomEvent} ev    CustomEvent object.
-	 */
-	function update(ev) {
-		let action = ev.detail.action,
-			container = this._content_container;
-
-		if (action !== 'filter_apply' && action !== 'filter_update') {
-			return;
-		}
-
-		$('[name="show_suppressed"]', container)
-			.filter(':disabled')
-			.prop('checked', false);
 	}
 
 	// Tab filter item events handlers.
@@ -317,6 +298,6 @@ if (array_key_exists('render_html', $data)) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
-		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+		expand.call(ev.detail, ev.detail._data);
 	});
 </script>

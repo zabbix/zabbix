@@ -50,6 +50,9 @@ class CControllerHostViewData extends CControllerDataTable {
 		$custom_text = $this->extractCustomText($options);
 		$this->flattenColumnOptions($options);
 
+		$show_suppressed = array_key_exists('show_suppressed', $options)
+			&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE;
+
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
@@ -58,8 +61,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? (array_key_exists('show_suppressed', $options)
-					&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
+				? ($show_suppressed ? null : false)
 				: null,
 			'search' => [
 				'name' => $filter['name'] === '' ? null : $filter['name'],
@@ -133,8 +135,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => array_key_exists('show_suppressed', $options)
-				&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
+			'suppressed' => $show_suppressed ? null : false,
 			'symptom' => false
 		]);
 
@@ -142,7 +143,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'countOutput' => true,
 			'groupCount' => true,
 			'hostids' => array_keys($hosts),
-			'webitems' =>true,
+			'webitems' => true,
 			'monitored' => true
 		]);
 		$items_count = $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
