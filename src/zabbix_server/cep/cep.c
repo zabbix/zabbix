@@ -655,7 +655,7 @@ void	cep_load_problems_by_eventids(zbx_cep_t *cep, zbx_dbconn_t *db, const zbx_v
 
 	zbx_vector_uint64_create(&cached_eventids);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select e.eventid,e.clock,e.severity,e.ns,e.source,e.object,e.objectid,e.name,"
 				"es.cause_eventid,e.flags,er.r_eventid"
 			" from events e"
@@ -663,9 +663,7 @@ void	cep_load_problems_by_eventids(zbx_cep_t *cep, zbx_dbconn_t *db, const zbx_v
 				" on e.eventid=es.eventid"
 			" left join event_recovery er"
 				" on e.eventid=er.eventid"
-			" where (e.source=%d or e.source=%d)"
-				" and",
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
+			" where");
 
 	zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "e.eventid", eventids);
 	zbx_dbconn_large_query_append_sql(&query, " order by e.eventid");
