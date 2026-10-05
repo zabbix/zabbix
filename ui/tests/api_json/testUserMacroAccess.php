@@ -113,6 +113,12 @@ class testUserMacroAccess extends CAPITest {
 						['usrgrpid' => ':user_group:usermacro.access.usergroup3']
 					],
 					'roleid' => ':role:usermacro.access.admin.role'
+				],
+				[
+					'username' => 'usermacro.access.user.4',
+					'passwd' => '|-|e!1@ (/\)0rLD!',
+					'usrgrps' => [],
+					'roleid' => ':role:usermacro.access.user.role'
 				]
 			]
 		]);
@@ -131,6 +137,22 @@ class testUserMacroAccess extends CAPITest {
 			[
 				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
+		];
+
+		yield 'user without host permissions gets no macros' => [
+			['username' => 'usermacro.access.user.4', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'output' => ['hostmacroid', 'macro', 'value']
+			],
+			[]
+		];
+
+		yield 'user without host permissions gets zero macros' => [
+			['username' => 'usermacro.access.user.4', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'countOutput' => true
+			],
+			'0'
 		];
 
 		yield 'filter by hostids for "usermacro.access.user.1" return macros only for host user have access' => [
@@ -240,13 +262,44 @@ class testUserMacroAccess extends CAPITest {
 				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
+
+		yield 'editable returns macros from writable hosts' => [
+			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'output' => ['hostmacroid', 'macro', 'value'],
+				'editable' => true
+			],
+			[
+				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+			]
+		];
+
+		yield 'editable excludes macros from read-only hosts' => [
+			['username' => 'usermacro.access.user.3', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'output' => ['hostmacroid', 'macro', 'value'],
+				'editable' => true
+			],
+			[]
+		];
+
+		yield 'countOutput excludes macros from inaccessible hosts' => [
+			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
+			[
+				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2'],
+				'countOutput' => true
+			],
+			'1'
+		];
 	}
 
 	/**
 	 * @dataProvider getProvider
 	 */
-	public function testUserMacroAccessGet(array $login, array $request, array $expected): void {
-		CTestDataHelper::convertUserMacroReferences($expected);
+	public function testUserMacroAccessGet(array $login, array $request, array|string $expected): void {
+		if (is_array($expected)) {
+			CTestDataHelper::convertUserMacroReferences($expected);
+		}
 
 		if (array_key_exists('hostids', $request)) {
 			CTestDataHelper::convertValueReferences($request['hostids']);
