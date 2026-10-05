@@ -144,6 +144,10 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
+.......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
+..F....... [ZBX-28072] fixed maximum validation limit per request in validate.api.exists (uolekss)
 ...G...... [ZBX-27495] fixed excessive history upload delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27883] fixed inability to copy prototypes that depend on same trigger prototype when cloning template or host (vmaksimovs)
 ..F....... [ZBX-27065] fixed JavaScript error when closing standalone edit form with inline validation that performs server side checks (vmurzins)
@@ -182,6 +186,9 @@ Bug fixes:
 Changes for 7.4.11rc1
 
 Bug fixes:
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
+........S. [ZBX-28071] fixed hardcoded session key (sboidenko)
+..F....... [ZBX-28070] extended validation in CControllerValidateApiExists to check for specific options for each API (msnihach)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations Update interval, History, and Trends (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -264,6 +271,8 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .........T [ZBXNEXT-10403] implemented template for Huawei AR600 devices (kflorowski)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
+A.F....... [ZBX-28067] fixed OAuth client secret not being reset on OAuth token URL change (isharha)
 .........T [ZBX-27662] renamed GLPI media type (mruszczyk)
 ...G...... [ZBX-27542] fixed memory leak in Zabbix Agent 2 scheduler (mkorotkov)
 .D........ [ZBX-27179] fixed incorrect man page for Zabbix agent 2 (dbriedis)
@@ -1753,6 +1762,9 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
+.......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
 ...G...... [ZBX-27495] fixed excessive history upload delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27883] fixed inability to copy trigger prototypes that depend on same trigger prototype when cloning template or host (vmaksimovs)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
@@ -1782,6 +1794,7 @@ Changes for 7.0.27
 Changes for 7.0.27rc1
 
 Bug fixes:
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations Update interval, History, and Trends (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -1846,6 +1859,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
 .........T [ZBX-27662] renamed GLPI media type (mruszczyk)
 ...G...... [ZBX-27542] fixed memory leak in Zabbix Agent 2 scheduler (mkorotkov)
 .D........ [ZBX-27179] fixed incorrect man page for Zabbix agent 2 (dbriedis)
@@ -5900,6 +5914,9 @@ A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprih
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-28076] improved login handling (vbodrihins)
+.......PS. [ZBX-28075] fixed potential type mismatch in JS exception handling (MVekslers)
+A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 
@@ -5917,6 +5934,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-28068] fixed property name handling in JavaScript objects (averza)
 ..F....... [ZBX-27603] fixed issue with updating existing LDAP settings after LDAP host change (kkuzmina)
 A......... [ZBX-27306] prevented deletion of httptest item tags when "tags" parameter hasn't been passed to httptest.update API method (aluchko)
 
