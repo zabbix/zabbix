@@ -26,6 +26,8 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 	const HOSTNAME = 'test_web_scenario_dynamic_vars';
 	const BROKEN_COLUMN = 'agent_renamed';
+	// PostgreSQL and MySQL messages about the missing column
+	const BROKEN_COLUMN_ERROR = '(column t\\.agent does not exist|Unknown column .t\\.agent.)';
 
 	private static int $hostid = 0;
 	private static array $enabled_ids = [];
@@ -414,16 +416,16 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		DBexecute('alter table httptest rename column agent to '.self::BROKEN_COLUMN);
 
 		try {
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'column t.agent does not exist', true, 30);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, self::BROKEN_COLUMN_ERROR, true, 30, null, true);
 		}
 		finally {
 			DBexecute('alter table httptest rename column '.self::BROKEN_COLUMN.' to agent');
 		}
 
-		preg_match_all('/column t\.agent does not exist[^\[]*\[select h\.hostid[^\]]*t\.httptestid=(\d+)\]/',
+		preg_match_all('/'.self::BROKEN_COLUMN_ERROR.'[^\[]*\[select h\.hostid[^\]]*t\.httptestid=(\d+)\]/',
 				file_get_contents($log_path, false, null, $offset), $matches);
 
-		$httptestids = array_values(array_unique($matches[1]));
+		$httptestids = array_values(array_unique($matches[2]));
 		$this->assertNotEmpty($httptestids, 'Failed web scenario query was not found in server log');
 
 		return $httptestids;
