@@ -875,8 +875,19 @@ class testFormUserRoles extends CWebTest {
 
 		// The API method buttons are disabled by default.
 		$this->assertFalse($form->getField('API methods')->isEnabled());
-		$this->assertFalse($this->query('button:Select')->one()->isClickable());
+		$selector = 'xpath://div[@id="api_methods_"]/following::button[text()="Select"]';
+		$this->assertFalse($this->query($selector)->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
+
+		// After enabling API access again, API methods controls become active.
+		$form->fill(['Enabled' => true]);
+		$this->assertTrue($form->getField('API methods')->isEnabled());
+		$this->assertTrue($this->query($selector)->one()->isClickable());
+		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and not(@aria-disabled)]')->exists());
+		$this->query($selector)->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
+
+		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals(4, $form->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
