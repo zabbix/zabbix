@@ -594,25 +594,19 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
-				sizeof(error)))
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command,
+				macro_type, error, sizeof(error)))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
-			goto fail;
-
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
-				&host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid,
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig,
+				macro_type, error, sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
 		}
-
-		if (SUCCEED != substitute_webhook_macros(&script.command_orig, error, sizeof(error), manualinput))
-			goto fail;
 	}
 	else
 	{
@@ -622,14 +616,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
+					&user->userid, manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz,
 					(char **)&webhook_params.values[i].second, macro_type, error, sizeof(error)))
-			{
-				goto fail;
-			}
-
-			if (SUCCEED != substitute_webhook_macros((char **)&webhook_params.values[i].second, error,
-					sizeof(error), manualinput))
 			{
 				goto fail;
 			}
