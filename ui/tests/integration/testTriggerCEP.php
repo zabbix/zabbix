@@ -5411,10 +5411,14 @@ HEREDOC;
 	 *
 	 * The operations of every rule are then renumbered so their execution points come in the order the server
 	 * reaches them, which is the order the API insists on, see groupOperationsByExecuteWhen().
+	 *
+	 * Every operation that may be limited to the current event is limited to it, see
+	 * limitOperationsToCurrentEvent().
 	 */
 	private function upsertCepRule(array $rule_params): string {
 		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
 		$rule_params = self::groupOperationsByExecuteWhen($rule_params);
+		$rule_params = self::limitOperationsToCurrentEvent($rule_params);
 
 		// The rules of the scenario that ran before go here: they match the very same events and would keep
 		// closing the problems of this one. Everything this scenario has asked for since beginCepScenario()
@@ -5470,6 +5474,88 @@ HEREDOC;
 
 		foreach ($params['operations'] as $sortorder => &$operation) {
 			$operation['sortorder'] = $sortorder;
+		}
+		unset($operation);
+
+		return $params;
+	}
+
+	/**
+	 * The rule parameters $params with a "Current event" Yes condition AND-ed to the filter of every operation
+	 * whose execution point accepts one (event added, evicted and closed).
+	 *
+	 * At those points an operation is by default performed for every event of the window, not only for the event
+	 * that reached the point. The suite is written around the operation acting on that one event alone, which is
+	 * what the condition restores. An operation that already has a "Current event" condition of its own is left
+	 * as it is - it asks for a scope of its own and the API takes only one such condition per operation.
+	 *
+	 * The condition is AND-ed whatever the evaltype: under AND and AND/OR it is merely appended (it is of a type no
+	 * other condition shares, so AND/OR puts it in a group of its own), an OR filter becomes the custom expression
+	 * "(A or B or ...) and X" and a custom expression is wrapped as "(<formula>) and X".
+	 */
+	private static function limitOperationsToCurrentEvent(array $params): array {
+		$current_event = [
+			'type' => ZBX_CONDITION_TYPE_EVENT_CURRENT,
+			'operator' => CONDITION_OPERATOR_YES
+		];
+
+		foreach ($params['operations'] as &$operation) {
+			if (!in_array(ZBX_CONDITION_TYPE_EVENT_CURRENT,
+					CCepRuleHelper::OPERATION_CONDITION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']])) {
+				continue;
+			}
+
+			if (!array_key_exists('filter', $operation) || !$operation['filter']['conditions']) {
+				$operation['filter'] = [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [$current_event]
+				];
+
+				continue;
+			}
+
+			$filter = $operation['filter'];
+
+			if (in_array(ZBX_CONDITION_TYPE_EVENT_CURRENT, array_column($filter['conditions'], 'type'))) {
+				continue;
+			}
+
+			switch ($filter['evaltype']) {
+				case CONDITION_EVAL_TYPE_AND_OR:
+				case CONDITION_EVAL_TYPE_AND:
+					$filter['conditions'][] = $current_event;
+					break;
+
+				case CONDITION_EVAL_TYPE_OR:
+					$formulaids = [];
+
+					foreach ($filter['conditions'] as $i => &$condition) {
+						$condition['formulaid'] = chr(ord('A') + $i);
+						$formulaids[] = $condition['formulaid'];
+					}
+					unset($condition);
+
+					$formulaid = chr(ord('A') + count($filter['conditions']));
+					$filter = [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => '('.implode(' or ', $formulaids).') and '.$formulaid,
+						'conditions' => array_merge($filter['conditions'],
+							[['formulaid' => $formulaid] + $current_event]
+						)
+					];
+					break;
+
+				case CONDITION_EVAL_TYPE_EXPRESSION:
+					$used = array_column($filter['conditions'], 'formulaid');
+
+					for ($formulaid = 'A'; in_array($formulaid, $used); $formulaid++);
+
+					$filter['formula'] = '('.$filter['formula'].') and '.$formulaid;
+					$filter['conditions'][] = ['formulaid' => $formulaid] + $current_event;
+					break;
+			}
+
+			$operation['filter'] = $filter;
 		}
 		unset($operation);
 
