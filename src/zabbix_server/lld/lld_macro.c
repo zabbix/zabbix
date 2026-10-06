@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxparam.h"
+#include "zbxdbschema.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_macro_path_ptr, zbx_lld_macro_path_t *)
 
