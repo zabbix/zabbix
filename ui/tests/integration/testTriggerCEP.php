@@ -576,6 +576,13 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window simple close window evicted';
 	const CEP_RULE_WINDOW_TAG_CLOSE = self::CEP_RULE_NAME_PREFIX.'window tag close window';
 	const CEP_RULE_WINDOW_TAG_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window tag close window evicted';
+	// The close window flavours ended by a problem of the window being closed by its trigger recovering rather than
+	// by an "up" value, see prepareDataCepWindowCloseWindowOperations() with WHEN_EVENT_CLOSED.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX.'window simple close window on closed';
+	const CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX.'window tag close window on closed';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX.'window cause close window on closed';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX
+		.'window pattern close window on closed';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window cause close window';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window cause close window evicted';
 	// One flavour per window type is additionally run with the "down" values of a single id discarded as they occur,
@@ -3410,6 +3417,17 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the pattern match flavour of the close window scenario that performs its close window operation when
+	 * an event it holds is closed, so the window is ended by its trigger recovering while its script never reports a
+	 * match, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnClosed() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
+		);
+	}
+
+	/**
 	 * Prepare the simple window flavour of the close window scenario, whose close window operation is performed
 	 * when an "up" event is added to it. A simple window has no matching of its own, so this and the eviction
 	 * flavour
@@ -3430,6 +3448,17 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowOnEvicted() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour of the close window scenario that performs its close window operation when
+	 * an event it holds is closed, so the window is ended by its trigger recovering rather than by an "up" value,
+	 * see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnClosed() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
 		);
 	}
 
@@ -3455,6 +3484,17 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the tag correlation flavour of the close window scenario that performs its close window operation
+	 * when an event it holds is closed, so the window is ended by its trigger recovering rather than by an "up"
+	 * value, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseWindowOnClosed() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
+		);
+	}
+
+	/**
 	 * Prepare the cause and symptom flavour of the close window scenario, whose close window operation is
 	 * performed when an "up" event is added to it - and singles that event out by the rank its window has just
 	 * given it
@@ -3476,6 +3516,18 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowOnEvicted() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the close window scenario that performs its close window operation
+	 * when an event it holds is closed, so the window is ended by its trigger recovering rather than by an "up"
+	 * value - whichever of the cause and its symptoms that closes first, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowOnClosed() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
 		);
 	}
 
@@ -3935,7 +3987,12 @@ HEREDOC;
 	 *     one that needs a capacity limit, and it has room for exactly the "down" events of an id
 	 *     (getCloseWindowCapacity()): they take every place of its window, so the "up" event of that id finds them
 	 *     all taken and is evicted - without ever entering the window it ends. Being evicted rather than held is
-	 *     also why this flavour needs the extra "close" operation below.
+	 *     also why this flavour needs the extra "close" operation below;
+	 *   - WHEN_EVENT_CLOSED, which is reached by an event the window holds being closed - here by the recovery
+	 *     value of its trigger rather than by an "up" value, which this flavour is never sent. Any event the window
+	 *     holds closing means the id has recovered, so the operation keeps no condition, and the events of the
+	 *     window that were not closed with it - the ones of another trigger - are what the window closed
+	 *     operation below is left to close, see runEventAssessmentTestCepWindowCloseWindow().
 	 *
 	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE_MULTIPLE window does nothing of its own, so
 	 * the two event driven execution points are all it has; a WINDOW_SIMPLE_ONCE window correlates the events of a
@@ -4143,10 +4200,12 @@ HEREDOC;
 			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
 		];
 
-		// The pattern match execution point is reached only once the script has found the "up" event, and an aged
-		// flavour is reached by whichever event of the window is oldest - neither of them has anything for a condition
-		// to single out, so the operation is left unconditional there.
+		// The pattern match execution point is reached only once the script has found the "up" event, an aged
+		// flavour is reached by whichever event of the window is oldest and the event closed one by whichever event of
+		// the window its trigger recovered first - none of them has anything for a condition to single out, so the
+		// operation is left unconditional there.
 		$operations[] = $execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED || $aged
+				|| $execute_when == CCepRuleHelper::WHEN_EVENT_CLOSED
 			? $close_window
 			: $close_window + $close_window_condition;
 
@@ -12005,6 +12064,21 @@ HEREDOC;
 	}
 
 	/**
+	 * The same close window scenario with the same pattern match window, whose close window operation is this time
+	 * performed when an event the window holds is closed: the script never reports a match, no "up" value is sent at
+	 * all, and the recovery value of the trigger closing some of the problems of every window is what ends the
+	 * windows, which must close the problems of the other trigger they held - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnClosed$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnClosed() {
+		$this->prepareDataCepWindowPatternCloseWindowOnClosed();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED);
+	}
+
+	/**
 	 * The pattern match close window rule with one operation added: the "down" values of one id are discarded as they
 	 * occur, while its "up" values are kept and still end a window. The ids that were kept behave exactly as they do
 	 * without the discard - their "up" event completes what the script looks for and the match closes the window with
@@ -12185,6 +12259,20 @@ HEREDOC;
 	}
 
 	/**
+	 * The same close window scenario with the same simple window, whose close window operation is this time
+	 * performed when an event the window holds is closed: no "up" value is sent at all, the recovery value of the
+	 * trigger closes some of the problems of every window and that is what ends the windows, which must close the
+	 * problems of the other trigger they held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnClosed$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnClosed() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnClosed();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED);
+	}
+
+	/**
 	 * The simple window close window rule with the "down" values of one id discarded as they occur: the "up" values
 	 * of the other ids still close the window they enter and the problem it holds, while the discarded id never
 	 * opened a problem for a window to hold in the first place - see
@@ -12297,6 +12385,20 @@ HEREDOC;
 	}
 
 	/**
+	 * The same close window scenario with the same tag correlation window, whose close window operation is this
+	 * time performed when an event the window holds is closed: no "up" value is sent at all, the recovery value of
+	 * the trigger closes some of the problems of every window and that is what ends the windows, which must close
+	 * the problems of the other trigger they held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowOnClosed$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowOnClosed() {
+		$this->prepareDataCepWindowTagCloseWindowOnClosed();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED);
+	}
+
+	/**
 	 * The tag correlation close window rule with the "down" values of one id discarded as they occur: the discard is
 	 * decided before the event is handed to a window of any type, so it must keep an event out of a tag correlation
 	 * window exactly as it does out of the others, while the ids it does not match still correlate and close as
@@ -12372,6 +12474,21 @@ HEREDOC;
 		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvicted();
 
 		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED);
+	}
+
+	/**
+	 * The same close window scenario with the same cause and symptom window, whose close window operation is this
+	 * time performed when an event the window holds is closed: no "up" value is sent at all, and the recovery value
+	 * of the trigger closing some of the events of every window - the cause, its symptoms or both, whichever of them
+	 * came through that trigger - is what ends the windows, which must close the events of the other trigger they
+	 * held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowOnClosed$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnClosed() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowOnClosed();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED);
 	}
 
 	/**
@@ -15001,7 +15118,8 @@ return;
 	/**
 	 * The execution point the "close window" operation of the $name rule is performed at, which is what tells the
 	 * flavours of the close window family apart - the window of one is ended by the event being added to it, of
-	 * another by that event not fitting, and of a third by the script of the window reporting a match.
+	 * another by that event not fitting, of a third by the script of the window reporting a match and of a fourth by
+	 * an event it holds being closed.
 	 *
 	 * The rule is asked rather than the caller told, as it is asked whether its window keeps an event count (see
 	 * getCepRuleEventCountTag()): the family runs one assessment for every flavour, so what the assessment has to
@@ -15855,6 +15973,20 @@ return;
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
 	 *
+	 * The flavours ended at the event closed execution point (prepareDataCepWindowCloseWindowOperations() with
+	 * WHEN_EVENT_CLOSED) are the exception: they are never sent an "up" value, a recovery value is what ends their
+	 * windows. Which flavour that is, is read from the rule, as the execution point of the suppress points flavours
+	 * is (getCepRuleCloseWindowExecuteWhen()). Their steps are these instead:
+	 *   1. the "down" values of every id go through two triggers taking turns - the odd values of an id through the
+	 *      first one and the even values through the second - so the window of every id holds open problems of both;
+	 *   2. the recovery value "0" is sent through the first trigger alone. It returns to OK and its recovery event
+	 *      closes every problem it had - the ones of every id at once, so there is no id left untouched to compare
+	 *      against. Each of those is an event a window holds being closed, which is what reaches the event closed
+	 *      execution point and ends the window. The second trigger was sent nothing, so its problems can only be
+	 *      closed by the window closed operation of the closing windows: they are what tell the window having been
+	 *      ended apart from the recovery having merely closed the problems it was going to close anyway.
+	 * They are not combined with $discarded, $single_service, $doubled or $suppress_points.
+	 *
 	 * $discarded drives the flavours whose rule additionally discards the "down" values of one id
 	 * (getCloseWindowDiscardService()). The "up" values still end the windows of the ids around it, so what
 	 * changes is only what those windows have to give: the discarded id opens no problem in step 1, however many
@@ -15925,6 +16057,21 @@ return;
 		// value per discovered trigger instead, all of them going to the one id they drive.
 		$events = static::getCloseWindowEventCount($single_service);
 
+		// Whether the windows are ended by a recovery value closing an event they hold instead of by an "up" value.
+		$on_closed = $this->getCepRuleCloseWindowExecuteWhen($rule_name) == CCepRuleHelper::WHEN_EVENT_CLOSED;
+
+		if ($on_closed) {
+			$this->assertFalse($discarded || $single_service || $doubled || $suppress_points,
+				'The event closed flavour of "'.$rule_name.'" cannot be combined with a discarding, single window,'
+					.' doubled or suppress points flavour.'
+			);
+
+			// Both triggers have to be in every window, so every id needs at least one value for each of them.
+			$this->assertGreaterThan(1, $events, 'The event closed flavour of "'.$rule_name
+				.'" needs more than one value per id.'
+			);
+		}
+
 		// Which discovered triggers the values go through. The flavours that drive an id per window send everything
 		// through a single trigger - what they vary is the id, and one trigger produces the events of every id alike.
 		// The single id flavours vary the trigger instead: they drive one id, so every event of the run carries the
@@ -15935,11 +16082,27 @@ return;
 		// out of the group nor split the group into one window per trigger - and the problems the closing window then
 		// closes belong to that many triggers instead of all to one, each of which has to return to OK once the last
 		// of its own problems is gone.
+		//
+		// The event closed flavours use two triggers taking turns instead, the second one holding the problems only
+		// the closing windows can close, see the description of those flavours above.
 		$discovered = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
-		$keys = $single_service ? $discovered : [$discovered[0]];
+
+		if ($single_service) {
+			$keys = $discovered;
+		}
+		else {
+			$keys = $on_closed ? [$discovered[0], $discovered[1]] : [$discovered[0]];
+		}
 
 		$triggerids = $this->getTriggeridsForKeys(self::HOST_DISC_VALUE, $keys);
 		$all = array_values($triggerids);
+
+		// The trigger the $index-th value of the run goes through, that value being the $count-th of its id. The two
+		// triggers of the event closed flavours follow the count rather than the position in the run, so whatever
+		// the fill order is every id gets the same share of each.
+		$key_of = fn(int $index, int $count) => $on_closed
+			? $keys[($count - 1) % 2]
+			: $keys[$index % count($keys)];
 
 		// Every trigger the values will go through must start in OK state.
 		foreach ($this->getTriggers($all) as $t) {
@@ -15986,7 +16149,7 @@ return;
 		if (static::CEP_CLOSE_WINDOW_BATCH_FILL) {
 			$this->dispatchSenderValues(array_map(fn(array $step, int $index) => [
 				'host' => self::HOST_DISC_VALUE,
-				'key' => $keys[$index % count($keys)],
+				'key' => $key_of($index, $step[1]),
 				'value' => 'down_'.$step[0]
 			], $order, array_keys($order)));
 
@@ -16007,7 +16170,7 @@ return;
 		}
 		else {
 			foreach ($order as $index => [$service, $count]) {
-				$step_key = $keys[$index % count($keys)];
+				$step_key = $key_of($index, $count);
 
 				$send('down_'.$service, $step_key);
 
@@ -16035,6 +16198,14 @@ return;
 		// were - so the oldest event of every id has to carry the number of values that joined it, and no other event
 		// of the id may carry that tag at all. The rule says whether it keeps such a count, so the flavours whose
 		// window type does not are given nothing to look for.
+		if ($on_closed) {
+			// The odd values of every id went through the first trigger and the even ones through the second.
+			$held_open = count($services) * intdiv($events, 2);
+
+			$this->waitForOpenProblemCount([$triggerids[$keys[0]]], $open - $held_open);
+			$this->waitForOpenProblemCount([$triggerids[$keys[1]]], $held_open);
+		}
+
 		$counted_services = $discarded_service === null
 			? $services
 			: array_values(array_diff($services, [$discarded_service]));
@@ -16043,8 +16214,10 @@ return;
 		if ($event_count_tag !== '') {
 			// Which event of an id opened its window is only known when every event of the id went through the same
 			// trigger, which is what the flavours driving an id per window do - the single id ones give each value a
-			// trigger of its own, see $keys above.
-			$this->waitForCepWindowEventCounts($all, $event_count_tag, $counted_services, $events, !$single_service);
+			// trigger of its own and the event closed ones alternate two, see $keys above.
+			$this->waitForCepWindowEventCounts($all, $event_count_tag, $counted_services, $events,
+				!$single_service && !$on_closed
+			);
 		}
 
 		if ($suppress_points) {
@@ -16077,11 +16250,41 @@ return;
 		// The restart closes nothing on its way down or up, so what is open going into step 2 is what step 1 left.
 		$this->waitForOpenProblemCount($all, $open);
 
-		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it. A pattern
-		//    window whose script rejected what it was handed would throw instead of reporting a match, and the
-		//    server keeps that message on the rule, so it is reported here rather than leaving the problems simply
-		//    never closing.
-		foreach ($services as $service) {
+		// A pattern window whose script rejected what it was handed would throw instead of reporting a match, and the
+		// server keeps that message on the rule, so it is reported when the problems do not close rather than leaving
+		// them simply never closing.
+		$assert_no_rule_errors = function () use ($rule_names): void {
+			foreach ($rule_names as $name) {
+				$error = $this->getCepRuleError($name);
+
+				$this->assertSame('', $error, 'The rule "'.$name.'" reported an error: '.$error);
+			}
+		};
+
+		if ($on_closed) {
+			// 2. The recovery value closes the problems of the first trigger, which ends every window, and the
+			//    closing windows close the problems of the second trigger they were holding.
+			$send('0', $keys[0]);
+
+			try {
+				$this->waitForOpenProblemCount([$triggerids[$keys[0]]], 0,
+					'The recovery value must close every problem of its own trigger.'
+				);
+				$this->waitForOpenProblemCount([$triggerids[$keys[1]]], 0,
+					'The windows ended by the recovery value must close the problems of the other trigger they held.'
+				);
+			}
+			catch (Throwable $e) {
+				$assert_no_rule_errors();
+
+				throw $e;
+			}
+
+			$open = 0;
+		}
+
+		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it.
+		foreach ($on_closed ? [] : $services as $service) {
 			if ($service === $discarded_service) {
 				continue;
 			}
@@ -16096,11 +16299,7 @@ return;
 				$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
 			}
 			catch (Throwable $e) {
-				foreach ($rule_names as $name) {
-					$error = $this->getCepRuleError($name);
-
-					$this->assertSame('', $error, 'The rule "'.$name.'" reported an error: '.$error);
-				}
+				$assert_no_rule_errors();
 
 				throw $e;
 			}
