@@ -20,6 +20,7 @@ class CDocHelper {
 	const ADMINISTRATION_AUDITLOG_EDIT =						'web_interface/frontend_sections/administration/audit_log';
 	const ADMINISTRATION_AUTOREG_EDIT =							'web_interface/frontend_sections/administration/general#autoregistration';
 	const ADMINISTRATION_CONNECTOR_LIST =						'web_interface/frontend_sections/administration/general#connectors';
+	const ADMINISTRATION_DATA_SOURCE_APM_EDIT =					'web_interface/frontend_sections/administration/data_source#apm';
 	const ADMINISTRATION_GEOMAPS_EDIT =							'web_interface/frontend_sections/administration/general#geographical-maps';
 	const ADMINISTRATION_GUI_EDIT =								'web_interface/frontend_sections/administration/general#gui';
 	const ADMINISTRATION_HOUSEKEEPING_EDIT =					'web_interface/frontend_sections/administration/housekeeping';
@@ -45,6 +46,9 @@ class CDocHelper {
 	const ALERTS_MEDIATYPE_LIST =								'web_interface/frontend_sections/alerts/mediatypes';
 	const ALERTS_SCRIPT_EDIT =									'web_interface/frontend_sections/alerts/scripts#configuring-a-global-script';
 	const ALERTS_SCRIPT_LIST =									'web_interface/frontend_sections/alerts/scripts';
+	const APM_TRACE_VIEW =										'web_interface/frontend_sections/apm/traces';
+	const APM_METRIC_VIEW =										'web_interface/frontend_sections/apm/metrics';
+	const APM_LOG_VIEW =										'web_interface/frontend_sections/apm/logs';
 	const CONFIGURATION_DASHBOARDS_EDIT =						'web_interface/frontend_sections/dashboards#creating-a-dashboard';
 	const CONFIGURATION_DASHBOARDS_LIST =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const DASHBOARDS_LIST =										'web_interface/frontend_sections/dashboards';

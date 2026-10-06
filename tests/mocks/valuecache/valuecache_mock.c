@@ -27,6 +27,7 @@
 #include "history.h"
 #include "zbxcacheconfig.h"
 #include "zbx_dbversion_constants.h"
+#include "zbxcfg.h"
 
 #include <setjmp.h>
 #include <cmocka.h>
@@ -50,10 +51,10 @@ void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
-zbx_history_provider_t	*__wrap_history_sql_open(const zbx_history_option_t *options, int options_num, char **error);
-zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_history_option_t *options, int options_num,
+zbx_history_provider_t	*__wrap_history_sql_open(const zbx_config_option_t *options, int options_num, char **error);
+zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_config_option_t *options, int options_num,
 		char **error);
-zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_history_option_t *options, int options_num,
+zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_config_option_t *options, int options_num,
 		char **error);
 void	__wrap_zbx_elastic_version_extract(void);
 int	__wrap_zbx_elastic_version_get(void);
@@ -654,7 +655,7 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	return SUCCEED;
 }
 
-zbx_history_provider_t	*__wrap_history_sql_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*__wrap_history_sql_open(const zbx_config_option_t *options, int options_num, char **error)
 {
 	ZBX_UNUSED(options);
 	ZBX_UNUSED(options_num);
@@ -663,7 +664,7 @@ zbx_history_provider_t	*__wrap_history_sql_open(const zbx_history_option_t *opti
 	return NULL;
 }
 
-zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_history_option_t *options, int options_num,
+zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_config_option_t *options, int options_num,
 		char **error)
 {
 	ZBX_UNUSED(options);
@@ -673,7 +674,7 @@ zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_history_option_t *
 	return NULL;
 }
 
-zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_history_option_t *options, int options_num,
+zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_config_option_t *options, int options_num,
 		char **error)
 {
 	ZBX_UNUSED(options);

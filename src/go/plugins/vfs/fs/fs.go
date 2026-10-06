@@ -16,13 +16,9 @@ package vfsfs
 
 import (
 	"encoding/json"
-	"errors"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-)
-
-const (
-	errorInvalidParameters = "Invalid number of parameters."
 )
 
 const (
@@ -31,6 +27,13 @@ const (
 	statModeUsed
 	statModePFree
 	statModePUsed
+)
+
+var (
+	errInvalidParameters      = errs.New("invalid number of parameters")
+	errTooManyParameters      = errs.New("too many parameters")
+	errInvalidFirstParameter  = errs.New("invalid first parameter")
+	errInvalidSecondParameter = errs.New("invalid second parameter")
 )
 
 type FsStats struct {
@@ -58,7 +61,7 @@ type FsInfoNew struct {
 	DriveType  *string  `json:"fsdrivetype,omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
-	FsOptions  *string  `json:"options",omitempty"`
+	FsOptions  *string  `json:"options,omitempty"`
 }
 
 type Plugin struct {
@@ -67,84 +70,8 @@ type Plugin struct {
 
 var impl Plugin
 
-func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error) {
-	if len(params) != 0 {
-		return nil, errors.New(errorInvalidParameters)
-	}
-	var d []*FsInfo
-	if d, err = p.getFsInfo(); err != nil {
-		return
-	}
-	var b []byte
-	if b, err = json.Marshal(&d); err != nil {
-		return
-	}
-	return string(b), nil
-}
-
-func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
-	if len(params) != 0 {
-		return nil, errors.New(errorInvalidParameters)
-	}
-	var d []*FsInfoNew
-	if d, err = p.getFsInfoStats(); err != nil {
-		return
-	}
-	var b []byte
-	if b, err = json.Marshal(&d); err != nil {
-		return
-	}
-	return string(b), nil
-}
-
-func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (value interface{}, err error) {
-	if len(params) < 1 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
-	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
-	}
-	mode := statModeTotal
-	if len(params) == 2 {
-		switch params[1] {
-		case "total":
-		case "free":
-			mode = statModeFree
-		case "used":
-			mode = statModeUsed
-		case "pfree":
-			mode = statModePFree
-		case "pused":
-			mode = statModePUsed
-		default:
-			return nil, errors.New("Invalid second parameter.")
-		}
-	}
-
-	fsCaller := p.newFSCaller(getStats, 1)
-
-	var stats *FsStats
-	if stats, err = fsCaller.run(params[0]); err != nil {
-		return
-	}
-
-	switch mode {
-	case statModeTotal:
-		return stats.Total, nil
-	case statModeFree:
-		return stats.Free, nil
-	case statModeUsed:
-		return stats.Used, nil
-	case statModePFree:
-		return stats.PFree, nil
-	case statModePUsed:
-		return stats.PUsed, nil
-	}
-
-	return nil, errors.New("Invalid second parameter.")
-}
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+// Export returns the value of the requested filesystem metric.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	switch key {
 	case "vfs.fs.discovery":
 		return p.exportDiscovery(params)
@@ -156,5 +83,126 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.export(params, getFsInode)
 	default:
 		return nil, plugin.UnsupportedMetricError
+	}
+}
+
+func (p *Plugin) exportDiscovery(params []string) (any, error) {
+	if len(params) != 0 {
+		return nil, errInvalidParameters
+	}
+
+	d, getErr := p.getMountedFilesystems()
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	b, marshalErr := json.Marshal(&d)
+	if marshalErr != nil {
+		return nil, errs.Wrap(marshalErr, "cannot marshal filesystem discovery data")
+	}
+
+	return string(b), nil
+}
+
+func (p *Plugin) exportGet(params []string) (any, error) {
+	if len(params) > 2 {
+		return nil, errTooManyParameters
+	}
+
+	var mode, mountpoint string
+
+	if len(params) > 0 {
+		mode = params[0]
+	}
+
+	if len(params) > 1 {
+		mountpoint = params[1]
+	}
+
+	var (
+		data []*FsInfoNew
+		err  error
+	)
+
+	switch mode {
+	case "", "full":
+		data, err = p.getFsInfoStats(mountpoint)
+	case "short":
+		data, err = p.getFsInfoShort(mountpoint)
+	default:
+		return nil, errInvalidFirstParameter
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, errs.Wrap(err, "cannot marshal filesystem data")
+	}
+
+	return string(b), nil
+}
+
+func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (any, error) {
+	if len(params) < 1 || params[0] == "" {
+		return nil, errInvalidFirstParameter
+	}
+	if len(params) > 2 {
+		return nil, errTooManyParameters
+	}
+
+	mode, err := getMode(params)
+	if err != nil {
+		return nil, err
+	}
+
+	fsCaller := p.newFSCaller(getStats, 1)
+
+	stats, runErr := fsCaller.run(params[0])
+	if runErr != nil {
+		return nil, runErr
+	}
+
+	return getStatValue(stats, mode)
+}
+
+// getMode returns the filesystem statistics mode specified in params.
+func getMode(params []string) (int, error) {
+	if len(params) < 2 {
+		return statModeTotal, nil
+	}
+
+	switch params[1] {
+	case "total":
+		return statModeTotal, nil
+	case "free":
+		return statModeFree, nil
+	case "used":
+		return statModeUsed, nil
+	case "pfree":
+		return statModePFree, nil
+	case "pused":
+		return statModePUsed, nil
+	default:
+		return 0, errInvalidSecondParameter
+	}
+}
+
+func getStatValue(stats *FsStats, mode int) (any, error) {
+	switch mode {
+	case statModeTotal:
+		return stats.Total, nil
+	case statModeFree:
+		return stats.Free, nil
+	case statModeUsed:
+		return stats.Used, nil
+	case statModePFree:
+		return stats.PFree, nil
+	case statModePUsed:
+		return stats.PUsed, nil
+	default:
+		return nil, errInvalidSecondParameter
 	}
 }

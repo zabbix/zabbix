@@ -373,7 +373,8 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	zbx_dbconn_mode_t	last_mode;
 
 #if defined(HAVE_MYSQL)
-	int		err_no = 0;
+	int				err_no = 0;
+	struct	zbx_db_version_info_t	version_info = {0};
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_MAX_PARAMS	11
 
@@ -543,12 +544,16 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ret = ZBX_DB_FAIL;
 	}
 
+	zbx_dbconn_extract_version_info(db, &version_info);
+
 	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
-	if (ZBX_DB_OK == ret && ON == zbx_mariadb_fork_get() && 110602 <= db_get_server_version())
+	if (ZBX_DB_OK == ret && ON == version_info.mariadb_fork && 110602 <= version_info.current_version)
 	{
 		if (0 < (ret = dbconn_execute(db, "set innodb_snapshot_isolation='OFF'")))
 			ret = ZBX_DB_OK;
 	}
+
+	zbx_db_version_info_clear(&version_info);
 
 	if (ZBX_DB_OK == ret)
 	{
@@ -746,12 +751,9 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	zbx_db_free_result(result);
 
-	if (90000 <= db_get_server_version())
-	{
-		/* change the output format for values of type bytea from hex (the default) to escape */
-		if (0 < (ret = dbconn_execute(db, "set bytea_output=escape")))
-			ret = ZBX_DB_OK;
-	}
+	/* change the output format for values of type bytea from hex (the default) to escape */
+	if (0 < (ret = dbconn_execute(db, "set bytea_output=escape")))
+		ret = ZBX_DB_OK;
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -1498,13 +1500,18 @@ void	zbx_dbconn_set_autoincrement(zbx_dbconn_t *db, int options)
  ******************************************************************************/
 zbx_dbconn_t	*zbx_dbconn_create(void)
 {
+	return zbx_dbconn_create_custom(db_config);
+}
+
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config)
+{
 	zbx_dbconn_t	*db;
 
 	db = (zbx_dbconn_t *)zbx_malloc(NULL, sizeof(zbx_dbconn_t));
 	memset(db, 0, sizeof(zbx_dbconn_t));
 
 	db->managed = DBCONN_TYPE_UNMANAGED;
-	db->config = db_config;
+	db->config = config;
 	db->txn_error = ZBX_DB_OK;
 	db->txn_end_error = ZBX_DB_OK;
 	db->connect_options = ZBX_DB_CONNECT_NORMAL;
@@ -1594,7 +1601,7 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 	while (ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1651,7 +1658,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
 		dbconn_close(db);
-		rc = dbconn_open(db);
+		rc = dbconn_open_retry(db);
 	}
 	else
 	{
@@ -1701,7 +1708,7 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	while (ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1753,7 +1760,7 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1805,7 +1812,7 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{

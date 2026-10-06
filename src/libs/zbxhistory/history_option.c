@@ -21,8 +21,6 @@
 static const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
 		"dbl", "str", "log", "uint", "text", "bin", "json"};
 
-ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get description of history value type                             *
@@ -32,7 +30,7 @@ ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
  * Return value: description of the history value type                        *
  *                                                                            *
  ******************************************************************************/
-const char	*history_option_value_type_str(unsigned char value_type)
+const char	*zbx_history_option_value_type_str(unsigned char value_type)
 {
 	if (value_type >= ARRSIZE(history_options_value_types))
 		return "unknown";
@@ -49,7 +47,7 @@ const char	*history_option_value_type_str(unsigned char value_type)
  * Return value: value type or FAIL if unknown                                *
  *                                                                            *
  ******************************************************************************/
-int	history_option_value_type_from_str(const char *value_type_str)
+int	zbx_history_option_value_type_from_str(const char *value_type_str)
 {
 	for (int i = 0; i < (int)ARRSIZE(history_options_value_types); i++)
 	{
@@ -60,248 +58,6 @@ int	history_option_value_type_from_str(const char *value_type_str)
 	THIS_SHOULD_NEVER_HAPPEN_MSG("unknown history value type \"%s\"", value_type_str);
 
 	return FAIL;
-}
-
-/*******************************************************************************
- *                                                                             *
- * Purpose: create a history option with name and string value                 *
- *                                                                             *
- * Parameters: name  - [IN] option name                                        *
- *             value - [IN] option value                                       *
- *                                                                             *
- * Return value: The created option.                                           *
- *                                                                             *
- *******************************************************************************/
-zbx_history_option_t	history_option_str(const char *name, const char *value)
-{
-	zbx_history_option_t	option;
-
-	option.name = zbx_strdup(NULL, name);
-	option.value = zbx_strdup(NULL, value);
-
-	return option;
-}
-
-/*******************************************************************************
- *                                                                             *
- * Purpose: create a history option with name and integer value                *
- *                                                                             *
- * Parameters: name  - [IN] option name                                        *
- *             value - [IN] option value                                       *
- *                                                                             *
- * Return value: The created option.                                           *
- *                                                                             *
- *******************************************************************************/
-zbx_history_option_t	history_option_int(const char *name, int value)
-{
-	zbx_history_option_t	option;
-
-	option.name = zbx_strdup(NULL, name);
-	option.value = zbx_dsprintf(NULL, "%d", value);
-
-	return option;
-}
-
-/*******************************************************************************
- *                                                                             *
- * Purpose: retrieve specified option value                                    *
- *                                                                             *
- * Parameters: options     - [IN] array of history options                     *
- *             options_num - [IN] number of options in the array               *
- *             name        - [IN] name of the option to retrieve               *
- *                                                                             *
- * Return value: The value of the specified option or NULL if not found        *
- *                                                                             *
- *******************************************************************************/
-const char	*history_option_value(const zbx_history_option_t *options, int options_num, const char *name)
-{
-	for (int i = 0; i < options_num; i++)
-	{
-		if (0 == strcmp(options[i].name, name))
-			return options[i].value;
-	}
-
-	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse a parameter from the given text                             *
- *                                                                            *
- * Parameters: text - [IN] string to parse                                    *
- *                                                                            *
- * Return value: number of characters in the parsed parameter                 *
- *                                                                            *
- * Comments: Only alphanumeric, _, -, . characters are accepted               *
- *                                                                            *
- ******************************************************************************/
-static ssize_t	history_option_parse_param(const char *text)
-{
-	const char	*ptr;
-
-	for (ptr = text; '\0' != *ptr; ptr++)
-	{
-		if (0 == isalnum((int)*ptr) && '_' != *ptr && '-' != *ptr && '.' != *ptr)
-			break;
-	}
-
-	return ptr - text;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse unquoted value from given text                              *
- *                                                                            *
- * Parameters: text - [IN] string to parse                                    *
- *                                                                            *
- * Return value: number of characters in the parsed value                     *
- *                                                                            *
- * Comments: parsing stops at control characters or delimiters (', ", space)  *
- *                                                                            *
- ******************************************************************************/
-static ssize_t	history_option_parse_value(const char *text)
-{
-	const char	*ptr;
-	const char	*delims = "'\" ,";
-
-	for (ptr = text; '\0' != *ptr; ptr++)
-	{
-		if (0 != iscntrl((int)*ptr) || NULL != strchr(delims, *ptr))
-			break;
-	}
-
-	return ptr - text;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse quoted value from given text                                *
- *                                                                            *
- * Parameters: text - [IN] string to parse                                    *
- *                                                                            *
- * Return value: number of characters in the parsed value including quotes    *
- *               FAIL if parsing fails                                        *
- *                                                                            *
- ******************************************************************************/
-static ssize_t	history_option_parse_quoted_value(const char *text)
-{
-	const char	*ptr;
-
-	for (ptr = text + 1; '\0' != *ptr; ptr++)
-	{
-		if ('\\' == *ptr)
-		{
-			if ('"' == *(ptr + 1) || '\\' == *(ptr + 1))
-				ptr++;
-			else
-				return FAIL;
-		}
-		else if ('"' == *ptr)
-			return ptr - text + 1;
-	}
-
-	return FAIL;
-}
-
-/*******************************************************************************
- *                                                                             *
- * Purpose: parse history provider options from a string                       *
- *                                                                             *
- * Parameters: text    - [IN] string containing options in "key=value" format  *
- *             options - [OUT] vector to store parsed options                  *
- *             error   - [OUT] error message                                   *
- *                                                                             *
- * Return value: SUCCEED - options were parsed successfully                    *
- *               FAIL    - otherwise                                           *
- *                                                                             *
- *                                                                             *
- * Comments: Options are expected to be in the format:                         *
- *           "key1=value1,key2=value2,..."                                     *
- *           Spaces around commas are ignored.                                 *
- *                                                                             *
- ******************************************************************************/
-static int	history_get_options(const char *text, zbx_vector_history_option_t *options, char **error)
-{
-	int	ret = FAIL;
-
-	for (const char *ptr = text;;)
-	{
-		ssize_t			key_len, value_len;
-		const char		*key;
-		zbx_history_option_t	option;
-
-		key_len = history_option_parse_param(ptr);
-		if (0 == key_len || '\0' == ptr[key_len])
-		{
-			*error = zbx_dsprintf(NULL, "invalid option starting with \"%s\"", ptr);
-			goto out;
-		}
-
-		key = ptr;
-		ptr += key_len;
-		while (' ' == *ptr)
-			ptr++;
-
-		if ('=' != *ptr)
-		{
-			*error = zbx_dsprintf(NULL, "invalid option starting with \"%s\"", key);
-			goto out;
-		}
-
-		while (' ' == *++ptr)
-			;
-
-		if ('"' != *ptr)
-			value_len = history_option_parse_value(ptr);
-		else
-			value_len = history_option_parse_quoted_value(ptr);
-
-		if (FAIL == value_len)
-		{
-			*error = zbx_dsprintf(NULL, "invalid option value starting with \"%s\"", ptr);
-			goto out;
-		}
-
-		if (FAIL == zbx_str_extract(key, key_len, &option.name))
-		{
-			*error = zbx_dsprintf(NULL, "invalid option name starting with \"%s\"", key);
-			goto out;
-		}
-
-		if (FAIL == zbx_str_extract(ptr, value_len, &option.value))
-		{
-			zbx_free(option.name);
-			*error = zbx_dsprintf(NULL, "invalid option value starting with \"%s\"", ptr);
-			goto out;
-		}
-
-		zbx_vector_history_option_append(options, option);
-
-		ptr += value_len;
-		while (' ' == *ptr)
-			ptr++;
-
-		if ('\0' == *ptr)
-			break;
-
-		if (',' != *ptr)
-		{
-			*error = zbx_dsprintf(NULL, "invalid option name starting with \"%s\"", ptr);
-			goto out;
-		}
-
-		ptr++;
-	}
-
-	ret = SUCCEED;
-out:
-	if (FAIL == ret)
-	{
-		history_options_clear(options->values, options->values_num);
-		zbx_vector_history_option_clear(options);
-	}
-
-	return ret;
 }
 
 /******************************************************************************
@@ -317,13 +73,13 @@ out:
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	history_provider_parse_options(const char *conf, char **name, zbx_vector_history_option_t *options,
+int	history_provider_parse_options(const char *conf, char **name, zbx_vector_config_option_t *options,
 		char **error)
 {
 	const char	*ptr = conf;
 	ssize_t		len;
 
-	len = history_option_parse_param(ptr);
+	len = zbx_config_option_parse_param(ptr);
 	ptr += len;
 	while (' ' == *ptr)
 		ptr++;
@@ -338,13 +94,13 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 	while (' ' == *(++ptr))
 		;
 
-	if (SUCCEED != history_get_options(ptr, options, error))
+	if (SUCCEED != zbx_config_option_parse_options(ptr, options, error))
 		return FAIL;
 
 	if (0 != strncmp(conf, HISTORY_PROVIDER_SQL, ZBX_CONST_STRLEN(HISTORY_PROVIDER_SQL)))
 	{
 		/* value_types option is mandatory for non default providers */
-		if (NULL == history_option_value(options->values, options->values_num,
+		if (NULL == zbx_config_option_value(options->values, options->values_num,
 				HISTORY_PROVIDER_OPTION_VALUE_TYPES))
 		{
 			for (int i = 0; i < options->values_num; i++)
@@ -352,7 +108,7 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 				zbx_free(options->values[i].name);
 				zbx_free(options->values[i].value);
 			}
-			zbx_vector_history_option_clear(options);
+			zbx_vector_config_option_clear(options);
 
 			*error = zbx_dsprintf(NULL, "cannot find mandatory option \"%s\" in history provider"
 					" configuration \"%s\"", HISTORY_PROVIDER_OPTION_VALUE_TYPES, conf);
@@ -367,15 +123,6 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 	return SUCCEED;
 }
 
-void	history_options_clear(zbx_history_option_t *options, int options_num)
-{
-	for (int i = 0; i < options_num; i++)
-	{
-		zbx_free(options[i].name);
-		zbx_free(options[i].value);
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert value types option string to bitmask                      *
@@ -386,12 +133,12 @@ void	history_options_clear(zbx_history_option_t *options, int options_num)
  * Return value: bitmask representing supported value types                   *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int options_num)
+zbx_uint64_t	history_options_type_mask(const zbx_config_option_t *options, int options_num)
 {
 	zbx_uint64_t	mask = 0;
 	const char	*types;
 
-	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
+	if (NULL == (types = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
 		return 0;
 
 	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
@@ -418,11 +165,11 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
  *               FAIL    - invalid value type found                           *
  *                                                                            *
  ******************************************************************************/
-static int	history_options_validate_value_type(const zbx_history_option_t *options, int options_num, char **error)
+static int	history_options_validate_value_type(const zbx_config_option_t *options, int options_num, char **error)
 {
 	const char	*value_types;
 
-	if (NULL == (value_types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
+	if (NULL == (value_types = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
 		return FAIL;
 
 	const char	*start = value_types, *end;
@@ -479,11 +226,11 @@ static int	history_options_validate_value_type(const zbx_history_option_t *optio
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	history_options_validate_precache(const zbx_history_option_t *options, int options_num, char **error)
+static int	history_options_validate_precache(const zbx_config_option_t *options, int options_num, char **error)
 {
 	const char	*precache, *valid_values = "0,1,on,off";
 
-	if (NULL == (precache = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)))
+	if (NULL == (precache = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)))
 		return SUCCEED;
 
 	if (SUCCEED == zbx_str_in_list(valid_values, precache, ','))
@@ -506,7 +253,7 @@ static int	history_options_validate_precache(const zbx_history_option_t *options
  *               FAIL    - invalid value type found                           *
  *                                                                            *
  ******************************************************************************/
-int	history_options_validate_common_settings(const zbx_history_option_t *options, int options_num, char **error)
+int	history_options_validate_common_settings(const zbx_config_option_t *options, int options_num, char **error)
 {
 	if (SUCCEED != history_options_validate_value_type(options, options_num, error))
 		return FAIL;
@@ -530,11 +277,11 @@ int	history_options_validate_common_settings(const zbx_history_option_t *options
  *           or "1".                                                          *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	history_options_precache(const zbx_history_option_t *options, int options_num)
+zbx_uint64_t	history_options_precache(const zbx_config_option_t *options, int options_num)
 {
 	const char	*precache;
 
-	if (NULL == (precache = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)) ||
+	if (NULL == (precache = zbx_config_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)) ||
 			0 == strcmp(precache, "on") || 0 == strcmp(precache, "1"))
 	{
 		return ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
@@ -552,9 +299,9 @@ zbx_uint64_t	history_options_precache(const zbx_history_option_t *options, int o
  * Return value: The created option with comma-separated value types.         *
  *                                                                            *
  ******************************************************************************/
-zbx_history_option_t	history_option_types(zbx_uint64_t mask)
+zbx_config_option_t	history_option_types(zbx_uint64_t mask)
 {
-	zbx_history_option_t	option;
+	zbx_config_option_t	option;
 
 	char	*types = NULL;
 	size_t	types_alloc = 0, types_offset = 0;
@@ -598,11 +345,11 @@ zbx_history_option_t	history_option_types(zbx_uint64_t mask)
  *               FAIL    - parameter conflict                                 *
  *                                                                            *
  ******************************************************************************/
-int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
+int	history_options_add_common_params(zbx_vector_config_option_t *options, const char *config_source_ip,
 		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error)
 {
-	if (NULL != history_option_value(options->values, options->values_num,
+	if (NULL != zbx_config_option_value(options->values, options->values_num,
 			HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override LogSlowQueries parameter");
@@ -611,11 +358,11 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	if (0 != config_log_slow_queries)
 	{
-		zbx_vector_history_option_append(options, history_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
+		zbx_vector_config_option_append(options, zbx_config_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
 				config_log_slow_queries));
 	}
 
-	if (NULL != history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SOURCE_IP))
+	if (NULL != zbx_config_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SOURCE_IP))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override SourceIP parameter");
 		return FAIL;
@@ -623,11 +370,12 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	if (NULL != config_source_ip)
 	{
-		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SOURCE_IP,
+		zbx_vector_config_option_append(options, zbx_config_option_str(HISTORY_PROVIDER_OPTION_SOURCE_IP,
 				config_source_ip));
 	}
 
-	if (NULL != history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION))
+	if (NULL != zbx_config_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLCALocation parameter");
 		return FAIL;
@@ -635,11 +383,11 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	if (NULL != config_ssl_ca_location)
 	{
-		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION,
+		zbx_vector_config_option_append(options, zbx_config_option_str(HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION,
 				config_ssl_ca_location));
 	}
 
-	if (NULL != history_option_value(options->values, options->values_num,
+	if (NULL != zbx_config_option_value(options->values, options->values_num,
 			HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLCertLocation parameter");
@@ -648,11 +396,12 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	if (NULL != config_ssl_cert_location)
 	{
-		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION,
+		zbx_vector_config_option_append(options,
+				zbx_config_option_str(HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION,
 				config_ssl_cert_location));
 	}
 
-	if (NULL != history_option_value(options->values, options->values_num,
+	if (NULL != zbx_config_option_value(options->values, options->values_num,
 			HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLKeyLocation parameter");
@@ -661,7 +410,7 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	if (NULL != config_ssl_key_location)
 	{
-		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION,
+		zbx_vector_config_option_append(options, zbx_config_option_str(HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION,
 				config_ssl_key_location));
 	}
 
@@ -678,7 +427,7 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
  * Comments: Sensitive option values are masked in the log output.            *
  *                                                                            *
  ******************************************************************************/
-void	history_log_options(zbx_history_option_t *options, int options_num)
+void	history_log_options(zbx_config_option_t *options, int options_num)
 {
 	const char	*unmasked =
 			HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES ","
