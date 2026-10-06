@@ -46,10 +46,8 @@ class CElasticsearchHelper {
 			]
 		];
 
-		if ($request) {
-			$request = json_encode($request);
-			$options['http']['content'] = $request;
-		}
+		$request = $request ? json_encode($request) : '{}';
+		$options['http']['content'] = $request;
 
 		$result = file_get_contents($endpoint, false, stream_context_create($options));
 
