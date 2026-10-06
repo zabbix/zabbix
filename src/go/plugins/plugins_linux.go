@@ -36,6 +36,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/swap"
+	_ "golang.zabbix.com/agent2/plugins/system/switches"
 	_ "golang.zabbix.com/agent2/plugins/system/uname"
 	_ "golang.zabbix.com/agent2/plugins/system/uptime"
 	_ "golang.zabbix.com/agent2/plugins/system/users"
