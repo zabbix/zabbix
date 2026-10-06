@@ -360,8 +360,20 @@ class CHistory extends CApiService {
 			$query = CElasticsearchHelper::addSearch($table, $query, $options);
 		}
 
+		// count
+		if ($options['countOutput']) {
+			$endpoints = Manager::History()->getElasticsearchEndpoints($options['history'], '_count');
+			if (!$endpoints) {
+				return null;
+			}
+
+			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
+			return $result['count'] ?? 0;
+		}
+
 		// output
-		if ($options['countOutput'] === false && $options['output'] !== API_OUTPUT_EXTEND) {
+		if ($options['output'] !== API_OUTPUT_EXTEND) {
 			$query['_source'] = $options['output'];
 		}
 
@@ -376,7 +388,7 @@ class CHistory extends CApiService {
 		}
 
 		if ($options['history'] === ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] !== null
-				&& in_array('value', $options['output']) && !$options['countOutput']) {
+				&& in_array('value', $options['output'])) {
 			$query['_source'] = array_values(array_diff($options['output'], ['value']));
 
 			if (!$query['_source']) {

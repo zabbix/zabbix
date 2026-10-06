@@ -98,10 +98,11 @@ class CElasticsearchHelper {
 	 * @return array    parsed result
 	 */
 	public static function query($method, $endpoint, $request = null) {
+		$is_search = str_ends_with($endpoint, '/_search');
 		$parse_as = ELASTICSEARCH_RESPONSE_PLAIN;
 
 		// For non-search requests no additional parsing is done.
-		if (substr($endpoint, -strlen('/_search')) === '/_search') {
+		if ($is_search) {
 			$parse_as = ELASTICSEARCH_RESPONSE_DOCUMENTS;
 
 			if (is_array($request) && array_key_exists('aggs', $request)) {
@@ -110,7 +111,8 @@ class CElasticsearchHelper {
 			}
 		}
 
-		if (is_array($request) && (!array_key_exists('size', $request) || $request['size'] > self::MAX_RESULT_WINDOW)) {
+		if ($is_search && is_array($request)
+				&& (!array_key_exists('size', $request) || $request['size'] > self::MAX_RESULT_WINDOW)) {
 			// Scroll API should be used to retrieve all data.
 			$results = [];
 			$limit = array_key_exists('size', $request) ? $request['size'] : null;
