@@ -27,6 +27,7 @@ typedef struct
 	zbx_atomic_int_t		itservices_num;
 
 	zbx_correlation_config_t	*correlation_config;
+	char				*apm_config;
 	zbx_cep_config_t		*cep_config;
 }
 zbx_dc_config_local_t;

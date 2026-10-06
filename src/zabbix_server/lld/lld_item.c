@@ -3594,6 +3594,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdiscover=%d", d, item->discover);
+		d = ",";
 		zbx_audit_item_update_json_update_discover(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, item->discover_orig, item->discover);
 	}
@@ -3628,7 +3629,6 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	{
 		value_esc = zbx_db_dyn_escape_string(item->granularity);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sgranularity='%s'", d, value_esc);
-		d = ",";
 		zbx_audit_item_update_json_update_granularity(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, item->granularity_orig, item->granularity);
 		zbx_free(value_esc);

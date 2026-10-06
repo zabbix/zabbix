@@ -264,7 +264,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'Close problems older than 2 weeks',
 						'Type' => 'Complex event processing',
 						'Conditions' => 'Tag value dc equals north',
-						'Time window processing' => 'Simple',
+						'Time window processing' => 'Simple (multiple)',
 						'Operations' => 'Execute when Event evicted: Close',
 						'Stop after this rule' => 'Enabled',
 						'Sort order' => '1',

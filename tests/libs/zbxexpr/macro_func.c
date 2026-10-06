@@ -24,15 +24,20 @@ void	zbx_mock_test_entry(void **state)
 {
 	const size_t		macro_pos = 1, macro_pos_end = 6, func_pos = 8;
 	int			expected_ret, returned_ret;
-	char			*value = NULL, macro_expr[MAX_STRING_LEN], *func = NULL, *params = NULL;
+	char			*value = NULL, macro_expr[MAX_STRING_LEN];
+	const char		*func = NULL, *params = NULL;
 	zbx_token_func_macro_t	token;
 
 	ZBX_UNUSED(state);
-	func = zbx_malloc(func, MACROFUNC_INPUT_SIZE);
-	params = zbx_malloc(params, MACROFUNC_INPUT_SIZE);
 
-	zbx_snprintf(func, MACROFUNC_INPUT_SIZE, "%s", zbx_mock_get_parameter_string("in.function"));
-	zbx_snprintf(params, MACROFUNC_INPUT_SIZE, "%s", zbx_mock_get_parameter_string("in.params"));
+	func = zbx_mock_get_parameter_string("in.function");
+	params = zbx_mock_get_parameter_string("in.params");
+
+#ifndef HAVE_LIBXML2
+	if (0 == strcmp(func, "xmlxpath"))
+		skip();
+#endif
+
 	zbx_snprintf(macro_expr, MAX_STRING_LEN, "{{TIME}.%s(%s)}", func, params);
 
 	token = (zbx_token_func_macro_t)
@@ -55,6 +60,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_free(value);
-	zbx_free(func);
-	zbx_free(params);
 }

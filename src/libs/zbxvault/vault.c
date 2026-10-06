@@ -319,8 +319,11 @@ int	zbx_vault_apm_db_credentials_get(const zbx_config_vault_t *config_vault, cha
 	const zbx_kv_t	*kv_username, *kv_password;
 	zbx_kv_t	kv_local;
 
-	if (NULL == vault_path)
-		return SUCCEED;
+	if (NULL == zbx_vault_get_kvs_cb)
+	{
+		*error = zbx_strdup(*error, "vault is not configured");
+		return FAIL;
+	}
 
 	zbx_kvs_create(&kvs, 2);
 

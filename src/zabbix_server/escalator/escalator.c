@@ -1778,7 +1778,8 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		/* push notifications are supported only for trigger events */
 		if (MEDIA_TYPE_PUSH == type && EVENT_SOURCE_TRIGGERS != event->source)
 		{
-			const char	*push_error = "Push notifications are supported only for trigger actions.";
+			const char	*push_error = "Cannot send notification to device: "
+					"push notifications are supported only for trigger actions.";
 
 			if (0 != all_mediatypes)
 				continue;

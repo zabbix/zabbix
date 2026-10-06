@@ -13,3 +13,6 @@ libzbxexpr_a_SOURCES = \
 	substitute.c \
 	urlencode.c \
 	macrofunc.c
+
+libzbxexpr_a_CFLAGS = \
+	$(LIBXML2_CFLAGS)

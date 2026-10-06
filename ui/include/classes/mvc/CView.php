@@ -46,6 +46,8 @@ class CView {
 	 */
 	private string $name;
 
+	private ?string $side_drawer = null;
+
 	/**
 	 * List of JavaScript files for inclusion into HTML page using <script src="...">.
 	 */
@@ -109,7 +111,17 @@ class CView {
 	}
 
 	public function getAssetsPath(): string {
-		RETURN $this->assets_path;
+		return $this->assets_path;
+	}
+
+	public function setSideDrawer(?string $output): self {
+		$this->side_drawer = $output;
+
+		return $this;
+	}
+
+	public function getSideDrawer(): ?string {
+		return $this->side_drawer;
 	}
 
 	/**
