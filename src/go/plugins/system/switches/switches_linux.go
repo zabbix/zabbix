@@ -33,7 +33,7 @@ const (
 )
 
 // Error texts match the C agent's system_cpu_switches(), which always names /proc/stat.
-var errCtxtNotFound = errs.New(`Cannot find a line with "ctxt" in /proc/stat.`)
+var errCtxtNotFound = errs.New(`cannot find a line with "ctxt" in /proc/stat`)
 
 // Plugin is a base struct for a plugin.
 type Plugin struct {
@@ -106,11 +106,11 @@ func openError(err error) error {
 	var errno syscall.Errno
 
 	if !errors.As(err, &errno) {
-		return errs.Wrap(err, "Cannot open /proc/stat")
+		return errs.Wrap(err, "cannot open /proc/stat")
 	}
 
 	// Go's errno texts are glibc's strerror() with a lowercase first letter.
 	text := errno.Error()
 
-	return errs.Errorf("Cannot open /proc/stat: [%d] %s", int(errno), strings.ToUpper(text[:1])+text[1:])
+	return errs.Errorf("cannot open /proc/stat: [%d] %s", int(errno), strings.ToUpper(text[:1])+text[1:])
 }
