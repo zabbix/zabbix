@@ -20,7 +20,6 @@ func getMetrics() []string {
 		"sensor", "Hardware sensor reading.",
 		"system.cpu.load", "CPU load.",
 		"system.cpu.switches", "Count of context switches.",
-		"system.cpu.intr", "Device interrupts.",
 		"system.hw.cpu", "CPU information.",
 		"system.hw.macaddr", "Listing of MAC addresses.",
 	}
