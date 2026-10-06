@@ -793,8 +793,8 @@ class CUserGroup extends CApiService {
 								'values' => $upd_right,
 								'where' => ['rightid' => $db_right['rightid']]
 							];
-							$changed_permissions[$usrgrp['usrgrpid']][$right['id']]['new'] = $right['permission'];
-							$changed_permissions[$usrgrp['usrgrpid']][$right['id']]['old'] = $db_right['permission'];
+
+							$changed_permissions[$usrgrp['usrgrpid']][$right['id']] = $right['permission'];
 						}
 					}
 					else {
@@ -805,8 +805,7 @@ class CUserGroup extends CApiService {
 						];
 
 						if ($db_usrgrps !== null) {
-							$changed_permissions[$usrgrp['usrgrpid']][$right['id']]['new'] = $right['permission'];
-							$changed_permissions[$usrgrp['usrgrpid']][$right['id']]['old'] = PERM_NONE;
+							$changed_permissions[$usrgrp['usrgrpid']][$right['id']] = $right['permission'];
 						}
 					}
 				}
@@ -814,8 +813,7 @@ class CUserGroup extends CApiService {
 
 				foreach ($db_rights as $db_right) {
 					$del_rightids[] = $db_right['rightid'];
-					$changed_permissions[$usrgrp['usrgrpid']][$db_right['id']]['new'] = PERM_NONE;
-					$changed_permissions[$usrgrp['usrgrpid']][$db_right['id']]['old'] = $db_right['permission'];
+					$changed_permissions[$usrgrp['usrgrpid']][$db_right['id']] = PERM_NONE;
 				}
 			}
 			unset($usrgrp);
@@ -875,12 +873,11 @@ class CUserGroup extends CApiService {
 			foreach ($changed_permissions[$row['usrgrpid']] as $groupid => $permission) {
 				if (!array_key_exists($row['ugsetid'], $ugset_permissions)
 						|| !array_key_exists($groupid, $ugset_permissions[$row['ugsetid']])) {
-					$ugset_permissions[$row['ugsetid']][$groupid]['new'] = $permission['new'];
+					$ugset_permissions[$row['ugsetid']][$groupid] = $permission;
 				}
-				elseif ($ugset_permissions[$row['ugsetid']][$groupid]['new'] != PERM_DENY
-						&& ($permission['new'] > $ugset_permissions[$row['ugsetid']][$groupid]['new']
-							|| $permission['new'] == PERM_DENY)) {
-					$ugset_permissions[$row['ugsetid']][$groupid]['new'] = $permission['new'];
+				elseif ($ugset_permissions[$row['ugsetid']][$groupid] != PERM_DENY
+						&& ($permission > $ugset_permissions[$row['ugsetid']][$groupid] || $permission == PERM_DENY)) {
+					$ugset_permissions[$row['ugsetid']][$groupid] = $permission;
 				}
 			}
 		}
@@ -901,12 +898,12 @@ class CUserGroup extends CApiService {
 		while ($row = DBfetch($result)) {
 			if (!array_key_exists($row['ugsetid'], $db_ugset_permissions)
 					|| !array_key_exists($row['id'], $db_ugset_permissions[$row['ugsetid']])) {
-				$db_ugset_permissions[$row['ugsetid']][$row['id']]['old'] = $row['permission'];
+				$db_ugset_permissions[$row['ugsetid']][$row['id']] = $row['permission'];
 			}
-			elseif ($db_ugset_permissions[$row['ugsetid']][$row['id']]['old'] != PERM_DENY
-					&& ($row['permission'] > $db_ugset_permissions[$row['ugsetid']][$row['id']]['old']
+			elseif ($db_ugset_permissions[$row['ugsetid']][$row['id']] != PERM_DENY
+					&& ($row['permission'] > $db_ugset_permissions[$row['ugsetid']][$row['id']]
 						|| $row['permission'] == PERM_DENY)) {
-				$db_ugset_permissions[$row['ugsetid']][$row['id']]['old'] = $row['permission'];
+				$db_ugset_permissions[$row['ugsetid']][$row['id']] = $row['permission'];
 			}
 
 			if (!array_key_exists($row['id'], $ugset_permissions[$row['ugsetid']])
@@ -915,10 +912,10 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			if ($ugset_permissions[$row['ugsetid']][$row['id']]['new'] != PERM_DENY
-					&& ($row['permission'] > $ugset_permissions[$row['ugsetid']][$row['id']]['new']
+			if ($ugset_permissions[$row['ugsetid']][$row['id']] != PERM_DENY
+					&& ($row['permission'] > $ugset_permissions[$row['ugsetid']][$row['id']]
 						|| $row['permission'] == PERM_DENY)) {
-				$ugset_permissions[$row['ugsetid']][$row['id']]['new'] = $row['permission'];
+				$ugset_permissions[$row['ugsetid']][$row['id']] = $row['permission'];
 			}
 		}
 
@@ -1019,8 +1016,8 @@ class CUserGroup extends CApiService {
 				}
 
 				$permission = array_key_exists($row['groupid'], $ugset_permissions[$ugsetid])
-					? $ugset_permissions[$ugsetid][$row['groupid']]['new']
-					: $db_ugset_permissions[$ugsetid][$row['groupid']]['old'];
+					? $ugset_permissions[$ugsetid][$row['groupid']]
+					: $db_ugset_permissions[$ugsetid][$row['groupid']];
 
 				if (!array_key_exists($ugsetid, $permissions)
 						|| !array_key_exists($row['hgsetid'], $permissions[$ugsetid])
@@ -1030,7 +1027,7 @@ class CUserGroup extends CApiService {
 				}
 
 				$db_permission = array_key_exists($row['groupid'], $db_ugset_permissions[$ugsetid])
-					? $db_ugset_permissions[$ugsetid][$row['groupid']]['old']
+					? $db_ugset_permissions[$ugsetid][$row['groupid']]
 					: PERM_NONE;
 
 				if (!array_key_exists($ugsetid, $db_permissions)
