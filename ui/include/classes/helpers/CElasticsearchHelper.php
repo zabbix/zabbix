@@ -251,8 +251,7 @@ class CElasticsearchHelper {
 		$clauses = [];
 
 		foreach ($options['filter'] as $field => $value) {
-			if ($value === null || !array_key_exists($field, $schema['fields'])
-					|| $schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
+			if ($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
 				continue;
 			}
 
@@ -298,9 +297,7 @@ class CElasticsearchHelper {
 		}
 
 		foreach ($options['search'] as $field => $value) {
-			// Skip missing fields, non textual fields and empty values.
-			if ($value === null || !array_key_exists($field, $schema['fields'])
-					|| ($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
+			if (($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
 				continue;
 			}
 
