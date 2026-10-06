@@ -40,6 +40,7 @@
 #include "zbxcachehistory.h"
 #include "zbxregexp.h"
 #include "zbxtypes.h"
+#include "zbxcacheconfig.h"
 
 #define CEP_WORKERS_MIN		2
 #define CEP_WORKERS_MAX		100
