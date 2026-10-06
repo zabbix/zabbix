@@ -57,7 +57,8 @@ static int	tq_read_string(const char *p, char **out, const char *tag, char *erro
 	if (NULL != *out)
 		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
 
-	if (NULL == zbx_json_decodevalue_dyn(p, out, &out_alloc, &type) || ZBX_JSON_TYPE_STRING != type)
+	if (NULL == zbx_json_decodevalue_dyn(p, out, &out_alloc, &type) || ZBX_JSON_TYPE_STRING != type ||
+			SUCCEED != zbx_is_utf8(*out))
 	{
 		zbx_snprintf(error, max_error_len, "Failed to read \"%s\"", tag);
 		zbx_free(*out);
@@ -256,7 +257,8 @@ static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_st
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 	{
-		if (NULL == zbx_json_decodevalue_dyn(p, buf, buf_alloc, &type) || ZBX_JSON_TYPE_STRING != type)
+		if (NULL == zbx_json_decodevalue_dyn(p, buf, buf_alloc, &type) || ZBX_JSON_TYPE_STRING != type ||
+				SUCCEED != zbx_is_utf8(*buf))
 			goto out;
 
 		zbx_vector_str_append(parameters, zbx_strdup(NULL, *buf));
@@ -707,12 +709,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 		}
-
-		if (SUCCEED != zbx_is_utf8(col->attribute_key))
-		{
-			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
-					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
-		}
 	}
 
 	if (0 == query->aggregated_columns.values_num)
@@ -754,12 +750,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		if (NULL == aggr_col->alias)
 		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for aggregated column #%d",
-					ZBX_TQ_QUERY_TAG_ALIAS, i);
-		}
-
-		if (SUCCEED != zbx_is_utf8(aggr_col->alias))
-		{
-			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ALIAS, i);
 		}
 
@@ -835,23 +825,9 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 			}
 
-			if (SUCCEED != zbx_is_utf8(cond->attribute_key))
-			{
-				return ret_errf(FAIL, error, max_error_len,
-						"\"%s\" is not valid UTF-8 for condition #%d",
-						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
-			}
-
 			if (NULL == cond->value)
 			{
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
-						ZBX_TQ_QUERY_TAG_VALUE, i);
-			}
-
-			if (SUCCEED != zbx_is_utf8(cond->value))
-			{
-				return ret_errf(FAIL, error, max_error_len,
-						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 			}
 
