@@ -248,26 +248,28 @@ class CElasticsearchHelper {
 	 * @return array    Elasticsearch query with added filtering
 	 */
 	public static function addFilter($schema, $query, $options) {
+		$clauses = [];
+
 		foreach ($options['filter'] as $field => $value) {
-			// Skip missing fields, textual fields (different mapping is needed for exact matching) and empty values.
 			if ($value === null || !array_key_exists($field, $schema['fields'])
 					|| $schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
 				continue;
 			}
 
+			$clauses[] = ['terms' => [$field => $value]];
+		}
+
+		if ($clauses) {
 			if ($options['searchByAny']) {
-				$type = 'should';
-				$query['query']['bool']['minimum_should_match'] = 1;
+				$query['query']['bool']['must'][] = [
+					'bool' => ['should' => $clauses, 'minimum_should_match' => 1]
+				];
 			}
 			else {
-				$type = 'must';
+				foreach ($clauses as $clause) {
+					$query['query']['bool']['must'][] = $clause;
+				}
 			}
-
-			$query['query']['bool'][$type][] = [
-				'terms' => [
-					$field => $value
-				]
-			];
 		}
 
 		return $query;
