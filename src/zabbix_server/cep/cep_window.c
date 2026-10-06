@@ -567,7 +567,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, NULL, tasks);
-		ctx->pos &= CEP_POS_FIRST;
+		ctx->pos &= ~CEP_POS_FIRST;
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
