@@ -33,6 +33,7 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 #include "zbx_expression_constants.h"
 
 /******************************************************************************
