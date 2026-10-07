@@ -18,8 +18,8 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
-	const MAX_YAXIS_WIDTH = 208;
-	const MIN_YAXIS_WIDTH = 80;
+	const MAX_YAXIS_WIDTH = 213;
+	const MIN_YAXIS_WIDTH = 85;
 	const NO_YAXIS_WIDTH = 30;
 	const YAXIS_LABEL_GAP = 9;
 	const YAXIS_WIDTH_STEP = 16;
