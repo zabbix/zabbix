@@ -257,16 +257,9 @@ class CElasticsearchHelper {
 		}
 
 		if ($clauses) {
-			if ($options['searchByAny']) {
-				$query['query']['bool']['must'][] = [
-					'bool' => ['should' => $clauses, 'minimum_should_match' => 1]
-				];
-			}
-			else {
-				foreach ($clauses as $clause) {
-					$query['query']['bool']['must'][] = $clause;
-				}
-			}
+			$query['query']['bool']['must'][] = $options['searchByAny']
+				? ['bool' => ['should' => $clauses, 'minimum_should_match' => 1]]
+				: ['bool' => ['must' => $clauses]];
 		}
 
 		return $query;
@@ -284,15 +277,7 @@ class CElasticsearchHelper {
 	public static function addSearch($table, $query, $options) {
 		$schema = DB::getSchema($table);
 		$start = $options['startSearch'] ? '' : '*';
-		$exclude = $options['excludeSearch'] ? 'must_not' : 'must';
-
-		if ($options['searchByAny']) {
-			if (!$options['excludeSearch']) {
-				$exclude = 'should';
-			}
-
-			$query['query']['bool']['minimum_should_match'] = 1;
-		}
+		$clauses = [];
 
 		foreach ($options['search'] as $field => $value) {
 			if (($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
@@ -307,28 +292,17 @@ class CElasticsearchHelper {
 				$phrase = str_replace('?', '\\?', $phrase);
 
 				if (!$options['searchWildcardsEnabled']) {
-					$phrase = str_replace('*', '\\*', $phrase);
-					$criteria = [
-						'wildcard' => [
-							$field => $start.$phrase.'*'
-						]
-					];
-				}
-				else {
-					$criteria = [
-						'wildcard' => [
-							$field => $phrase
-						]
-					];
+					$phrase = $start.str_replace('*', '\\*', $phrase).'*';
 				}
 
-				if ($options['excludeSearch'] && $options['searchByAny']) {
-					$query['query']['bool']['must_not']['bool']['should'][] = $criteria;
-				}
-				else {
-					$query['query']['bool'][$exclude][] = $criteria;
-				}
+				$clauses[] = ['wildcard' => [$field => $phrase]];
 			}
+		}
+
+		if ($clauses) {
+			$query['query']['bool'][$options['excludeSearch'] ? 'must_not' : 'must'][] = $options['searchByAny']
+				? ['bool' => ['should' => $clauses, 'minimum_should_match' => 1]]
+				: ['bool' => ['must' => $clauses]];
 		}
 
 		return $query;
