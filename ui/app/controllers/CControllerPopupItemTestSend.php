@@ -490,27 +490,19 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					);
 				}
 
-				$valuemap = $this->getInput('valuemapid', 0) == 0
-					? []
-					: API::ValueMap()->get([
+				if ($result_preproc['result'] !== null && $this->getInput('valuemapid', 0) != 0) {
+					$valuemaps = API::ValueMap()->get([
 						'output' => [],
 						'selectMappings' => ['type', 'newvalue', 'value'],
 						'valuemapids' => $this->getInput('valuemapid')
-					])[0];
+					]);
 
-				if ($valuemap) {
-					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
-						$result_preproc['result'], $valuemap
-					);
+					if ($valuemaps) {
+						$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
+							$result_preproc['result'], $valuemaps[0]
+						);
+					}
 				}
-			}
-			elseif (array_key_exists('error', $result_preproc)) {
-				$output['final'] = [
-					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
-						? _('Set error to')
-						: '',
-					'error' => $result_preproc['error']
-				];
 			}
 
 			if (array_key_exists('final', $output) && $output['final']['action'] !== '') {
