@@ -17,7 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -422,7 +421,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
-		$hint = $this->query('xpath:.//div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 
 		// Assert text.
 		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
@@ -754,7 +753,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'last(/'.self::HOST.'/Unsigned,#1)<5',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],

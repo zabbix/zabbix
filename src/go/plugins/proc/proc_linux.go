@@ -47,6 +47,9 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
+// disable capitalized error check linter, to be consistent with Zabbix agent.
+var errGetPwnamRFailed = errors.New("No such file or directory") //nolint:staticcheck
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -266,15 +269,32 @@ func (err *userNotFoundError) Error() string {
 	return fmt.Sprintf("user `%s` not found!", err.name)
 }
 
-// Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD.
+// Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam_r()) ignores remote services like SSSD.
 func getUIDByName(userName string) (*uid, error) {
 	userNameC := C.CString(userName)
-
 	defer C.free(unsafe.Pointer(userNameC))
-	passwdC, err := C.getpwnam(userNameC)
+
+	var pwd C.struct_passwd
+	var passwdC *C.struct_passwd
+
+	//nolint:makezero // false positive
+	buf := make([]byte, 16384)
+
+	//nolint:gocritic,nlreturn //false positive
+	errCode := C.getpwnam_r(
+		userNameC,
+		&pwd,
+		(*C.char)(unsafe.Pointer(unsafe.SliceData(buf))),
+		C.size_t(len(buf)),
+		&passwdC,
+	)
+
+	if errCode != 0 {
+		return nil, errs.Errorf("[%d] %v", errCode, errGetPwnamRFailed)
+	}
 
 	if passwdC == nil {
-		return nil, err
+		return nil, &userNotFoundError{}
 	}
 
 	return &uid{uint32(passwdC.pw_uid)}, nil
@@ -287,12 +307,13 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 		var uid *uid
 		uid, err = getUIDByName(q.user)
 
-		if uid == nil {
-			if err != nil {
-				return nil, err
+		if err != nil {
+			u := &userNotFoundError{}
+			if errors.As(err, &u) {
+				return query, err
 			}
 
-			return query, &userNotFoundError{}
+			return nil, err
 		}
 
 		query.userid = int64(uid.uid)
@@ -606,12 +627,13 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		if username := params[1]; username != "" {
 			uid, err = getUIDByName(username)
 
-			if uid == nil {
-				if err != nil {
-					return nil, err
+			if err != nil {
+				u := &userNotFoundError{}
+				if errors.As(err, &u) {
+					return 0, nil
 				}
 
-				return 0, nil
+				return nil, errs.Errorf("Cannot obtain user information: %v", err)
 			}
 		}
 		fallthrough
@@ -803,7 +825,8 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 		if errors.As(err, &u) {
 			return 0, nil
 		}
-		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
+
+		return nil, errs.Errorf("Cannot obtain user information: %v", err)
 	}
 
 	procs, err := getProcesses(flags)
@@ -846,14 +869,15 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	case 2:
 		userName = params[1]
 		if userName != "" {
-			uid, err := getUIDByName(userName)
+			_, err := getUIDByName(userName)
 
-			if uid == nil {
-				if err != nil {
-					return nil, err
+			if err != nil {
+				u := &userNotFoundError{}
+				if errors.As(err, &u) {
+					return "[]", nil
 				}
 
-				return "[]", nil
+				return nil, errs.Errorf("Cannot obtain user information: %v", err)
 			}
 		}
 		fallthrough
@@ -876,7 +900,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
+		return nil, errs.Errorf("Cannot obtain user information: %v", err)
 	}
 
 	if mode != "thread" {

@@ -1725,7 +1725,7 @@ class testPageProblems extends CWebTest {
 			: count($data['result'])
 		);
 
-		$dialog_selector = 'xpath://div[@class="overlay-dialogue wordbreak"]';
+		$dialog_selector = 'css:div.overlay-dialogue.wordbreak';
 		if (array_key_exists('check_trigger_description', $data)) {
 			foreach ($data['check_trigger_description'] as $i => $description) {
 				$cell = $table->getRow($i)->getColumn('Problem');
@@ -1755,7 +1755,7 @@ class testPageProblems extends CWebTest {
 					$this->assertTrue($tick->exists());
 					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
 					$action_dialog = $this->query($dialog_selector)->asOverlayDialog()->waitUntilReady()->one();
-					$this->assertTableData($action, $dialog_selector.'//table');
+					$this->assertTableData($action, $dialog_selector.' table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$action_dialog->waitUntilNotPresent();
 				}
@@ -1772,7 +1772,7 @@ class testPageProblems extends CWebTest {
 				else {
 					$arrow->one()->click();
 					$dependency_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
-					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
+					$this->assertEquals("Dependent trigger\n".$dependency, $dependency_dialog->getText());
 					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 					$dependency_dialog->waitUntilNotPresent();
 				}
@@ -1991,7 +1991,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * @dataProvider getFilterForOperationalData
 	 */
-	public function testPageProblems_OperationalData($data){
+	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();

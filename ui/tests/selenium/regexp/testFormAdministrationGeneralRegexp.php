@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup regexps
  */
@@ -93,6 +91,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', $name);
 		$this->zbxTestInputType('expressions_0_expression', $expression);
 		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
+
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		}
@@ -141,7 +140,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
+		$this->query('xpath://table[@id="testResultTable"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -154,7 +153,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));
+		$this->query('xpath://table[@id="testResultTable"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 
@@ -162,8 +161,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputType('name', $this->regexp.'_clone');
+		$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
+		$this->query('id:name')->one()->fill($this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 

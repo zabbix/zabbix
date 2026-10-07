@@ -75,18 +75,16 @@ function escapeHtml(string) {
  * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
  *
  * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
- * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
- *                                           with "0".
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
  * @param {number}           min_length      Pad number with zeroes to maintain min length.
  */
-function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+function normalizeNumericBox(input, {allow_negative, min_length}) {
 	const old_value = input.value;
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		input.value = '0'.repeat(Math.max(min_length, 1));
 	}
 	else {
 		if (num < 0 && !allow_negative) {
@@ -107,7 +105,13 @@ function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
  * @param {String} str
  */
 function t(str) {
-	return (!!locale[str]) ? locale[str] : str;
+	if (!!locale[str]) {
+		return locale[str];
+	}
+
+	console.warn(`Missing translation for string: ${str}`);
+
+	return str;
 }
 
 /**
@@ -681,7 +685,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			jQuery('<button>')
 				.addClass('btn-overlay-close')
 				.attr('type', 'button')
-				.attr('title', t('Close'))
+				.attr('aria-label', t('Close notification'))
 				.click(function() {
 					jQuery(this)
 						.closest(`.${classes[type]}`)
@@ -720,7 +724,9 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
 		$labels_clone,
-		labels_height = labels.length ? labels.height() : 0,
+		labels_height = labels.length
+			? labels.height() + Math.max(0, parseFloat(getComputedStyle(labels[0]).top) || 0)
+			: 0,
 		context2d;
 
 	// Clone only svg styles.
@@ -770,7 +776,7 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
-	a.href = img.src;
+	a.href = img.src + "&download=1";
 	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';
@@ -847,7 +853,10 @@ function urlEncodeData(parameters, prefix = '') {
  *            d: "3"
  *        },
  *        e: {
- *            f: ["4", "5"]
+ *            f: {
+ *                0: "4",
+ *                1: "5"
+ *            }
  *        }
  *    }
  *
@@ -860,49 +869,40 @@ function getFormFields(form) {
 }
 
 /**
- * Convert URL search parameters into nested object.
+ * Convert URL search parameters into a nested object.
  *
  * @param search_params  An object implementing iterator protocol (URLSearchParams).
  *
  * @returns {Object}
  */
 function searchParamsToObject(search_params) {
-	const fields = {};
+	const fields = Object.create(null);
 
 	for (let [key, value] of search_params) {
 		value = value.replace(/\r?\n/g, '\r\n');
 
-		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+		const key_parts = [...key.matchAll(/[^\[\]]+|\[]/g)];
 
 		let key_fields = fields;
 
 		for (let i = 0; i < key_parts.length; i++) {
-			const key_part = key_parts[i][0];
+			let key_part = key_parts[i][0];
+
+			if (key_part === '[]') {
+				key_part = Object.keys(key_fields).length;
+			}
 
 			if (i === key_parts.length - 1) {
-				if (key_part === '[]') {
-					key_fields.push(value);
-				}
-				else {
-					key_fields[key_part] = value;
-				}
+				key_fields[key_part] = value;
 
 				break;
 			}
 
-			if (key_part === '[]') {
-				const key_field = key_parts[i + 1][0] === '[]' ? [] : {};
-
-				key_fields.push(key_field);
-				key_fields = key_field;
+			if (!Object.hasOwn(key_fields, key_part)) {
+				key_fields[key_part] = Object.create(null);
 			}
-			else {
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = key_parts[i + 1][0] === '[]' ? [] : {};
-				}
 
-				key_fields = key_fields[key_part];
-			}
+			key_fields = key_fields[key_part];
 		}
 	}
 
@@ -910,7 +910,7 @@ function searchParamsToObject(search_params) {
 }
 
 /**
- * Convert nested data object into URL search parameters object.
+ * Convert a nested data object into URL search parameters object.
  *
  * @param {Object|Array} object
  *
@@ -918,12 +918,7 @@ function searchParamsToObject(search_params) {
  */
 function objectToSearchParams(object) {
 	const combine = (data, search_params = new URLSearchParams(), name_prefix = '') => {
-		if (Array.isArray(data)) {
-			for (const [index, datum] of data.entries()) {
-				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
-			}
-		}
-		else if (typeof data === 'object') {
+		if (typeof data === 'object') {
 			for (const [name, datum] of Object.entries(data)) {
 				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
 			}
@@ -936,6 +931,17 @@ function objectToSearchParams(object) {
 	};
 
 	return combine(object);
+}
+
+/**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
 }
 
 /**
@@ -978,4 +984,3 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
-

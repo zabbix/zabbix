@@ -239,11 +239,13 @@ class testPageHosts extends CLegacyWebTest {
 	 */
 	public function testPageHosts_FilterByStatus($data) {
 		$this->page->login()->open('zabbix.php?action=host.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
 		// Apply filtering parameters.
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
@@ -427,8 +429,10 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill($data['filter']);
+		$table = $this->query('class:list-table')->waitUntilpresent()->one();
 		$filter->submit();
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		$this->assertTableStats(count($data['expected']));
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -883,7 +887,8 @@ class testPageHosts extends CLegacyWebTest {
 	 * Test the Enable and Disable link in the Host list.
 	 */
 	public function testPageHosts_EnableDisableLink() {
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		// Reset the filter (filter_rst=1) so a filter left over from a previous test does not hide the host.
+		$this->page->login()->open('zabbix.php?action=host.list&filter_rst=1')->waitUntilReady();
 		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Enabled status');
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
@@ -893,6 +898,49 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 			CMessageElement::find()->one()->close();
+		}
+	}
+
+	public function testPageHosts_Delete() {
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill('Host for t');
+		$filter->submit();
+		$table->waitUntilReloaded();
+
+		$table_rows_count = $table->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
+
+		// Cancel delete.
+		$all_hosts = $this->query('id:all_hosts')->asCheckbox()->one();
+		$all_hosts->check();
+		$delete_button->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+		$all_hosts->uncheck();
+
+		$delete_hosts = [
+			['Host for tags filtering'],
+			['Host for tags filtering - clone', 'Host for tags filtering - update']
+		];
+
+		// Delete single/multiple hosts.
+		foreach ($delete_hosts as $selection) {
+			$host_count = count($selection);
+			$this->selectTableRows($selection);
+			$delete_button->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, ($host_count > 1) ? 'Hosts deleted' : 'Host deleted');
+			CMessageElement::find()->one()->close();
+			$table_rows_count = $table_rows_count - $host_count;
+			$this->assertTableStats($table_rows_count);
+			$this->assertSelectedCount(0);
 		}
 	}
 }

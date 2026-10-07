@@ -1,5 +1,7 @@
 <?php
 
+ob_start();
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Logger;
@@ -34,6 +36,13 @@ $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
 $app->add(new Session());
 
 $app->get('/', function (Request $request, Response $response, $args) {
+    # Helpfully redirect to `localhost` if accessed via 127.0.0.1 or 0.0.0.0 to ensure session cookie consistency and avoid state errors.
+    # (The url used in redirect_uri must match the url used to access the app)
+    if (in_array($request->getUri()->getHost(), ['127.0.0.1', '0.0.0.0'])) {
+        header('Location: http://localhost:' . $request->getUri()->getPort());
+        exit();
+    }
+
     $renderer = new PhpRenderer('./templates');
     $args["message"] = "This is a demo";
     return $renderer->render($response, "login.php", $args);

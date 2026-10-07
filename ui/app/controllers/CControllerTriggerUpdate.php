@@ -54,7 +54,10 @@ class CControllerTriggerUpdate extends CController {
 				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			]],
 			'url_name' => ['db triggers.url_name'],
-			'url' => ['db triggers.url', 'use' => [CUrlValidator::class, []]],
+			'url' => ['db triggers.url', 'use' => [CUrlValidator::class, [
+				'user_macro' => true,
+				'schemes' => CSettingsHelper::getAllowedUriSchemes()
+			]]],
 			'description' => ['db triggers.comments'],
 			'status' => ['db triggers.status', 'in' => [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]],
 			'tags' => ['objects', 'uniq' => ['tag', 'value'],

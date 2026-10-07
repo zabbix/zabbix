@@ -1,5 +1,5 @@
 
-# MikroTik CRS212-1G-10S-1SIN by SNMP
+# MikroTik CRS212-1G-10S-1S+IN by SNMP
 
 ## Overview
 

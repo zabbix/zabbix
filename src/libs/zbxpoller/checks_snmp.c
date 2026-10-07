@@ -3253,6 +3253,8 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	SNMP_MT_INITLOCK;
+
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == snmp_context->step)
 	{
 		if (NULL != reverse_dns)
@@ -3487,6 +3489,8 @@ stop:
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid: " ZBX_FS_UI64 " unhandled snmp error:'%s'",
 				snmp_context->item.itemid, snmp_error);
 	}
+
+	SNMP_MT_UNLOCK;
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{

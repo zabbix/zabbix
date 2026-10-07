@@ -7,7 +7,7 @@ use Exception;
 /**
  * xmlseclibs.php
  *
- * Copyright (c) 2007-2020, Robert Richards <rrichards@cdatazone.org>.
+ * Copyright (c) 2007-2024, Robert Richards <rrichards@cdatazone.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ use Exception;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @author    Robert Richards <rrichards@cdatazone.org>
- * @copyright 2007-2020 Robert Richards <rrichards@cdatazone.org>
+ * @copyright 2007-2024 Robert Richards <rrichards@cdatazone.org>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  */
 
@@ -475,6 +475,9 @@ class XMLSecurityKey
             // obtain and remove the authentication tag
             $offset = 0 - self::AUTHTAG_LENGTH;
             $authTag = substr($data, $offset);
+            if (strlen($authTag) !== self::AUTHTAG_LENGTH) {
+                throw new Exception('Authentication tag length is invalid');
+            }
             $data = substr($data, 0, $offset);
             $decrypted = openssl_decrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA, $this->iv, $authTag);
         } else {

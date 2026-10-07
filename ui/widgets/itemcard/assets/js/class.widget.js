@@ -15,6 +15,9 @@
 
 class CWidgetItemCard extends CWidget {
 
+	static VALUE_TYPE_IMAGE = 'image';
+	static VALUE_TYPE_RAW = 'raw';
+
 	#abort_controller = null;
 	#binary_button = null;
 	#binary_data_cache = new Map();
@@ -165,7 +168,7 @@ class CWidgetItemCard extends CWidget {
 
 					if (button !== null) {
 						switch (binary_data.type) {
-							case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+							case CWidgetItemCard.VALUE_TYPE_IMAGE:
 								if ('thumbnail' in binary_data) {
 									this.#makeThumbnailButton(button, binary_data);
 								} else {
@@ -173,7 +176,7 @@ class CWidgetItemCard extends CWidget {
 								}
 								break;
 
-							case CWidgetItemHistory.VALUE_TYPE_RAW:
+							case CWidgetItemCard.VALUE_TYPE_RAW:
 								this.#makeBinaryButton(button, binary_data);
 								break;
 
@@ -207,14 +210,14 @@ class CWidgetItemCard extends CWidget {
 		button.classList.add(ZBX_STYLE_BTN_LINK);
 
 		switch (binary_data.type) {
-			case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+			case CWidgetItemCard.VALUE_TYPE_IMAGE:
 				const img = document.createElement('img');
 				img.alt = button.dataset.alt;
 
 				this.#addHintbox(button, img);
 				break;
 
-			case CWidgetItemHistory.VALUE_TYPE_RAW:
+			case CWidgetItemCard.VALUE_TYPE_RAW:
 				const curl = this.#getHintboxContentCUrl();
 				curl.setArgument('action', 'widget.itemcard.binary_value.get');
 
@@ -250,14 +253,14 @@ class CWidgetItemCard extends CWidget {
 	#addHintbox(button, content, curl = null) {
 		button.dataset.hintbox = '1';
 		button.dataset.hintboxStatic = '1';
-		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox' + (content === '' ? ' nowrap' : '');
+		button.dataset.hintboxClass = 'dashboard-widget-itemcard-hintbox' + (content === '' ? ' nowrap' : '');
 
 		if (content instanceof HTMLImageElement) {
 			button.addEventListener('onShowHint.hintBox', e => {
 				const hint_box = e.target.hintBoxItem[0];
-				const container = hint_box.querySelector('.dashboard-widget-itemhistory-hintbox');
+				const container = hint_box.querySelector('.dashboard-widget-itemcard-hintbox');
 
-				hint_box.classList.add('dashboard-widget-itemhistory-hintbox-image');
+				hint_box.classList.add('dashboard-widget-itemcard-hintbox-image');
 
 				const curl = this.#getHintboxContentCUrl(button);
 
@@ -265,19 +268,6 @@ class CWidgetItemCard extends CWidget {
 				content.src = curl.getUrl();
 				container.innerHTML = '';
 				container.append(content);
-
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
 
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
@@ -293,14 +283,6 @@ class CWidgetItemCard extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {

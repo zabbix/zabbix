@@ -139,10 +139,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '50',
 						'URL (after login)' => ''
 					],
-					// TODO: xpath should be replaced after ZBX-23936 fix.
-					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
-						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
-					],
+					'disabled' => ['Username', 'xpath:.//button[@id="label-lang"]/..', 'Time zone', 'xpath:.//button[@id="label-theme"]/..'],
 					'disabled_values' => [
 						'id:label-lang' => 'System default',
 						'id:label-timezone' => CDateTimeHelper::getTimeZoneFormat('System default'),
@@ -177,7 +174,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
-					'disabled' => ['id:autologout', 'button:Delete'],
+					'disabled' => ['id:autologout'],
 					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
 					'hintbox_warning' => [
 						'Language' => 'You are not able to choose some of the languages,'.
@@ -221,6 +218,12 @@ class testFormUser extends CWebTest {
 		}
 
 		$form->checkValue($data['default']);
+
+		if ($user === 'Admin' || $user === 'guest') {
+			$disabled_button = ($user === 'Admin') ? 'button:Delete' : 'button:Change password';
+			$this->assertTrue($form->query($disabled_button)->one()->isDisplayed());
+			$this->assertFalse($form->query($disabled_button)->one()->isEnabled());
+		}
 
 		foreach ($data['disabled'] as $locator) {
 			$field = $form->getField($locator);
@@ -272,12 +275,12 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilReady();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilReady()->one();
 			$help_message = "Password requirements:\n".
 					"must be at least 8 characters long\n".
 					"must not contain user's name, surname or username\n".
 					"must not be one of common or context-specific passwords";
-			$this->assertEquals($help_message, $hint->one()->getText());
+			$this->assertEquals($help_message, $hint->getText());
 			$hint->query('class:btn-overlay-close')->one()->click();
 
 			$info_message = 'Password is not mandatory for non internal authentication type.';
@@ -289,7 +292,7 @@ class testFormUser extends CWebTest {
 		// Check hintbox contains correct text message.
 		foreach ($data['hintbox_warning'] as $field => $text) {
 			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}
@@ -367,7 +370,7 @@ class testFormUser extends CWebTest {
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
-			$this->assertTrue($form->getField('id:roleid')->isEnabled());
+			$this->assertTrue($form->getField('Role')->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
@@ -776,7 +779,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -792,7 +795,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Creating user by specifying only mandatory parameters.
@@ -1326,7 +1329,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #26 Incorrect URL protocol.
@@ -1337,7 +1340,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #27 Updating LDAP user with empty password fields.
@@ -1452,7 +1455,7 @@ class testFormUser extends CWebTest {
 		}
 
 		if ($update_user === 'Admin') {
-			$this->assertTrue($form->query('id:current_password')->one()->isVisible());
+			$form->query('id:current_password')->waitUntilVisible();
 		}
 		else {
 			$this->assertFalse($form->query('id:current_password')->one(false)->isValid());

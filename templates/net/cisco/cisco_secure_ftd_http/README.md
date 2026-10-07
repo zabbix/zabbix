@@ -33,6 +33,7 @@ You must set the following macros in the template or host configuration:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CISCO.FTD.HTTP_PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco Secure Firewall Threat Defense", e.g. {$HTTP.TLS.VERIFY:"Cisco Secure Firewall Threat Defense"}.</p>|`full`|
 |{$CISCO.FTD.API.URL}|<p>Cisco Secure Firewall Threat Defense REST API URL. Format example: `https://ftd.example.com/api/fdm/latest`</p>||
 |{$CISCO.FTD.API.USERNAME}|<p>Cisco Secure Firewall Threat Defense REST API username.</p>||
 |{$CISCO.FTD.API.PASSWORD}|<p>Cisco Secure Firewall Threat Defense REST API password.</p>||

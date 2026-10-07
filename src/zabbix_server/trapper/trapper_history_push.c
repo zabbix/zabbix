@@ -813,7 +813,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 	else
 		zbx_tcp_send(sock, j.buffer);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

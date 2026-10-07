@@ -136,7 +136,10 @@ static void	connector_destroy_manager(zbx_connector_manager_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, manager->worker_count);
 
 	for (i = 0; i < manager->worker_count; i++)
+	{
+		zbx_ipc_client_release(manager->workers[i].client);
 		zbx_vector_uint64_destroy(&manager->workers[i].ids);
+	}
 
 	zbx_free(manager->workers);
 	zbx_hashset_destroy(&manager->connectors);
@@ -180,6 +183,7 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
 		worker->client = client;
+		zbx_ipc_client_addref(client);
 		zbx_vector_uint64_create(&worker->ids);
 	}
 

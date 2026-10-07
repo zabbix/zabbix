@@ -277,7 +277,7 @@ class testDashboardURLWidget extends testWidgets {
 					'fields' => [
 						'URL' => 'dns://zabbix.com'
 					],
-					'error' => 'Invalid parameter "URL": unacceptable URL.'
+					'error' => 'Invalid parameter "URL": unacceptable URL scheme.'
 				]
 			],
 			[
@@ -286,7 +286,7 @@ class testDashboardURLWidget extends testWidgets {
 					'fields' => [
 						'URL' => 'message://zabbix.com'
 					],
-					'error' => 'Invalid parameter "URL": unacceptable URL.'
+					'error' => 'Invalid parameter "URL": unacceptable URL scheme.'
 				]
 			],
 			// Widget name "URL", if no name is given.
@@ -802,9 +802,8 @@ class testDashboardURLWidget extends testWidgets {
 		$this->query('button:Save changes')->one()->click();
 
 		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
-		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": cannot be empty.');
-		$message->close();
+		CMessageElement::find()->one()->close();
 
 		// Check updated valid URI schemes.
 		$dashboard->getWidget(self::$default_widget)->edit();
@@ -843,7 +842,7 @@ class testDashboardURLWidget extends testWidgets {
 				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			}
 			else {
-				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL.');
+				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL scheme.');
 				CMessageElement::find()->one()->close();
 				COverlayDialogElement::find()->one()->close();
 			}

@@ -1,5 +1,5 @@
 
-# MikroTik CRS326-24S2QRM by SNMP
+# MikroTik CRS326-24S+2Q+RM by SNMP
 
 ## Overview
 

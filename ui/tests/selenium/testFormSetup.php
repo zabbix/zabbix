@@ -21,6 +21,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
  * @backup sessions
  *
  * @backupConfig
+ *
+ * @onAfter waitUntilConfigRestored
  */
 class testFormSetup extends CWebTest {
 
@@ -84,7 +86,6 @@ class testFormSetup extends CWebTest {
 			'PHP databases support',
 			'PHP bcmath',
 			'PHP mbstring',
-			'PHP option "mbstring.func_overload"',
 			'PHP sockets',
 			'PHP gd',
 			'PHP gd PNG support',
@@ -307,9 +308,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complete the setup and check in DB that the default timezone was applied.
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Finish')->waitUntilVisible()->one()->click();
 
 		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
 				' \'default_timezone\') ORDER BY name', 'value_str'
@@ -325,7 +326,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
+		$this->query('id:zbx_server_name')->waitUntilVisible()->one()->fill('Zabbix server name');
 		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
@@ -1041,5 +1042,14 @@ class testFormSetup extends CWebTest {
 		// Uncheck the Database TLS encryption and verify that Verify database certificate field is hidden.
 		$tls_encryption->uncheck();
 		$this->assertFalse($verify_certificate->isDisplayed());
+	}
+
+	/**
+	 * Wait for frontend to get the restored config from zabbix.conf.php file. Otherwise the next tests are
+	 * executed with the configuration file written by the setup form, where Zabbix server name and Zabbix
+	 * server address are empty.
+	 */
+	public static function waitUntilConfigRestored() {
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 	}
 }

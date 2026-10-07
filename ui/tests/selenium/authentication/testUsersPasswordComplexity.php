@@ -1017,9 +1017,9 @@ class testUsersPasswordComplexity extends CWebTest {
 		if (array_key_exists('hint', $data)) {
 			// Summon hint-box and assert text accordingly to password complexity settings, then close hint-box.
 			$user_form->getLabel('Password')->query('xpath:./button[@data-hintbox]')->one()->click();
-			$hint = $user_form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
-			$this->assertEquals($data['hint'], $hint->one()->getText());
-			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
+			$this->assertEquals($data['hint'], $hint->getText());
+			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 			$hint->waitUntilNotPresent();
 		}
 		else {

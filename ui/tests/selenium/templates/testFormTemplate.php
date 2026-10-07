@@ -18,7 +18,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup hosts
@@ -113,8 +112,13 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilVisible()->one();
+
 		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
+
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
@@ -192,7 +196,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
 
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
+			$this->query('id:template_name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
 			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');

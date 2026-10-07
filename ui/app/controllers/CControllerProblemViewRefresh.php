@@ -141,7 +141,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 				'sort' => $this->getInput('sort', 'clock'),
 				'sortorder' => $this->getInput('sortorder', ZBX_SORT_DOWN),
 				'filter' => $filter,
-				'tabfilter_idx' => 'web.problem.filter'
+				'tabfilter_idx' => 'web.problem.filter',
+				'user' => ['debug_mode' => $this->getDebugMode()]
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

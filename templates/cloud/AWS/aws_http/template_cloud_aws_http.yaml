@@ -171,7 +171,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-1
+        version: 7.4-2
       groups:
         - name: Templates/Cloud
       items:
@@ -200,6 +200,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -220,7 +245,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -259,6 +284,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -378,7 +404,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -464,6 +490,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Backup Vault"}'
             - name: vault
               value: '{$AWS.BACKUP_VAULT.NAME}'
           tags:
@@ -556,6 +584,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -576,7 +629,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -615,6 +668,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -734,7 +788,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -885,6 +939,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Backup Vault"}'
             - name: vault
               value: '{$AWS.BACKUP_VAULT.NAME}'
           tags:
@@ -1364,14 +1420,14 @@ zabbix_export:
           description: 'Access key ID.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             label: 'Access key ID'
             description: 'Access keys are long-term credentials for an IAM user.'
         - macro: '{$AWS.ASSUME.ROLE.ARN}'
           description: 'ARN assume role; add when using the `assume_role` authorization method.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'ARN assume role'
             description: 'The ARN of the role to assume when using the assume_role authorization method.'
         - macro: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
@@ -1379,7 +1435,7 @@ zabbix_export:
           description: 'Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.'
           config:
             type: LIST
-            priority: '7'
+            priority: '8'
             label: 'Assume Role Metadata Authorization'
             description: 'Chose `True` when use instance metadata service to retrieve role credentials.'
             options:
@@ -1392,7 +1448,7 @@ zabbix_export:
           description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
           config:
             type: LIST
-            priority: '6'
+            priority: '7'
             label: 'Authorization method'
             description: 'Authorization method used to access AWS.'
             required: 'YES'
@@ -1408,7 +1464,7 @@ zabbix_export:
           description: 'The number of days over which to retrieve backup jobs.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             label: 'Job discovery period'
             description: 'The number of days over which to retrieve backup jobs. No less than 1.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1417,7 +1473,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by resource name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Job filter by resource name'
             description: 'Filter of discoverable jobs by resource name.'
@@ -1426,7 +1482,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by resource name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Job filter by resource name (exclude)'
             description: 'Filter to exclude discoverable jobs by resource name.'
@@ -1435,7 +1491,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by resource type.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Job filter by resource type'
             description: 'Filter of discoverable jobs by resource type.'
@@ -1444,7 +1500,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by resource type.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Job filter by resource type (exclude)'
             description: 'Filter to exclude discoverable jobs by resource type.'
@@ -1453,7 +1509,7 @@ zabbix_export:
           description: 'Filter of discoverable jobs by state.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Job filter by state'
             description: 'Filter of discoverable jobs by state.'
@@ -1462,7 +1518,7 @@ zabbix_export:
           description: 'Filter to exclude discovered jobs by state.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Job filter by state (exclude)'
             description: 'Filter to exclude discoverable jobs by state.'
@@ -1470,7 +1526,7 @@ zabbix_export:
           description: 'AWS backup vault name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'Backup vault name'
             description: 'AWS Backup vault name.'
         - macro: '{$AWS.DATA.TIMEOUT}'
@@ -1495,7 +1551,7 @@ zabbix_export:
           description: 'AWS backup vault region code.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'AWS Region'
             description: 'The AWS region where your backup vaults are located.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
@@ -1503,7 +1559,7 @@ zabbix_export:
           description: 'Secret access key.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             label: 'Secret access key'
             description: 'Secret access key can be retrieved only at the time you create it.'
         - macro: '{$AWS.STS.REGION}'
@@ -1511,9 +1567,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Backup Vault", e.g. {$HTTP.TLS.VERIFY:"AWS Backup Vault"}.'
+          config:
+            type: LIST
+            priority: '3'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 92a5197bbdeb403cabb6dd12eabb7deb
           name: 'AWS Backup vault'
@@ -2152,7 +2224,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       discovery_rules:
@@ -2162,6 +2234,31 @@ zabbix_export:
           key: aws.backup_vault.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -2182,7 +2279,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -2221,6 +2318,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -2340,7 +2438,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -2500,6 +2598,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.BACKUP_VAULT.NAME}'
               path: $.BackupVaultName
@@ -2511,6 +2611,31 @@ zabbix_export:
           key: aws.ec2.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -2531,7 +2656,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -2570,6 +2695,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -2690,7 +2816,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -2887,6 +3013,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instanceId
@@ -2900,13 +3028,38 @@ zabbix_export:
           key: aws.ecs.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -2945,6 +3098,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -3077,7 +3231,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -3281,6 +3435,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
               path: $.infrastructure
@@ -3319,6 +3475,31 @@ zabbix_export:
           key: aws.elb.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -3339,7 +3520,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -3378,6 +3559,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -3498,7 +3680,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -3664,6 +3846,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.ELB.ARN}'
               path: $.arn
@@ -3706,6 +3890,31 @@ zabbix_export:
           key: aws.lambda.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -3726,7 +3935,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -3765,6 +3974,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -3885,7 +4095,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -4051,6 +4261,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.LAMBDA.ARN}'
               path: $.arn
@@ -4068,6 +4280,31 @@ zabbix_export:
           key: aws.rds.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -4088,7 +4325,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -4127,6 +4364,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -4247,7 +4485,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -4405,6 +4643,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.RDS.INSTANCE.ID}'
               path: $.DBInstanceIdentifier
@@ -4416,6 +4656,31 @@ zabbix_export:
           key: aws.s3.discovery
           delay: 12h
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -4436,7 +4701,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -4475,6 +4740,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -4604,7 +4870,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -4723,6 +4989,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS"}'
           lld_macro_paths:
             - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
@@ -4792,7 +5060,7 @@ zabbix_export:
           description: 'Filter of discoverable backup vaults by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Backup vault filter by name'
             description: 'Filter of discoverable backup vaults by name.'
@@ -4801,7 +5069,7 @@ zabbix_export:
           description: 'Filter to exclude discovered backup vaults by name.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Backup vault filter by name (exclude)'
             description: 'Filter to exclude discovered backup vaults by name.'
@@ -4810,7 +5078,7 @@ zabbix_export:
           description: 'Filter of discoverable backup vaults by region.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'Backup vault filter by region'
             description: 'Filter of discoverable backup vaults by region.'
@@ -4819,7 +5087,7 @@ zabbix_export:
           description: 'Filter to exclude discovered backup vaults by region.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'Backup vault filter by region (exclude)'
             description: 'Filter to exclude discovered backup vaults by region.'
@@ -4828,7 +5096,7 @@ zabbix_export:
           description: 'A response timeout for an API.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Other
             label: 'Response timeout'
             description: 'A response timeout for an API.'
@@ -4837,7 +5105,7 @@ zabbix_export:
           description: 'Region used in POST request `DescribeRegions`.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'Region `DescribeRegions`'
             description: 'Region Used in POST request `DescribeRegions`.'
         - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
@@ -4845,7 +5113,7 @@ zabbix_export:
           description: 'Filter of discoverable EC2 instances by namespace.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'EC2 filter by namespace'
             description: 'Filter of discoverable EC2 instances by namespace.'
@@ -4854,7 +5122,7 @@ zabbix_export:
           description: 'Filter to exclude discovered EC2 instances by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'EC2 filter by namespace (exclude)'
             description: 'Filter to exclude discovered EC2 instances by namespace.'
@@ -4863,7 +5131,7 @@ zabbix_export:
           description: 'Filter of discoverable EC2 instances by region.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'EC2 filter by region'
             description: 'Filter of discoverable EC2 instances by region.'
@@ -4872,7 +5140,7 @@ zabbix_export:
           description: 'Filter to exclude discovered EC2 instances by region.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'EC2 filter by region (exclude)'
             description: 'Filter to exclude discovered EC2 instances by region.'
@@ -4881,7 +5149,7 @@ zabbix_export:
           description: 'Filter of discoverable ECS clusters by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'ECS filter by name'
             description: 'Filter of discoverable ECS clusters by name.'
@@ -4890,7 +5158,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ECS clusters by name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'ECS filter by name (exclude)'
             description: 'Filter to exclude discovered ECS clusters by name.'
@@ -4899,7 +5167,7 @@ zabbix_export:
           description: 'Filter of discoverable ECS clusters by region.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'ECS filter by region'
             description: 'Filter of discoverable ECS clusters by region.'
@@ -4908,7 +5176,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ECS clusters by region.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'ECS filter by region (exclude)'
             description: 'Filter to exclude discovered ECS clusters by region.'
@@ -4917,7 +5185,7 @@ zabbix_export:
           description: 'Filter of discoverable ECS clusters by status.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'ECS filter by status'
             description: 'Filter of discoverable ECS clusters by status.'
@@ -4926,7 +5194,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ECS clusters by status.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'ECS filter by status (exclude)'
             description: 'Filter to exclude discovered ECS clusters by status.'
@@ -4935,7 +5203,7 @@ zabbix_export:
           description: 'Filter of discoverable ELB load balancers by name.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'ELB filter by name'
             description: 'Filter of discoverable ELB load balancers by name.'
@@ -4944,7 +5212,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ELB load balancers by name.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'ELB filter by name (exclude)'
             description: 'Filter to exclude discovered ELB load balancers by name.'
@@ -4953,7 +5221,7 @@ zabbix_export:
           description: 'Filter of discoverable ELB load balancers by region.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'ELB filter by region'
             description: 'Filter of discoverable ELB load balancers by region.'
@@ -4962,7 +5230,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ELB load balancers by region.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'ELB filter by region (exclude)'
             description: 'Filter to exclude discovered ELB load balancers by region.'
@@ -4971,7 +5239,7 @@ zabbix_export:
           description: 'Filter of discoverable ELB load balancers by status.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'ELB filter by status'
             description: 'Filter of discoverable ELB load balancers by status.'
@@ -4980,7 +5248,7 @@ zabbix_export:
           description: 'Filter to exclude discovered ELB load balancer by status.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'ELB filter by status (exclude)'
             description: 'Filter to exclude discovered ELB load balancer by status.'
@@ -4989,7 +5257,7 @@ zabbix_export:
           description: 'Filter of discoverable Lambda functions by name.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Lambda filter by name'
             description: 'Filter of discoverable Lambda functions by name.'
@@ -4998,7 +5266,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Lambda functions by name.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Lambda filter by name (exclude)'
             description: 'Filter to exclude discovered Lambda functions by name.'
@@ -5007,7 +5275,7 @@ zabbix_export:
           description: 'Filter of discoverable Lambda functions by region.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Lambda filter by region'
             description: 'Filter of discoverable Lambda functions by region.'
@@ -5016,7 +5284,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Lambda functions by region.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Lambda filter by region (exclude)'
             description: 'Filter to exclude discovered Lambda functions by region.'
@@ -5025,7 +5293,7 @@ zabbix_export:
           description: 'Filter of discoverable Lambda functions by Runtime.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Lambda filter by Runtime'
             description: 'Filter of discoverable Lambda functions by Runtime.'
@@ -5034,7 +5302,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Lambda functions by Runtime.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Lambda filter by Runtime (exclude)'
             description: 'Filter to exclude discovered Lambda functions by Runtime.'
@@ -5051,7 +5319,7 @@ zabbix_export:
           description: 'Filter of discoverable RDS instances by namespace.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'RDS filter by namespace'
             description: 'Filter of discoverable RDS instances by namespace.'
@@ -5060,7 +5328,7 @@ zabbix_export:
           description: 'Filter to exclude discovered RDS instances by namespace.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'RDS filter by namespace (exclude)'
             description: 'Filter to exclude discovered RDS instances by namespace.'
@@ -5069,7 +5337,7 @@ zabbix_export:
           description: 'Filter of discoverable RDS instances by region.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'RDS filter by region'
             description: 'Filter of discoverable RDS instances by region.'
@@ -5078,7 +5346,7 @@ zabbix_export:
           description: 'Filter to exclude discovered RDS instances by region.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'RDS filter by region (exclude)'
             description: 'Filter to exclude discovered RDS instances by region.'
@@ -5087,7 +5355,7 @@ zabbix_export:
           description: 'Region used in GET request `ListBuckets`.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'Region `ListBuckets`'
             description: 'Region Used in GET request `ListBuckets`.'
         - macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
@@ -5095,7 +5363,7 @@ zabbix_export:
           description: 'Filter of discoverable S3 buckets by namespace.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'S3 filter by namespace'
             description: 'Filter of discoverable S3 buckets by namespace.'
@@ -5104,7 +5372,7 @@ zabbix_export:
           description: 'Filter to exclude discovered S3 buckets by namespace.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'S3 filter by namespace (exclude)'
             description: 'Filter to exclude discovered S3 buckets by namespace.'
@@ -5121,9 +5389,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'STS Region'
             description: 'Region Used in assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS", e.g. {$HTTP.TLS.VERIFY:"AWS"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
     - uuid: dce23cdaef364e139efa580d8a304ffe
       template: 'AWS Cost Explorer by HTTP'
       name: 'AWS Cost Explorer by HTTP'
@@ -5284,7 +5568,7 @@ zabbix_export:
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html).
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -5296,13 +5580,38 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -5341,6 +5650,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -5483,7 +5793,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -5576,6 +5886,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Cost Explorer"}'
           tags:
             - tag: component
               value: raw
@@ -5587,13 +5899,38 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -5632,6 +5969,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -5775,7 +6113,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -5901,6 +6239,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Cost Explorer"}'
           tags:
             - tag: component
               value: raw
@@ -6121,7 +6461,7 @@ zabbix_export:
           description: 'Filter of discoverable discovered billing service by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Service Filter (Matches)'
             description: 'A regex pattern to include services in discovery.'
@@ -6130,7 +6470,7 @@ zabbix_export:
           description: 'Filter to exclude discovered billing service by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Service Filter (Not Matches)'
             description: 'A regex pattern to exclude services from discovery.'
@@ -6139,7 +6479,7 @@ zabbix_export:
           description: 'Months to get historical data from AWS Cost Explore API, no more than 12 months.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'Billing Month'
             description: 'The number of months to retrieve historical billing data (maximum 12). In the range from 1 to 12 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -6148,7 +6488,7 @@ zabbix_export:
           description: 'Amazon Billing region code.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'Billing Region'
             description: 'The AWS region for billing data retrieval.'
         - macro: '{$AWS.PROXY}'
@@ -6172,9 +6512,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Cost Explorer", e.g. {$HTTP.TLS.VERIFY:"AWS Cost Explorer"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: e1e4edbf129142b4b27a9471db1ed8e2
           name: 'Overview AWS Costs'
@@ -6396,7 +6752,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -6405,7 +6761,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ec2.alarms.check
           value_type: CHAR
-          description: 'Check result of the alarm data has been got correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6801,6 +7157,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -6824,7 +7205,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -6862,6 +7243,7 @@ zabbix_export:
             		});
             	},
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -6982,7 +7364,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -7126,6 +7508,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS EC2"}'
           tags:
             - tag: component
               value: raw
@@ -7137,6 +7521,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -7158,7 +7567,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -7197,6 +7606,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -7399,7 +7809,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -7500,6 +7910,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS EC2"}'
           tags:
             - tag: component
               value: raw
@@ -7511,6 +7923,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -7534,7 +7971,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -7573,6 +8010,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -7693,7 +8131,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -7794,6 +8232,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS EC2"}'
           tags:
             - tag: component
               value: raw
@@ -7817,11 +8257,11 @@ zabbix_export:
             - tag: component
               value: metadata
         - uuid: 7c264d8d5d934f898f7c745acd429d25
-          name: 'Get metrics check'
+          name: 'EC2 metrics check'
           type: DEPENDENT
           key: aws.ec2.metrics.check
           value_type: CHAR
-          description: 'Check result of the instance metric data has been got correctly.'
+          description: 'Checks whether EC2 metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8026,7 +8466,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ec2.volumes.check
           value_type: CHAR
-          description: 'Check result of the volume information has been got correctly.'
+          description: 'Checks whether the volume information was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8180,7 +8620,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 6cf7fc98fea44b0789a5aaa837042699
-          name: 'Instance Volumes discovery'
+          name: 'EC2 volumes discovery'
           type: DEPENDENT
           key: aws.ec2.volumes.discovery
           filter:
@@ -8632,6 +9072,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	request_period: 600,
@@ -8653,7 +9118,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -8692,6 +9157,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -8882,7 +9348,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -8978,6 +9444,8 @@ zabbix_export:
                   value: '{$AWS.SECRET.ACCESS.KEY}'
                 - name: sts_region
                   value: '{$AWS.STS.REGION}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS EC2"}'
                 - name: volume_id
                   value: '{#VOLUME_ID}'
               tags:
@@ -9103,7 +9571,7 @@ zabbix_export:
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Minimum Burst Credit Balance Warning'
             description: 'The minimum percentage of Burst credits before a warning is triggered.'
@@ -9113,7 +9581,7 @@ zabbix_export:
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Minimum Byte Credit Balance Warning'
             description: 'The minimum percentage of Byte credits before a warning is triggered.'
@@ -9123,7 +9591,7 @@ zabbix_export:
           description: 'Minimum percentage of I/O credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Minimum I/O Credit Balance Warning'
             description: 'The minimum percentage of I/O credits before a warning is triggered.'
@@ -9133,7 +9601,7 @@ zabbix_export:
           description: 'Minimum number of free earned CPU credits for trigger expression.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Minimum CPU Credit Balance Warning'
             description: 'The minimum number of CPU credits before a warning is triggered.'
@@ -9143,7 +9611,7 @@ zabbix_export:
           description: 'Maximum number of spent CPU Surplus credits for trigger expression.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Maximum Surplus CPU Credit Balance Warning'
             description: 'The maximum number of surplus CPU credits before a warning is triggered.'
@@ -9153,7 +9621,7 @@ zabbix_export:
           description: 'The warning threshold of the CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'CPU Utilization Warning Threshold'
             description: 'The maximum CPU utilization percentage before a warning is triggered. In the range from 0 to 100 inclusive.'
@@ -9162,7 +9630,7 @@ zabbix_export:
           description: 'EC2 instance ID.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'EC2 Instance ID'
             description: 'The ID of the EC2 instance to monitor.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -9170,7 +9638,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'A regex to match discoverable alarm names.'
@@ -9179,7 +9647,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'A regex to exclude certain alarm names from discovery.'
@@ -9188,7 +9656,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'A regex to match discoverable alarm namespaces.'
@@ -9197,7 +9665,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'A regex to exclude certain alarm namespaces from discovery.'
@@ -9206,7 +9674,7 @@ zabbix_export:
           description: 'Filter of discoverable volumes by type.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Volume Type Filter (Matches)'
             description: 'A regex to match discoverable volume types.'
@@ -9215,7 +9683,7 @@ zabbix_export:
           description: 'Filter to exclude discovered volumes by type.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Volume Type Filter (Not Matches)'
             description: 'A regex to exclude certain volume types from discovery.'
@@ -9251,6 +9719,22 @@ zabbix_export:
             priority: '7'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS EC2", e.g. {$HTTP.TLS.VERIFY:"AWS EC2"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       valuemaps:
         - uuid: 50b7fdfdf6de41f4b4b210a07c10cd77
           name: 'Alarm state'
@@ -9459,7 +9943,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-7
       groups:
         - name: Templates/Cloud
       items:
@@ -9468,7 +9952,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ecs.alarms.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9566,6 +10050,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -9586,7 +10095,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -9624,6 +10133,7 @@ zabbix_export:
             		});
             	},
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -9743,7 +10253,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -9860,6 +10370,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -9871,13 +10383,38 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -9916,6 +10453,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -10050,7 +10588,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -10159,6 +10697,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -10170,6 +10710,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -10177,7 +10742,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -10216,6 +10781,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -10420,7 +10986,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -10530,6 +11096,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -10566,11 +11134,11 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a214cef0377b4901afc2cb90186e5e46
-          name: 'Get metrics check'
+          name: 'ECS metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether ECS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -10899,6 +11467,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	request_period: 600,
@@ -10906,7 +11499,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -10945,6 +11538,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -11160,7 +11754,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -11257,6 +11851,8 @@ zabbix_export:
                   value: '{#AWS.ECS.SERVICE.NAME}'
                 - name: sts_region
                   value: '{$AWS.STS.REGION}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS ECS Cluster"}'
               tags:
                 - tag: component
                   value: raw
@@ -11563,7 +12159,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Cluster CPU Utilization Warning Threshold'
             description: 'The warning threshold for cluster CPU utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -11573,7 +12169,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster memory utilization expressed in %.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Cluster Memory Utilization Warning Threshold'
             description: 'The warning threshold for cluster memory utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -11582,7 +12178,7 @@ zabbix_export:
           description: 'ECS cluster name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'ECS Cluster Name'
             description: 'The name of the ECS cluster to monitor.'
@@ -11591,7 +12187,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster service CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Service CPU Utilization Warning Threshold'
             description: 'The warning threshold for service CPU utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -11601,7 +12197,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster service memory utilization expressed in %.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Service Memory Utilization Warning Threshold'
             description: 'The warning threshold for service memory utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -11611,7 +12207,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'A regex pattern to include alarms by name.'
@@ -11620,7 +12216,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'A regex pattern to exclude alarms by name.'
@@ -11629,7 +12225,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'A regex pattern to include alarms by namespace.'
@@ -11638,7 +12234,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'A regex pattern to exclude alarms by namespace.'
@@ -11647,7 +12243,7 @@ zabbix_export:
           description: 'Filter of discoverable services by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Service Name Filter (Matches)'
             description: 'A regex pattern to include services by name.'
@@ -11656,7 +12252,7 @@ zabbix_export:
           description: 'Filter to exclude discovered services by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Service Name Filter (Not Matches)'
             description: 'A regex pattern to exclude services by name.'
@@ -11692,6 +12288,22 @@ zabbix_export:
             priority: '7'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Cluster"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: d06afc9b9488445d887659b67d955384
           name: 'Overview AWS ECS Cluster'
@@ -12028,7 +12640,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-7
       groups:
         - name: Templates/Cloud
       items:
@@ -12037,7 +12649,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ecs.alarms.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12176,6 +12788,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -12196,7 +12833,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -12234,6 +12871,7 @@ zabbix_export:
             		});
             	},
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -12353,7 +12991,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -12470,6 +13108,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -12481,13 +13121,38 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -12526,6 +13191,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -12660,7 +13326,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -12769,6 +13435,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -12780,6 +13448,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -12787,7 +13480,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -12826,6 +13519,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -13032,7 +13726,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -13143,6 +13837,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}'
           tags:
             - tag: component
               value: raw
@@ -13179,11 +13875,11 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 852512ccdd9e48f9849ac019d94cdf55
-          name: 'Get metrics check'
+          name: 'ECS metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether ECS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -13564,6 +14260,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	request_period: 600,
@@ -13571,7 +14292,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -13610,6 +14331,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -13825,7 +14547,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -13922,6 +14644,8 @@ zabbix_export:
                   value: '{#AWS.ECS.SERVICE.NAME}'
                 - name: sts_region
                   value: '{$AWS.STS.REGION}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}'
               tags:
                 - tag: component
                   value: raw
@@ -14270,7 +14994,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Cluster CPU Utilization Warning Threshold'
             description: 'The warning threshold for cluster CPU utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -14280,7 +15004,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster memory utilization expressed in %.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Cluster Memory Utilization Warning Threshold'
             description: 'The warning threshold for cluster memory utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -14289,7 +15013,7 @@ zabbix_export:
           description: 'ECS cluster name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'ECS Cluster Name'
             description: 'The name of the ECS cluster to monitor.'
@@ -14298,7 +15022,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster service CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Service CPU Utilization Warning Threshold'
             description: 'The warning threshold for service CPU utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -14308,7 +15032,7 @@ zabbix_export:
           description: 'The warning threshold of the cluster service memory utilization expressed in %.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Service Memory Utilization Warning Threshold'
             description: 'The warning threshold for service memory utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -14318,7 +15042,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'A regex to filter discoverable alarms by name.'
@@ -14327,7 +15051,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'A regex to exclude discovered alarms by name.'
@@ -14336,7 +15060,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'A regex to filter discoverable alarms by namespace.'
@@ -14345,7 +15069,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'A regex to exclude discovered alarms by namespace.'
@@ -14354,7 +15078,7 @@ zabbix_export:
           description: 'Filter of discoverable services by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Service Name Filter (Matches)'
             description: 'A regex to filter discoverable services by name.'
@@ -14363,7 +15087,7 @@ zabbix_export:
           description: 'Filter to exclude discovered services by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Service Name Filter (Not Matches)'
             description: 'A regex to exclude discovered services by name.'
@@ -14399,6 +15123,22 @@ zabbix_export:
             priority: '7'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Serverless Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 21cc12db2b0f4289b0660fcf5538b65d
           name: 'Overview AWS ECS Serverless Cluster'
@@ -14753,7 +15493,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -14777,7 +15517,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.elb.alb.alarms.check
           value_type: CHAR
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -14933,6 +15673,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -14953,7 +15718,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -14992,6 +15757,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -15112,7 +15878,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -15230,6 +15996,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}'
           tags:
             - tag: component
               value: raw
@@ -15241,6 +16009,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -15262,7 +16055,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -15301,6 +16094,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -15480,7 +16274,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -15558,6 +16352,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}'
           tags:
             - tag: component
               value: raw
@@ -15569,6 +16365,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -15589,7 +16410,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -15628,6 +16449,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -15747,7 +16569,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -15838,6 +16660,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}'
           tags:
             - tag: component
               value: raw
@@ -16043,11 +16867,11 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: 7fdd931458ba4fa5b3baff1d67e4a32f
-          name: 'Get metrics check'
+          name: 'ALB metrics check'
           type: DEPENDENT
           key: aws.elb.alb.metrics.check
           value_type: CHAR
-          description: 'Check that the Application Load Balancer metrics data has been received correctly.'
+          description: 'Checks whether ALB metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -16402,6 +17226,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	metadata: 'http://169.254.169.254/latest/',
@@ -16423,7 +17272,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -16462,6 +17311,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -16632,7 +17482,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -16712,6 +17562,8 @@ zabbix_export:
                   value: '{$AWS.STS.REGION}'
                 - name: target_arn
                   value: '{#AWS.ELB.TARGET.GROUP.ARN}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}'
               tags:
                 - tag: component
                   value: raw
@@ -17195,7 +18047,7 @@ zabbix_export:
           description: 'Amazon Resource Names (ARN) of the load balancer.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'Load Balancer ARN'
             description: 'The ARN of the load balancer.'
         - macro: '{$AWS.ELB.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -17203,7 +18055,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'Regex filter for discoverable alarms by name.'
@@ -17212,7 +18064,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'Regex filter to exclude discovered alarms by name.'
@@ -17221,7 +18073,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'Regex filter for discoverable alarms by namespace.'
@@ -17230,7 +18082,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'Regex filter to exclude discovered alarms by namespace.'
@@ -17239,7 +18091,7 @@ zabbix_export:
           description: 'Filter of discoverable target groups by name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Target Group Filter (Matches)'
             description: 'Regex filter for discoverable target groups by name.'
@@ -17248,7 +18100,7 @@ zabbix_export:
           description: 'Filter to exclude discovered target groups by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Target Group Filter (Not Matches)'
             description: 'Regex filter to exclude discovered target groups by name.'
@@ -17257,7 +18109,7 @@ zabbix_export:
           description: 'Maximum number of HTTP request failures for a trigger expression.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'HTTP 4XX Failures Threshold'
             description: 'Maximum number of HTTP 4XX failures allowed before triggering a warning.'
@@ -17267,7 +18119,7 @@ zabbix_export:
           description: 'Maximum number of HTTP request failures for a trigger expression.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'HTTP 5XX Failures Threshold'
             description: 'Maximum number of HTTP 5XX failures allowed before triggering a warning.'
@@ -17301,9 +18153,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Application Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 1020fa347dd24a2ba4091528e63639d4
           name: 'Overview AWS ELB Application Load Balancer'
@@ -17838,7 +18706,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -17921,7 +18789,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.elb.nlb.alarms.check
           value_type: CHAR
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -18049,6 +18917,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -18069,7 +18962,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -18108,6 +19001,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -18228,7 +19122,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -18346,6 +19240,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}'
           tags:
             - tag: component
               value: raw
@@ -18357,6 +19253,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -18378,7 +19299,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -18417,6 +19338,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -18600,7 +19522,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -18678,6 +19600,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}'
           tags:
             - tag: component
               value: raw
@@ -18689,6 +19613,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -18709,7 +19658,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -18748,6 +19697,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -18867,7 +19817,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -18958,15 +19908,17 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}'
           tags:
             - tag: component
               value: raw
         - uuid: 13516270f6124bf09a308bc20565528c
-          name: 'Get metrics check'
+          name: 'NLB metrics check'
           type: DEPENDENT
           key: aws.elb.nlb.metrics.check
           value_type: CHAR
-          description: 'Check that the Network Load Balancer metrics data has been received correctly.'
+          description: 'Checks whether NLB metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -19531,6 +20483,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	metadata: 'http://169.254.169.254/latest/',
@@ -19552,7 +20529,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -19591,6 +20568,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -19749,7 +20727,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -19829,6 +20807,8 @@ zabbix_export:
                   value: '{$AWS.STS.REGION}'
                 - name: target_arn
                   value: '{#AWS.ELB.TARGET.GROUP.ARN}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}'
               tags:
                 - tag: component
                   value: raw
@@ -20003,7 +20983,7 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'API response timeout'
             description: 'Timeout for API responses in seconds.'
@@ -20011,7 +20991,7 @@ zabbix_export:
           description: 'Amazon Resource Names (ARN) of the load balancer.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'Load Balancer ARN'
             description: 'The ARN of the load balancer.'
         - macro: '{$AWS.ELB.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -20019,7 +20999,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'Regex filter for discoverable alarms by name.'
@@ -20028,7 +21008,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'Regex filter to exclude discovered alarms by name.'
@@ -20037,7 +21017,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'Regex filter for discoverable alarms by namespace.'
@@ -20046,7 +21026,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'Regex filter to exclude discovered alarms by namespace.'
@@ -20055,7 +21035,7 @@ zabbix_export:
           description: 'Filter of discoverable target groups by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Target Group Filter (Matches)'
             description: 'Regex filter for discoverable target groups by name.'
@@ -20064,7 +21044,7 @@ zabbix_export:
           description: 'Filter to exclude discovered target groups by name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Target Group Filter (Not Matches)'
             description: 'Regex filter to exclude discovered target groups by name.'
@@ -20073,7 +21053,7 @@ zabbix_export:
           description: 'Maximum number of unhealthy hosts for a trigger expression.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Unhealthy Host Count'
             description: 'Maximum number of unhealthy hosts allowed before triggering a warning.'
@@ -20107,9 +21087,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Network Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}.'
+          config:
+            type: LIST
+            priority: '8'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 3b69323b2b8940b0a1fd0ae2ae2dc156
           name: 'Overview AWS ELB Network Load Balancer'
@@ -20534,7 +21530,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -20543,7 +21539,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.lambda.alarms.check
           value_type: CHAR
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -20691,6 +21687,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -20711,7 +21732,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -20750,6 +21771,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -20870,7 +21892,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -20984,6 +22006,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Lambda"}'
           tags:
             - tag: component
               value: raw
@@ -20995,6 +22019,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -21016,7 +22065,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -21055,6 +22104,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -21216,7 +22266,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -21294,6 +22344,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS Lambda"}'
           tags:
             - tag: component
               value: raw
@@ -21313,11 +22365,11 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: 2bfa15a2c1ef4f66a8b2065e34a1a690
-          name: 'Get metrics check'
+          name: 'Lambda metrics check'
           type: DEPENDENT
           key: aws.lambda.metrics.check
           value_type: CHAR
-          description: 'Check that the Lambda function metrics data has been received correctly.'
+          description: 'Checks whether Lambda metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -21569,7 +22621,7 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'API response timeout'
             description: 'Timeout for API responses in seconds.'
@@ -21577,7 +22629,7 @@ zabbix_export:
           description: 'The Amazon Resource Names (ARN) of the Lambda function.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'Lambda function ARN'
             description: 'The ARN of the Lambda function.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -21585,7 +22637,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm name filter (matches)'
             description: 'A regex to filter discoverable alarms by name.'
@@ -21594,7 +22646,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Alarm name filter (not matches)'
             description: 'A regex to exclude discovered alarms by name.'
@@ -21603,7 +22655,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alarm namespace filter (matches)'
             description: 'A regex to filter discoverable alarms by namespace.'
@@ -21612,7 +22664,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alarm namespace filter (not matches)'
             description: 'A regex to exclude discovered alarms by namespace.'
@@ -21645,9 +22697,25 @@ zabbix_export:
           description: 'Region used in assume role request.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'STS region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Lambda", e.g. {$HTTP.TLS.VERIFY:"AWS Lambda"}.'
+          config:
+            type: LIST
+            priority: '8'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: aab5dac54efa4d0cbc0f7980220e172e
           name: 'Overview AWS Lambda function'
@@ -21951,7 +23019,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -21960,7 +23028,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.rds.alarms.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -22291,7 +23359,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.rds.events.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the instance event data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -22401,6 +23469,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -22421,7 +23514,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -22460,6 +23553,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -22580,7 +23674,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -22694,6 +23788,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS RDS instance"}'
           tags:
             - tag: component
               value: raw
@@ -22705,6 +23801,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -22725,7 +23846,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -22764,6 +23885,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -22884,7 +24006,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -22988,6 +24110,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS RDS instance"}'
           tags:
             - tag: component
               value: raw
@@ -22999,6 +24123,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -23020,7 +24169,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -23059,6 +24208,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -23179,7 +24329,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -23274,6 +24424,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS RDS instance"}'
           tags:
             - tag: component
               value: raw
@@ -23285,6 +24437,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 600,
@@ -23306,7 +24483,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -23345,6 +24522,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -23569,7 +24747,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -23665,6 +24843,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS RDS instance"}'
           tags:
             - tag: component
               value: raw
@@ -23673,7 +24853,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.rds.instance_info.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the instance information was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -23698,11 +24878,11 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 8f651a01cd1d4639b6a4ef443285b24c
-          name: 'Get metrics check'
+          name: 'RDS metrics check'
           type: DEPENDENT
           key: aws.rds.metrics.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether RDS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -25244,7 +26424,7 @@ zabbix_export:
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Minimum Byte Credit Balance Warning'
             description: 'The minimum percentage of Byte credits remaining for the warning trigger.'
@@ -25254,7 +26434,7 @@ zabbix_export:
           description: 'Minimum percentage of I/O credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Minimum I/O Credit Balance Warning'
             description: 'The minimum percentage of I/O credits remaining for the warning trigger.'
@@ -25272,7 +26452,7 @@ zabbix_export:
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Thresholds
             label: 'Minimum Burst Credit Balance Warning'
             description: 'The minimum percentage of Burst credits remaining for the warning trigger.'
@@ -25282,7 +26462,7 @@ zabbix_export:
           description: 'Minimum number of free earned CPU credits for trigger expression.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Minimum CPU Credit Balance Warning'
             description: 'The minimum number of free earned CPU credits for the warning trigger.'
@@ -25292,7 +26472,7 @@ zabbix_export:
           description: 'The warning threshold of the CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'CPU Utilization Warning Threshold'
             description: 'The warning threshold for CPU utilization in percentage. In the range from 0 to 100 inclusive.'
@@ -25301,7 +26481,7 @@ zabbix_export:
           description: 'RDS DB Instance identifier.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'RDS Instance ID'
             description: 'The identifier of the RDS DB instance to monitor.'
         - macro: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -25309,7 +26489,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alarm Name Filter (Matches)'
             description: 'A regex to filter discoverable alarms by name.'
@@ -25318,7 +26498,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alarm Name Filter (Not Matches)'
             description: 'A regex to exclude discovered alarms by name.'
@@ -25327,7 +26507,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by namespace.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alarm Namespace Filter (Matches)'
             description: 'A regex to filter discoverable alarms by namespace.'
@@ -25336,7 +26516,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by namespace.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alarm Namespace Filter (Not Matches)'
             description: 'A regex to exclude discovered alarms by namespace.'
@@ -25345,7 +26525,7 @@ zabbix_export:
           description: 'Filter of discoverable events by category.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Event Category Filter (Matches)'
             description: 'A regex to filter discoverable events by category.'
@@ -25354,7 +26534,7 @@ zabbix_export:
           description: 'Filter to exclude discovered events by category.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Event Category Filter (Not Matches)'
             description: 'A regex to exclude discovered events by category.'
@@ -25363,7 +26543,7 @@ zabbix_export:
           description: 'Filter of discoverable events by source type.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Event Source Type Filter (Matches)'
             description: 'A regex to filter discoverable events by source type.'
@@ -25372,7 +26552,7 @@ zabbix_export:
           description: 'Filter to exclude discovered events by source type.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Event Source Type Filter (Not Matches)'
             description: 'A regex to exclude discovered events by source type.'
@@ -25400,6 +26580,22 @@ zabbix_export:
             priority: '7'
             label: 'STS Region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS RDS instance", e.g. {$HTTP.TLS.VERIFY:"AWS RDS instance"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       valuemaps:
         - uuid: 4ff4cda021a4464ebbebb42b7ee02673
           name: 'Alarm state'
@@ -25585,7 +26781,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -25594,7 +26790,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.s3.alarms.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -25646,6 +26842,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
@@ -25666,7 +26887,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -25705,6 +26926,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -25840,7 +27062,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
+            			request = new HttpRequest(AWS.tls.options),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -25972,6 +27194,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS S3 bucket"}'
           tags:
             - tag: component
               value: raw
@@ -25983,6 +27207,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AWS = {
             	params: {},
             	request_period: 2 * 86400,
@@ -26005,7 +27254,7 @@ zabbix_export:
             
             	getRoleBaseCredentials: function () {
             		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
+            		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -26044,6 +27293,7 @@ zabbix_export:
             	},
             
             	setParams: function (params) {
+            		AWS.tls = new CTlsConfig(params.tls_verify);
             		AWS.params['proxy'] = params.proxy;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
@@ -26233,7 +27483,7 @@ zabbix_export:
             			key = AWS.sign(key, region),
             			key = AWS.sign(key, service),
             			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest();
+            			request = new HttpRequest(AWS.tls.options);
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
@@ -26376,15 +27626,17 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: sts_region
               value: '{$AWS.STS.REGION}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"AWS S3 bucket"}'
           tags:
             - tag: component
               value: raw
         - uuid: 0e22c196ae834d2899068f25316ffed2
-          name: 'Get metrics check'
+          name: 'S3 metrics check'
           type: DEPENDENT
           key: aws.s3.metrics.check
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Checks whether S3 metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -26747,6 +27999,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AWS = {
                 	params: {},
                 	metadata: 'http://169.254.169.254/latest/',
@@ -26779,7 +28056,7 @@ zabbix_export:
                 
                 	getRoleBaseCredentials: function () {
                 		AWS.params['auth_type'] = 'role_base';
-                		var request = new HttpRequest();
+                		var request = new HttpRequest({SSLVerifyPeer: false, SSLVerifyHost: false});
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 			request.setProxy(AWS.params.proxy);
                 		}
@@ -26818,6 +28095,7 @@ zabbix_export:
                 	},
                 
                 	setParams: function (params) {
+                		AWS.tls = new CTlsConfig(params.tls_verify);
                 		AWS.params['proxy'] = params.proxy;
                 		switch (AWS.getField(params, 'auth_type')) {
                 			case 'role_base':
@@ -27010,7 +28288,7 @@ zabbix_export:
                 			key = AWS.sign(key, region),
                 			key = AWS.sign(key, service),
                 			key = AWS.sign(key, 'aws4_request'),
-                			request = new HttpRequest(),
+                			request = new HttpRequest(AWS.tls.options),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -27107,6 +28385,8 @@ zabbix_export:
                   value: '{$AWS.SECRET.ACCESS.KEY}'
                 - name: sts_region
                   value: '{$AWS.STS.REGION}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"AWS S3 bucket"}'
               tags:
                 - tag: component
                   value: raw
@@ -27438,7 +28718,7 @@ zabbix_export:
           description: 'S3 bucket name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             label: 'S3 bucket name'
             description: 'The name of the S3 bucket to monitor.'
         - macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
@@ -27446,7 +28726,7 @@ zabbix_export:
           description: 'Filter of discoverable alarms by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alarm name filter (matches)'
             description: 'A regex pattern to include alarms by name.'
@@ -27455,7 +28735,7 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alarm name filter (not matches)'
             description: 'A regex pattern to exclude alarms by name.'
@@ -27464,7 +28744,7 @@ zabbix_export:
           description: 'Filter of discoverable request metrics by filter ID name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Request metrics filter (matches)'
             description: 'A regex pattern to include request metrics by filter ID name.'
@@ -27473,7 +28753,7 @@ zabbix_export:
           description: 'Filter to exclude discovered request metrics by filter ID name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Request metrics filter (not matches)'
             description: 'A regex pattern to exclude request metrics by filter ID name.'
@@ -27482,7 +28762,7 @@ zabbix_export:
           description: 'Interval in seconds for getting request metrics. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Other
             label: 'Update interval'
             description: 'The interval in seconds for retrieving request metrics. In the range from 1 to 86400 inclusive.'
@@ -27503,6 +28783,22 @@ zabbix_export:
             priority: '7'
             label: 'STS region'
             description: 'The AWS region for the assume role request.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS S3 bucket", e.g. {$HTTP.TLS.VERIFY:"AWS S3 bucket"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       valuemaps:
         - uuid: 5f232f40f02246ab843c9aacdcf8d5c5
           name: 'Alarm state'

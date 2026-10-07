@@ -23,6 +23,8 @@ class HostInterfaceManager {
 	static SNMP_V2C = 2;
 	static SNMP_V3 = 3;
 	static SNMP_BULK_ENABLED = 1;
+	static SNMP_MAX_REPETITIONS = 10;
+	static SNMP_COMMUNITY = '{$SNMP_COMMUNITY}';
 	static INTERFACE_SECONDARY = 0;
 	static INTERFACE_PRIMARY = 1;
 	static INTERFACE_USE_IP = 1;
@@ -230,8 +232,8 @@ class HostInterfaceManager {
 			main: '0',
 			details: {
 				version: HostInterfaceManager.SNMP_V2C,
-				community: '{$SNMP_COMMUNITY}',
-				max_repetitions: 10,
+				community: HostInterfaceManager.SNMP_COMMUNITY,
+				max_repetitions: HostInterfaceManager.SNMP_MAX_REPETITIONS,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,
@@ -270,6 +272,17 @@ class HostInterfaceManager {
 		const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 		iface.type_name = this.INTERFACE_NAMES[iface.type];
+
+		if (iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP) {
+			iface.details.community = typeof iface.details.community === 'undefined'
+				? HostInterfaceManager.SNMP_COMMUNITY
+				: iface.details.community;
+
+			iface.details.max_repetitions = typeof iface.details.max_repetitions === 'undefined'
+				? HostInterfaceManager.SNMP_MAX_REPETITIONS
+				: iface.details.max_repetitions;
+		}
+
 		const template = iface.type == HostInterfaceManager.INTERFACE_TYPE_SNMP ? this.TEMPLATE_SNMP : this.TEMPLATE;
 
 		/*

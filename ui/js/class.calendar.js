@@ -28,11 +28,13 @@ var CLNDR = null,
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
 		CLNDR.clndrhide();
+		trigger_elmnt.setAttribute('aria-expanded', 'false');
 	}
 	else {
 		CLNDR && CLNDR.clndrhide();
 		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
 		CLNDR.clndrshow();
+		trigger_elmnt.setAttribute('aria-expanded', 'true');
 	}
 }
 
@@ -46,14 +48,14 @@ calendar.prototype = {
 	clndr_month_div: null,		// html obj
 	clndr_year_div: null,		// html obj
 	clndr_days: null,			// html obj
-	clndr_month: null,			// html obj
 	clndr_year: null,			// html obj
 	clndr_year_wrap: null,		// html obj
+	clndr_yearup: null,			// html bttn obj
+	clndr_yeardown: null,		// html bttn obj
+	clndr_month: null,			// html obj
 	clndr_month_wrap: null,		// html obj
 	clndr_monthup: null,		// html bttn obj
 	clndr_monthdown: null,		// html bttn obj
-	clndr_yearup: null,			// html bttn obj
-	clndr_yeardown: null,		// html bttn obj
 	timeobject: null,			// Input field with selected time. Source and destination of selected date.
 	is_visible: false,			// State of calendar visibility.
 	has_user_time: false,		// Confirms, if time was selected from input field.
@@ -67,7 +69,7 @@ calendar.prototype = {
 	dayname: new Array(t('S_SUNDAY'), t('S_MONDAY'), t('S_TUESDAY'), t('S_WEDNESDAY'), t('S_THURSDAY'), t('S_FRIDAY'),
 		t('S_SATURDAY')
 	),
-	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
+	sections: new Array('.btn-year-prev', '.btn-year-next', '.btn-month-prev', '.btn-month-next', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 	trigger_elmnt: null,		// Calendar visibility trigger element.
 
@@ -154,7 +156,7 @@ calendar.prototype = {
 		if (event.which == 32) { // Space
 			// Enter has special meaning for each Calendar section.
 			var active_section = this.sections[this.active_section];
-			if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
+			if (['.btn-year-prev', '.btn-year-next', '.btn-month-prev', '.btn-month-next'].includes(active_section)) {
 				this.active_section++;
 				this.focusSection();
 			}
@@ -221,25 +223,51 @@ calendar.prototype = {
 							.focus();
 						break;
 
-					case '.calendar-year':
+					case '.btn-year-prev':
 						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
 							this.yeardown();
 						}
 						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
-							this.yearup();
+							this.active_section++;
+							this.focusSection();
 						}
 						break;
 
-					case '.calendar-month':
+					case '.btn-year-next':
+						// Arrow right or arrow up.
+						if (event.which == 38 || event.which == 39) {
+							this.yearup();
+						}
+						// Arrow left or arrow down.
+						else if (event.which == 37 || event.which == 40) {
+							this.active_section--;
+							this.focusSection();
+						}
+						break;
+
+					case '.btn-month-prev':
 						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
 							this.monthdown();
 						}
 						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
+							this.active_section++;
+							this.focusSection();
+						}
+						break;
+
+					case '.btn-month-next':
+						// Arrow right or arrow up.
+						if (event.which == 38 || event.which == 39) {
 							this.monthup();
+						}
+						// Arrow left or arrow down.
+						else if (event.which == 37 || event.which == 40) {
+							this.active_section--;
+							this.focusSection();
 						}
 						break;
 				}
@@ -271,7 +299,8 @@ calendar.prototype = {
 			case 13: // Enter
 				// Enter has special meaning for each Calendar section.
 				var active_section = this.sections[this.active_section];
-				if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
+				if (['.btn-year-prev', '.btn-year-next', '.btn-month-prev', '.btn-month-next']
+						.includes(active_section)) {
 					this.active_section++;
 					this.focusSection();
 				}
@@ -290,7 +319,7 @@ calendar.prototype = {
 		var section_to_focus = this.sections[this.active_section];
 
 		jQuery('.highlighted', this.clndr_calendar).removeClass('highlighted').blur();
-		if (section_to_focus === '.calendar-year' ||  section_to_focus === '.calendar-month') {
+		if (['.btn-year-prev', '.btn-year-next', '.btn-month-prev', '.btn-month-next'].includes(section_to_focus)) {
 			jQuery(section_to_focus, this.clndr_calendar).addClass('highlighted').focus();
 		}
 		else if (section_to_focus === '.calendar-date') {
@@ -568,7 +597,6 @@ calendar.prototype = {
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.setAttribute('aria-label', t('S_CALENDAR'));
 		this.clndr_calendar.setAttribute('role', 'application');
-		this.clndr_calendar.setAttribute('tabindex', '0');
 		this.clndr_calendar.style.display = 'none';
 
 		document.body.appendChild(this.clndr_calendar);
@@ -582,7 +610,6 @@ calendar.prototype = {
 
 		//  year
 		this.clndr_year_div = document.createElement('div');
-		this.clndr_year_div.setAttribute('role', 'presentation');
 		this.clndr_year_div.className = 'calendar-year';
 		header.appendChild(this.clndr_year_div);
 
@@ -599,14 +626,11 @@ calendar.prototype = {
 		this.clndr_year_div.appendChild(this.clndr_yeardown);
 
 		this.clndr_year = document.createTextNode('');
-
 		this.clndr_year_wrap = document.createElement('span');
 		this.clndr_year_wrap.appendChild(this.clndr_year);
-		this.clndr_year_wrap.setAttribute('aria-live', 'assertive');
-		this.clndr_year_wrap.setAttribute('id', 'current-year'+this.id);
-		this.clndr_year_wrap.setAttribute('aria-atomic', 'true');
+		this.clndr_year_wrap.setAttribute('id', `current-year${this.id}`);
+		this.clndr_year_wrap.setAttribute('aria-live', 'polite');
 		this.clndr_year_div.appendChild(this.clndr_year_wrap);
-		this.clndr_year_div.setAttribute('aria-labelledby', this.clndr_year_wrap.id);
 
 		this.clndr_yearup = document.createElement('button');
 		this.clndr_yearup.setAttribute('type', 'button');
@@ -618,7 +642,6 @@ calendar.prototype = {
 		// month
 		this.clndr_month_div = document.createElement('div');
 		this.clndr_month_div.className = 'calendar-month';
-		this.clndr_month_div.setAttribute('role', 'presentation');
 		header.appendChild(this.clndr_month_div);
 
 		var arrow_left = document.createElement('span');
@@ -628,24 +651,22 @@ calendar.prototype = {
 
 		this.clndr_monthdown = document.createElement('button');
 		this.clndr_monthdown.setAttribute('type', 'button');
-		this.clndr_monthdown.setAttribute('tabindex', '-1');
-		this.clndr_monthdown.className = 'btn-grey';
+		this.clndr_monthdown.className = `${ZBX_STYLE_BTN_GREY} btn-month-prev`;
+		this.clndr_monthdown.setAttribute('aria-label', t('Previous month'));
 		this.clndr_monthdown.appendChild(arrow_left);
 		this.clndr_month_div.appendChild(this.clndr_monthdown);
 
 		this.clndr_month = document.createTextNode('');
 		this.clndr_month_wrap = document.createElement('span');
-		this.clndr_month_wrap.setAttribute('aria-live', 'assertive');
-		this.clndr_month_wrap.setAttribute('aria-atomic', 'true');
-		this.clndr_month_wrap.setAttribute('id', 'current-month'+this.id);
 		this.clndr_month_wrap.appendChild(this.clndr_month);
+		this.clndr_month_wrap.setAttribute('id', `current-month${this.id}`);
+		this.clndr_month_wrap.setAttribute('aria-live', 'polite');
 		this.clndr_month_div.appendChild(this.clndr_month_wrap);
-		this.clndr_month_div.setAttribute('aria-labelledby', this.clndr_month_wrap.id);
 
 		this.clndr_monthup = document.createElement('button');
 		this.clndr_monthup.setAttribute('type', 'button');
-		this.clndr_monthup.setAttribute('tabindex', '-1');
-		this.clndr_monthup.className = 'btn-grey';
+		this.clndr_monthup.className = `${ZBX_STYLE_BTN_GREY} btn-month-next`;
+		this.clndr_monthup.setAttribute('aria-label', t('Next month'));
 		this.clndr_monthup.appendChild(arrow_right);
 		this.clndr_month_div.appendChild(this.clndr_monthup);
 

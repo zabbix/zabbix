@@ -13,117 +13,70 @@
 **/
 
 
-class CFieldArray extends CField {
-
-	/**
-	 * Array of input field references that particular FieldArray instance holds.
-	 *
-	 * @type {Array<CField>}
-	 */
-	#fields = [];
-
-	init() {
-		super.init();
-
-		this.#discoverAllFields();
-
-		this._prev_value = this.getValue();
-
-		const observer = new MutationObserver(this.#detectFieldChanges);
-
-		observer.observe(this._field, {
-			childList: true,
-			subtree: true
-		});
-
-		this._field.addEventListener('click', e => e.target.matches('[type="checkbox"]') && this.#detectFieldChanges());
-	}
-
-	getName() {
-		return this._field.getAttribute('data-field-name');
-	}
+class CFieldArray extends CFieldCollection {
 
 	getInnerValue(trim_value) {
 		const result = [];
 
-		for (const field of this.#fields) {
+		for (const [key, field] of Object.entries(this.getFields())) {
 			const value = trim_value ? field.getValueTrimmed() : field.getValue();
 
 			if (value !== null) {
-				result.push(value);
+				result[key] = value;
 			}
 		}
 
 		return result;
 	}
 
-	getValue() {
-		return this.getInnerValue(false);
+	_normalizeSubfieldName(subfield_name, index) {
+		const subname = super._normalizeSubfieldName(subfield_name, index);
+
+		return subname === '[]' ? `${index}` : subname.substring(1, subname.length - 1);
 	}
 
-	getValueTrimmed() {
-		return this.getInnerValue(true);
-	}
-
-	updateState() {
-		this.#discoverAllFields();
-	}
-
-	_appendErrorHint(error_hint) {
-		this._field.parentNode.parentNode.appendChild(error_hint);
-	}
-
-	_toggleError() {
-		this._field.parentNode.classList.toggle('has-error', this.hasErrorHint());
-	}
-
-	#detectFieldChanges = () => {
-		this.#discoverAllFields();
-
-		if (this.#hasValueChanged()) {
-			this.fieldChanged();
+	_bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
+		if (field_type === 'checkbox') {
+			discovered_field.addEventListener('field.change', (e) => {
+				if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
+					this.fieldChanged([this.getName(), ...e.detail.source_fields]);
+				}
+			});
+		}
+		else {
+			super._bindDiscoveredFieldChangeEvent(discovered_field, field_type);
 		}
 	}
 
-	#discoverAllFields() {
-		const fields = [];
+	_fieldsSetErrors(errors, force_display_errors) {
+		for (const [key, field_errors] of Object.entries(errors)) {
+			const key_full = key.replaceAll('[', '').replaceAll(']', '');
 
-		for (const field of CForm.findAllFields(this._field)) {
-			const field_type = field.getAttribute('data-field-type');
+			if (key_full in this.getFields()) {
+				const field = this.getFields()[key_full];
+				// These errors need to be added even if field is not changed, but smaller index one was.
+				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
+					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+				];
 
-			if (field_type in CForm.field_types) {
-				let field_instance = this.#fields.find(discovered_field => discovered_field.isSameField(field));
+				if (field.hasChanged() || force_display_errors
+						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
+					field_errors.forEach((error) => field.setErrors(error));
 
-				if (field_instance === undefined) {
-					field_instance = new CForm.field_types[field_type](field);
-					field_instance.init();
-					field_instance.setTabId(this._tab_id);
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
 				}
-				else {
-					field_instance.updateState();
-				}
+			}
+			else if (errors[key] !== '') {
+				// Field is not present in fields, display generic error.
+				let extended_name = this.getName() + key;
+				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');
 
-				fields.push(field_instance);
+				field_errors.forEach(error => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + extended_name + '": ' + error.message);
+					}
+				});
 			}
 		}
-
-		this.#fields = fields;
-	}
-
-	#hasValueChanged() {
-		const a = this._prev_value.sort();
-		const b = this.getValue().sort();
-
-		if (a.length != b.length) {
-			return true;
-		}
-
-		for (let i = 0; a.length > i; i++) {
-			if (a[i] != b[i]) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

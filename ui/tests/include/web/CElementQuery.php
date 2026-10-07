@@ -584,11 +584,12 @@ class CElementQuery implements IWaitable {
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
 				'/textarea[@name]'
 			],
-			'CListElement'				=> '/select[@name]',
-			'CDropdownElement'			=> '/z-select[@name]',
-			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
+			'CListElement'				=> ['/select[@name]'],
+			'CDropdownElement'			=> ['/z-select[@name]'],
+			'CCheckboxElement'			=> ['/input[@name][@type="checkbox" or @type="radio"]'],
 			'CMultiselectElement'		=> [
-				'/div[contains(@class, "multiselect-control")]'
+				'/div[contains(@class, "multiselect-control")]',
+				'/div/div[contains(@class, "multiselect-control")]'
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
@@ -612,15 +613,13 @@ class CElementQuery implements IWaitable {
 			'CColorPickerElement'		=> [
 				'/z-color-picker'
 			],
-			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
-			'CFieldsetElement'			=> '/fieldset'
+			'CMultilineElement'			=> ['/div[contains(@class, "multilineinput-control")]'],
+			'CInputGroupElement'		=> ['/div[contains(@class, "macro-input-group")]'],
+			'CFieldsetElement'			=> ['/fieldset']
 		];
 
 		if ($class !== null) {
-			if (!is_array($class)) {
-				$class = [$class];
-			}
+			$class = (array) $class;
 
 			foreach (array_keys($classes) as $name) {
 				if (!in_array($name, $class)) {
@@ -629,24 +628,141 @@ class CElementQuery implements IWaitable {
 			}
 		}
 
-		foreach ($classes as $class => $selectors) {
-			if (!is_array($selectors)) {
-				$selectors = [$selectors];
+		// CHostInterfaceElement is located via a nested marker, but the match resolves to an ancestor of it,
+		// so the found element carries no attribute of its own to classify it by - it has to stay a separate query.
+		$host_interface = null;
+
+		if (array_key_exists('CHostInterfaceElement', $classes)) {
+			$host_interface = $classes['CHostInterfaceElement'];
+			unset($classes['CHostInterfaceElement']);
+		}
+
+		if ($classes) {
+			static::$selector = 'xpath:'.$prefix.implode('|'.$prefix, array_merge(...array_values($classes)));
+			$collection = $target->query(static::$selector)->all();
+
+			$found = null;
+			$element = null;
+
+			if (!$collection->isEmpty()) {
+				if (count($classes) === 1) {
+					$found = array_key_first($classes);
+					$element = $collection->first();
+				}
+				else {
+					$nodes = array_values($collection->asArray());
+
+					$attributes = CElementQuery::getDriver()->executeScript(
+						'return arguments[0].map(function (node) {'.
+								'return [node.tagName.toLowerCase(), node.getAttribute("class") || "",'.
+									'node.getAttribute("type") || ""];'.
+							'});',
+						[$nodes]
+					);
+
+					$matches = [];
+					foreach ($nodes as $i => $node) {
+						$node_class = self::resolveInputElementClass($attributes[$i][0], $attributes[$i][1],
+							$attributes[$i][2]
+						);
+
+						if ($node_class !== null && array_key_exists($node_class, $classes)
+								&& !array_key_exists($node_class, $matches)) {
+							$matches[$node_class] = $node;
+						}
+					}
+
+					foreach (array_keys($classes) as $name) {
+						if (array_key_exists($name, $matches)) {
+							$found = $name;
+							$element = $matches[$name];
+							break;
+						}
+					}
+				}
 			}
 
-			$xpaths = [];
-			foreach ($selectors as $selector) {
-				$xpaths[] = $prefix.$selector;
-			}
+			if ($found !== null) {
+				static::$selector = 'xpath:'.$prefix.implode('|'.$prefix, $classes[$found]);
 
-			static::$selector = 'xpath:'.implode('|', $xpaths);
-			$element = $target->query(static::$selector)->cast($class)->one(false);
+				return call_user_func([$found, 'createInstance'], $element, [
+					'parent' => ($target !== static::getDriver()) ? $target : null,
+					'by' => static::getSelector('xpath', $prefix.implode('|'.$prefix, $classes[$found]))
+				]);
+			}
+		}
+
+		if ($host_interface !== null) {
+			static::$selector = 'xpath:'.$prefix.implode('|'.$prefix, $host_interface);
+			$element = $target->query(static::$selector)->cast('CHostInterfaceElement')->one(false);
 			if ($element->isValid()) {
 				return $element;
 			}
 		}
 
 		static::$selector = null;
+
 		return new CNullElement(['locator' => 'input element']);
+	}
+
+	/**
+	 * Determine element class based on tag name and attributes of an already located element.
+	 * Mirrors the matching rules encoded in the xpath selectors built by self::getInputElement().
+	 *
+	 * @param string $tag      lower-cased tag name
+	 * @param string $class    "class" attribute value ('' if absent)
+	 * @param string $type     "type" attribute value, relevant for <input> only ('' if absent)
+	 *
+	 * @return string|null
+	 */
+	protected static function resolveInputElementClass($tag, $class, $type) {
+		switch ($tag) {
+			case 'textarea':
+				return 'CElement';
+
+			case 'select':
+				return 'CListElement';
+
+			case 'z-select':
+				return 'CDropdownElement';
+
+			case 'z-color-picker':
+				return 'CColorPickerElement';
+
+			case 'table':
+				return 'CMultifieldTableElement';
+
+			case 'fieldset':
+				return 'CFieldsetElement';
+
+			case 'input':
+				return in_array($type, ['checkbox', 'radio']) ? 'CCheckboxElement' : 'CElement';
+		}
+
+		if (strpos($class, 'multiselect-control') !== false || strpos($class, 'multiselect') !== false) {
+			return 'CMultiselectElement';
+		}
+
+		if (strpos($class, 'radio-list-control') !== false) {
+			return 'CSegmentedRadioElement';
+		}
+
+		if (strpos($class, 'checkbox-list') !== false || strpos($class, 'list-check-radio') !== false) {
+			return 'CCheckboxListElement';
+		}
+
+		if (strpos($class, 'range-control') !== false || strpos($class, 'calendar-control') !== false) {
+			return 'CCompositeInputElement';
+		}
+
+		if (strpos($class, 'multilineinput-control') !== false) {
+			return 'CMultilineElement';
+		}
+
+		if (strpos($class, 'macro-input-group') !== false) {
+			return 'CInputGroupElement';
+		}
+
+		return null;
 	}
 }

@@ -562,6 +562,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$table->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'At least one LDAP server must exist');
+		CMessageElement::find()->one()->close();
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 
 		// Uncheck LDAP authentication and try saving again. Make sure the server is not deleted from DB before saving.
@@ -3028,7 +3029,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			if ($field === 'Host') {
 				$ldap_form->checkValue(['Bind password' => '']);
 				$bind_password_field->query('xpath:./button[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);

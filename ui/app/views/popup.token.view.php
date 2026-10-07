@@ -50,6 +50,7 @@ $token_from_grid = (new CFormGrid())
 				->addClass('js-copy-button')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
+				->setAttribute('aria-label', _('Copy to clipboard'))
 		])
 	])
 	->addItem([
