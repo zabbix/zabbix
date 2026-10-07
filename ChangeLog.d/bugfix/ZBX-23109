@@ -1,0 +1,1 @@
+..F....... [ZBX-23109] fixed to auto set SNMP max repetition count and community on SNMP version change for host interface (gberzina)

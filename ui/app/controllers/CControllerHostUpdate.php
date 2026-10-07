@@ -22,7 +22,8 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 	private $host;
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
+		$ret = $this->validateInput(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields())
+			& $this->validateInterfaces();
 
 		if (!$ret) {
 			$this->setResponse(
