@@ -30,8 +30,8 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$IGNITE.PASSWORD}|||
-|{$IGNITE.USER}||`zabbix`|
+|{$IGNITE.PASSWORD}|<p>Ignite JMX password.</p>||
+|{$IGNITE.USER}|<p>Ignite JMX user.</p>|`zabbix`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}|<p>Filter of discoverable thread pools.</p>|`.*`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}|<p>Filter to exclude discovered thread pools.</p>|`Macro too long. Please see the template.`|
 |{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}|<p>Filter of discoverable data regions.</p>|`.*`|

@@ -29,13 +29,13 @@
 		#hostid;
 
 		/**
-		 * Selected dashboard ID.
-		 * @type {string}
+		 * Selected dashboard
+		 * @type {Object}
 		 */
-		#dashboardid;
+		#dashboard;
 
 		/**
-		 * @tape {Object}
+		 * @type {Object}
 		 */
 		#host_dashboards;
 
@@ -57,7 +57,12 @@
 		/**
 		 * @type {HTMLElement}
 		 */
-		#host_dashboard_navigation_tabs
+		#host_dashboard_navigation_tabs;
+
+		/**
+		 * @type {Object}
+		 */
+		#dashboard_time_period;
 
 		/**
 		 * @type {HTMLElement}
@@ -79,13 +84,15 @@
 			dashboard,
 			widget_defaults,
 			configuration_hash,
+			start_slideshow,
 			broadcast_requirements,
 			dashboard_host,
 			dashboard_time_period,
 			web_layout_mode
 		}) {
 			this.#hostid = dashboard_host.hostid;
-			this.#dashboardid = dashboard.dashboardid;
+			this.#dashboard = dashboard;
+			this.#dashboard_time_period = dashboard_time_period;
 
 			if (dashboard.pages.length > 1 || (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length > 0)) {
 				timeControl.refreshPage = false;
@@ -159,13 +166,28 @@
 					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 				});
 
-				ZABBIX.Dashboard.activate();
-
 				ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, (e) => this.#onFeedback(e));
 
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
 					location.href = location.href;
 				});
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECT, e => {
+					const {dashboard_page_index} = e.detail;
+					const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
+
+					this.#updateHistory({page, add_new: false});
+				});
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
+					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
+				});
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, () => {
+					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
+				});
+
+				ZABBIX.Dashboard.activate(start_slideshow);
 			}
 
 			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
@@ -188,6 +210,46 @@
 			}
 
 			this.#initPopupListeners();
+		}
+
+		#updateHistory({slideshow = null, page = undefined, add_new} = {}) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'host.dashboard.view');
+			curl.setArgument('hostid', this.#hostid);
+			curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+
+			const state = {};
+
+			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
+				curl.setArgument('from', this.#dashboard_time_period.from);
+				curl.setArgument('to', this.#dashboard_time_period.to);
+			}
+
+			const url = new Curl();
+
+			if (page === undefined) {
+				page = url.getArgument('page');
+			}
+
+			if (page !== null) {
+				curl.setArgument('page', page);
+			}
+
+			const auto_start = this.#dashboard.auto_start === '1' ? DASHBOARD_SLIDESHOW_ON : DASHBOARD_SLIDESHOW_OFF;
+
+			slideshow = slideshow ?? url.getArgument('slideshow');
+
+			if (slideshow !== null && slideshow !== auto_start) {
+				curl.setArgument('slideshow', slideshow);
+			}
+
+			if (add_new) {
+				history.pushState(state, '', curl.getUrl());
+			}
+			else {
+				history.replaceState(state, '', curl.getUrl());
+			}
 		}
 
 		#activateHostDashboardNavigation() {
@@ -224,7 +286,7 @@
 				this.#host_dashboard_tabs.set(host_dashboard.dashboardid, tab);
 			}
 
-			this.#selected_dashboard_tab = this.#host_dashboard_tabs.get(this.#dashboardid);
+			this.#selected_dashboard_tab = this.#host_dashboard_tabs.get(this.#dashboard.dashboardid);
 			this.#selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 			this.#previous_dashboard.disabled = this.#selected_dashboard_tab.previousElementSibling === null;
 			this.#next_dashboard.disabled = this.#selected_dashboard_tab.nextElementSibling === null;
@@ -252,14 +314,14 @@
 
 			this.#previous_dashboard.addEventListener('click', () => {
 				const keys = [...this.#host_dashboard_tabs.keys()];
-				const previous_dashboardid = keys[keys.indexOf(this.#dashboardid) - 1];
+				const previous_dashboardid = keys[keys.indexOf(this.#dashboard.dashboardid) - 1];
 
 				this.#selectHostDashboardTab(this.#host_dashboard_tabs.get(previous_dashboardid));
 			});
 
 			this.#next_dashboard.addEventListener('click', () => {
 				const keys = [...this.#host_dashboard_tabs.keys()];
-				const next_dashboardid = keys[keys.indexOf(this.#dashboardid) + 1];
+				const next_dashboardid = keys[keys.indexOf(this.#dashboard.dashboardid) + 1];
 
 				this.#selectHostDashboardTab(this.#host_dashboard_tabs.get(next_dashboardid));
 			});
@@ -311,6 +373,8 @@
 		}
 
 		#onTimeSelectorRangeUpdate(data) {
+			this.#dashboard_time_period = data;
+
 			if (this.#skip_time_selector_range_update) {
 				this.#skip_time_selector_range_update = false;
 

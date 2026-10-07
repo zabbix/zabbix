@@ -21,16 +21,20 @@ window.proxy_edit_popup = new class {
 		this.clone_proxyid = null;
 		this.form = null;
 		this.form_element = null;
+		this.warnings = [];
 	}
 
-	init({proxyid, rules}) {
+	init({proxyid, rules, warnings}) {
 		this.proxyid = proxyid;
+		this.warnings = warnings;
 
 		this.overlay = overlays_stack.getById('proxy.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
+
+		this.dialogue.classList.add('modal-popup-proxy-edit')
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxy.list');
@@ -53,7 +57,7 @@ window.proxy_edit_popup = new class {
 		jQuery('#proxy_groupid').on('change', () => this._update());
 
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
-				'custom_timeouts']) {
+				'custom_timeouts', 'data_collection_status', 'quota_mode']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -80,11 +84,25 @@ window.proxy_edit_popup = new class {
 			document.getElementById(id).disabled = false;
 		}
 
+		document.getElementById('tls_psk_identity').focus();
+
 		this.display_change_psk = false;
 	}
 
 	_update() {
 		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
+		const has_selection = $proxy_group.length > 0;
+
+		if (has_selection && this.warnings.length) {
+			this.#removePopupMessages();
+
+			const message_box = makeMessageBox('warning', this.warnings, null, true, false)[0];
+
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
+		}
+		else if (!has_selection) {
+			this.#removePopupMessages();
+		}
 
 		for (const element of this.form_element.querySelectorAll('.js-local-address')) {
 			element.style.display = $proxy_group.length ? '' : 'none';
@@ -157,9 +175,48 @@ window.proxy_edit_popup = new class {
 
 		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser']) {
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query']) {
 			document.getElementById(id).readOnly = !custom_timeouts_enabled;
 		}
+
+		const data_collection_status = this.form
+			.findFieldByName('data_collection_status')?.getField()?.checked ?? false;
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode, .js-apm-attributes')) {
+			field?.toggleAttribute('hidden', !data_collection_status);
+		}
+
+		const fields = this.getAllValues();
+		const quota_mode_unlimited = fields.quota_mode === PROXY_APM_QUOTA_MODE_UNLIMITED;
+
+		const max_messages_per_second = this.form.findFieldByName('max_messages_per_second')?.getField();
+		max_messages_per_second?.toggleAttribute('disabled', quota_mode_unlimited);
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode-custom')) {
+			field?.toggleAttribute('hidden', quota_mode_unlimited);
+		}
+
+		const additional_resource_attributes = this.form
+			.findFieldByName('additional_resource_attributes')?.getFields() ?? [];
+
+		for (const [, field] of Object.entries(additional_resource_attributes)) {
+			field?.getField()?.toggleAttribute('disabled', !data_collection_status);
+		}
+	}
+
+	/**
+	 * @returns {Object<string, any>}
+	 */
+	getAllValues() {
+		const values = this.form.getAllValues();
+		const data_collection_status = parseInt(values.data_collection_status);
+		const quota_mode = parseInt(document.querySelector('[name="quota_mode"]:checked')?.value);
+
+		return {
+			...values,
+			data_collection_status,
+			quota_mode
+		};
 	}
 
 	refreshConfig() {
@@ -171,6 +228,9 @@ window.proxy_edit_popup = new class {
 	}
 
 	clone({title, buttons, rules}) {
+		this.#removePopupMessages();
+
+		this.warnings = [];
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
 
@@ -183,6 +243,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	delete() {
+		this.#removePopupMessages();
+
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
@@ -191,6 +253,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	submit() {
+		this.#removePopupMessages();
+
 		const fields = this.form.getAllValues();
 
 		if (this.proxyid !== null) {
@@ -198,6 +262,14 @@ window.proxy_edit_popup = new class {
 		}
 		else if (this.clone_proxyid !== null) {
 			fields.clone_proxyid = this.clone_proxyid;
+		}
+
+		if (fields.data_collection_status === PROXY_APM_DATA_COLLECTION_DISABLED) {
+			for (const field of ['max_messages_per_second', 'additional_resource_attributes']) {
+				if (field in fields) {
+					delete fields[field];
+				}
+			}
 		}
 
 		const curl = new Curl('zabbix.php');
@@ -273,5 +345,13 @@ window.proxy_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 };

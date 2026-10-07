@@ -16,7 +16,6 @@
 
 #include "zbxalgo.h"
 #include "zbxeval.h"
-#include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxregexp.h"

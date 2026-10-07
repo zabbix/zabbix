@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package vfsdev
+package dev
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -219,6 +219,8 @@ func vfsDevGet(params []string) (string, error) {
 		out = vfsDevGetDevices(devs, rdevs, devNamesRgx)
 	case modeDeviceStats:
 		out = vfsDevGetDeviceStats(devs, rdevs, devNamesRgx)
+	default:
+		return "", errInvalidFirstParam
 	}
 
 	b, err := json.Marshal(out)
@@ -283,7 +285,8 @@ func devidsInit() []vfsDevice {
 			continue
 		}
 
-		if err := syscall.Stat(fp, &stat); err != nil {
+		err = syscall.Stat(fp, &stat)
+		if err != nil {
 			continue
 		}
 
@@ -299,9 +302,7 @@ func devidsInit() []vfsDevice {
 		})
 	}
 
-	sort.Slice(devices, func(i, j int) bool {
-		return deviceCompare(devices[i], devices[j]) < 0
-	})
+	slices.SortFunc(devices, deviceCompare)
 
 	return devices
 }
@@ -378,6 +379,8 @@ func sysfsDevStatsGet(rdev uint64) *vfsStats {
 			stats.BytesWritten = &v
 		case 10:
 			stats.IOTimeMs = &val
+		default:
+			continue
 		}
 	}
 

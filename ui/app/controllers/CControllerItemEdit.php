@@ -103,9 +103,12 @@ class CControllerItemEdit extends CControllerItem {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
 		$item = $this->hasInput('clone') ? $this->getClone($host) : $this->getItem($host);
 		$item['context'] = $this->getInput('context');
-		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
-			? $inherited_timeouts[$item['type']] : '';
+
+		$inherited = getInheritedTimeouts($host['proxyid']);
+		$item['timeout_inaccessible'] = $inherited['source'] === 'inaccessible';
+		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited['timeouts'])
+			? $inherited['timeouts'][$item['type']]
+			: '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];
@@ -152,9 +155,26 @@ class CControllerItemEdit extends CControllerItem {
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
+		$history_override = [];
+
+		foreach (Manager::History()->getValueTypesStorageTtls() as $value_type => $storage) {
+			$history_override[$value_type] = $storage['value_ttl'] !== null
+				? convertSecondsToTimeUnits($storage['value_ttl'])
+				: '';
+		}
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+			$history_override += array_fill_keys([
+					ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON
+				],
+				CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+			);
+		}
+
 		$data = [
 			'js_test_validation_rules' => (new CFormValidator(
-				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+				CControllerPopupItemTestEdit::getValidationRules(allow_lld_macro: false)
 			))->getRules(),
 			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
 				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()
@@ -164,7 +184,7 @@ class CControllerItemEdit extends CControllerItem {
 			'types' => array_diff_key(item_type2str(), array_flip([ITEM_TYPE_HTTPTEST, ITEM_TYPE_NESTED])),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'executable_item_types' => checkNowAllowedTypes(),
-			'inherited_timeouts' => $inherited_timeouts,
+			'inherited_timeouts' => $inherited['timeouts'],
 			'interface_types' => itemTypeInterface(),
 			'inventory_fields' => $inventory_fields,
 			'value_type_keys' => $value_type_keys,
@@ -180,6 +200,8 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
+			'history_override' => $history_override,
+			'storage_value_types' => array_keys(Manager::History()->getValueTypesStorageTtls()),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
@@ -298,7 +320,8 @@ class CControllerItemEdit extends CControllerItem {
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 					'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
-					'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+					'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'query', 'time_shift',
+					'lookback_limit', 'granularity'
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],

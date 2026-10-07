@@ -95,7 +95,7 @@ class CHistory extends CApiService {
 			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'filter' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'timestamp', 'source', 'severity', 'logeventid', 'ns']],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'ns']],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'ns']],
 											['else' => true, 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'ns', 'value']]
 			]],
 			'search' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
@@ -135,38 +135,37 @@ class CHistory extends CApiService {
 				'itemids' => $options['itemids'],
 				'hostids' => $options['hostids'],
 				'editable' => $options['editable'],
+				'templated' => false,
 				'webitems' => true,
 				'preservekeys' => true
 			]);
 			$options['itemids'] = array_keys($items);
 		}
 
-		$this->tableName = CHistoryManager::getTableName($options['history']);
+		$_output = $options['output'];
 
-		switch (CHistoryManager::getDataSourceType($options['history'])) {
-			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getFromElasticsearch($options);
-				break;
-
-			default:
-				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
-					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
-				}
-
-				$result = $this->getFromSql($options);
-				break;
+		if (!$options['countOutput'] && !$options['output']) {
+			$options['output'] = ['itemid'];
 		}
 
-		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
-				&& $this->outputIsRequested('value', $options['output'])) {
+		$result = match (Manager::History()->getDataSourceType($options['history'])) {
+			ZBX_HISTORY_SOURCE_ELASTIC => $this->getFromElasticsearch($options),
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => $this->getFromClickHouse($options),
+			ZBX_HISTORY_SOURCE_SQL => $this->getFromSql($options)
+		};
+
+		if ($options['countOutput']) {
+			return (string) $result;
+		}
+
+		if ($options['history'] == ITEM_VALUE_TYPE_BINARY && $this->outputIsRequested('value', $options['output'])) {
 			foreach ($result as &$row) {
 				$row['value'] = base64_encode($row['value']);
 			}
 			unset($row);
 		}
 
-		return $result;
+		return $this->unsetExtraFields($result, ['itemid'], $_output);
 	}
 
 	/**
@@ -174,10 +173,15 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromSql($options) {
-		$result = [];
+	private function getFromSql(array $options) {
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+			$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+			$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+		}
+
+		$this->tableName = Manager::History()->getTableName($options['history']);
 		$sql_parts = [
-			'select'	=> ['history' => 'h.itemid'],
+			'select'	=> [],
 			'from'		=> $this->tableName.' h',
 			'where'		=> [],
 			'group'		=> [],
@@ -187,16 +191,6 @@ class CHistory extends CApiService {
 		// itemids
 		if ($options['itemids'] !== null) {
 			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
-		}
-
-		// time_from
-		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
-		}
-
-		// time_till
-		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
 		// filter
@@ -209,11 +203,81 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
+		$use_time_based_chunking = $options['limit'] !== null && reset($options['sortfield']) === 'clock'
+			&& $options['sortorder'] && ((array) $options['sortorder'])[0] === ZBX_SORT_DOWN;
+
+		return $use_time_based_chunking
+			? $this->getFromSqlUsingTimeBasedChunking($options, $sql_parts)
+			: $this->getFromSqlDirectly($options, $sql_parts);
+	}
+
+	private function getFromSqlUsingTimeBasedChunking(array $options, array $sql_parts) {
+		$result = [];
+		$count = 0;
+
+		$segments = self::getTimeRangeSegments($options);
+
+		foreach ($segments as $segment) {
+			if ($options['countOutput']) {
+				$count += $this->getFromSqlDirectly($segment + $options, $sql_parts);
+			}
+			else {
+				$result = array_merge($result, $this->getFromSqlDirectly(
+					$segment + ['limit' => $options['limit'] - count($result)] + $options,
+					$sql_parts
+				));
+
+				if (count($result) >= $options['limit']) {
+					return array_slice($result, 0, $options['limit'], true);
+				}
+			}
+		}
+
+		return $options['countOutput'] ? (string) $count : $result;
+	}
+
+	private static function getTimeRangeSegments(array $options): array {
+		$now = time();
+		$min_time_from = $options['time_from'] !== null ? $options['time_from'] : 0;
+		$max_time_till = $options['time_till'] !== null ? $options['time_till'] : $now;
+
+		if ($min_time_from > $max_time_till) {
+			return [];
+		}
+
+		$window_sizes = [SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH];
+
+		$segments = [];
+		$time_from = null;
+
+		do {
+			$window_size = array_shift($window_sizes);
+			$time_till = $time_from === null ? $max_time_till : ($time_from - 1);
+			$time_from = $window_size !== null ? max($time_till - $window_size + 1, $min_time_from) : $min_time_from;
+
+			$segments[] = ($time_from > 0 ? ['time_from' => $time_from] : [])
+				+ ($time_till < $now ? ['time_till' => $time_till] : []);
+		}
+		while ($time_from != $min_time_from);
+
+		return $segments;
+	}
+
+	private function getFromSqlDirectly(array $options, array $sql_parts) {
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+		}
+
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+		}
+
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
+		$result = [];
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
 				$result = $data['rowscount'];
@@ -244,9 +308,10 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromElasticsearch($options) {
+	private function getFromElasticsearch(array $options) {
 		$query = [];
-		$schema = DB::getSchema($this->tableName);
+		$table = Manager::History()->getTableName($options['history']);
+		$schema = DB::getSchema($table);
 
 		// itemids
 		if ($options['itemids'] !== null) {
@@ -281,7 +346,7 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
-			$query = CElasticsearchHelper::addFilter(DB::getSchema($this->tableName), $query, $options);
+			$query = CElasticsearchHelper::addFilter($schema, $query, $options);
 		}
 
 		// search
@@ -318,12 +383,35 @@ class CHistory extends CApiService {
 			];
 		}
 
-		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
+		$endpoints = Manager::History()->getElasticsearchEndpoints($options['history']);
 		if ($endpoints) {
 			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
 		}
 
 		return null;
+	}
+
+	/**
+	 * ClickHouse specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromClickHouse(array $options) {
+		$value_type_ttl = Manager::History()->getValueTypesStorageTtls()[$options['history']]['value_ttl'];
+
+		if ($value_type_ttl !== null) {
+			$options['time_from'] = max($options['time_from'], time() - $value_type_ttl + 1);
+		}
+
+		/** @var CClickHouseStorage $storage */
+		$storage = Manager::History()->getStorageProviderInstance($options['history']);
+		$result = $storage->select($options);
+
+		if ($storage->getErrorCode() !== null) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
+		}
+
+		return $options['countOutput'] ? $result[0]['rowscount'] : $result;
 	}
 
 	/**

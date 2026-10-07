@@ -1,0 +1,40 @@
+.banner {
+	position: relative;
+	color: $banner-color;
+	background-color: $banner-bg-color;
+
+	.banner-content {
+		padding: 16px;
+
+		a {
+			color: $banner-link-color;
+			text-decoration: underline;
+		}
+
+		p {
+			&:first-child {
+				margin-top: 0;
+			}
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	.btn-icon {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		min-width: 12px;
+		height: 12px;
+		line-height: 12px;
+		color: $banner-icon-color;
+
+		&:before {
+			font-size: 12px;
+			paint-order: stroke fill;
+			-webkit-text-stroke: 1px currentColor;
+		}
+	}
+}

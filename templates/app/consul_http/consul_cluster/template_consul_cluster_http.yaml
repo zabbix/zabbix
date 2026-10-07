@@ -43,7 +43,7 @@ zabbix_export:
         *NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -575,7 +575,7 @@ zabbix_export:
             description: 'Maximum number of service nodes in status ''critical'' for trigger expression. Can be used with context.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CONSUL.TOKEN}'
-          value: '<PUT YOUR AUTH TOKEN>'
+          type: SECRET_TEXT
           description: 'Consul auth token.'
           config:
             type: TEXT

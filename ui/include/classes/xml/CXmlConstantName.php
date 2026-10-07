@@ -97,6 +97,9 @@ class CXmlConstantName {
 	const MAX = 'MAX';
 	const ALL = 'ALL';
 	const LAST = 'LAST';
+	const COUNT = 'COUNT';
+	const SUM = 'SUM';
+	const PERCENTILE = 'PERCENTILE';
 
 	const SIMPLE = 'SIMPLE';
 	const GRAPH_SUM = 'GRAPH_SUM';
@@ -239,6 +242,16 @@ class CXmlConstantName {
 	// const SCRIPT = 'SCRIPT'; // Duplicate.
 	const BROWSER = 'BROWSER';
 	const NESTED = 'NESTED';
+	const TELEMETRY_QUERY = 'TELEMETRY_QUERY';
+
+	const TQ_SIGNAL_TYPE_TRACES = 'TRACES';
+	const TQ_SIGNAL_TYPE_METRICS = 'METRICS';
+	const TQ_SIGNAL_TYPE_LOGS = 'LOGS';
+
+	const TQ_METRICS_POINT_TYPE_SUM = 'SUM';
+	const TQ_METRICS_POINT_TYPE_GAUGE = 'GAUGE';
+	const TQ_METRICS_POINT_TYPE_HISTOGRAM = 'HISTOGRAM';
+	const TQ_METRICS_POINT_TYPE_EXPONENTIAL_HISTOGRAM = 'EXPONENTIAL_HISTOGRAM';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';
@@ -298,6 +311,7 @@ class CXmlConstantName {
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';
 	const WEBHOOK = 'WEBHOOK';
+	const PUSH = 'PUSH';
 
 	const GENERIC_SMTP = 'GENERIC_SMTP';
 	const GMAIL = 'GMAIL';
@@ -357,6 +371,7 @@ class CXmlConstantName {
 	const CONDITION_OPERATOR_NOT_LIKE = 'NOT_LIKE';
 	const CONDITION_OPERATOR_REGEXP = 'REGEXP';
 	const CONDITION_OPERATOR_NOT_REGEXP = 'NOT_REGEXP';
+	const CONDITION_OPERATOR_EXISTS = 'EXISTS';
 	const DISCOVER = 'DISCOVER';
 	const NO_DISCOVER = 'NO_DISCOVER';
 
@@ -405,4 +420,11 @@ class CXmlConstantName {
 	public const INDICATOR_TYPE_STATIC_LINK = 'STATIC_LINK';
 	public const INDICATOR_TYPE_TRIGGER = 'TRIGGER';
 	public const INDICATOR_TYPE_ITEM_VALUE = 'ITEM_VALUE';
+
+	// Regular expression types.
+	public const REGEX_TYPE_CONTAINS_STRING = 'CONTAINS_STRING';
+	public const REGEX_TYPE_CONTAINS_ANY_SUBSTRING = 'CONTAINS_ANY_SUBSTRING';
+	public const REGEX_TYPE_NOT_CONTAINS_STRING = 'NOT_CONTAINS_STRING';
+	public const REGEX_TYPE_MATCHES_REGEX = 'MATCHES_REGEX';
+	public const REGEX_TYPE_NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX';
 }

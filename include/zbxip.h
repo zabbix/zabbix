@@ -17,6 +17,8 @@
 
 #include "zbxtypes.h"
 
+int	zbx_is_rfc_extended_hostname(const char *host);
+
 int	zbx_is_ip4(const char *ip);
 int	zbx_is_ip6(const char *ip);
 int	zbx_is_supported_ip(const char *ip);
@@ -64,6 +66,7 @@ void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address);
 int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address);
 int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len);
 int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress);
+void	zbx_iprange_uniq_last(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len);
 void	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len);
 int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port);
 int	zbx_portrange_uniq_iter(const zbx_range_t *ranges, const int num, int *idx, int *port);

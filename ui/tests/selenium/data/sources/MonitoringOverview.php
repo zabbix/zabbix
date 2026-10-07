@@ -300,7 +300,7 @@ class MonitoringOverview {
 		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE, ['clock' => 1533555726, 'ns' => 726692808]);
 
 		foreach ($trigger_names as $description) {
-			DBexecute('UPDATE triggers SET value=1 WHERE description='.zbx_dbstr($description));
+			DBexecute('UPDATE trigger_rtdata SET value=1 WHERE triggerid='.zbx_dbstr($triggerids[$description]));
 		}
 
 		// Get event ids.

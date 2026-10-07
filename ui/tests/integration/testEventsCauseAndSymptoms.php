@@ -316,6 +316,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 				'name' => $item_name,
 				'key_' => $item_key,
 				'type' => ITEM_TYPE_TRAPPER,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]);
 

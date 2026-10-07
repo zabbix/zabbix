@@ -19,6 +19,11 @@ div.dashboard-widget-map {
 						stroke-width: 1px;
 					}
 				}
+
+				rect {
+					rx: var(--overlay-border-radius);
+					ry: var(--overlay-border-radius);
+				}
 			}
 		}
 	}
@@ -51,7 +56,7 @@ div.dashboard-widget-map {
 
 		.btn-back-map {
 			border: $ui-border-color solid 1px;
-			border-radius: 0 2px 2px 0;
+			border-radius: 0 var(--button-border-radius) var(--button-border-radius) 0;
 			background-color: $btn-back-map-background-color;
 			color: $btn-back-text-color;
 			margin-top: 10px;

@@ -185,8 +185,8 @@ class testPageGroups extends CWebTest {
 			? $links['lld'].': '.$links['host_template']
 			: $links['host_template'];
 
-		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name',  $name);
-		$this->assertEquals($name, $host_row->getColumn('Name')->getText());
+		$host_row = $this->query('class:datatable')->asDatatable()->one()->findRow('Name',  $name);
+		$this->assertEquals($name, $host_row->getColumn('Name')->getAllText());
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.

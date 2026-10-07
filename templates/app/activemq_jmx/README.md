@@ -30,9 +30,9 @@ Metrics are collected by JMX.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ACTIVEMQ.USER}|<p>User for JMX</p>|`admin`|
-|{$ACTIVEMQ.PASSWORD}|<p>Password for JMX</p>|`activemq`|
-|{$ACTIVEMQ.PORT}|<p>Port for JMX</p>|`1099`|
+|{$ACTIVEMQ.USER}|<p>ActiveMQ JMX user.</p>|`admin`|
+|{$ACTIVEMQ.PASSWORD}|<p>ActiveMQ JMX password.</p>|`activemq`|
+|{$ACTIVEMQ.PORT}|<p>ActiveMQ JMX port.</p>|`1099`|
 |{$ACTIVEMQ.LLD.FILTER.BROKER.MATCHES}|<p>Filter of discoverable discovered brokers</p>|`.*`|
 |{$ACTIVEMQ.LLD.FILTER.BROKER.NOT_MATCHES}|<p>Filter to exclude discovered brokers</p>|`CHANGE IF NEEDED`|
 |{$ACTIVEMQ.LLD.FILTER.DESTINATION.MATCHES}|<p>Filter of discoverable discovered destinations</p>|`.*`|

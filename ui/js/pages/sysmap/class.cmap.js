@@ -88,7 +88,7 @@ class CMap {
 		// Create container for forms.
 		this.form_container = $('<div>', {
 				id: 'map-window',
-				class: 'overlay-dialogue',
+				class: ZBX_STYLE_OVERLAY_DIALOGUE,
 				style: 'display: none; top: 0; left: 0; padding-top: 13px;'
 			})
 			.appendTo('.wrapper')

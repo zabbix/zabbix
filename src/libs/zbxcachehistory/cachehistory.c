@@ -37,7 +37,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
-#include "zbxipcservice.h"
+#include "zbxexpr.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -65,9 +65,6 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
-
-/* the maximum number of characters for history cache values (except binary and JSON) */
-#define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
 
 typedef struct
 {
@@ -526,6 +523,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int num)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
+	double			max_val, scaled_avg, scaled_avg2;
 
 	value_min.dbl = atof(row[2]);
 	value_avg.dbl = atof(row[3]);
@@ -537,8 +535,20 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int nu
 	if (value_max.dbl > trend->value_max.dbl)
 		trend->value_max.dbl = value_max.dbl;
 
-	trend->value_avg.dbl = trend->value_avg.dbl / (trend->num + num) * trend->num +
-			value_avg.dbl / (trend->num + num) * num;
+	max_val = fmax(fabs(trend->value_avg.dbl), fabs(value_avg.dbl));
+
+	if (0.0 == max_val)
+	{
+		trend->value_avg.dbl = 0.0;
+	}
+	else
+	{
+		scaled_avg = trend->value_avg.dbl / max_val;
+		scaled_avg2 = value_avg.dbl / max_val;
+
+		trend->value_avg.dbl = (scaled_avg * trend->num + scaled_avg2 * num) / (trend->num + num) * max_val;
+	}
+
 	trend->num += num;
 }
 
@@ -852,35 +862,34 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
 	ZBX_DC_TREND	*trend = NULL;
 	int		hour;
 
-	hour = history->ts.sec - history->ts.sec % SEC_PER_HOUR;
+	hour = history->entry.ts.sec - history->entry.ts.sec % SEC_PER_HOUR;
 
-	trend = DCget_trend(history->itemid);
+	trend = DCget_trend(history->entry.itemid);
 
-	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type) &&
-			SUCCEED == zbx_history_requires_trends(trend->value_type))
+	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->entry.value_type))
 	{
 		DCflush_trend(trend, trends, trends_alloc, trends_num);
 	}
 
-	trend->value_type = history->value_type;
+	trend->value_type = history->entry.value_type;
 	trend->clock = hour;
 
 	switch (trend->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			if (trend->num == 0 || history->value.dbl < trend->value_min.dbl)
-				trend->value_min.dbl = history->value.dbl;
-			if (trend->num == 0 || history->value.dbl > trend->value_max.dbl)
-				trend->value_max.dbl = history->value.dbl;
-			trend->value_avg.dbl += history->value.dbl / (trend->num + 1) -
+			if (trend->num == 0 || history->entry.value.dbl < trend->value_min.dbl)
+				trend->value_min.dbl = history->entry.value.dbl;
+			if (trend->num == 0 || history->entry.value.dbl > trend->value_max.dbl)
+				trend->value_max.dbl = history->entry.value.dbl;
+			trend->value_avg.dbl += history->entry.value.dbl / (trend->num + 1) -
 					trend->value_avg.dbl / (trend->num + 1);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (trend->num == 0 || history->value.ui64 < trend->value_min.ui64)
-				trend->value_min.ui64 = history->value.ui64;
-			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
-				trend->value_max.ui64 = history->value.ui64;
-			zbx_uinc128_64(&trend->value_avg.ui64, history->value.ui64);
+			if (trend->num == 0 || history->entry.value.ui64 < trend->value_min.ui64)
+				trend->value_min.ui64 = history->entry.value.ui64;
+			if (trend->num == 0 || history->entry.value.ui64 > trend->value_max.ui64)
+				trend->value_max.ui64 = history->entry.value.ui64;
+			zbx_uinc128_64(&trend->value_avg.ui64, history->entry.value.ui64);
 			break;
 	}
 	trend->num++;
@@ -904,6 +913,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 	zbx_timespec_t		ts;
 	int			trends_alloc = 0, i, hour, seconds;
 	zbx_vector_uint64_t	del_itemids;
+	zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -920,6 +930,9 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_dc_history_t	*h = &history[i];
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
+			continue;
+
+		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(trends_flags, h->entry.value_type))
 			continue;
 
 		DCadd_trend(h, trends, &trends_alloc, trends_num);
@@ -955,7 +968,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 			}
 			else
 			{
-				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
+				if (0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 				/* trend is missing an hour, check if it should be cleared from cache */
@@ -1169,10 +1182,6 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 
 		if (NULL == item_info || item_info->itemid != itemid)
 		{
-			if (NULL != item_info)
-			{
-				zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
-			}
 			if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -1184,11 +1193,6 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		item_tag->tag = zbx_strdup(NULL, row[1]);
 		item_tag->value = zbx_strdup(NULL, row[2]);
 		zbx_vector_tags_ptr_append(&item_info->item_tags, item_tag);
-	}
-
-	if (NULL != item_info)
-	{
-		zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
 	}
 
 	zbx_db_free_result(result);
@@ -1225,6 +1229,199 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 static void	zbx_item_info_clean_wrapper(void *data)
 {
 	zbx_item_info_clean((zbx_item_info_t*)data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add unique item info to export hashset                            *
+ *                                                                            *
+ * Parameters: items_info      - [IN/OUT] item info hashset                   *
+ *             hostids         - [IN/OUT] host IDs vector                     *
+ *             item_info_ids   - [IN/OUT] item info IDs vector                *
+ *             item            - [IN] item to add                             *
+ *                                                                            *
+ * Comments: Creates item info entry only if itemid is not already present.   *
+ *           Appends hostid and itemid to vectors only for new entries.       *
+ *                                                                            *
+ ******************************************************************************/
+static void	export_add_item_info(zbx_hashset_t *items_info, zbx_vector_uint64_t *hostids,
+		zbx_vector_uint64_t *item_info_ids, zbx_history_sync_item_t *item)
+{
+	zbx_item_info_t	item_info;
+
+	if (NULL != zbx_hashset_search(items_info, &item->itemid))
+		return;
+
+	item_info.itemid = item->itemid;
+	item_info.name = NULL;
+	item_info.item = item;
+
+	zbx_vector_tags_ptr_create(&item_info.item_tags);
+
+	if (NULL == zbx_hashset_insert(items_info, &item_info, sizeof(item_info)))
+	{
+		zbx_vector_tags_ptr_destroy(&item_info.item_tags);
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_vector_uint64_append(hostids, item->host.hostid);
+	zbx_vector_uint64_append(item_info_ids, item->itemid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve item tags by expanding built-in, user and function macros *
+ *                                                                            *
+ * Parameters: item_tags - [IN/OUT] item tags to resolve                      *
+ *             um_handle - [IN] user macro handle                             *
+ *             item      - [IN] item used as macro resolution context         *
+ *                                                                            *
+ * Comments: Resolves tag names and values in place and sorts the resulting   *
+ *           tag vector.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	resolve_item_tags(zbx_vector_tags_ptr_t *item_tags, zbx_dc_um_handle_t *um_handle,
+		const zbx_history_sync_item_t *item)
+{
+	for (int i = 0; i < item_tags->values_num; i++)
+	{
+		zbx_tag_t	*item_tag = item_tags->values[i];
+
+		zbx_substitute_macros(&item_tag->tag, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
+				item->host.hostid, item->itemid);
+		zbx_substitute_macros(&item_tag->value, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
+				item->host.hostid, item->itemid);
+	}
+
+	zbx_vector_tags_ptr_sort(item_tags, zbx_compare_tags);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: helper function to add pre-resolved item tags to JSON             *
+ *                                                                            *
+ * Parameters: json     - [OUT] JSON builder                                  *
+ *             resolved - [IN] pre-resolved item tags                         *
+ *                                                                            *
+ * Comments: Serializes already resolved tags to JSON. Does not perform       *
+ *           macro expansion or string duplication.                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_vector_tags_ptr_t *resolved)
+{
+	for (int i = 0; i < resolved->values_num; i++)
+	{
+		const zbx_tag_t	*item_tag = resolved->values[i];
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, item_tag->value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(json);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: match item value type by mask                                     *
+ *                                                                            *
+ * Parameters: mask - [IN] value type mask                                    *
+ *             item - [IN] item for value type matching                       *
+ *                                                                            *
+ * Return value: SUCCEED if item value type matches mask, FAIL otherwise      *
+ *                                                                            *
+ ******************************************************************************/
+static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
+{
+	if (0 != (mask & (1 << item->value_type)))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if any connector filter matches the item's value type       *
+ *                                                                            *
+ * Parameters: connector_filters - [IN] connector filters                     *
+ *             item              - [IN] item for value type matching          *
+ *                                                                            *
+ * Return value: SUCCEED if any connector filter matches the value type,      *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ * Comments: This is a lightweight check that does not require tag matching.  *
+ *                                                                            *
+ ******************************************************************************/
+static int	connector_match_value_type(const zbx_vector_connector_filter_t *connector_filters,
+		const zbx_history_sync_item_t *item)
+{
+	for (int i = 0; i < connector_filters->values_num; i++)
+	{
+		if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[i].item_value_type, item))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: match connector filters against pre-resolved item tags            *
+ *                                                                            *
+ * Parameters: connector_filters - [IN] connector filters                     *
+ *             resolved_tags     - [IN] pre-resolved item tags                *
+ *             item              - [IN] item for value type matching          *
+ *             matching_ids      - [OUT] matching connector identifiers       *
+ *                                                                            *
+ * Comments: Matches connector filters against already resolved tags.         *
+ *           Does not perform macro expansion or allocation.                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_match_filters(const zbx_vector_connector_filter_t *connector_filters,
+		const zbx_vector_tags_ptr_t *resolved_tags, const zbx_history_sync_item_t *item,
+		zbx_vector_uint64_t *matching_ids)
+{
+	for (int i = 0; i < connector_filters->values_num; i++)
+	{
+		zbx_connector_filter_t	*cf = &connector_filters->values[i];
+
+		if (SUCCEED == match_item_value_type_by_mask(cf->item_value_type, item) &&
+				SUCCEED == zbx_match_tags(cf->tags_evaltype, &cf->connector_tags, resolved_tags))
+		{
+			zbx_vector_uint64_append(matching_ids, cf->connectorid);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: determine whether a history record has a possible destination     *
+ *                                                                            *
+ * Parameters: history                - [IN] history record                   *
+ *             history_export_enabled - [IN] local history export flag        *
+ *             connector_filters      - [IN] connector filters                *
+ *             item                   - [IN] item configuration               *
+ *                                                                            *
+ * Return value: SUCCEED - record can be exported locally or at least one     *
+ *                         Connector accepts the configured item value type   *
+ *               FAIL    - record has no possible export destination          *
+ *                                                                            *
+ * Comments: Local export eligibility is based on the history value type.     *
+ *           Connector eligibility is based on the configured item value      *
+ *           type. Connector tag filters are evaluated later against resolved *
+ *           item tags.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_record_has_possible_destination(const zbx_dc_history_t *history, int history_export_enabled,
+		const zbx_vector_connector_filter_t *connector_filters, const zbx_history_sync_item_t *item)
+{
+	if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != history->entry.value_type &&
+			ITEM_VALUE_TYPE_JSON != history->entry.value_type)
+	{
+		return SUCCEED;
+	}
+
+	return connector_match_value_type(connector_filters, item);
 }
 
 /******************************************************************************
@@ -1267,7 +1464,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_reset(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
@@ -1280,16 +1477,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		zbx_json_close(&json);
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
-
-		for (j = 0; j < item_info->item_tags.values_num; j++)
-		{
-			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
-
-			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag->value, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&json);
-		}
+		dc_export_add_item_tags_json(&json, &item_info->item_tags);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1325,19 +1513,11 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
-static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
-{
-	if (0 != (mask & (1 << item->value_type)))
-		return SUCCEED;
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
  *                                                                            *
- * Parameters: history     - [IN/OUT] array of history data                   *
+ * Parameters: history     - [IN] array of history data                       *
  *             history_num - [IN] number of history structures                *
  *             hosts_info  - [IN] hosts groups names                          *
  *             items_info  - [IN] item names and tags                         *
@@ -1360,46 +1540,34 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 	for (i = 0; i < history_num; i++)
 	{
+		zbx_vector_uint64_clear(&connector_object.ids);
+
 		h = &history[i];
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
-		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->itemid)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
+		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->entry.itemid)))
 			continue;
-		}
 
 		item = item_info->item;
+
+		if (FAIL == history_record_has_possible_destination(h, history_export_enabled, connector_filters, item))
+			continue;
+
+		if (0 != connector_filters->values_num)
+			connector_match_filters(connector_filters, &item_info->item_tags, item, &connector_object.ids);
+
+		if (0 == connector_object.ids.values_num &&
+				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->entry.value_type ||
+				ITEM_VALUE_TYPE_JSON == h->entry.value_type))
+		{
+			continue;
+		}
 
 		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &item->host.hostid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		if (0 != connector_filters->values_num)
-		{
-			int	k;
-
-			for (k = 0; k < connector_filters->values_num; k++)
-			{
-				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].
-						item_value_type, item) && SUCCEED ==
-						zbx_match_tags(connector_filters->values[k].tags_evaltype,
-						&connector_filters->values[k].connector_tags, &item_info->item_tags))
-				{
-					zbx_vector_uint64_append(&connector_object.ids,
-							connector_filters->values[k].connectorid);
-				}
-			}
-		}
-
-		if (0 == connector_object.ids.values_num &&
-				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type ||
-				ITEM_VALUE_TYPE_JSON == h->value_type))
-		{
 			continue;
 		}
 
@@ -1418,16 +1586,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		zbx_json_close(&json);
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
-
-		for (j = 0; j < item_info->item_tags.values_num; j++)
-		{
-			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
-
-			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag->value, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&json);
-		}
+		dc_export_add_item_tags_json(&json, &item_info->item_tags);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1435,30 +1594,31 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		if (NULL != item_info->name)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, h->ts.sec);
-		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, h->ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, h->entry.ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, h->entry.ts.ns);
 
-		switch (h->value_type)
+		switch (h->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_adddouble(&json, ZBX_PROTO_TAG_VALUE, h->value.dbl);
+				zbx_json_adddouble(&json, ZBX_PROTO_TAG_VALUE, h->entry.value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_VALUE, h->value.ui64);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_VALUE, h->entry.value.ui64);
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
 			case ITEM_VALUE_TYPE_JSON:
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->entry.value.str,
+						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, h->value.log->timestamp);
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, h->entry.value.log->timestamp);
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE,
-						ZBX_NULL2EMPTY_STR(h->value.log->source), ZBX_JSON_TYPE_STRING);
-				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, h->value.log->severity);
-				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGEVENTID, h->value.log->logeventid);
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.log->value,
+						ZBX_NULL2EMPTY_STR(h->entry.value.log->source), ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, h->entry.value.log->severity);
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGEVENTID, h->entry.value.log->logeventid);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->entry.value.log->value,
 						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_NONE:
@@ -1467,21 +1627,19 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 				zbx_exit(EXIT_FAILURE);
 		}
 
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->entry.value_type);
 
 		if (0 != connector_object.ids.values_num)
 		{
 			connector_object.objectid = item->itemid;
-			connector_object.ts = h->ts;
+			connector_object.ts = h->entry.ts;
 			connector_object.str = json.buffer;
 
 			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
-
-			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
-		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type &&
-				ITEM_VALUE_TYPE_JSON != h->value_type)
+		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->entry.value_type &&
+				ITEM_VALUE_TYPE_JSON != h->entry.value_type)
 		{
 			zbx_history_export_write(json.buffer, json.buffer_size);
 		}
@@ -1498,7 +1656,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
  *                                                                            *
  * Purpose: export history and trends                                         *
  *                                                                            *
- * Parameters: history     - [IN/OUT] array of history data                   *
+ * Parameters: history     - [IN] array of history data                       *
  *             history_num - [IN] number of history structures                *
  *             itemids     - [IN] the item identifiers                        *
  *                                (used for item lookup)                      *
@@ -1518,8 +1676,10 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_t	hostids, item_info_ids, trend_itemids;
 	zbx_hashset_t		hosts_info, items_info;
 	zbx_history_sync_item_t	*item;
-	zbx_item_info_t		item_info;
 	zbx_history_sync_item_t	*trend_items = NULL;
+	zbx_dc_um_handle_t	*um_handle;
+	zbx_item_info_t		*item_info;
+	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __func__, history_num, trends_num);
 
@@ -1537,7 +1697,8 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_EXPORT & h->flags))
 			continue;
 
-		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->entry.itemid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -1548,14 +1709,10 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 
 		item = &items[index];
 
-		zbx_vector_uint64_append(&hostids, item->host.hostid);
-		zbx_vector_uint64_append(&item_info_ids, item->itemid);
+		if (FAIL == history_record_has_possible_destination(h, history_export_enabled, connector_filters, item))
+			continue;
 
-		item_info.itemid = item->itemid;
-		item_info.name = NULL;
-		item_info.item = item;
-		zbx_vector_tags_ptr_create(&item_info.item_tags);
-		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
+		export_add_item_info(&items_info, &hostids, &item_info_ids, item);
 	}
 
 	for (i = 0; i < trends_num; i++)
@@ -1606,14 +1763,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 		if (SUCCEED != errcode)
 			continue;
 
-		zbx_vector_uint64_append(&hostids, item->host.hostid);
-		zbx_vector_uint64_append(&item_info_ids, item->itemid);
-
-		item_info.itemid = item->itemid;
-		item_info.name = NULL;
-		item_info.item = item;
-		zbx_vector_tags_ptr_create(&item_info.item_tags);
-		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
+		export_add_item_info(&items_info, &hostids, &item_info_ids, item);
 	}
 
 	if (0 == item_info_ids.values_num)
@@ -1628,8 +1778,23 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
-
 	db_get_items_info_by_itemid(&items_info, &item_info_ids);
+
+	um_handle = zbx_dc_open_user_macros();
+
+	zbx_hashset_iter_reset(&items_info, &iter);
+	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
+	{
+		item = item_info->item;
+		resolve_item_tags(&item_info->item_tags, um_handle, item);
+
+		if (NULL == item_info->name)
+			continue;
+
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &item_info->name, &item->host.hostid, 1, NULL);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	if (0 != history_num)
 	{
@@ -1711,8 +1876,7 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 
 	while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age &&
-				0 != trend->num)
+		if (trend->clock >= compression_age && 0 != trend->num)
 		{
 			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
 			{
@@ -1820,25 +1984,25 @@ void	zbx_dc_history_clean_value(zbx_dc_history_t *history)
 {
 	if (ITEM_STATE_NOTSUPPORTED == history->state)
 	{
-		zbx_free(history->value.err);
+		zbx_free(history->entry.value.err);
 		return;
 	}
 
 	if (0 != (ZBX_DC_FLAG_NOVALUE & history->flags))
 		return;
 
-	switch (history->value_type)
+	switch (history->entry.value_type)
 	{
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_free(history->value.log->value);
-			zbx_free(history->value.log->source);
-			zbx_free(history->value.log);
+			zbx_free(history->entry.value.log->value);
+			zbx_free(history->entry.value.log->source);
+			zbx_free(history->entry.value.log);
 			break;
 		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_free(history->value.str);
+			zbx_free(history->entry.value.str);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
@@ -1920,7 +2084,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
+static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
@@ -1968,7 +2132,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 		do
 		{
-			sync_history_cache_cb(events_cbs, NULL, config_history_storage_pipelines, &stats);
+			sync_history_cache_cb(events_cbs, ZBX_HISTORY_SYNC_SKIP_TRIGGERS, &stats);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)stats.values_num / (cache->history_num + stats.values_num) * 100);
@@ -2087,23 +2251,15 @@ static void	zbx_log_sync_trends_cache_progress(void)
  *                                                                                     *
  * Purpose: writes updates and new data from history cache to database                 *
  *                                                                                     *
- * Parameters:                                                                         *
- *   events_cbs                       - [IN]                                           *
- *   rtc                              - [IN] RTC socket                                *
- *   config_history_storage_pipelines - [IN]                                           *
- *   values_num                       - [OUT] number of synced values                  *
- *   triggers_num                     - [OUT]                                          *
- *   more                             - [OUT] flag indicating cache emptiness:         *
- *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
- *                                            ZBX_SYNC_MORE - more data to sync        *
+ * Parameters: events_cbs - [IN]                                                       *
+ *             stats      - [OUT]                                                      *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_history_sync_stats_t *stats)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
-	sync_history_cache_cb(events_cbs, rtc, config_history_storage_pipelines, stats);
+	sync_history_cache_cb(events_cbs, ZBX_HISTORY_SYNC_DEFAULT, stats);
 }
 
 /******************************************************************************
@@ -2230,7 +2386,7 @@ static void	dc_local_add_history_text_bin_json_helper(unsigned char value_type, 
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_TEXT:
-				maxlen = ZBX_HISTORY_VALUE_LEN;
+				maxlen = ZBX_HISTORY_VALUE_LEN_MAX;
 				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
@@ -2274,7 +2430,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 		item_value->logeventid = log->logeventid;
 		item_value->timestamp = log->timestamp;
 
-		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN) + 1;
+		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN_MAX) + 1;
 
 		if (NULL != log->source && '\0' != *log->source)
 			item_value->source.len = zbx_db_strlen_n(log->source, ZBX_HISTORY_LOG_SOURCE_LEN) + 1;
@@ -2495,20 +2651,27 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
 		zbx_uint64_t lastlogsize)
 {
-	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.str))
+	size_t	json_len = strlen(value->data.str);
+
+	if (ZBX_HISTORY_JSON_VALUE_LEN < json_len)
 	{
 		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
 		return;
 	}
 
-	char	*err = NULL;
-
-	if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+	/* Large JSON entries are validated now to avoid polluting history cache */
+	/* with large invalid JSON that will be discarded anyway.                */
+	if (ZBX_HISTORY_VALUE_LEN_MAX < json_len)
 	{
-		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
-		zbx_free(err);
+		char	*err = NULL;
 
-		return;
+		if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+		{
+			dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
+			zbx_free(err);
+
+			return;
+		}
 	}
 
 	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.str,
@@ -3261,8 +3424,8 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
  ******************************************************************************/
 static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	history->itemid = itemid;
-	history->ts = data->ts;
+	history->entry.itemid = itemid;
+	history->entry.ts = data->ts;
 	history->state = data->state;
 	history->flags = data->flags;
 	history->lastlogsize = data->lastlogsize;
@@ -3270,43 +3433,43 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		history->value.err = zbx_malloc(NULL, data->sz_value);
-		memcpy(history->value.err, data->value.str, data->sz_value);
+		history->entry.value.err = zbx_malloc(NULL, data->sz_value);
+		memcpy(history->entry.value.err, data->value.str, data->sz_value);
 		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;
 	}
 
-	history->value_type = data->value_type;
+	history->entry.value_type = data->value_type;
 
 	if (0 == (ZBX_DC_FLAG_NOVALUE & data->flags))
 	{
 		switch (data->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				history->value.dbl = data->value.dbl;
+				history->entry.value.dbl = data->value.dbl;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				history->value.ui64 = data->value.ui64;
+				history->entry.value.ui64 = data->value.ui64;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
 			case ITEM_VALUE_TYPE_JSON:
-				history->value.str = zbx_malloc(NULL, data->sz_value);
-				memcpy(history->value.str, data->value.str, data->sz_value);
+				history->entry.value.str = zbx_malloc(NULL, data->sz_value);
+				memcpy(history->entry.value.str, data->value.str, data->sz_value);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				history->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
-				history->value.log->value = zbx_strdup(NULL, data->value.log->value);
+				history->entry.value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
+				history->entry.value.log->value = zbx_strdup(NULL, data->value.log->value);
 
 				if (NULL != data->value.log->source)
-					history->value.log->source = zbx_strdup(NULL, data->value.log->source);
+					history->entry.value.log->source = zbx_strdup(NULL, data->value.log->source);
 				else
-					history->value.log->source = NULL;
+					history->entry.value.log->source = NULL;
 
-				history->value.log->timestamp = data->value.log->timestamp;
-				history->value.log->severity = data->value.log->severity;
-				history->value.log->logeventid = data->value.log->logeventid;
+				history->entry.value.log->timestamp = data->value.log->timestamp;
+				history->entry.value.log->severity = data->value.log->severity;
+				history->entry.value.log->logeventid = data->value.log->logeventid;
 
 				break;
 			case ITEM_VALUE_TYPE_NONE:
@@ -3635,11 +3798,11 @@ out:
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
+static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache_full(events_cbs, config_history_storage_pipelines);
+	sync_history_cache_full(events_cbs);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends(1, ZBX_DC_SYNC_TREND_MODE_FULL);
@@ -3652,12 +3815,12 @@ static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all(events_cbs, config_history_storage_pipelines);
+		DCsync_all(events_cbs);
 
 	cache = NULL;
 
@@ -3827,6 +3990,25 @@ int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 
 	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) && NULL != item->tail)
 		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start)
+{
+	int		ret = FAIL;
+	zbx_hc_item_t	*item;
+
+	LOCK_CACHE;
+
+	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) &&
+			NULL != item->tail && ITEM_STATE_NORMAL == item->tail->state &&
+			0 == (item->tail->flags & ZBX_DC_FLAG_NOVALUE) && item->tail->ts.sec >= period_start)
+	{
+			ret = SUCCEED;
+	}
 
 	UNLOCK_CACHE;
 

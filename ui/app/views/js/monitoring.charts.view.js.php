@@ -163,9 +163,9 @@
 		},
 
 		replacePaging(paging) {
-			document.querySelector('.<?= ZBX_STYLE_TABLE_PAGING ?>').outerHTML = paging;
+			document.querySelector('.<?= ZBX_STYLE_PAGER ?>').outerHTML = paging;
 
-			document.querySelectorAll('.<?= ZBX_STYLE_TABLE_PAGING ?> .paging-btn-container a').forEach(link => {
+			document.querySelectorAll('.<?= ZBX_STYLE_PAGER ?> .<?= ZBX_STYLE_PAGER_CONTAINER ?> a').forEach(link => {
 				link.addEventListener('click', e => {
 					e.preventDefault();
 

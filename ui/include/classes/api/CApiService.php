@@ -55,6 +55,13 @@ class CApiService {
 	protected $sortColumns = [];
 
 	/**
+	 * An array of fields that can be used for grouping.
+	 *
+	 * @var array
+	 */
+	protected $groupByColumns = [];
+
+	/**
 	 * An array of allowed get() options that are supported by all APIs.
 	 *
 	 * @var array
@@ -273,24 +280,17 @@ class CApiService {
 	 */
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
-		$extraFields = [];
+		$extra_fields = [];
 		foreach ($fields as $field) {
 			if (!$this->outputIsRequested($field, $output)) {
-				$extraFields[] = $field;
+				$extra_fields[$field] = true;
 			}
 		}
 
 		// unset these fields
-		if ($extraFields) {
-			foreach ($objects as &$object) {
-				foreach ($extraFields as $field) {
-					unset($object[$field]);
-				}
-			}
-			unset($object);
-		}
-
-		return $objects;
+		return $extra_fields
+			? array_map(static fn (array $row) => array_diff_key($row, $extra_fields), $objects)
+			: $objects;
 	}
 
 	/**
@@ -517,9 +517,10 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
+			elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
 				foreach ($options['groupBy'] as $field) {
-					if (is_string($field) && $this->hasField($field, $table_name)) {
+					if (is_string($field) && in_array($field, $this->groupByColumns)
+							&& $this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -528,11 +529,13 @@ class CApiService {
 				}
 			}
 		}
-		elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
+		elseif ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+					&& $options['groupBy']) {
 			$sql_parts['select'] = [];
 
 			foreach ($options['groupBy'] as $field) {
-				if (is_string($field) && $this->hasField($field, $table_name)) {
+				if (is_string($field) && in_array($field, $this->groupByColumns)
+						&& $this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -616,8 +619,9 @@ class CApiService {
 
 		$allowed_sort_fields = $this->sortColumns;
 
-		if (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
-			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
+		if ($this->groupByColumns && array_key_exists('groupBy', $options) && is_array($options['groupBy'])
+				&& $options['groupBy']) {
+			$allowed_sort_fields = array_intersect($this->sortColumns, $this->groupByColumns, $options['groupBy']);
 
 			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
 				$allowed_sort_fields[] = 'rowscount';
@@ -825,11 +829,11 @@ class CApiService {
 	/**
 	 * Throws an API exception.
 	 *
-	 * @param int    $code
-	 * @param string $error
+	 * @throws APIException
 	 */
-	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
-		throw new APIException($code, $error);
+	protected static function exception(int $code = ZBX_API_ERROR_INTERNAL, string $error = '',
+			string $debug_message = '') {
+		throw new APIException($code, $error, $debug_message);
 	}
 
 	/**

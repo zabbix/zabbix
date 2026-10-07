@@ -52,7 +52,10 @@ abstract class CItemType {
 		'snmp_oid',
 
 		// SSH item type specific fields.
-		'publickey', 'privatekey'
+		'publickey', 'privatekey',
+
+		// Telemetry query
+		'time_shift', 'lookback_limit', 'granularity', 'query'
 	];
 
 	/**
@@ -199,12 +202,12 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
+							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts'), 'default' => ZBX_DEFAULT_TRAPPER_HOSTS],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
-						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
+						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts'), 'default' => ZBX_DEFAULT_TRAPPER_HOSTS];
 				}
 
 			case 'parameters':
@@ -507,7 +510,13 @@ abstract class CItemType {
 
 			// SSH item type specific fields.
 			'publickey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')],
-			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
+			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')],
+
+			// Telemetry query item.
+			'time_shift' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'time_shift')],
+			'lookback_limit' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'lookback_limit')],
+			'granularity' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'granularity')],
+			'query' =>				['type' => API_OBJECTS, 'length' => 0]
 		];
 	}
 }

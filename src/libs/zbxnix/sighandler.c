@@ -76,7 +76,7 @@ typedef struct
 zbx_siginfo_t;
 
 static volatile sig_atomic_t	sig_exiting;
-static volatile sig_atomic_t	sig_exit_on_terminate = 1;
+static volatile sig_atomic_t	sig_exit_on_terminate_log = 1;
 static zbx_on_exit_t		zbx_on_exit_cb = NULL;
 static void 			*zbx_on_exit_args = NULL;
 
@@ -270,12 +270,12 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
-			if (0 != sig_exit_on_terminate)
-			{
+			if (0 != sig_exit_on_terminate_log)
 				zbx_log_exit_signal();
-				/* shutdown during startup must be handled as exit with failure */
+
+			/* shutdown during startup must be handled as exit with failure */
+			if (NULL != zbx_on_exit_cb)
 				zbx_on_exit_cb(FAIL, zbx_on_exit_args);
-			}
 		}
 	}
 }
@@ -363,9 +363,10 @@ void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg)
  *          terminate signals                                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_unset_exit_on_terminate(void)
+void	zbx_unset_exit_on_terminate(zbx_on_exit_t on_exit_cb)
 {
-	sig_exit_on_terminate = 0;
+	sig_exit_on_terminate_log = 0;
+	zbx_on_exit_cb = on_exit_cb;
 }
 
 /******************************************************************************

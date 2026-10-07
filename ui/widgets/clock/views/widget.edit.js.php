@@ -24,6 +24,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._form = this.getForm();
 		this._time_type = document.getElementById('time_type');
 		this._clock_type = document.getElementById('clock_type');
+		this._init_time_type_value = this._time_type.value;
 
 		this._show_date = document.getElementById('show_1');
 		this._show_time = document.getElementById('show_2');
@@ -44,6 +45,10 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	updateForm() {
+		for (const element of this._form.querySelectorAll('.field-tzone-timezone, .field-tzone-format')) {
+			element.style.display = this._time_type.value != <?= TIME_TYPE_HOST ?> ? '' : 'none';
+		}
+
 		document.querySelectorAll('.js-row-itemid').forEach(element => {
 			element.style.display = this._time_type.value == <?= TIME_TYPE_HOST ?> ? '' : 'none'
 		});
@@ -70,10 +75,17 @@ window.widget_form = new class extends CWidgetForm {
 			for (const element of this._form.querySelectorAll('.fields-group-tzone')) {
 				element.style.display = this._show_tzone.checked ? '' : 'none';
 			}
+		}
 
-			for (const element of this._form.querySelectorAll('.field-tzone-timezone, .field-tzone-format')) {
-				element.style.display = this._time_type.value != <?= TIME_TYPE_HOST ?> ? '' : 'none';
+		if (this._time_type.value != this._init_time_type_value) {
+			if (this._time_type.value == <?= TIME_TYPE_SERVER ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= ZBX_DEFAULT_TIMEZONE ?>';
 			}
+			else if (this._time_type.value == <?= TIME_TYPE_LOCAL ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= TIMEZONE_DEFAULT_LOCAL ?>';
+			}
+
+			this._init_time_type_value = this._time_type.value;
 		}
 	}
 };

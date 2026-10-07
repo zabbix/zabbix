@@ -119,7 +119,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldColor('tzone_color', _('Color')))->allowInherited()
 			)
 			->addField(
-				(new CWidgetFieldTimeZone('tzone_timezone', _('Time zone')))
+				(new CWidgetFieldTimeZone('tzone_timezone', _('Override time zone')))
 					->setDefault($time_type == TIME_TYPE_LOCAL ? TIMEZONE_DEFAULT_LOCAL : ZBX_DEFAULT_TIMEZONE)
 			)
 			->addField(

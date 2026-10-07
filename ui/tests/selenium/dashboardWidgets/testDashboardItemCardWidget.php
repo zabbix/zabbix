@@ -324,9 +324,9 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		// Emulate item discovery in DB.
 		DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
-				' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+				' params, posts, headers, query, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
 				zbx_dbstr(self::$host_ids['hostids'][self::HOST_NAME]).', '.zbx_dbstr($discovered_item['item_name']).
-				', \'\', '.zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.
+				', \'\', '.zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', \'{}\', '.
 				zbx_dbstr($discovered_item['status']).')'
 		);
 		DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, ts_delete, disable_source,'.
@@ -1683,9 +1683,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
-									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
-									'&context=host'
+							'Create dependent discovery rule' => 'menu-popup-item'
 						],
 						'ACTIONS' => [
 							'Execute now' => 'menu-popup-item'
@@ -1742,9 +1740,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
-									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
-									'&context=host'
+							'Create dependent discovery rule' => 'menu-popup-item'
 						],
 						'ACTIONS' => [
 							'Execute now' => 'menu-popup-item'
@@ -1805,7 +1801,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Host' => 'Visible host name for Item Card widget',
 					'Interval and storage' => [
 						'column' => '15m',
-						'center-column' => '',
+						'center-column' => 'Not stored',
 						'right-column' => ''
 					],
 					'Type of information' => 'Log',

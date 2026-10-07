@@ -20,37 +20,9 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../build/win32/include
 #cgo CFLAGS: -DUNICODE -D__MINGW32__ -I${SRCDIR}/../../../../src/libs
 
-#include "zbxsysinfo.h"
-#include "module.h"
-
-
-// vfs_dir_get, system_localtime
-#include "zbxsysinfo/common/system.c"
+// vfs_dir_get
 #include "zbxsysinfo/common/vfs_file.c"
 #include "zbxsysinfo/common/dir.c"
-
-int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
 

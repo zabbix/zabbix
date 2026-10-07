@@ -26,7 +26,7 @@ zabbix_export:
         2. Set values in host wizard configuration field `JMX user`, `JMX password` and `JMX port`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       discovery_rules:
@@ -795,22 +795,22 @@ zabbix_export:
             label: 'Message rate time window'
             description: 'The time for message enqueue/dequeue rate. Can be used with destination or broker name as context.'
         - macro: '{$ACTIVEMQ.PASSWORD}'
-          value: activemq
-          description: 'Password for JMX'
+          type: SECRET_TEXT
+          description: 'ActiveMQ JMX password.'
           config:
             type: TEXT
             priority: '2'
             label: 'JMX password'
-            description: 'Password for JMX'
+            description: 'ActiveMQ JMX password.'
             required: 'YES'
         - macro: '{$ACTIVEMQ.PORT}'
           value: '1099'
-          description: 'Port for JMX'
+          description: 'ActiveMQ JMX port.'
           config:
             type: TEXT
             priority: '3'
             label: 'JMX port'
-            description: 'Port for JMX'
+            description: 'ActiveMQ JMX port.'
         - macro: '{$ACTIVEMQ.QUEUE.ENABLED}'
           value: '1'
           description: 'Use this to disable alerting for specific destination. 1 = enabled, 0 = disabled. Can be used with destination name as context.'
@@ -912,12 +912,12 @@ zabbix_export:
             description: 'Attribute for TotalProducerCount per destination. Used to suppress destination''s triggers when the count of consumers on the broker is lower than threshold.'
         - macro: '{$ACTIVEMQ.USER}'
           value: admin
-          description: 'User for JMX'
+          description: 'ActiveMQ JMX user.'
           config:
             type: TEXT
             priority: '1'
             label: 'JMX user'
-            description: 'User for JMX'
+            description: 'ActiveMQ JMX user.'
             required: 'YES'
       dashboards:
         - uuid: 292193a9f5fc4a40a78aa304a6ceb536

@@ -1033,18 +1033,19 @@ class CMap extends CMapElement {
 						);
 					}
 
-					$url_validate_options = ['allow_user_macro' => false];
+					$url_validate_options = ['schemes' => CSettingsHelper::getAllowedUriSchemes()];
+
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
 					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
 					}
 					else {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
+					if (!(new CUrlValidator($url_validate_options))->validate($url['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
@@ -1528,18 +1529,19 @@ class CMap extends CMapElement {
 						);
 					}
 
-					$url_validate_options = ['allow_user_macro' => false];
+					$url_validate_options = ['schemes' => CSettingsHelper::getAllowedUriSchemes()];
+
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
 					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
 					}
 					else {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
+					if (!(new CUrlValidator($url_validate_options))->validate($url['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
@@ -3834,20 +3836,7 @@ class CMap extends CMapElement {
 				), 'linkthresholdid');
 
 				if ($link_thresholds) {
-					$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-					foreach ($link_thresholds as &$link_threshold) {
-						$number_parser->parse($link_threshold['threshold']);
-						$link_threshold['order_threshold'] = $number_parser->calcValue();
-					}
-					unset($link_threshold);
-
-					CArrayHelper::sort($link_thresholds, ['order_threshold']);
-
-					foreach ($link_thresholds as &$link_threshold) {
-						unset($link_threshold['order_threshold']);
-					}
-					unset($link_threshold);
+					$link_thresholds = filterAndSortThresholds($link_thresholds);
 				}
 
 				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');

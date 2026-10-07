@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -25,14 +26,15 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 class testFormHost extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, DatatableBehaviour and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -91,6 +93,8 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
+			'Max repetition count' => 10,
+			'Retries' => 5,
 			'Use combined requests' => true
 		],
 		'JMX' => [
@@ -264,10 +268,10 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asGridForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
-			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Retries', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Retries', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Retries', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
 		];
@@ -285,7 +289,8 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' => 10,
+					'Max repetition count' => 255,
+					'Retries' => 255,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -303,7 +308,7 @@ class testFormHost extends CWebTest {
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
+		$this->assertEquals('Max repetition count is applicable to walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
@@ -593,11 +598,40 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value must be less than or equal to 65535.'
 					]
 				]
 			],
-			// #16.
+			// #16 Agent port validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'default_values' => true,
+					'host_fields' => [
+						'Host name' => 'Host for port validation',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent',
+							'ip' => '127.1.1.1',
+							'port' => '1023'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent',
+							'ip' => '127.2.2.2',
+							'port' => '32768'
+						]
+					],
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: Value must be greater than or equal to 1024.',
+						'id:interfaces_2_port' => 'Port: Value must be less than or equal to 32767.'
+					]
+				]
+			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -613,11 +647,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #17.
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -633,11 +667,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #18 Empty SNMP community.
+			// #19 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -657,7 +691,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #19 Too low max repetition count.
+			// #20 Too low max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -673,11 +707,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
-			// #20 Empty proxy multiselect.
+			// #21 Empty proxy multiselect.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -692,7 +726,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #21 Empty proxy group multiselect.
+			// #22 Empty proxy group multiselect.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -707,7 +741,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #22 Too high value in Max repetition count.
+			// #23 Too high value in Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -722,11 +756,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
-			// #23 Host without interface.
+			// #24 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -736,7 +770,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #24 UTF8MB4 check.
+			// #25 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -748,7 +782,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #25 Default values of all interfaces.
+			// #26 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -776,7 +810,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #26 Change default host interface.
+			// #27 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -790,19 +824,19 @@ class testFormHost extends CWebTest {
 							'action' => USER_ACTION_ADD,
 							'type' => 'Agent',
 							'ip' => '127.1.1.1',
-							'port' => '111'
+							'port' => '1024'
 						],
 						[
 							'action' => USER_ACTION_ADD,
 							'type' => 'Agent',
 							'ip' => '127.2.2.2',
-							'port' => '222',
+							'port' => '32767',
 							'Default' => true
 						]
 					]
 				]
 			],
-			// #27 Different versions of SNMP interface and encryption.
+			// #28 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -824,7 +858,8 @@ class testFormHost extends CWebTest {
 							'type' => 'SNMP',
 							'SNMP version' => 'SNMPv2',
 							'SNMP community' => '{$SNMP_TEST}',
-							'Max repetition count' => '20'
+							'Max repetition count' => '20',
+							'Retries' => '19'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -860,7 +895,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #28 All interfaces and all fields in form.
+			// #29 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -880,7 +915,7 @@ class testFormHost extends CWebTest {
 							'ip' => '::1',
 							'dns' => '1211',
 							'Connect to' => 'DNS',
-							'port' => '100'
+							'port' => '1025'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -891,6 +926,7 @@ class testFormHost extends CWebTest {
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
 							'Max repetition count' => '15',
+							'Retries' => '10',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -933,6 +969,86 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'Default' => true
 						]
+					]
+				]
+			],
+			// #30 SNMP too high retries count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #31 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
+					]
+				]
+			],
+			// #32 User macros in SNMP max repetition and retries
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with user macro in SNMP interface',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '{$MACRO}',
+							'Retries' => '{$MACRO}'
+						]
+					]
+				]
+			],
+			// #33 SNMP retries and max repetition empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
+						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
 			]
@@ -1294,11 +1410,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value must be less than or equal to 32767.'
 					]
 				]
 			],
-			// #17.
+			// #17 Port validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1309,11 +1425,11 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'port' => 'test'
+							'port' => '1'
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value must be greater than or equal to 1024.'
 					]
 				]
 			],
@@ -1328,15 +1444,34 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
+							'port' => 'test'
+						]
+					],
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: Value is not a valid integer.'
+					]
+				]
+			],
+			// #19.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid port'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'port' => '10.5'
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #19 Empty SNMP community.
+			// #20 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1355,7 +1490,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #20 Zero Max repetition count.
+			// #21 Zero Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1372,11 +1507,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value must be within range 1:2147483647.'
+						'Max repetition count' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
-			// #21 Too high value in Max repetition count.
+			// #22 Too high value in Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1393,11 +1528,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Max repetition count' => 'This value is not a valid integer.'
+						'Max repetition count' => 'Value must be less than or equal to 2147483647.'
 					]
 				]
 			],
-			// #22 Empty proxy.
+			// #23 Empty proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1411,7 +1546,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #23 Empty proxy group.
+			// #24 Empty proxy group.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1422,6 +1557,70 @@ class testFormHost extends CWebTest {
 					],
 					'inline_errors' => [
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #25 SNMP too high value in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => '101'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value must be less than or equal to 100.'
+					]
+				]
+			],
+			// #26 SNMP characters in retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Characters in retries count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Retries' => 'aaa'
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'Value is not a valid integer.'
+					]
+				]
+			],
+			// #27 SNMP retries and max repetition empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty SNMP retries',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Retries' => '',
+							'Max repetition count' => ''
+						]
+					],
+					'inline_errors' => [
+						'Retries' => 'This field cannot be empty.',
+						'Max repetition count' => 'This field cannot be empty.'
 					]
 				]
 			]
@@ -2121,7 +2320,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
 					'error' => 'Cannot delete host "Host for suppression" because maintenance "Maintenance for suppression test"'.
-							' must contain at least one host or host group.'
+							' must contain at least one host group, host or trigger.'
 				]
 			]
 		];
@@ -2193,20 +2392,23 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
-		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+		$this->page->waitUntilReady();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
+		$this->query('name:zbx_filter')->asForm()->one()->waitUntilReady()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
-		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilPresent();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
-			$host_link->one()->click();
+			$host_link->one()->click(true);
 		}
 
 		return COverlayDialogElement::find()->waitUntilReady()->asForm()->one();

@@ -96,7 +96,7 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 					}
 				})
 				.bind("afteradd.dynamicRows", function(event, options) {
-					const container = jQuery(".overlay-dialogue-body");
+					const container = jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`);
 
 					container.scrollTop(Math.max(container.scrollTop(),
 						widget_form.getForm().scrollHeight - container.height()

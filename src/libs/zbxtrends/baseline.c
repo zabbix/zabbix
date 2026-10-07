@@ -17,6 +17,7 @@
 #include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxstr.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *
@@ -214,6 +215,12 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 	const char	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(zbx_history_get_trends_flags(), value_type))
+	{
+		*error = zbx_strdup(*error, "history storage provider does not support trend functions");
+		goto out;
+	}
 
 	switch (value_type)
 	{

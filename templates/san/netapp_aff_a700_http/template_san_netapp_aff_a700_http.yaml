@@ -16,7 +16,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -1969,6 +1969,7 @@ zabbix_export:
             label: 'Agent timeout'
             description: 'The HTTP agent timeout to wait for a response from AFF700.'
         - macro: '{$NETAPP.PASSWORD}'
+          type: SECRET_TEXT
           description: 'AFF700 user password.'
           config:
             type: TEXT

@@ -26,6 +26,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Aranet Cloud", e.g. {$HTTP.TLS.VERIFY:"Aranet Cloud"}.</p>|`full`|
 |{$ARANET.API.ENDPOINT}|<p>Aranet Cloud API endpoint.</p>|`https://aranet.cloud/api`|
 |{$ARANET.API.USERNAME}|<p>Aranet Cloud username.</p>||
 |{$ARANET.API.PASSWORD}|<p>Aranet Cloud password.</p>||

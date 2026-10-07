@@ -65,23 +65,24 @@ static int	zbx_macro_variable_search(const zbx_vector_ptr_pair_t *pmacro, const 
 /******************************************************************************
  *                                                                            *
  * Purpose: Appends key/value pair to the HTTP test macro cache.              *
- *          If the value format is 'regex:<pattern>', then regular expression *
- *          match is performed against the supplied data value and specified  *
- *          pattern. The first captured group is assigned to the macro value. *
+ *          If the value format is 'regex:', 'jsonpath:' or 'xmlxpath:',      *
+ *          the corresponding parsing is performed against the supplied data  *
+ *          and the extracted value is assigned to the macro value.           *
  *                                                                            *
  * Parameters: httptest - [IN/OUT] HTTP test data                             *
  *             pkey     - [IN] pointer to macro name (key) data               *
  *             nkey     - [IN] macro name (key) size                          *
  *             pvalue   - [IN] pointer to macro value data                    *
  *             nvalue   - [IN] value size                                     *
- *             data     - [IN] data for regexp matching (optional)            *
+ *             data     - [IN] HTTP response data for variable parsing.       *
+ *                             If NULL, dynamic parsing is skipped (used      *
+ *                             during scenario initialization phase)          *
  *             err_str  - [OUT] error message (optional)                      *
  *                                                                            *
  * Return value:  SUCCEED - key/value pair was added successfully             *
  *                   FAIL - key/value pair adding to cache failed             *
  *                          The failure reason can be either empty key/value, *
- *                          wrong key format or failed regular expression     *
- *                          match.                                            *
+ *                          wrong key format or failed parsing/match.         *
  *                                                                            *
  ******************************************************************************/
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
@@ -139,14 +140,15 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
-	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
+
+	if (NULL != data && 0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
 		/* The value contains regexp pattern, retrieve the first captured group or fail. */
 		zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1", ZBX_REGEXP_GROUP_CHECK_ENABLE,
 				(char **)&pair.second);
 		zbx_free(value_str);
 	}
-	else if (0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
+	else if (NULL != data && 0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
 	{
 		zbx_jsonobj_t	obj;
 
@@ -163,7 +165,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		zbx_jsonobj_clear(&obj);
 		zbx_free(value_str);
 	}
-	else if (0 == strncmp(XMLXPATH_PREFIX, value_str, XMLXPATH_PREFIX_SIZE))
+	else if (NULL != data && 0 == strncmp(XMLXPATH_PREFIX, value_str, XMLXPATH_PREFIX_SIZE))
 	{
 		zbx_variant_t	value;
 		int		is_empty;
@@ -302,17 +304,19 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
  * Purpose: Parses HTTP test/step variable string and stores results into     *
  *          httptest macro cache.                                             *
  *          The variables are specified as {<key>}=><value> pairs             *
- *          If the value format is 'regex:<pattern>', then regular expression *
- *          match is performed against the supplied data value and specified  *
- *          pattern. The first captured group is assigned to the macro value. *
+ *          If the value format is 'regex:', 'jsonpath:' or 'xmlxpath:',      *
+ *          corresponding parsing is performed against the supplied data      *
+ *          and extracted value is assigned to the macro value.               *
  *                                                                            *
  * Parameters: httptest  - [IN/OUT] HTTP test data                            *
  *             variables - [IN] variable vector                               *
- *             data      - [IN] data for variable regexp matching (optional)  *
+ *             data      - [IN] HTTP response data for variable parsing       *
+ *                              If NULL, dynamic parsing is skipped (used     *
+ *                              during scenario initialization phase)         *
  *             err_str   - [OUT] error message (optional)                     *
  *                                                                            *
  * Return value: SUCCEED - variables were processed successfully              *
- *               FAIL    - variable processing failed (regexp match failed)   *
+ *               FAIL    - variable processing failed (parsing/match failed)  *
  *                                                                            *
  ******************************************************************************/
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,

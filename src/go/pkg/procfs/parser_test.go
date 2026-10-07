@@ -37,9 +37,9 @@ func TestParser_Parse(t *testing.T) {
 		for i := range 1000 {
 			// Every 100th line is an error
 			if i%100 == 0 {
-				sb.WriteString(fmt.Sprintf("2025-01-01 10:00:%02d [ERROR] System crash %d\n", i%60, i))
+				fmt.Fprintf(&sb, "2025-01-01 10:00:%02d [ERROR] System crash %d\n", i%60, i)
 			} else {
-				sb.WriteString(fmt.Sprintf("2025-01-01 10:00:%02d [INFO] System healthy %d\n", i%60, i))
+				fmt.Fprintf(&sb, "2025-01-01 10:00:%02d [INFO] System healthy %d\n", i%60, i)
 			}
 		}
 

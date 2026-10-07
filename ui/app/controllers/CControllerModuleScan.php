@@ -24,7 +24,10 @@ class CControllerModuleScan extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		global $ZBX_FEATURE_FLAGS;
+
+		return $ZBX_FEATURE_FLAGS['modules_config_enabled']
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction(): void {
