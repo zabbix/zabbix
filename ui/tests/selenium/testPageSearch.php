@@ -498,8 +498,8 @@ class testPageSearch extends CWebTest {
 			else {
 				$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
 
-				// Only a maximum of 150 records are displayed at once.
-				$this->assertEquals('Displaying '.(min($expected_count, 150)).' of '.$expected_count.' found', $footer_text);
+				// Only a maximum of 160 records are displayed at once.
+				$this->assertEquals('Displaying '.(min($expected_count, 160)).' of '.$expected_count.' found', $footer_text);
 			}
 		}
 	}
