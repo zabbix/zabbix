@@ -11250,8 +11250,8 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
 
-			/* keep non functional triggers scheduled, since they could be      */
-			/* because it might depend on indirect changes, like disabling item */
+			/* keep timers of disabled and non functional triggers scheduled - */
+			/* their state can change indirectly, e.g. when an item is enabled */
 			*state = TRIGGER_TIMER_STATE_OK;
 			return FAIL;
 		}
@@ -11274,8 +11274,8 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 			if ((*dc_trigger)->timer_revision == timer->revision)
 				(*dc_trigger)->timer_revision = 0;
 
-			/* keep non functional triggers scheduled, since they could be      */
-			/* because it might depend on indirect changes, like disabling item */
+			/* keep timers of disabled and non functional triggers scheduled - */
+			/* their state can change indirectly, e.g. when an item is enabled */
 			*state = TRIGGER_TIMER_STATE_OK;
 			return FAIL;
 		}
