@@ -583,6 +583,19 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX.'window cause close window on closed';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX
 		.'window pattern close window on closed';
+	// The same event closed flavours with the close window operation left without the "Current event" condition
+	// every other operation of the suite is given (see limitOperationsToCurrentEvent()): the operation is then
+	// performed for every event of the window the closed event belongs to rather than for the closed event alone,
+	// and closing a window is the same whichever of its events asks for it, so they must assert exactly what the
+	// flavours above do, see prepareDataCepWindowCloseWindowOperations() with $any_event.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window on closed any event';
+	const CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window tag close window on closed any event';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window cause close window on closed any event';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window pattern close window on closed any event';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window cause close window';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window cause close window evicted';
 	// One flavour per window type is additionally run with the "down" values of a single id discarded as they occur,
@@ -3428,6 +3441,17 @@ HEREDOC;
 	}
 
 	/**
+	 * The pattern match flavour above with its close window operation left without the "Current event" condition, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnClosedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_CLOSED, false, false,
+			false, false, false, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the simple window flavour of the close window scenario, whose close window operation is performed
 	 * when an "up" event is added to it. A simple window has no matching of its own, so this and the eviction
 	 * flavour
@@ -3463,6 +3487,17 @@ HEREDOC;
 	}
 
 	/**
+	 * The simple window flavour above with its close window operation left without the "Current event" condition, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnClosedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_CLOSED, false, false,
+			false, false, false, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the tag correlation flavour of the close window scenario, whose close window operation is
 	 * performed when an "up" event is added to it, see prepareDataCepWindowCloseWindowOperations().
 	 */
@@ -3491,6 +3526,17 @@ HEREDOC;
 	public function prepareDataCepWindowTagCloseWindowOnClosed() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
 			self::CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
+		);
+	}
+
+	/**
+	 * The tag correlation flavour above with its close window operation left without the "Current event" condition, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowTagCloseWindowOnClosedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_CLOSED, false, false,
+			false, false, false, false, false, true
 		);
 	}
 
@@ -3528,6 +3574,17 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowOnClosed() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED, CCepRuleHelper::WHEN_EVENT_CLOSED
+		);
+	}
+
+	/**
+	 * The cause and symptom flavour above with its close window operation left without the "Current event" condition, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowOnClosedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_CLOSED, false, false,
+			false, false, false, false, false, true
 		);
 	}
 
@@ -4070,11 +4127,23 @@ HEREDOC;
 	 * reads to know that both of them were processed for the very events their windows closed - an event carrying only
 	 * one of the two would be an event one rule never got its turn for. Closing a problem twice may not do anything
 	 * more than closing it once, so the doubled flavours assert what the single ones do.
+	 *
+	 * $any_event leaves the operations of the rule without the "Current event" condition upsertCepRule() otherwise
+	 * gives them (see limitOperationsToCurrentEvent()). Only the event closed flavours may ask for it, and there it
+	 * changes the close window operation alone - the window closed point takes no such condition: the operation is
+	 * then performed for every event of the window the closed event belongs to instead of for that event alone. It
+	 * is unconditional there anyway and the window is ended by whichever of its events performs it first, so the
+	 * condition is not needed for the operation to do what it does and the flavour asserts exactly what the one
+	 * with the condition does.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			bool $discard_down = false, bool $single_service = false, bool $second_rule = false,
 			bool $discard_by_tag_value = false, bool $aged = false, bool $suppress_points = false,
-			bool $unsuppress_on_close = false) {
+			bool $unsuppress_on_close = false, bool $any_event = false) {
+		$this->assertFalse($any_event && $execute_when != CCepRuleHelper::WHEN_EVENT_CLOSED,
+			'Only an event closed flavour may leave "'.$name.'" without the "Current event" condition.'
+		);
+
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -4363,7 +4432,7 @@ HEREDOC;
 
 		$cep_ruleid = $this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
-		));
+		), !$any_event);
 
 		// The limits must have been stored as the macros themselves: were they resolved before reaching the
 		// database, the scenario would be running on plain values again and would say nothing about macros at all.
@@ -4388,7 +4457,7 @@ HEREDOC;
 			$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
 				self::buildSecondRuleName($name), [], $second_operations, CONDITION_EVAL_TYPE_AND, '', $window_type,
 				$window
-			));
+			), !$any_event);
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -5472,12 +5541,15 @@ HEREDOC;
 	 * reaches them, which is the order the API insists on, see groupOperationsByExecuteWhen().
 	 *
 	 * Every operation that may be limited to the current event is limited to it, see
-	 * limitOperationsToCurrentEvent().
+	 * limitOperationsToCurrentEvent(), unless $current_event leaves the rule without that condition.
 	 */
-	private function upsertCepRule(array $rule_params): string {
+	private function upsertCepRule(array $rule_params, bool $current_event = true): string {
 		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
 		$rule_params = self::groupOperationsByExecuteWhen($rule_params);
-		$rule_params = self::limitOperationsToCurrentEvent($rule_params);
+
+		if ($current_event) {
+			$rule_params = self::limitOperationsToCurrentEvent($rule_params);
+		}
 
 		// The rules of the scenario that ran before go here: they match the very same events and would keep
 		// closing the problems of this one. Everything this scenario has asked for since beginCepScenario()
@@ -12079,6 +12151,22 @@ HEREDOC;
 	}
 
 	/**
+	 * The same event closed scenario with the same pattern match window, with its close window operation left without
+	 * the "Current event" condition: it is then performed for every event of the window rather than for the closed
+	 * event alone, which ends the window all the same - see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnClosedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnClosedAnyEvent() {
+		$this->prepareDataCepWindowPatternCloseWindowOnClosedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED_ANY_EVENT
+		);
+	}
+
+	/**
 	 * The pattern match close window rule with one operation added: the "down" values of one id are discarded as they
 	 * occur, while its "up" values are kept and still end a window. The ids that were kept behave exactly as they do
 	 * without the discard - their "up" event completes what the script looks for and the match closes the window with
@@ -12268,8 +12356,23 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_CepWindowSimpleCloseWindowOnClosed() {
 		$this->prepareDataCepWindowSimpleCloseWindowOnClosed();
-
 		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED);
+	}
+
+	/**
+	 * The same event closed scenario with the same simple window, with its close window operation left without
+	 * the "Current event" condition: it is then performed for every event of the window rather than for the closed
+	 * event alone, which ends the window all the same - see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnClosedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnClosedAnyEvent() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnClosedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_ON_CLOSED_ANY_EVENT
+		);
 	}
 
 	/**
@@ -12399,6 +12502,22 @@ HEREDOC;
 	}
 
 	/**
+	 * The same event closed scenario with the same tag correlation window, with its close window operation left without
+	 * the "Current event" condition: it is then performed for every event of the window rather than for the closed
+	 * event alone, which ends the window all the same - see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery$|testTriggerCEP_CepWindowTagCloseWindowOnClosedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowOnClosedAnyEvent() {
+		$this->prepareDataCepWindowTagCloseWindowOnClosedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_TAG_CLOSE_ON_CLOSED_ANY_EVENT
+		);
+	}
+
+	/**
 	 * The tag correlation close window rule with the "down" values of one id discarded as they occur: the discard is
 	 * decided before the event is handed to a window of any type, so it must keep an event out of a tag correlation
 	 * window exactly as it does out of the others, while the ids it does not match still correlate and close as
@@ -12489,6 +12608,22 @@ HEREDOC;
 		$this->prepareDataCepWindowCauseSymptomCloseWindowOnClosed();
 
 		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED);
+	}
+
+	/**
+	 * The same event closed scenario with the same cause and symptom window, with its close window operation left without
+	 * the "Current event" condition: it is then performed for every event of the window rather than for the closed
+	 * event alone, which ends the window all the same - see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowOnClosedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnClosedAnyEvent() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowOnClosedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED_ANY_EVENT
+		);
 	}
 
 	/**
