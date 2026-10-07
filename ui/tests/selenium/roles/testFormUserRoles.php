@@ -880,7 +880,7 @@ class testFormUserRoles extends CWebTest {
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
 
 		// After enabling API access again, API methods controls become active.
-		$form->fill(['Enabled' => true]);
+		$form->fill(['id:api-access' => true]);
 		$this->assertTrue($form->getField('API methods')->isEnabled());
 		$this->assertTrue($this->query($selector)->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and not(@aria-disabled)]')->exists());
