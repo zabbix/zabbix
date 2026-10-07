@@ -11810,20 +11810,32 @@ out:
 	return num;
 }
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location)
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision)
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
 	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
-		return;
+		return SUCCEED;
 	}
 
 	memset(out, 0, sizeof(*out));
 
 	RDLOCK_CACHE;
+
+	if (NULL != revision)
+	{
+		if (*revision >= config->revision.settings_table)
+		{
+			UNLOCK_CACHE;
+			return FAIL;
+		}
+
+		*revision = config->revision.settings_table;
+	}
+
 
 	global_config = &config->config->apm_global_db;
 
@@ -11832,7 +11844,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 	if (0 == out->status)
 	{
 		UNLOCK_CACHE;
-		return;
+		return SUCCEED;
 	}
 
 	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
@@ -11855,6 +11867,8 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 
 	if (NULL != config_ssl_ca_location)
 		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+
+	return SUCCEED;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)

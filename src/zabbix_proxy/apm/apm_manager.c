@@ -51,6 +51,8 @@ typedef struct
 	int				commit_limit;
 	int				commit_task_num;
 
+	zbx_uint64_t			global_db_config_revision;
+
 	zbx_apm_commit_stats_t		commit_stats;
 
 	zbx_apm_exporter_pool_t	*exporters;
@@ -317,34 +319,29 @@ static void	apm_manager_send_stats(zbx_apm_manager_t *manager, zbx_ipc_client_t 
  *             config_source_ip        - [IN]                                 *
  *             config_ssl_ca_location  - [IN]                                 *
  *                                                                            *
- * Return value: APM_STATUS_ENABLED or APM_STATUS_DISABLED based on the       *
- *               resulting config status                                      *
- *                                                                            *
  ******************************************************************************/
-static int	apm_manager_update_global_config(zbx_apm_manager_t *manager, const char *config_source_ip,
+static void	apm_manager_update_global_config(zbx_apm_manager_t *manager, const char *config_source_ip,
 		const char *config_ssl_ca_location)
 {
 	zbx_apm_db_config_t	cfg_new;
 	char			*error = NULL;
-	int			ret = APM_STATUS_DISABLED;
 
-	zbx_dc_config_get_apm_db_config(&cfg_new, NULL, config_source_ip, config_ssl_ca_location);
-
-	if (0 != cfg_new.status)
+	if (SUCCEED == zbx_dc_config_get_apm_db_config(&cfg_new, NULL, config_source_ip, config_ssl_ca_location,
+			&manager->global_db_config_revision))
 	{
-		if (FAIL == apm_exporter_pool_set_config(manager->exporters, &cfg_new, &error))
+		if (0 != cfg_new.status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set APM exporter configuration: %s", error);
-			zbx_free(error);
-			ret = APM_STATUS_DISABLED;
+			if (FAIL == apm_exporter_pool_update_config(manager->exporters, &cfg_new, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot set APM exporter configuration: %s", error);
+				zbx_free(error);
+			}
 		}
 		else
-			ret = APM_STATUS_ENABLED;
+			apm_exporter_pool_clear_config(manager->exporters);
+
+		zbx_apm_db_config_clear(&cfg_new);
 	}
-
-	zbx_apm_db_config_clear(&cfg_new);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -411,8 +408,8 @@ void	*zbx_apm_manager_thread(void *args)
 
 	if (APM_STATUS_ENABLED == apm_config.enabled && 0 == apm_args->export_config->status)
 	{
-		if (APM_STATUS_ENABLED != apm_manager_update_global_config(manager, apm_args->source_ip,
-				apm_args->ca_location))
+		apm_manager_update_global_config(manager, apm_args->source_ip, apm_args->ca_location);
+		if (FAIL == apm_exporter_pool_is_active(manager->exporters))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "no local TelemetryProvider configuration found,"
 				" waiting for global APM data source configuration to start collecting data");
@@ -455,19 +452,24 @@ void	*zbx_apm_manager_thread(void *args)
 
 		if (CONFIG_INTERVAL < time_start - time_config)
 		{
+			int	apm_enabled_new;
+
 			proxy_apm_config = zbx_dc_get_apm_config(proxy_apm_config, &cfg_revision);
 			if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
 				apm_config_reset(&apm_config);
 
-			if (APM_STATUS_ENABLED == apm_config.enabled && 0 == apm_args->export_config->status)
+			apm_enabled_new = apm_config.enabled;
+
+			if (APM_STATUS_ENABLED == apm_enabled_new && 0 == apm_args->export_config->status)
 			{
-				apm_config.enabled = apm_manager_update_global_config(manager, apm_args->source_ip,
-						apm_args->ca_location);
+				apm_manager_update_global_config(manager, apm_args->source_ip, apm_args->ca_location);
+				if (FAIL == apm_exporter_pool_is_active(manager->exporters))
+					apm_enabled_new = APM_STATUS_DISABLED;
 			}
 
-			if (apm_enabled != apm_config.enabled)
+			if (apm_enabled != apm_enabled_new)
 			{
-				if (APM_STATUS_ENABLED == apm_config.enabled)
+				if (APM_STATUS_ENABLED == apm_enabled_new)
 				{
 					if (FAIL == apm_manager_activate(manager, apm_args->apm_listen_ip,
 							apm_args->apm_port, tls, &error))
@@ -482,7 +484,7 @@ void	*zbx_apm_manager_thread(void *args)
 				{
 					apm_manager_deactivate(manager);
 				}
-				apm_enabled = apm_config.enabled;
+				apm_enabled = apm_enabled_new;
 			}
 
 			if (quota != apm_config.quota)

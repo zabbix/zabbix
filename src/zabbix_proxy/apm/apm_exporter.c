@@ -28,8 +28,6 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter);
  *                                                                            *
  * Purpose: free resources allocated by exporter configuration                *
  *                                                                            *
- * Parameters: cfg - [IN] exporter configuration                              *
- *                                                                            *
  ******************************************************************************/
 static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 {
@@ -40,12 +38,15 @@ static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 		case APM_EXPORTER_CLICKHOUSE:
 			apm_clickhouse_cfg_clear(&cfg->data.clickhouse);
 			break;
-		case APM_EXPORTER_SQL:
-			/* TODO: implement */
-			break;
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release exporter configuration reference, freeing configuration   *
+ *          when the last reference is released                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	apm_exporter_cfg_release(zbx_apm_exporter_cfg_t *cfg)
 {
 	if (1 != atomic_fetch_sub(&cfg->refcount, 1))
@@ -57,42 +58,48 @@ static void	apm_exporter_cfg_release(zbx_apm_exporter_cfg_t *cfg)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse TelemetryProvider configuration into exporter               *
- *          configuration                                                     *
+ * Purpose: convert apm db configuration into exporter configuration          *
  *                                                                            *
- * Parameters: cfg           - [OUT] exporter configuration                   *
- *             export_config - [IN] TelemetryProvider configuration           *
- *             error         - [OUT] error message if the operation fails     *
+ * Parameters: cfg        - [OUT] exporter configuration                      *
+ *             apm_config - [IN] apm db configuration                         *
+ *             error      - [OUT] error message if the operation fails        *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
 static int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t *apm_config, char **error)
 {
-	int		ret = FAIL;
+	int	ret;
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_config->db_type)
+	switch (apm_config->db_type)
 	{
-		cfg->type = APM_EXPORTER_CLICKHOUSE;
-		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, apm_config, error))
-		{
-			goto out;
-		}
-	}
-	else
-	{
-		*error = zbx_dsprintf(NULL, "unknown telemetry provider type \"%u\"", apm_config->db_type);
-		goto out;
+		case ZBX_APM_DB_TYPE_CLICKHOUSE:
+			if (SUCCEED == (ret = apm_clickhouse_cfg_init(&cfg->data.clickhouse, apm_config, error)))
+				cfg->type = APM_EXPORTER_CLICKHOUSE;
+			break;
+		default:
+			*error = zbx_dsprintf(NULL, "unknown telemetry provider type \"%u\"", apm_config->db_type);
+			ret = FAIL;
+			break;
 	}
 
-	ret = SUCCEED;
-out:
 	if (FAIL == ret)
 		apm_exporter_cfg_clear(cfg);
 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create exporter configuration                                     *
+ *                                                                            *
+ * Parameters: apm_config - [IN] apm db configuration                         *
+ *             error      - [OUT] error message if the operation fails        *
+ *                                                                            *
+ * Return value: created exporter configuration with single reference, or     *
+ *               NULL on error                                                *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_apm_exporter_cfg_t	*apm_exporter_cfg_create(const zbx_apm_db_config_t *apm_config, char **error)
 {
 	zbx_apm_exporter_cfg_t	*cfg;
@@ -109,12 +116,35 @@ static zbx_apm_exporter_cfg_t	*apm_exporter_cfg_create(const zbx_apm_db_config_t
 	return cfg;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire exporter configuration reference                          *
+ *                                                                            *
+ * Parameters: cfg - [IN] exporter configuration                              *
+ *                                                                            *
+ * Return value: acquired exporter configuration                              *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_apm_exporter_cfg_t	*apm_exporter_cfg_acquire(zbx_apm_exporter_cfg_t *cfg)
 {
 	atomic_fetch_add(&cfg->refcount, 1);
 	return cfg;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create exporter pool                                              *
+ *                                                                            *
+ * Parameters: apm_config - [IN] apm db configuration                         *
+ *             error      - [OUT] error message if the operation fails        *
+ *                                                                            *
+ * Return value: created exporter pool, or NULL on error                      *
+ *                                                                            *
+ * Comments: When apm db configuration is disabled the pool is created        *
+ *           without configuration, it must be set later with                 *
+ *           apm_exporter_pool_update_config().                               *
+ *                                                                            *
+ ******************************************************************************/
 zbx_apm_exporter_pool_t	*apm_exporter_pool_create(const zbx_apm_db_config_t *apm_config, char **error)
 {
 	zbx_apm_exporter_pool_t	*pool;
@@ -174,11 +204,6 @@ static zbx_apm_exporter_t	*apm_exporter_create(zbx_apm_exporter_pool_t *pool, ch
 		case APM_EXPORTER_CLICKHOUSE:
 			ret = apm_clickhouse_init(&exporter->conn.clickhouse, &pool->cfg->data.clickhouse, error);
 			break;
-		case APM_EXPORTER_SQL:
-			*error = zbx_strdup(NULL, "not implemented");
-			/* TODO: implement */
-			break;
-
 	}
 
 	if (SUCCEED == ret)
@@ -192,8 +217,6 @@ static zbx_apm_exporter_t	*apm_exporter_create(zbx_apm_exporter_pool_t *pool, ch
 /******************************************************************************
  *                                                                            *
  * Purpose: free resources allocated by an exporter pool                      *
- *                                                                            *
- * Parameters: pool - [IN] exporter pool to destroy                           *
  *                                                                            *
  ******************************************************************************/
 void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
@@ -211,17 +234,22 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 	zbx_free(pool);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether exporter configuration matches apm db configuration *
+ *                                                                            *
+ * Parameters: cfg        - [IN] exporter configuration                       *
+ *             apm_config - [IN] apm db configuration                         *
+ *                                                                            *
+ * Return value: SUCCEED - configs match, FAIL - configs differ               *
+ *                                                                            *
+ ******************************************************************************/
 static int	apm_exporter_cfg_compare(const zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t *apm_config)
 {
 	switch (apm_config->db_type)
 	{
 		case ZBX_APM_DB_TYPE_CLICKHOUSE:
 			if (APM_EXPORTER_CLICKHOUSE != cfg->type)
-				return FAIL;
-			break;
-		case ZBX_APM_DB_TYPE_POSTGRESQL:
-		case ZBX_APM_DB_TYPE_MYSQL:
-			if (APM_EXPORTER_SQL != cfg->type)
 				return FAIL;
 			break;
 		default:
@@ -237,35 +265,82 @@ static int	apm_exporter_cfg_compare(const zbx_apm_exporter_cfg_t *cfg, const zbx
 	}
 }
 
-int	apm_exporter_pool_set_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replace exporter pool configuration                               *
+ *                                                                            *
+ * Parameters: pool - [IN/OUT] exporter pool                                  *
+ *             cfg  - [IN] new exporter configuration, can be NULL            *
+ *                                                                            *
+ ******************************************************************************/
+static void	apm_exporter_pool_set_config(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_cfg_t *cfg)
 {
-	if (NULL != pool->cfg)
-	{
-		if (SUCCEED == apm_exporter_cfg_compare(pool->cfg, apm_config))
-			return SUCCEED;
-	}
-
-	zbx_apm_exporter_cfg_t	*cfg_old, *cfg_new;
-
-	cfg_old = pool->cfg;
-	cfg_new = apm_exporter_cfg_create(apm_config, error);
+	zbx_apm_exporter_cfg_t	*cfg_old = pool->cfg;
 
 	pthread_mutex_lock(&pool->lock);
-	pool->cfg = cfg_new;
+	pool->cfg = cfg;
 	pthread_mutex_unlock(&pool->lock);
 
 	if (NULL != cfg_old)
 		apm_exporter_cfg_release(cfg_old);
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update exporter pool configuration if apm db configuration has    *
+ *          changed                                                           *
+ *                                                                            *
+ * Parameters: pool       - [IN/OUT] exporter pool                            *
+ *             apm_config - [IN] apm db configuration                         *
+ *             error      - [OUT] error message if the operation fails        *
+ *                                                                            *
+ * Return value: SUCCEED - configuration was updated or has not changed       *
+ *               FAIL    - invalid configuration                              *
+ *                                                                            *
+ * Comments: On failure the pool configuration is cleared, making the pool    *
+ *           inactive.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	apm_exporter_pool_update_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config,
+		char **error)
+{
+	if (NULL != pool->cfg && SUCCEED == apm_exporter_cfg_compare(pool->cfg, apm_config))
+		return SUCCEED;
+
+	zbx_apm_exporter_cfg_t	*cfg_new = apm_exporter_cfg_create(apm_config, error);
+
+	apm_exporter_pool_set_config(pool, cfg_new);
 
 	return (NULL == pool->cfg ? FAIL : SUCCEED);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free resources allocated by an exporter connection                *
+ * Purpose: clear exporter pool configuration, making the pool inactive       *
  *                                                                            *
- * Parameters: exporter - [IN] exporter to destroy                            *
+ ******************************************************************************/
+void	apm_exporter_pool_clear_config(zbx_apm_exporter_pool_t *pool)
+{
+	apm_exporter_pool_set_config(pool, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether exporter pool has valid configuration               *
+ *                                                                            *
+ * Parameters: pool - [IN] exporter pool                                      *
+ *                                                                            *
+ * Return value: SUCCEED - pool is configured, FAIL - otherwise               *
+ *                                                                            *
+ ******************************************************************************/
+int	apm_exporter_pool_is_active(zbx_apm_exporter_pool_t *pool)
+{
+	return (NULL == pool->cfg ? FAIL : SUCCEED);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by an exporter connection                *
  *                                                                            *
  ******************************************************************************/
 static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
@@ -276,9 +351,6 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
 			break;
 		case APM_EXPORTER_CLICKHOUSE:
 			apm_clickhouse_clear(&exporter->conn.clickhouse);
-			break;
-		case APM_EXPORTER_SQL:
-			/* TODO: implement */
 			break;
 	}
 
@@ -293,7 +365,8 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
  *                                                                            *
  * Parameters: pool - [IN/OUT] exporter pool to acquire from                  *
  *                                                                            *
- * Return value: acquired exporter connection                                 *
+ * Return value: acquired exporter connection, or NULL if pool is not         *
+ *               configured                                                   *
  *                                                                            *
  * Comments: Terminates the process if a new exporter connection cannot       *
  *           be created.                                                      *
@@ -375,9 +448,6 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 			break;
 		case APM_EXPORTER_CLICKHOUSE:
 			ret = apm_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
-			break;
-		case APM_EXPORTER_SQL:
-			/* TODO: implement */
 			break;
 	}
 

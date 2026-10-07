@@ -25,8 +25,7 @@
 typedef enum
 {
 	APM_EXPORTER_UNKNOWN,
-	APM_EXPORTER_CLICKHOUSE,
-	APM_EXPORTER_SQL
+	APM_EXPORTER_CLICKHOUSE
 }
 zbx_apm_exporter_type_t;
 
@@ -71,8 +70,10 @@ zbx_apm_exporter_pool_t;
 
 zbx_apm_exporter_pool_t	*apm_exporter_pool_create(const zbx_apm_db_config_t *apm_config, char **error);
 void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool);
-int	apm_exporter_pool_set_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config,
+int	apm_exporter_pool_update_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config,
 		char **error);
+void	apm_exporter_pool_clear_config(zbx_apm_exporter_pool_t *pool);
+int	apm_exporter_pool_is_active(zbx_apm_exporter_pool_t *pool);
 
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool);
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter);

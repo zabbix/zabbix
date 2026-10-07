@@ -19,6 +19,7 @@
 #include "zbxtypes.h"
 #include "zbxtypes_ext.h"
 
+#define APM_STATUS_UNKNOWN	-1
 #define APM_STATUS_DISABLED	0
 #define APM_STATUS_ENABLED	1
 
