@@ -108,7 +108,7 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
-		$output_fields = self::$userData && self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+		$output_fields = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
 			? array_diff(self::OUTPUT_FIELDS, ['apm_global_db'])
 			: self::OUTPUT_FIELDS;
 
