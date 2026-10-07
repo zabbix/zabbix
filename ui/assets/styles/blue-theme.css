@@ -5843,9 +5843,6 @@ z-color-picker {
 z-color-picker[readonly] .color-picker-box:focus {
   box-shadow: none; }
 
-z-color-picker[readonly] .color-picker-box:focus {
-  box-shadow: none; }
-
 .z-select,
 z-select {
   display: inline-grid; }
