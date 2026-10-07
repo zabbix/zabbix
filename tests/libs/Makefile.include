@@ -133,6 +133,7 @@ ZBX_SERVER_LIBS = \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
+	$(top_builddir)/src/libs/zbxtelemetry/libzbxtelemetry.a \
 	$(top_builddir)/src/libs/zbxcep_client/libzbxcep_client.a \
 	$(top_builddir)/src/zabbix_server/audit/libzbxaudit_server.a \
 	$(top_builddir)/src/zabbix_server/rtc/libzbxrtc_server.a \

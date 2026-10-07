@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbx_trigger_constants.h"
@@ -244,6 +245,17 @@ typedef struct
 }
 ZBX_DC_BROWSERITEM;
 
+typedef struct
+{
+	const char	*query;
+	const char	*time_shift;
+	const char	*lookback_limit;
+	const char	*granularity;
+	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
+}
+ZBX_DC_TQITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -259,6 +271,7 @@ typedef union
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_BROWSERITEM	*browseritem;
+	ZBX_DC_TQITEM		*tqitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -538,6 +551,8 @@ typedef struct
 	zbx_config_item_type_timeouts_t	item_timeouts;
 
 	int				pending_history;
+
+	const char			*apm;
 }
 ZBX_DC_PROXY;
 
@@ -615,7 +630,8 @@ typedef struct
 	unsigned char	bulk;
 	unsigned char	max_succeed;
 	unsigned char	min_fail;
-	int		max_repetitions;
+	const char	*max_repetitions;
+	const char	*retries;
 }
 ZBX_DC_SNMPINTERFACE;
 
@@ -681,6 +697,8 @@ typedef struct
 	zbx_config_hk_t	hk;
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
+
+	zbx_config_apm_global_db_t	apm_global_db;
 }
 zbx_dc_config_table_t;
 

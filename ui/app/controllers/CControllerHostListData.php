@@ -17,11 +17,11 @@
 class CControllerHostListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['hostid', 'data_actions', 'name', 'discovery', 'flags', 'maintenance',
-		'status', 'discoveryData', 'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
-		'maintenance_status', 'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by',
-		'proxyid', 'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates',
-		'parentTemplates', 'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept',
-		'tls_connect', 'info_icons', 'tags', 'custom_text'];
+		'status', 'discoveryData', 'discoveryRule', 'maintenanceid', 'maintenance_type', 'maintenance_status',
+		'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by', 'proxyid',
+		'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates', 'parentTemplates',
+		'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept', 'tls_connect',
+		'info_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -245,11 +245,30 @@ class CControllerHostListData extends CControllerDataTable {
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
 
+		$lld_parentids = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('discoveryRule', $host) && $host['discoveryRule']) {
+				$lld_parentids[$host['discoveryRule']['itemid']] = true;
+			}
+		}
+
+		$editable_lld_parents = $lld_parentids
+			? API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
 		foreach ($hosts as &$host) {
+			$discovery_rule = array_key_exists('discoveryRule', $host) ? $host['discoveryRule'] : null;
+
 			$host['discovery'] = [
 				'data' => $host['discoveryData'],
-				'rule' => $host['discoveryRule'],
-				'editable' => $host['is_discovery_rule_editable'] ?? false
+				'rule' => $discovery_rule,
+				'editable' => $discovery_rule && array_key_exists($discovery_rule['itemid'], $editable_lld_parents)
 			];
 
 			$host['maintenance'] = null;

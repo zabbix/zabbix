@@ -20,15 +20,14 @@ class CPager {
 
 	static RANGE = 11;
 
-	/**
-	 * @type {HTMLElement}
-	 */
+	/** @type {HTMLElement} */
 	#element;
 
-	/**
-	 * @type {number}
-	 */
-	#page;
+	/** @type {number} */
+	#page = 1;
+
+	/** @type {number} */
+	#num_pages = 1;
 
 	/**
 	 * @type {AbortController}
@@ -59,11 +58,12 @@ class CPager {
 		this.#bindEvents();
 	}
 
-	/**
-	 * @returns {number}
-	 */
 	getPage() {
 		return this.#page;
+	}
+
+	getNumPages() {
+		return this.#num_pages;
 	}
 
 	/**
@@ -81,14 +81,15 @@ class CPager {
 		this.#element.querySelector(`.${ZBX_STYLE_PAGER_CONTAINER}`)?.remove();
 		this.#element.querySelector(`.${ZBX_STYLE_TABLE_STATS}`)?.remove();
 
-		if (this.#page != page) {
+		if (page > 0 && this.#page !== page) {
 			this.#page = page;
 
 			this.dispatchEvent(CPager.EVENT_STATE_CHANGE, {page});
 		}
 
-		const num_pages = Math.max(1, Math.round(Math.ceil(num_rows / rows_per_page)));
-		page = Math.max(1, Math.min(num_pages, page));
+		this.#num_pages = Math.max(1, Math.round(Math.ceil(num_rows / rows_per_page)));
+
+		page = Math.max(1, Math.min(this.#num_pages, page));
 
 		const total = limit_exceeded ? `${num_rows}+` : num_rows;
 		const start = (page - 1) * rows_per_page;
@@ -99,8 +100,8 @@ class CPager {
 		nav.setAttribute('role', 'navigation');
 		nav.setAttribute('aria-label', 'Pager');
 
-		if (num_pages > 1) {
-			const end_page = Math.min(num_pages, Math.max(CPager.RANGE, page + Math.floor(CPager.RANGE / 2)));
+		if (this.#num_pages > 1) {
+			const end_page = Math.min(this.#num_pages, Math.max(CPager.RANGE, page + Math.floor(CPager.RANGE / 2)));
 			const start_page = Math.max(1, end_page - CPager.RANGE + 1);
 
 			if (start_page > 1) {
@@ -144,7 +145,7 @@ class CPager {
 				nav.appendChild(current);
 			}
 
-			if (page < num_pages) {
+			if (page < this.#num_pages) {
 				const next = document.createElement('a');
 				next.setAttribute('aria-label', sprintf(t('Go to next page, %1$s'), page + 1));
 				next.setAttribute('href', 'javascript:void(0);');
@@ -157,12 +158,12 @@ class CPager {
 				nav.appendChild(next);
 			}
 
-			if (end_page < num_pages) {
+			if (end_page < this.#num_pages) {
 				const last = document.createElement('a');
-				last.setAttribute('aria-label', sprintf(t('Go to last page, %1$s'), num_pages));
+				last.setAttribute('aria-label', sprintf(t('Go to last page, %1$s'), this.#num_pages));
 				last.setAttribute('href', 'javascript:void(0);');
 				last.textContent = t('Last');
-				last.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: num_pages}));
+				last.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: this.#num_pages}));
 
 				nav.appendChild(last);
 			}
@@ -172,7 +173,7 @@ class CPager {
 		stats.classList.add(ZBX_STYLE_TABLE_STATS);
 
 		if (num_rows > 0) {
-			if (num_pages == 1) {
+			if (this.#num_pages == 1) {
 				stats.textContent = sprintf(t('Displaying %1$s of %2$s found'), num_rows, total);
 			}
 			else {

@@ -17,7 +17,7 @@
 
 #include "zbxtime.h"
 #include "zbxvariant.h"
-#include "zbxexpr.h"
+#include "zbxstr.h"
 #include "zbxregexp.h"
 
 /*
@@ -124,6 +124,9 @@
 						ZBX_EVAL_PARSE_COMPOUND_CONST)
 
 #define ZBX_EVAL_PARSE_LLD_FILTER_EXPRESSION	(ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_FUNCTIONID |\
+						ZBX_EVAL_PARSE_GROUP)
+
+#define ZBX_EVAL_PARSE_TQ_FILTER_EXPRESSION	(ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_FUNCTIONID |\
 						ZBX_EVAL_PARSE_GROUP)
 /* expression composition rules */
 

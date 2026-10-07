@@ -2073,7 +2073,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Item Widget with type of information - text',
 						'Advanced configuration' => true
 					],
@@ -2113,7 +2113,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Type of information - text & aggregation function - max',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
@@ -2169,7 +2169,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Item Widget with type of information - text',
 						'Advanced configuration' => true,
 						'History data' => 'Trends'
