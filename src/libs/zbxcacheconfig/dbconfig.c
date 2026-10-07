@@ -4700,9 +4700,6 @@ static void	dc_update_function_timer(ZBX_DC_FUNCTION *function, zbx_hashset_t *t
 	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
 		return;
 
-	if (TRIGGER_STATUS_ENABLED != trigger->status)
-		return;
-
 	if (NULL == (timer = dc_trigger_function_timer_create(function, now)))
 		return;
 
