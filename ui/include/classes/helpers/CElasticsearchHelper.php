@@ -295,7 +295,7 @@ class CElasticsearchHelper {
 					$phrase = $start.str_replace('*', '\\*', $phrase).'*';
 				}
 
-				$clauses[] = ['wildcard' => [$field => $phrase]];
+				$clauses[] = ['wildcard' => [$field => mb_strtolower($phrase)]];
 			}
 		}
 
