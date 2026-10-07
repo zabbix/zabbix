@@ -470,7 +470,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'15th LLD 🙃^天!',
 						'16th LLD',
 						'17th LLD',
-						'Linux by Zabbix agent: Block devices discovery',
+						'Linux by Zabbix agent: Get block devices: Block devices discovery',
 						'DR1-agent',
 						'DR2-trap',
 						'I1-lvl1-agent-num: DR3-I1-dep-agent',
@@ -490,7 +490,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
-						'Linux by Zabbix agent: Network interface discovery',
+						'Linux by Zabbix agent: Get network interfaces: Network interface discovery',
 						'sevenths LLD',
 						'sixth LLD',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
@@ -512,7 +512,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Linux by Zabbix agent: Block devices discovery'
+						'Linux by Zabbix agent: Get block devices: Block devices discovery'
 					]
 				]
 			],
