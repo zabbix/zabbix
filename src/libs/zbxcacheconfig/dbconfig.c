@@ -172,6 +172,7 @@ int	zbx_get_sync_in_progress(void)
 #define ZBX_TRIGGER_POLL_INTERVAL		(SEC_PER_MIN * 10)
 
 #define ZBX_STATUS_LIFETIME		SEC_PER_MIN
+#define ZBX_TRIGGER_TIMER_DELAY		30
 
 /* shorthand macro for calling zbx_in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
@@ -4514,7 +4515,6 @@ out:
 static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
 		time_t from, zbx_uint64_t seed)
 {
-#define ZBX_TRIGGER_TIMER_DELAY	30
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
 	{
 		int	nextcheck;
@@ -4547,7 +4547,6 @@ static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handl
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return 0;
-#undef ZBX_TRIGGER_TIMER_DELAY
 }
 
 /******************************************************************************
@@ -4643,23 +4642,15 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
  *                                                                            *
  * Parameter: timer   - [IN] timer to schedule                                *
  *            now     - [IN] current time                                     *
- *            eval_ts - [IN] history snapshot time, optional                  *
- *                           (will use execution time if null)                *
- *            exec_ts - [IN] timer execution time, optional                   *
-*                            (will use current timestamp if null)             *
+ *            eval_ts - [IN] the history snapshot time, by default (NULL)     *
+ *                           execution time will be used.                     *
+ *            exec_ts - [IN] timer execution time                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, int now, const zbx_timespec_t *eval_ts,
 		const zbx_timespec_t *exec_ts)
 {
 	zbx_binary_heap_elem_t	elem;
-	zbx_timespec_t		ts_now;
-
-	if (NULL == exec_ts)
-	{
-		zbx_timespec(&ts_now);
-		exec_ts = &ts_now;
-	}
 
 	if (NULL == eval_ts)
 		timer->eval_ts = *exec_ts;
@@ -11395,9 +11386,15 @@ void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, 
 		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger, &timer_state))
 		{
 			if (TRIGGER_TIMER_STATE_INVALID == timer_state)
+			{
 				dc_remove_invalid_timer(timer);
+			}
 			else
-				dc_schedule_trigger_timer(timer, now, NULL, NULL);
+			{
+				zbx_timespec_t	ts = {.sec = now + ZBX_TRIGGER_TIMER_DELAY, .ns = 0};
+
+				dc_schedule_trigger_timer(timer, now, NULL, &ts);
+			}
 
 			continue;
 		}
