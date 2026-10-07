@@ -193,6 +193,9 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Proxy']
 			],
 			[
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Proxy group']
+			],
+			[
 				[
 					'eventsource' => EVENT_SOURCE_DISCOVERY,
 					'new_operation_operationtype' => 'Send message'
@@ -243,6 +246,9 @@ class testFormAction extends CLegacyWebTest {
 			],
 			[
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Proxy']
+			],
+			[
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Proxy group']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Host metadata']
@@ -441,14 +447,16 @@ class testFormAction extends CLegacyWebTest {
 						'Discovery status',
 						'Uptime/Downtime',
 						'Received value',
-						'Proxy'
+						'Proxy',
+						'Proxy group'
 				]);
 				break;
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host name',
 						'Proxy',
-						'Host metadata'
+						'Host metadata',
+						'Proxy group'
 				]);
 				break;
 			case EVENT_SOURCE_INTERNAL:
@@ -489,6 +497,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery rule':
 			case 'Discovery check':
 			case 'Proxy':
+			case 'Proxy group':
 				$this->zbxTestTextPresent([
 					'equals',
 					'does not equal'
@@ -622,6 +631,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Trigger':
 			case 'Discovery rule':
 			case 'Proxy':
+			case 'Proxy group':
 				$this->zbxTestAssertElementPresentXpath('//input[@placeholder="type here to search"]');
 				break;
 			default:
@@ -1120,6 +1130,7 @@ class testFormAction extends CLegacyWebTest {
 
 	public static function create() {
 		return [
+			// #0
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1157,6 +1168,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1168,6 +1180,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1182,11 +1195,23 @@ class testFormAction extends CLegacyWebTest {
 							'Type' => CFormElement::RELOADABLE_FILL('Received value'),
 							'Operator' => 'does not contain',
 							'Value' => 'Received value'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'equals',
+							'Proxy group' => 'Proxy group for Actions 1'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'does not equal',
+							'Proxy group' => 'Proxy group for Actions 2'
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Received value does not contain Received value',
-						'B' => 'Service type equals FTP'
+						'A' => 'Proxy group equals Proxy group for Actions 1',
+						'B' => 'Proxy group does not equal Proxy group for Actions 2',
+						'C' => 'Received value does not contain Received value',
+						'D' => 'Service type equals FTP'
 					],
 					'operations' => [
 						[
@@ -1199,6 +1224,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1209,6 +1235,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1221,13 +1248,25 @@ class testFormAction extends CLegacyWebTest {
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Host metadata'),
-							'Operator'=> 'does not contain',
+							'Operator' => 'does not contain',
 							'Value' => 'Zabbix'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'equals',
+							'Proxy group' => 'Proxy group for Actions 1'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'does not equal',
+							'Proxy group' => 'Proxy group for Actions 2'
 						]
 					],
 					'expected conditions' => [
 						'A' => 'Host name contains Zabbix',
-						'B' => 'Host metadata does not contain Zabbix'
+						'B' => 'Host metadata does not contain Zabbix',
+						'C' => 'Proxy group equals Proxy group for Actions 1',
+						'D' => 'Proxy group does not equal Proxy group for Actions 2'
 					],
 					'operations' => [
 						[
@@ -1240,6 +1279,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1250,6 +1290,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #6
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1282,6 +1323,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #7
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1293,6 +1335,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #8
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1342,6 +1385,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #9
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1353,6 +1397,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #10
 			[
 				[
 					'expected' => ACTION_BAD,

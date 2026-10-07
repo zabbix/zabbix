@@ -49,6 +49,18 @@ class Actions {
 			]
 		])['hostids'];
 
+		CDataHelper::call('proxygroup.create',
+			[
+				[
+					'name' => 'Proxy group for Actions 1'
+				],
+				[
+					'name' => 'Proxy group for Actions 2'
+				]
+			]
+		);
+		$proxy_groupids = CDataHelper::getIds('name');
+
 		CDataHelper::call('proxy.create',
 			[
 				[
@@ -58,6 +70,20 @@ class Actions {
 				[
 					'name' => 'Proxy for Actions 2',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				],
+				[
+					'name' => 'Proxy for Proxy groups 1',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'proxy_groupid' => $proxy_groupids['Proxy group for Actions 1'],
+					'local_address' => '127.0.0.1',
+					'local_port' => '10051'
+				],
+				[
+					'name' => 'Proxy for Proxy groups 2',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'proxy_groupid' => $proxy_groupids['Proxy group for Actions 1'],
+					'local_address' => '127.0.0.2',
+					'local_port' => '10051'
 				]
 			]
 		);
@@ -321,6 +347,16 @@ class Actions {
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => $proxyids['Proxy for Actions 2']
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => $proxy_groupids['Proxy group for Actions 1']
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => $proxy_groupids['Proxy group for Actions 2']
 						]
 					]
 				],
