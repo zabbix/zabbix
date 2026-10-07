@@ -48,8 +48,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
  ******************************************************************************/
 
 static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const char *name, zbx_uint64_t dashboardid,
-		zbx_uint64_t userid, int report_time, unsigned char period,
-		const zbx_vector_ptr_pair_t *params)
+		zbx_uint64_t userid, int report_time, unsigned char period, const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *len, name_len;
 	unsigned char	*ptr;
@@ -376,10 +375,9 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
  *               FAIL    - no access                                          *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
+static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
 	zbx_db_result_t	result;
-	zbx_db_row_t	row;
 	int		ret = FAIL;
 
 	result = zbx_db_select("select d.dashboardid from dashboard d"
@@ -400,7 +398,7 @@ static int	zbx_check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboar
 			" and d.dashboardid=" ZBX_FS_UI64,
 			userid, userid, userid, dashboardid);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	if (NULL != zbx_db_fetch(result))
 		ret = SUCCEED;
 
 	zbx_db_free_result(result);
@@ -462,7 +460,7 @@ void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, st
 		}
 	}
 
-	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != zbx_check_dashboard_access(user->userid, dashboardid))
+	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != check_dashboard_access(user->userid, dashboardid))
 	{
 		error = zbx_strdup(error, "no access to dashboard");
 		goto out;
