@@ -173,7 +173,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$status = getEventStatusString($in_closing, $problem);
 
 			$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
-			$cell_status = new CSpan($status);
+			$cell_status = (new CSpan($status))
+				->addClass($options['compact_view'] == 1 ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 
 			if (isEventUpdating($in_closing, $problem)) {
 				$cell_status->addClass('js-blink');
@@ -288,19 +289,23 @@ class CControllerProblemViewData extends CControllerDataTable {
 					? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 					: []
 			))
-				->addClass($options['compact_view'] == 1 ? ZBX_STYLE_FLEX_WRAPPER : ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_FLEX_WRAPPER)
 				->addItem(
-					(new CLinkAction($problem['name']))
-						->addClass(ZBX_STYLE_WORDBREAK)
-						->setMenuPopup(CMenuPopupHelper::getTrigger([
-							'triggerid' => $trigger['triggerid'],
-							'backurl' => (new CUrl('zabbix.php'))
-								->setArgument('action', 'problem.view')
-								->getUrl(),
-							'eventid' => $problem['eventid'],
-							'show_rank_change_cause' => true,
-							'show_rank_change_symptom' => true
-						]))
+					(new CDiv())
+						->addClass(ZBX_STYLE_FLEX_ITEM)
+						->addItem(
+							(new CLinkAction($problem['name']))
+								->addClass(ZBX_STYLE_WORDBREAK)
+								->setMenuPopup(CMenuPopupHelper::getTrigger([
+									'triggerid' => $trigger['triggerid'],
+									'backurl' => (new CUrl('zabbix.php'))
+										->setArgument('action', 'problem.view')
+										->getUrl(),
+									'eventid' => $problem['eventid'],
+									'show_rank_change_cause' => true,
+									'show_rank_change_symptom' => true
+								]))
+						)
 				);
 
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
@@ -314,13 +319,16 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			if (!$options['compact_view'] && $options['details'] == 1) {
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-					$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS), BR()];
-					$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)];
+					$problem_expression = (new CDiv($trigger['expression_html']))
+						->addClass(ZBX_STYLE_WORDBREAK);
+					$recovery_expression = (new CDiv($trigger['recovery_expression_html']))
+						->addClass(ZBX_STYLE_WORDBREAK);
+
+					$description[] = [_('Problem'), ': ', $problem_expression, BR()];
+					$description[] = [_('Recovery'), ': ', $recovery_expression];
 				}
 				else {
-					$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDBREAK);
 				}
 			}
 

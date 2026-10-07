@@ -46,7 +46,8 @@
 					flex-wrap: nowrap;
 					column-gap: 0;
 
-					& > .link-action {
+					& > .link-action,
+					.flex-item > .link-action {
 						@extend %overflow-ellipsis;
 					}
 				}
@@ -657,20 +658,6 @@
 
 				&.nowrap {
 					flex-wrap: nowrap;
-				}
-
-				.flex-item {
-					display: flex;
-					min-width: 0;
-
-					& > .link-action {
-						@extend %overflow-ellipsis;
-					}
-
-					.wordbreak {
-						word-break: normal;
-						overflow-wrap: normal;
-					}
 				}
 
 				.separator {

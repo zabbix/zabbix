@@ -214,7 +214,8 @@
 						.setRenderer('last_value')
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
-						.setFields(['change']),
+						.setFields(['change'])
+						.setRenderer('change'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setColumnOptions({
 							object_type: ZBX_TAG_OBJECT_ITEM
@@ -390,6 +391,15 @@
 
 					cell.appendChild(flex_wrapper);
 				})
+				.setCellRenderer('change', ({cell_data, cell}) => {
+					const [change] = cell_data;
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = change;
+
+					cell.appendChild(wordbreak);
+				})
 				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, show_link] = cell_data;
 
@@ -398,16 +408,24 @@
 					}
 
 					const data_link = document.createElement('a');
-					if (is_graph) {
-						const search_params = objectToSearchParams({action: 'showgraph', itemids: [itemid]});
+					data_link.classList.add(ZBX_STYLE_WORDBREAK);
 
-						data_link.setAttribute('href', `history.php?${search_params}`);
+					if (is_graph) {
+						const url = zabbixUrl({
+							action: 'showgraph',
+							itemids: [itemid]
+						}, 'history.php');
+
+						data_link.setAttribute('href', url);
 						data_link.textContent = <?= json_encode(_('Graph')); ?>;
 					}
 					else {
-						const search_params = objectToSearchParams({action: 'showvalues', 'itemids[]': itemid});
+						const url = zabbixUrl({
+							action: 'showvalues',
+							itemids: [itemid]
+						}, 'history.php');
 
-						data_link.setAttribute('href', `history.php?${search_params}`);
+						data_link.setAttribute('href', url);
 						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 

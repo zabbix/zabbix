@@ -39,6 +39,7 @@ const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_CURSOR_POINTER = 'cursor-pointer';
 const ZBX_STYLE_FLEX_WRAPPER = 'flex-wrapper';
+const ZBX_STYLE_FLEX_ITEM = 'flex-item';
 const ZBX_STYLE_OVERFLOW_ELLIPSIS = 'overflow-ellipsis';
 const ZBX_STYLE_TRIMMED_CONTENT = 'trimmed-content';
 

@@ -2153,6 +2153,7 @@ define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
 define('ZBX_STYLE_FLEX_WRAPPER', 'flex-wrapper');
+define('ZBX_STYLE_FLEX_ITEM', 'flex-item');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
 define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
