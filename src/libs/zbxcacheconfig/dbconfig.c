@@ -11240,19 +11240,6 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 		{
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
-
-			return FAIL;
-		}
-
-		if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
-		{
-			if (dc_function->timer_revision == timer->revision)
-				dc_function->timer_revision = 0;
-
-			/* keep timers of disabled and non functional triggers scheduled - */
-			/* their state can change indirectly, e.g. when an item is enabled */
-			*state = TRIGGER_TIMER_STATE_OK;
 			return FAIL;
 		}
 	}
@@ -11267,21 +11254,18 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 				(*dc_trigger)->timer_revision = 0;
 			return FAIL;
 		}
-
-		if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
-		{
-			if ((*dc_trigger)->timer_revision == timer->revision)
-				(*dc_trigger)->timer_revision = 0;
-
-			/* keep timers of disabled and non functional triggers scheduled - */
-			/* their state can change indirectly, e.g. when an item is enabled */
-			*state = TRIGGER_TIMER_STATE_OK;
-			return FAIL;
-		}
 	}
 
 	*state = TRIGGER_TIMER_STATE_OK;
+
+	if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
+			TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+	{
+		/* keep timers of disabled and non functional triggers scheduled - */
+		/* their state can change indirectly, e.g. when an item is enabled */
+		return FAIL;
+	}
+
 	return SUCCEED;
 }
 
