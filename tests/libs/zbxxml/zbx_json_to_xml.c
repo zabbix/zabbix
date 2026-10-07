@@ -17,36 +17,99 @@
 
 #include "zbxxml.h"
 #include "zbxstr.h"
+#include "zbxthreads.h"
 
 #define ZBX_XML_HEADER_SIZE	22
+#define ZBX_THREAD_STACK_SIZE	(128 * 1024)   /* stack size in B */
+
+typedef struct
+{
+	const char	*json;
+	const char	*expected_xml;
+	int		expected_result;
+
+	int		actual_result;
+	char		*xml;
+	char		*error;
+} zbx_mock_thread_args_t;
+
+static void	*zbx_mock_test_thread(void *arg)
+{
+	zbx_mock_thread_args_t	*t = (zbx_mock_thread_args_t *)arg;
+
+	char	*json_copy = strdup(t->json);
+
+	if (NULL != json_copy)
+	{
+		t->actual_result = zbx_json_to_xml(json_copy, &t->xml, &t->error);
+		free(json_copy);
+	}
+
+	return NULL;
+}
 
 void	zbx_mock_test_entry(void **state)
 {
-	char	*json, *expected_xml, *xml_content, *xml = NULL, *error = NULL;
-	int	actual_result, expected_result;
+	pthread_t	thread;
+	pthread_attr_t	attr;
+	int		err;
 
 	ZBX_UNUSED(state);
 
-	json = (char *)zbx_mock_get_parameter_string("in.json");
-	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	expected_xml = (char *)zbx_mock_get_parameter_string("out.xml");
-	actual_result = zbx_json_to_xml(json, &xml, &error);
-	xml_content = xml;
-	if (NULL != xml)
+	zbx_mock_thread_args_t	args = {
+		.json = zbx_mock_get_parameter_string("in.json"),
+		.expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
+		.expected_xml = zbx_mock_get_parameter_string("out.xml"),
+		.actual_result = 0,
+		.xml = NULL,
+		.error = NULL
+	};
+
+	zbx_pthread_init_attr(&attr);
+
+	err = pthread_attr_setstacksize(&attr, ZBX_THREAD_STACK_SIZE);
+	if (0 != err)
+	{
+		fail_msg("pthread_attr_setstacksize() failed: %s", zbx_strerror(err));
+		return;
+	}
+
+	err = pthread_create(&thread, &attr, zbx_mock_test_thread, (void *)&args);
+	if (0 != err)
+	{
+		fail_msg("cannot create thread: %s", zbx_strerror(err));
+		return;
+	}
+
+	err = pthread_join(thread, NULL);
+	if (0 != err)
+	{
+		fail_msg("pthread_join() failed: %s", zbx_strerror(err));
+		return;
+	}
+
+	char	*xml_content = args.xml;
+
+	if (NULL != xml_content)
 	{
 		xml_content += ZBX_XML_HEADER_SIZE;
 		zbx_rtrim(xml_content, "\r\n ");
 	}
 
-	if (actual_result != expected_result || ( NULL != xml && 0 != strcmp(expected_xml, xml_content)))
+	if (args.actual_result != args.expected_result ||
+		(NULL != args.xml && 0 != strcmp(args.expected_xml, xml_content)))
 	{
 #ifdef HAVE_LIBXML2
-		fail_msg("Actual: %d \"%s\" != expected: %d \"%s\"", actual_result, xml_content, expected_result,
-				expected_xml);
+		fail_msg("Actual: %d \"%s\" != expected: %d \"%s\"",
+			args.actual_result,
+			xml_content,
+			args.expected_result,
+			args.expected_xml);
 #else
 		skip();
 #endif
 	}
-	zbx_free(xml);
-	zbx_free(error);
+
+	zbx_free(args.xml);
+	zbx_free(args.error);
 }

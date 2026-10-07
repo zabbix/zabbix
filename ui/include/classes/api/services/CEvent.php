@@ -27,6 +27,7 @@ class CEvent extends CApiService {
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
+	protected $groupByColumns = ['objectid'];
 
 	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
 		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata',
@@ -83,7 +84,7 @@ class CEvent extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => []],
+			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->groupByColumns), 'uniq' => true, 'default' => []],
 			'select_acknowledges' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'select_alerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],

@@ -1,0 +1,14 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/test",
+    "info_name": "/dev/test",
+    "type": "ata",
+    "protocol": "ATA"
+  },
+  "model_name": "TEST_DEVICE_WITHOUT_SMART_STATUS"
+}
