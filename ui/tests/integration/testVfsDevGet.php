@@ -16,7 +16,7 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for the vfs.dev.get item, on both classic agent and agent2.
+ * Test suite for the vfs.dev.get item, on both Zabbix agent and agent2 on Linux.
  *
  * @onAfter clearData
  */
@@ -61,17 +61,16 @@ class testVfsDevGet extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		// Create host "agentd" and "agent2".
-		$hosts = [];
-		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 =>
-				self::AGENT2_PORT_SUFFIX] as $component => $port) {
-			$hosts[] = [
+		$ports = [self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX];
+
+		foreach ($ports as $component => $port) {
+			$response = $this->call('host.create', [
 				'host' => $component,
 				'interfaces' => [
 					[
-						'type' => 1,
-						'main' => 1,
-						'useip' => 1,
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => PHPUNIT_PORT_PREFIX.$port
@@ -81,61 +80,36 @@ class testVfsDevGet extends CIntegrationTest {
 					[
 						'groupid' => 4 // Zabbix servers
 					]
-				],
-				'status' => HOST_STATUS_NOT_MONITORED
-			];
-		}
+				]
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+			self::$hostids[$component] = $response['result']['hostids'][0];
 
-		$response = $this->call('host.create', $hosts);
-		$this->assertArrayHasKey('hostids', $response['result']);
+			$response = $this->call('hostinterface.get', [
+				'output' => ['interfaceid'],
+				'hostids' => self::$hostids[$component]
+			]);
+			$interfaceid = $response['result'][0]['interfaceid'];
 
-		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $i => $component) {
-			$this->assertArrayHasKey($i, $response['result']['hostids']);
-			self::$hostids[$component] = $response['result']['hostids'][$i];
-		}
-
-		// Get host interface ids.
-		$response = $this->call('host.get', [
-			'output' => ['host'],
-			'hostids' => array_values(self::$hostids),
-			'selectInterfaces' => ['interfaceid']
-		]);
-
-		$interfaceids = [];
-		foreach ($response['result'] as $host) {
-			$interfaceids[$host['host']] = $host['interfaces'][0]['interfaceid'];
-		}
-
-		// Create items.
-		$items = [];
-		foreach (self::$items as $item) {
-			$data = [
-				'name' => $item['key'],
-				'key_' => $item['key'],
-				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'delay' => self::ITEM_DELAY
-			];
-
-			foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-				$items[] = array_merge($data, [
+			$items = [];
+			foreach (self::$items as $item) {
+				$items[] = [
 					'hostid' => self::$hostids[$component],
-					'interfaceid' => $interfaceids[$component]
-				]);
+					'interfaceid' => $interfaceid,
+					'name' => $item['key'],
+					'key_' => $item['key'],
+					'type' => ITEM_TYPE_ZABBIX,
+					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'delay' => self::ITEM_DELAY
+				];
 			}
-		}
 
-		$response = $this->call('item.create', $items);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(count($items), count($response['result']['itemids']));
+			$response = $this->call('item.create', $items);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertCount(count($items), $response['result']['itemids']);
 
-		// Get item IDs.
-		$itemids = $response['result']['itemids'];
-		$i = 0;
-
-		foreach (self::$items as $item) {
-			foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-				self::$itemids[$component.':'.$item['key']] = $itemids[$i++];
+			foreach (self::$items as $i => $item) {
+				self::$itemids[$component.':'.$item['key']] = $response['result']['itemids'][$i];
 			}
 		}
 
@@ -149,9 +123,6 @@ class testVfsDevGet extends CIntegrationTest {
 		if (self::$hostids) {
 			CDataHelper::call('host.delete', array_values(self::$hostids));
 		}
-
-		self::$hostids = [];
-		self::$itemids = [];
 	}
 
 	/**
