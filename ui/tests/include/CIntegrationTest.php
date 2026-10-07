@@ -839,21 +839,20 @@ class CIntegrationTest extends CAPITest {
 		$child_pids = [];
 		$parent_pid = @file_get_contents(self::getPidPath($component));
 
-		if ($pid !== false && is_numeric($pid)) {
+		if ($parent_pid !== false && is_numeric($parent_pid)) {
+			$output = shell_exec('pgrep -P '.$parent_pid);
+			if ($output !== false && $output !== null) {
+				$child_pids = explode("\n", trim($output));
+			}
 			if ($component === self::COMPONENT_JAVA) {
 				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
 				self::executeCommand($script, []);
-				$pids[] = $pid;
 				sleep(3);
 			} else {
-				$output = shell_exec('pgrep -P '.$pid);
-				if ($output !== false && $output !== null) {
-					$pids = explode("\n", trim($output));
-				}
-				$pids[] = $pid;
-
-				posix_kill($pid, SIGTERM);
+				posix_kill($parent_pid, SIGTERM);
 			}
+
+			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
 	}
 
@@ -872,22 +871,20 @@ class CIntegrationTest extends CAPITest {
 		$pid = @file_get_contents($pid_path);
 
 		if ($pid !== false && is_numeric($pid)) {
+			$output = shell_exec('pgrep -P '.$pid);
+			if ($output !== false && $output !== null) {
+				$child_pids = explode("\n", trim($output));
+				foreach ($child_pids as $child_pid) {
+					if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+						posix_kill($child_pid, SIGKILL);
+					}
+				}
+			}
 			if ($component === self::COMPONENT_JAVA) {
 				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
-
 				self::executeCommand($script, []);
 				sleep(3);
 			} else {
-				$output = shell_exec('pgrep -P '.$pid);
-				if ($output !== false && $output !== null) {
-					$child_pids = explode("\n", trim($output));
-					foreach ($child_pids as $child_pid) {
-						if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-							posix_kill($child_pid, SIGKILL);
-						}
-					}
-				}
-
 				posix_kill($pid, SIGKILL);
 			}
 		}
