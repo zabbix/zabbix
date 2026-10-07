@@ -306,7 +306,7 @@ function check_field(&$fields, &$field, $checks) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags & P_ACT) {
-			$action = APP::Component()->router->getAction();
+			$action = CRouter::getInstance()->getAction();
 
 			$csrf_token_form = getRequest(CSRF_TOKEN_NAME, '');
 

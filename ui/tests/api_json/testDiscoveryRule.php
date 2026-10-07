@@ -105,6 +105,21 @@ class testDiscoveryRule extends CAPITest {
 					ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 				]).'.'
 			],
+			'Test LLD rule with unsupported telemetry query type' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule with unsupported item type',
+					'key_' => 'api_lld_rule_with_unsupported_item_type',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_TELEMETRY_QUERY,
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
+					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+					ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
+				]).'.'
+			],
 			'Test invalid lifetime_type value' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule delete immediately',

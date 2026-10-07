@@ -725,6 +725,7 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
  *                                                                            *
  * Parameters: manager    - [IN] preprocessing manager                        *
  *             message    - [IN] packed preprocessing request                 *
+ *             runstate   - [IN] preprocessing manager run state              *
  *             direct_num - [OUT] number of directly flushed values           *
  *             direct_sz  - [OUT] size of directly flushed values             *
  *                                                                            *
@@ -732,7 +733,8 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
-		zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_vector_pp_task_ptr_t *tasks)
+		zbx_supervisor_runstate_t runstate, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz,
+		zbx_vector_pp_task_ptr_t *tasks)
 {
 	zbx_uint32_t	offset = 0;
 	zbx_uint64_t	queued_num = 0;
@@ -761,11 +763,15 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, itemid, &var, ts, &var_opt)))
 		{
-			(*direct_num)++;
-			*direct_sz += sz;
-			/* allow empty values */
-			preproc_flush_value_func_cb(manager, itemid, value_type, item_flags, &var, ts, &var_opt);
+			if (0 == (item_flags & ZBX_FLAG_DISCOVERY_RULE) || UNIT_RUNNING == runstate)
+			{
+				(*direct_num)++;
+				*direct_sz += sz;
 
+				/* allow empty values */
+				preproc_flush_value_func_cb(manager, itemid, value_type, item_flags, &var, ts,
+						&var_opt);
+			}
 			zbx_variant_clear(&var);
 			zbx_pp_value_opt_clear(&var_opt);
 		}
@@ -1304,8 +1310,8 @@ void	*zbx_pp_manager_thread(void *args)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
 					direct_sz = 0;
-					queued_once = preprocessor_add_request(manager, message, &direct_num,
-							&direct_sz, &tasks);
+					queued_once = preprocessor_add_request(manager, message, *unit_args->runstate,
+							&direct_num, &direct_sz, &tasks);
 					queued_num += queued_once;
 					counter_queued_num += queued_once;
 					counter_queued_sz += (zbx_uint64_t)message->size - direct_sz;

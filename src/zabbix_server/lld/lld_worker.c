@@ -115,6 +115,8 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 
 	if (ITEM_STATE_UNKNOWN != state && state != lld_value->item.state)
 	{
+		zbx_db_event	*event = NULL;
+
 		diff.state = state;
 		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
 
@@ -123,25 +125,35 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became supported",
 					lld_value->item.host.host, lld_value->item.key_orig);
 
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_value->item.itemid,
-					&lld_value->ts, ITEM_STATE_NORMAL, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-					NULL, NULL, NULL);
+			if (0 != zbx_dc_get_internal_action_count())
+			{
+				event = zbx_create_internal_event(EVENT_OBJECT_LLDRULE, lld_value->item.itemid,
+						lld_value->ts.sec, lld_value->ts.ns, ITEM_STATE_NORMAL, NULL, NULL);
+			}
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became not supported: %s",
 					lld_value->item.host.host, lld_value->item.key_orig, error);
 
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_value->item.itemid,
-					&lld_value->ts, ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL,
-					0, NULL, NULL, error);
+			if (0 != zbx_dc_get_internal_action_count())
+			{
+				event = zbx_create_internal_event(EVENT_OBJECT_LLDRULE, lld_value->item.itemid,
+						lld_value->ts.sec, lld_value->ts.ns, ITEM_STATE_NOTSUPPORTED, error,
+						NULL);
+			}
 		}
 
-		zbx_db_begin();
-		zbx_process_events(NULL, NULL, NULL);
-		zbx_db_commit();
+		if (NULL != event)
+		{
+			zbx_add_event(event);
 
-		zbx_clean_events();
+			zbx_db_begin();
+			zbx_process_events();
+			zbx_db_commit();
+
+			zbx_clean_events();
+		}
 	}
 
 	/* with successful LLD processing LLD error will be set to empty string */

@@ -5,7 +5,8 @@ AGENT_tests = \
 	system_localtime \
 	web_page_get \
 	vfs_file_exists \
-	zbx_ip_reverse
+	zbx_ip_reverse \
+	cpus_test
 endif
 
 noinst_PROGRAMS = $(AGENT_tests)
@@ -91,5 +92,31 @@ zbx_ip_reverse_LDADD += @SERVER_LIBS@
 zbx_ip_reverse_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_ip_reverse_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+cpus_test_SOURCES = \
+	cpus_test.c \
+	$(COMMON_SRC_FILES)
+
+cpus_test_LDADD = \
+	$(COMMON_LIB_FILES)
+
+cpus_test_LDADD += @AGENT_LIBS@
+
+cpus_test_WRAP_FUNCS = \
+	-Wl,--wrap=cpu_collector_started \
+	-Wl,--wrap=get_collector \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets \
+	-Wl,--wrap=open \
+	-Wl,--wrap=close \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=fstat \
+	-Wl,--wrap=__fxstat \
+	-Wl,--wrap=stat
+
+cpus_test_LDFLAGS = @AGENT_LDFLAGS@ $(cpus_test_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+cpus_test_CFLAGS = $(COMMON_COMPILER_FLAGS) -I$(top_srcdir)/src/libs/zbxsysinfo/common/
 
 endif

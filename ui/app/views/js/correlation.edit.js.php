@@ -23,6 +23,10 @@ window.correlation_edit_popup = new class {
 
 	init({rules, clone_rules, conditions}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
+		this.#showWarning(<?= json_encode(
+			_('Global event correlation is deprecated and may be removed in next releases.')
+		) ?>);
+
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -30,7 +34,7 @@ window.correlation_edit_popup = new class {
 		this.clone_rules = clone_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
-		return_url.searchParams.set('action', 'correlation.list');
+		return_url.searchParams.set('action', 'ceprule.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.row_templates = {}
@@ -234,8 +238,8 @@ window.correlation_edit_popup = new class {
 			this.#removePopupMessages();
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'correlation.delete');
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
+			curl.setArgument('action', 'ceprule.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>);
 
 			const correlationid = this.form.findFieldByName('correlationid').getValue();
 
@@ -327,5 +331,12 @@ window.correlation_edit_popup = new class {
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+
+	#showWarning(message) {
+		const message_node = makeMessageBox('warning', null, message, false)[0];
+
+		this.overlay.$dialogue.$body[0]
+			.insertAdjacentElement('beforebegin', message_node)
 	}
 };

@@ -83,7 +83,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 	switch (state)
 	{
 		case ZBX_TRIGGER_CACHE_EVAL_CTX:
-			if ('\0' == *trigger->expression)
+			if (NULL == trigger->expression || '\0' == *trigger->expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx, trigger->expression,
@@ -94,7 +94,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 			}
 			break;
 		case ZBX_TRIGGER_CACHE_EVAL_CTX_R:
-			if ('\0' == *trigger->recovery_expression)
+			if (NULL == trigger->recovery_expression || '\0' == *trigger->recovery_expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx_r, trigger->recovery_expression,
@@ -435,13 +435,30 @@ int	zbx_db_get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
 	expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
-	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
+	if (SUCCEED != zbx_expression_eval_execute(&eval, ts, &value, error))
 	{
-		*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
-		zbx_variant_clear(&value);
+		zbx_expression_eval_clear(&eval);
+
+		goto out;
 	}
 
+	if (ZBX_VARIANT_VECTOR == value.type)
+	{
+		*error = zbx_dsprintf(NULL, "unsupported expression macro result \"%s\" of type \"%s\"",
+				zbx_variant_value_desc(&value), zbx_variant_type_desc(&value));
+
+		zbx_variant_clear(&value);
+		zbx_expression_eval_clear(&eval);
+
+		goto out;
+	}
+
+	*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
+
+	zbx_variant_clear(&value);
 	zbx_expression_eval_clear(&eval);
+
+	ret = SUCCEED;
 out:
 	zbx_eval_clear(&ctx);
 	zbx_free(expression);
@@ -565,6 +582,35 @@ void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vecto
 
 	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the first function ID from a trigger expression               *
+ *                                                                            *
+ * Parameters: trigger - [IN]                                                 *
+ *                                                                            *
+ * Return value: first function ID, or 0 if none found                        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger)
+{
+	zbx_trigger_cache_t	*cache;
+	zbx_vector_uint64_t	functionids;
+	zbx_uint64_t		functionid = 0;
+
+	zbx_vector_uint64_create(&functionids);
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+	{
+		zbx_eval_get_functionids_ordered(&cache->eval_ctx, &functionids);
+		if (0 != functionids.values_num)
+			functionid = functionids.values[0];
+	}
+
+	zbx_vector_uint64_destroy(&functionids);
+
+	return functionid;
 }
 
 /******************************************************************************
@@ -912,6 +958,9 @@ void	zbx_db_trigger_clean(zbx_db_trigger *trigger)
 	zbx_free(trigger->url_name);
 	zbx_free(trigger->opdata);
 	zbx_free(trigger->event_name);
+	zbx_free(trigger->correlation_tag);
+
+	zbx_vector_uint64_destroy(&trigger->dep_triggerids);
 
 	if (NULL != trigger->cache)
 		trigger_cache_free((zbx_trigger_cache_t *)trigger->cache);

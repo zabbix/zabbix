@@ -505,9 +505,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 		foreach ($this->items as $item) {
 			$db_triggers = DBselect(
-				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
-				' FROM triggers tr,functions f,items i,hosts h'.
+				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,trd.value'.
+				' FROM triggers tr, trigger_rtdata trd,functions f,items i,hosts h'.
 				' WHERE tr.triggerid=f.triggerid'.
+					' AND trd.triggerid=f.triggerid'.
 					" AND f.name IN ('last','min','avg','max')".
 					' AND tr.status='.TRIGGER_STATUS_ENABLED.
 					' AND i.itemid=f.itemid'.
@@ -1252,8 +1253,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
-				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->power[$side], 10
+				$this->intervals[$side], $units, $this->power[$side], 10, false
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);

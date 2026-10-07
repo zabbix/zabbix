@@ -72,7 +72,8 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'settings.media_type_test_timeout' => ['update', '60s', '65s'],
 			'settings.item_test_timeout' => ['update', '50s', '60s'],
 			'settings.script_timeout' => ['update', '50s', '60s'],
-			'settings.report_test_timeout' => ['update', '50s', '60s']
+			'settings.report_test_timeout' => ['update', '50s', '60s'],
+			'settings.timeout_telemetry_query' => ['update', '10s', '3s']
 		]);
 
 		$this->call('settings.update', [
@@ -120,7 +121,8 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'media_type_test_timeout' => '60s',
 			'item_test_timeout' => '50s',
 			'script_timeout' => '50s',
-			'report_test_timeout' => '50s'
+			'report_test_timeout' => '50s',
+			'timeout_telemetry_query' => '10s'
 		]);
 
 		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, null, self::RESOURCE_TYPE);

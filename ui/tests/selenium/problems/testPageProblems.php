@@ -1991,7 +1991,7 @@ class testPageProblems extends CWebTest {
 				}
 				else {
 					$this->assertTrue($tick->exists());
-					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
+					$cell->query('tag:button')->waitUntilClickable()->one()->click();
 					$action_dialog = $this->query($dialog_selector)->asOverlayDialog()->waitUntilReady()->one();
 					$this->assertTableData($action, $dialog_selector.'//table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();

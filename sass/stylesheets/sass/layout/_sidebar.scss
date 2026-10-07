@@ -140,10 +140,6 @@ $sidebar-padding: 12px;
 	}
 
 	&.is-compact {
-		& + .wrapper {
-			margin-left: $sidebar-compact-width;
-		}
-
 		.button-compact,
 		.button-show {
 			display: none;
@@ -229,7 +225,7 @@ $sidebar-padding: 12px;
 			display: none;
 		}
 
-		& + .wrapper {
+		& ~ header {
 
 			.sidebar-nav-toggle {
 				display: block;
