@@ -4056,9 +4056,9 @@ HEREDOC;
 	 *     that were not closed with it - the ones of another trigger - are left to the recovery value of their own
 	 *     trigger rather than closed with the window, so this flavour has no "close" at the window closed point,
 	 *     see runEventAssessmentTestCepWindowCloseWindow(). A tag operation is
-	 *     performed at that point as well: when the point is not limited to the current event (see $any_event) it
-	 *     tags the problems of the other trigger the window holds, which shows the point was performed for every
-	 *     event of the window.
+	 *     performed at that point as well, which shows which events the point was performed for: the closed event
+	 *     alone while it is limited to the current event, every event of its window when it is not (see
+	 *     $any_event).
 	 *
 	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE_MULTIPLE window does nothing of its own, so
 	 * the two event driven execution points are all it has; a WINDOW_SIMPLE_ONCE window correlates the events of a
@@ -16192,10 +16192,11 @@ return;
 	 *      against. Each of those is an event a window holds being closed, which is what reaches the event closed
 	 *      execution point and ends the window. The rule closes nothing when the window ends, so the problems of
 	 *      the second trigger stay open;
-	 *   3. when the event closed point is not limited to the current event, the tag operation the rule performs
-	 *      there beside the close window one shows that it was performed for every event the window held: the
-	 *      problems of both triggers are tagged, the closed ones of the first trigger and the ones of the second
-	 *      trigger the window was still holding open. Whether the rule has that condition is read from it, see
+	 *   3. the tag operation the rule performs at the event closed point beside the close window one shows which
+	 *      events that point was performed for. Limited to the current event it is the closed event alone, so one
+	 *      problem of the first trigger per id is tagged - the one whose closing ended the window of that id - and
+	 *      none of the second trigger. Without that condition it is every event the window held, so the problems
+	 *      of both triggers are tagged. Whether the rule has that condition is read from it, see
 	 *      getCepRuleEventClosedTagCurrent();
 	 *   4. the recovery value "0" is sent through the second trigger, which closes the problems left open.
 	 * They are not combined with $discarded, $single_service, $doubled or $suppress_points.
@@ -16484,12 +16485,23 @@ return;
 					'The recovery value must close every problem of its own trigger.'
 				);
 
-				// 3. Without the "Current event" condition the event closed point was performed for every event of
-				//    the window, so every problem of the run is tagged: those of the second trigger the window was
-				//    still holding open, and those of the first one as well - the closed event is still in its
-				//    window when the point is performed, and being closed by its recovery already does not keep
-				//    a tag from being added to it.
-				if ($this->getCepRuleEventClosedTagCurrent($rule_name) === false) {
+				// 3. Which events the event closed point was performed for, read from the tag it adds. The closed
+				//    event is still in its window when the point is performed, and being closed by its recovery
+				//    already does not keep a tag from being added to it.
+				if ($this->getCepRuleEventClosedTagCurrent($rule_name)) {
+					// Limited to the current event: the event whose closing ended the window of an id is tagged,
+					// one per id, and nothing of the second trigger is. The first trigger is waited for first: a
+					// tag of the second one would have been added in the same pass.
+					$this->waitForProblemEventCountByTag([$triggerids[$keys[0]]], self::CEP_TAG_EVENT_CLOSED,
+						self::CEP_TAG_EVENT_CLOSED_VALUE, count($services)
+					);
+					$this->waitForProblemEventCountByTag([$triggerids[$keys[1]]], self::CEP_TAG_EVENT_CLOSED,
+						self::CEP_TAG_EVENT_CLOSED_VALUE, 0
+					);
+				}
+				else {
+					// Without that condition every event of the window: every problem of the run is tagged, those
+					// of the second trigger the window was still holding open and those of the first one alike.
 					$this->waitForProblemEventCountByTag([$triggerids[$keys[1]]], self::CEP_TAG_EVENT_CLOSED,
 						self::CEP_TAG_EVENT_CLOSED_VALUE, $held_open
 					);
