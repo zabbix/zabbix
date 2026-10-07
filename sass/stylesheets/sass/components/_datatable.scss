@@ -5,6 +5,8 @@
 }
 
 .datatable {
+	--datatable-columns: none;
+
 	position: relative;
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius);
@@ -20,14 +22,14 @@
 
 	&.compact-view {
 		.datatable-body {
-			.cell.cell-data {
+			.datatable-cell.datatable-cell-data {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
 				padding: 2px 8px;
 
 				.symptoms {
-					margin-top: 0;
 					height: calc(var(--datatable-compact-row-height) - 4px);
+					margin-top: 0;
 
 					.btn-icon {
 						height: calc(var(--datatable-compact-row-height) - 6px);
@@ -42,6 +44,11 @@
 
 				.flex-wrapper {
 					flex-wrap: nowrap;
+					column-gap: 0;
+
+					& > .link-action {
+						@extend %overflow-ellipsis;
+					}
 				}
 
 				.tags-wrapper {
@@ -57,19 +64,19 @@
 					@extend %overflow-ellipsis;
 				}
 
-				&.cell-checkbox .flex-wrapper {
+				&.datatable-cell-checkbox .flex-wrapper {
 					column-gap: 5px;
 				}
 			}
 
-			.row-spacer {
+			.datatable-row-spacer {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
 			}
 		}
 	}
 
-	&.has-highlighted-rows .datatable-body .row:not(.row-disabled) {
+	&.has-highlighted-rows .datatable-body .datatable-row:not(.datatable-row-disabled) {
 		&:not(.row-selected) {
 			&:not(:hover) {
 				.btn-icon,
@@ -78,10 +85,10 @@
 				}
 			}
 
-			&:hover .cell.cell-data {
-				&:not(.cell-bg) {
-					background-color: $ui-hover-bg-color;
+			&:hover .datatable-cell.datatable-cell-data {
+				&:not(.datatable-cell-bg) {
 					border-bottom-color: $ui-border-color;
+					background-color: $ui-hover-bg-color;
 				}
 			}
 		}
@@ -96,8 +103,8 @@
 
 		.datatable-options-header {
 			margin-bottom: 10px;
-			font-weight: 600;
 			color: $font-color;
+			font-weight: 600;
 		}
 
 		.datatable-options-list {
@@ -109,9 +116,9 @@
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				gap: 5px;
 				height: 25px;
 				padding: 5px;
+				gap: 5px;
 
 				&:hover {
 					background-color: $ui-hover-bg-color;
@@ -122,16 +129,16 @@
 					margin-top: 0;
 
 					& + label span {
-						vertical-align: middle;
 						flex-shrink: 0;
 						margin: 2px 4px 2px 2px;
+						vertical-align: middle;
 					}
 				}
 
 				label {
-					align-items: center;
 					display: flex;
 					overflow: hidden;
+					align-items: center;
 
 					.datatable-options-list-item-label {
 						@extend %overflow-ellipsis;
@@ -156,22 +163,22 @@
 
 	.datatable-options-popup {
 		position: absolute;
-		top: calc(var(--datatable-row-height) + 1px);
 		z-index: 2000;
-		box-sizing: border-box;
+		top: calc(var(--datatable-row-height) + 1px);
 		display: flex;
+		overflow-y: auto;
 		flex-direction: column;
-		gap: 5px;
+		box-sizing: border-box;
 		width: 220px;
 		min-height: 40px;
 		padding: 10px;
-		overflow-y: auto;
-		outline: none;
-		user-select: none;
-		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		border-radius: var(--surface-border-radius);
+		outline: none;
+		background-color: $ui-bg-color;
 		box-shadow: 0 4px 20px 0 $action-shadow-color;
+		user-select: none;
+		gap: 5px;
 
 		&.is-loading {
 			pointer-events: all;
@@ -216,40 +223,43 @@
 	.datatable-header {
 		display: grid;
 		overflow: hidden;
+		height: calc(var(--datatable-row-height) + 1px);
 		border-top-left-radius: var(--surface-border-radius);
 		border-top-right-radius: var(--surface-border-radius);
+		background-color: $ui-bg-color;
+		grid-template-columns: var(--datatable-columns);
 
 		&.datatable-header-sticky {
 			position: sticky;
-			top: 0;
 			z-index: 10;
+			top: 0;
 		}
 
 		.datatable-options-link {
 			z-index: 1;
-			box-sizing: border-box;
 			display: flex;
+			flex-shrink: 0;
 			justify-content: center;
 			align-items: center;
-			flex-shrink: 0;
+			box-sizing: border-box;
 			width: var(--datatable-row-height);
 			height: var(--datatable-row-height);
 			margin-right: -1px;
 			padding: 0;
+			border: 1px solid transparent;
+			border-radius: 0;
+			background-color: transparent;
 			color: $font-alt-color;
 			text-align: center;
 			user-select: none;
-			background-color: transparent;
-			border: 1px solid transparent;
-			border-radius: 0;
 
 			&:hover,
 			&:focus,
 			&.datatable-options-link-opened {
-				color: $font-alt-color;
-				background-color: $ui-hover-bg-color;
 				border-color: $btn-alt-color;
+				background-color: $ui-hover-bg-color;
 				box-shadow: none;
+				color: $font-alt-color;
 			}
 
 			.zi-context {
@@ -272,20 +282,21 @@
 
 		.datatable-options-button {
 			position: absolute;
+			z-index: 3;
 			top: 0;
 			right: 0;
-			z-index: 3;
-			box-sizing: border-box;
 			display: flex;
 			justify-content: space-between;
+			box-sizing: border-box;
 			height: var(--datatable-row-height);
+			border-radius: 0 var(--surface-border-radius) 0 0;
+			background-color: $ui-bg-color;
 			color: $font-color;
 			user-select: none;
-			background-color: $ui-bg-color;
 
 			.datatable-options-link {
 				margin-right: 0;
-				border-radius: 0 var(--surface-border-radius) 0 0;
+				border-radius: inherit;
 
 				&:not(:hover):not(:focus):not(.datatable-options-link-opened) {
 					border-left-color: $ui-border-color;
@@ -296,11 +307,12 @@
 
 	.datatable-body {
 		display: grid;
-		align-items: center;
-		width: 100%;
 		overflow-x: auto;
 		overflow-y: hidden;
+		align-items: center;
+		width: 100%;
 		background-color: $ui-bg-color;
+		grid-template-columns: var(--datatable-columns);
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 
@@ -312,20 +324,22 @@
 			padding: 100px 0;
 		}
 
-		.row {
-			display: contents;
+		.datatable-row {
+			display: grid;
+			grid-column: 1 / -1;
+			grid-template-columns: subgrid;
 
-			&:not(.row-selected):not(.row-disabled):hover {
-				.row-spacer,
-				.cell.cell-data:not(.cell-bg) {
+			&:not(.row-selected):not(.datatable-row-disabled):hover {
+				.datatable-row-spacer,
+				.datatable-cell.datatable-cell-data:not(.datatable-cell-bg) {
 					background-color: $ui-hover-bg-color;
 				}
 			}
 
 			&.nested {
 				&:not(.row-selected) {
-					.row-spacer,
-					.cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
+					.datatable-row-spacer,
+					.datatable-cell.datatable-cell-data:not(.datatable-cell-bg):not(.datatable-cell-bg-hover) {
 						background-color: darken($ui-bg-color, 5%);
 					}
 				}
@@ -333,17 +347,17 @@
 				&.nested-small {
 					font-size: 11px;
 
-					.cell.cell-data .flex-wrapper {
+					.datatable-cell.datatable-cell-data .flex-wrapper {
 						justify-content: flex-end;
 					}
 				}
 			}
 
 			&.row-selected {
-				.row-spacer,
-				.cell:not(.cell-bg) {
+				.datatable-row-spacer,
+				.datatable-cell:not(.datatable-cell-bg) {
+					border-bottom-color: $ui-border-color;
 					background-color: $lighter-yellow;
-					border-bottom-color: rgba(31, 44, 51, .1);
 				}
 			}
 
@@ -360,15 +374,16 @@
 
 	.datatable-scrollbar {
 		position: sticky;
-		bottom: calc(var(--datatable-row-height) + 1px);
-		margin-top: -1px;
 		z-index: 10;
-		height: var(--datatable-scrollbar-height);
+		bottom: calc(var(--datatable-row-height) + 1px);
 		overflow-x: auto;
 		overflow-y: hidden;
-		background-color: $ui-bg-color;
-		border-top: 1px solid $ui-border-color;
 		box-sizing: border-box;
+		height: var(--datatable-scrollbar-height);
+		margin-top: -1px;
+		border-top: 1px solid $ui-border-color;
+		background-color: $ui-bg-color;
+		grid-column: 1 / -1;
 
 		@supports #{'not selector(::-webkit-scrollbar)'} {
 			scrollbar-width: thin;
@@ -384,10 +399,10 @@
 		}
 
 		&::-webkit-scrollbar-thumb {
-			background-color: $datatable-scrollbar-thumb-bg-color;
-			background-clip: content-box;
 			border: 3px solid transparent;
 			border-radius: calc(var(--button-border-radius) + 3px);
+			background-color: $datatable-scrollbar-thumb-bg-color;
+			background-clip: content-box;
 		}
 
 		.datatable-scrollbar-inner {
@@ -395,9 +410,9 @@
 
 			&::after {
 				position: absolute;
-				content: '';
-				height: 1px;
 				width: 100%;
+				height: 1px;
+				content: '';
 			}
 		}
 	}
@@ -405,13 +420,13 @@
 	.datatable-footer {
 		z-index: 10;
 		display: grid;
-		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
-		height: var(--datatable-row-height);
-		padding: 0 8px;
-		color: $font-alt-color;
-		background-color: $ui-bg-color;
+		padding: 3px 8px;
 		border-top: 1px solid $ui-border-color;
+		background-color: $ui-bg-color;
+		color: $font-alt-color;
+		grid-column: 1 / -1;
+		grid-template-columns: 1fr auto 1fr;
 
 		&.datatable-footer-sticky {
 			position: sticky;
@@ -422,6 +437,10 @@
 			border: solid $ui-border-color;
 			border-width: 1px 0 0;
 
+			a {
+				box-sizing: border-box;
+			}
+
 			.selected-item-count {
 				justify-self: start;
 			}
@@ -431,19 +450,28 @@
 				justify-self: end;
 			}
 		}
+
+		&.datatable-footer-compact {
+			grid-template-columns: 1fr max-content;
+
+			&.pager .table-stats {
+				grid-column: 1 / -1;
+				grid-row: 2;
+			}
+		}
 	}
 
-	.cell {
+	.datatable-cell {
 		position: relative;
 		box-sizing: border-box;
-		height: 100%;
 		min-width: 0;
+		height: 100%;
 		min-height: calc(var(--datatable-row-height) + 1px);
-		text-align: left;
-		border-bottom: 1px solid $ui-border-color;
 		padding: 7px 8px;
+		border-bottom: 1px solid $ui-border-color;
+		text-align: left;
 
-		&:not(.cell-bg) {
+		&:not(.datatable-cell-bg) {
 			color: $font-color;
 		}
 
@@ -451,27 +479,23 @@
 			grid-column-start: 1;
 		}
 
-		&.cell-header {
+		&.datatable-cell-header {
 			top: 0;
-			box-sizing: border-box;
 			display: flex;
 			justify-content: space-between;
+			box-sizing: border-box;
 			height: calc(var(--datatable-row-height) + 1px);
-			color: $font-alt-color;
-			outline: none;
-			user-select: none;
-			background-color: $ui-bg-color;
 			border-right: 1px solid $ui-border-color;
+			outline: none;
+			background-color: $ui-bg-color;
+			color: $font-alt-color;
+			user-select: none;
 
 			.header-name {
 				@extend %overflow-ellipsis;
 			}
 
 			&:last-of-type {
-				border-right: 0;
-			}
-
-			&:last-child {
 				border-top-right-radius: 2px;
 
 				.header-link {
@@ -483,21 +507,21 @@
 				outline: none;
 			}
 
-			&.cell-header-link {
+			&.datatable-cell-header-link {
 				padding: 0;
 
 				.header-link {
 					@extend %overflow-ellipsis;
-					box-sizing: border-box;
 					display: flex;
 					align-items: center;
-					gap: 3px;
+					box-sizing: border-box;
 					width: 100%;
 					height: var(--datatable-row-height);
 					padding: 0 8px;
+					border: none;
 					color: $link-color;
 					text-decoration: none;
-					border: none;
+					gap: 3px;
 
 					&:hover,
 					&:focus {
@@ -533,19 +557,19 @@
 				}
 			}
 
-			&.cell-sticky:first-child {
+			&.datatable-cell-sticky:first-child {
 				border-right: 1px solid $ui-border-color;
 
-				& + .cell-header {
+				& + .datatable-cell-header {
 					border-left: none;
 				}
 			}
 
 			.header-resizer {
 				position: absolute;
-				right: -6px;
-				top: 0;
 				z-index: 2;
+				top: 0;
+				right: -6px;
 				width: 11px;
 				height: calc(var(--datatable-row-height) + 1px);
 				cursor: col-resize;
@@ -557,8 +581,8 @@
 					top: 0;
 					bottom: 0;
 					left: 5px;
-					content: '';
 					border-left: 1px solid transparent;
+					content: '';
 				}
 
 				&:hover::after {
@@ -566,7 +590,7 @@
 				}
 			}
 
-			&.cell-context {
+			&.datatable-cell-context {
 				padding: 0;
 
 				.header-name {
@@ -576,20 +600,20 @@
 			}
 		}
 
-		&.cell-sticky {
+		&.datatable-cell-sticky {
 			position: sticky;
 			z-index: 4;
 		}
 
-		&.cell-data {
-			align-items: flex-start;
+		&.datatable-cell-data {
 			overflow: hidden;
+			align-items: flex-start;
 
-			&.cell-sticky:not(.cell-bg-hover) {
+			&.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
 				background-color: $ui-bg-color;
 			}
 
-			&.cell-error {
+			&.datatable-cell-error {
 				color: $red;
 			}
 
@@ -627,11 +651,12 @@
 
 			.flex-wrapper {
 				display: flex;
-				column-gap: 4px;
+				flex-wrap: wrap;
 				min-height: 16px;
+				column-gap: 5px;
 
-				&.wrap {
-					flex-wrap: wrap;
+				&.nowrap {
+					flex-wrap: nowrap;
 				}
 
 				& > .link-action {
@@ -659,8 +684,8 @@
 
 			.tags-wrapper {
 				.tag {
-					margin: 0;
 					height: 16px;
+					margin: 0;
 				}
 
 				.btn-icon {
@@ -677,6 +702,10 @@
 				}
 			}
 
+			&:not(.datatable-cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
+				margin-left: 5px;
+			}
+
 			.action-wrapper {
 				display: flex;
 				flex-wrap: wrap;
@@ -689,11 +718,11 @@
 
 			.symptoms {
 				display: flex;
+				flex-shrink: 0;
 				justify-content: flex-start;
 				align-items: center;
-				flex-shrink: 0;
-				gap: 3px;
 				margin-left: 2px;
+				gap: 3px;
 
 				.symptoms-left {
 					min-width: 17px;
@@ -735,8 +764,8 @@
 				right: 0;
 				bottom: -1px;
 				width: 2px;
-				content: '';
 				background-color: $timeline-color;
+				content: '';
 			}
 
 			.timeline-dot,
@@ -746,25 +775,25 @@
 					right: -3px;
 					width: 4px;
 					height: 4px;
-					content: '';
 					border-radius: 50%;
+					content: '';
 				}
 			}
 
 			.timeline-dot::after {
 				top: 11px;
-				background-color: $btn-bg-color;
 				border: 2px solid $ui-bg-color;
+				background-color: $btn-bg-color;
 			}
 
 			.timeline-dot-big::after {
 				top: 11px;
-				background-color: $ui-bg-color;
 				border: 2px solid $btn-bg-color;
+				background-color: $ui-bg-color;
 			}
 		}
 
-		&.cell-checkbox {
+		&.datatable-cell-checkbox {
 			position: sticky;
 			justify-content: flex-start;
 			padding: 6px 8px;
@@ -784,7 +813,7 @@
 			}
 		}
 
-		&.cell-timeline {
+		&.datatable-cell-timeline {
 			display: flex;
 			padding: 0;
 
@@ -793,52 +822,56 @@
 				padding: 7px 8px;
 			}
 		}
+
+		&.datatable-cell-compact {
+			padding: 0;
+		}
 	}
 
-	.row-spacer {
+	.datatable-row-spacer {
 		box-sizing: border-box;
-		height: 100%;
 		min-width: 0;
+		height: 100%;
 		min-height: var(--datatable-row-height);
-		background-color: $ui-bg-color;
 		border-bottom: 1px solid $ui-border-color;
+		background-color: $ui-bg-color;
 
 		&.na-bg {
-			background-color: var(--severity-color-na-bg);
 			border-bottom-color: var(--severity-color-na-bg);
+			background-color: var(--severity-color-na-bg);
 		}
 
 		&.info-bg {
-			background-color: var(--severity-color-info-bg);
 			border-bottom-color: var(--severity-color-info-bg);
+			background-color: var(--severity-color-info-bg);
 		}
 
 		&.warning-bg {
-			background-color: var(--severity-color-warning-bg);
 			border-bottom-color: var(--severity-color-warning-bg);
+			background-color: var(--severity-color-warning-bg);
 		}
 
 		&.average-bg {
-			background-color: var(--severity-color-average-bg);
 			border-bottom-color: var(--severity-color-average-bg);
+			background-color: var(--severity-color-average-bg);
 		}
 
 		&.high-bg {
-			background-color: var(--severity-color-high-bg);
 			border-bottom-color: var(--severity-color-high-bg);
+			background-color: var(--severity-color-high-bg);
 		}
 
 		&.disaster-bg {
-			background-color: var(--severity-color-disaster-bg);
 			border-bottom-color: var(--severity-color-disaster-bg);
+			background-color: var(--severity-color-disaster-bg);
 		}
 	}
 
 	.no-data-message {
 		box-sizing: border-box;
 		padding: 100px 0;
-		background-color: $ui-bg-color;
 		border-top: none;
+		background-color: $ui-bg-color;
 	}
 }
 
@@ -848,12 +881,69 @@
 	}
 
 	.datatable {
+		-webkit-user-select: none;
 		user-select: none;
 		pointer-events: none;
-		-webkit-user-select: none;
 
-		.cell.cell-resizing .header-resizer {
+		.datatable-cell.datatable-cell-resizing .header-resizer {
 			z-index: 4;
+		}
+	}
+}
+
+#datatable-traces,
+#datatable-metrics,
+#datatable-logs {
+	.datatable-row:not(.row-selected):hover {
+		cursor: pointer;
+
+		.datatable-cell {
+			border-block-end-color: $ui-border-color;
+			background-color: $ui-hover-bg-color;
+		}
+	}
+}
+
+#datatable-traces {
+	.span-count {
+		color: $font-alt-color;
+	}
+
+	.error-count {
+		display: flex;
+		justify-content: center;
+		height: 16px;
+		padding: 0 4px;
+		border-radius: 2px;
+		background-color: $red;
+		color: $white;
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	.duration {
+		position: relative;
+		display: flex;
+		height: 100%;
+
+		.duration-bar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			height: inherit;
+			background-color: $disabled-bg-color;
+		}
+
+		.duration-time-units {
+			z-index: 1;
+			display: flex;
+			align-items: center;
+			width: 100%;
+			min-width: 0;
+			height: inherit;
+			padding: 0 8px;
 		}
 	}
 }

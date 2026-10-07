@@ -239,11 +239,12 @@
 		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
 				user_configs}) {
 
-			const data_provider_url = new URL('zabbix.php', location.href);
-			data_provider_url.searchParams.set('action', 'host.list.data');
-			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const data_provider_url = zabbixUrl({
+				action: 'host.list.data',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+			const data_provider = new CDefaultDataProvider(data_provider_url);
 
 			this.#datatable = new CDataTable(document.getElementById('datatable-hosts'), data_provider)
 				.setColumns([
@@ -364,6 +365,7 @@
 								const discovery_rule_link = document.createElement('a');
 								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
 								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
+								discovery_rule_link.textContent = discovery.rule.name;
 
 								cell.appendChild(discovery_rule_link);
 							}
@@ -391,15 +393,11 @@
 					url.searchParams.set('popup', 'host.edit');
 					url.searchParams.set('hostid', hostid);
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const edit_link = document.createElement('a');
-					edit_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
-					flex_wrapper.appendChild(edit_link);
+					cell.appendChild(edit_link);
 
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -430,10 +428,8 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(maintenance_icon);
+						cell.appendChild(maintenance_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
@@ -452,7 +448,11 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.appendChild(item_link);
+
+					flex_wrapper.appendChild(overflow_ellipsis);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -480,7 +480,11 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.appendChild(item_link);
+
+					flex_wrapper.appendChild(overflow_ellipsis);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -508,7 +512,11 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.appendChild(item_link);
+
+					flex_wrapper.appendChild(overflow_ellipsis);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -536,10 +544,13 @@
 
 					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', zabbixUrl(url_params));
-
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.appendChild(item_link);
+
+					flex_wrapper.appendChild(overflow_ellipsis);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -566,7 +577,11 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.appendChild(item_link);
+
+					flex_wrapper.appendChild(overflow_ellipsis);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -898,12 +913,12 @@
 
 		#refreshDebug(debug) {
 			const debug_output = document
-				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+				.querySelector(`.wrapper > main > .${ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH}`);
 
 			if (debug_output) {
-				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.classList.add(ZBX_STYLE_DEBUG_OUTPUT);
 				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
-					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+					.querySelector(`.${ZBX_STYLE_DEBUG_OUTPUT}`).innerHTML;
 			}
 		}
 
