@@ -20,8 +20,8 @@
 #include "zbxtypes.h"
 #include "zbxstr.h"
 
-static ZBX_THREAD_LOCAL zbx_channel_t	*zbx_channel;
-static int				zbx_ares_init_done;
+static ZBX_THREAD_LOCAL zbx_ares_channel_t	*zbx_channel;
+static int					zbx_ares_init_done;
 
 void	zbx_ares_library_init(void)
 {

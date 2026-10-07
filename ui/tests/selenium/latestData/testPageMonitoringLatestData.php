@@ -588,7 +588,17 @@ class testPageMonitoringLatestData extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$table = $this->getDatatable()->waitUntilReady();
-		$table->waitUntilRowsCount(count($data['result']));
+
+		if ($data['result']) {
+			$table->waitUntilRowsCount(count($data['result']));
+		}
+		else {
+			/*
+			 * The row count is already zero while the previous result is still being cleared, so waiting for zero
+			 * rows settles too early and the column headers become stale right after. Wait for the placeholder.
+			 */
+			$this->query('class:datatable-body')->waitUntilTextPresent('No data found');
+		}
 
 		// Set the datatable layout from Tags column header.
 		$tag_number = CTestArrayHelper::get($data, 'header_settings.Tags.Number of tags', 3);

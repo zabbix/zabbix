@@ -19,6 +19,7 @@
 
 #include "async_http.h"
 #include "discoverer_int.h"
+#include "discoverer_async.h"
 #include "zbxsysinc.h"
 #include "zbxcurl.h"
 #include "zbxip.h"

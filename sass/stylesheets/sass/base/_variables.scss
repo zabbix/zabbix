@@ -3,6 +3,9 @@
 	--font-stack-mono: "Courier New", Courier, monospace;
 	--font-body-size: 75%; // Default 1em/12px
 
+	--header-size: calc(var(--banner-size, 0px) + 45px);
+	--min-content-size: 1200px;
+
 	--badge-border-radius: 2px;
 	--button-border-radius: 4px;
 	--input-border-radius: 4px;

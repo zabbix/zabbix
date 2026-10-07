@@ -31,7 +31,9 @@ if (array_key_exists('actions', $data)) {
 		: null;
 
 	$output['data'] = (new CObject([
-		makeEventActionsTable($data['actions'], $data['users'], $data['mediatypes'], $data['maintenances']),
+		makeEventActionsTable($data['actions'], $data['users'], $data['mediatypes'], $data['maintenances'],
+			$data['ceprules']
+		),
 		$foot_note
 	]))->toString();
 }

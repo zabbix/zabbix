@@ -202,13 +202,6 @@ typedef int (*zbx_history_provider_get_info_t)(void *data, zbx_history_provider_
 
 typedef struct
 {
-	char	*name;
-	char	*value;
-}
-zbx_history_option_t;
-
-typedef struct
-{
 	zbx_history_provider_write_t		write;
 	zbx_history_provider_flush_t		flush;
 	zbx_history_provider_fetch_t		fetch;

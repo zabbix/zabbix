@@ -16,6 +16,7 @@
 #define ZABBIX_EXPR_H
 
 #include "zbxcommon.h"
+#include "zbxstr.h"
 
 #define ZBX_MACRO_EXPAND_NO			0
 #define ZBX_MACRO_EXPAND_YES			1
@@ -108,16 +109,6 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO | ZBX_TOKEN_USER_FUNC_MACRO)
-
-/* location of a substring */
-typedef struct
-{
-	/* left position */
-	size_t	l;
-	/* right position */
-	size_t	r;
-}
-zbx_strloc_t;
 
 /* data used by macros, lld macros and objectid tokens */
 typedef struct
@@ -267,8 +258,6 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_NO			11
 #define ZBX_CONDITION_OPERATOR_EXIST		12
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
-
-int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
 
 typedef struct
 {

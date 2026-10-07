@@ -305,3 +305,10 @@ zbx_db_result_t	zbx_dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list ar
 
 	return __wrap_zbx_db_vselect(fmt, args);
 }
+
+int zbx_dbconn_open(zbx_dbconn_t *db)
+{
+	ZBX_UNUSED(db);
+
+	return ZBX_DB_OK;
+}

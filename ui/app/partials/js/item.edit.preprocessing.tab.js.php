@@ -505,6 +505,24 @@ var ItemEditPreprocessingTab = class {
 				this.#form.findFieldByName('key').setChanged();
 			}
 
+			const types_test_fields = <?= json_encode(CControllerPopupItemTest::$item_types_test_fields) ?>;
+			const item_type = this.#form.findFieldByName('type').getValue();
+
+			if (item_type in types_test_fields) {
+				for (const name of types_test_fields[item_type]) {
+					const field = this.#form.findFieldByName(name);
+
+					validate_fields.push(name);
+					field.setChanged();
+
+					if (field instanceof CFieldCollection) {
+						for (const sub_field of Object.values(field.getFields())) {
+							sub_field.setChanged();
+						}
+					}
+				}
+			}
+
 			this.#form.validateFieldsForAction(validate_fields, this.#test_rules).then((result) => {
 				this.#container.dispatchEvent(new CustomEvent('test.validated'));
 

@@ -49,6 +49,9 @@ int	zbx_vault_get_kvs(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
+int	zbx_vault_apm_db_credentials_get(const zbx_config_vault_t *config_vault, char **username, char **password,
+		const char *vault_path, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **error);
 
 void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,

@@ -34,12 +34,14 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'TELNET agent' => '3s',
 		'Script' => '3s',
 		'Browser' => '60s',
+		'Telemetry query' => '3s',
 		'Communication' => '3s',
 		'Connection' => '3s',
 		'Media type test' => '65s',
 		'Script execution' => '60s',
 		'Item test' => '60s',
-		'Scheduled report test' => '60s'
+		'Scheduled report test' => '60s',
+		'Device link' => '60s'
 	];
 
 	public $custom_values = [
@@ -53,12 +55,14 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'TELNET agent' => '123s',
 		'Script' => '123s',
 		'Browser' => '123s',
+		'Telemetry query' => '123s',
 		'Communication' => '123s',
 		'Connection' => '15s',
 		'Media type test' => '123s',
 		'Script execution' => '123s',
 		'Item test' => '123s',
-		'Scheduled report test' => '123s'
+		'Scheduled report test' => '123s',
+		'Device link' => '123s'
 	];
 
 	public $db_default_values = [
@@ -72,6 +76,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'timeout_telnet_agent' => '3s',
 		'timeout_script' => '3s',
 		'timeout_browser' => '60s',
+		'timeout_telemetry_query' => '3s',
 		'socket_timeout' => '3s',
 		'connect_timeout' => '3s',
 		'media_type_test_timeout' => '65s',
@@ -95,12 +100,14 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			'TELNET agent' => 255,
 			'Script' => 255,
 			'Browser' => 255,
+			'Telemetry query' => 255,
 			'Communication' => 32,
 			'Connection' => 32,
 			'Media type test' => 32,
 			'Script execution' => 32,
 			'Item test' => 32,
-			'Scheduled report test' => 32
+			'Scheduled report test' => 32,
+			'Device link' => 32
 		];
 
 		$this->page->login()->open($this->config_link)->waitUntilReady();
@@ -321,7 +328,18 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #16 Update values for all item timeouts.
+			// #16.
+			[
+				[
+					'fields' => [
+						'Device link' => '15s'
+					],
+					'db' => [
+						'device_link_timeout' => '15s'
+					]
+				]
+			],
+			// #17 Update values for all item timeouts.
 			[
 				[
 					'fields' => [
@@ -350,7 +368,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #17 Update values for all network timeouts.
+			// #18 Update values for all network timeouts.
 			[
 				[
 					'fields' => [
@@ -359,7 +377,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '29s',
 						'Script execution' => '29s',
 						'Item test' => '29s',
-						'Scheduled report test' => '29s'
+						'Scheduled report test' => '29s',
+						'Device link' => '29s'
 					],
 					'db' => [
 						'socket_timeout' => '29s',
@@ -367,11 +386,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'media_type_test_timeout' => '29s',
 						'script_timeout' => '29s',
 						'item_test_timeout' => '29s',
-						'report_test_timeout' => '29s'
+						'report_test_timeout' => '29s',
+						'device_link_timeout' => '29s'
 					]
 				]
 			],
-			// #18 Update values for all timeouts.
+			// #19 Update values for all timeouts.
 			[
 				[
 					'fields' => [
@@ -390,7 +410,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '25s',
 						'Script execution' => '25s',
 						'Item test' => '25s',
-						'Scheduled report test' => '25s'
+						'Scheduled report test' => '25s',
+						'Device link' => '25s'
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '22s',
@@ -408,11 +429,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'media_type_test_timeout' => '25s',
 						'script_timeout' => '25s',
 						'item_test_timeout' => '25s',
-						'report_test_timeout' => '25s'
+						'report_test_timeout' => '25s',
+						'device_link_timeout' => '25s'
 					]
 				]
 			],
-			// #19 Update values for all timeouts.
+			// #20 Update values for all timeouts.
 			[
 				[
 					'fields' => [
@@ -431,7 +453,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '29',
 						'Script execution' => '29',
 						'Item test' => '29',
-						'Scheduled report test' => '29'
+						'Scheduled report test' => '29',
+						'Device link' => '29'
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '33',
@@ -449,11 +472,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'media_type_test_timeout' => '29',
 						'script_timeout' => '29',
 						'item_test_timeout' => '29',
-						'report_test_timeout' => '29'
+						'report_test_timeout' => '29',
+						'device_link_timeout' => '29'
 					]
 				]
 			],
-			// #20 Update values with macros for all item timeouts.
+			// #21 Update values with macros for all item timeouts.
 			[
 				[
 					'fields' => [
@@ -482,7 +506,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #21 Update all available timeouts with minutes type.
+			// #22 Update all available timeouts with minutes type.
 			[
 				[
 					'fields' => [
@@ -500,7 +524,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1m',
 						'Script execution' => '1m',
 						'Item test' => '1m',
-						'Scheduled report test' => '1m'
+						'Scheduled report test' => '1m',
+						'Device link' => '1m'
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '10m',
@@ -517,11 +542,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'media_type_test_timeout' => '1m',
 						'script_timeout' => '1m',
 						'item_test_timeout' => '1m',
-						'report_test_timeout' => '1m'
+						'report_test_timeout' => '1m',
+						'device_link_timeout' => '1m'
 					]
 				]
 			],
-			// #22.
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -533,7 +559,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #23.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -545,7 +571,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #24.
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -557,7 +583,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #25.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -569,7 +595,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #26.
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -581,7 +607,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #27.
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -593,7 +619,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #28.
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -605,7 +631,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #29.
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -617,7 +643,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #30.
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -629,7 +655,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #31.
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -641,7 +667,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #32.
+			// #33.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -653,7 +679,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #33.
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -665,7 +691,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #34.
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -677,7 +703,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #35.
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -689,7 +715,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #36.
+			// #37.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -701,7 +727,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #37.
+			// #38.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -713,7 +739,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #38.
+			// #39.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -725,7 +751,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #39.
+			// #40.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -737,7 +763,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #40.
+			// #41.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -749,7 +775,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #41.
+			// #42.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -761,7 +787,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #42 All network timeouts errors at once - less than available.
+			// #43 All network timeouts errors at once - less than available.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -771,7 +797,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '0s',
 						'Script execution' => '0s',
 						'Item test' => '0s',
-						'Scheduled report test' => '0s'
+						'Scheduled report test' => '0s',
+						'Device link' => '0s'
 					],
 					'inline_errors' => [
 						'Communication' => 'Value must be between 1s and 300s (5m).',
@@ -779,11 +806,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'Value must be between 1s and 300s (5m).',
 						'Script execution' => 'Value must be between 1s and 300s (5m).',
 						'Item test' => 'Value must be between 1s and 600s (10m).',
-						'Scheduled report test' => 'Value must be between 1s and 300s (5m).'
+						'Scheduled report test' => 'Value must be between 1s and 300s (5m).',
+						'Device link' => 'Value must be between 1s and 300s (5m).'
 					]
 				]
 			],
-			// #43 All network timeouts errors at once - higher than available.
+			// #44 All network timeouts errors at once - higher than available.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -793,7 +821,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '301s',
 						'Script execution' => '301s',
 						'Item test' => '601s',
-						'Scheduled report test' => '301s'
+						'Scheduled report test' => '301s',
+						'Device link' => '301s'
 					],
 					'inline_errors' => [
 						'Communication' => 'Value must be between 1s and 300s (5m).',
@@ -801,11 +830,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'Value must be between 1s and 300s (5m).',
 						'Script execution' => 'Value must be between 1s and 300s (5m).',
 						'Item test' => 'Value must be between 1s and 600s (10m).',
-						'Scheduled report test' => 'Value must be between 1s and 300s (5m).'
+						'Scheduled report test' => 'Value must be between 1s and 300s (5m).',
+						'Device link' => 'Value must be between 1s and 300s (5m).'
 					]
 				]
 			],
-			// #44 All fields empty.
+			// #45 All fields empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -825,7 +855,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '',
 						'Script execution' => '',
 						'Item test' => '',
-						'Scheduled report test' => ''
+						'Scheduled report test' => '',
+						'Device link' => ''
 					],
 					'inline_errors' => [
 						'Zabbix agent' => 'This field cannot be empty.',
@@ -843,11 +874,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'This field cannot be empty.',
 						'Script execution' => 'This field cannot be empty.',
 						'Item test' => 'This field cannot be empty.',
-						'Scheduled report test' => 'This field cannot be empty.'
+						'Scheduled report test' => 'This field cannot be empty.',
+						'Device link' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #45.
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -859,7 +891,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #46.
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -871,7 +903,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #47.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -883,7 +915,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #48.
+			// #49.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -895,7 +927,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #49.
+			// #50.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -907,7 +939,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #50.
+			// #51.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -919,7 +951,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #51.
+			// #52.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -931,7 +963,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #52.
+			// #53.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -943,7 +975,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #53.
+			// #54.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -955,7 +987,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #54.
+			// #55.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -967,7 +999,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #55 All network timeouts time unit errors at once.
+			// #56 All network timeouts time unit errors at once.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -977,7 +1009,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'test',
 						'Script execution' => 'test',
 						'Item test' => 'test',
-						'Scheduled report test' => 'test'
+						'Scheduled report test' => 'test',
+						'Device link' => 'test'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -985,11 +1018,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #56 Check 1h time validation.
+			// #57 Check 1h time validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -999,7 +1033,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1h',
 						'Script execution' => '1h',
 						'Item test' => '1h',
-						'Scheduled report test' => '1h'
+						'Scheduled report test' => '1h',
+						'Device link' => '1h'
 					],
 					'inline_errors' => [
 						'Communication' => 'Value must be between 1s and 300s (5m).',
@@ -1007,11 +1042,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'Value must be between 1s and 300s (5m).',
 						'Script execution' => 'Value must be between 1s and 300s (5m).',
 						'Item test' => 'Value must be between 1s and 600s (10m).',
-						'Scheduled report test' => 'Value must be between 1s and 300s (5m).'
+						'Scheduled report test' => 'Value must be between 1s and 300s (5m).',
+						'Device link' => 'Value must be between 1s and 300s (5m).'
 					]
 				]
 			],
-			// #57 Check 1d time validation.
+			// #58 Check 1d time validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1021,7 +1057,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1d',
 						'Script execution' => '1d',
 						'Item test' => '1d',
-						'Scheduled report test' => '1d'
+						'Scheduled report test' => '1d',
+						'Device link' => '1d'
 					],
 					'inline_errors' => [
 						'Communication' => 'Value must be between 1s and 300s (5m).',
@@ -1029,11 +1066,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'Value must be between 1s and 300s (5m).',
 						'Script execution' => 'Value must be between 1s and 300s (5m).',
 						'Item test' => 'Value must be between 1s and 600s (10m).',
-						'Scheduled report test' => 'Value must be between 1s and 300s (5m).'
+						'Scheduled report test' => 'Value must be between 1s and 300s (5m).',
+						'Device link' => 'Value must be between 1s and 300s (5m).'
 					]
 				]
 			],
-			// #58 All network timeouts errors for 1w validation.
+			// #59 All network timeouts errors for 1w validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1043,7 +1081,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1w',
 						'Script execution' => '1w',
 						'Item test' => '1w',
-						'Scheduled report test' => '1w'
+						'Scheduled report test' => '1w',
+						'Device link' => '1w'
 					],
 					'inline_errors' => [
 						'Communication' => 'Value must be between 1s and 300s (5m).',
@@ -1051,11 +1090,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'Value must be between 1s and 300s (5m).',
 						'Script execution' => 'Value must be between 1s and 300s (5m).',
 						'Item test' => 'Value must be between 1s and 600s (10m).',
-						'Scheduled report test' => 'Value must be between 1s and 300s (5m).'
+						'Scheduled report test' => 'Value must be between 1s and 300s (5m).',
+						'Device link' => 'Value must be between 1s and 300s (5m).'
 					]
 				]
 			],
-			// #59 All network timeouts errors for 1M validation.
+			// #60 All network timeouts errors for 1M validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1065,7 +1105,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1M',
 						'Script execution' => '1M',
 						'Item test' => '1M',
-						'Scheduled report test' => '1M'
+						'Scheduled report test' => '1M',
+						'Device link' => '1M'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -1073,11 +1114,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #60 All network timeouts errors for 1y validation.
+			// #61 All network timeouts errors for 1y validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1087,7 +1129,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '1y',
 						'Script execution' => '1y',
 						'Item test' => '1y',
-						'Scheduled report test' => '1y'
+						'Scheduled report test' => '1y',
+						'Device link' => '1y'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -1095,11 +1138,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #61.
+			// #62.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1111,7 +1155,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #62.
+			// #63.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1123,7 +1167,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #63.
+			// #64.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1135,7 +1179,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #64.
+			// #65.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1147,7 +1191,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #65.
+			// #66.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1159,7 +1203,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #66.
+			// #67.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1171,7 +1215,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #67.
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1183,7 +1227,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #68.
+			// #69.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1195,7 +1239,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #69.
+			// #70.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1207,7 +1251,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #70.
+			// #71.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1219,7 +1263,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #71.
+			// #72.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1231,7 +1275,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #72.
+			// #73.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1243,7 +1287,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #73.
+			// #74.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1255,7 +1299,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #74.
+			// #75.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1267,7 +1311,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #75.
+			// #76.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1279,7 +1323,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #76.
+			// #77.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1291,7 +1335,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #77.
+			// #78.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1303,7 +1347,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #78.
+			// #79.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1315,7 +1359,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #79.
+			// #80.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1327,7 +1371,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #80.
+			// #81.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1339,7 +1383,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #81.
+			// #82.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1351,7 +1395,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #82.
+			// #83.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1363,7 +1407,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #83.
+			// #84.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1375,7 +1419,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #84.
+			// #85.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1387,7 +1431,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #85.
+			// #86.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1399,7 +1443,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #86.
+			// #87.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1411,7 +1455,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #87.
+			// #88.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1423,7 +1467,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #88.
+			// #89.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1435,7 +1479,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #89.
+			// #90.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1447,7 +1491,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #90.
+			// #91.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1459,7 +1503,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #91.
+			// #92.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1471,7 +1515,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #92.
+			// #93.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1483,7 +1527,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #93.
+			// #94.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1495,7 +1539,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #94.
+			// #95.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1507,7 +1551,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #95.
+			// #96.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1519,7 +1563,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #96.
+			// #97.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1531,7 +1575,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #97.
+			// #98.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1543,7 +1587,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #98.
+			// #99.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1555,7 +1599,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #99.
+			// #100.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1567,7 +1611,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #100.
+			// #101.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1579,7 +1623,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #101.
+			// #102.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1591,7 +1635,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #102.
+			// #103.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1603,7 +1647,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #103.
+			// #104.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1615,7 +1659,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #104.
+			// #105.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1627,7 +1671,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #105.
+			// #106.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1639,7 +1683,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #106.
+			// #107.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1651,7 +1695,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #107.
+			// #108.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1663,7 +1707,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #108.
+			// #109.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1675,7 +1719,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #109.
+			// #110.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1687,7 +1731,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #110.
+			// #111.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1699,7 +1743,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #111.
+			// #112.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1711,7 +1755,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #112.
+			// #113.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1723,7 +1767,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #113.
+			// #114.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1735,7 +1779,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #114.
+			// #115.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1747,7 +1791,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #115.
+			// #116.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1759,7 +1803,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #116.
+			// #117.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1771,7 +1815,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #117.
+			// #118.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1783,7 +1827,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #118.
+			// #119.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1795,7 +1839,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #119.
+			// #120.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1807,7 +1851,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #120.
+			// #121.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1819,7 +1863,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #121 All network timeouts errors with LLD macros.
+			// #122 All network timeouts errors with LLD macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1829,7 +1873,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '{#LDD_MACROS}',
 						'Script execution' => '{#LDD_MACROS}',
 						'Item test' => '{#LDD_MACROS}',
-						'Scheduled report test' => '{#LDD_MACROS}'
+						'Scheduled report test' => '{#LDD_MACROS}',
+						'Device link' => '{#LDD_MACROS}'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -1837,11 +1882,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #122 All network timeouts errors with global macros.
+			// #123 All network timeouts errors with global macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1851,7 +1897,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '{HOST.HOST}',
 						'Script execution' => '{HOST.HOST}',
 						'Item test' => '{HOST.HOST}',
-						'Scheduled report test' => '{HOST.HOST}'
+						'Scheduled report test' => '{HOST.HOST}',
+						'Device link' => '{HOST.HOST}'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -1859,11 +1906,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #123 All network timeouts errors with user macros.
+			// #124 All network timeouts errors with user macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1873,7 +1921,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '{$MACROS}',
 						'Script execution' => '{$MACROS}',
 						'Item test' => '{$MACROS}',
-						'Scheduled report test' => '{$MACROS}'
+						'Scheduled report test' => '{$MACROS}',
+						'Device link' => '{$MACROS}'
 					],
 					'inline_errors' => [
 						'Communication' => 'A time unit is expected.',
@@ -1881,11 +1930,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => 'A time unit is expected.',
 						'Script execution' => 'A time unit is expected.',
 						'Item test' => 'A time unit is expected.',
-						'Scheduled report test' => 'A time unit is expected.'
+						'Scheduled report test' => 'A time unit is expected.',
+						'Device link' => 'A time unit is expected.'
 					]
 				]
 			],
-			// #124.
+			// #125.
 			[
 				[
 					'trim' => true,
@@ -1905,7 +1955,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '   15s   ',
 						'Script execution' => '   15s   ',
 						'Item test' => '   15s   ',
-						'Scheduled report test' => '   15s   '
+						'Scheduled report test' => '   15s   ',
+						'Device link' => '   15s   '
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '15s',
@@ -1923,7 +1974,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'media_type_test_timeout' => '15s',
 						'script_timeout' => '15s',
 						'item_test_timeout' => '15s',
-						'report_test_timeout' => '15s'
+						'report_test_timeout' => '15s',
+						'device_link_timeout' => '15s'
 					]
 				]
 			]

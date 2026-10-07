@@ -111,13 +111,13 @@ class CWidget extends CModule {
 		$actions['widget.'.$this->getId().'.view'] += [
 			'class' => CControllerDashboardWidgetView::class,
 			'view' => 'widget.view',
-			'layout' => 'layout.widget'
+			'layout' => ZBX_LAYOUT_WIDGET
 		];
 
 		$actions['widget.'.$this->getId().'.edit'] += [
 			'class' => CControllerDashboardWidgetEdit::class,
 			'view' => 'widget.edit',
-			'layout' => 'layout.json'
+			'layout' => ZBX_LAYOUT_JSON
 		];
 
 		return $actions;

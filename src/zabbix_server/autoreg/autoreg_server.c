@@ -18,7 +18,6 @@
 #include "zbx_trigger_constants.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
-#include "zbxtime.h"
 #include "zbxautoreg.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
@@ -231,7 +230,6 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 	int			create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_timespec_t		ts = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -327,18 +325,19 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 		{
 			break;
 		}
-		ts.sec = autoreg_host->now;
 
 		if (NULL != events_cbs->add_event_cb)
 		{
-			events_cbs->add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
-					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+			zbx_db_event	*event;
+
+			event = zbx_create_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+					autoreg_host->autoreg_hostid, autoreg_host->now, 0, TRIGGER_VALUE_PROBLEM);
+			events_cbs->add_event_cb(event);
 		}
 	}
 
 	if (NULL != events_cbs->process_events_cb)
-		events_cbs->process_events_cb(NULL, NULL, NULL);
+		events_cbs->process_events_cb();
 
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();

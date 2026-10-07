@@ -1,5 +1,5 @@
 
-# MikroTik CSS610-8G-2SIN by SNMP
+# MikroTik CSS610-8G-2S+IN by SNMP
 
 ## Overview
 

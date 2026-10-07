@@ -41,9 +41,13 @@ jQuery(function($) {
 			this.prepareNext(timeout);
 
 			this.$elem = $elem;
-			this.updateWidth();
 			this.$elem.on('mouseenter', this.hideMessage.bind(this));
-			$(window).on('resize', this.updateWidth.bind(this));
+
+			const resize_observer = new ResizeObserver(() => this.updateWidth());
+
+			document.querySelectorAll('main, aside').forEach(element => {
+				resize_observer.observe(element);
+			});
 		},
 
 		prepareNext: function(delay) {
@@ -101,10 +105,11 @@ jQuery(function($) {
 		},
 
 		updateWidth: function() {
-			let $wrapper = $('.wrapper');
+			const wrapper_rect = document.querySelector('main').getBoundingClientRect();
+
 			this.$elem.css({
-				left: $wrapper.offset().left + 10,
-				width: $wrapper[0].clientWidth - 20
+				left: wrapper_rect.left + 10,
+				width: wrapper_rect.width - 20
 			});
 		}
 	};

@@ -1,5 +1,5 @@
 
-# MikroTik CCR1072-1G-8S by SNMP
+# MikroTik CCR1072-1G-8S+ by SNMP
 
 ## Overview
 

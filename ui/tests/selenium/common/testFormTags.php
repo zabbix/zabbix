@@ -356,6 +356,11 @@ class testFormTags extends CWebTest {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
 			$screenshot_area = $this->query($this->tags_table)->one();
+
+			if ($object === 'maintenance') {
+				$screenshot_area->scrollIntoView();
+			}
+
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -983,6 +988,11 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$screenshot_area = $this->query($this->tags_table)->one();
+
+			if ($object === 'maintenance') {
+				$screenshot_area->scrollIntoView();
+				}
+
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}

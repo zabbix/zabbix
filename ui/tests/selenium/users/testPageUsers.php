@@ -187,7 +187,7 @@ class testPageUsers extends CWebTest {
 		$table = $this->getTable();
 		$this->assertEquals(['Username', 'Name', 'Last name', 'User role', 'Provisioned'], $table->getSortableHeaders()->asText());
 		$this->assertEquals(['', 'Username', 'Name', 'Last name', 'User role', 'Groups', 'Is online?', 'Login', 'Frontend access',
-				'API access', 'Debug mode', 'Status', 'Provisioned', 'Info'], $table->getHeadersText()
+				'API access', 'Devices', 'Debug mode', 'Status', 'Provisioned', 'Info'], $table->getHeadersText()
 		);
 
 		// Data for checking table rows in layout test.
@@ -201,6 +201,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'Internal',
 				'API access' => 'Enabled',
+				'Devices' => 'Enabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Enabled',
 				'Provisioned' => '',
@@ -216,6 +217,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'System default',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Enabled',
 				'Status' => 'Enabled',
 				'Provisioned' => '',
@@ -231,6 +233,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'System default',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Disabled',
 				'Provisioned' => '',
@@ -246,6 +249,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'Internal',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Disabled',
 				'Provisioned' => '',
@@ -261,6 +265,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'LDAP',
 				'API access' => 'Enabled',
+				'Devices' => 'Enabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Enabled',
 				'Provisioned' => '',
@@ -276,6 +281,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'Disabled',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Enabled',
 				'Provisioned' => '',
@@ -291,6 +297,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'System default',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Enabled',
 				'Provisioned' => ''
@@ -305,6 +312,7 @@ class testPageUsers extends CWebTest {
 				'Login' => 'Ok',
 				'Frontend access' => 'System default',
 				'API access' => 'Disabled',
+				'Devices' => 'Disabled',
 				'Debug mode' => 'Disabled',
 				'Status' => 'Enabled',
 				'Provisioned' => '',
@@ -365,6 +373,9 @@ class testPageUsers extends CWebTest {
 				'API access' => [
 					'Enabled' => 'green'
 				],
+				'Devices' => [
+					'Enabled' => 'green'
+				],
 				'Debug mode' => [
 					'Disabled' => 'green'
 				],
@@ -378,6 +389,9 @@ class testPageUsers extends CWebTest {
 				],
 				'Frontend access' => [
 					'System default' => 'green'
+				],
+				'Devices' => [
+					'Disabled' => 'red'
 				],
 				'Debug mode' => [
 					'Enabled' => 'orange'

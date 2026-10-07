@@ -324,9 +324,9 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		// Emulate item discovery in DB.
 		DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
-				' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+				' params, posts, headers, query, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
 				zbx_dbstr(self::$host_ids['hostids'][self::HOST_NAME]).', '.zbx_dbstr($discovered_item['item_name']).
-				', \'\', '.zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.
+				', \'\', '.zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', \'{}\', '.
 				zbx_dbstr($discovered_item['status']).')'
 		);
 		DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, ts_delete, disable_source,'.

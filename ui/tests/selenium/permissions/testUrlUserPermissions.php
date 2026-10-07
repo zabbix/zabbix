@@ -674,9 +674,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #44.
 			[[
-				'url' => 'zabbix.php?action=correlation.list',
-				'title' =>	'Event correlation rules',
-				'header' => 'Event correlation',
+				'url' => 'zabbix.php?action=ceprule.list',
+				'title' =>	'Configuration of event processing rules',
+				'header' => 'Event processing',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
