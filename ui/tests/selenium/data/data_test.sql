@@ -1248,20 +1248,20 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, f
 
 -- testFormAdministrationMediaTypeWebhook
 INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (111, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1300, 111, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1301, 111, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1302, 111, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1303, 111, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1304, 111, 'HTTPProxy', '');
-INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (102, 4, 'Validation webhook', 0, 'return 0;', 'Reference webhook media type for validation tests');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1305, 102, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1306, 102, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1307, 102, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1308, 102, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1309, 102, 'HTTPProxy', '');
-INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1310, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1311, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13000, 111, 'URL', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13001, 111, 'To', '{ALERT.SENDTO}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13002, 111, 'Subject', '{ALERT.SUBJECT}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13003, 111, 'Message', '{ALERT.MESSAGE}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13004, 111, 'HTTPProxy', '');
+INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (1002, 4, 'Validation webhook', 0, 'return 0;', 'Reference webhook media type for validation tests');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13005, 1002, 'URL', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13006, 1002, 'To', '{ALERT.SENDTO}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13007, 1002, 'Subject', '{ALERT.SUBJECT}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13008, 1002, 'Message', '{ALERT.MESSAGE}');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13009, 1002, 'HTTPProxy', '');
+INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (1003, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13010, 1003, 'Parameter name to be deleted', 'Parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13011, 1003, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- Overrides for LLD Overrides test
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);

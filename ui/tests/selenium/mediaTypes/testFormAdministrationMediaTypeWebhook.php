@@ -16,6 +16,8 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
+
 /**
  * @backup media_type
  */
@@ -493,9 +495,18 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 
-		$overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
-				->one()->click();
-		$this->page->waitUntilReady();
+		/*
+		 * Changing the media type re-renders the form and can shift the footer button while it is being clicked.
+		 * Retry the click if that happens.
+		 */
+		$submit = $overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
+				->one();
+		try {
+			$submit->click();
+		}
+		catch (ElementNotInteractableException $exception) {
+			$submit->click();
+		}
 
 		// Check media type creation or update message.
 		$message_title = CTestArrayHelper::get($data, 'update', false) ? 'Cannot update media type' : 'Cannot add media type';

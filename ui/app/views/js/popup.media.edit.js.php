@@ -104,9 +104,7 @@ window.media_edit_popup = new class {
 
 		if ('sendto_emails' in fields) {
 			for (const key in fields.sendto_emails) {
-				if (fields.sendto_emails.hasOwnProperty(key)) {
-					fields.sendto_emails[key] = fields.sendto_emails[key].trim();
-				}
+				fields.sendto_emails[key] = fields.sendto_emails[key].trim();
 			}
 		}
 

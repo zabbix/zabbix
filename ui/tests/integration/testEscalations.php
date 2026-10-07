@@ -916,7 +916,7 @@ HEREDOC;
 
 	/**
 	 * Test active remote commands
-	 *testEscalations_checkActiveCommands
+	 * testEscalations_checkActiveCommands
 	 * @required-components server, agent
 	 * @configurationDataProvider serverConfigurationProviderRemote
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem

@@ -577,14 +577,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #47 Update host group via popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=4', // Zabbix servers.
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #48 Template list view.
@@ -1782,7 +1782,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other-parameters'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other'
 				]
 			],
 			// #185 Administration -> Proxy list view.
@@ -2030,14 +2030,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit',
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #217 Edit template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=12', // Templates/Applications.
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #218 Start creating Discovery status widget.
@@ -2694,6 +2694,11 @@ class testDocumentationLinks extends CWebTest {
 	 * Open the Mass update overlay dialog.
 	 */
 	private function openMassUpdate() {
+		/*
+		 * Wait for loading to finish first, otherwise selecting the checkbox acts on an element that is about to
+		 * be replaced and raises a StaleElementReferenceException.
+		 */
+		$this->query('xpath://*[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 	}
@@ -2710,7 +2715,7 @@ class testDocumentationLinks extends CWebTest {
 			// #1 Edit shape form.
 			[
 				[
-					'element' => 'xpath://div[contains(@style, "top: 82px")]',
+					'element' => 'xpath://div[contains(@style, "top: 63px")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			],
@@ -2728,8 +2733,8 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 258px")]',
-						'xpath://div[contains(@style, "top: 82px")]'
+						'xpath://div[contains(@style, "top: 324px")]',
+						'xpath://div[contains(@style, "top: 63px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]

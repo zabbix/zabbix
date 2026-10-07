@@ -1,0 +1,211 @@
+---
+test case: write 0 autoreg hosts - empty buffer, get_rows returns 0
+in:
+  host: "host1"
+  ip: "192.168.1.1"
+  dns: ""
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 0
+out:
+  rows: 0
+---
+test case: write 1 autoreg host with full metadata
+in:
+  host: "myhost"
+  ip: "10.0.0.1"
+  dns: "myhost.example.com"
+  host_metadata: "role=web,env=prod"
+  port: 10050
+  flags: 0
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 autoreg host with empty dns and metadata
+in:
+  host: "barehost"
+  ip: "10.0.0.2"
+  dns: ""
+  host_metadata: ""
+  port: 10051
+  flags: 0
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 autoreg host with tls flags set
+in:
+  host: "tlshost"
+  ip: "10.0.0.3"
+  dns: "tlshost.internal"
+  host_metadata: ""
+  port: 10050
+  flags: 2
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 3 autoreg hosts same fields - all rows flushed
+in:
+  host: "agent01"
+  ip: "192.168.10.1"
+  dns: "agent01.local"
+  host_metadata: "version=7.0"
+  port: 10050
+  flags: 0
+  rows: 3
+out:
+  rows: 3
+---
+test case: write 1 host with long metadata - large string stored correctly
+in:
+  host: "bigmeta"
+  ip: "198.51.100.1"
+  dns: "bigmeta.example.net"
+  host_metadata: "role=worker,datacenter=us-east-1,rack=r42,env=staging,team=platform"
+  port: 10050
+  flags: 0
+  rows: 1
+out:
+  rows: 1
+---
+test case: partial set_lastid clears only first row leaving remainder
+in:
+  host: "parthost"
+  ip: "192.168.5.5"
+  dns: "parthost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 3
+out:
+  rows: 3
+  rows_after_partial_clear: 2
+---
+# Allocation-failure coverage for pb_autoreg_add_row_mem() - parity with the
+# pb_discovery_add_row_mem() regression tests. Each case fails the Nth shmem
+# allocation made while writing the 2 rows below; the first row is
+# discarded, but the second must still be written correctly afterwards,
+# proving the failure did not corrupt the allocator or leak into subsequent
+# writes.
+test case: row allocation fails - nothing to free, second row still written
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 1
+out:
+  rows: 1
+---
+test case: host allocation fails - ip/dns/host_metadata must not be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 2
+out:
+  rows: 1
+---
+test case: ip allocation fails - host must be freed, dns/host_metadata must not
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 3
+out:
+  rows: 1
+---
+test case: dns allocation fails - host/ip must be freed, host_metadata must not
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 4
+out:
+  rows: 1
+---
+test case: host_metadata allocation fails - host/ip/dns must be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 5
+out:
+  rows: 1
+---
+test case: list insertion fails - fully-built row must still be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 6
+out:
+  rows: 1
+---
+# pb_autoreg_check_age() coverage: the first row is backdated by stale_offset seconds.
+# offline_buffer is kept large enough that the purge loop does not evict it, so the
+# second write's check_age() call falls through to the max_age gate instead and forces
+# a fallback to database mode ("cached records are too old"). pd_fallback_to_database()
+# always clears the memory buffer on transition (pb_flush() only persists to the database
+# first when pb->mode != ZBX_PB_MODE_MEMORY, but always clears regardless of mode), so the
+# first row is dropped, not carried over; the second row is written straight to the
+# database, leaving the memory row count at 0.
+test case: second write falls back to database once first row exceeds max_age
+in:
+  host: "staleagent"
+  ip: "10.20.30.40"
+  dns: "staleagent.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  age: 5
+  offline_buffer: 100
+  stale_offset: 10
+out:
+  rows: 0
+  state: 0
+---
+# same clocks as above but age is larger than stale_offset, so the row must NOT be
+# considered too old - both rows stay buffered in memory.
+test case: second write stays in memory when row is within max_age
+in:
+  host: "freshagent"
+  ip: "10.20.30.41"
+  dns: "freshagent.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  age: 100
+  offline_buffer: 100
+  stale_offset: 10
+out:
+  rows: 2
+  state: 1

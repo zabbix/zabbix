@@ -36,6 +36,35 @@ class CControllerOauthCheck extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$url_validator = new CUrlValidator(['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]);
+
+			if ($this->hasInput('redirection_url') && !$url_validator->validate($this->getInput('redirection_url'))) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Redirection endpoint'),
+					$url_validator->getError()
+				));
+
+				$ret = false;
+			}
+
+			if ($this->hasInput('authorization_url')
+					&& !$url_validator->validate($this->getInput('authorization_url'))) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Authorization endpoint'),
+					$url_validator->getError()
+				));
+
+				$ret = false;
+			}
+
+			if ($this->hasInput('token_url') && !$url_validator->validate($this->getInput('token_url'))) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Token endpoint'),
+					$url_validator->getError()
+				));
+
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
@@ -69,7 +98,8 @@ class CControllerOauthCheck extends CController {
 
 		$authorization_url = new CUrl($oauth['authorization_url']);
 		foreach ($this->getInput('authorization_url_parameters', []) as $parameter) {
-			if (array_key_exists('name', $parameter) && array_key_exists('value', $parameter)) {
+			if (array_key_exists('name', $parameter) && $parameter['name'] !== ''
+					&& array_key_exists('value', $parameter) && $parameter['value'] !== '') {
 				$authorization_url->setArgument($parameter['name'], $parameter['value']);
 			}
 		}
@@ -78,7 +108,8 @@ class CControllerOauthCheck extends CController {
 
 		$token_url = new CUrl($oauth['token_url']);
 		foreach ($this->getInput('token_url_parameters', []) as $parameter) {
-			if (array_key_exists('name', $parameter) && array_key_exists('value', $parameter)) {
+			if (array_key_exists('name', $parameter) && $parameter['name'] !== ''
+					&& array_key_exists('value', $parameter) && $parameter['value'] !== '') {
 				$token_url->setArgument($parameter['name'], $parameter['value']);
 			}
 		}

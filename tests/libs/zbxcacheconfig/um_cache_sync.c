@@ -123,6 +123,8 @@ void	zbx_mock_test_entry(void **state)
 	um_mock_config_init();
 
 	um_mock_cache_init(&mock_cache0, -1);
+
+	zbx_config_wlock_set_locked();
 	umc = um_cache_create();
 
 	for (i = 0; i < steps.values_num; i++)
@@ -179,6 +181,8 @@ void	zbx_mock_test_entry(void **state)
 	um_mock_cache_clear(&mock_cache0);
 
 	um_mock_config_destroy();
+
+	zbx_config_wlock_set_unlocked();
 
 	zbx_vector_mock_step_clear_ext(&steps, mock_step_free);
 	zbx_vector_mock_step_destroy(&steps);

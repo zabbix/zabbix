@@ -72,6 +72,8 @@ typedef struct
 }
 ZBX_DC_TRIGGER;
 
+ZBX_PTR_VECTOR_DECL(trigger_ptr, ZBX_DC_TRIGGER *)
+
 /* specifies if trigger expression/recovery expression has timer functions */
 /* (date, time, now, dayofweek or dayofmonth)                              */
 #define ZBX_TRIGGER_TIMER_DEFAULT		0x00
@@ -99,6 +101,8 @@ typedef struct
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
+
+ZBX_PTR_VECTOR_DECL(dc_function_ptr, ZBX_DC_FUNCTION *)
 
 typedef struct
 {

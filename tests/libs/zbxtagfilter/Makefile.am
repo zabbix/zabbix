@@ -8,7 +8,7 @@ tagfilter_match_tags_SOURCES = \
 	../../zbxmocktest.h
 
 TAGFILTER_LIBS = \
-	$(TAGFILTER_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

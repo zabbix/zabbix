@@ -109,7 +109,10 @@ int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
 		{
 			zbx_replace_invalid_utf8(tmp);
-			SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
+			if ('\0' == *tmp)
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, tmp));
 			return NOTSUPPORTED;
 		}
 

@@ -37,7 +37,7 @@ $evalTypes = [
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && !isset({itemid})'],
-	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "discoveryprototype.updatediscover")'],
+	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update" || {form} == "clone")) || (isset({action}) && {action} == "discoveryprototype.updatediscover")'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -231,7 +231,6 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"name","key_","delay","type","status","discover"'),	null],
 	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -245,6 +244,11 @@ unset($_REQUEST[$paramsFieldName]);
 /*
  * Permissions
  */
+
+$backurl = (new CUrl('host_discovery_prototypes.php'))
+	->setArgument('parent_discoveryid', getRequest('parent_discoveryid'))
+	->setArgument('context', getRequest('context'));
+
 $itemid = getRequest('itemid');
 
 if (getRequest('parent_discoveryid')) {
@@ -259,6 +263,7 @@ if (getRequest('parent_discoveryid')) {
 	$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
 
 	if (!$parent_discovery) {
+		zbx_add_post_js("history.replaceState({}, '');");
 		access_deny();
 	}
 
@@ -280,16 +285,12 @@ if (getRequest('parent_discoveryid')) {
 		]);
 
 		if (!$discovery_prototype) {
+			zbx_add_post_js("history.replaceState({}, '');");
 			access_deny();
 		}
 	}
 }
 else {
-	access_deny();
-}
-
-// Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -307,12 +308,16 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::DiscoveryRulePrototype()->delete([$itemid]);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Discovery prototype deleted'));
+
 		uncheckTableRows($parent_discovery['itemid']);
 	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete discovery prototype'));
+	}
 
-	show_messages($result, _('Discovery prototype deleted'), _('Cannot delete discovery prototype'));
-
-	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
@@ -510,32 +515,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$result = false;
 	}
 
-	if (hasRequest('add')) {
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery prototype created'));
-		}
-		else {
-			CMessageHelper::setErrorTitle(_('Cannot add discovery prototype'));
-		}
-	}
-	else {
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery prototype updated'));
-		}
-		else {
-			CMessageHelper::setErrorTitle(_('Cannot update discovery prototype'));
-		}
-	}
-
 	if ($result) {
-		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		$message_success = hasRequest('add') ? _('Discovery prototype created') : _('Discovery prototype updated');
+		CMessageHelper::setSuccessTitle($message_success);
+
 		uncheckTableRows($parent_discovery['itemid']);
 
-		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-			$response->redirect();
-		}
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
 	}
+
+	$message_failed = hasRequest('add') ? _('Cannot add discovery prototype') : _('Cannot update discovery prototype');
+	show_error_message($message_failed);
 }
 elseif ($itemid != 0 && getRequest('action', '') === 'discoveryprototype.updatediscover') {
 	$result = API::DiscoveryRulePrototype()->update([
@@ -550,10 +541,8 @@ elseif ($itemid != 0 && getRequest('action', '') === 'discoveryprototype.updated
 		CMessageHelper::setErrorTitle(_('Cannot update discovery prototype'));
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action')
 		&& str_in_array(getRequest('action'), ['discoveryprototype.massenable', 'discoveryprototype.massdisable'])
@@ -588,10 +577,8 @@ elseif (hasRequest('action')
 		CMessageHelper::setErrorTitle($message);
 	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryprototype.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRulePrototype()->delete(getRequest('g_hostdruleid'));
@@ -678,6 +665,7 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
+	$data['form'] = getRequest('form');
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
@@ -687,12 +675,7 @@ if (hasRequest('form')) {
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD_PROTOTYPE;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-	$data['backurl'] = getRequest('backurl');
 	$data['is_discovered_prototype'] = false;
-
-	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
-		throw new CAccessDeniedException();
-	}
 
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
@@ -785,8 +768,8 @@ if (hasRequest('form')) {
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
-		unset($data['itemid']);
 		$data['form'] = 'clone';
+		$data['limited'] = false;
 	}
 
 	if (!$data['conditions']) {

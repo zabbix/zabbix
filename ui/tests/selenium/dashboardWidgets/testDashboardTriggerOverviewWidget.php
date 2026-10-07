@@ -698,13 +698,13 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	public function testDashboardTriggerOverviewWidget_CheckDependencyPopups() {
 		$popup_content = [
 			'Dependent trigger ONE' => [
-				'Depends on' => ['Trigger disabled with tags']
+				'Dependent trigger' => ['Trigger disabled with tags']
 			],
 			'Inheritance trigger with tags' => [
-				'Depends on' => ['Trigger disabled with tags']
+				'Dependent trigger' => ['Trigger disabled with tags']
 			],
 			'Trigger disabled with tags' => [
-				'Dependent' => ['Inheritance trigger with tags', 'Dependent trigger ONE']
+				'Parent trigger' => ['Inheritance trigger with tags', 'Dependent trigger ONE']
 			]
 		];
 
@@ -725,7 +725,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		foreach ($popup_content as $trigger => $dependency) {
 			// Hover hint and check table headers in hint.
 			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
-			$hint_table = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one()
+			$hint_table = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilVisible()->one()
 					->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 

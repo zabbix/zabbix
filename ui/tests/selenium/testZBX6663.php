@@ -15,8 +15,6 @@
 
 require_once __DIR__.'/../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup profiles
  */
@@ -203,12 +201,12 @@ class testZBX6663 extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));
+		$this->query('id:selected_count')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestCheckboxSelect("all_$checkbox");
 
 		$this->zbxTestClickLinkText($this->templated);
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('selected_count'));
+		$this->query('id:selected_count')->waitUntilPresent()->one();
 		$this->zbxTestTextPresent('0 selected');
 	}
 }
