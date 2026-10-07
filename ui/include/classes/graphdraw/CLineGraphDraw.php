@@ -1980,26 +1980,19 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$units = '';
+			$side_units = [];
 
 			foreach ($this->items as $item) {
 				if ($item['yaxisside'] == $side) {
-					$units = $item['units'];
-					break;
+					if (!$side_units) {
+						$units = $item['units'];
+					}
+
+					$side_units[] = $item['units'];
 				}
 			}
 
-			$display_units = null;
-
-			foreach ($this->items as $item) {
-				if ($item['yaxisside'] == $side) {
-					if ($display_units === null) {
-						$display_units = $item['units'];
-					}
-					elseif ($item['units'] !== $display_units) {
-						$display_units = '';
-					}
-				}
-			}
+			$display_units = self::getYAxisDisplayUnits($side_units);
 
 			$calc_power = $units === '' || $units[0] !== '!';
 
@@ -2020,10 +2013,14 @@ class CLineGraphDraw extends CGraphDraw {
 			] = $result;
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
-				$calc_min, $calc_max, $this->intervals[$side], (string) $display_units, $this->power[$side], 10
+				$calc_min, $calc_max, $this->intervals[$side], $display_units, $this->power[$side], 10
 			);
 
-			$this->scale_values[$side] = $this->truncateYAxisLabels($scale_values, (string) $display_units);
+			$shift = $side == GRAPH_YAXIS_SIDE_LEFT ? $this->shiftXleft : $this->shiftXright;
+
+			$this->scale_values[$side] = $this->truncateYAxisLabels($scale_values, $display_units,
+				$shift - self::YAXIS_LABEL_GAP * 2
+			);
 
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];
@@ -2046,9 +2043,7 @@ class CLineGraphDraw extends CGraphDraw {
 		return $truncated.$ellipsis;
 	}
 
-	private function truncateYAxisLabels(array $rows, string $units): array {
-		$max_width = self::MAX_YAXIS_WIDTH - self::YAXIS_LABEL_GAP * 2;
-
+	private function truncateYAxisLabels(array $rows, string $units, int $max_width): array {
 		if ($units !== '' && $units[0] === '!')
 		{
 			$units = substr($units, 1);
@@ -2098,30 +2093,70 @@ class CLineGraphDraw extends CGraphDraw {
 		return $rows;
 	}
 
-	private function calcYAxisWidth($side) {
-		if (!$this->yaxis[$side]) {
-			return self::NO_YAXIS_WIDTH;
-		}
+	public static function getYAxisDisplayUnits(array $units): string {
+		$units = array_unique($units);
 
-		if (!array_key_exists($side, $this->scale_values)) {
-			return self::MIN_YAXIS_WIDTH;
-		}
+		return count($units) == 1 ? (string) reset($units) : '';
+	}
 
-		$width = 0;
+	public static function getYAxisWidth(string $display_units): int {
+		$label = convertUnits([
+			'value' => 99990000,
+			'units' => $display_units,
+			'convert' => ITEM_CONVERT_NO_UNITS
+		]);
 
-		foreach ($this->scale_values[$side] as ['value' => $value]) {
-			$width = max($width, imageTextSize(8, 0, $value)['width']);
-		}
+		$width = imageTextSize(8, 0, $label)['width'];
 
-		$stepped = (int) (ceil(($width + self::YAXIS_LABEL_GAP * 2) / self::YAXIS_WIDTH_STEP)
-			* self::YAXIS_WIDTH_STEP);
+		$stepped = (int) (ceil(($width + self::YAXIS_LABEL_GAP * 2) / self::YAXIS_WIDTH_STEP) * self::YAXIS_WIDTH_STEP);
 
 		return min(self::MAX_YAXIS_WIDTH, max(self::MIN_YAXIS_WIDTH, $stepped));
 	}
 
+	public static function fitYAxisWidths(int $left, bool $left_shown, int $right, bool $right_shown,
+			int $full_width): array {
+		$left_floor = $left_shown ? self::MIN_YAXIS_WIDTH : self::NO_YAXIS_WIDTH;
+		$right_floor = $right_shown ? self::MIN_YAXIS_WIDTH : self::NO_YAXIS_WIDTH;
+
+		$excess = $left + $right + 1 - ($full_width - self::GRAPH_WIDTH_MIN);
+
+		while ($excess > 0) {
+			if ($left - $left_floor >= $right - $right_floor) {
+				if ($left <= $left_floor) {
+					break;
+				}
+
+				$left--;
+			}
+			else {
+				$right--;
+			}
+
+			$excess--;
+		}
+
+		return [$left, $right];
+	}
+
+	private function getYAxisWidthOfSide($side) {
+		if (!$this->yaxis[$side]) {
+			return self::NO_YAXIS_WIDTH;
+		}
+
+		$units = [];
+
+		foreach ($this->items as $item) {
+			if ($item['yaxisside'] == $side) {
+				$units[] = $item['units'];
+			}
+		}
+
+		return self::getYAxisWidth(self::getYAxisDisplayUnits($units));
+	}
+
 	private function calcDimensions() {
-		$this->shiftXleft = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_LEFT);
-		$this->shiftXright = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_RIGHT);
+		$this->shiftXleft = $this->getYAxisWidthOfSide(GRAPH_YAXIS_SIDE_LEFT);
+		$this->shiftXright = $this->getYAxisWidthOfSide(GRAPH_YAXIS_SIDE_RIGHT);
 
 		// Calculate graph summary padding for both axes.
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
@@ -2156,6 +2191,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Normalize dimensions according to which dimensions were initially provided.
 		if ($this->outer) {
+			[$this->shiftXleft, $this->shiftXright] = self::fitYAxisWidths($this->shiftXleft,
+				$this->yaxis[GRAPH_YAXIS_SIDE_LEFT], $this->shiftXright,
+				$this->yaxis[GRAPH_YAXIS_SIDE_RIGHT], $this->fullSizeX
+			);
+
+			$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
+
 			// Adjust inner graph dimensions.
 			$this->sizeX = $this->fullSizeX - $x_offsets;
 			$this->sizeY = $this->fullSizeY - $y_offsets;
@@ -2189,21 +2231,6 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function recalcHorizontalDimensions()
-	{
-		$shiftXleft = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_LEFT);
-		$shiftXright = $this->calcYAxisWidth(GRAPH_YAXIS_SIDE_RIGHT);
-
-		if ($shiftXleft == $this->shiftXleft && $shiftXright == $this->shiftXright) {
-			return;
-		}
-
-		$this->shiftXleft = $shiftXleft;
-		$this->shiftXright = $shiftXright;
-
-		$this->sizeX = $this->fullSizeX - $this->shiftXleft - $this->shiftXright - 1;
-	}
-
 	public function getMinDimensions() {
 		$min_dimensions = [
 			'width' => self::GRAPH_WIDTH_MIN,
@@ -2211,8 +2238,12 @@ class CLineGraphDraw extends CGraphDraw {
 		];
 
 		if ($this->outer) {
-			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
-			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT]
+				? self::MIN_YAXIS_WIDTH
+				: self::NO_YAXIS_WIDTH;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT]
+				? self::MIN_YAXIS_WIDTH
+				: self::NO_YAXIS_WIDTH;
 			$min_dimensions['width']++;
 
 			$min_dimensions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
@@ -2258,7 +2289,6 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		$this->calcVerticalScale();
-		$this->recalcHorizontalDimensions();
 		$this->calcPercentile();
 		$this->calcZero();
 
