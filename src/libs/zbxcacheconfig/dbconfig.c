@@ -11239,9 +11239,7 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &timer->objectid)))
 			return FAIL;
 
-		if (dc_function->revision > timer->revision ||
-				NULL == *dc_trigger ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status)
+		if (dc_function->revision > timer->revision || NULL == *dc_trigger)
 		{
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
@@ -11249,7 +11247,8 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 			return FAIL;
 		}
 
-		if (TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
+				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
 		{
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
@@ -11265,15 +11264,15 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 		if (NULL == (*dc_trigger))
 			return FAIL;
 
-		if ((*dc_trigger)->revision > timer->revision ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status)
+		if ((*dc_trigger)->revision > timer->revision)
 		{
 			if ((*dc_trigger)->timer_revision == timer->revision)
 				(*dc_trigger)->timer_revision = 0;
 			return FAIL;
 		}
 
-		if (TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
+				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
 		{
 			if ((*dc_trigger)->timer_revision == timer->revision)
 				(*dc_trigger)->timer_revision = 0;
