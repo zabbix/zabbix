@@ -1237,7 +1237,11 @@ class testDashboardHostCardWidget extends testWidgets {
 					]
 				]
 			],
-			// #3.
+			/**
+			* #3.
+			* Test case depends on items added to host by other tests, so the value differs when the test is run separately
+			* and as a part of the whole test suite.
+			*/
 			[
 				[
 					'Header' => 'Default host card widget',
@@ -1248,7 +1252,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 2,
-						'Latest data' => 126,
+						'Latest data' => 130,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1711,6 +1715,10 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Name' => 'Host card'
 				]
 			],
+			/**
+			* Test case depends on items added to host by other tests, so the value differs when the test is run separately
+			* and as a part of the whole test suite.
+			*/
 			[
 				[
 					'Name' => 'Default host card widget'
