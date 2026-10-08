@@ -51,13 +51,7 @@ int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret)
 
 	sig_jmp_ret = jmp_ret;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
+	ZBX_SIGSET_THREAD_SIGNALS(&mask);
 
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
@@ -430,13 +424,7 @@ void	zbx_block_thread_signals(sigset_t *orig_mask)
 {
 	sigset_t	mask;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
+	ZBX_SIGSET_THREAD_SIGNALS(&mask);
 
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, orig_mask))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the signal");
