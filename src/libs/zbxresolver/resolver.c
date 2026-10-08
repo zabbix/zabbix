@@ -20,7 +20,7 @@
 #include "zbxtypes.h"
 #include "zbxstr.h"
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	include "zbxnix.h"
 #endif
 
@@ -53,7 +53,7 @@ static void	ares_event_thread_init(void)
 
 	struct ares_options	options = {0};
 	int			optmask = ARES_OPT_EVENT_THREAD|ARES_OPT_QUERY_CACHE, status;
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t		orig_mask;
 #endif
 
@@ -66,14 +66,14 @@ static void	ares_event_thread_init(void)
 		return;
 	}
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	/* block asynchronous signals while c-ares event thread is created, so that it inherits the blocked */
 	/* signal mask and signals are always handled by the main thread of the process                     */
 	zbx_block_thread_signals(&orig_mask);
 #endif
 	if (ARES_SUCCESS != (status = ares_init_options(&zbx_channel, &options, optmask)))
 		zabbix_log(LOG_LEVEL_ERR, "cannot set c-ares library options: %s", ares_strerror(status));
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	zbx_unblock_signals(&orig_mask);
 #endif
 }
