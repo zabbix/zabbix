@@ -9,9 +9,6 @@
 	</condition>
 	<property name="with.encryption" value="--with-openssl"/>
 
-	<!-- TEMPORARY: force thread sanitizer for this PR, remove before merging -->
-	<property name="config.site" value="share/config.site.d/clang-debug-sanitize-thread"/>
-
 	<!-- Initialize sanitizer build profile based on the SANITIZER variable: none (default), memory, or thread -->
 	<condition property="config.site" value="share/config.site.d/clang-debug-sanitize-memory">
 		<equals arg1="${SANITIZER}" arg2="memory"/>
