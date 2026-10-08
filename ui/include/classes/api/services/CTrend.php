@@ -294,11 +294,12 @@ class CTrend extends CApiService {
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
+			$output_fields = array_flip($options['output']);
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
 					foreach ($item['group_by_clock']['buckets'] as $histogram) {
-						$result[] = [
+						$result[] = array_intersect_key([
 							'itemid' => $item['key'],
 							// Field key_as_string is used to get seconds instead of milliseconds.
 							'clock' => $histogram['key_as_string'],
@@ -306,7 +307,7 @@ class CTrend extends CApiService {
 							'value_min' => $histogram['value_min']['value'],
 							'value_avg' => $histogram['value_avg']['value'],
 							'value_max' => $histogram['value_max']['value']
-						];
+						], $output_fields);
 
 						if ($limit !== null) {
 							$limit--;
