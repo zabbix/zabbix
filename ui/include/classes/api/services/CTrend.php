@@ -217,18 +217,18 @@ class CTrend extends CApiService {
 								'min_doc_count' => 1
 							],
 							'aggs' => [
-								'max_value' => [
-									'max' => [
+								'value_min' => [
+									'min' => [
 										'field' => 'value'
 									]
 								],
-								'avg_value' => [
+								'value_avg' => [
 									'avg' => [
 										'field' => 'value'
 									]
 								],
-								'min_value' => [
-									'min' => [
+								'value_max' => [
+									'max' => [
 										'field' => 'value'
 									]
 								]
@@ -303,9 +303,9 @@ class CTrend extends CApiService {
 							// Field key_as_string is used to get seconds instead of milliseconds.
 							'clock' => $histogram['key_as_string'],
 							'num' => $histogram['doc_count'],
-							'min_value' => $histogram['min_value']['value'],
-							'avg_value' => $histogram['avg_value']['value'],
-							'max_value' => $histogram['max_value']['value']
+							'value_min' => $histogram['value_min']['value'],
+							'value_avg' => $histogram['value_avg']['value'],
+							'value_max' => $histogram['value_max']['value']
 						];
 
 						if ($limit !== null) {
