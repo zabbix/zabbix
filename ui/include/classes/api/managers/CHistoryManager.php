@@ -333,7 +333,7 @@ class CHistoryManager {
 						}
 					}
 
-					$results[$item['key']][] = $row['_source'];
+					$results[$item['key']][] = CElasticsearchHelper::normalizeDocument($row['_source'], $type);
 				}
 			}
 		}
@@ -604,7 +604,7 @@ class CHistoryManager {
 			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
 
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
-				return $result[0];
+				return CElasticsearchHelper::normalizeDocument($result[0], $item['value_type']);
 			}
 		}
 

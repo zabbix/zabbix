@@ -327,6 +327,41 @@ class CElasticsearchHelper {
 	}
 
 	/**
+	 * Convert numeric values of an Elasticsearch document to strings as they are returned by SQL databases.
+	 * The "value" field of float items is converted to the shortest representation that preserves the value, because
+	 * Zabbix server stores it in Elasticsearch with 17 significant digits.
+	 *
+	 * @param array $document    Document fields.
+	 * @param int   $value_type  Item value type.
+	 *
+	 * @return array
+	 */
+	public static function normalizeDocument(array $document, int $value_type): array {
+		foreach ($document as $field => &$value) {
+			if ($field === 'value' && $value_type == ITEM_VALUE_TYPE_FLOAT) {
+				$value = self::floatToString((float) $value);
+			}
+			elseif (is_int($value) || is_float($value)) {
+				$value = (string) $value;
+			}
+		}
+		unset($value);
+
+		return $document;
+	}
+
+	/**
+	 * Convert a floating point number to the shortest string that preserves the value.
+	 *
+	 * @param float $value
+	 *
+	 * @return string
+	 */
+	public static function floatToString(float $value): string {
+		return json_encode($value);
+	}
+
+	/**
 	 * Returns an Elasticsearch Painless script that truncates a string field
 	 * to the given number of Unicode code points.
 	 *

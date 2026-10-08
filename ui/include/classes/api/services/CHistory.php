@@ -402,11 +402,18 @@ class CHistory extends CApiService {
 		}
 
 		$endpoints = Manager::History()->getElasticsearchEndpoints($options['history']);
-		if ($endpoints) {
-			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
+		if (!$endpoints) {
+			return null;
 		}
 
-		return null;
+		$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
+		foreach ($result as &$row) {
+			$row = CElasticsearchHelper::normalizeDocument($row, $options['history']);
+		}
+		unset($row);
+
+		return $result;
 	}
 
 	/**

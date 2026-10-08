@@ -295,18 +295,21 @@ class CTrend extends CApiService {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 			$output_fields = array_flip($options['output']);
+			$value_to_string = $type == ITEM_VALUE_TYPE_UINT64
+				? static fn (float $value): string => sprintf('%.0f', $value)
+				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
 					foreach ($item['group_by_clock']['buckets'] as $histogram) {
 						$result[] = array_intersect_key([
-							'itemid' => $item['key'],
+							'itemid' => (string) $item['key'],
 							// Field key_as_string is used to get seconds instead of milliseconds.
 							'clock' => $histogram['key_as_string'],
-							'num' => $histogram['doc_count'],
-							'value_min' => $histogram['value_min']['value'],
-							'value_avg' => $histogram['value_avg']['value'],
-							'value_max' => $histogram['value_max']['value']
+							'num' => (string) $histogram['doc_count'],
+							'value_min' => $value_to_string($histogram['value_min']['value']),
+							'value_avg' => CElasticsearchHelper::floatToString($histogram['value_avg']['value']),
+							'value_max' => $value_to_string($histogram['value_max']['value'])
 						], $output_fields);
 
 						if ($limit !== null) {
