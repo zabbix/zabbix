@@ -800,6 +800,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_TrendAvg()
 	{
+		global $HISTORY_PROVIDERS;
+
+		// Skip this test if ClickHouse or Elasticsearch is used as a history provider.
+		if (isset($HISTORY_PROVIDERS) && $HISTORY_PROVIDERS) {
+			$this->markTestSkipped('Zabbix configured with external history provider.');
+		}
+
 		/* Trying to store Inf values into DB can result in failed transactions.   */
 		/* (Jenkins checks for failed transactions and turns yellow in that case). */
 		/* Note, that although history trends and new trends are DBL_MAX the       */
