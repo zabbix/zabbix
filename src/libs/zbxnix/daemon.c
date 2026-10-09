@@ -190,6 +190,7 @@ void	zbx_set_sigusr_handler(zbx_signal_handler_f handler)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* signal redirection (sigqueue(), logging) may change errno that interrupted code relies on */
 	int	saved_errno = errno;
 
 	ZBX_UNUSED(sig);

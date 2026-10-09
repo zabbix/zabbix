@@ -240,6 +240,7 @@ void	zbx_log_exit_signal(void)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* logging and exit callback may change errno that interrupted code relies on */
 	int	saved_errno = errno;
 
 	ZBX_UNUSED(context);
@@ -285,6 +286,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* waitpid() may change errno that interrupted code relies on */
 	int	saved_errno = errno;
 
 	SIG_CHECK_PARAMS(sig, siginfo, context);
