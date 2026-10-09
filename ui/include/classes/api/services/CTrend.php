@@ -267,6 +267,7 @@ class CTrend extends CApiService {
 		}
 
 		$limit = $options['limit'];
+		$output_fields = array_flip($options['output']);
 		$result = [];
 
 		if ($options['countOutput']) {
@@ -294,7 +295,6 @@ class CTrend extends CApiService {
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
-			$output_fields = array_flip($options['output']);
 			$value_to_string = $type == ITEM_VALUE_TYPE_UINT64
 				? static fn (float $value): string => sprintf('%.0f', $value)
 				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
