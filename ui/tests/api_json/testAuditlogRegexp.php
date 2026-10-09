@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ class testAuditlogRegexp extends testAuditlogCommon {
 	 * Created regexp ID.
 	 */
 	protected static $resourceid;
+
+	/**
+	 * Resource type Regular expression
+	 */
+	const RESOURCE_TYPE = 28;
 
 	/**
 	 * Created regexp expression ID (before update).
@@ -65,7 +70,7 @@ class testAuditlogRegexp extends testAuditlogCommon {
 			'regexp.regexpid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -102,7 +107,7 @@ class testAuditlogRegexp extends testAuditlogCommon {
 					=> ['add', $after_expressionid['expressionid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -110,6 +115,6 @@ class testAuditlogRegexp extends testAuditlogCommon {
 	 */
 	public function testAuditlogRegexp_Delete() {
 		$this->call('regexp.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated regex', self::$resourceid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated regex', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

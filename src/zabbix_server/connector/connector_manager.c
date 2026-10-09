@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -88,8 +88,15 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_hashset_destroy(&connector->data_point_links);
 }
 
-static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
+static void	connector_clear_wrapper(void *data)
 {
+	connector_clear((zbx_connector_t*)data);
+}
+
+static void	data_point_link_clean(void *ptr)
+{
+	zbx_data_point_link_t	*data_point_link = (zbx_data_point_link_t*)ptr;
+
 	zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
 			zbx_connector_data_point_free);
 	zbx_vector_connector_data_point_destroy(&data_point_link->connector_data_points);
@@ -114,7 +121,7 @@ static void	connector_init_manager(zbx_connector_manager_t *manager, int worker_
 			(size_t)manager->worker_fork_count, sizeof(zbx_connector_worker_t));
 
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, connector_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
 
@@ -128,7 +135,10 @@ static void	connector_destroy_manager(zbx_connector_manager_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, manager->worker_count);
 
 	for (i = 0; i < manager->worker_count; i++)
+	{
+		zbx_ipc_client_release(manager->workers[i].client);
 		zbx_vector_uint64_destroy(&manager->workers[i].ids);
+	}
 
 	zbx_free(manager->workers);
 	zbx_hashset_destroy(&manager->connectors);
@@ -172,6 +182,7 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
 		worker->client = client;
+		zbx_ipc_client_addref(client);
 		zbx_vector_uint64_create(&worker->ids);
 	}
 
@@ -684,7 +695,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 							&manager.config_revision, &manager.connector_revision,
-							(zbx_clean_func_t)data_point_link_clean);
+							data_point_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);

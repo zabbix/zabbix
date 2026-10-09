@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1275,6 +1275,20 @@ class testHost extends CAPITest {
 
 					// Sample of unspecified property.
 					'inventory_mode' => null,
+
+					// Write-only properties.
+					'tls_psk_identity' => null,
+					'tls_psk' => null,
+					'name_upper' => null
+				]
+			],
+			'Check if {"output": true} excludes write-only properties' => [
+				'request' => [
+					'output' => true,
+					'hostids' => ['99013']
+				],
+				'expected_result' => [
+					'hostid' => '99013',
 
 					// Write-only properties.
 					'tls_psk_identity' => null,

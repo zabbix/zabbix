@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -225,6 +225,8 @@ function setupLocale(string $language, ?string &$error = null): bool {
 	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
 	foreach ($locale_variants as $locale) {
 		if (setlocale(LC_ALL, $locale)) {
+			putenv('LANGUAGE='.$locale);
+			putenv('LANG='.$locale);
 			$locale_set = true;
 			break;
 		}

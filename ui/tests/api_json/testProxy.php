@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,7 @@
 require_once __DIR__.'/../include/CAPITest.php';
 
 /**
- * @backup   ids
+ * @backup   ids,hgset
  *
  * @onBefore prepareTestData
  * @onAfter  clearData

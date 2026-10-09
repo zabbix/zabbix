@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -65,8 +65,8 @@ foreach ($data['services'] as $service) {
 			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId(),
 			(new CLink($service['name']))->addClass('js-name')
 		]))->addClass(ZBX_STYLE_WORDBREAK),
-		new CCol($data['tags'][$service['serviceid']]),
-		new CCol($data['problem_tags'][$service['serviceid']])
+		new CCol((new CDiv($data['tags'][$service['serviceid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)),
+		new CCol((new CDiv($data['problem_tags'][$service['serviceid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER))
 	]);
 }
 

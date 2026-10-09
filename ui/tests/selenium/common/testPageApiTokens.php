@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -205,7 +205,7 @@ class testPageApiTokens extends CWebTest {
 		}
 
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'no_data')) {
@@ -251,11 +251,11 @@ class testPageApiTokens extends CWebTest {
 	 * @param string $token		Name of the token to be deleted.
 	 */
 	public function checkDelete($url, $token) {
-		$this->page->login()->open($url);
+		$this->page->login()->open($url)->waitUntilReady();
 
 		// Delete API token.
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', $token)->select();
-		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->query('class:list-table')->waitUntilVisible()->asTable()->one()->findRow('Name', $token)->select();
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'API token deleted');
 

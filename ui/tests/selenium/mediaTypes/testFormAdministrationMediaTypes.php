@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -109,6 +109,17 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				'type' => MEDIA_TYPE_EXEC,
 				'name' => 'Switch script to webhook with custom params',
 				'exec_path' => 'script3.sh'
+			],
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
 			]
 		]);
 	}
@@ -251,7 +262,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Menu entry name' => 255,
 						'Menu entry URL' => 2048
 					],
-					'mandatory' => ['Script', 'Timeout', 'Menu entry name', 'Menu entry URL']
+					'mandatory' => ['Script', 'Timeout']
 				]
 			]
 		];
@@ -382,7 +393,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals('', $param_field->getValue());
 				$this->assertEquals(255, $param_field->getAttribute('maxlength'));
 
-				// Check removal ofscript parameters.
+				// Check removal of script parameters.
 				$script_params->query('button:Remove')->one()->click();
 				$this->assertFalse($param_field->isVisible());
 				break;
@@ -427,16 +438,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				);
 				$script_dialog->query('button:Cancel')->one()->click();
 
-				// Check that Menu entry fields are enabled only when "Include event menu entry" is set.
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled']))->count()
-				);
+				// Check that Menu entry fields are enabled and mandatory only when "Include event menu entry" is set.
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertFalse($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is enabled, but should be disabled.'
+					);
+					$this->assertFalse($form->isRequired($menu_field), 'Field '.$menu_field.
+							' marked as mandatory when disabled.'
+					);
+				}
 
 				$form->getField('Include event menu entry')->fill(true);
 
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->count()
-				);
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertTrue($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is disabled, but should be enabled.'
+					);
+					$this->assertTrue($form->isRequired($menu_field), 'Field '.$menu_field.
+							' not marked as mandatory when enabled.'
+					);
+				}
+
 				break;
 		}
 
@@ -758,7 +780,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'mediatype_tab' => [
-						'Name' => 'Email with 2h in inerval'
+						'Name' => 'Email with 2h in interval'
 					],
 					'options_tab' => [
 						'Attempt interval' => '2h'
@@ -884,7 +906,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// Offise365 relay email with all possible parameters defined.
+			// Office365 relay email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [

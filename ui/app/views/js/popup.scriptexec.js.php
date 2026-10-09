@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,7 +38,7 @@ $(document).ready(function() {
 		$content.append($logitems);
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			'title': <?= json_encode(_('Script execution log')) ?>,
 			'content': $content,
 			'class': 'modal-popup modal-popup-generic debug-modal position-middle',
@@ -52,5 +52,8 @@ $(document).ready(function() {
 				}
 			]
 		}, opener);
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$close_btn.show();
 	});
 });

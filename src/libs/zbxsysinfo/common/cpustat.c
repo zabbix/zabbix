@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1327,11 +1327,17 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 
 		cpu = &pcpus->cpu[idx];
 
-		if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
-			index -= ZBX_MAX_COLLECTOR_HISTORY;
-
 		pair.first = cpu->cpu_num;
-		pair.second = get_cpu_status(cpu->h_status[index]);
+
+		if (0 < cpu->h_count)
+		{
+			if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
+				index -= ZBX_MAX_COLLECTOR_HISTORY;
+
+			pair.second = get_cpu_status(cpu->h_status[index]);
+		}
+		else
+			pair.second = ZBX_CPU_STATUS_OFFLINE;
 #else
 		pair.first = idx - 1;
 		pair.second = get_cpu_perf_counter_status(pcpus->cpu_counter[idx]->status);

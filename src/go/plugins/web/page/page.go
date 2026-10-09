@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -105,7 +105,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			output = "\\0"
 		}
 
-		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
+		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, true)
 		if err != nil {
 			return nil, err
 		}
@@ -128,7 +128,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		start := time.Now()
 
-		_, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false)
+		_, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false, true)
 		if err != nil {
 			return nil, err
 		}
@@ -139,6 +139,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, fmt.Errorf("Too many parameters.")
 		}
 
-		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
+		//nolint:wrapcheck // requires refactoring
+		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, true)
 	}
 }

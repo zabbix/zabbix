@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -44,6 +45,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/profiler"
 	"golang.zabbix.com/sdk/zbxerr"
 	"golang.zabbix.com/sdk/zbxflag"
 )
@@ -54,11 +56,28 @@ const usageMessageFormatRuntimeControlFormat = //
 `Perform administrative functions (%s timeout)
 
     Remote control interface, available commands:
-      log_level_increase     Increase log level
-      log_level_decrease     Decrease log level
-      userparameter_reload   Reload user parameters
-      metrics                List available metrics
-      version                Display Agent version
+      log_level_increase                    Increase log level
+      log_level_decrease                    Decrease log level
+      userparameter_reload                  Reload user parameters
+      periodic_prof_enable                  Enable periodic profiling
+      periodic_prof_disable                 Disable periodic profiling
+      periodic_prof_execute                 Write profiles after a 5-second sample
+      periodic_prof_set_interval <seconds>  Set profiling interval
+      metrics                               List available metrics
+      version                               Display Agent version
+
+    Periodic CPU data is collected into a hidden temporary file. When an
+    interval ends, the file is published as a CPU profile and the configured
+    number of completed files is retained. The temporary file does not count
+    toward ProfilerMaxFilesPerProfile.
+
+    When periodic profiling is enabled, periodic_prof_execute finishes the
+    current CPU interval, writes a separate 5-second CPU profile, and starts a
+    new periodic CPU file. Explicitly requested profiles are rotated according
+    to ProfilerMaxFilesPerProfile when the command completes.
+
+    While periodic_prof_execute is collecting profiles, all profiler runtime
+    commands are rejected with "profiler is busy".
 `
 
 const usageMessageFormat = //
@@ -67,7 +86,7 @@ const usageMessageFormat = //
   %[1]s [-c config-file] [-v] -p
   %[1]s [-c config-file] [-v] -t item-key
   %[1]s [-c config-file] -T
-  %[1]s [-c config-file] -R runtime-option
+  %[1]s [-c config-file] -R runtime-option [parameters...]
   %[1]s -h
   %[1]s -V
 `
@@ -101,6 +120,17 @@ var (
 	pluginSocket     string
 )
 
+//nolint:gochecknoglobals
+var remoteCommandHandlers = map[string]remoteCommandHandler{
+	"log_level_increase":   processCommandWithoutParameters(processLoglevelIncreaseCommand),
+	"log_level_decrease":   processCommandWithoutParameters(processLoglevelDecreaseCommand),
+	"metrics":              processCommandWithoutParameters(processMetricsCommand),
+	"userparameter_reload": processCommandWithoutParameters(processUserParamReloadCommand),
+	"version":              processCommandWithoutParameters(processVersionCommand),
+}
+
+type remoteCommandHandler func(*runtimecontrol.Client) error
+
 type AgentUserParamOption struct {
 	UserParameter []string `conf:"optional"`
 }
@@ -116,6 +146,10 @@ type Arguments struct {
 	version        bool
 	runtimeCommand string
 	help           bool
+}
+
+func (args *Arguments) isTestCommand() bool {
+	return args.test != "" || args.print || args.testConfig
 }
 
 func main() {
@@ -255,22 +289,22 @@ func run() error {
 		return nil
 	}
 
-	systemOpt, err := agent.Options.RemovePluginSystemOptions()
+	systemOptions, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
 		return errs.Wrap(err, "cannot initialize plugin system option")
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOptions, args)
 	if err != nil {
 		return errs.Wrap(err, "cannot register plugins")
 	}
 
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print || args.testConfig {
+	if args.isTestCommand() {
 		var m *scheduler.Manager
 
-		m, err = prepareMetricPrintManager(args.verbose, systemOpt)
+		m, err = prepareMetricPrintManager(args.verbose, systemOptions)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
@@ -296,7 +330,7 @@ func run() error {
 		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
-	err = runAgent(args.foreground, args.configPath, systemOpt)
+	err = runAgent(args.foreground, args.configPath, systemOptions)
 	if err != nil {
 		if agent.Options.LogType == "file" {
 			log.Critf("%s", err.Error())
@@ -491,10 +525,23 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		}
 	}
 
+	profilerControl := profiler.New(profiler.Options{
+		Enabled:            agent.Options.EnableProfiler == 1,
+		Dir:                agent.Options.ProfilerDir,
+		MaxFilesPerProfile: agent.Options.ProfilerMaxFilesPerProfile,
+		Interval:           time.Duration(agent.Options.ProfilerInterval) * time.Second,
+	})
+	profilerCtx, profilerCancel := context.WithCancel(context.Background())
+	profilerControl.Start(profilerCtx)
+	registerProfilerCommands(profilerControl)
+
 	err = waitStop()
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
+
+	profilerCancel()
+	profilerControl.Wait()
 
 	if agent.Options.StatusPort != 0 {
 		statuslistener.Stop()
@@ -533,6 +580,10 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 }
 
 func parseArgs() (string, *Arguments, error) {
+	return parseArgsFrom(os.Args[1:])
+}
+
+func parseArgsFrom(arguments []string) (string, *Arguments, error) {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	// set to empty cause lib triggers Usage func on --help/-h and invalid
@@ -633,7 +684,7 @@ func parseArgs() (string, *Arguments, error) {
 
 	f.Register(fs)
 
-	err := fs.Parse(os.Args[1:])
+	err := fs.Parse(arguments)
 	if err != nil {
 		fmt.Fprint(os.Stdout, usageMessage())
 
@@ -641,6 +692,10 @@ func parseArgs() (string, *Arguments, error) {
 			errs.NewCLIError(err.Error(), 1),
 			errs.Wrap(err, "failed to parse command line arguments"),
 		)
+	}
+
+	if args.runtimeCommand != "" && fs.NArg() != 0 {
+		args.runtimeCommand += " " + strings.Join(fs.Args(), " ")
 	}
 
 	return f.Usage(), args, nil
@@ -791,32 +846,52 @@ func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
 	return
 }
 
+func processCommandWithoutParameters(handler remoteCommandHandler) remoteCommandHandler {
+	return func(c *runtimecontrol.Client) error {
+		params := strings.Fields(c.Request())
+		if len(params) > 1 {
+			return errs.New("too many commands")
+		}
+
+		return handler(c)
+	}
+}
+
+func registerProfilerCommands(controller *profiler.Controller) {
+	handler := func(c *runtimecontrol.Client) error {
+		ctx, cancel := context.WithTimeout(context.Background(), runtimeCommandSendingTimeout)
+		defer cancel()
+
+		message, err := controller.ProcessCommand(ctx, c.Request())
+		if err != nil {
+			return errs.Wrap(err, "cannot process profiler command")
+		}
+
+		err = c.Reply(message)
+		if err != nil {
+			return errs.Wrap(err, "cannot reply to remote command")
+		}
+
+		return nil
+	}
+
+	for _, command := range controller.Commands() {
+		remoteCommandHandlers[command] = handler
+	}
+}
+
 func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
-	switch len(params) {
-	case 0:
-		return errors.New("Empty command")
-	case 2: //nolint:mnd
-		return errors.New("Too many commands")
-	default:
+	if len(params) == 0 {
+		return errs.New("empty command")
 	}
 
-	switch params[0] {
-	case "log_level_increase":
-		err = processLoglevelIncreaseCommand(c)
-	case "log_level_decrease":
-		err = processLoglevelDecreaseCommand(c)
-	case "metrics":
-		err = processMetricsCommand(c)
-	case "version":
-		err = processVersionCommand(c)
-	case "userparameter_reload":
-		err = processUserParamReloadCommand(c)
-	default:
-		return errors.New("Unknown command")
+	handler, ok := remoteCommandHandlers[params[0]]
+	if !ok {
+		return errs.New("unknown command")
 	}
 
-	return
+	return handler(c)
 }
 
 func waitStop() error {
@@ -835,7 +910,8 @@ func waitStop() error {
 
 	for {
 		select {
-		case <-sigs:
+		case sig := <-sigs:
+			log.Debugf("syscall signal '%s' received", getSignalName(sig))
 			sendServiceStop()
 
 			return nil
@@ -854,5 +930,16 @@ func waitStop() error {
 				return nil
 			}
 		}
+	}
+}
+
+func getSignalName(sig os.Signal) string {
+	switch sig {
+	case syscall.SIGINT:
+		return "SIGINT"
+	case syscall.SIGTERM:
+		return "SIGTERM"
+	default:
+		return "unknown"
 	}
 }

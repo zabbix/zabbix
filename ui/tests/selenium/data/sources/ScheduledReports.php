@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,8 @@ class ScheduledReports {
 	 * @return array
 	 */
 	public static function load() {
+		$time = time();
+
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'admin user for testFormScheduledReport',
@@ -54,8 +56,8 @@ class ScheduledReports {
 				'cycle' => '1',
 				'start_time' => '43200', // 12:00
 				'weekdays' => '12', // Wednesday and Thursday
-				'active_since' => '2025-04-24',
-				'active_till' => '2026-04-25',
+				'active_since' => date('Y-m-d', strtotime('-1 year', $time)),
+				'active_till' => date('Y-m-d', strtotime('+1 year', $time)),
 				'subject' => 'Weekly report',
 				'message' => 'Report accompanying text',
 				'status' => '0',
@@ -86,7 +88,7 @@ class ScheduledReports {
 				'period' => '3',
 				'cycle' => '1',
 				'weekdays' => '12', // Wednesday and Thursday
-				'active_till' => '2026-04-25',
+				'active_till' => date('Y-m-d', strtotime('+1 year', $time)),
 				'message' => 'Report text',
 				'description' => 'Report description',
 				'status' => '1',
@@ -215,7 +217,7 @@ class ScheduledReports {
 			],
 			[
 				'userid' => '1',
-				'name' => 'Report for filter - disabled',
+				'name' => 'Report for filter -   disabled',
 				'dashboardid' => '57',
 				'period' => '2',
 				'cycle' => '2',

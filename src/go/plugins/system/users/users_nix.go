@@ -1,7 +1,7 @@
 //go:build !windows
 
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,13 +25,9 @@ import (
 )
 
 func (p *Plugin) getUsersNum(timeout int) (int, error) {
-	if p.executor == nil {
-		var err error
-
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return 0, errs.Wrap(err, "command init failed")
-		}
+	err := p.initExecutor()
+	if err != nil {
+		return 0, err
 	}
 
 	out, err := p.executor.Execute("who | wc -l", time.Second*time.Duration(timeout), "")
@@ -40,4 +36,22 @@ func (p *Plugin) getUsersNum(timeout int) (int, error) {
 	}
 
 	return strconv.Atoi(out)
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }

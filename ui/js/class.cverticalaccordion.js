@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -78,8 +78,8 @@ jQuery(function($) {
 				accordion.trigger('collapse', {section: $(this)});
 			});
 
-			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
-			$(options['handler'], accordion).attr('aria-expanded', false);
+			$(options['handler'], accordion).attr('aria-label', t('Collapse section'));
+			$(options['handler'], accordion).attr('aria-expanded', 'false');
 		},
 		// Expand N-th row in accordion. Collapse others.
 		expandNth: function(n) {
@@ -96,8 +96,8 @@ jQuery(function($) {
 
 			accordion.trigger('expand', {section: section});
 
-			handler.attr('title', t('S_COLLAPSE'));
-			handler.attr('aria-expanded', true);
+			handler.attr('aria-label', t('Expand section'));
+			handler.attr('aria-expanded', 'true');
 		}
 	};
 

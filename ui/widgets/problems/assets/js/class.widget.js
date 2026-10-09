@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -75,8 +75,10 @@ class CWidgetProblems extends CWidget {
 
 		this.#activateContentsEvents();
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_eventid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_eventid === null || !this.#hasSelectable()) {
+				this.#selected_eventid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_eventid !== null) {
 				this.#selectEvent();
@@ -105,6 +107,10 @@ class CWidgetProblems extends CWidget {
 		const row = this.#table_body.querySelector('[data-eventid]');
 
 		return row !== null ? row.dataset.eventid : null;
+	}
+
+	#hasSelectable() {
+		return this.#table_body.querySelector(`[data-eventid="${this.#selected_eventid}"]`) !== null;
 	}
 
 	#activateContentsEvents() {

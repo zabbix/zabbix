@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 	 * Existing Maintenance ID.
 	 */
 	private const MAINTENANCEID = 60002;
+
+	/**
+	 * Resource type Maintenance
+	 */
+	const RESOURCE_TYPE = 27;
 
 	public function testAuditlogMaintenance_Create() {
 		$create = $this->call('maintenance.create', [
@@ -84,7 +89,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.maintenanceid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Update() {
@@ -151,11 +156,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MAINTENANCEID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
 		$this->call('maintenance.delete', [self::MAINTENANCEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_maintenance', self::MAINTENANCEID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_maintenance', self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 }

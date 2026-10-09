@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -311,7 +311,7 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
-		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false, false))
+		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
@@ -801,8 +801,11 @@ if ($data['action'] !== 'user.edit') {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(CSeverityHelper::getName($severity))
-				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
-				->setUncheckedValue(0),
+				->setChecked(
+					array_key_exists($severity, $data['messages']['triggers.severities'])
+						&& $data['messages']['triggers.severities'][$severity] == TRIGGER_SEVERITY_ON
+				)
+				->setUncheckedValue(TRIGGER_SEVERITY_OFF),
 			[
 				(new CSelect('messages[sounds.'.$severity.']'))
 					->setId('messages_sounds.'.$severity)

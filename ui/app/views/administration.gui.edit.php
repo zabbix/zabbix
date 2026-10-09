@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,19 +86,19 @@ $gui_tab = (new CFormList())
 			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
-		(new CNumericBox('search_limit', $data['search_limit'], 6, false, false, false))
+		(new CNumericBox('search_limit', $data['search_limit'], 6, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(
 		(new CLabel(_('Max number of columns and rows in overview tables'), 'max_overview_table_size'))
 			->setAsteriskMark(),
-		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6, false, false, false))
+		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Max count of elements to show inside table cell'), 'max_in_table'))->setAsteriskMark(),
-		(new CNumericBox('max_in_table', $data['max_in_table'], 5, false, false, false))
+		(new CNumericBox('max_in_table', $data['max_in_table'], 5, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)

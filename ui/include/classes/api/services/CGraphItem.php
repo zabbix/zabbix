@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -87,7 +87,7 @@ class CGraphItem extends CApiService {
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
 				' WHERE gi.graphid=gi1.graphid'.
-					' AND p1.permission IS NULL'.
+					' AND p1.hgsetid IS NULL'.
 			')';
 		}
 

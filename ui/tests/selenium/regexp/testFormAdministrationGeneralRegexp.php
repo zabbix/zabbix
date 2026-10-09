@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup regexps
@@ -93,6 +91,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', $name);
 		$this->zbxTestInputType('expressions_0_expression', $expression);
 		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
+
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		}
@@ -141,7 +140,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
+		$this->query('xpath://table[@id="testResultTable"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -154,7 +153,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));
+		$this->query('xpath://table[@id="testResultTable"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 

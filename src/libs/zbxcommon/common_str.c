@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -63,9 +63,17 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
  *                                                                            *
  * Purpose: dynamical formatted output conversion                             *
  *                                                                            *
+ * Parameters: dest - [IN] previous string to free (or NULL)                  *
+ *             fmt  - [IN] format string                                      *
+ *             ...  - [IN]                                                    *
+ *                                                                            *
  * Return value: formatted string                                             *
  *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
+ * Comments: Returns a pointer to allocated memory.                           *
+ *           Safe for one-shot formatting where exact buffer sizing matters   *
+ *           (e.g. building a single error message).                          *
+ *                                                                            *
+ *           WARNING: DO NOT USE IN A LOOP OR RECURSIVE CONTEXT.              *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args)

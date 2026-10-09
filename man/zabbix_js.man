@@ -65,15 +65,15 @@ is a command line utility that can be used for embedded script testing.
 .IP "\fB\-s\fR, \fB\-\-script\fR \fIscript\-file\fR"
 Specify the file name of the script to execute. If '-' is specified as file name, the script will be read from stdin.
 .IP "\fB\-p\fR, \fB\-\-param\fR \fIinput\-param\fR"
-Specify the input parameter.
+Specify the input parameter passed to the script. Parameter is passed verbatim as a string and is available in the script via the 'value' variable. Mutually exclusive with -i.
 .IP "\fB\-i\fR, \fB\-\-input\fR \fIinput\-file\fR"
-Specify the file name of the input parameter. If '-' is specified as file name, the input will be read from stdin.
+Specify a file containing the input parameter passed to the script. The file contents are passed verbatim as a string and are available in the script via the 'value' variable. If '-' is specified as file name, the input will be read from stdin. Mutually exclusive with -p.
 .IP "\fB\-w\fR, \fB\-\-webdriver\fR \fIurl\fR"
 Specify the webdriver URL.
 .IP "\fB\-l\fR, \fB\-\-loglevel\fR \fIlog\-level\fR"
-Specify the log level.
+Specify log level (Range: 0-5).
 .IP "\fB\-t\fR, \fB\-\-timeout\fR \fItimeout\fR"
-Specify the timeout in seconds. Valid range: 1\-60 seconds (default: 10)
+Specify the timeout in seconds. Valid range: 1\-600 seconds (default: 10)
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"

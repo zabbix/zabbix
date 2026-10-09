@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -98,6 +98,32 @@ class CSeverityHelper {
 				return ZBX_STYLE_STATUS_INFO_BG;
 			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
 				return ZBX_STYLE_STATUS_NA_BG;
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Get trigger severity full line height css style name.
+	 *
+	 * @param int $severity  Trigger severity.
+	 *
+	 * @return string|null
+	 */
+	public static function getSeverityFlhStyle($severity): ?string {
+		switch ($severity) {
+			case TRIGGER_SEVERITY_DISASTER:
+				return ZBX_STYLE_FLH_DISASTER_BG;
+			case TRIGGER_SEVERITY_HIGH:
+				return ZBX_STYLE_FLH_HIGH_BG;
+			case TRIGGER_SEVERITY_AVERAGE:
+				return ZBX_STYLE_FLH_AVERAGE_BG;
+			case TRIGGER_SEVERITY_WARNING:
+				return ZBX_STYLE_FLH_WARNING_BG;
+			case TRIGGER_SEVERITY_INFORMATION:
+				return ZBX_STYLE_FLH_INFO_BG;
+			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+				return ZBX_STYLE_FLH_NA_BG;
 			default:
 				return null;
 		}

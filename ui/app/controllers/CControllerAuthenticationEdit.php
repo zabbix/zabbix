@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -245,11 +245,11 @@ class CControllerAuthenticationEdit extends CController {
 					'username_attribute' => '',
 					'sp_entityid' => '',
 					'nameid_format' => '',
-					'sign_messages' => '',
-					'sign_assertions' => '',
-					'sign_authn_requests' => '',
-					'sign_logout_requests' => '',
-					'sign_logout_responses' => '',
+					'sign_messages' => 1,
+					'sign_assertions' => 1,
+					'sign_authn_requests' => 1,
+					'sign_logout_requests' => 1,
+					'sign_logout_responses' => 1,
 					'encrypt_nameid' => '',
 					'encrypt_assertions' => '',
 					'saml_provision_status' => JIT_PROVISIONING_DISABLED,

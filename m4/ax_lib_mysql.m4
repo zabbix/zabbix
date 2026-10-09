@@ -173,10 +173,28 @@ AC_DEFUN([AX_LIB_MYSQL],
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
             _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
 
+            m4_ifdef([PKG_PROG_PKG_CONFIG], [
+				PKG_PROG_PKG_CONFIG()
+				if test -z "$PKG_CONFIG"; then
+					AC_MSG_WARN([pkg-config is required but not found. Please install pkg-config.])
+				fi
+			], [
+				AC_MSG_WARN([pkg-config not found, skipping c-ares detection via pkg-config])
+			])
+
+            if test -n "$PKG_CONFIG"; then
+                ZSTD_LDFLAGS=`$PKG_CONFIG --libs-only-L libzstd`
+			fi
+
+            if test -n "$PKG_CONFIG"; then
+                TLS_LDFLAGS=`$PKG_CONFIG --libs-only-L openssl`
+			fi
+
+            _full_libmysql_libs="${_full_libmysql_libs} ${ZSTD_LDFLAGS}"
             _save_mysql_ldflags="${LDFLAGS}"
             _save_mysql_cflags="${CFLAGS}"
             _save_mysql_libs="${LIBS}"
-            LDFLAGS="${LDFLAGS} ${_full_libmysql_libs}"
+            LDFLAGS="${LDFLAGS} ${_full_libmysql_libs} ${TLS_LDFLAGS}"
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
             for i in $_full_libmysql_libs; do
@@ -213,7 +231,7 @@ AC_DEFUN([AX_LIB_MYSQL],
             CFLAGS="${_save_mysql_cflags}"
 
             CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
-            LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
+            LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS} ${ZSTD_LDFLAGS} ${TLS_LDFLAGS}"
             LIBS="${LIBS} ${MYSQL_LIBS}"
             LIBMYSQL_TLS_TRY_LINK([no])
             if test "$found_mysql_tls" == "yes"; then

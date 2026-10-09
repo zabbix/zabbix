@@ -35,14 +35,14 @@ Refer to the vendor documentation.
 |{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}|<p>Filter of discoverable interfaces by admin status.</p><p>1 - Up</p><p>2 - Down</p><p>3 - Testing</p>|`1`|
 |{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}|<p>Filter to exclude discovered interfaces by admin status.</p>|`CHANGE_IF_NEEDED`|
 |{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}|<p>Filter triggers by discoverable interface names.</p><p>Used in overrides. Triggers will only be created for interfaces whose names contain the value of the macro.</p>|`.*`|
-|{$CPU.UTIL.CRIT}||`90`|
-|{$MEMORY.UTIL.MAX}||`90`|
+|{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization in %.</p>|`90`|
+|{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]|
 |System description|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|cisco.asav.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|cisco.asav.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Host name|<p>MIB: RFC1213-MIB</p><p>An administratively-assigned name for this</p><p>managed node.  By convention, this is the node's</p><p>fully-qualified domain name.</p>|SNMP agent|cisco.asav.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -75,7 +75,7 @@ class CSetupWizard extends CForm {
 	public function getStep(): int {
 		$step = $this->getConfig('step');
 
-		return array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
+		return $step !== null && array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
 	}
 
 	private function doAction(): void {
@@ -566,9 +566,8 @@ class CSetupWizard extends CForm {
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
 			->addRow(_('Database port'), [
-				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false,
-					false
-				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
 			])

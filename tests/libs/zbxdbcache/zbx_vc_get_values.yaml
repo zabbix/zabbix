@@ -359,7 +359,7 @@ out:
 ---
 # TC6
 # Test that cached data is returned from cache without database access.
-test case: Get interval of already already data values
+test case: Get interval of already cached data values
 include: &include zbx_vc_get_values.inc.yaml
 in:
   history: [*include]

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -316,7 +316,7 @@ class Script {
 			content.classList.add('confirmation-msg');
 			content.textContent = confirmation;
 
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				title: dialogue_title,
 				content: content.outerHTML,
 				class: 'modal-popup modal-popup-small position-middle',
@@ -336,6 +336,9 @@ class Script {
 					}
 				]
 			}, trigger_element);
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$close_btn.show();
 		});
 	}
 

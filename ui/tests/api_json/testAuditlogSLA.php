@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,6 +40,11 @@ class testAuditlogSLA extends testAuditlogCommon {
 	 * Created SLA schedule ID.
 	 */
 	protected static $created_schedule;
+
+	/**
+	 * Resource type SLA
+	 */
+	const RESOURCE_TYPE = 48;
 
 	public function testAuditlogSLA_Create() {
 		$create = $this->call('sla.create', [
@@ -115,7 +120,7 @@ class testAuditlogSLA extends testAuditlogCommon {
 			'sla.slaid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -194,7 +199,7 @@ class testAuditlogSLA extends testAuditlogCommon {
 					=> ['add', $updated_downtime['sla_excluded_downtimeid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -202,6 +207,8 @@ class testAuditlogSLA extends testAuditlogCommon {
 	 */
 	public function testAuditlogSLA_Delete() {
 		$this->call('sla.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated SLA', self::$resourceid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated SLA', self::$resourceid, self::RESOURCE_TYPE,
+				self::RESOURCE_TYPE
+		);
 	}
 }

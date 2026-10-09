@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,7 +67,7 @@ func init() {
 		&impl, "WindowsServices",
 		"service.discovery", "List of Windows services for low-level discovery.",
 		"service.info", "Information about a service.",
-		"services", "Filtered list of Windows sercices.",
+		"services", "Filtered list of Windows services.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))

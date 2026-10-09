@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,11 +41,11 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'SP name ID format' => ['value' => '', 'visible' => true, 'maxlength' => 2048,
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
-			'id:sign_messages' => ['value' => false, 'visible' => true],
-			'id:sign_assertions' => ['value' => false, 'visible' => true],
-			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_responses' => ['value' => false, 'visible' => true],
+			'id:sign_messages' => ['value' => true, 'visible' => true],
+			'id:sign_assertions' => ['value' => true, 'visible' => true],
+			'id:sign_authn_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_responses' => ['value' => true, 'visible' => true],
 			'id:encrypt_nameid' => ['value' => false, 'visible' => true],
 			'id:encrypt_assertions' => ['value' => false, 'visible' => true],
 			'Case-sensitive login' => ['value' => false, 'visible' => true],
@@ -734,7 +734,13 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
 				'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
 				'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
-				'Case-sensitive login' => false
+				'Case-sensitive login' => false,
+				// Sign.
+				'id:sign_messages' => false,
+				'id:sign_assertions' => false,
+				'id:sign_authn_requests' => false,
+				'id:sign_logout_requests' => false,
+				'id:sign_logout_responses' => false
 			]
 		];
 
@@ -771,7 +777,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->page->waitUntilReady();
 			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
-			$this->query('button:Login')-> one()->click();
+			$this->query('button:Login')-> one()->click()->waitUntilStalled();
 		}
 
 		$this->page->waitUntilReady();
@@ -783,11 +789,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 		// Check the header of the page that was displayed to the user after login.
 		$header = CTestArrayHelper::get($data, 'header', 'Global view');
-		$this->assertEquals($header, $this->query('tag:h1')->one()->getText());
+		$this->assertEquals($header, $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:signin-logo')->waitUntilVisible()->one();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentUrl());
 	}
 

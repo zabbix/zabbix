@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,8 @@
 package users
 
 import (
+	"sync"
+
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -24,7 +26,8 @@ var impl Plugin
 
 type Plugin struct {
 	plugin.Base
-	executor zbxcmd.Executor
+	executor       zbxcmd.Executor
+	executorInitMu sync.Mutex
 }
 
 func init() {

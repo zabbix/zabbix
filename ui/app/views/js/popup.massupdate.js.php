@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -411,7 +411,7 @@ function submitPopup(overlay) {
 	}
 
 	if (warning_message !== '') {
-		overlayDialogue({
+		let warning_overlay = overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
 			'class': 'position-middle',
@@ -424,6 +424,9 @@ function submitPopup(overlay) {
 				}
 			]
 		}, overlay.$btn_submit);
+
+		// Display the close button after the screen reader announces the dialog title.
+		warning_overlay.$dialogue.$close_btn.show();
 
 		overlay.unsetLoading();
 		return false;

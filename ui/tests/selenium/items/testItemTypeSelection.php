@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -190,8 +190,8 @@ class testItemTypeSelection extends CWebTest {
 		if (CTestArrayHelper::get($data, 'hint')) {
 			$icon = $this->query('class:js-hint')->waitUntilClickable()->one();
 			$icon->click();
-			$this->assertEquals($data['hint_text'],
-					$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
+			$this->assertEquals($data['hint_text'], $form->query('xpath://div[contains(@class, "hintbox-wrap")]')
+					->waitUntilPresent()->one()->getText()
 			);
 		}
 		elseif (CTestArrayHelper::get($data, 'hint') === false) {

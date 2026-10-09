@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -223,7 +223,7 @@ foreach ($data['items'] as $item) {
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
-		$data['tags'][$item['itemid']],
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$info_cell
 	];
 
@@ -334,7 +334,8 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostids' => $data['filter_data']['filter_hostids'],
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+		'filter_values' => $data['filter_values']
 	]).');
 '))
 	->setOnDocumentReady()

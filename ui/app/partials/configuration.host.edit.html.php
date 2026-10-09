@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -203,6 +203,7 @@ $host_tab
 				'object_name' => 'hostGroup',
 				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+				'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 				'data' => $data['groups_ms'],
 				'popup' => [
 					'parameters' => [
@@ -425,7 +426,8 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 
 	if ($inventory_field['type'] & DB::FIELD_TYPE_TEXT) {
 		$input_field = (new CTextArea('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('host_inventory', $field_name));
 	}
 	else {
 		$input_field = (new CTextBox('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))

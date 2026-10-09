@@ -367,13 +367,64 @@ var QRCode;
 			this._el.appendChild(this._elImage);
 			this._bSupportDataURI = null;
 		};
-			
+
+		/**
+		 * Draw the QRCode with:
+		 * - automatically size down image (square only) so that one module is integer (not float)
+		 * - add 4 module border for QR code
+		 *
+		 * IMPLEMENTED BY ZABBIX
+		 *
+		 * @param oQRCode
+		 */
+		Drawing.prototype.drawInteger = function (oQRCode) {
+			const nCount = oQRCode.getModuleCount();
+			const module_size = Math.floor(this._htOption.width / (8 + nCount));
+
+			const border_size = 4 * module_size;
+			const image_size = 2 * border_size  + nCount * module_size;
+
+			this._elImage.width = image_size;
+			this._elImage.height = image_size;
+			this._elCanvas.width = image_size;
+			this._elCanvas.height = image_size;
+			this._elImage.style.display = "none";
+			this.clear();
+
+			this._oContext.fillStyle = this._htOption.colorLight;
+			this._oContext.fillRect(0, 0, image_size, image_size);
+
+			this._oContext.fillStyle = this._htOption.colorDark;
+
+			for (let row = 0; row < nCount; row++) {
+				for (let col = 0; col < nCount; col++) {
+					if (oQRCode.isDark(row, col)) {
+						this._oContext.fillRect(
+							col * module_size + border_size,
+							row * module_size + border_size,
+							module_size,
+							module_size
+						);
+					}
+				}
+			}
+
+			this._bIsPainted = true;
+		}
+
 		/**
 		 * Draw the QRCode
-		 * 
+		 *
+		 * ALTERED BY ZABBIX: switch to use precise drawing.
+		 *
 		 * @param {QRCode} oQRCode 
 		 */
 		Drawing.prototype.draw = function (oQRCode) {
+			if (this._htOption.draw_integer) {
+				this.drawInteger(oQRCode);
+				return;
+			}
+
             var _elImage = this._elImage;
             var _oContext = this._oContext;
             var _htOption = this._htOption;

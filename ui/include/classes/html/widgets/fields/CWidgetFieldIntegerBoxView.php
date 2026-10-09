@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,9 +23,7 @@ class CWidgetFieldIntegerBoxView extends CWidgetFieldView {
 	}
 
 	public function getView(): CNumericBox {
-		return (new CNumericBox($this->field->getName(), $this->field->getValue(), $this->field->getMaxLength(), false,
-			!$this->isNotEmpty()
-		))
+		return (new CNumericBox($this->field->getName(), $this->field->getValue(), $this->field->getMaxLength()))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
 	}

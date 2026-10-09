@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
  * @backup config
  */
 class testAuditlogSettings extends testAuditlogCommon {
+
+	/**
+	 * Resource type Settings
+	 */
+	const RESOURCE_TYPE = 40;
 
 	public function testAuditlogSettings_Update() {
 		$updated = json_encode([
@@ -118,6 +123,6 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'report_test_timeout' => '50s'
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 1, self::RESOURCE_TYPE);
 	}
 }

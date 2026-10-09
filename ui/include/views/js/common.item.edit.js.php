@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -270,7 +270,7 @@
 				url_node.val(url.url);
 			}
 			else {
-				overlayDialogue({
+				const overlay = overlayDialogue({
 					'title': <?= json_encode(_('Error')); ?>,
 					'class': 'modal-popup position-middle',
 					'content': $('<span>').html(<?=
@@ -285,6 +285,9 @@
 						}
 					]
 				}, e.target);
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$close_btn.show();
 			}
 		});
 

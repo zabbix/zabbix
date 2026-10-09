@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,18 +16,16 @@
 
 class CNumericBox extends CInput {
 
-	private bool $allow_empty;
 	private bool $allow_negative;
 	private int $min_length = 0;
 
 	public function __construct($name = 'number', $value = '0', $maxlength = 20, $readonly = false,
-			$allow_empty = false, $allow_negative = true) {
+			$allow_negative = true) {
 		parent::__construct('text', $name, $value);
 
 		$this->setReadonly($readonly);
 		$this->setAttribute('maxlength', $maxlength);
 
-		$this->allow_empty = $allow_empty;
 		$this->allow_negative = $allow_negative;
 	}
 
@@ -50,7 +48,6 @@ class CNumericBox extends CInput {
 
 	public function toString($destroy = true) {
 		$this->onChange('normalizeNumericBox(this, '.json_encode([
-			'allow_empty' => $this->allow_empty,
 			'allow_negative' => $this->allow_negative,
 			'min_length' => $this->min_length
 		]).');');

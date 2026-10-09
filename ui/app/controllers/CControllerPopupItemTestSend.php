@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -281,28 +281,28 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
-		if ($this->use_prev_value) {
-			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
-			$prev_time = $this->getInput('prev_time', '');
-
-			if ($prev_value !== '' || $prev_time !== '') {
-				$data['options']['history'] = [
-					'value' => $prev_value,
-					'timestamp' => $prev_time
-				];
-			}
-		}
-
 		if ($this->get_value_from_host) {
+			$history = [
+				'value' => $this->getInput('value', ''),
+				'timestamp' => $this->getInput('prev_time', '') === '' ? '' : $this->getPrevTime()
+			];
 			$data += $this->prepareTestData();
 		}
 		else {
+			$history = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time', '')
+			];
 			$data['item']['value'] = $this->getInput('value', '');
 			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
 
 			if ($data['options']['state'] == self::NOT_SUPPORTED_STATE) {
 				$data['options']['runtime_error'] = $this->getInput('runtime_error', '');
 			}
+		}
+
+		if ($this->use_prev_value && $history['timestamp'] !== '') {
+			$data['options']['history'] = $history;
 		}
 
 		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
@@ -463,27 +463,19 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					);
 				}
 
-				$valuemap = $this->getInput('valuemapid', 0) == 0
-					? []
-					: API::ValueMap()->get([
+				if ($result_preproc['result'] !== null && $this->getInput('valuemapid', 0) != 0) {
+					$valuemaps = API::ValueMap()->get([
 						'output' => [],
 						'selectMappings' => ['type', 'newvalue', 'value'],
 						'valuemapids' => $this->getInput('valuemapid')
-					])[0];
+					]);
 
-				if ($valuemap) {
-					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
-						$result_preproc['result'], $valuemap
-					);
+					if ($valuemaps) {
+						$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
+							$result_preproc['result'], $valuemaps[0]
+						);
+					}
 				}
-			}
-			elseif (array_key_exists('error', $result_preproc)) {
-				$output['final'] = [
-					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
-						? _('Set error to')
-						: '',
-					'error' => $result_preproc['error']
-				];
 			}
 
 			if (array_key_exists('final', $output) && $output['final']['action'] !== '') {

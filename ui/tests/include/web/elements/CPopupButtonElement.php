@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,9 +67,16 @@ class CPopupButtonElement extends CElement {
 		// Sometimes menu is not summoning from the first time.
 		for ($i = 0; $i < 2; $i++) {
 			try {
-				$this->click(true);
+				for ($n = 0; $n < 2; $n++) {
+					try {
+						$this->click(true)->waitUntilAttributesPresent(['aria-expanded' => 'true'], 1);
+					}
+					catch (Exception $e) {
+						// Code is not missing here.
+					}
+				}
 
-				$menu = $query->waitUntilVisible()->one(false);
+				$menu = $query->waitUntilVisible(2)->one(false);
 				if ($menu->isValid()) {
 					return $menu;
 				}

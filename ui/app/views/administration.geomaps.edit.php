@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -90,7 +90,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel([_('Max zoom level'), $hintbox_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),
 		new CFormField(
-			(new CNumericBox('geomaps_max_zoom', $data['geomaps_max_zoom'], 2, false, false, false))
+			(new CNumericBox('geomaps_max_zoom', $data['geomaps_max_zoom'], 2, false, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setAriaRequired()

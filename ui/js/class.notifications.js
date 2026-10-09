@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -413,9 +413,19 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * Close the notification box.
  */
 ZBX_Notifications.prototype.handleCloseClicked = function() {
-	const data = {ids: this.getEventIds()};
+	if (this._closing) {
+		return;
+	}
 
-	data[CSRF_TOKEN_NAME] = this._csrf_token;
+	const ids = this.getEventIds();
+
+	if (!ids.length) {
+		return;
+	}
+
+	this._closing = true;
+
+	const data = {ids, [CSRF_TOKEN_NAME]: this._csrf_token};
 
 	this
 		.fetch('notifications.read', data)
@@ -443,6 +453,9 @@ ZBX_Notifications.prototype.handleCloseClicked = function() {
 			else {
 				console.log('Could not read notifications:', exception);
 			}
+		})
+		.finally(() => {
+			this._closing = false;
 		});
 };
 

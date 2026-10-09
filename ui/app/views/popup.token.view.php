@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -47,6 +47,7 @@ $token_from_grid = (new CFormGrid())
 				->onClick('writeTextClipboard(this.dataset.auth_token);')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
+				->setAttribute('aria-label', _('Copy to clipboard'))
 		])
 	])
 	->addItem([

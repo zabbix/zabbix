@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,6 +69,39 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			'clone'				=> 'in 1',
 			'clone_hostid'		=> 'db hosts.hostid'
 		];
+	}
+
+	protected function validateInterfaces(): bool {
+		$ret = true;
+		$index = 1;
+
+		foreach ($this->getInput('interfaces', []) as $interface) {
+			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+				$validation_rules = [];
+
+				if ($interface['details']['version'] != SNMP_V3) {
+					$validation_rules['community'] = 'db interface_snmp.community|required|not_empty';
+				}
+
+				if ($interface['details']['version'] != SNMP_V1) {
+					$validation_rules['max_repetitions'] = 'db interface_snmp.max_repetitions|required|ge 1';
+				}
+
+				$validator = new CNewValidator($interface['details'], $validation_rules);
+
+				foreach ($validator->getAllErrors() as $error) {
+					error('interfaces/'.$index.': '.$error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+
+			$index++;
+		}
+
+		return $ret;
 	}
 
 	/**

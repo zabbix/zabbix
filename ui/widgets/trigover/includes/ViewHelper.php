@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -91,9 +91,11 @@ class ViewHelper {
 
 		foreach (['down', 'up'] as $type) {
 			if (array_key_exists($type, $dependencies)) {
+				$title = $type === 'down' ? _('Dependent trigger') : _('Parent trigger');
+
 				$table = (new CTableInfo())
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-					->setHeader([$type === 'down' ? _('Depends on') : _('Dependent')]);
+					->setHeader([$title]);
 
 				foreach ($dependencies[$type] as $description) {
 					$table->addRow($description);
@@ -101,6 +103,7 @@ class ViewHelper {
 
 				$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))
 					->addClass(ZBX_STYLE_COLOR_ICON)
+					->setAttribute('aria-label', $title)
 					->setHint($table, '', false);
 			}
 		}

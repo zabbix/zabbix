@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -286,6 +286,7 @@ zbx_json_status_t;
 
 #define ZBX_JSON_STAT_BUF_LEN 4096
 #define ZBX_JSON_TEST_DATA_MAX_SIZE (512 * ZBX_KIBIBYTE)
+#define ZBX_MAX_JSON_DEPTH	64
 
 struct zbx_json
 {
@@ -406,5 +407,8 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
 void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
+void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
+
+zbx_jsonobj_t *zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *name);
 
 #endif /* ZABBIX_ZJSON_H */

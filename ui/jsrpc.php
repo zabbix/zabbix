@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,6 +42,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 if (!is_array($data) || !isset($data['method'])
 		|| ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params'])))) {
+	fatal_error('Wrong RPC call to JS RPC!');
+}
+
+if (!CJsRpcInputValidator::validate($data)) {
 	fatal_error('Wrong RPC call to JS RPC!');
 }
 
@@ -568,10 +572,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemap_names':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
@@ -591,10 +591,6 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				if ($data['context'] === 'host') {
 					$hosts = API::Host()->get([
 						'output' => ['name'],
@@ -848,7 +844,7 @@ switch ($data['method']) {
 		if ($db_result) {
 			$db_result = array_flip(array_column($db_result, 'name'));
 
-			if (array_key_exists($search, $db_result)) {
+			if ($search !== null && array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);
 			}
 
@@ -926,9 +922,6 @@ switch ($data['method']) {
 			}
 		}
 		break;
-
-	default:
-		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {

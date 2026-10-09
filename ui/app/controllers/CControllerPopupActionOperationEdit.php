@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,11 +38,11 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
+				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
@@ -51,7 +51,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 	protected function validateInputConstraints(): bool {
 		$eventsource = $this->getInput('eventsource');
-		$recovery = $this->getInput('recovery');
+		$recovery = $this->getInput('recovery', ACTION_OPERATION);
 		$allowed_operations = getAllowedOperations($eventsource);
 
 		if (!array_key_exists($recovery, $allowed_operations)) {
@@ -80,7 +80,7 @@ class CControllerPopupActionOperationEdit extends CController {
 	protected function doAction(): void {
 		$operation = $this->getInput('data', []) + $this->defaultOperationObject();
 		$eventsource = (int) $this->getInput('eventsource');
-		$recovery = (int) $this->getInput('recovery');
+		$recovery = (int) $this->getInput('recovery', ACTION_OPERATION);
 		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
 		$scripts_with_warning = [];

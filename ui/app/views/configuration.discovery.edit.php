@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,7 +96,7 @@ $form_grid = (new CFormGrid())
 					->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
 					->setModern()
 			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
+			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->addClass(ZBX_STYLE_DISPLAY_NONE)
 				->setAriaRequired()

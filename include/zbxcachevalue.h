@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,7 +36,7 @@
  * Adding data
  *
  *   Whenever a new item value is added to system (history tables) the item value must be
- *   also added added to Value Cache with zbx_dc_add_value() function to keep it up to date.
+ *   also added to Value Cache with zbx_dc_add_value() function to keep it up to date.
  *
  * Retrieving data
  *

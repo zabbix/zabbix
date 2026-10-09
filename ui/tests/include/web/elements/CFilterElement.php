@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -118,7 +118,7 @@ class CFilterElement extends CElement {
 	public function getTab($name = null) {
 		if ($this->context === self::CONTEXT_LEFT) {
 			if ($name === null) {
-				return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
+				return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Default filter tab"]')
 						->one();
 			}
 
@@ -158,7 +158,7 @@ class CFilterElement extends CElement {
 	 */
 	public function getTabsText() {
 		$tabs = $this->query('xpath:.//li[not(@data-target="tabfilter_timeselector")]/a[contains(@class, '.
-				'"tabfilter-item-link") and not(@aria-label="Home")]')->all();
+				'"tabfilter-item-link") and not(@aria-label="Default filter tab")]')->all();
 		if ($tabs->count() > 0) {
 			return $tabs->asText();
 		}

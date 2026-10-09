@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,23 @@
 #include "../../../../src/libs/zbxsysinfo/agent/modbtype.h"
 #include "zbxstr.h"
 #include <modbus.h>
+
+modbus_t	*__wrap_modbus_new_rtu(char *port, int baudrate, unsigned char parity, unsigned char data_bits,
+		unsigned char stop_bits);
+modbus_t	*__wrap_modbus_new_tcp_pi(char *ip, char *port);
+void	__wrap_modbus_free(modbus_t *mdb_ctx);
+void	__wrap_modbus_close(modbus_t *mdb_ctx);
+int	__wrap_modbus_connect(modbus_t *mdb_ctx);
+int	__wrap_modbus_set_slave(modbus_t *mdb_ctx, int slaveid);
+int	__wrap_modbus_read_registers(modbus_t *mdb_ctx, int addr, int nb, uint16_t *dest);
+#ifdef HAVE_LIBMODBUS_3_0
+void	__wrap_modbus_set_response_timeout(modbus_t *mdb_ctx, struct timeval *timeout);
+#else
+int	__wrap_modbus_set_response_timeout(modbus_t *mdb_ctx, uint32_t to_sec, uint32_t to_usec);
+#endif
+int	__wrap_modbus_read_bits(modbus_t *mdb_ctx, int addr, int nb, uint8_t *dest);
+int	__wrap_modbus_read_input_bits(modbus_t *mdb_ctx, int addr, int nb, uint8_t *dest);
+int	__wrap_modbus_read_input_registers(modbus_t *mdb_ctx, int addr, int nb, uint16_t *dest);
 
 modbus_t	*__wrap_modbus_new_rtu(char *port, int baudrate,
 		unsigned char parity, unsigned char data_bits,
@@ -177,7 +194,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	AGENT_REQUEST	request;
 	AGENT_RESULT	result;
-	char		*item_key;
+	const char	*item_key;
 	int		ret;
 
 	ZBX_UNUSED(state);

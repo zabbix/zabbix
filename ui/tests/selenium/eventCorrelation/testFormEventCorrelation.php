@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -139,8 +139,8 @@ class testFormEventCorrelation extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Check modal header buttons.
-		foreach (['Help', 'Close'] as $button_title) {
-			$this->assertTrue($dialog->query('xpath:.//*[@title="'.$button_title.'"]')->one()->isClickable());
+		foreach (['Open Zabbix documentation in a new tab', 'Close modal window'] as $button_arialabel) {
+			$this->assertTrue($dialog->query('xpath:.//*[@aria-label="'.$button_arialabel.'"]')->one()->isClickable());
 		}
 
 		// Check form labels.

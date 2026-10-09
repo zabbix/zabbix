@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,7 +74,7 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 		->setId('operation_esc_step_from');
 	$step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 
-	$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+	$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false))
 		->setAttribute('value', $operation['esc_step_to'] ?? 0)
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,7 +48,7 @@ void	ZBX_DO_EXIT(void)
 #undef ZBX_APP_RUNNING
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
-void	zbx_free_service_resources(void);
+void	zbx_free_service_resources(int ret);
 
 static void	parent_signal_handler(int sig)
 {
@@ -96,7 +96,7 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 
 			/* notify other threads and allow them to terminate */
 			ZBX_DO_EXIT();
-			zbx_free_service_resources();
+			zbx_free_service_resources(SUCCEED);
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;

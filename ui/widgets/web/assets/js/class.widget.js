@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,8 +40,10 @@ class CWidgetWeb extends CWidget {
 
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_hostgroupid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_hostgroupid === null || !this.#hasSelectable()) {
+				this.#selected_hostgroupid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostgroupid !== null) {
 				this.#selectHostGroup();
@@ -70,6 +72,10 @@ class CWidgetWeb extends CWidget {
 		const row = this.#table_body.querySelector('[data-hostgroupid]');
 
 		return row !== null ? row.dataset.hostgroupid : null;
+	}
+
+	#hasSelectable() {
+		return this.#table_body.querySelector(`[data-hostgroupid="${this.#selected_hostgroupid}"]`) !== null;
 	}
 
 	#selectHostGroup() {

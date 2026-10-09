@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -268,7 +268,15 @@ JAVASCRIPT;
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+
+			$item['valuemap'] = $valuemap
+				? reset($valuemap)
+				: [
+					'valuemapid' => 0,
+					'name' => _('Inaccessible value mapping'),
+					'hostid' => 0,
+					'inaccessible' => true
+				];
 		}
 
 		$params_field = [

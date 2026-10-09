@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -149,7 +149,7 @@ $form_grid->addItem([
 			->addValue(_('Single line'), CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE)
 			->setModern()
 			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CNumericBox('max_length', $data['max_length'], 3, false, false, false))
+		(new CNumericBox('max_length', $data['max_length'], 3, false, false))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->addClass('js-single-line-input')
 	]))->addClass('js-display-row')

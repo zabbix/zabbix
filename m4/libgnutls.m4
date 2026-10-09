@@ -89,8 +89,29 @@ AS_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
          found_gnutls="yes"
          LIBGNUTLS_ACCEPT_VERSION([/usr/include/gnutls/gnutls.h])
        else #libraries are not found in default directories
-         found_gnutls="no"
-         AC_MSG_RESULT(no)
+          m4_ifdef([PKG_PROG_PKG_CONFIG], [
+            PKG_PROG_PKG_CONFIG()
+            if test -z "$PKG_CONFIG"; then
+              AC_MSG_ERROR([pkg-config is required but not found. Please install pkg-config.])
+            fi
+          ], [
+            AC_MSG_WARN([pkg-config not found, skipping detection via pkg-config])
+          ])
+
+          if test -n "$PKG_CONFIG"; then
+            GNUTLS_CFLAGS=`$PKG_CONFIG --cflags gnutls`
+            GNUTLS_LDFLAGS=`$PKG_CONFIG --libs-only-L gnutls`
+            GNUTLS_LIBS=`$PKG_CONFIG --libs-only-l gnutls`
+
+            GNUTLS_VERSION=`$PKG_CONFIG --modversion gnutls`
+
+            if ! $PKG_CONFIG --atleast-version=3.8.0 gnutls; then
+                AC_MSG_ERROR([GnuTLS version 3.8.0 or higher is required. Found version: $GNUTLS_VERSION])
+            fi
+
+            accept_gnutls_version="yes"
+            found_gnutls="yes"
+          fi
        fi
      else
        if test -f $_libgnutls_dir/include/gnutls/gnutls.h; then

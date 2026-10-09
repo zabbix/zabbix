@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -259,6 +259,9 @@ class CMapImporter extends CImporter {
 				}
 				$map['iconmapid'] = $iconmapid;
 			}
+			else {
+				$map['iconmapid'] = null;
+			}
 
 			if (array_key_exists('background', $map) && array_key_exists('name', $map['background'])
 					&& $map['background']['name'] !== '') {
@@ -270,6 +273,9 @@ class CMapImporter extends CImporter {
 					));
 				}
 				$map['backgroundid'] = $imageid;
+			}
+			else {
+				$map['backgroundid'] = null;
 			}
 		}
 		unset($map);

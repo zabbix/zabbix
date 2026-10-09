@@ -1,0 +1,182 @@
+---
+test case: string value
+in:
+  value: "OK"
+  valuemapid: 1
+  units: null
+  value_type: 1  # ITEM_VALUE_TYPE_STR
+out:
+  value: "Operational (OK)"
+db data:
+  valuemap_mapping:
+    - ["OK", "Operational", 0, 1]
+---
+test case: float value seconds and milliseconds
+in:
+  value: "1.156"
+  valuemapid: 0
+  units: "s"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "1s 156ms"
+db data: {}
+---
+test case: float value years, days, hours
+in:
+  value: "146549765.156"
+  valuemapid: 0
+  units: "s"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "4y 7M 26d"
+db data: {}
+---
+test case: float value minutes and seconds unix time
+in:
+  value: "25000.15"
+  valuemapid: 0
+  units: "uptime"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "06:56:40"
+db data: {}
+---
+test case: float value bps without suffix
+in:
+  value: "25000.15"
+  valuemapid: 0
+  units: "!Bps"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "25000.15 Bps"
+db data: {}
+---
+test case: float value RPM
+in:
+  value: "666.666667"
+  valuemapid: 0
+  units: "RPM"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "666.67 RPM"
+db data: {}
+---
+test case: float value without unit type
+in:
+  value: "666.666667"
+  valuemapid: 0
+  units: ""
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "666.666667"
+db data: {}
+---
+test case: negative float value B
+in:
+  value: "-25.5454"
+  valuemapid: 0
+  units: "B"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "-25.55 B"
+db data: {}
+---
+test case: uint64 suffixed KB
+in:
+  value: "15000"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "14.65 KB"
+db data: {}
+---
+test case: uint64 suffixed MB
+in:
+  value: "15000000"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "14.31 MB"
+db data: {}
+---
+test case: uint64 suffixed GB
+in:
+  value: "15000000000"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "13.97 GB"
+db data: {}
+---
+test case: uint64 suffixed TB
+in:
+  value: "15000000000000"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "13.64 TB"
+db data: {}
+---
+test case: uint64 unixtime
+in:
+  value: "1234567890"
+  valuemapid: 0
+  units: "unixtime"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "2009.02.14 01:31:30"
+db data: {}
+---
+test case: max uint64 value B
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "16777216 TB"
+db data: {}
+---
+test case: max uint64 value s
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "s"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "584942417355y 26d"
+db data: {}
+---
+test case: max uint64 unixtime (integer overflow)
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "unixtime"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "1970.01.01 03:00:00"
+db data: {}
+---
+test case: max float value Bps
+in:
+  value: "1.7976931348623157e+308"
+  valuemapid: 0
+  units: "Bps"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "163499238157084228818828181585290037035584252885969359885091286 TBps"
+db data: {}
+---
+test case: min float value Bps
+in:
+  value: "2.2250738585072014e-308"
+  valuemapid: 0
+  units: "Bps"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "0 Bps"
+db data: {}

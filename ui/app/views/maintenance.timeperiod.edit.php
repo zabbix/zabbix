@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -183,11 +183,11 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('At (hour:minute)'), 'hour'))->addClass('js-hour-minute'),
 		(new CFormField([
-			(new CNumericBox('hour', $data['form']['hour'], 2, false, false, false))
+			(new CNumericBox('hour', $data['form']['hour'], 2, false, false))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 				->padWithZeroes(2),
 			' : ',
-			(new CNumericBox('minute', $data['form']['minute'], 2, false, false, false))
+			(new CNumericBox('minute', $data['form']['minute'], 2, false, false))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 				->padWithZeroes(2)
 		]))->addClass('js-hour-minute')

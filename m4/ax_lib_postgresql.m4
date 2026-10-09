@@ -78,7 +78,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     dnl
 
     if test "x$want_postgresql" = "xyes"; then
-        AC_PATH_PROG([PG_CONFIG], [pg_config], [])
+        AC_PATH_PROGS([PG_CONFIG], [pg_config pg_config-17], [no])
 
         if test -x "$PG_CONFIG"; then
             POSTGRESQL_CFLAGS="`$PG_CONFIG --includedir`"

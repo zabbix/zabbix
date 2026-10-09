@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,7 +37,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->testTotpLayout();
 
 		// QR code should not be visible.
-		$container = $this->page->query('class:signin-container')->one();
+		$container = $this->query('class:signin-container')->waitUntilVisible()->one();
 		$this->assertFalse($container->query('xpath:.//div[text()="Scan this QR code"]')->one(false)->isVisible());
 		$this->assertFalse($container->query('class:qr-code')->query('tag:img')->one(false)->isVisible());
 	}
@@ -75,7 +75,7 @@ class testFormTotpValidate extends testFormTotp {
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 		$totp_secret = CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32);
 
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Get the verification code (the TOTP itself). Generate only if it is not defined in the data provider.
 		CMfaTotpHelper::waitForSafeTotpWindow();
@@ -91,14 +91,15 @@ class testFormTotpValidate extends testFormTotp {
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			// Successful login.
+			// Successful login. Wait for the redirect to the frontend to finish rendering before asserting.
+			$this->query('class:zi-sign-out')->waitUntilPresent();
 			$this->page->assertUserIsLoggedIn();
 			// Check that no error messages are displayed after logging in.
 			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
 		}
 		else {
 			// Verify validation error.
-			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+			$this->assertEquals($data['error'], $form->query('class:red')->waitUntilVisible()->one()->getText());
 		}
 	}
 
@@ -114,9 +115,10 @@ class testFormTotpValidate extends testFormTotp {
 		$this->userLogin();
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		// Wait for the sign-in form to close so the login redirect finishes before asserting the logged-in state.
+		$form->query('button:Sign in')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->page->assertUserIsLoggedIn();
 
@@ -127,7 +129,7 @@ class testFormTotpValidate extends testFormTotp {
 		$form->invalidate();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
-		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->one()->getText());
+		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->waitUntilVisible()->one()->getText());
 	}
 
 	/**
@@ -148,8 +150,9 @@ class testFormTotpValidate extends testFormTotp {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
 		$this->userLogin();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->one();
 		$this->page->removeFocus();
-		$this->assertScreenshot($this->page->query('class:signin-container')->one(), 'TOTP validation form');
+		$this->assertScreenshot($form, 'TOTP validation form');
 	}
 
 	/**

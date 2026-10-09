@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,7 +36,7 @@
 		});
 
 		$("#resetDefaults").click(function() {
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
 				'class': 'position-middle',
 				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
@@ -74,6 +74,9 @@
 					}
 				]
 			}, this);
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$close_btn.show();
 		});
 	});
 </script>

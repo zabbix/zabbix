@@ -29,7 +29,7 @@ Refer to the vendor documentation.
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
 |{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}|<p>Filter of discoverable mount point names.</p>|`.*`|
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}|<p>Filter to exclude discovered by mount point names.</p>|`CHANGE_IF_NEEDED`|
-|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^/usr$`|
+|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^(?:/usr\|/opt/\.sdm/(?:usr\|lib\|lib64))$`|
 |{$BIGIP.CERT.MIN}|<p>Minimum number of days before certificate expiration.</p>|`7`|
 |{$BIGIP.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$BIGIP.CPU.UTIL.WARN.MIN}|<p>The recovery threshold of the CPU utilization expressed in %.</p>|`65`|
@@ -46,7 +46,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]|
 |Chassis serial number|<p>MIB: F5-BIGIP-SYSTEM-MIB</p><p>Serial number</p>|SNMP agent|bigip.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Hardware model name|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|bigip.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|bigip.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|

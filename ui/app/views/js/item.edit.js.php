@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -218,6 +218,10 @@ window.item_edit_form = new class {
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
+			if (target.readOnly) {
+				return;
+			}
+
 			switch (target.getAttribute('name')) {
 				case 'custom_timeout':
 				case 'history_mode':
@@ -411,7 +415,7 @@ window.item_edit_form = new class {
 	}
 
 	#showErrorDialog(body, trigger_element) {
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(body),
@@ -422,6 +426,9 @@ window.item_edit_form = new class {
 				action: function() {}
 			}]
 		}, jQuery(trigger_element));
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$close_btn.show();
 	}
 
 	#getFormFields() {
@@ -704,8 +711,8 @@ window.item_edit_form = new class {
 	}
 
 	#updateHistoryModeVisibility() {
-		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
+		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -713,8 +720,8 @@ window.item_edit_form = new class {
 	}
 
 	#updateTrendsModeVisibility() {
-		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
+		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);

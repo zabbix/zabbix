@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,7 +74,7 @@
 						let form_fields = this.form.querySelectorAll('[name^=http_]');
 
 						const http_auth_enabled = document.getElementById('http_auth_enabled');
-						overlayDialogue({
+						const overlay = overlayDialogue({
 							'title': <?= json_encode(_('Confirm changes')) ?>,
 							'class': 'position-middle',
 							'content': document.createElement('span').innerText = <?= json_encode(
@@ -103,6 +103,9 @@
 								}
 							]
 						}, e.target);
+
+						// Display the close button after the screen reader announces the dialog title.
+						overlay.$dialogue.$close_btn.show();
 					}
 				});
 			}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -598,19 +598,24 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateUuid(array $triggers, array $descriptions): void {
+		$triggers_validate_indexes = [];
+
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
 				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
+				$triggers_validate_indexes[] = $_trigger['index'];
 			}
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED | API_PRESERVE_KEYS, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('triggers', 'uuid'), 'unset' => true]
 			]]
 		]];
+
+		$triggers = array_intersect_key($triggers, array_flip($triggers_validate_indexes));
 
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

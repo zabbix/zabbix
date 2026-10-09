@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed for the effortless deployment of AWS monitoring by Zabbix via HTTP and doesn't require any external scripts.
-- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda and S3 buckets.
+- Currently, the template supports the discovery of EC2 and RDS instances, ECS clusters, ELB, Lambda, S3 buckets, and backup vaults.
 
 ## Included Monitoring Templates
 
@@ -17,6 +17,7 @@ This template is designed for the effortless deployment of AWS monitoring by Zab
 - *AWS RDS instance by HTTP*
 - *AWS S3 bucket by HTTP*
 - *AWS Cost Explorer by HTTP*
+- *AWS Backup Vault by HTTP*
 
 ## Requirements
 
@@ -61,7 +62,11 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -113,7 +118,11 @@ For using assume role authorization, add the appropriate permissions to the role
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -178,7 +187,11 @@ If you are using role-based authorization, add the appropriate permissions:
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups",
-                "lambda:ListFunctions"
+                "lambda:ListFunctions",
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
             ],
             "Resource": "*"
         }
@@ -226,6 +239,8 @@ Additional information about the metrics and used API methods:
 * [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
 * [Full metrics list related to ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html)
 * [Full metrics list related to ELB ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html)
+* [Full metrics list related to Backup vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
+* [Full metrics list related to Backup jobs](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupJob.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
@@ -240,6 +255,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS", e.g. {$HTTP.TLS.VERIFY:"AWS"}.</p>|`full`|
 |{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
 |{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
@@ -273,6 +289,10 @@ Additional information about the metrics and used API methods:
 |{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by Runtime.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable Lambda functions by name.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable backup vaults by name.</p>|`.*`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable backup vaults by region.</p>|`.*`|
+|{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by region.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 
@@ -310,14 +330,20 @@ Additional information about the metrics and used API methods:
 |----|-----------|----|-----------------------|
 |Lambda discovery|<p>Get Lambda functions.</p>|Script|aws.lambda.discovery|
 
+### LLD rule Backup vault discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backup vault discovery|<p>Get backup vaults.</p>|Script|aws.backup_vault.discovery|
+
 # AWS EC2 by HTTP
 
 ## Overview
 
 The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -343,7 +369,6 @@ This template has been tested on:
 ## Setup
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
 ### Required Permissions
@@ -479,7 +504,7 @@ For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.EC2.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -496,6 +521,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS EC2", e.g. {$HTTP.TLS.VERIFY:"AWS EC2"}.</p>|`full`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -517,9 +543,9 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html</p>|Script|aws.ec2.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ec2.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get volumes data|<p>Get volumes attached to instance.</p><p>DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html</p>|Script|aws.ec2.get_volumes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check result of the instance metric data has been got correctly.</p>|Dependent item|aws.ec2.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check result of the alarm data has been got correctly.</p>|Dependent item|aws.ec2.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get volumes info check|<p>Check result of the volume information has been got correctly.</p>|Dependent item|aws.ec2.volumes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|EC2 metrics check|<p>Checks whether EC2 metric data was retrieved correctly.</p>|Dependent item|aws.ec2.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ec2.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get volumes info check|<p>Checks whether the volume information was retrieved correctly.</p>|Dependent item|aws.ec2.volumes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Credit CPU: Balance|<p>The number of earned CPU credits that an instance has accrued since it was launched or started. For T2 Standard, the CPUCreditBalance also includes the number of launch credits that have been accrued.</p><p>Credits are accrued in the credit balance after they are earned, and removed from the credit balance when they are spent. The credit balance has a maximum limit, determined by the instance size. After the limit is reached, any new credits that are earned are discarded. For T2 Standard, launch credits do not count towards the limit.</p><p>The credits in the CPUCreditBalance are available for the instance to spend to burst beyond its baseline CPU utilization.</p><p>When an instance is running, credits in the CPUCreditBalance do not expire. When a T3 or T3a instance stops, the CPUCreditBalance value persists for seven days. Thereafter, all accrued credits are lost. When a T2 instance stops, the CPUCreditBalance value does not persist, and all accrued credits are lost.</p>|Dependent item|aws.ec2.cpu.credit_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "CPUCreditBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Credit CPU: Usage|<p>The number of CPU credits spent by the instance for CPU utilization.</p><p>One CPU credit equals one vCPU running at 100% utilization for one minute or an equivalent combination of vCPUs, utilization, and time (for example, one vCPU running at 50% utilization for two minutes or two vCPUs running at 25% utilization for two minutes).</p>|Dependent item|aws.ec2.cpu.credit_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "CPUCreditUsage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Credit CPU: Surplus balance|<p>The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.</p><p>The CPUSurplusCreditBalance value is paid down by earned CPU credits. If the number of surplus credits exceeds the maximum number of credits that the instance can earn in a 24-hour period, the spent surplus credits above the maximum incur an additional charge.</p>|Dependent item|aws.ec2.cpu.surplus_credit_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -580,13 +606,13 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |AWS EC2: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS EC2: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
-### LLD rule Instance Volumes discovery
+### LLD rule EC2 volumes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Instance Volumes discovery|<p>Discovery attached EBS volumes.</p>|Dependent item|aws.ec2.volumes.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|EC2 volumes discovery|<p>Discovery attached EBS volumes.</p>|Dependent item|aws.ec2.volumes.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
-### Item prototypes for Instance Volumes discovery
+### Item prototypes for EC2 volumes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
@@ -609,7 +635,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |[{#VOLUME_ID}]: Consumed Read/Write, ops|<p>Used with Provisioned IOPS SSD volumes only.</p><p>The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.</p><p>I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units.</p><p>For example, a 1024K I/O would count as 4 consumed IOPS.</p>|Dependent item|aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Burst balance|<p>Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.</p><p>Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.</p><p>Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.</p>|Dependent item|aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "BurstBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
-### Trigger prototypes for Instance Volumes discovery
+### Trigger prototypes for EC2 volumes discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
@@ -622,8 +648,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -649,7 +675,6 @@ This template has been tested on:
 ## Setup
 
 The template get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
 ### Required Permissions
@@ -786,7 +811,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.RDS.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -803,6 +828,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS RDS instance", e.g. {$HTTP.TLS.VERIFY:"AWS RDS instance"}.</p>|`full`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -826,10 +852,10 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |Get instance info|<p>Get instance info.</p><p>DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html</p>|Script|aws.rds.get_instance_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.rds.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get instance events data|<p>DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html</p>|Script|aws.rds.get_events<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get instance info check|<p>Data collection check.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get events check|<p>Data collection check.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RDS metrics check|<p>Checks whether RDS metric data was retrieved correctly.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get instance info check|<p>Checks whether the instance information was retrieved correctly.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get events check|<p>Checks whether the instance event data was retrieved correctly.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Class|<p>Contains the name of the compute and memory capacity class of the DB instance.</p>|Dependent item|aws.rds.class<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].DBInstanceClass.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Engine|<p>Database engine.</p>|Dependent item|aws.rds.engine<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Engine.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Engine version|<p>Indicates the database engine version.</p>|Dependent item|aws.rds.engine.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].EngineVersion.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -983,8 +1009,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -1008,7 +1034,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS S3 metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1146,7 +1171,7 @@ You can also define a filter for the Request metrics using a shared prefix, obje
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.S3.BUCKET.NAME}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -1162,6 +1187,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS S3 bucket", e.g. {$HTTP.TLS.VERIFY:"AWS S3 bucket"}.</p>|`full`|
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1175,8 +1201,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |Get metrics data|<p>Get bucket metrics.</p><p>Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html</p>|Script|aws.s3.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.s3.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|S3 metrics check|<p>Checks whether S3 metric data was retrieved correctly.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Bucket Size|<p>This is a daily metric for the bucket.</p><p>The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class, or S3 Glacier Flexible Retrieval (GLACIER) storage class.</p><p>This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.bucket_size_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Number of objects|<p>This is a daily metric for the bucket.</p><p>The total number of objects stored in a bucket for all storage classes.</p><p>This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.number_of_objects<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
@@ -1246,8 +1272,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS ECS Serverless Cluster by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about the metrics and used API methods:
@@ -1271,7 +1297,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS ECS metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1404,7 +1429,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
 
-For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Refer to the Macros section for a list of macros used for LLD filters.
 
@@ -1420,6 +1445,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Serverless Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Serverless Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1439,8 +1465,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ECS metrics check|<p>Checks whether ECS metric data was retrieved correctly.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Container Instance Count|<p>The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.</p>|Dependent item|aws.ecs.container_instance_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Task Count|<p>The number of tasks running in the cluster.</p>|Dependent item|aws.ecs.task_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Service Count|<p>The number of services in the cluster.</p>|Dependent item|aws.ecs.service_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -1522,8 +1548,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS ECS Cluster by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about the metrics and used API methods:
@@ -1547,7 +1573,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS ECS metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1681,7 +1706,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
 
-For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Refer to the Macros section for a list of macros used for LLD filters.
 
@@ -1697,6 +1722,7 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ECS Cluster", e.g. {$HTTP.TLS.VERIFY:"AWS ECS Cluster"}.</p>|`full`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1716,8 +1742,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 |Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Data collection check.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Data collection check.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ECS metrics check|<p>Checks whether ECS metric data was retrieved correctly.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Container Instance Count|<p>The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.</p>|Dependent item|aws.ecs.container_instance_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Task Count|<p>The number of tasks running in the cluster.</p>|Dependent item|aws.ecs.task_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Service Count|<p>The number of services in the cluster.</p>|Dependent item|aws.ecs.service_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -1970,6 +1996,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Application Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Application Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
@@ -1990,8 +2017,8 @@ See the section below for a list of macros used for LLD filters.
 |Get metrics data|<p>Get ELB Application Load Balancer metrics.</p><p>Full metrics list related to Application Load Balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html</p>|Script|aws.elb.alb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get target groups|<p>Get ELB target group.</p><p>`DescribeTargetGroups` API method: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html</p>|Script|aws.elb.alb.get_target_groups<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get ELB ALB alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.elb.alb.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Application Load Balancer metrics data has been received correctly.</p>|Dependent item|aws.elb.alb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.elb.alb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|ALB metrics check|<p>Checks whether ALB metric data was retrieved correctly.</p>|Dependent item|aws.elb.alb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.elb.alb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Active Connection Count|<p>The total number of active concurrent TCP connections from clients to the load balancer and from the load balancer to targets.</p>|Dependent item|aws.elb.alb.active_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |New Connection Count|<p>The total number of new TCP connections established from clients to the load balancer and from the load balancer to targets.</p>|Dependent item|aws.elb.alb.new_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Rejected Connection Count|<p>The number of connections that were rejected because the load balancer had reached its maximum number of connections.</p>|Dependent item|aws.elb.alb.rejected_connection_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2257,6 +2284,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>AWS Network Load Balancer region code.</p>|`us-west-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS ELB Network Load Balancer", e.g. {$HTTP.TLS.VERIFY:"AWS ELB Network Load Balancer"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
@@ -2276,8 +2304,8 @@ See the section below for a list of macros used for LLD filters.
 |Get metrics data|<p>Get ELB Network Load Balancer metrics.</p><p>Full metrics list related to Network Load Balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html</p>|Script|aws.elb.nlb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get target groups|<p>Get ELB target group.</p><p>`DescribeTargetGroups` API method: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html</p>|Script|aws.elb.nlb.get_target_groups<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get ELB NLB alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.elb.nlb.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Network Load Balancer metrics data has been received correctly.</p>|Dependent item|aws.elb.nlb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.elb.nlb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|NLB metrics check|<p>Checks whether NLB metric data was retrieved correctly.</p>|Dependent item|aws.elb.nlb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.elb.nlb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Active Flow Count|<p>The total number of concurrent flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ActiveFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Active Flow Count TCP|<p>The total number of concurrent TCP flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Active Flow Count TLS|<p>The total number of concurrent TLS flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p>|Dependent item|aws.elb.nlb.active_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2532,6 +2560,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Lambda", e.g. {$HTTP.TLS.VERIFY:"AWS Lambda"}.</p>|`full`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
 |{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
@@ -2547,8 +2576,8 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |Get metrics data|<p>Get Lambda function metrics.</p><p>Full metrics list related to the Lambda function: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html</p>|Script|aws.lambda.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get Lambda alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.lambda.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get metrics check|<p>Check that the Lambda function metrics data has been received correctly.</p>|Dependent item|aws.lambda.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.lambda.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Lambda metrics check|<p>Checks whether Lambda metric data was retrieved correctly.</p>|Dependent item|aws.lambda.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alarms check|<p>Checks whether the alarm data was retrieved correctly.</p>|Dependent item|aws.lambda.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Async events received sum|<p>The number of events that Lambda successfully queues for processing. This metric provides insight into the number of events that a Lambda function receives.</p>|Dependent item|aws.lambda.async_events_received.sum<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Async event age average|<p>The time between when Lambda successfully queues the event and when the function is invoked. The value of this metric increases when events are being retried due to invocation failures or throttling.</p>|Dependent item|aws.lambda.async_event_age.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "AsyncEventAge")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Async events dropped sum|<p>The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or an `OnFailure` destination, events are sent there before they're dropped.</p>|Dependent item|aws.lambda.async_events_dropped.sum<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -2588,14 +2617,258 @@ See the section below for a list of macros used for LLD filters.
 |AWS Lambda: [{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS Lambda by HTTP/aws.lambda.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS Lambda: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
+# AWS Backup Vault by HTTP
+
+## Overview
+
+This template uses AWS Backup API calls to list and retrieve metrics.
+For more information, please refer to the [AWS Backup API](https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
+
+Additional information about metrics and API methods used in the template:
+* [Metrics related to backup vaults](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
+* [Metrics related to backup jobs](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupJob.html)
+
+
+## Requirements
+
+Zabbix version: 7.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- AWS Backup Vault service
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+The template gets AWS Backup vault metrics and uses the script item to make HTTP requests to the AWS Backup API.
+
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
+
+### Required permissions
+Add the following required permissions to your Zabbix IAM policy in order to collect AWS backup vaults and jobs.
+
+```json
+{
+    "Version":"2012-10-17",
+    "Statement":[
+        {
+          "Action":[
+              "backup:ListBackupVaults",
+              "backup:ListBackupJobs",
+              "backup:ListCopyJobs",
+              "backup:ListRestoreJobs"
+          ],
+          "Effect":"Allow",
+          "Resource":"*"
+        }
+    ]
+  }
+```
+
+### Access Key Authorization
+
+If you are using access key authorization, you need to generate an access key and a secret key for an IAM user with the necessary permissions:
+
+1. Create an IAM user with programmatic access.
+2. Attach the required policy to the IAM user.
+3. Generate an access key and a secret key.
+4. Use the generated credentials in the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+### Assume Role authorization
+For using Assume Role authorization, add the appropriate permissions to the role you are using:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+#### Trust Relationships for Assume Role Authorization
+Next, add a principal to the trust relationships of the role you are using:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+Set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
+
+**Note**: If you set the `{$AWS.ASSUME.ROLE.AUTH.METADATA}` macro to `true` and set the macros `{$AWS.STS.REGION}` and `{$AWS.ASSUME.ROLE.ARN}`, the Zabbix server or proxy will attempt to retrieve the role credentials from the instance metadata service.
+This means that the Zabbix server or proxy must be running on an AWS EC2 instance with an IAM role assigned that has the necessary permissions.
+This approach is recommended when running Zabbix inside an AWS EC2 instance with an IAM role assigned, as it simplifies credential management.
+
+### Role-Based Authorization
+If you are using role-based authorization, set the appropriate permissions:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "backup:ListBackupVaults",
+                "backup:ListBackupJobs",
+                "backup:ListCopyJobs",
+                "backup:ListRestoreJobs"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+#### Trust Relationships for Role-Based Authorization
+Next, add a principal to the trust relationships of the role you are using:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "backup.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+
+**Note**: Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+
+Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.BACKUP_VAULT.NAME}`.
+
+For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+
+See the section below for a list of macros used for LLD filters.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AWS.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Backup Vault", e.g. {$HTTP.TLS.VERIFY:"AWS Backup Vault"}.</p>|`full`|
+|{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
+|{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
+|{$AWS.REGION}|<p>AWS backup vault region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.ASSUME.ROLE.AUTH.METADATA}|<p>Add when using the `assume_role` through instance metadata or environment authorization method. Possible values: `false`, `true`.</p>|`false`|
+|{$AWS.BACKUP_VAULT.NAME}|<p>AWS backup vault name.</p>||
+|{$AWS.BACKUP_JOB.STATE.MATCHES}|<p>Filter of discoverable jobs by state.</p>|`.*`|
+|{$AWS.BACKUP_JOB.STATE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by state.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.RESOURCE_TYPE.MATCHES}|<p>Filter of discoverable jobs by resource type.</p>|`.*`|
+|{$AWS.BACKUP_JOB.RESOURCE_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by resource type.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.RESOURCE_NAME.MATCHES}|<p>Filter of discoverable jobs by resource name.</p>|`.*`|
+|{$AWS.BACKUP_JOB.RESOURCE_NAME.NOT_MATCHES}|<p>Filter to exclude discovered jobs by resource name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.BACKUP_JOB.PERIOD}|<p>The number of days over which to retrieve backup jobs.</p>|`7`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get jobs|<p>Get a list of jobs in the vault.</p>|Script|aws.backup_vault.job.get|
+|Get data|<p>Retrieve AWS backup vault metrics.</p><p>More information here: https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html</p>|Script|aws.backup_vault.data.get|
+|Recovery points|<p>The total number of recovery points in the backup vault.</p>|Dependent item|aws.backup_vault.recovery_points<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NumberOfRecoveryPoints`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Age|<p>The age of the vault.</p>|Dependent item|aws.backup_vault.age<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CreationDate`</p></li><li><p>JavaScript: `return Date.now() / 1000 - value`</p></li></ul>|
+|Retention period, min|<p>The minimum retention period that the vault retains its recovery points.</p>|Dependent item|aws.backup_vault.retention.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MinRetentionDays`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `The vault does not have the minimum retention period set.`</p></li></ul>|
+|Retention period, max|<p>The maximum retention period that the vault retains its recovery points.</p>|Dependent item|aws.backup_vault.retention.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MaxRetentionDays`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `The vault does not have the maximum retention period set.`</p></li></ul>|
+|Lock status|<p>Indicates whether AWS Backup Vault Lock is applied to the selected backup vault. When the vault is locked, delete and update operations on recovery points in that vault are prevented.</p>|Dependent item|aws.backup_vault.lock.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Locked`</p></li><li><p>Replace: `false -> 0`</p></li><li><p>Replace: `true -> 1`</p></li></ul>|
+|Lock time remain|<p>The remaining time before AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.time_left<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Lock date|<p>The date and time when AWS Backup Vault Lock configuration becomes immutable, meaning it cannot be changed or deleted.</p>|Dependent item|aws.backup_vault.lock.date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LockDate`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Either the vault is not locked, or the lock date is not specified.`</p></li></ul>|
+|State|<p>The current state of the backup vault.</p><p>Possible values are:</p><p>- Unknown</p><p>- Creating</p><p>- Available</p><p>- Failed</p>|Dependent item|aws.backup_vault.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.VaultState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Jobs: Size, avg|<p>The average size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.avg()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, max|<p>The maximum size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.max()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Size, min|<p>The minimum size, in bytes, of a backup (recovery point).</p><p>This value can render differently depending on the resource type as AWS Backup pulls in data information from other AWS services. For example, the value returned may show a value of `0`, which may differ from the anticipated value.</p>|Dependent item|aws.backup_vault.job.size.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.job_size > 0)].job_size.min()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Backup|<p>The number of backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.backup.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "backup-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Restore|<p>The number of restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.restore.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "restore-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Copy|<p>The number of copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.copy.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_type == "copy-job")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Total|<p>The total number of jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.total.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed backup|<p>The number of failed backup jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.backup.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed restore|<p>The number of failed restore jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.restore.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs: Failed copy|<p>The number of failed copy jobs in the vault over the last `{$AWS.BACKUP_JOB.PERIOD}` day(s).</p>|Dependent item|aws.backup_vault.job.copy.failed.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS Backup vault: Restore job has appeared|<p>New restore job has appeared.</p>|`change(/AWS Backup Vault by HTTP/aws.backup_vault.job.restore.count)>0`|Average|**Manual close**: Yes|
+|AWS Backup vault: Copy job has appeared|<p>New copy job has appeared.</p>|`change(/AWS Backup Vault by HTTP/aws.backup_vault.job.copy.count)>0`|Warning|**Manual close**: Yes|
+
+### LLD rule AWS Backup job discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|AWS Backup job discovery|<p>AWS Backup job discovery.</p>|Dependent item|aws.backup_vault.job.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for AWS Backup job discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Job state [{#AWS.BACKUP_JOB.RESOURCE_NAME}][{#AWS.BACKUP_JOB.ID}]|<p>The state of the job.</p><p>Possible values are:</p><p>- Unknown</p><p>- Created</p><p>- Pending</p><p>- Running</p><p>- Aborting</p><p>- Aborted</p><p>- Completed</p><p>- Failed</p><p>- Expired</p><p>- Partial</p>|Dependent item|aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.job_id == "{#AWS.BACKUP_JOB.ID}")].job_state.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for AWS Backup job discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|AWS Backup vault: Job failed [{#AWS.BACKUP_JOB.ID}]|<p>Job has failed.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=7`|High|**Manual close**: Yes|
+|AWS Backup vault: Job has been aborted [{#AWS.BACKUP_JOB.ID}]|<p>Job has been aborted.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=5`|Average|**Manual close**: Yes|
+|AWS Backup vault: Job has expired [{#AWS.BACKUP_JOB.ID}]|<p>Job expired.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=8`|Warning|**Manual close**: Yes|
+|AWS Backup vault: Job is in an unknown state [{#AWS.BACKUP_JOB.ID}]|<p>Job is in unknown state.</p>|`last(/AWS Backup Vault by HTTP/aws.backup_vault.job.state["{#AWS.BACKUP_JOB.ID}"])=0`|Warning|**Manual close**: Yes|
+
 # AWS Cost Explorer by HTTP
 
 ## Overview
 
 The template to monitor AWS Cost Explorer by HTTP via Zabbix, which works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the Cost Explorer API calls to list and retrieve metrics.
+
+**Note:** This template uses the Cost Explorer API calls to list and retrieve metrics.
+
 For more information, please refer to the [Cost Explorer pricing](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/) page.
 
 
@@ -2761,6 +3034,7 @@ Additional information about metrics and used API methods:
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "AWS Cost Explorer", e.g. {$HTTP.TLS.VERIFY:"AWS Cost Explorer"}.</p>|`full`|
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ class testAuditlogIconMap extends testAuditlogCommon {
 	 * Existing Icon map ID.
 	 */
 	private const ICONMAPID = 1;
+
+	/**
+	 * Resource type Icon mapping
+	 */
+	const RESOURCE_TYPE = 32;
 
 	public function testAuditlogIconMap_Create() {
 		$create = $this->call('iconmap.create', [
@@ -55,7 +60,7 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			'iconmap.iconmapid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogIconMap_Update() {
@@ -87,11 +92,11 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconmappingid' => ['add', $icon_map['iconmappingid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ICONMAPID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::ICONMAPID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogIconMap_Delete() {
 		$this->call('iconmap.delete', [self::ICONMAPID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_icon_mapping', self::ICONMAPID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_icon_mapping', self::ICONMAPID, self::RESOURCE_TYPE);
 	}
 }

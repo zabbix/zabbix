@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -93,14 +93,14 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				(new CCheckBox(str_replace('.', '_', $first_rule_key), 1))
 					->setId($first_rule_key)
 					->setChecked(
-						array_key_exists($first_rule_key, $data['rules']['ui'])
-						&& $data['rules']['ui'][$first_rule_key]
+						array_key_exists($first_rule_key, $data['rules']['ui']) && $data['rules']['ui'][$first_rule_key]
 					)
 					->setReadonly($data['readonly'])
 					->setUncheckedValue(0)
 			)
 		]);
-	} else {
+	}
+	else {
 		$ui = [];
 		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 			$ui[] = [
@@ -320,7 +320,8 @@ $form_grid
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
 				'data' => $data['rules']['api'],
-				'readonly' => $data['readonly'] || !$data['rules']['api.access'],
+				'readonly' => $data['readonly'],
+				'disabled' => !$data['rules']['api.access'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,21 +21,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Queue details'))
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => [
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview')
-					->getUrl() => _('Queue overview'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview.proxy')
-					->getUrl() => _('Queue overview by proxy'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.details')
-					->getUrl() => _('Queue details')
-			]
-		]
-	])
+	->setTitleSubmenu(getAdministrationQueueSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_DETAILS));
 
 $table = (new CTableInfo())->setHeader([
@@ -53,15 +39,24 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 
 	$item = $data['items'][$itemid];
 	$host = reset($item['hosts']);
+	$item_host = $data['hosts'][$item['hostid']];
+
+	if (array_key_exists($item_host['proxyid'], $data['proxies'])) {
+		$proxy_name = $data['proxies'][$item_host['proxyid']]['name'];
+	}
+	elseif (array_key_exists($item_host['assigned_proxyid'], $data['proxies'])) {
+		$proxy_name = $data['proxies'][$item_host['assigned_proxyid']]['name'];
+	}
+	else {
+		$proxy_name = (new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY);
+	}
 
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item_queue_data['nextcheck']),
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])
-			? $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name']
-			: ''
+		$proxy_name
 	]);
 }
 

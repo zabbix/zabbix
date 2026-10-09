@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -225,8 +225,10 @@ static void	rm_session_close(zbx_rm_session_t *session)
 	zbx_free(session);
 }
 
-static void	rm_job_free(zbx_rm_job_t *job)
+static void	rm_job_free(void *ptr)
 {
+	zbx_rm_job_t	*job = (zbx_rm_job_t *)ptr;
+
 	if (NULL != job->client)
 		zbx_ipc_client_release(job->client);
 
@@ -243,7 +245,7 @@ static void	rm_job_free(zbx_rm_job_t *job)
 
 static void	rm_batch_clean(zbx_rm_batch_t *batch)
 {
-	zbx_vector_ptr_clear_ext(&batch->jobs, (zbx_ptr_free_func_t)rm_job_free);
+	zbx_vector_ptr_clear_ext(&batch->jobs, rm_job_free);
 	zbx_vector_ptr_destroy(&batch->jobs);
 	zbx_free(batch->info);
 }
@@ -327,6 +329,7 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
 
 		writer = (zbx_rm_writer_t *)manager->writers.values[manager->next_writer_index++];
 		writer->client = client;
+		zbx_ipc_client_addref(client);
 
 		zbx_queue_ptr_push(&manager->free_writers, writer);
 	}
@@ -386,7 +389,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(out_str);
 
 	return cookie;
@@ -534,8 +537,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH,
 						ZBX_TIME_UNIT_YEAR};
 
-	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&from_time)))
+	if (ARRSIZE(period2unit) <= period)
 		return FAIL;
+
+	tm = zbx_localtime(&from_time, NULL);
 
 	*to = *tm;
 	zbx_tm_round_down(to, period2unit[period]);
@@ -580,11 +585,9 @@ static char	*rm_get_report_name(const char *name, int report_time)
 		}
 	}
 
-	if (NULL == (tm = localtime(&rtime)))
-		name_full = zbx_dsprintf(NULL, "%s.pdf", name_esc);
-	else
-		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
-				tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+	tm = zbx_localtime(&rtime, NULL);
+	name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
+			tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
 
 	zbx_free(name_esc);
 
@@ -1121,7 +1124,7 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != params.values_num)
+	if (NULL != report && 0 != params.values_num)
 		rm_report_update_params(report, &params);
 
 	report_destroy_params(&params);
@@ -1194,7 +1197,7 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != users.values_num || 0 != users_excl.values_num)
+	if (NULL != report && (0 != users.values_num || 0 != users_excl.values_num))
 		rm_report_update_users(report, &users, &users_excl);
 
 	zbx_vector_uint64_destroy(&users_excl);
@@ -1258,7 +1261,7 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != usergroups.values_num)
+	if (NULL != report && 0 != usergroups.values_num)
 		rm_report_update_usergroups(report, &usergroups);
 
 	zbx_vector_recipient_destroy(&usergroups);
@@ -1383,8 +1386,10 @@ typedef struct
 }
 zbx_report_dst_t;
 
-static void	zbx_report_dst_free(zbx_report_dst_t *dst)
+static void	zbx_report_dst_free(void *ptr)
 {
+	zbx_report_dst_t	*dst= (zbx_report_dst_t *)ptr;
+
 	zbx_free(dst->recipient);
 	zbx_free(dst);
 }
@@ -1501,6 +1506,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
 				mediatypeids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by mediatypeid");
 
 		result = zbx_db_select("%s", sql);
 
@@ -1562,7 +1568,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 out:
 	zbx_free(sql);
 	zbx_free(data);
-	zbx_vector_ptr_clear_ext(&dsts, (zbx_ptr_free_func_t)zbx_report_dst_free);
+	zbx_vector_ptr_clear_ext(&dsts, zbx_report_dst_free);
 	zbx_vector_ptr_destroy(&dsts);
 	zbx_vector_uint64_destroy(&mediatypeids);
 
@@ -1863,7 +1869,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);

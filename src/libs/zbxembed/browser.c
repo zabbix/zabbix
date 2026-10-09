@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -132,7 +132,6 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
-
 	if (NULL == (wd = webdriver_create(env->browser_endpoint, env->config_source_ip, &error)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot create webdriver: %s", error);
@@ -150,6 +149,19 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
 		goto out;
+	}
+
+	if (0 < env->timeout)
+	{
+		int	timeout_ms = env->timeout * 1000;
+
+		if (SUCCEED != webdriver_set_timeouts(wd, timeout_ms, timeout_ms, -1, &error))
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot set webdriver timeouts: %s",
+					error);
+
+			goto out;
+		}
 	}
 
 	duk_push_c_function(ctx, es_browser_dtor, 1);
@@ -1383,12 +1395,12 @@ static int	es_browser_create_prototype(duk_context *ctx)
 	duk_push_c_function(ctx, es_browser_ctor, 1);
 	duk_push_object(ctx);
 
-	duk_put_function_list(ctx, -1, browser_methods);
+	es_put_function_list(ctx, -1, browser_methods);
 
 	if (1 != duk_put_prop_string(ctx, -2, "prototype"))
 		return FAIL;
 
-	duk_put_function_list(ctx, -1, browser_static_methods);
+	es_put_function_list(ctx, -1, browser_static_methods);
 
 	if (1 != duk_put_global_string(ctx, "Browser"))
 		return FAIL;
