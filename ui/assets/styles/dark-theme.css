@@ -4566,7 +4566,7 @@ output {
       overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 216px);
       max-width: inherit; }
       .overlay-dialogue.modal .overlay-dialogue-body form {
         padding: 2px 0; }
