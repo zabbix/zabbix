@@ -373,9 +373,7 @@ class CHistory extends CApiService {
 		}
 
 		// output
-		if ($options['output'] !== API_OUTPUT_EXTEND) {
-			$query['_source'] = $options['output'];
-		}
+		$query['_source'] = $options['output'];
 
 		// sorting
 		if ($options['sortfield']) {
