@@ -21,7 +21,6 @@
  * @param {number|null} item_type          Current item type.
  */
 function organizeInterfaces(interface_ids_by_types, item_interface_types, item_type) {
-	const use_inline_validation = window.item_edit_form && window.item_edit_form.form_element.isConnected;
 	const  INTERFACE_TYPE_OPT = -2,
 		$interface_select = $('#interface-select'),
 		interface_select_node = $interface_select.get(0);
@@ -31,8 +30,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	}
 
 	if ($('#visible_interfaceid').data('multipleInterfaceTypes') && !$('#visible_type').is(':checked')) {
-		// Inline validation ensures message.
-		!use_inline_validation && $('#interface_not_defined')
+		$('#interface_not_defined')
 			.html(t('To set a host interface select a single item type for all items'))
 			.show();
 		interface_select_node.disabled = true;
@@ -52,8 +50,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		interface_select_node.disabled = true;
 		$interface_select.hide();
 
-		// Inline validation ensures message.
-		!use_inline_validation && $('#interface_not_defined')
+		$('#interface_not_defined')
 			.html(t('No interface found'))
 			.show();
 	}
@@ -63,9 +60,8 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		interface_select_node.disabled = true;
 		$interface_select.hide();
 
-		// Inline validation ensures message.
-		!use_inline_validation && $('#interface_not_defined').
-			html(t('Item type does not use interface'))
+		$('#interface_not_defined')
+			.html(t('Item type does not use interface'))
 			.show();
 	}
 	// If any interface type allowed, enable all options.
@@ -73,8 +69,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		interface_select_node.disabled = false;
 		select_options.map(opt => opt.disabled = false);
 		$interface_select.show();
-		// Inline validation ensures message.
-		!use_inline_validation && $('#interface_not_defined').hide();
+		$('#interface_not_defined').hide();
 	}
 	// If none of required interfaces found.
 	else if (!available_interfaceids) {
@@ -87,8 +82,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 			typeof available_interfaceids === 'undefined' || !available_interfaceids.includes(option.value)
 		));
 		$interface_select.show();
-		// Inline validation ensures message.
-		!use_inline_validation && $('#interface_not_defined').hide();
+		$('#interface_not_defined').hide();
 	}
 
 	const allowed_opt_interface = (interface_type == INTERFACE_TYPE_OPT);

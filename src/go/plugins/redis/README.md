@@ -21,7 +21,10 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
-**Plugins.Redis.Timeout** — The maximum time for waiting when a request has to be done.  
+**Plugins.Redis.Timeout** — The maximum time for waiting when a request has to be done.
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
@@ -37,6 +40,10 @@ The Zabbix Agent's configuration file is used to configure plugins.
 
 **Plugins.Redis.Sessions.TLSKeyFile** — Full pathname of a file containing the Redis private key.  
 *Default value:*
+
+**Plugins.Redis.Sessions.ConnectionTimeout** — Full pathname of a file containing the Redis private key.  
+*Default value:* equals the global Timeout configuration parameter.
+*Limits:* 1-30
 
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
@@ -84,6 +91,7 @@ You should add the following options to the agent configuration file:
     Plugins.Redis.Sessions.Prod.TLSCAFile=/path/to/ca_file
     Plugins.Redis.Sessions.Prod.TLSCertFile=/path/to/cert_file
     Plugins.Redis.Sessions.Prod.TLSKeyFile=/path/to/key_file
+    Plugins.Redis.Sessions.Prod.ConnectionTimeout=10
 
     Plugins.Redis.Sessions.Test.Uri=tcp://192.168.0.1:6379   
     Plugins.Redis.Sessions.Test.Password=<PasswordForTest>  
@@ -92,6 +100,7 @@ You should add the following options to the agent configuration file:
     Plugins.Redis.Sessions.Test.TLSCAFile=/path/to/test/ca_file
     Plugins.Redis.Sessions.Test.TLSCertFile=/path/to/test/cert_file
     Plugins.Redis.Sessions.Test.TLSKeyFile=/path/to/test/key_file
+    Plugins.Redis.Sessions.Test.ConnectionTimeout=10
 
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 

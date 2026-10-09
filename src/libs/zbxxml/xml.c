@@ -39,59 +39,6 @@ struct _zbx_xml_node_t
 
 ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *)
 
-static char	data_static[ZBX_MAX_B64_LEN];
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get DATA from <tag>DATA</tag>                                     *
- *                                                                            *
- * !!! Attention: static !!! Not thread-safe                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data)
-{
-	size_t		len, sz;
-	const char	*start, *end;
-
-	sz = sizeof(data_static);
-
-	len = zbx_snprintf(data_static, sz, "<%s>", tag);
-	if (NULL == (start = strstr(xml, data_static)))
-		return FAIL;
-
-	zbx_snprintf(data_static, sz, "</%s>", tag);
-	if (NULL == (end = strstr(xml, data_static)))
-		return FAIL;
-
-	if (end < start)
-		return FAIL;
-
-	start += len;
-	len = end - start;
-
-	if (len > sz - 1)
-		*data = (char *)zbx_malloc(*data, len + 1);
-	else
-		*data = data_static;
-
-	zbx_strlcpy(*data, start, len + 1);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * !!! Attention: static !!! Not thread-safe                                  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_xml_free_data_dyn(char **data)
-{
-	if (*data == data_static)
-		*data = NULL;
-	else
-		zbx_free(*data);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: replace <> symbols in string with &lt;&gt; so the resulting       *
@@ -251,24 +198,154 @@ void zbx_xml_escape_xpath(char **data)
 	*data = buffer;
 }
 
-static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
+#ifdef HAVE_LIBXML2
+static int	xpath_query_result_is_empty(xmlXPathObject *xpathObj)
 {
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(params);
-	ZBX_UNUSED(is_empty);
-	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+	return XPATH_NODESET == xpathObj->type && 0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval) ? SUCCEED : FAIL;
+}
 
-	return FAIL;
-#else
-	int		ret = FAIL;
+static int	format_xpath_obj_primitive(xmlXPathObject *xpathObj, zbx_variant_t *out, char **errmsg)
+{
 	char		buffer[32], *ptr;
+
+	switch (xpathObj->type)
+	{
+		case XPATH_STRING:
+			zbx_variant_set_str(out, zbx_strdup(NULL, (const char *)xpathObj->stringval));
+			return SUCCEED;
+		case XPATH_BOOLEAN:
+			zbx_variant_set_str(out, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
+			return SUCCEED;
+		case XPATH_NUMBER:
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
+
+			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90 */
+			/* so simply check the result starts with digit (accounting for -inf) */
+			if ('-' == *(ptr = buffer))
+				ptr++;
+
+			if (0 == isdigit(*ptr))
+			{
+				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
+				return FAIL;
+			}
+
+			zbx_del_zeros(buffer);
+			zbx_variant_set_str(out, zbx_strdup(NULL, buffer));
+			return SUCCEED;
+		case XPATH_NODESET:
+			*errmsg = zbx_dsprintf(*errmsg, "Invalid XPath primitive object type %d", (int)xpathObj->type);
+			return FAIL;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "Unknown XPath object type %d", (int)xpathObj->type);
+			return FAIL;
+	}
+}
+
+typedef int	(*xpath_format_query_result_func_t)(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg);
+
+static int	format_xpath_query_result_default(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg)
+{
+	xmlBufferPtr	xmlBufferLocal;
+
+	if (XPATH_NODESET != xpathObj->type)
+		return format_xpath_obj_primitive(xpathObj, out, errmsg);
+
+	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "Failed to create buffer");
+		return FAIL;
+	}
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		xmlNodeSetPtr	nodeset = xpathObj->nodesetval;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+	}
+
+	zbx_variant_set_str(out, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+
+	xmlBufferFree(xmlBufferLocal);
+	return SUCCEED;
+}
+
+static int	format_xpath_query_result_vector(xmlXPathObject *xpathObj, xmlDoc *doc, zbx_variant_t *out,
+		char **errmsg)
+{
+	int			ret = FAIL;
+	zbx_vector_var_t	*matches;
+	xmlBufferPtr		xmlBufferLocal;
+
+	matches = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+	zbx_vector_var_create(matches);
+
+	if (XPATH_NODESET != xpathObj->type)
+	{
+		zbx_variant_t	v;
+
+		zbx_variant_set_none(&v);
+
+		if (SUCCEED != (ret = format_xpath_obj_primitive(xpathObj, &v, errmsg)))
+			goto out;
+
+		zbx_vector_var_append(matches, v);
+
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "Failed to create buffer");
+		goto out;
+	}
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		xmlNodeSetPtr	nodeset = xpathObj->nodesetval;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+		{
+			zbx_variant_t	v;
+
+			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+			zbx_variant_set_str(&v, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+			xmlBufferEmpty(xmlBufferLocal);
+
+			zbx_vector_var_append(matches, v);
+		}
+	}
+
+	xmlBufferFree(xmlBufferLocal);
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+	{
+		zbx_variant_set_vector(out, matches);
+	}
+	else
+	{
+		zbx_vector_var_clear_ext(matches);
+		zbx_vector_var_destroy(matches);
+		zbx_free(matches);
+	}
+
+	return ret;
+}
+
+static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty,
+		xpath_format_query_result_func_t query_result_format_func, char **errmsg)
+{
+	int		ret = FAIL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
 	const xmlError	*pErr;
-	xmlBufferPtr	xmlBufferLocal;
 	zbx_fs_size_t	len = strlen(value->data.str);
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, len, "noname.xml", NULL, XML_PARSE_NOERROR)))
@@ -305,97 +382,26 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 		goto out;
 	}
 
-	/* set is_empty before switch because of different possible XPATH types */
 	if (NULL != is_empty)
-		*is_empty = FAIL;
+		*is_empty = xpath_query_result_is_empty(xpathObj);
 
-	switch (xpathObj->type)
-	{
-		case XPATH_NODESET:
-			if (NULL == (xmlBufferLocal = xmlBufferCreate()))
-				break;
-
-			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-			{
-				nodeset = xpathObj->nodesetval;
-
-				if (0 == nodeset->nodeNr && NULL != is_empty)
-					*is_empty = SUCCEED;
-
-				for (int i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
-			}
-			else if (NULL != is_empty)
-				*is_empty = SUCCEED;
-
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
-
-			xmlBufferFree(xmlBufferLocal);
-			ret = SUCCEED;
-			break;
-		case XPATH_STRING:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xpathObj->stringval));
-			ret = SUCCEED;
-			break;
-		case XPATH_BOOLEAN:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
-			ret = SUCCEED;
-			break;
-		case XPATH_NUMBER:
-			zbx_variant_clear(value);
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
-
-			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90 */
-			/* so simply check the result starts with digit (accounting for -inf) */
-			if ('-' == *(ptr = buffer))
-				ptr++;
-			if (0 != isdigit(*ptr))
-			{
-				zbx_del_zeros(buffer);
-				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
-				ret = SUCCEED;
-			}
-			else
-				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
-			break;
-		default:
-			*errmsg = zbx_dsprintf(*errmsg, "Unknown XPath object type %d", (int)xpathObj->type);
-			break;
-	}
+	zbx_variant_clear(value);
+	ret = query_result_format_func(xpathObj, doc, value, errmsg);
 out:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 
 	return ret;
-#endif
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: execute xpath query                                               *
- *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message                                   *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	return query_xpath(value, params, NULL, errmsg);
-}
+#endif /* HAVE_LIBXML2 */
 
 /******************************************************************************
  *                                                                            *
  * Purpose: execute xpath query and return the contents of the result         *
  *                                                                            *
- * Parameters: value    - [IN/OUT] the value to process                       *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
  *             params   - [IN] the operation parameters                       *
  *             is_empty - [OUT] whether the xpath returned empty nodeset      *
  *             errmsg   - [OUT] error message                                 *
@@ -406,7 +412,61 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
  ******************************************************************************/
 int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
 {
-	return query_xpath(value, params, is_empty, errmsg);
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	ZBX_UNUSED(is_empty);
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+
+	return FAIL;
+#else
+	return query_xpath(value, params, is_empty, format_xpath_query_result_default, errmsg);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	return zbx_query_xpath_contents(value, params, NULL, errmsg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query and return the contents of the result as      *
+ *          a vector                                                          *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process, may be modified even   *
+ *                      if return value is FAIL                               *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath_vector(zbx_variant_t *value, const char *params, char **errmsg)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+
+	return FAIL;
+#else
+	return query_xpath(value, params, NULL, format_xpath_query_result_vector, errmsg);
+#endif
 }
 
 #ifdef HAVE_LIBXML2
@@ -848,23 +908,34 @@ int	zbx_xmlnode_to_json(void *xml_node, char **jstr)
  * Parameters: jp             - [IN] JSON parse structure                     *
  *             arr_name       - [IN] name of parent array                     *
  *             deep           - [IN] node depth level                         *
+ *             buffersize     - [IN] size of node buffer                      *
+ *             nodevalue      - [IN/OUT] node value buffer                    *
  *             doc            - [IN/OUT] xml document structure               *
  *             parent_node    - [IN/OUT] parent XML node                      *
  *             attr           - [OUT] node attribute name                     *
  *             attr_val       - [OUT] node attribute value                    *
  *             text           - [OUT] node content                            *
  *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
  ******************************************************************************/
-static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, xmlDoc *doc, xmlNode *parent_node,
-		char **attr, char **attr_val, char **text)
+static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, size_t buffersize, char *nodevalue,
+		xmlDoc *doc, xmlNode *parent_node, char **attr, char **attr_val, char **text)
 {
 	const char		*json_string_ptr = NULL, *json_string_ptr_old = NULL;
-	char			*array_loc, *pname, name[MAX_STRING_LEN], value[MAX_STRING_LEN], *attr_loc = NULL,
-			*attr_val_loc = NULL, *text_loc = NULL, *pvalue = NULL;
-	int			set_attr, set_text, idx = 0;
+	char			*array_loc, *pname, *attr_loc = NULL,
+				*attr_val_loc = NULL, *text_loc = NULL, *value = NULL, *name = NULL;
+	int			set_attr, set_text, idx = 0, ret = SUCCEED;
 	zbx_json_type_t		type;
 	xmlNode			*node;
 	struct zbx_json_parse	jp_data;
+
+	if (ZBX_MAX_JSON_DEPTH < deep)
+		return FAIL;
+
+	name = zbx_malloc(NULL, buffersize);
+	name[0] = '\0';
 
 	do
 	{
@@ -873,14 +944,14 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		array_loc = NULL;
 		pname = NULL;
 
-		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, sizeof(name))))
+		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, buffersize)))
 		{
 			pname = name;
 
-			if (NULL == zbx_json_decodevalue(json_string_ptr, value, sizeof(value), &type))
+			if (NULL == zbx_json_decodevalue(json_string_ptr, nodevalue, buffersize, &type))
 				type = zbx_json_valuetype(json_string_ptr);
 			else
-				pvalue = zbx_xml_escape_dyn(value);
+				value = zbx_xml_escape_dyn(nodevalue);
 			if ('@' == name[0])
 				set_attr = 1;
 			else if (0 == strcmp(name, XML_TEXT_TAG))
@@ -889,10 +960,11 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		else
 		{
 			json_string_ptr = json_string_ptr_old;
-			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr, value, sizeof(value),
-					&type)))
+
+			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr,
+					nodevalue, buffersize, &type)))
 			{
-				pvalue = zbx_xml_escape_dyn(value);
+				value = zbx_xml_escape_dyn(nodevalue);
 			}
 			else
 			{
@@ -906,12 +978,12 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		if (0 != set_attr)
 		{
 			*attr = zbx_strdup(*attr, &name[1]);
-			if (NULL != pvalue)
-				*attr_val = zbx_strdup(*attr_val, pvalue);
+			if (NULL != value)
+				*attr_val = zbx_strdup(*attr_val, value);
 		}
-		else if (0 != set_text && NULL != pvalue)
+		else if (0 != set_text && NULL != value)
 		{
-			*text = zbx_strdup(*text, pvalue);
+			*text = zbx_strdup(*text, value);
 		}
 		else if (NULL != json_string_ptr)
 		{
@@ -923,7 +995,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 
 			if (ZBX_JSON_TYPE_ARRAY == type)
 			{
-				array_loc = name;
+				array_loc = ('\0' != name[0]) ? name : arr_name;
 				node = parent_node;
 			}
 			else if (ZBX_JSON_TYPE_OBJECT == type || ZBX_JSON_TYPE_UNKNOWN == type)
@@ -931,7 +1003,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 				node = xmlNewDocNode(doc, NULL, (xmlChar *)pname, NULL);
 			}
 			else
-				node = xmlNewDocNode(doc, NULL, (xmlChar *)pname, (xmlChar *)pvalue);
+				node = xmlNewDocNode(doc, NULL, (xmlChar *)pname, (xmlChar *)value);
 
 			if (0 == deep)
 			{
@@ -948,8 +1020,16 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 
 			if (SUCCEED == zbx_json_brackets_open(json_string_ptr, &jp_data))
 			{
-				json_to_xmlnode(&jp_data, array_loc, deep + 1, doc, node, &attr_loc, &attr_val_loc,
-						&text_loc);
+				if (SUCCEED != json_to_xmlnode(&jp_data, array_loc, deep + 1, buffersize, nodevalue,
+						doc, node, &attr_loc, &attr_val_loc, &text_loc))
+				{
+					ret = FAIL;
+					zbx_free(attr_loc);
+					zbx_free(attr_val_loc);
+					zbx_free(text_loc);
+
+					break;
+				}
 			}
 		}
 
@@ -961,12 +1041,15 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		zbx_free(attr_loc);
 		zbx_free(attr_val_loc);
 		zbx_free(text_loc);
-		zbx_free(pvalue);
+		zbx_free(value);
 		idx++;
 	}
 	while (NULL != json_string_ptr);
 
-	zbx_free(pvalue);
+	zbx_free(value);
+	zbx_free(name);
+
+	return ret;
 }
 #endif /* HAVE_LIBXML2 */
 
@@ -996,6 +1079,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	xmlDoc			*doc = NULL;
 	const xmlError		*pErr;
 	xmlChar			*xmem;
+	char			json_value[MAX_STRING_LEN] = {0};
 
 	if (NULL == (doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION)))
 	{
@@ -1012,13 +1096,14 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 		goto clean;
 	}
 
-	json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text);
+	if (SUCCEED != json_to_xmlnode(&jp, NULL, 0, sizeof(json_value), json_value, doc, NULL,
+			&attr, &attr_val, &text))
+	{
+		*errmsg = zbx_strdup(*errmsg, "convert to xml node failed");
+		goto clean;
+	}
 
 	xmlDocDumpMemory(doc, &xmem, &size);
-
-	zbx_free(text);
-	zbx_free(attr_val);
-	zbx_free(attr);
 
 	if (FAIL == zbx_check_xml_memory((char *)xmem, -1, errmsg))
 		goto clean;
@@ -1028,6 +1113,9 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	xmlFree(xmem);
 	ret = SUCCEED;
 clean:
+	zbx_free(text);
+	zbx_free(attr_val);
+	zbx_free(attr);
 	xmlFreeDoc(doc);
 exit:
 	return ret;

@@ -148,7 +148,7 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
-	zbx_dc_proxy_t		proxy;
+	zbx_dc_proxy_t		proxy = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -189,10 +189,10 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 	{
 		if (SUCCEED != (ret = zbx_process_proxy_data(rtc, &proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE,
 				events_cbs, proxydata_frequency, zbx_discovery_update_host_server,
-				zbx_discovery_update_service_server, zbx_discovery_update_service_down_server,
-				zbx_discovery_find_host_server, zbx_discovery_update_drule_server,
-				zbx_autoreg_host_free_server, zbx_autoreg_flush_hosts_server,
-				zbx_autoreg_prepare_host_server, NULL, &error)))
+				zbx_discovery_update_hosts_server, zbx_discovery_update_service_server,
+				zbx_discovery_update_service_down_server, zbx_discovery_find_host_server,
+				zbx_discovery_update_drule_server, zbx_autoreg_host_free_server,
+				zbx_autoreg_flush_hosts_server, zbx_autoreg_prepare_host_server, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.name, sock->peer, error);
@@ -237,6 +237,8 @@ out:
 
 	zbx_free(error);
 	zbx_free(version_str);
+
+	zbx_dc_proxy_clear(&proxy);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }

@@ -296,8 +296,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'itemids' => $itemids,
 				'time_from' => $time_from,
 				'time_till' => $time_to,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
 			]);
 

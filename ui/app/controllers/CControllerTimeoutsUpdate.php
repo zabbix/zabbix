@@ -22,7 +22,7 @@ class CControllerTimeoutsUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		return ['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'timeout_zabbix_agent' => ['setting timeout_zabbix_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
@@ -53,6 +53,9 @@ class CControllerTimeoutsUpdate extends CController {
 			'timeout_browser' => ['setting timeout_browser', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
+			'timeout_telemetry_query' => ['setting timeout_telemetry_query', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
+			],
 			'socket_timeout' => ['setting socket_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			],
@@ -72,6 +75,14 @@ class CControllerTimeoutsUpdate extends CController {
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			]
 		]];
+
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
+			$rules['fields']['device_link_timeout'] = ['setting device_link_timeout', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
+			];
+		}
+
+		return $rules;
 	}
 
 	protected function checkInput(): bool {

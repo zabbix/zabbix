@@ -32,9 +32,15 @@ function zbx_is_callable(array $names) {
 }
 
 /************ REQUEST ************/
-function redirect($url) {
-	$curl = (new CUrl($url))->removeArgument(CSRF_TOKEN_NAME);
-	header('Location: '.$curl->getUrl());
+
+function redirect(string $url): void {
+	header('Content-Type: text/html; charset=UTF-8');
+	header('Location: '.
+		(new CUrl($url))
+			->removeArgument(CSRF_TOKEN_NAME)
+			->getUrl()
+	);
+
 	exit;
 }
 
@@ -502,65 +508,72 @@ function convertUnitsS($value, array $options = []) {
  * The following units will be used: weeks, days, hours, minutes and seconds.
  * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
  *
- * @param int $value  Time period in seconds.
+ * @param float $value    Time period in seconds.
+ * @param array $options
+ *        bool  $options['combine_last_subsecond_parts']  (optional) Whether to combine last subsecond parts together.
+ *                                                        e.g. 1ms 400μs -> 1.4ms,, 1μs 400ns -> 1.4μs, etc.
  *
  * @return string
  */
-function convertSecondsToTimeUnits(int $value): string {
-	$parts = [];
-	$start = null;
-
-	if (($v = floor($value / SEC_PER_WEEK)) > 0) {
-		$parts['weeks'] = $v;
-		$value -= $v * SEC_PER_WEEK;
-		$start = 0;
+function convertSecondsToTimeUnits(float $value, array $options = []): string {
+	if ($value <= 0) {
+		return '0';
 	}
 
-	$level = 1;
-
-	foreach ([
-		'days' => SEC_PER_DAY,
-		'hours' => SEC_PER_HOUR,
-		'minutes' => SEC_PER_MIN
-	] as $part => $sec_per_part) {
-		$v = floor($value / $sec_per_part);
-
-		if ($v > 0) {
-			$parts[$part] = $v;
-			$value -= $v * $sec_per_part;
-			$start = $start === null ? $level : $start;
-		}
-
-		if ($start !== null && $level - $start >= 2) {
-			break;
-		}
-
-		$level++;
-	}
-
-	if ($start === null || $start >= 2) {
-		$v = $value + round(fmod($value, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
-
-		if ($v > 0) {
-			$parts['seconds'] = $v;
-		}
-	}
-
-	$units = [
-		'weeks' => _x('w', 'week short'),
-		'days' => _x('d', 'day short'),
-		'hours' => _x('h', 'hour short'),
-		'minutes' => _x('m', 'minute short'),
-		'seconds' => _x('s', 'second short')
+	$options += [
+		'combine_last_subsecond_parts' => false
 	];
 
-	$result = [];
+	$time_units = [
+		'weeks'        => SEC_PER_WEEK,
+		'days'         => SEC_PER_DAY,
+		'hours'        => SEC_PER_HOUR,
+		'minutes'      => SEC_PER_MIN,
+		'seconds'      => 1,
+		'milliseconds' => SEC_PER_MILLISEC,
+		'microseconds' => SEC_PER_MICROSEC,
+		'nanoseconds'  => SEC_PER_NANOSEC
+	];
 
-	foreach ($parts as $part_unit => $part_value) {
-		$result[] = $part_value.$units[$part_unit];
+	$unit_labels = [
+		'weeks'        => _x('w', 'week short'),
+		'days'         => _x('d', 'day short'),
+		'hours'        => _x('h', 'hour short'),
+		'minutes'      => _x('m', 'minute short'),
+		'seconds'      => _x('s', 'second short'),
+		'milliseconds' => _x('ms', 'millisecond short'),
+		'microseconds' => _x('μs', 'microsecond short'),
+		'nanoseconds'  => _x('ns', 'nanosecond short')
+	];
+
+	$parts = [];
+
+	foreach ($time_units as $unit => $sec_per_unit) {
+		$value = round($value, 9);
+
+		if ($value < $sec_per_unit && empty($parts)) {
+			continue;
+		}
+
+		if ($options['combine_last_subsecond_parts'] && $sec_per_unit < SEC_PER_MILLISEC && $value > 0) {
+			if ($value >= $sec_per_unit || $unit === 'nanoseconds') {
+				$v = round($value / $sec_per_unit, ZBX_UNITS_ROUNDOFF_SUFFIXED);
+				if ($v > 0) {
+					$parts[] = $v . $unit_labels[$unit];
+				}
+				break;
+			}
+			continue;
+		}
+
+		$v = floor(round($value / $sec_per_unit, 9));
+		if ($v > 0) {
+			$parts[] = $v . $unit_labels[$unit];
+			$value -= $v * $sec_per_unit;
+		}
 	}
 
-	return $result ? implode(' ', $result) : '0';
+	return $parts ? implode(' ', $parts) : '0';
 }
 
 /**
@@ -761,10 +774,10 @@ function convertUnitsRaw(array $options): array {
  * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
  *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false): int|float|null {
+function timeUnitToSeconds(string $time, bool $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
-	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
+	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>('.$suffixes.'))?$/', $time, $matches)) {
 		return null;
 	}
 
@@ -1509,7 +1522,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
 		if (detect_page_type() == PAGE_TYPE_JS) {
-			echo (new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
+			echo (new CView(ZBX_LAYOUT_JSON, ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
 		}
 		else {
 			echo (new CView('general.warning', $data))->getOutput();
@@ -1601,7 +1614,7 @@ function makeMessageBox(string $class, array $messages, mixed $title = null, boo
 			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-				->setTitle(_('Close'))
+				->setAttribute('aria-label', _('Close notification'))
 		);
 	}
 
@@ -1793,9 +1806,9 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
  * @param array $options['with_session_messages']  Include messages passed by the previous request.
  * @param array $options['with_current_messages']  Include messages generated by the current request.
  *
- * @return string|null  One or several HTML message boxes.
+ * @return array  One or several HTML message boxes.
  */
-function get_prepared_messages(array $options = []): ?string {
+function get_prepared_messages(array $options = []): array {
 	global $ZBX_MESSAGES_PREPARED;
 
 	if (!is_array($ZBX_MESSAGES_PREPARED)) {
@@ -1873,11 +1886,11 @@ function get_prepared_messages(array $options = []): ?string {
 
 	// Create message boxes for all requested messages types in the correct order.
 
-	$html = '';
+	$output = [];
+
 	foreach (array_merge($messages_authentication, $messages_session, $messages_current) as $box) {
-		$html .= makeMessageBox($box['class'], $box['messages'], $box['title'], $box['show_close_box'],
-			$box['show_details']
-		)->toString();
+		$output[] =makeMessageBox($box['class'], $box['messages'], $box['title'], $box['show_close_box'],
+			$box['show_details']);
 	}
 
 	foreach ($restore_messages as $message) {
@@ -1886,7 +1899,7 @@ function get_prepared_messages(array $options = []): ?string {
 
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;
 
-	return ($html === '') ? null : $html;
+	return $output;
 }
 
 function show_error_message(string $msg): void {
@@ -1962,6 +1975,17 @@ function parse_period($str) {
 			];
 		}
 	}
+
+	foreach ($out as &$periods) {
+		usort($periods, static function(array $p1, array $p2): int {
+			if ($p1['start_h'] == $p2['start_h']) {
+				return $p1['start_m'] <=> $p2['start_m'];
+			}
+
+			return $p1['start_h'] <=> $p2['start_h'];
+		});
+	}
+	unset($periods);
 
 	return $out;
 }
@@ -2461,6 +2485,66 @@ function generateUuidV4($seed = '') {
 	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
 	return bin2hex($data);
+}
+
+function generateUuidV7(): string {
+	static $last_timestamp = 0;
+	static $random_part = null;
+
+	// Use 48 bits of Unix timestamp.
+	$current_timestamp = (int) floor(microtime(true) * 1000);
+
+	if ($current_timestamp < $last_timestamp) {
+		$current_timestamp = $last_timestamp;
+	}
+
+	// Millisecond changed since last function call or not called before.
+	if ($current_timestamp > $last_timestamp) {
+		$random_part = random_bytes(10);
+
+		$last_timestamp = $current_timestamp;
+	}
+	else {
+		// Increment random part.
+		for ($i = 9; $i >= 0; $i--) {
+			$value = ord($random_part[$i]);
+
+			if ($value < 255) {
+				$random_part[$i] = chr($value + 1);
+
+				break;
+			}
+
+			$random_part[$i] = chr(0);
+		}
+	}
+
+	// 32 bit leftmost bits.
+	$left_time_part = ($current_timestamp >> 16) & 0xffffffff;
+
+	// 16 bit rightmost bits.
+	$right_time_part = $current_timestamp & 0xffff;
+
+	// 6 bytes time part.
+	$time_part = pack('Nn', $left_time_part, $right_time_part);
+
+	$data = $time_part.$random_part;
+
+	// Set version: 7th byte to 0111 (0111xxxx).
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x70);
+
+	// Set variant: 9th byte to 10 (10xxxxxx).
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+	$hex_data = bin2hex($data);
+
+	return implode('-', [
+		substr($hex_data, 0, 8),
+		substr($hex_data, 8, 4),
+		substr($hex_data, 12, 4),
+		substr($hex_data, 16, 4),
+		substr($hex_data, 20, 12)
+	]);
 }
 
 /**

@@ -103,7 +103,7 @@ div.dashboard-widget-navtree {
 						margin-right: 10px;
 
 						.problem-icon-list-item {
-							border-radius: 2px;
+							border-radius: var(--badge-border-radius);
 						}
 					}
 

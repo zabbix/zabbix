@@ -112,7 +112,7 @@ function getGraphDims($graphid = null) {
 		$graphDims['shiftXright'] = 85;
 	}
 
-	$graphDims['graphHeight']++;
+	$graphDims['graphHeight'] = min($graphDims['graphHeight'] + 1, 65535);
 
 	return $graphDims;
 }
@@ -535,99 +535,50 @@ function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 }
 
 function find_period_start($periods, $time) {
-	$date = getdate($time);
-	$wday = $date['wday'] == 0 ? 7 : $date['wday'];
-	$curr = $date['hours'] * 100 + $date['minutes'];
+	$date = new DateTime('@'.$time);
+	$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
 
-	if (isset($periods[$wday])) {
-		$next_h = -1;
-		$next_m = -1;
-		foreach ($periods[$wday] as $period) {
-			$per_start = $period['start_h'] * 100 + $period['start_m'];
-			if ($per_start > $curr) {
-				if (($next_h == -1 && $next_m == -1) || ($per_start < ($next_h * 100 + $next_m))) {
-					$next_h = $period['start_h'];
-					$next_m = $period['start_m'];
+	for ($d = 0; $d < 8; $d++) {
+		$wday = $date->format('N');
+
+		if (array_key_exists($wday, $periods)) {
+			foreach ($periods[$wday] as $period) {
+				$current_timestamp = $date->getTimestamp();
+
+				$date->setTime($period['end_h'], $period['end_m'], 0);
+				$per_end = $date->getTimestamp();
+
+				if ($per_end <= $time) {
+					continue;
 				}
-				continue;
-			}
 
-			$per_end = $period['end_h'] * 100 + $period['end_m'];
-			if ($per_end <= $curr) {
-				continue;
+				$date->setTimestamp($current_timestamp);
+				$date->setTime($period['start_h'], $period['start_m'], 0);
+				$per_start = $date->getTimestamp();
+
+				return $per_start < $time ? $time : $per_start;
 			}
-			return $time;
 		}
 
-		if ($next_h >= 0 && $next_m >= 0) {
-			return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
-		}
+		$date->modify('+1 day');
 	}
 
-	for ($days = 1; $days < 7 ; ++$days) {
-		$new_wday = ($wday + $days - 1) % 7 + 1;
-		if (isset($periods[$new_wday ])) {
-			$next_h = -1;
-			$next_m = -1;
-
-			foreach ($periods[$new_wday] as $period) {
-				$per_start = $period['start_h'] * 100 + $period['start_m'];
-
-				if (($next_h == -1 && $next_m == -1) || ($per_start < ($next_h * 100 + $next_m))) {
-					$next_h = $period['start_h'];
-					$next_m = $period['start_m'];
-				}
-			}
-
-			if ($next_h >= 0 && $next_m >= 0) {
-				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'] + $days, $date['year']);
-			}
-		}
-	}
 	return -1;
 }
 
 function find_period_end($periods, $time, $max_time) {
-	$date = getdate($time);
-	$wday = $date['wday'] == 0 ? 7 : $date['wday'];
-	$curr = $date['hours'] * 100 + $date['minutes'];
+	$date = new DateTime('@'.$time);
+	$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
 
-	if (isset($periods[$wday])) {
-		$next_h = -1;
-		$next_m = -1;
+	$wday = $date->format('N');
 
+	if (array_key_exists($wday, $periods)) {
 		foreach ($periods[$wday] as $period) {
-			$per_start = $period['start_h'] * 100 + $period['start_m'];
-			$per_end = $period['end_h'] * 100 + $period['end_m'];
-			if ($per_start > $curr) {
-				continue;
-			}
-			if ($per_end < $curr) {
-				continue;
-			}
+			$date->setTime($period['end_h'], $period['end_m'], 0);
+			$per_end = $date->getTimestamp();
 
-			if (($next_h == -1 && $next_m == -1) || ($per_end > ($next_h * 100 + $next_m))) {
-				$next_h = $period['end_h'];
-				$next_m = $period['end_m'];
-			}
-		}
-
-		if ($next_h >= 0 && $next_m >= 0) {
-			$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
-
-			if ($new_time == $time) {
-				return $time;
-			}
-			if ($new_time > $max_time) {
-				return $max_time;
-			}
-
-			$next_time = find_period_end($periods, $new_time, $max_time);
-			if ($next_time < 0) {
-				return $new_time;
-			}
-			else {
-				return $next_time;
+			if ($per_end > $time) {
+				return $per_end > $max_time ? $max_time : $per_end;
 			}
 		}
 	}
@@ -1145,17 +1096,16 @@ function calculateLogarithmicGraphScaleExtremes(float $min, float $max, ?float $
  *
  * @param float  $min             Minimum extreme of the scale.
  * @param float  $max             Maximum extreme of the scale.
- * @param bool   $min_calculated  Is minimum extreme of the scale calculated?
- * @param bool   $max_calculated  Is maximum extreme of the scale calculated?
  * @param float  $interval        Scale interval.
  * @param string $units           Scale units.
  * @param int    $power           Scale power.
  * @param int    $precision_max   Maximum precision to use for the scale.
+ * @param bool   $unsigned        Modify negative scale values to positive.
  *
  * @return array
  */
-function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
-		string $units, int $power, int $precision_max): array {
+function calculateGraphScaleValues(float $min, float $max, float $interval, string $units, int $power,
+		int $precision_max, bool $unsigned): array {
 	$rows = [];
 
 	$clearance = 0.5;
@@ -1213,7 +1163,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 0,
 		'value' => convertUnits([
-			'value' => $min
+			'value' => $unsigned ? abs($min) : $min
 		] + $options)
 	];
 
@@ -1223,7 +1173,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
-				'value' => $value
+				'value' => $unsigned ? abs($value) : $value
 			] + $options)
 		];
 	}
@@ -1231,7 +1181,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 1,
 		'value' => convertUnits([
-			'value' => $max
+			'value' => $unsigned ? abs($max) : $max
 		] + $options)
 	];
 
@@ -1250,17 +1200,17 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
  * @param bool       $max_calculated     Is maximum extreme of the scale calculated?
  * @param int        $interval           Scale interval.
  * @param string     $units              Scale units.
- * @param bool       $is_binary          Is the scale binary (use 1024 base for units)?
  * @param int        $precision_max      Maximum precision to use for the scale.
  * @param float|null $lower_power_shift  Scale bottom positive power shift extreme.
  * @param float|null $upper_power_shift  Scale top positive power shift extreme.
+ * @param bool       $unsigned           Modify negative scale values to positive.
  *
  * @return array
  */
 function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float $max_negative_power,
 		?float $min_positive_power, ?float $max_positive_power, bool $has_zero, bool $min_calculated,
 		bool $max_calculated, int $interval, string $units, int $precision_max, ?float $lower_power_shift,
-		?float $upper_power_shift): array {
+		?float $upper_power_shift, bool $unsigned): array {
 	$rows = [];
 
 	$start_index = 0;
@@ -1275,9 +1225,15 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 		$min_position = -1 * ($max_negative_power - $min_negative_power);
 
 		if ($lower_power_shift > 0) {
+			$value = -10 ** $max_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => -1 * ($max_negative_power - $min_negative_power),
-				'value' => -10 ** $max_negative_power
+				'value' => $value
 			];
 
 			$start_index++;
@@ -1305,17 +1261,29 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 					break;
 				}
 
+				$value = -10 ** $log_value;
+
+				if ($unsigned) {
+					$value = abs($value);
+				}
+
 				$rows[] = [
 					'log_value' => -1 * ($log_value - $min_negative_power),
-					'value' => -10 ** $log_value
+					'value' => $value
 				];
 			}
 		}
 
 		if ($upper_power_shift > 0 && !$has_zero) {
+			$value = -10 ** $min_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => 1,
-				'value' => -10 ** $min_negative_power
+				'value' => $value
 			];
 		}
 	}

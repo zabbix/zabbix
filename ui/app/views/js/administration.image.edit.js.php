@@ -35,11 +35,8 @@
 		#initEvents() {
 			this.form_element.addEventListener('submit', (e) => this.submit(e));
 
-			const delete_btn = document.getElementById('delete');
-
-			if (delete_btn) {
-				delete_btn.addEventListener('click', () => this.delete());
-			}
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
+				?.addEventListener('click', () => this.#delete());
 		}
 
 		#ajaxExceptionHandler(exception) {
@@ -58,7 +55,7 @@
 
 		submit(e) {
 			e.preventDefault();
-			this.#setLoadingStatus(['add', 'update']);
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 			const fields = this.form.getAllValues();
 
@@ -109,9 +106,9 @@
 				});
 		}
 
-		delete() {
+		#delete() {
 			if (window.confirm('<?=_('Delete selected image?') ?>')) {
-				this.#setLoadingStatus(['delete']);
+				this.#setLoadingStatus('js-delete');
 				const fields = this.form.getAllValues();
 
 				const curl = new Curl('zabbix.php');
@@ -124,36 +121,27 @@
 			}
 		}
 
-		#setLoadingStatus(loading_ids) {
-			document.getElementById('imageFormList').classList.add('is-loading', 'is-loading-fadein');
-			[
-				document.getElementById('add'),
-				document.getElementById('update'),
-				document.getElementById('delete')
-			].forEach(button => {
-				if (button) {
-					button.setAttribute('disabled', true);
+		#setLoadingStatus(loading_btn_class) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-					if (loading_ids.includes(button.id)) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
+
+					if (button.classList.contains(loading_btn_class)) {
 						button.classList.add('is-loading');
 					}
-				}
-			});
+				});
 		}
 
 		#unsetLoadingStatus() {
-			[
-				document.getElementById('add'),
-				document.getElementById('update'),
-				document.getElementById('delete')
-			].forEach(button => {
-				if (button) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
 					button.classList.remove('is-loading');
-					button.removeAttribute('disabled');
-				}
-			});
+					button.disabled = false;
+				});
 
-			document.getElementById('imageFormList').classList.remove('is-loading', 'is-loading-fadein');
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 	};
 </script>

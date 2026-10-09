@@ -14,15 +14,19 @@
 
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"golang.zabbix.com/sdk/plugin"
+)
 
 const (
 	pingFailed = "0"
 	pingOk     = "1"
 )
 
-func keyPingHandler(client *http.Client, query string, _ ...string) (string, error) {
-	body, err := queryDockerAPI(client, query)
+func keyPingHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil || string(body) != "OK" {
 		return pingFailed, nil //nolint:nilerr // is intended behavior.
 	}

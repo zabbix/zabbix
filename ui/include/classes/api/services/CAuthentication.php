@@ -54,9 +54,9 @@ class CAuthentication extends CApiService {
 	 * required.
 	 */
 	public static function getPublic(): array {
-		global $ALLOW_HTTP_AUTH;
+		global $ZBX_FEATURE_FLAGS;
 
-		return ($ALLOW_HTTP_AUTH ? [] : ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
+		return ($ZBX_FEATURE_FLAGS['http_auth_enabled'] ? [] : ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
 			CApiSettingsHelper::getParameters([
 				'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 				'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive',	'saml_jit_status',
@@ -110,7 +110,7 @@ class CAuthentication extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateUpdate(array &$auth, ?array &$db_auth): void {
-		global $ALLOW_HTTP_AUTH;
+		global $ZBX_FEATURE_FLAGS;
 
 		$auth += CApiSettingsHelper::getParameters(['authentication_type']);
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -133,7 +133,7 @@ class CAuthentication extends CApiService {
 			'mfaid' =>						['type' => API_ID]
 		]];
 
-		if ($ALLOW_HTTP_AUTH) {
+		if ($ZBX_FEATURE_FLAGS['http_auth_enabled']) {
 			$api_input_rules['fields'] += [
 				'http_auth_enabled' =>		['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 				'http_login_form' =>		['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
@@ -255,7 +255,7 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	public static function getOutputFields(): array {
-		global $ALLOW_HTTP_AUTH;
+		global $ZBX_FEATURE_FLAGS;
 
 		$output_fields = ['authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
 			'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'disabled_usrgrpid',
@@ -264,6 +264,8 @@ class CAuthentication extends CApiService {
 
 		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];
 
-		return $ALLOW_HTTP_AUTH ? array_merge($output_fields, $http_output_fields) : $output_fields;
+		return $ZBX_FEATURE_FLAGS['http_auth_enabled']
+			? array_merge($output_fields, $http_output_fields)
+			: $output_fields;
 	}
 }

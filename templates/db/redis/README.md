@@ -12,7 +12,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Redis versions 3.0.6, 4.0.14, 5.0.6, 7.2.4
+- Redis versions 8.8
 
 ## Configuration
 
@@ -27,6 +27,25 @@ This template has been tested on:
 - Or, the default user ACL should have the `@admin`, `@slow`, `@dangerous`, `@fast` and `@connection` categories.
 
 - Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
+
+### Optional setup
+
+**Memory overhead triggers**
+
+The template includes three memory-related triggers, available from Redis 5.0 onward, each flagging a different source of memory overhead:
+fragmentation within the allocator (memory allocator fragmentation trigger), memory retained by the allocator but not actively used (allocator RSS ratio trigger),
+and process memory outside the allocator (RSS overhead ratio trigger).
+
+Each trigger combines a ratio threshold with a minimum bytes guard, controlled by user macros:
+
+`{$REDIS.MEM.ALLOC_FRAG_RATIO.MAX.WARN}` and `{$REDIS.MEM.ALLOC_FRAG_BYTES.MIN}`,
+
+`{$REDIS.MEM.ALLOC_RSS_RATIO.MAX.WARN}` and `{$REDIS.MEM.ALLOC_RSS_BYTES.MIN}`,
+
+`{$REDIS.MEM.RSS_OVERHEAD_RATIO.MAX.WARN}` and `{$REDIS.MEM.RSS_OVERHEAD_BYTES.MIN}`.
+
+The bytes guard exists to avoid false positives on small or freshly started instances.
+The values of these macros can be adjusted per host to tune sensitivity to your environment.
 
 ### Macros used
 
@@ -45,7 +64,12 @@ This template has been tested on:
 |{$REDIS.SLOWLOG.COUNT.MAX.WARN}|<p>Slowlog entry rate threshold that triggers a warning.</p>|`1`|
 |{$REDIS.CLIENTS.PRC.MAX.WARN}|<p>Threshold for the maximum percentage of connected Redis clients.</p>|`80`|
 |{$REDIS.MEM.PUSED.MAX.WARN}|<p>Maximum percentage of memory used by the Redis server.</p>|`90`|
-|{$REDIS.MEM.FRAG_RATIO.MAX.WARN}|<p>Threshold for the Redis server memory fragmentation ratio.</p>|`1.5`|
+|{$REDIS.MEM.ALLOC_FRAG_RATIO.MAX.WARN}|<p>Threshold for the Redis memory allocator fragmentation ratio.</p>|`1.5`|
+|{$REDIS.MEM.ALLOC_FRAG_BYTES.MIN}|<p>Minimum allocator fragmentation bytes required before the memory fragmentation trigger fires.</p>|`100M`|
+|{$REDIS.MEM.ALLOC_RSS_RATIO.MAX.WARN}|<p>Threshold for the Redis allocator RSS ratio.</p>|`1.5`|
+|{$REDIS.MEM.ALLOC_RSS_BYTES.MIN}|<p>Minimum allocator RSS bytes required before the allocator RSS ratio trigger fires.</p>|`100M`|
+|{$REDIS.MEM.RSS_OVERHEAD_RATIO.MAX.WARN}|<p>Threshold for the Redis RSS overhead ratio.</p>|`1.5`|
+|{$REDIS.MEM.RSS_OVERHEAD_BYTES.MIN}|<p>Minimum RSS overhead bytes required before the RSS overhead ratio trigger fires.</p>|`100M`|
 
 ### Items
 
@@ -76,7 +100,7 @@ This template has been tested on:
 |Memory used Lua|<p>Monitors the memory used by Lua scripts in the Redis server.</p>|Dependent item|redis.memory.used_memory_lua<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.used_memory_lua`</p></li></ul>|
 |Memory used peak|<p>Monitors peak memory usage of the Redis server.</p>|Dependent item|redis.memory.used_memory_peak<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.used_memory_peak`</p></li></ul>|
 |Memory used RSS|<p>Monitors resident memory (RSS) used by the Redis server.</p>|Dependent item|redis.memory.used_memory_rss<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.used_memory_rss`</p></li></ul>|
-|Memory fragmentation ratio|<p>Shows the memory fragmentation ratio of the Redis server instance.</p><p> This value indicates the efficiency of Redis memory mapping:</p><p>   Above 1.0 – Memory fragmentation is likely. Consider restarting the Redis server to allow the operating system to reclaim fragmented memory, especially if the ratio exceeds 1.5.</p><p>   Below 1.0 – Redis may have insufficient available memory. Consider optimizing memory usage or adding more RAM.</p><p></p><p> Note: If peak memory usage is significantly higher than current memory usage, the memory fragmentation ratio may be unreliable.</p><p> More information: https://redis.io/topics/memory-optimization</p>|Dependent item|redis.memory.fragmentation_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_fragmentation_ratio`</p></li></ul>|
+|Memory fragmentation ratio|<p>Ratio between used_memory_rss and used_memory.</p><p>Note: This metric does not measure memory fragmentation directly.</p><p>It includes other process overheads such as shared libraries, code, stack, and other allocator overheads</p><p>(see allocator_frag_ratio for actual fragmentation).</p>|Dependent item|redis.memory.fragmentation_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_fragmentation_ratio`</p></li></ul>|
 |AOF current rewrite time sec|<p>Monitors the current AOF rewrite time on the Redis server.</p>|Dependent item|redis.persistence.aof_current_rewrite_time_sec<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_current_rewrite_time_sec`</p></li></ul>|
 |AOF enabled|<p>Indicates if AOF persistence is enabled on the Redis server.</p>|Dependent item|redis.persistence.aof_enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_enabled`</p></li></ul>|
 |AOF last bgrewrite status|<p>Shows the status of the last AOF background rewrite on the Redis server.</p>|Dependent item|redis.persistence.aof_last_bgrewrite_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_last_bgrewrite_status`</p></li><li>Boolean to decimal</li></ul>|
@@ -133,7 +157,6 @@ This template has been tested on:
 |Redis: Service is down||`last(/Redis by Zabbix agent 2/redis.ping["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.USERNAME}"])=0`|Average|**Manual close**: Yes|
 |Redis: Too many entries in the slowlog||`min(/Redis by Zabbix agent 2/redis.slowlog.count["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.USERNAME}"],5m)>{$REDIS.SLOWLOG.COUNT.MAX.WARN}`|Info||
 |Redis: Total number of connected clients is too high|<p>When the number of clients reaches the value of the `maxclients` parameter, new connections will be rejected.<br><br>https://redis.io/topics/clients#maximum-number-of-clients</p>|`min(/Redis by Zabbix agent 2/redis.clients.connected,5m)/last(/Redis by Zabbix agent 2/redis.config.maxclients)*100>{$REDIS.CLIENTS.PRC.MAX.WARN}`|Warning||
-|Redis: Memory fragmentation ratio is too high|<p>This ratio is an indication of memory mapping efficiency:<br>  - Value over 1.0 indicates that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.<br>  - Value under 1.0 indicates that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.<br><br>Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.<br><br>https://redis.io/topics/memory-optimization</p>|`min(/Redis by Zabbix agent 2/redis.memory.fragmentation_ratio,15m)>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}`|Warning||
 |Redis: Last AOF write operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0`|Warning||
 |Redis: Last RDB save operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0`|Warning||
 |Redis: Number of slaves has changed|<p>Redis number of slaves has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2)`|Info|**Manual close**: Yes|
@@ -269,7 +292,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Redis: Memory usage is too high||`last(/Redis by Zabbix agent 2/redis.memory.used_memory)/min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)*100>{$REDIS.MEM.PUSED.MAX.WARN}`|Warning||
+|Redis: Memory usage is too high||`last(/Redis by Zabbix agent 2/redis.memory.used_memory)/(min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)+(min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)=0))*100*(min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)>0)>{$REDIS.MEM.PUSED.MAX.WARN}`|Warning||
 
 ### LLD rule Version 5+ metrics discovery
 
@@ -298,6 +321,14 @@ This template has been tested on:
 |Memory clients normal{#SINGLETON}|<p>Memory used by normal client connections on the Redis server.</p>|Dependent item|redis.memory.mem_clients_normal[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_clients_normal`</p></li></ul>|
 |Memory clients slaves{#SINGLETON}|<p>Memory used by slave client connections on the Redis server.</p>|Dependent item|redis.memory.mem_clients_slaves[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_clients_slaves`</p></li></ul>|
 |Memory AOF buffer{#SINGLETON}|<p>Size of the AOF buffer on the Redis server.</p>|Dependent item|redis.memory.mem_aof_buffer[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_aof_buffer`</p></li></ul>|
+
+### Trigger prototypes for Version 5+ metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Redis: Memory allocator fragmentation is too high|<p>Memory fragmentation at the allocator level indicates how efficiently the memory allocator is using physical memory:<br>  - Value over 1.5 means the allocator has significantly more fragmented memory than necessary.<br>    Consider enabling active defragmentation (activedefrag yes) or restarting Redis to reclaim fragmented memory.<br>  - Low fragmentation (close to 1.0) is normal and expected.</p>|`min(/Redis by Zabbix agent 2/redis.memory.allocator_frag_ratio[{#SINGLETON}],15m)>{$REDIS.MEM.ALLOC_FRAG_RATIO.MAX.WARN} and last(/Redis by Zabbix agent 2/redis.memory.allocator_frag_bytes[{#SINGLETON}])>{$REDIS.MEM.ALLOC_FRAG_BYTES.MIN}`|Warning||
+|Redis: Allocator RSS ratio is too high|<p>Ratio between allocator_resident and allocator_active.<br>Indicates pages that the allocator can and probably will soon release<br>back to the OS. If sustained, consider running MEMORY PURGE.</p>|`min(/Redis by Zabbix agent 2/redis.memory.allocator_rss_ratio[{#SINGLETON}],15m)>{$REDIS.MEM.ALLOC_RSS_RATIO.MAX.WARN} and last(/Redis by Zabbix agent 2/redis.memory.allocator_rss_bytes[{#SINGLETON}])>{$REDIS.MEM.ALLOC_RSS_BYTES.MIN}`|Warning||
+|Redis: RSS overhead ratio is too high|<p>Ratio between used_memory_rss (the process RSS) and allocator_resident.<br>Includes RSS overheads that are not allocator or heap related.<br>If sustained, investigate persistence configuration (BGSAVE frequency, AOF rewrite settings).</p>|`min(/Redis by Zabbix agent 2/redis.memory.rss_overhead_ratio[{#SINGLETON}],15m)>{$REDIS.MEM.RSS_OVERHEAD_RATIO.MAX.WARN} and last(/Redis by Zabbix agent 2/redis.memory.rss_overhead_bytes[{#SINGLETON}])>{$REDIS.MEM.RSS_OVERHEAD_BYTES.MIN}`|Warning||
 
 ## Feedback
 

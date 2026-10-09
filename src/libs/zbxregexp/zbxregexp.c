@@ -1422,11 +1422,11 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *                                                                                *
  **********************************************************************************/
 /* regular expressions */
-#define EXPRESSION_TYPE_INCLUDED	0
-#define EXPRESSION_TYPE_ANY_INCLUDED	1
-#define EXPRESSION_TYPE_NOT_INCLUDED	2
-#define EXPRESSION_TYPE_TRUE		3
-#define EXPRESSION_TYPE_FALSE		4
+#define REGEX_TYPE_CONTAINS_STRING	0
+#define REGEX_TYPE_CONTAINS_ANY_SUBSTRING	1
+#define REGEX_TYPE_NOT_CONTAINS_STRING	2
+#define REGEX_TYPE_MATCHES_REGEX	3
+#define REGEX_TYPE_NOT_MATCHES_REGEX	4
 int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
@@ -1458,7 +1458,7 @@ int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string
 
 		switch (regexp->expression_type)
 		{
-			case EXPRESSION_TYPE_TRUE:
+			case REGEX_TYPE_MATCHES_REGEX:
 				if (NULL != output)
 				{
 					char	*output_tmp = NULL;
@@ -1477,21 +1477,21 @@ int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string
 							NULL, NULL);
 				}
 				break;
-			case EXPRESSION_TYPE_FALSE:
+			case REGEX_TYPE_NOT_MATCHES_REGEX:
 				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
 						NULL, NULL);
 				if (FAIL != ret)	/* invert output value */
 					ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
-			case EXPRESSION_TYPE_INCLUDED:
+			case REGEX_TYPE_CONTAINS_STRING:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				break;
-			case EXPRESSION_TYPE_NOT_INCLUDED:
+			case REGEX_TYPE_NOT_CONTAINS_STRING:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				/* invert output value */
 				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
-			case EXPRESSION_TYPE_ANY_INCLUDED:
+			case REGEX_TYPE_CONTAINS_ANY_SUBSTRING:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
 						regexp->exp_delimiter);
 				break;
@@ -1517,7 +1517,7 @@ out:
 	{
 		/* Handle output value allocation for global regular expression types   */
 		/* that cannot perform output_template substitution (practically        */
-		/* all global regular expression types except EXPRESSION_TYPE_TRUE).    */
+		/* all global regular expression types except REGEX_TYPE_MATCHES_REGEX).    */
 		size_t	offset = 0, size = 0;
 
 		zbx_strcpy_alloc(output, &size, &offset, string);
@@ -1595,7 +1595,7 @@ int	zbx_regexp_sub_ex2(const zbx_vector_expression_t *regexps, const char *strin
 
 		switch (regexp->expression_type)
 		{
-			case EXPRESSION_TYPE_TRUE:
+			case REGEX_TYPE_MATCHES_REGEX:
 				if (NULL != output)
 				{
 					char	*output_tmp = NULL;
@@ -1621,7 +1621,7 @@ int	zbx_regexp_sub_ex2(const zbx_vector_expression_t *regexps, const char *strin
 				}
 
 				break;
-			case EXPRESSION_TYPE_FALSE:
+			case REGEX_TYPE_NOT_MATCHES_REGEX:
 				ret = regexp_match_ex_regsub2(string, regexp->expression, regexp->case_sensitive,
 						NULL, NULL, err_msg);
 
@@ -1640,15 +1640,15 @@ int	zbx_regexp_sub_ex2(const zbx_vector_expression_t *regexps, const char *strin
 				}
 
 				break;
-			case EXPRESSION_TYPE_INCLUDED:
+			case REGEX_TYPE_CONTAINS_STRING:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				break;
-			case EXPRESSION_TYPE_NOT_INCLUDED:
+			case REGEX_TYPE_NOT_CONTAINS_STRING:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				/* invert output value */
 				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
-			case EXPRESSION_TYPE_ANY_INCLUDED:
+			case REGEX_TYPE_CONTAINS_ANY_SUBSTRING:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
 						regexp->exp_delimiter);
 				break;
@@ -1686,7 +1686,7 @@ out:
 	{
 		/* Handle output value allocation for global regular expression types   */
 		/* that cannot perform output_template substitution (practically        */
-		/* all global regular expression types except EXPRESSION_TYPE_TRUE).    */
+		/* all global regular expression types except REGEX_TYPE_MATCHES_REGEX).    */
 		size_t	offset = 0, size = 0;
 
 		zbx_strcpy_alloc(output, &size, &offset, string);
@@ -1694,11 +1694,11 @@ out:
 
 	return ret;
 }
-#undef EXPRESSION_TYPE_INCLUDED
-#undef EXPRESSION_TYPE_ANY_INCLUDED
-#undef EXPRESSION_TYPE_NOT_INCLUDED
-#undef EXPRESSION_TYPE_TRUE
-#undef EXPRESSION_TYPE_FALSE
+#undef REGEX_TYPE_CONTAINS_STRING
+#undef REGEX_TYPE_CONTAINS_ANY_SUBSTRING
+#undef REGEX_TYPE_NOT_CONTAINS_STRING
+#undef REGEX_TYPE_MATCHES_REGEX
+#undef REGEX_TYPE_NOT_MATCHES_REGEX
 
 int	zbx_regexp_match_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive)

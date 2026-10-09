@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
  */
 class testAuditlogHousekeeping extends testAuditlogCommon {
 
+	/**
+	 * Resource type Housekeeping
+	 */
+	const RESOURCE_TYPE = 41;
+
 	public function testAuditlogHousekeeping_Update() {
 		$this->call('housekeeping.update', [
 			'hk_events_mode' => '1',
@@ -62,6 +67,6 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.compress_older' => ['update', '788400000', '7d']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 0);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 0, self::RESOURCE_TYPE);
 	}
 }

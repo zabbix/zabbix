@@ -68,7 +68,7 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_USER_NOT_FOUND => _('Incorrect user name or password or account is temporarily blocked.')
 		];
 
-		return array_key_exists($error, $messages) ? $messages[$error] : '';
+		return $error !== null && array_key_exists($error, $messages) ? $messages[$error] : '';
 	}
 
 	/**

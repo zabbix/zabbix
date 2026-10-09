@@ -18,6 +18,7 @@ zabbix_export:
           type: TRAP
           key: main_drule
           lifetime_type: DELETE_IMMEDIATELY
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           host_prototypes:
             - uuid: ad74f72ee3ee4f9c96e41e1ea44e2f85
               host: 'Host for database {#DB}'

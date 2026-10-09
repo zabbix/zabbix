@@ -15,6 +15,8 @@
 package sw
 
 import (
+	"sync"
+
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -26,7 +28,8 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	executor zbxcmd.Executor
+	executor       zbxcmd.Executor
+	executorInitMu sync.Mutex
 }
 
 func init() {
@@ -59,19 +62,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		maxSwOSGetParams    = 0
 	)
 
-	if p.executor == nil {
-		var err error
-
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err := p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
-	var (
-		result any
-		err    error
-	)
+	var result any
 
 	switch key {
 	case "system.sw.packages":
@@ -102,4 +98,22 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return result, nil
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }

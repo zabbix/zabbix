@@ -40,7 +40,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE))
 			continue;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update trigger_rtdata set");
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
 		{
@@ -64,7 +64,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 		{
 			char	*error_esc;
 
-			error_esc = zbx_db_dyn_escape_field("triggers", "error", diff->error);
+			error_esc = zbx_db_dyn_escape_field("trigger_rtdata", "error", diff->error);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror='%s'", delim, error_esc);
 			zbx_free(error_esc);
 		}

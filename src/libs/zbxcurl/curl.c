@@ -13,17 +13,19 @@
 **/
 
 #include "zbxcommon.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
-
-#include "zbxcurl.h"
 
 /* See https://curl.se/libcurl/c/symbols-by-name.html for information in which version a symbol was added. */
 
 /* added in 7.85.0 (0x075500) */
 #if LIBCURL_VERSION_NUM < 0x075500
-#	define CURLOPT_PROTOCOLS_STR	10318L
+#	define CURLOPT_PROTOCOLS_STR		10318L
+#	define CURLOPT_REDIR_PROTOCOLS_STR	10319L
 #endif
+
+static int	zbx_curl_has_multi_wait(char **error);
 
 static unsigned int	libcurl_version_num(void)
 {
@@ -61,7 +63,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 	if (NULL == fptr)
 	{
 		/* this check must be performed before calling this function */
-		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		if (SUCCEED != zbx_curl_has_multi_wait(NULL))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using"
 					" cURL library < 7.28.0 (using version %s)", libcurl_version_str());
@@ -228,11 +230,29 @@ static void	setopt_error(const char *option, CURLcode err, char **error)
 			option, curl_easy_strerror(err), libcurl_version_str());
 }
 
-int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: limits the protocols cURL is allowed to use to HTTP and, when it  *
+ *          is supported, HTTPS                                               *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] cURL easy handle                             *
+ *             opt        - [IN] deprecated numeric protocol option to use    *
+ *                               with cURL older than 7.85.0                  *
+ *             opt_str    - [IN] the *_STR counterpart of "opt"               *
+ *             error      - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the protocols were limited                         *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Comments: the caller must ensure that the cURL library is at least 7.19.4  *
+ *           (0x071304), neither option exists before that version.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	curl_setopt_http_protocols(CURL *easyhandle, long opt, long opt_str, char **error)
 {
 	CURLcode	err;
-	static ZBX_THREAD_LOCAL char	*protocols_str;
-	static ZBX_THREAD_LOCAL long	protocols = 0;
+	static ZBX_THREAD_LOCAL const char	*protocols_str;
+	static ZBX_THREAD_LOCAL long		protocols;
 
 /* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071304
@@ -240,45 +260,56 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 #	define CURLPROTO_HTTPS		(1<<1)
 #endif
 
-	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
-	if (libcurl_version_num() >= 0x071304)
+	if (NULL == protocols_str)
 	{
-		if (0 == protocols)
+		if (SUCCEED == zbx_curl_protocol("HTTPS", NULL))
 		{
-			if (SUCCEED == zbx_curl_protocol("HTTPS", NULL))
-			{
-				protocols_str = "HTTP,HTTPS";
-				protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
-			}
-			else
-			{
-				protocols_str = "HTTP";
-				protocols = CURLPROTO_HTTP;
-			}
-		}
-
-		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
-		if (libcurl_version_num() >= 0x075500)
-		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
-					CURLOPT_PROTOCOLS_STR, protocols_str)))
-			{
-				setopt_error(protocols_str, err, error);
-				return FAIL;
-			}
+			protocols_str = "HTTP,HTTPS";
+			protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
 		}
 		else
 		{
-			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, protocols)))
-			{
-				setopt_error(protocols_str, err, error);
-				return FAIL;
-			}
+			protocols_str = "HTTP";
+			protocols = CURLPROTO_HTTP;
 		}
 	}
 
+	/* the numeric options were replaced by their *_STR counterparts */
+	/* remove when cURL requirement will become >= 7.85.0 (0x075500) */
+	if (libcurl_version_num() >= 0x075500)
+		err = curl_easy_setopt(easyhandle, (CURLoption)opt_str, protocols_str);
+	else
+		err = curl_easy_setopt(easyhandle, (CURLoption)opt, protocols);
+
+	if (CURLE_OK != err)
+	{
+		setopt_error(protocols_str, err, error);
+		return FAIL;
+	}
+
 	return SUCCEED;
+}
+
+int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
+{
+	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
+	if (libcurl_version_num() < 0x071304)
+		return SUCCEED;
+
+	return curl_setopt_http_protocols(easyhandle, 181L, CURLOPT_PROTOCOLS_STR, error);
+}
+
+int	zbx_curl_setopt_redir_https(CURL *easyhandle, char **error)
+{
+	/* CURLOPT_REDIR_PROTOCOLS (182L) is supported starting with version 7.19.4 (0x071304) */
+	if (libcurl_version_num() < 0x071304)
+	{
+		*error = zbx_dsprintf(*error, "cURL library cannot limit the protocols redirects are followed"
+				" with (using version %s, 7.19.4 or newer is required)", libcurl_version_str());
+		return FAIL;
+	}
+
+	return curl_setopt_http_protocols(easyhandle, 182L, CURLOPT_REDIR_PROTOCOLS_STR, error);
 }
 
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
@@ -422,15 +453,15 @@ int	zbx_curl_has_smtp_auth(char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_good_for_elasticsearch(char **error)
+static int	zbx_curl_has_multi_wait(char **error)
 {
-	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
+	/* History providers need curl_multi_wait() which was added in 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
-					" backend, 7.28.0 or newer is required", libcurl_version_str());
+			*error = zbx_dsprintf(*error, "cURL library version %s is too old,"
+					" 7.28.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
@@ -438,4 +469,57 @@ int	zbx_curl_good_for_elasticsearch(char **error)
 
 	return SUCCEED;
 }
+
+static int	curl_initialized = 0;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize cURL library global state                              *
+ *                                                                            *
+ * Comments: Safe to call multiple times.                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_init(void)
+{
+	if (0 == curl_initialized)
+	{
+		CURLcode	err;
+
+		if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL: %s", curl_easy_strerror(err));
+
+			exit(EXIT_FAILURE);
+		}
+
+		curl_initialized = 1;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cleanup cURL library global state                                 *
+ *                                                                            *
+ * Comments: Safe to call without initialization.                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_cleanup(void)
+{
+	if (0 != curl_initialized)
+	{
+		curl_global_cleanup();
+		curl_initialized = 0;
+	}
+}
+
+#else
+
+void	zbx_curl_init(void)
+{
+}
+
+void	zbx_curl_cleanup(void)
+{
+}
+
 #endif /* HAVE_LIBCURL */

@@ -179,8 +179,16 @@ static void	dc_items_convert_hk_periods(const zbx_dc_um_handle_t *um_handle, con
 				item->history_sec = ZBX_HK_PERIOD_MAX;
 		}
 
-		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
-			item->history_sec = config_hk->history;
+		if (0 != item->history_sec)
+		{
+			if (0 != config_hk->history_override[item->value_type])
+			{
+				item->history_sec = config_hk->history_override[item->value_type];
+				item->history = 1;
+			}
+			else if (ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+				item->history_sec = config_hk->history;
+		}
 
 		item->history = (0 != item->history_sec);
 	}
@@ -932,6 +940,9 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 		}
 		else
 		{
+			if (NULL == connector_filters_events)
+				continue;
+
 			connector_filter_dest = connector_filters_events;
 			connector_filter.item_value_type = 0;
 		}
@@ -1182,27 +1193,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get host information by name                                      *
- *                                                                            *
- * Parameters: host      - [IN] host name                                     *
- *             sock      - [IN] connection socket                             *
- *             recv_host - [OUT] host information                             *
- *             redirect  - [OUT] host redirection data (optional)             *
- *                                                                            *
- * Return value: SUCCEED         - host found                                 *
- *               SUCCEED_PARTIAL - redirection data was specified and host is *
- *                                 not monitored by the this instance         *
- *               FAIL            - host not found                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect)
-{
-	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get host identifier by name                                       *
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *
@@ -1228,6 +1218,35 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
 	return ret;
 }
 
+int	zbx_dc_config_get_item_format(zbx_uint64_t itemid, unsigned char *value_type, zbx_uint64_t *valuemapid,
+		char *units, size_t units_alloc)
+{
+	int		ret = FAIL;
+	ZBX_DC_ITEM	*dc_item;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &itemid)))
+	{
+		*valuemapid = dc_item->valuemapid;
+		*value_type = dc_item->value_type;
+
+		switch (dc_item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_strlcpy(units, dc_item->itemvaluetype.numitem->units, units_alloc);
+			default:
+				break;
+		}
+
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return ret;
+}
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
 

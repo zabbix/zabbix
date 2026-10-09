@@ -111,6 +111,9 @@ void	zbx_stats_ext_get_data_server(struct zbx_json *json, const void *arg)
 		zbx_json_adduint64(json, "requests", tcache_stats.requests_num);
 		zbx_json_addfloat(json, "pitems", (0 == total ? 0 : (double)tcache_stats.items_num / total * 100));
 
+		zbx_json_addfloat(json, "paccessed", (0 == tcache_stats.slots_num ? 0 :
+				(double)tcache_stats.recent_entry_num / tcache_stats.slots_num * 100));
+
 		zbx_json_close(json);
 	}
 

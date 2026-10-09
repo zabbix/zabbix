@@ -52,332 +52,354 @@ zabbix_export:
           value: '<PLACE USER ID HERE>'
         - name: rc_user_token
           value: '<PLACE TOKEN HERE>'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"Rocket.Chat"}'
         - name: use_default_message
           value: 'false'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         var RocketChat = {
-            params: {},
+        	params: {},
         
-            setParams: function (params) {
-                if (typeof params !== 'object') {
-                    return;
-                }
+        	setParams: function (params) {
+        		if (typeof params !== 'object') {
+        			return;
+        		}
         
-                RocketChat.params = params;
-                if (RocketChat.params.url && RocketChat.params.api_url) {
-                    if (!RocketChat.params.url.endsWith('/')) {
-                        RocketChat.params.url += '/';
-                    }
-                    if (!RocketChat.params.api_url.endsWith('/')) {
-                        RocketChat.params.api_url += '/';
-                    }
-                    if (RocketChat.params.api_url.startsWith('/')) {
-                        RocketChat.params.api_url = RocketChat.params.api_url.substring(1);
-                    }
+        		RocketChat.params = params;
+        		if (RocketChat.params.url && RocketChat.params.api_url) {
+        			if (!RocketChat.params.url.endsWith('/')) {
+        				RocketChat.params.url += '/';
+        			}
+        			if (!RocketChat.params.api_url.endsWith('/')) {
+        				RocketChat.params.api_url += '/';
+        			}
+        			if (RocketChat.params.api_url.startsWith('/')) {
+        				RocketChat.params.api_url = RocketChat.params.api_url.substring(1);
+        			}
         
-                    RocketChat.params.url += RocketChat.params.api_url;
-                }
-            },
+        			RocketChat.params.url += RocketChat.params.api_url;
+        		}
+        	},
         
-            setProxy: function (HTTPProxy) {
-                RocketChat.HTTPProxy = HTTPProxy;
-            },
+        	setProxy: function (HTTPProxy) {
+        		RocketChat.HTTPProxy = HTTPProxy;
+        	},
         
-            addFields: function (fields) {
-                var data = [];
+        	addFields: function (fields) {
+        		var data = [];
         
-                if (typeof fields === 'object' && Object.keys(fields).length) {
-                    Object.keys(fields)
-                        .forEach(function(field) {
-                            if (fields[field] === '') {
-                                Zabbix.log(4, '[ RocketChat Webhook ] Field "' + field +
-                                    '" can\'t be empty. The field ignored.');
-                            }
-                            else {
-                                try {
-                                    var parts = field.split(':'),
-                                        prefix = parts[0].split('_');
+        		if (typeof fields === 'object' && Object.keys(fields).length) {
+        			Object.keys(fields)
+        				.forEach(function(field) {
+        					if (fields[field] === '') {
+        						Zabbix.log(4, '[ RocketChat Webhook ] Field "' + field +
+        							'" can\'t be empty. The field ignored.');
+        					}
+        					else {
+        						try {
+        							var parts = field.split(':'),
+        								prefix = parts[0].split('_');
         
-                                    if (typeof prefix[2] === 'undefined'
-                                            || (prefix[2] === 'p' && params.event_value === '1')
-                                            || (prefix[2] === 'r' && params.event_value === '0')) {
-                                        data.push({
-                                            title: field.substring(field.indexOf(':') + 1),
-                                            value: fields[field],
-                                            short: prefix[1] === 'short'
-                                        });
-                                    }
-                                }
-                                catch (error) {
-                                    Zabbix.log(4, '[ RocketChat Webhook ] Can\'t parse field "' + field +
-                                        '". The field ignored.');
-                                }
-                            }
-                        });
-                }
+        							if (typeof prefix[2] === 'undefined'
+        									|| (prefix[2] === 'p' && params.event_value === '1')
+        									|| (prefix[2] === 'r' && params.event_value === '0')) {
+        								data.push({
+        									title: field.substring(field.indexOf(':') + 1),
+        									value: fields[field],
+        									short: prefix[1] === 'short'
+        								});
+        							}
+        						}
+        						catch (error) {
+        							Zabbix.log(4, '[ RocketChat Webhook ] Can\'t parse field "' + field +
+        								'". The field ignored.');
+        						}
+        					}
+        				});
+        		}
         
-                return data;
-            },
+        		return data;
+        	},
         
-            request: function (method, query, data) {
-                ['url', 'api_url', 'user_id', 'user_token', 'send_to'].forEach(function (field) {
-                    if (typeof RocketChat.params !== 'object' || typeof RocketChat.params[field] === 'undefined'
-                            || RocketChat.params[field] === '' ) {
-                        throw 'Required parameter is not set: "' + field + '".';
-                    }
-                });
+        	request: function (method, query, data) {
+        		['url', 'api_url', 'user_id', 'user_token', 'send_to'].forEach(function (field) {
+        			if (typeof RocketChat.params !== 'object' || typeof RocketChat.params[field] === 'undefined'
+        					|| RocketChat.params[field] === '' ) {
+        				throw 'Required parameter is not set: "' + field + '".';
+        			}
+        		});
         
-                var response,
-                    url = RocketChat.params.url + query,
-                    request = new HttpRequest();
+        		var response,
+        			url = RocketChat.params.url + query,
+        			request = new HttpRequest(tls.options);
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('X-Auth-Token:' + RocketChat.params.user_token);
-                request.addHeader('X-User-Id:' + RocketChat.params.user_id);
+        		request.addHeader('Content-Type: application/json');
+        		request.addHeader('X-Auth-Token:' + RocketChat.params.user_token);
+        		request.addHeader('X-User-Id:' + RocketChat.params.user_id);
         
-                if (typeof RocketChat.HTTPProxy !== 'undefined' && RocketChat.HTTPProxy !== '') {
-                    request.setProxy(RocketChat.HTTPProxy);
-                }
+        		if (typeof RocketChat.HTTPProxy !== 'undefined' && RocketChat.HTTPProxy !== '') {
+        			request.setProxy(RocketChat.HTTPProxy);
+        		}
         
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+        		if (typeof data !== 'undefined') {
+        			data = JSON.stringify(data);
+        		}
         
-                Zabbix.log(4, '[ RocketChat Webhook ] Sending request: ' + url +
-                    ((typeof data === 'string') ? ('\n' + data) : ''));
+        		Zabbix.log(4, '[ RocketChat Webhook ] Sending request: ' + url +
+        			((typeof data === 'string') ? ('\n' + data) : ''));
         
-                switch (method) {
-                    case 'get':
-                        response = request.get(url, data);
-                        break;
+        		switch (method) {
+        			case 'get':
+        				response = request.get(tls.checkURL(url), data);
+        				break;
         
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
+        			case 'post':
+        				response = request.post(tls.checkURL(url), data);
+        				break;
         
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
+        			default:
+        				throw 'Unsupported HTTP request method: ' + method;
+        		}
         
-                Zabbix.log(4, '[ RocketChat Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+        		Zabbix.log(4, '[ RocketChat Webhook ] Received response with status code ' +
+        			request.getStatus() + '\n' + response);
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ RocketChat Webhook ] Failed to parse response received from RocketChat');
-                        response = null;
-                    }
-                }
+        		if (response !== null) {
+        			try {
+        				response = JSON.parse(response);
+        			}
+        			catch (error) {
+        				Zabbix.log(4, '[ RocketChat Webhook ] Failed to parse response received from RocketChat');
+        				response = null;
+        			}
+        		}
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+        			var message = 'Request failed with status code ' + request.getStatus();
         
-                    if (response !== null && typeof response.message !== 'undefined') {
-                        message += ': ' + JSON.stringify(response.message);
-                    }
-                    else if (response !== null && typeof response.error !== 'undefined') {
-                        message += ': ' + JSON.stringify(response.error);
-                    }
+        			if (response !== null && typeof response.message !== 'undefined') {
+        				message += ': ' + JSON.stringify(response.message);
+        			}
+        			else if (response !== null && typeof response.error !== 'undefined') {
+        				message += ': ' + JSON.stringify(response.error);
+        			}
         
-                    throw message + '. Check debug log for more information.';
-                }
+        			throw message + '. Check debug log for more information.';
+        		}
         
-                return {
-                    status: request.getStatus(),
-                    response: response
-                };
-            },
+        		return {
+        			status: request.getStatus(),
+        			response: response
+        		};
+        	},
         
-            postMessage: function(use_default_message, message, fields) {
-                var data = {
-                    channel: RocketChat.params.send_to,
-                    attachments: [{
-                        collapsed: false,
-                        color: RocketChat.params.color,
-                        title: params.alert_subject
-                    }]
-                };
+        	postMessage: function(use_default_message, message, fields) {
+        		var data = {
+        			channel: RocketChat.params.send_to,
+        			attachments: [{
+        				collapsed: false,
+        				color: RocketChat.params.color,
+        				title: params.alert_subject
+        			}]
+        		};
         
-                if (RocketChat.params.title_link) {
-                    data.attachments[0].title_link = RocketChat.params.title_link;
-                }
+        		if (RocketChat.params.title_link) {
+        			data.attachments[0].title_link = RocketChat.params.title_link;
+        		}
         
-                if (use_default_message) {
-                    data.attachments[0].text = message;
-                }
-                else {
-                    data.attachments[0].fields = RocketChat.addFields(fields);
-                }
+        		if (use_default_message) {
+        			data.attachments[0].text = message;
+        		}
+        		else {
+        			data.attachments[0].fields = RocketChat.addFields(fields);
+        		}
         
-                var result = RocketChat.request('post', 'chat.postMessage', data);
+        		var result = RocketChat.request('post', 'chat.postMessage', data);
         
-                if (typeof result.response !== 'object' || typeof result.response.message._id === 'undefined') {
-                    throw 'Cannot send RocketChat message. Check debug log for more information.';
-                }
+        		if (typeof result.response !== 'object' || typeof result.response.message._id === 'undefined') {
+        			throw 'Cannot send RocketChat message. Check debug log for more information.';
+        		}
         
-                return {
-                    id: result.response.message._id,
-                    rid: result.response.message.rid,
-                    channel: result.response.channel
-                };
-            },
+        		return {
+        			id: result.response.message._id,
+        			rid: result.response.message.rid,
+        			channel: result.response.channel
+        		};
+        	},
         
-            sendMessage: function(update, fields) {
+        	sendMessage: function(update, fields) {
         
-                var data = {
-                    message: {
-                        rid: RocketChat.params.room_id,
-                        tmid: RocketChat.params.msg_id,
-                        tshow: true
-                    }
-                };
+        		var data = {
+        			message: {
+        				rid: RocketChat.params.room_id,
+        				tmid: RocketChat.params.msg_id,
+        				tshow: true
+        			}
+        		};
         
-                if (update.status === '0') {
-                    data.message.attachments = [{
-                        collapsed: false,
-                        color: RocketChat.params.color,
-                        title: params.alert_subject,
-                        title_link: RocketChat.params.title_link,
-                        fields: RocketChat.addFields(fields)
-                    }];
-                }
-                else {
-                    data.message.alias = update.user;
-                    data.message.msg = update.action;
-                    if (update.message) {
-                        data.message.attachments = [{
-                            color: RocketChat.params.color,
-                            text: update.message
-                        }];
-                    }
-                }
+        		if (update.status === '0') {
+        			data.message.attachments = [{
+        				collapsed: false,
+        				color: RocketChat.params.color,
+        				title: params.alert_subject,
+        				title_link: RocketChat.params.title_link,
+        				fields: RocketChat.addFields(fields)
+        			}];
+        		}
+        		else {
+        			data.message.alias = update.user;
+        			data.message.msg = update.action;
+        			if (update.message) {
+        				data.message.attachments = [{
+        					color: RocketChat.params.color,
+        					text: update.message
+        				}];
+        			}
+        		}
         
-                RocketChat.request('post', 'chat.sendMessage', data);
-            },
+        		RocketChat.request('post', 'chat.sendMessage', data);
+        	},
         
-            getMessageLink: function(rid, id) {
-                var room = RocketChat.request('get', 'rooms.info?roomId=' + encodeURIComponent(rid)),
-                    link = params.rc_url +
-                        (params.rc_url.endsWith('/') ? '' : '/');
+        	getMessageLink: function(rid, id) {
+        		var room = RocketChat.request('get', 'rooms.info?roomId=' + encodeURIComponent(rid)),
+        			link = params.rc_url +
+        				(params.rc_url.endsWith('/') ? '' : '/');
         
-                switch (room.response.room.t) {
-                    case 'c':
-                        link += 'channel/' + room.response.room.name + '?msg=' + id;
-                        break;
+        		switch (room.response.room.t) {
+        			case 'c':
+        				link += 'channel/' + room.response.room.name + '?msg=' + id;
+        				break;
         
-                    case 'p':
-                        link += 'group/' + room.response.room.name + '?msg=' + id;
-                        break;
+        			case 'p':
+        				link += 'group/' + room.response.room.name + '?msg=' + id;
+        				break;
         
-                    case 'd':
-                        link += 'direct/' + rid + '?msg=' + id;
-                        break;
+        			case 'd':
+        				link += 'direct/' + rid + '?msg=' + id;
+        				break;
         
-                    default:
-                        Zabbix.log(4, '[ RocketChat Webhook ] Can\'t get room type. Link to message will not be added.');
-                }
+        			default:
+        				Zabbix.log(4, '[ RocketChat Webhook ] Can\'t get room type. Link to message will not be added.');
+        		}
         
-                return link;
-            }
+        		return link;
+        	}
         };
         
         try {
-            var params = JSON.parse(value),
-                response,
-                fields = {},
-                rc = {},
-                update = {},
-                result = {tags: {}},
-                required_params = ['alert_subject', 'alert_message', 'event_source', 'event_value'],
-                severities = [
-                    {name: 'not_classified', color: '#97AAB3'},
-                    {name: 'information', color: '#7499FF'},
-                    {name: 'warning', color: '#FFC859'},
-                    {name: 'average', color: '#FFA059'},
-                    {name: 'high', color: '#E97659'},
-                    {name: 'disaster', color: '#E45959'},
-                    {name: 'resolved', color: '#009900'},
-                    {name: 'default', color: '#000000'}
-                ];
+        	var params = JSON.parse(value),
+        	tls = new CTlsConfig(params.tls_verify),
+        		response,
+        		fields = {},
+        		rc = {},
+        		update = {},
+        		result = {tags: {}},
+        		required_params = ['alert_subject', 'alert_message', 'event_source', 'event_value'],
+        		severities = [
+        			{name: 'not_classified', color: '#97AAB3'},
+        			{name: 'information', color: '#7499FF'},
+        			{name: 'warning', color: '#FFC859'},
+        			{name: 'average', color: '#FFA059'},
+        			{name: 'high', color: '#E97659'},
+        			{name: 'disaster', color: '#E45959'},
+        			{name: 'resolved', color: '#009900'},
+        			{name: 'default', color: '#000000'}
+        		];
         
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (key.startsWith('rc_')) {
-                        rc[key.substring(3)] = params[key];
-                    }
-                    else if (key.startsWith('field_')) {
-                        fields[key.substring(6)] = params[key];
-                    }
-                    else if (key.startsWith('event_update_')) {
-                        update[key.substring(13)] = params[key];
-                    }
-                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
-                        throw 'Parameter "' + key + '" can\'t be empty.';
-                    }
-                });
+        	Object.keys(params)
+        		.forEach(function (key) {
+        			if (key.startsWith('rc_')) {
+        				rc[key.substring(3)] = params[key];
+        			}
+        			else if (key.startsWith('field_')) {
+        				fields[key.substring(6)] = params[key];
+        			}
+        			else if (key.startsWith('event_update_')) {
+        				update[key.substring(13)] = params[key];
+        			}
+        			else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+        				throw 'Parameter "' + key + '" can\'t be empty.';
+        			}
+        		});
         
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
-            }
+        	if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+        		throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+        	}
         
-            // Forcing parameters for non trigger-based events.
-            if (params.event_source !== '0') {
-                params.use_default_message = 'true';
-                params.event_nseverity = '0';
-                params.rc_title_link = false;
-            }
+        	if (params.event_source !== '0') {
+        		params.use_default_message = 'true';
+        		params.event_nseverity = '0';
+        		params.rc_title_link = false;
+        	}
         
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                    && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
+        	if (params.event_value !== '0' && params.event_value !== '1'
+        			&& (params.event_source === '0' || params.event_source === '3')) {
+        		throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+        	}
         
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
+        	if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+        		throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+        	}
         
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                params.event_nseverity = '7';
-            }
+        	if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+        		params.event_nseverity = '7';
+        	}
         
-            if (params.event_value === '0') {
-                params.event_nseverity = '6';
-            }
+        	if (params.event_value === '0') {
+        		params.event_nseverity = '6';
+        	}
         
-            RocketChat.setParams(rc);
-            RocketChat.setProxy(params.HTTPProxy);
-            RocketChat.params.color = severities[params.event_nseverity].color;
+        	RocketChat.setParams(rc);
+        	RocketChat.setProxy(params.HTTPProxy);
+        	RocketChat.params.color = severities[params.event_nseverity].color;
         
-            // Send default message if use_default_message === true.
-            if (params.use_default_message.toLowerCase() === 'true') {
-                response = RocketChat.postMessage(true, params.alert_message);
-                result.tags.__zbx_rc_id = response.id;
-                result.tags.__zbx_rc_rid = response.rid;
-                result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);
-            }
-            // Send message for trigger-based events.
-            else if (params.event_value === '1' && update.status === '0') {
-                response = RocketChat.postMessage(false, params.alert_message, fields);
-                result.tags.__zbx_rc_id = response.id;
-                result.tags.__zbx_rc_rid = response.rid;
-                result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);
-            }
-            // Send thread message for trigger-based event.
-            else {
-                RocketChat.sendMessage(update, fields);
-            }
+        	if (params.use_default_message.toLowerCase() === 'true') {
+        		response = RocketChat.postMessage(true, params.alert_message);
+        		result.tags.__zbx_rc_id = response.id;
+        		result.tags.__zbx_rc_rid = response.rid;
+        		result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);
+        	}
+        	else if (params.event_value === '1' && update.status === '0') {
+        		response = RocketChat.postMessage(false, params.alert_message, fields);
+        		result.tags.__zbx_rc_id = response.id;
+        		result.tags.__zbx_rc_rid = response.rid;
+        		result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);
+        	}
+        	else {
+        		RocketChat.sendMessage(update, fields);
+        	}
         
-            return JSON.stringify(result);
+        	return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ RocketChat Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Zabbix.log(3, '[ RocketChat Webhook ] ERROR: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
@@ -386,7 +408,7 @@ zabbix_export:
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          subject: 'Problem: {EVENT.NAME}'
           message: |
             Problem started at {EVENT.TIME} on {EVENT.DATE}
             Problem name: {EVENT.NAME}
@@ -397,7 +419,7 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
             Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
@@ -407,12 +429,12 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
             {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
             {EVENT.UPDATE.MESSAGE}
             
-            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -435,3 +457,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

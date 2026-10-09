@@ -36,7 +36,7 @@ func init() {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 
-	impl.SetHandleTimeout(true)
+	impl.SetForceEffectiveTimeoutExtension(true)
 }
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {

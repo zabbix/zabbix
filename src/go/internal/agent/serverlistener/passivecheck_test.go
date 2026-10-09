@@ -81,7 +81,7 @@ func Test_parsePassiveCheckJSONRequest(t *testing.T) {
 		},
 		{
 			name:       "-invalidTimeout",
-			givenInput: `{"request":"passive checks","data":[{"key":"system.cpu.load","timeout":"0"}]}`,
+			givenInput: `{"request":"passive checks","data":[{"key":"system.cpu.load","timeout":"-1"}]}`,
 			expect: expectations{
 				hasError: true,
 			},

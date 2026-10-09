@@ -16,6 +16,8 @@
 
 require_once __DIR__.'/../common/testWidgetCommunication.php';
 
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * @backup profiles
  *
@@ -127,7 +129,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 					'width' => 20,
 					'height' => 6,
 					'x' => 32,
-					'y' => 20,
+					'y' => 23,
 					'fields' => [
 						[
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -402,7 +404,15 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 			// Locate the graph and double-click on it in order to zoom out two times and to send feedback.
 			$tag = ($data['listener_type'] === 'svg graph') ? 'svg' : 'img';
-			$listener->query('tag', $tag)->one()->doubleClick();
+
+			// The graph can redraw after the broadcast, making the element stale; re-fetch and retry the double-click.
+			try {
+				$listener->query('tag', $tag)->waitUntilVisible()->one()->doubleClick();
+			}
+			catch (StaleElementReferenceException $exception) {
+				$listener->query('tag', $tag)->waitUntilVisible()->one()->doubleClick();
+			}
+
 			$listener->waitUntilReady();
 
 			// Prepare the expected feedback, containing both formatted and unixtime "From" and "To" time periods.
@@ -439,7 +449,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 				[
 					'page' => 'Hostgroups page',
 					'listeners' => [
-						'Data listener for Map hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
+						'Data listener for Map hostgroup broadcaster' => self::THIRD_HOSTGROUP_NAME,
 						'Data listener for Problem hosts hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
 						'Data listener for Problems by severity hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
 						'Data listener for Web monitoring hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME

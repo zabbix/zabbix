@@ -330,7 +330,8 @@ class testItemRate extends CIntegrationTest {
 				'key_' => $item['key'],
 				'value_type' => $item['value_type'],
 				'type' => ITEM_TYPE_TRAPPER,
-				'hostid' => self::$hostid
+				'hostid' => self::$hostid,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			];
 		}
 

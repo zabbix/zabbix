@@ -16,23 +16,34 @@ package memcached
 
 import (
 	"fmt"
+	"strconv"
 
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
+type session struct {
+	URI      string `conf:"name=Uri,optional"`
+	Password string `conf:"optional"`
+	User     string `conf:"optional"`
+
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
+}
+
 type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyTimeout int `conf:"name=Timeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]conf.Session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 
 	// Default stores default connection parameter values from configuration file
-	Default conf.Session `conf:"optional"`
+	Default session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -42,20 +53,34 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("'Plugins.Memcached.Timeout' is deprecated")
+
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyTimeout)
+		}
+	}
+
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
 	}
 }
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+//
+//nolint:gocyclo,cyclop // will be removed once set defaults can handle ints
+func (*Plugin) Validate(options any) error {
 	var (
 		opts PluginOptions
-		err  error
+		ct   int
 	)
 
-	err = conf.UnmarshalStrict(options, &opts)
+	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return err
 	}
@@ -64,6 +89,42 @@ func (p *Plugin) Validate(options interface{}) error {
 		if len(session.Password+session.User) > maxEntryLen {
 			return fmt.Errorf("invalid parameters for session '%s': credentials cannot be longer "+
 				"than %d characters", name, maxEntryLen)
+		}
+
+		if session.ConnectionTimeout != "" {
+			ct, err = strconv.Atoi(session.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					session.ConnectionTimeout,
+					name,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					session.ConnectionTimeout,
+					name,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		ct, err = strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if ct < 1 || ct > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
 		}
 	}
 

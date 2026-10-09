@@ -11,13 +11,11 @@ available for connection and configure monitoring.
 ## Configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
 
-**Plugins.Modbus.Timeout** — request execution timeout (how long to wait for a request to complete before shutting it down).  
-*Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
-*Limits:* 1-30
-
 #### Named sessions
 Named sessions allow you to define specific parameters for each instance of modbus device. Currently, only three parameters are supported: 
 Endpoint, SlaveID and Timeout (if certain parameter is not specified for a named session, a value from key will be used). 
+
+Timeout is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 *Example:*  
 If you have two instances: "MB1" and "MB2", the following options have to be added to the agent configuration:

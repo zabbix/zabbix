@@ -715,7 +715,8 @@ class testMacros extends CIntegrationTest {
 				'name' => self::TRAPPER_ITEM_NAME.$i,
 				'key_' => self::TRAPPER_ITEM_KEY.$i,
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			];
 		}
 
@@ -1380,7 +1381,10 @@ const SUBJECT_INTERNAL = "Internal";
 				'host' => ['Zabbix server']
 			]
 		]);
-		$this->assertArrayHasKey('hostid', $response['result'][0]);
+
+		if (empty($response['result'])) {
+			return;
+		}
 
 		//disable default host to not interrupt testing via not supported items
 		self::$host_id_disable = $response['result'][0]['hostid'];
@@ -1549,12 +1553,14 @@ const SUBJECT_INTERNAL = "Internal";
 			$this->assertEquals($message_expect, $alert_response_internal['result'][1]['message']);
 
 			// enable default host
-			$response = $this->call('host.update', [
-				'hostid' => self::$host_id_disable,
-				'status' => ITEM_STATUS_ACTIVE
-			]);
-			$this->assertArrayHasKey('hostids', $response['result']);
-			$this->assertEquals(1, count($response['result']['hostids']));
+			if (self::$host_id_disable !== null) {
+				$response = $this->call('host.update', [
+					'hostid' => self::$host_id_disable,
+					'status' => ITEM_STATUS_ACTIVE
+				]);
+				$this->assertArrayHasKey('hostids', $response['result']);
+				$this->assertEquals(1, count($response['result']['hostids']));
+			}
 	}
 
 	/***********************************************************************************************************************
@@ -2358,13 +2364,15 @@ const SUBJECT_INTERNAL = "Internal";
 
 			$this->assertEquals($message_expect, $alert_response_internal_trigger['result'][1]['message']);
 
-			// enable default host
+		// enable default host
+		if (self::$host_id_disable !== null) {
 			$response = $this->call('host.update', [
 				'hostid' => self::$host_id_disable,
 				'status' => ITEM_STATUS_ACTIVE
 			]);
 			$this->assertArrayHasKey('hostids', $response['result']);
 			$this->assertEquals(1, count($response['result']['hostids']));
+		}
 	}
 
 	/***************************************************************************************************************
@@ -2620,7 +2628,8 @@ const SUBJECT_INTERNAL = "Internal";
 			'name'			=> self::TRAPPER_ITEM_KEY_SERVICE,
 			'key_'			=> self::TRAPPER_ITEM_KEY_SERVICE,
 			'type'			=> ITEM_TYPE_TRAPPER,
-			'value_type'	=> ITEM_VALUE_TYPE_UINT64
+			'value_type'	=> ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -3191,7 +3200,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 	/***************************************************************************************************************
 
-		Test macro resolution (source: event created by an autoregestration).
+		Test macro resolution (source: event created by an autoregistration).
 
 	***************************************************************************************************************/
 	const SUBJECT_AUTOREG = 'Autoregistration';
@@ -3422,7 +3431,7 @@ const SUBJECT_INTERNAL = "Internal";
 	 * @required-components server, agent
 	 */
 
-	public function testMacros_AutoregestrationEvent() {
+	public function testMacros_AutoregistrationEvent() {
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
 		}

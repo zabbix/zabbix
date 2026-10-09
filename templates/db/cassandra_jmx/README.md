@@ -31,12 +31,12 @@ Metrics are collected by JMX.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CASSANDRA.USER}||`zabbix`|
-|{$CASSANDRA.PASSWORD}||`zabbix`|
-|{$CASSANDRA.KEY_SPACE.MATCHES}|<p>Filter of discoverable key spaces</p>|`.*`|
-|{$CASSANDRA.KEY_SPACE.NOT_MATCHES}|<p>Filter to exclude discovered key spaces</p>|`(system\|system_auth\|system_distributed\|system_schema)`|
-|{$CASSANDRA.PENDING_TASKS.MAX.HIGH}||`500`|
-|{$CASSANDRA.PENDING_TASKS.MAX.WARN}||`350`|
+|{$CASSANDRA.USER}|<p>Cassandra JMX user.</p>|`zabbix`|
+|{$CASSANDRA.PASSWORD}|<p>Cassandra JMX password.</p>|`zabbix`|
+|{$CASSANDRA.KEY_SPACE.MATCHES}|<p>Filter of discoverable key spaces.</p>|`.*`|
+|{$CASSANDRA.KEY_SPACE.NOT_MATCHES}|<p>Filter to exclude discovered key spaces.</p>|`(system\|system_auth\|system_distributed\|system_schema)`|
+|{$CASSANDRA.PENDING_TASKS.MAX.HIGH}|<p>High threshold for the maximum number of pending Cassandra tasks detected via JMX.</p>|`500`|
+|{$CASSANDRA.PENDING_TASKS.MAX.WARN}|<p>Warning threshold for the maximum number of pending Cassandra tasks detected via JMX.</p>|`350`|
 
 ### Items
 

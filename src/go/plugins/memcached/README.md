@@ -21,7 +21,10 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
-**Plugins.Memcached.Timeout** — The maximum time for waiting when a request has to be done.  
+**Plugins.Memcached.Timeout** — The maximum time for waiting when a request has to be done.
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
@@ -54,7 +57,9 @@ If you use ConnString as a session name, just skip the rest of the connection pa
  
 #### Using named sessions
 Named sessions allow you to define specific parameters for each Memcached instance. Currently, there are only three supported 
-parameters: Uri, User and Password. It's a bit more secure way to store credentials compared to item keys or macros.  
+parameters: Uri, User, Password and ConnectionTimeout. It's a bit more secure way to store credentials compared to item keys or macros.
+
+ConnectionTimeout is only available as a session parameter or can be set as a default for all other items.
 
 E.g: suppose you have two Memcached instances: "Prod" and "Test". 
 You should add the following options to the agent configuration file:   
@@ -62,11 +67,13 @@ You should add the following options to the agent configuration file:
     Plugins.Memcached.Sessions.Prod.Uri=tcp://192.168.1.1:11211
     Plugins.Memcached.Sessions.Prod.User=<UserForProd>  
     Plugins.Memcached.Sessions.Prod.Password=<PasswordForProd>  
+    Plugins.Memcached.Sessions.Prod.ConnectionTimeout=10  
       
     Plugins.Memcached.Sessions.Test.Uri=tcp://192.168.0.1:11211
     Plugins.Memcached.Sessions.Test.User=<UserForTest>   
     Plugins.Memcached.Sessions.Test.Password=<PasswordForTest>
-        
+    Plugins.Memcached.Sessions.Prod.ConnectionTimeout=30  
+
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 
     memcached.ping[Prod]

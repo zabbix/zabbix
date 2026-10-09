@@ -65,8 +65,8 @@ class testDashboardsForm extends CWebTest {
 	private $default_values = [
 		'Owner' => 'Admin (Zabbix Administrator)',
 		'Name' => 'New dashboard',
-		'Default page display period' => '30 seconds',
-		'Start slideshow automatically' => true
+		'Default slideshow interval' => '30 seconds',
+		'Start slideshow' => false
 	];
 
 	/**
@@ -75,8 +75,8 @@ class testDashboardsForm extends CWebTest {
 	private $update_values = [
 		'Owner' => 'guest',
 		'Name' => 'Dashboard to test properties changes',
-		'Default page display period' => '1 hour',
-		'Start slideshow automatically' => false
+		'Default slideshow interval' => '1 hour',
+		'Start slideshow' => false
 	];
 
 	public function prepareDashboardData() {
@@ -181,7 +181,7 @@ class testDashboardsForm extends CWebTest {
 
 		// Check available display periods.
 		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
-				$form->getField('Default page display period')->getOptions()->asText()
+				$form->getField('Default slideshow interval')->getOptions()->asText()
 		);
 
 		// Close the dialog.
@@ -255,7 +255,7 @@ class testDashboardsForm extends CWebTest {
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
 						'Name' => '!@#$%^&*()_+=-09[]{};:\'"',
-						'Default page display period' => '10 seconds'
+						'Default slideshow interval' => '10 seconds'
 					]
 				]
 			],
@@ -265,7 +265,7 @@ class testDashboardsForm extends CWebTest {
 					'dashboard_properties' => [
 						'Owner' => 'guest',
 						'Name' => 'кириллица',
-						'Start slideshow automatically' => false
+						'Start slideshow' => false
 					]
 				]
 			],
@@ -275,8 +275,8 @@ class testDashboardsForm extends CWebTest {
 					'dashboard_properties' => [
 						'Owner' => 'guest',
 						'Name' => '☺æų☺',
-						'Default page display period' => '1 minute',
-						'Start slideshow automatically' => false
+						'Default slideshow interval' => '1 minute',
+						'Start slideshow' => false
 					]
 				]
 			],
@@ -285,7 +285,7 @@ class testDashboardsForm extends CWebTest {
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
 						'Name' => '    Trailing & leading spaces    ',
-						'Start slideshow automatically' => false
+						'Start slideshow' => false
 					],
 					'trim' => true
 				]
@@ -543,8 +543,8 @@ class testDashboardsForm extends CWebTest {
 		$original_values = [
 			'Name' => 'Dashboard for clone and delete',
 			'Owner' => 'guest',
-			'Default page display period' => '1 hour',
-			'Start slideshow automatically' => false
+			'Default slideshow interval' => '1 hour',
+			'Start slideshow' => false
 		];
 		$cloned_name = 'Cloned dashboard';
 		$original_hashes = $this->getDashboardHashes($original_values['Name']);

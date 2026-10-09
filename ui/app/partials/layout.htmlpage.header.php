@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-global $DB, $ZBX_SERVER_NAME;
+global $DB, $ZBX_SERVER_NAME, $ZBX_FEATURE_FLAGS;
 
 $scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
@@ -43,6 +43,10 @@ if (!empty($DB['DB'])) {
 
 	if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 		$scripts[] = 'class.software-version-check.js';
+	}
+
+	if ($ZBX_FEATURE_FLAGS['banners_enabled'] && $data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+		$scripts[] = 'class.banner.js';
 	}
 }
 
@@ -72,11 +76,12 @@ $page_header
 		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
-	->addJsFile((new CUrl('jsLoader.php'))
-		->setArgument('lang', $data['user']['lang'])
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('showGuiMessaging', $show_gui_messaging)
-		->getUrl()
+	->addJsFile(
+		(new CUrl('jsLoader.php'))
+			->setArgument('ver', ZABBIX_VERSION)
+			->setArgument('lang', $data['user']['lang'])
+			->setArgument('showGuiMessaging', $show_gui_messaging)
+			->getUrl()
 	);
 
 foreach ($data['stylesheet']['files'] as $css_file) {

@@ -47,22 +47,18 @@ type MyConn struct {
 
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
-	connectionsMu  sync.Mutex
-	connections    map[connKey]*MyConn
-	keepAlive      time.Duration
-	connectTimeout time.Duration
-	callTimeout    time.Duration
-	Destroy        context.CancelFunc
-	queryStorage   yarn.Yarn
-	log            log.Logger
+	connectionsMu sync.Mutex
+	connections   map[connKey]*MyConn
+	keepAlive     time.Duration
+	Destroy       context.CancelFunc
+	queryStorage  yarn.Yarn
+	log           log.Logger
 }
 
 type connectionManagerOptions struct {
-	keepAlive      time.Duration
-	connectTimeout time.Duration
-	callTimeout    time.Duration
-	queryStorage   yarn.Yarn
-	logger         log.Logger
+	keepAlive    time.Duration
+	queryStorage yarn.Yarn
+	logger       log.Logger
 }
 
 type connKey struct {
@@ -113,13 +109,11 @@ func NewConnManager(options *connectionManagerOptions) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[connKey]*MyConn),
-		keepAlive:      options.keepAlive,
-		connectTimeout: options.connectTimeout,
-		callTimeout:    options.callTimeout,
-		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
-		queryStorage:   options.queryStorage,
-		log:            options.logger,
+		connections:  make(map[connKey]*MyConn),
+		keepAlive:    options.keepAlive,
+		Destroy:      cancel, // Destroy stops originated goroutines and closes connections.
+		queryStorage: options.queryStorage,
+		log:          options.logger,
 	}
 
 	go connMgr.housekeeper(ctx)
@@ -128,7 +122,7 @@ func NewConnManager(options *connectionManagerOptions) *ConnManager {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(u *uri.URI, params map[string]string) (*MyConn, error) {
+func (c *ConnManager) GetConnection(u *uri.URI, params map[string]string, connectionTimeout int) (*MyConn, error) {
 	ck := createConnKey(u, params)
 
 	conn := c.getConn(ck)
@@ -142,7 +136,7 @@ func (c *ConnManager) GetConnection(u *uri.URI, params map[string]string) (*MyCo
 
 	c.log.Tracef("creating new connection for host: %s", u.Host())
 
-	conn, err := c.create(ck)
+	conn, err := c.create(ck, connectionTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +204,9 @@ func (c *ConnManager) housekeeper(ctx context.Context) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(ck connKey) (*MyConn, error) {
+//
+//nolint:gocritic // we'll leave this for the refactor.
+func (c *ConnManager) create(ck connKey, connectionTimeout int) (*MyConn, error) {
 	details, err := getTLSDetails(ck)
 	if err != nil {
 		return nil, err
@@ -221,7 +217,7 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 		return nil, errs.Wrap(err, "failed to get TLS config")
 	}
 
-	config, err := getMySQLConfig(&ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
+	config, err := getMySQLConfig(&ck.uri, tlsConfig, connectionTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -278,16 +274,14 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 func getMySQLConfig(
 	u *uri.URI,
 	tlsConfig *tls.Config,
-	connectTimeout,
-	callTimeout time.Duration,
+	connectionTimeout int,
 ) (*mysql.Config, error) {
 	config := mysql.NewConfig()
 	config.User = u.User()
 	config.Passwd = u.Password()
 	config.Net = u.Scheme()
 	config.Addr = u.Addr()
-	config.Timeout = connectTimeout
-	config.ReadTimeout = callTimeout
+	config.Timeout = time.Duration(connectionTimeout) * time.Second
 	config.InterpolateParams = true
 
 	if tlsConfig == nil {

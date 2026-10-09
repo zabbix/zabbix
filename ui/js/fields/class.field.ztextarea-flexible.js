@@ -27,7 +27,7 @@ class CFieldZTextareaFlexible extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
@@ -42,6 +42,10 @@ class CFieldZTextareaFlexible extends CField {
 		}
 
 		return value.trim();
+	}
+
+	isDisabled() {
+		return this._field.disabled;
 	}
 
 	focusErrorField() {

@@ -30,8 +30,8 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$GRIDGAIN.PASSWORD}||`<secret>`|
-|{$GRIDGAIN.USER}||`zabbix`|
+|{$GRIDGAIN.PASSWORD}|<p>GridGain JMX password.</p>|`zabbix`|
+|{$GRIDGAIN.USER}|<p>GridGain JMX user.</p>|`zabbix`|
 |{$GRIDGAIN.LLD.FILTER.THREAD.POOL.MATCHES}|<p>Filter of discoverable thread pools.</p>|`.*`|
 |{$GRIDGAIN.LLD.FILTER.THREAD.POOL.NOT_MATCHES}|<p>Filter to exclude discovered thread pools.</p>|`Macro too long. Please see the template.`|
 |{$GRIDGAIN.LLD.FILTER.DATA.REGION.MATCHES}|<p>Filter of discoverable data regions.</p>|`.*`|

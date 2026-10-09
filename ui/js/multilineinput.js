@@ -123,7 +123,7 @@
 			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));
 		}
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: obj.options.title,
 			class: 'modal-popup multilineinput-modal',
 			content: $content,
@@ -145,6 +145,9 @@
 		}, {
 			trigger_element: obj.$button
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 
 		if (obj.options.label_before.length) {
 			height_offset += $('<div>', {class: 'multilineinput-label' + monospace_font})
@@ -208,7 +211,7 @@
 						$node: $this,
 						options: $.extend({
 							title: '',
-							hint: t('S_CLICK_TO_VIEW_OR_EDIT'),
+							hint: t('Click to view or edit'),
 							value: '',
 							placeholder: '',
 							placeholder_textarea: '',
@@ -245,7 +248,9 @@
 					type: 'button',
 					title: obj.options.hint,
 					autofocus: obj.options.autofocus || null
-				}).on('click', obj, openModal);
+				})
+					.attr('aria-label', t('Click to view or edit'))
+					.on('click', obj, openModal);
 
 				$this
 					.data('multilineInput', obj)

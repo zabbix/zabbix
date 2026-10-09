@@ -88,7 +88,7 @@ JAVASCRIPT;
 			'templated' => false,
 			'templateid' => 0,
 			'timeout' => DB::getDefault('items', 'timeout'),
-			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+			'trapper_hosts' => ZBX_DEFAULT_TRAPPER_HOSTS,
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
 			'trends' => DB::getDefault('items', 'trends'),
 			'type' => DB::getDefault('items', 'type'),
@@ -99,7 +99,17 @@ JAVASCRIPT;
 			'valuemapid' => 0,
 			'valuemap' => [],
 			'verify_host' => DB::getDefault('items', 'verify_host'),
-			'verify_peer' => DB::getDefault('items', 'verify_peer')
+			'verify_peer' => DB::getDefault('items', 'verify_peer'),
+			'time_shift' => DB::getDefault('items', 'time_shift'),
+			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
+			'granularity' => DB::getDefault('items', 'granularity'),
+			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+			'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+			'columns' => [],
+			'aggregated_columns' => [],
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'formula' => '',
+			'conditions' => []
 		];
 	}
 	/**
@@ -212,6 +222,14 @@ JAVASCRIPT;
 		foreach ($item['preprocessing'] as &$step) {
 			$step['params'] = $step['type'] == ZBX_PREPROC_SCRIPT
 				? [$step['params'], ''] : explode("\n", $step['params']);
+
+			if ($step['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+				if ($step['params'][1] == ZBX_PREPROC_PROMETHEUS_FUNCTION) {
+					$step['params'][1] = $step['params'][2];
+					$step['params'][2] = '';
+				}
+			}
+
 			$step['sortorder'] = $i++;
 		}
 		unset($step);
@@ -257,6 +275,10 @@ JAVASCRIPT;
 			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
+		if ($item['type'] != ITEM_TYPE_TRAPPER && ($item['type'] != ITEM_TYPE_HTTPAGENT || $item['allow_traps'] == 0)) {
+			$item['trapper_hosts'] = ZBX_DEFAULT_TRAPPER_HOSTS;
+		}
+
 		if ($item['timeout'] !== DB::getDefault('items', 'timeout')) {
 			$item['custom_timeout'] = ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 		}
@@ -266,7 +288,7 @@ JAVASCRIPT;
 			$item['parameters'] = array_values($item['parameters']);
 		}
 
-		if ($item['tags']) {
+		if (array_key_exists('tags', $item) && $item['tags']) {
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}
 
@@ -275,7 +297,16 @@ JAVASCRIPT;
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+
+			$item['valuemap'] = $valuemap
+				? reset($valuemap)
+				: [
+					'valuemapid' => 0,
+					'name' => _('Inaccessible value mapping'),
+					'prefix' => '',
+					'hostid' => 0,
+					'inaccessible' => true
+				];
 		}
 
 		$params_field = [
@@ -291,6 +322,10 @@ JAVASCRIPT;
 			$field = $params_field[$item['type']];
 			$item[$field] = $item['params'];
 			$item['params'] = '';
+		}
+
+		if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+			$item += self::prepareTelemetryQueryForForm($item['query']);
 		}
 
 		$item += static::getDefaults();
@@ -312,9 +347,11 @@ JAVASCRIPT;
 			$delay = timeUnitToSeconds($item['delay']);
 
 			if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-					|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-						&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
-				$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+					|| $item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_NESTED
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key'], 'mqtt.get', 8) == 0))) {
+				$item['delay'] = $item['flags'] & ZBX_FLAG_DISCOVERY_RULE
+					? ZBX_LLD_RULE_DELAY_DEFAULT
+					: ZBX_ITEM_DELAY_DEFAULT;
 			}
 		}
 
@@ -541,14 +578,6 @@ JAVASCRIPT;
 	public static function convertFormInputForApi(array $input): array {
 		$field_map = ['key' => 'key_'];
 
-		if ($input['history_mode'] == ITEM_STORAGE_OFF) {
-			$input['history'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if ($input['trends_mode'] == ITEM_STORAGE_OFF) {
-			$input['trends'] = ITEM_NO_STORAGE_VALUE;
-		}
-
 		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
 			$field_map['http_authtype'] = 'authtype';
 			$field_map['http_username'] = 'username';
@@ -568,10 +597,6 @@ JAVASCRIPT;
 
 		if ($input['type'] != ITEM_TYPE_JMX) {
 			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
-		}
-
-		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 		}
 
 		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
@@ -601,7 +626,161 @@ JAVASCRIPT;
 			$input['params'] = $input[$field];
 		}
 
+		if ($input['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+			$input['query'] = self::composeTelemetryQuery($input);
+		}
+
 		return CArrayHelper::renameKeys($input, $field_map);
+	}
+
+	/**
+	 * Compose the "query" item field from the decomposed telemetry query item form fields.
+	 *
+	 * @param array $input       Form data.
+	 * @param bool  $for_server  Produce the form the Zabbix server consumes directly when testing items.
+	 *
+	 * @return array
+	 */
+	public static function composeTelemetryQuery(array $input, bool $for_server = false): array {
+		$input += ['columns' => [], 'aggregated_columns' => [], 'conditions' => []];
+
+		$columns = [];
+
+		foreach ($input['columns'] as $column) {
+			$is_complex = in_array($column['column'], CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME, true);
+
+			$columns[] = [
+				'column' => $column['column'],
+				'attribute_key' => $is_complex && array_key_exists('attribute_key', $column)
+					? $column['attribute_key']
+					: ''
+			];
+		}
+
+		$aggregated_columns = [];
+
+		foreach ($input['aggregated_columns'] as $column) {
+			$function = (int) $column['function'];
+			$percentile = array_key_exists('percentile', $column) ? (string) $column['percentile'] : '';
+			$parameters = $function == AGGREGATE_PERCENTILE && $percentile !== '' ? [$percentile] : [];
+			$column_name = $function != AGGREGATE_COUNT && array_key_exists('column', $column)
+				? $column['column']
+				: '';
+
+			$aggregated_columns[] = [
+				'column' => $column_name,
+				'function' => $function,
+				'parameters' => $parameters,
+				'alias' => $column['alias']
+			];
+		}
+
+		$evaltype = (int) $input['evaltype'];
+		$is_expression = $evaltype == CONDITION_EVAL_TYPE_EXPRESSION;
+		$conditions = [];
+
+		foreach ($input['conditions'] as $condition) {
+			$new_condition = [
+				'column' => $condition['column'],
+				'attribute_key' => array_key_exists('attribute_key', $condition) ? $condition['attribute_key'] : '',
+				'operator' => (int) $condition['operator'],
+				'value' => array_key_exists('value', $condition) ? $condition['value'] : ''
+			];
+
+			if ($is_expression) {
+				$new_condition['formulaid'] = $condition['formulaid'];
+			}
+
+			$conditions[] = $new_condition;
+		}
+
+		$formula = $is_expression ? $input['formula'] : '';
+
+		if ($for_server && $is_expression) {
+			CConditionHelper::replaceFormulaIds($formula, $conditions);
+
+			foreach ($conditions as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
+		}
+
+		return [
+			'signal_type' => (int) $input['signal_type'],
+			'metric_point_type' => (int) $input['metric_point_type'],
+			'columns' => $columns,
+			'aggregated_columns' => $aggregated_columns,
+			'filter' => [
+				'evaltype' => $evaltype,
+				'formula' => $formula,
+				'conditions' => $conditions
+			]
+		];
+	}
+
+	/**
+	 * Decompose the "query" item field back into the telemetry query item form fields.
+	 *
+	 * @param array $query The "query" item field, as returned by the API.
+	 *
+	 * @return array
+	 */
+	private static function prepareTelemetryQueryForForm(array $query): array {
+		$aggregated_columns = [];
+
+		foreach ($query['aggregated_columns'] as $column) {
+			$column['percentile'] = array_key_exists('parameters', $column) && $column['parameters'] !== []
+				? $column['parameters'][0]
+				: '';
+			unset($column['parameters']);
+
+			$aggregated_columns[] = $column;
+		}
+
+		$conditions = [];
+
+		foreach ($query['filter']['conditions'] as $condition) {
+			unset($condition['formulaid']);
+
+			$conditions[] = $condition;
+		}
+
+		return [
+			'signal_type' => $query['signal_type'],
+			'metric_point_type' => $query['metric_point_type'],
+			'columns' => $query['columns'],
+			'aggregated_columns' => $aggregated_columns,
+			'evaltype' => $query['filter']['evaltype'],
+			'formula' => $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+				? $query['filter']['formula']
+				: '',
+			'conditions' => $conditions
+		];
+	}
+
+	/**
+	 * Convert source items data to be ready for copying.
+	 *
+	 * @param array  $src_items
+	 *
+	 * @return array
+	 */
+	protected static function prepareSourceItemsForCopy(array $src_items): array {
+		foreach ($src_items as &$src_item) {
+			if ($src_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+				unset($src_item['query']['filter']['eval_formula']);
+
+				if ($src_item['query']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					foreach ($src_item['query']['filter']['conditions'] as &$condition) {
+						unset($condition['formulaid']);
+					}
+					unset($condition);
+				}
+			}
+		}
+		unset($src_item);
+
+		return $src_items;
 	}
 
 	/**
@@ -617,23 +796,26 @@ JAVASCRIPT;
 		}
 		unset($step);
 
-		$tags = [];
+		if (array_key_exists('tags', $input)) {
+			$tags = [];
 
-		foreach ($input['tags'] as $tag) {
-			if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-				// Skip inherited tags.
-				continue;
+			foreach ($input['tags'] as $tag) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					// Skip inherited tags.
+					continue;
+				}
+
+				if ($tag['tag'] !== '' || $tag['value'] !== '') {
+					$tags[] = [
+						'tag' => $tag['tag'],
+						'value' => $tag['value']
+					];
+				}
 			}
 
-			if ($tag['tag'] !== '' || $tag['value'] !== '') {
-				$tags[] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
+			$input['tags'] = $tags;
 		}
 
-		$input['tags'] = $tags;
 		$custom_intervals = [];
 
 		foreach ($input['delay_flex'] as $interval) {
@@ -680,6 +862,11 @@ JAVASCRIPT;
 
 			$input['parameters'] = $parameters;
 		}
+		elseif ($input['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+			$input['columns'] = array_values($input['columns']);
+			$input['aggregated_columns'] = array_values($input['aggregated_columns']);
+			$input['conditions'] = array_values($input['conditions']);
+		}
 
 		$input['query_fields'] = array_values($query_fields);
 		$input['headers'] = array_values($headers);
@@ -690,6 +877,11 @@ JAVASCRIPT;
 	}
 
 	public static function normalizeFormDataPreprocessingStep(array $step): array {
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+
 		if (array_key_exists('params', $step)) {
 			return $step;
 		}

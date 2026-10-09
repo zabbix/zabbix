@@ -21,10 +21,10 @@ void	zbx_audit_trigger_create_entry(int audit_context_mode, int audit_action, zb
 		const char *name, int flags);
 
 void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t triggerid, zbx_uint64_t templateid,
-		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
-		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url,
-		const char *url_name, int flags, unsigned char correlation_mode, const char *correlation_tag,
-		unsigned char manual_close, const char *opdata, unsigned char discover, const char *event_name);
+		unsigned char recovery_mode, unsigned char status, unsigned char type, unsigned char priority,
+		const char *comments, const char *url, const char *url_name, int flags, unsigned char correlation_mode,
+		const char *correlation_tag, unsigned char manual_close, const char *opdata, unsigned char discover,
+		const char *event_name);
 
 void	zbx_audit_trigger_update_json_add_expr(int audit_context_mode, zbx_uint64_t triggerid, int flags,
 		const char *expression);

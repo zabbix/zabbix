@@ -41,7 +41,7 @@ zabbix_export:
         4. Configure the host wizard configuration fields: `Application ID`, `Password`, `Tenant ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -615,6 +615,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -627,11 +652,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -664,8 +690,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -781,6 +807,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: apps
@@ -1145,6 +1173,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -1157,11 +1210,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -1194,8 +1248,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -1309,6 +1363,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: copilot
@@ -1694,6 +1750,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -1706,11 +1787,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -1743,8 +1825,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -1861,6 +1943,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: onedrive
@@ -2299,6 +2383,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -2311,11 +2420,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -2348,8 +2458,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -2466,6 +2576,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: outlook
@@ -2840,6 +2952,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -2852,11 +2989,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -2889,8 +3027,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -2999,6 +3137,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: raw
@@ -3279,6 +3419,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -3291,11 +3456,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -3328,8 +3494,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -3448,6 +3614,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: raw
@@ -4780,6 +4948,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             const ms365 = {
             	params: {},
             	token: null,
@@ -4792,11 +4985,12 @@ zabbix_export:
             		});
             
             		ms365.params = params;
+            		ms365.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		const response = new HttpRequest(),
-            			login = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			login = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			login.setProxy(ms365.params.http_proxy);
@@ -4829,8 +5023,8 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		const response = new HttpRequest(),
-            			request = new HttpRequest();
+            		const response = new HttpRequest(ms365.tls.options),
+            			request = new HttpRequest(ms365.tls.options);
             
             		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
             			request.setProxy(ms365.params.http_proxy);
@@ -4948,6 +5142,8 @@ zabbix_export:
               value: '{$MS365.PASSWORD}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Microsoft 365 reports"}'
           tags:
             - tag: component
               value: raw
@@ -5574,12 +5770,28 @@ zabbix_export:
         - tag: target
           value: ms365
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Microsoft 365 reports", e.g. {$HTTP.TLS.VERIFY:"Microsoft 365 reports"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$MS365.API.TIMEOUT}'
           value: 15s
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Other
             label: 'API response timeout'
             description: 'API response timeout.'
@@ -5588,7 +5800,7 @@ zabbix_export:
           description: 'Microsoft Graph API version.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'API version'
             description: 'Microsoft Graph API version.'

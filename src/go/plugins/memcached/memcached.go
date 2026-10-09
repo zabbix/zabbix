@@ -16,8 +16,10 @@ package memcached
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -60,12 +62,19 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	connectionTimeout, err := p.getConnectionTimeout(params)
+	if err != nil {
+		return nil, err
+	}
+
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	handleMetric := getHandlerFunc(key)
 	if handleMetric == nil {
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	result, err = handleMetric(p.connMgr.GetConnection(*uri), params)
+	result, err = handleMetric(p.connMgr.GetConnection(*uri, connectionTimeout), params)
 	if err != nil {
 		p.Errf(err.Error())
 	}
@@ -77,7 +86,6 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second,
 		hkInterval*time.Second,
 	)
 }
@@ -86,4 +94,20 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+
+		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+		if err != nil {
+			p.Tracef("failed to convert default connection timeout %s", err.Error())
+
+			return 0, errs.New("failed to get connection timeout")
+		}
+	}
+
+	return connectionTimeout, nil
 }

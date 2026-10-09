@@ -348,10 +348,20 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 	{
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
+			int	vault_ret = SUCCEED;
+
 			zbx_recv_proxyconfig(sock, config_comms->config_tls, config_vault, config_comms->config_timeout,
 					config_comms->config_trapper_timeout, config_comms->config_source_ip,
 					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-					config_comms->config_ssl_key_location, config_comms->server);
+					config_comms->config_ssl_key_location, config_comms->server, &vault_ret);
+
+			if (SUCCEED != vault_ret && NULL != config_vault->token)
+			{
+				zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char *)config_vault->token,
+					(zbx_uint32_t)strlen(config_vault->token) + 1);
+			}
+
 			return SUCCEED;
 		}
 		else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))

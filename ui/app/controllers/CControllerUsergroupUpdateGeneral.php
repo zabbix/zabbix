@@ -21,7 +21,10 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 	protected function getUserGroupInputData(): array {
 		$user_group = $this->getInputAll();
 		$user_group['users'] = zbx_toObject($user_group['userids'], 'userid');
-		unset($user_group['userids']);
+		$user_group['proxies'] = zbx_toObject($user_group['proxyids'], 'proxyid');
+		$user_group['proxy_groups'] = zbx_toObject($user_group['proxy_groupids'], 'proxy_groupid');
+
+		unset($user_group['userids'], $user_group['proxyids'], $user_group['proxy_groupids']);
 
 		return $user_group;
 	}
@@ -72,5 +75,38 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		}
 
 		return $tag_filters;
+	}
+
+	protected function validateProxiesNotInProxyGroup(): void {
+		$proxyids = $this->getInput('proxyids');
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => [],
+			'selectProxies' => ['proxyid', 'name'],
+			'proxyids' => $proxyids
+		]);
+
+		$proxy_names = [];
+
+		foreach ($proxy_groups as $proxy_group) {
+			foreach ($proxy_group['proxies'] as $proxy) {
+				if (in_array($proxy['proxyid'], $proxyids)) {
+					$proxy_names[$proxy['proxyid']] = $proxy['name'];
+				}
+			}
+		}
+
+		if ($proxy_names) {
+			CMessageHelper::addError(_n(
+				'Proxy "%1$s" cannot be added to the proxy list because it is already managed by proxy group.',
+				'Proxies "%1$s" cannot be added to the proxy list because they are already managed by proxy group.',
+				implode(', ', $proxy_names),
+				count($proxy_names)
+			));
+		}
 	}
 }

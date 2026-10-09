@@ -13,6 +13,7 @@ zabbix_export:
         - uuid: d3a9243db34447f49960364281e292e4
           name: 'Active connections to {$DB}'
           type: TRAP
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           key: 'db.connections[{$DB}]'
       discovery_rules:
         - uuid: 29e2336e671e48d6bd5837915681a315
@@ -23,6 +24,7 @@ zabbix_export:
             - uuid: 6024174125d549bfbd030e3923bae098
               name: 'Size of tablespace {#TSNAME} for {#DB}'
               type: TRAP
+              allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
               key: 'db.ts.size[{#DB},{#TSNAME}]'
           lld_macro_paths:
             - lld_macro: '{#TSNAME}'

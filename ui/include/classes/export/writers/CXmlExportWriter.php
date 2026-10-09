@@ -80,7 +80,9 @@ class CXmlExportWriter extends CExportWriter {
 			'dependencies' => 'dependency',
 			'discovery_rules' => 'discovery_rule',
 			'elements' => 'element',
+			'expressions' => 'expression',
 			'fields' => 'field',
+			'global_regexes' => 'global_regex',
 			'graph_items' => 'graph_item',
 			'graph_prototypes' => 'graph_prototype',
 			'graphs' => 'graph',
@@ -127,7 +129,9 @@ class CXmlExportWriter extends CExportWriter {
 			'valuemaps' => 'valuemap',
 			'variables' => 'variable',
 			'widgets' => 'widget',
-			'options' => 'option'
+			'options' => 'option',
+			'columns' => 'column',
+			'aggregated_columns' => 'aggregated_column'
 		];
 
 		return array_key_exists($name, $map) ? $map[$name] : false;

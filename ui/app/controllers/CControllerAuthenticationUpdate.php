@@ -17,7 +17,7 @@
 class CControllerAuthenticationUpdate extends CController {
 
 	public static function getValidationRules(): array {
-		global $ALLOW_HTTP_AUTH;
+		global $ZBX_FEATURE_FLAGS;
 
 		$rules = ['object', 'fields' => [
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
@@ -396,7 +396,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if ($ALLOW_HTTP_AUTH) {
+		if ($ZBX_FEATURE_FLAGS['http_auth_enabled']) {
 			$rules['fields'] += [
 				'http_auth_enabled' => ['setting http_auth_enabled',
 					'in' => [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]
@@ -515,9 +515,9 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateMfa(): bool {
-		$default_mfa = $this->hasInput('mfa_default_row_index') ? $this->getInput('mfa_default_row_index') : null;
 		$error = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
-			&& !array_key_exists($default_mfa, $this->getInput('mfa_methods', []));
+			&& (!$this->hasInput('mfa_default_row_index')
+				|| !array_key_exists($this->getInput('mfa_default_row_index'), $this->getInput('mfa_methods', [])));
 
 		if ($error) {
 			error(_('Default MFA method must be specified.'));
@@ -639,7 +639,7 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
-		global $ALLOW_HTTP_AUTH;
+		global $ZBX_FEATURE_FLAGS;
 
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
@@ -670,7 +670,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfaid' => $mfaid
 		];
 
-		if ($ALLOW_HTTP_AUTH) {
+		if ($ZBX_FEATURE_FLAGS['http_auth_enabled']) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,

@@ -90,6 +90,7 @@ $form_grid = (new CFormGrid())
 			->setId('default-mapping-icon')
 			->addOptions($options_icon)
 			->setValue($data['iconmap']['default_iconid'])
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		)
 		->addItem((new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 			'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
@@ -106,23 +107,17 @@ $form
 	->addItem((new CTabView())
 		->addTab('iconmap-edit', _('Icon map'), $form_grid)
 		->setFooter($data['iconmapid'] != 0
-			? makeFormFooter(new CSubmit('update', _('Update')), [
-				(new CSimpleButton(_('Clone')))->setId('clone'),
-				(new CSimpleButton(_('Delete')))
-					->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
-						->setArgument('action', 'iconmap.delete')
-						->setArgument('iconmapid', $data['iconmapid'])
-						->setArgument(CSRF_TOKEN_NAME, $csrf_token)
-					)
-					->setId('delete'),
+			? makeFormFooter((new CSubmit('', _('Update')))->addClass('js-submit'), [
+				(new CSimpleButton(_('Clone')))->addClass('js-clone'),
+				(new CSimpleButton(_('Delete')))->addClass('js-delete'),
 				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.list')
-				))->setId('cancel')
+				))->addClass('js-cancel')
 			])
-			: makeFormFooter(new CSubmit('add', _('Add')), [
+			: makeFormFooter((new CSubmit('', _('Add')))->addClass('js-submit'), [
 				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.list')
-				))->setId('cancel')
+				))->addClass('js-cancel')
 			])
 		)
 	)
@@ -153,6 +148,7 @@ function getMappingEntryView(string $sortorder, string $expression, string $icon
 				->setErrorLabel(_('Inventory field'))
 				->addOptions($options_inventory)
 				->setValue($inventory_link)
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 		)
 		->addItem((new CCol())
@@ -172,6 +168,7 @@ function getMappingEntryView(string $sortorder, string $expression, string $icon
 				->addClass('js-mapping-icon')
 				->addOptions($options_icon)
 				->setValue($iconid)
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 		)
 		->addItem((new CCol())

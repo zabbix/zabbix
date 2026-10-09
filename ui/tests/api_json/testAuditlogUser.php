@@ -36,6 +36,11 @@ class testAuditlogUser extends testAuditlogCommon {
 	 */
 	private static $before_media;
 
+	/**
+	 * Resource type User
+	 */
+	const RESOURCE_TYPE = 0;
+
 	public function testAuditlogUser_Create() {
 		$create = $this->call('user.create', [
 			[
@@ -43,6 +48,7 @@ class testAuditlogUser extends testAuditlogCommon {
 				'passwd' => 'zabbixzabbix',
 				'name' => 'Audit_name',
 				'surname' => 'Audit_surname',
+				'default_maintenance_period' => '3661s',
 				'roleid' => 3,
 				'usrgrps' => [
 					[
@@ -72,6 +78,7 @@ class testAuditlogUser extends testAuditlogCommon {
 			'user.passwd' => ['add', '******'],
 			'user.name' => ['add', 'Audit_name'],
 			'user.surname' => ['add', 'Audit_surname'],
+			'user.default_maintenance_period' => ['add', '3660s'],
 			'user.roleid' => ['add', '3'],
 			'user.usrgrps['.self::$before_usrgroup['id'].']' => ['add'],
 			'user.usrgrps['.self::$before_usrgroup['id'].'].usrgrpid' => ['add', '7'],
@@ -83,7 +90,7 @@ class testAuditlogUser extends testAuditlogCommon {
 			'user.userid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -97,6 +104,7 @@ class testAuditlogUser extends testAuditlogCommon {
 				'passwd' => 'updatezabbix',
 				'name' => 'Updated_Audit_name',
 				'surname' => 'Updated_Audit_surname',
+				'default_maintenance_period' => '2h',
 				'usrgrps' => [
 					[
 						'usrgrpid' => 11
@@ -127,6 +135,7 @@ class testAuditlogUser extends testAuditlogCommon {
 			'user.passwd' => ['update', '******', '******'],
 			'user.name' => ['update', 'Updated_Audit_name', 'Audit_name'],
 			'user.surname' => ['update', 'Updated_Audit_surname', 'Audit_surname'],
+			'user.default_maintenance_period' => ['update', '2h', '3660s'],
 			'user.usrgrps['.$after_usrgroup['id'].'].usrgrpid' => ['add', '11'],
 			'user.usrgrps['.$after_usrgroup['id'].'].id' => ['add', $after_usrgroup['id']],
 			'user.medias['.$after_media['mediaid'].'].mediatypeid' => ['add', '1'],
@@ -134,7 +143,7 @@ class testAuditlogUser extends testAuditlogCommon {
 			'user.medias['.$after_media['mediaid'].'].mediaid' => ['add', $after_media['mediaid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -142,7 +151,7 @@ class testAuditlogUser extends testAuditlogCommon {
 	 */
 	public function testAuditlogUser_Login() {
 		$this->authorize('updated_Audit', 'updatezabbix');
-		$this->getAuditDetails('username', $this->login_actionid, 'updated_Audit', self::$resourceid);
+		$this->getAuditDetails('username', self::ACTION_LOGIN, 'updated_Audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -152,7 +161,7 @@ class testAuditlogUser extends testAuditlogCommon {
 		$this->authorize('updated_Audit', 'updatezabbix');
 		$this->call('user.logout', []);
 		$this->authorize('Admin', 'zabbix');
-		$this->getAuditDetails('username', $this->logout_actionid, 'updated_Audit', self::$resourceid);
+		$this->getAuditDetails('username', self::ACTION_LOGOUT, 'updated_Audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -161,7 +170,7 @@ class testAuditlogUser extends testAuditlogCommon {
 	public function testAuditlogUser_FailedLogin() {
 		$this->authorize('updated_Audit', 'incorrect_pas');
 		$this->authorize('Admin', 'zabbix');
-		$this->getAuditDetails('username', $this->failedlogin_actionid, 'updated_Audit', self::$resourceid);
+		$this->getAuditDetails('username', self::ACTION_FAILED_LOGIN, 'updated_Audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -169,6 +178,6 @@ class testAuditlogUser extends testAuditlogCommon {
 	 */
 	public function testAuditlogUser_Delete() {
 		$this->call('user.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_Audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_Audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

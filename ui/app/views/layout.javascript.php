@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 header('Content-Type: application/javascript; charset=UTF-8');

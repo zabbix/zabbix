@@ -40,7 +40,7 @@ In case of Open Source version leave this macro empty.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CONSUL.CLUSTER.URL}|<p>Consul cluster URL.</p>|`http://localhost:8500`|
-|{$CONSUL.TOKEN}|<p>Consul auth token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$CONSUL.TOKEN}|<p>Consul auth token.</p>||
 |{$CONSUL.NAMESPACE}|<p>Consul service namespace. Enterprise only, in case of Open Source version leave this macro empty. Do not specify this macro to get all of services.</p>||
 |{$CONSUL.API.SCHEME}|<p>Consul API scheme. Using in node LLD.</p>|`http`|
 |{$CONSUL.API.PORT}|<p>Consul API port. Using in node LLD.</p>|`8500`|

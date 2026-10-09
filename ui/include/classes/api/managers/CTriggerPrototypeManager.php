@@ -88,6 +88,8 @@ class CTriggerPrototypeManager {
 			'values' => ['templateid' => 0],
 			'where' => ['triggerid' => $del_triggerids]
 		]);
+		DB::delete('trigger_depends', ['triggerid_down' => $del_triggerids]);
+		DB::delete('trigger_depends', ['triggerid_up' => $del_triggerids]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
 	}
 }

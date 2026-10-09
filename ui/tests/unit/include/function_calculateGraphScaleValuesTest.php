@@ -21,7 +21,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 	public static function dataProvider() {
 		return [
 			[
-				['min' => 0, 'max' => 1, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.25, 'units' => '', 'power' => 0, 'precision_max' => 15],
+				['min' => 0, 'max' => 1, 'interval' => 0.25, 'units' => '', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.25,	'value' => '0.25'],
@@ -31,7 +31,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => -1, 'max' => 0, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.25, 'units' => '', 'power' => 0, 'precision_max' => 15],
+				['min' => -1, 'max' => 0, 'interval' => 0.25, 'units' => '', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '-1.00'],
 					['relative_pos' => 0.25,	'value' => '-0.75'],
@@ -41,7 +41,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => -1, 'max' => 1, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.5, 'units' => '', 'power' => 0, 'precision_max' => 15],
+				['min' => -1, 'max' => 1, 'interval' => 0.5, 'units' => '', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '-1.0'],
 					['relative_pos' => 0.25,	'value' => '-0.5'],
@@ -51,7 +51,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 5000, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 1000, 'units' => '', 'power' => 0, 'precision_max' => 15],
+				['min' => 0, 'max' => 5000, 'interval' => 1000, 'units' => '', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.2,		'value' => '1000'],
@@ -62,7 +62,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 5000, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 1000, 'units' => '', 'power' => 1, 'precision_max' => 15],
+				['min' => 0, 'max' => 5000, 'interval' => 1000, 'units' => '', 'power' => 1, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.2,		'value' => '1 K'],
@@ -73,7 +73,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 4096, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 1024, 'units' => 'B', 'power' => 1, 'precision_max' => 15],
+				['min' => 0, 'max' => 4096, 'interval' => 1024, 'units' => 'B', 'power' => 1, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0 B'],
 					['relative_pos' => 0.25,	'value' => '1 KB'],
@@ -83,7 +83,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 4096*1024, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 1024*1024/2, 'units' => 'B', 'power' => 2, 'precision_max' => 15],
+				['min' => 0, 'max' => 4096*1024, 'interval' => 1024*1024/2, 'units' => 'B', 'power' => 2, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0 B'],
 					['relative_pos' => 0.125,	'value' => '0.5 MB'],
@@ -97,7 +97,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 10, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 5, 'units' => 's', 'power' => 0, 'precision_max' => 15],
+				['min' => 0, 'max' => 10, 'interval' => 5, 'units' => 's', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.5,		'value' => '5s'],
@@ -105,7 +105,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 1, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.5, 'units' => 's', 'power' => 0, 'precision_max' => 15],
+				['min' => 0, 'max' => 1, 'interval' => 0.5, 'units' => 's', 'power' => 0, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.5,		'value' => '0.5s'],
@@ -113,7 +113,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 0.1, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.05, 'units' => 's', 'power' => -1, 'precision_max' => 15],
+				['min' => 0, 'max' => 0.1, 'interval' => 0.05, 'units' => 's', 'power' => -1, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.5,		'value' => '50ms'],
@@ -121,7 +121,7 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => 0.0001, 'min_calculated' => true, 'max_calculated' => true, 'interval' => 0.00005, 'units' => 's', 'power' => -1, 'precision_max' => 15],
+				['min' => 0, 'max' => 0.0001, 'interval' => 0.00005, 'units' => 's', 'power' => -1, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.5,		'value' => '0.05ms'],
@@ -129,11 +129,21 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 				]
 			],
 			[
-				['min' => 0, 'max' => SEC_PER_HOUR*10, 'min_calculated' => true, 'max_calculated' => true, 'interval' => SEC_PER_HOUR*5, 'units' => 's', 'power' => 2, 'precision_max' => 15],
+				['min' => 0, 'max' => SEC_PER_HOUR*10, 'interval' => SEC_PER_HOUR*5, 'units' => 's', 'power' => 2, 'precision_max' => 15, 'unsigned' => false],
 				[
 					['relative_pos' => 0,		'value' => '0'],
 					['relative_pos' => 0.5,		'value' => '5h'],
 					['relative_pos' => 1,		'value' => '10h']
+				]
+			],
+			[
+				['min' => -1, 'max' => 1, 'interval' => 0.5, 'units' => '', 'power' => 0, 'precision_max' => 15, 'unsigned' => true],
+				[
+					['relative_pos' => 0,		'value' => '1.0'],
+					['relative_pos' => 0.25,	'value' => '0.5'],
+					['relative_pos' => 0.5,		'value' => '0'],
+					['relative_pos' => 0.75,	'value' => '0.5'],
+					['relative_pos' => 1,		'value' => '1.0']
 				]
 			]
 		];
@@ -147,8 +157,8 @@ class function_calculateGraphScaleValuesTest extends TestCase {
 	*/
 	public function test(array $args, array $expected) {
 		$this->assertSame($expected,
-			calculateGraphScaleValues($args['min'], $args['max'], $args['min_calculated'],
-				$args['max_calculated'], $args['interval'], $args['units'], $args['power'], $args['precision_max']
+			calculateGraphScaleValues($args['min'], $args['max'], $args['interval'], $args['units'], $args['power'],
+				$args['precision_max'], $args['unsigned']
 			)
 		);
 	}
