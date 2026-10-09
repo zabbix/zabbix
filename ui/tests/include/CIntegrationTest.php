@@ -30,7 +30,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATIONS			= 60;
 	const WAIT_ITERATIONS_STARTUP		= 15;
 
-	// Used when the build combines LeakSanitizer, AddressSanitizer and UndefinedBehaviorSanitizer.
+	// Used for the SANITIZER=memory and SANITIZER=thread builds.
 	const WAIT_ITERATIONS_SHUTDOWN_SANITIZED	= 180;
 
 	// Default delays (in seconds):
@@ -493,27 +493,21 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
-	 * Check whether the components under test were built using the sanitizer profile selected by
-	 * SANITIZER=memory (share/config.site.d/clang-debug-sanitize-memory), which in practice combines
-	 * AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer rather than Clang's MemorySanitizer.
+	 * Check whether the components under test were built with sanitizers (SANITIZER=memory or thread).
 	 *
 	 * @return bool
 	 */
-	private static function isSanitizedShutdownBuild(): bool {
-		return getenv('SANITIZER') === 'memory';
+	private static function isSanitizedBuild(): bool {
+		return in_array(getenv('SANITIZER'), ['memory', 'thread'], true);
 	}
 
 	/**
-	 * Number of iterations to wait for a component's pid file to disappear after it was asked to stop. This is
-	 * extended for the sanitizer build combining AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer:
-	 * every forked worker process pays extra instrumentation overhead on top of an additional leak scan that
-	 * only that build runs as each process exits, so an otherwise ordinary shutdown of the whole process tree
-	 * can take noticeably longer than the default wait budget allows for.
+	 * Number of iterations to wait for a component to stop, extended for slower sanitizer builds.
 	 *
 	 * @return int
 	 */
 	private static function shutdownWaitIterations(): int {
-		return self::isSanitizedShutdownBuild()
+		return self::isSanitizedBuild()
 			? self::WAIT_ITERATIONS_SHUTDOWN_SANITIZED
 			: self::WAIT_ITERATIONS;
 	}
