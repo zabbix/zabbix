@@ -594,6 +594,8 @@ var hintBox = {
 			left: null
 		};
 
+		const {overflowX, overflowY} = host.style;
+
 		const resetPosition = () => {
 			Object.keys(css).forEach(key => {
 				css[key] = null;
@@ -681,6 +683,9 @@ var hintBox = {
 			Object.entries(css).forEach(([key, value]) => hint.style[key] = value !== null ? `${value}px` : null);
 		}
 		while (host_client_width > host.clientWidth || host_client_height > host.clientHeight);
+
+		host.style.overflowX = overflowX;
+		host.style.overflowY = overflowY;
 	},
 
 	hideHint: function(target, hideStatic) {
