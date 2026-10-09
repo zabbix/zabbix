@@ -233,6 +233,26 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Determine which TLS library the server/agent/proxy binaries were built with.
+	 *
+	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
+	 * default to OpenSSL. Read directly from the environment, the same way IntegrationTests::suite()
+	 * reads DB/HISTORY_STORAGE to decide which suites to run.
+	 *
+	 * @return string 'gnutls', 'openssl' or 'none'
+	 */
+	protected static function detectTLSLibrary(): string {
+		switch (strtoupper((string) getenv('ENCRYPTION'))) {
+			case 'GNUTLS':
+				return 'gnutls';
+			case 'NONE':
+				return 'none';
+			default:
+				return 'openssl';
+		}
+	}
+
+	/**
 	 * Callback executed before every test case.
 	 *
 	 * @before
@@ -305,7 +325,7 @@ class CIntegrationTest extends CAPITest {
 			if (file_exists($log_file)) {
 				copy($log_file, PHPUNIT_COMPONENT_DIR.'all/'.$case_name.'/'.basename($log_file));
 				if ($this->hasFailed()) {
-					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
+					copy($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
 				}
 			}
 		}
@@ -457,15 +477,14 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Checks absence of pid file after kill.
 	 *
-	 * @param string $component    component name
-	 *
+	 * @param string $parent_pid
 	 */
-	private static function checkPidKilled($component) {
+	private static function waitComponentStopped($parent_pid) {
 		$usleep_total = 0;
 
 		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			if (!file_exists(self::getPidPath($component))) {
-				return true;
+			if (!posix_kill($parent_pid, 0)) {
+				return;
 			}
 
 			if ($usleep_total < 1000000) {
@@ -477,30 +496,24 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
-
-		return false;
 	}
 
 	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component
+	 * @param string $parent_pid
 	 * @param array  $child_pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component, array $child_pids) {
+	protected static function waitForShutdown(string $component, string $parent_pid, array $child_pids) {
 		$start = microtime(true);
-		if (!self::checkPidKilled($component)) {
-			$pid = @file_get_contents(self::getPidPath($component));
-
-			if ($pid !== false && is_numeric($pid)) {
-				$child_pids[] = $pid;
-			}
-		}
+		self::waitComponentStopped($parent_pid);
 
 		$failed_pids = [];
 		$failed_kills = [];
+		$child_pids[] = $parent_pid;
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
@@ -513,7 +526,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (!$failed_pids) {
-
 			if (static::$trace_delays) {
 				self::recordDelay('shutdown', microtime(true) - $start);
 			}
@@ -684,7 +696,7 @@ class CIntegrationTest extends CAPITest {
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
 			foreach ($values[$component] as $key => $value) {
-				$config = preg_replace('/^(\s*'.$key.'\s*=.*)$/m', '#\1', $config);
+				$config = preg_replace('/^([ \t]*'.$key.'[ \t]*=.*)$/m', '#\1', $config);
 				foreach ((array) $value as $val) {
 					$config .= "\n".$key.'='.$val;
 				}
@@ -745,17 +757,18 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$child_pids = [];
-		$pid = @file_get_contents(self::getPidPath($component));
+		$parent_pid = @file_get_contents(self::getPidPath($component));
 
-		if ($pid !== false && is_numeric($pid)) {
-			$output = shell_exec('pgrep -P '.$pid);
+		if ($parent_pid !== false && is_numeric($parent_pid)) {
+			$output = shell_exec('pgrep -P '.$parent_pid);
 			if ($output !== false && $output !== null) {
 				$child_pids = explode("\n", trim($output));
 			}
 
-			posix_kill($pid, SIGTERM);
+			posix_kill($parent_pid, SIGTERM);
+
+			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
-		self::waitForShutdown($component, $child_pids);
 	}
 
 	/**
@@ -944,14 +957,18 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send item values using the agent data protocol (variant 2, itemid-based).
 	 *
-	 * @param array   $values        item values, each with keys: itemid, value, clock, ns
-	 * @param string  $host          Zabbix host name
-	 * @param string  $component     component name or null for active component
-	 * @param integer $delayOverride override default processing delay, or null to use default
+	 * When $proxy is specified, the values are sent as a 'proxy data' request impersonating
+	 * the named proxy instead of the active agent protocol.
 	 *
-	 * @return array    processing result
+	 * @param array       $values        item values, each with keys: itemid, value, clock, ns
+	 * @param string      $host          Zabbix host name
+	 * @param string      $component     component name or null for active component
+	 * @param integer     $delayOverride override default processing delay, or null to use default
+	 * @param string|null $proxy         proxy name to send as, or null for agent data
+	 *
+	 * @return array|bool    processing result
 	 */
-	protected function sendAgentDataValues($values, $host, $component = null, $delayOverride = null) {
+	protected function sendAgentDataValues($values, $host, $component = null, $delayOverride = null, $proxy = null) {
 		$start = microtime(true);
 
 		if ($component === null) {
@@ -960,15 +977,16 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host);
+		$result = $client->sendAgentDataValues($values, $session, $host, ZABBIX_VERSION, $proxy);
 
-		$this->assertTrue(($result !== false),
-			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
-		);
-		$this->assertTrue(array_key_exists('processed', $result), 'Result doesn\'t contain "processed" count.');
-		$this->assertEquals(count($values), $result['processed'],
-			'Processed value count doesn\'t match sent value count.'
-		);
+		if ($proxy === null) {
+			$this->assertTrue(array_key_exists('processed', $result),
+				'Result doesn\'t contain "processed" count.'
+			);
+			$this->assertEquals(count($values), $result['processed'],
+				'Processed value count doesn\'t match sent value count.'
+			);
+		}
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
@@ -1112,21 +1130,27 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$callback_error = null;
 		$usleep_total = 0;
 		$start = microtime(true);
 
 		for ($i = 0; $i < $iterations; $i++) {
+			$callback_error = null;
 			try {
 				$response = $this->call($method, $params);
 
 				if (is_array($response['result']) && count($response['result']) > 0
-					&& ($callback === null || call_user_func($callback, $response))) {
+					&& ($callback === null || ($result = call_user_func($callback, $response)) === true)) {
 
 					if (static::$trace_delays) {
 						self::recordDelay('call_data_present', microtime(true) - $start);
 					}
 
 					return $response;
+				}
+
+				if (isset($result) && is_string($result) && $result !== '') {
+					$callback_error = $result;
 				}
 			} catch (Exception $e) {
 				$exception = $e;
@@ -1151,7 +1175,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
-				"\n".json_encode($params)
+				"\n".json_encode($params).
+				($callback_error !== null ? "\nCallback error: ".$callback_error : '')
 		);
 	}
 
@@ -1184,8 +1209,9 @@ class CIntegrationTest extends CAPITest {
 			try {
 				$response = $this->call($method, $count_params);
 
-				if (isset($response['result']) && $response['result'] == $expected_count
-						&& ($callback === null || call_user_func($callback, $response))) {
+				$callback_ok = ($callback === null || call_user_func($callback, $response) === true);
+
+				if (isset($response['result']) && $response['result'] == $expected_count && $callback_ok) {
 					if (static::$trace_delays) {
 						self::recordDelay('call_count_present', microtime(true) - $start);
 					}

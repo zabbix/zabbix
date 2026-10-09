@@ -27,6 +27,7 @@ class CElasticsearchHelper {
 
 	/**
 	 * Perform request to Elasticsearch.
+	 * Return empty string for failed request.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -49,16 +50,11 @@ class CElasticsearchHelper {
 			$options['http']['content'] = $request;
 		}
 
-		try {
-			$result = file_get_contents($endpoint, false, stream_context_create($options));
-		}
-		catch (Exception $e) {
-			error($e->getMessage());
-		}
+		$result = file_get_contents($endpoint, false, stream_context_create($options));
 
 		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $method, $endpoint, $request);
 
-		return $result;
+		return $result === false ? '' : $result;
 	}
 
 	/**
@@ -78,8 +74,8 @@ class CElasticsearchHelper {
 			}
 			else {
 				// Endpoint is in different format, no way to get scroll API url.
-				error(_s('Elasticsearch error: %1$s.',
-						_('cannot perform Scroll API request, data could be truncated'))
+				error(_s('Elasticsearch error: %1$s.', _('cannot perform Scroll API request, data could be truncated')),
+					true
 				);
 
 				return null;
@@ -177,7 +173,7 @@ class CElasticsearchHelper {
 	private static function parseResult($data, $parse_as) {
 		$result = json_decode($data, TRUE);
 		if (!is_array($result)) {
-			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')));
+			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')), true);
 
 			return [];
 		}
@@ -187,7 +183,7 @@ class CElasticsearchHelper {
 					? $result['error']['reason']
 					: _('Unknown error');
 
-			error(_s('Elasticsearch error: %1$s.', $error));
+			error(_s('Elasticsearch error: %1$s.', $error), true);
 
 			return [];
 		}

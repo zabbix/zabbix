@@ -1,14 +1,51 @@
+![](images/logo.png?raw=true)
 # Brevis.one webhook
 
-This guide describes how to integrate Zabbix 7.0 installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.<br>
+## Overview
 
-## Setting up Brevis.one
+This guide describes how to integrate Zabbix installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.
+
+## Requirements
+
+Zabbix version: 7.0 and higher.
+
+## Parameters
+
+After importing the webhook, you can configure it using webhook parameters.
+
+### Configurable parameters
+
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|endpoint|\<PLACE HTTP API URL\>||
+|flash|false||
+|password|\<PLACE PASSWORD\>||
+|ring|false||
+|telauto|true||
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Brevis\.one"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Brevis.one", e.g. {$HTTP.TLS.VERIFY:"Brevis.one"}.|
+|username|\<PLACE USERNAME\>||
+
+### Internal parameters
+
+Internal parameters are reserved for predefined macros that are not meant to be changed.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|send_to|\{ALERT\.SENDTO\}|'Send to' value from user media configuration.|
+|text|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
+
+## Service setup
+
 1\. Create a user for HTTP API or use an existing one.<br>
 
 2\. Grant to the user *Access to the HTTP API* permission. See Brevis.one [documentation](https://docs.brevis.one/current/en/Content/Functionality/Sending%20Messages/HTTP%20API.htm) for the information.<br>
 
+## Zabbix configuration
 
-## Setting up the webhook in Zabbix
 1\. Before setting up a media type, you need to set up a global macro "{$ZABBIX.URL}", which must contain the URL to Zabbix frontend.
 
 2\. In the *Administration > Media types* section, import [media_brevis.one.xml](media_brevis.one.xml).
@@ -33,7 +70,8 @@ See Brevis.one [documentation](https://docs.brevis.one/current/en/Content/Functi
 Note, that the "Send to" field cannot be empty. If the phone number or user/group ID is already specified in the **send_to** parameter, you can put any symbol in this field to comply with frontend requirements.
 Make sure this user has access to all hosts, for which you would like problem notifications to be sent via Brevis.one HTTP API.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [Brevis.one](https://docs.brevis.one/current/en/Content/Home.htm) documentations.
+## Feedback
 
-## Supported versions
-Zabbix 7.0 and higher
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

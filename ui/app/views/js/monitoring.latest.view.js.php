@@ -37,12 +37,11 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set, layout_mode}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, layout_mode}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
-			this.filter_set = filter_set;
 			this.layout_mode = layout_mode;
 
 			const url = new Curl('zabbix.php');
@@ -53,11 +52,7 @@
 			this.initExpandableSubfilter();
 			this.initListActions();
 			this.initItemFormEvents(this.getCurrentForm().get(0));
-
-			if (this.refresh_interval != 0 && this.filter_set) {
-				this.running = true;
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		initTabFilter(filter_options) {
@@ -378,9 +373,7 @@
 		},
 
 		onDataAlways() {
-			if (this.running) {
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		scheduleRefresh() {

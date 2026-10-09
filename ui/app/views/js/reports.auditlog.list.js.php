@@ -130,7 +130,7 @@
 
 			wrapper.appendChild(textarea)
 
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				title: <?= json_encode(_('Details')) ?>,
 				content: wrapper,
 				class: 'modal-popup modal-popup-generic',
@@ -142,6 +142,9 @@
 					}
 				]
 			});
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$close_btn.show();
 		}
 	};
 </script>
