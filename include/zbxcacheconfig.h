@@ -1373,6 +1373,7 @@ typedef struct
 	zbx_uint64_t	overcommit_limit;
 	zbx_uint64_t	overcommit;
 	zbx_uint64_t	values_limit;
+	zbx_uint64_t	collected_num;
 	zbx_uint64_t	written_num;
 }
 zbx_vps_monitor_stats_t;
