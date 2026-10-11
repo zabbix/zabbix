@@ -12,9 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_vlog() is static, so the source file is included directly to reach it. It is OpenIPMI's log         */
-/* callback (registered via os_hnd->set_log_handler() in zbx_init_ipmi()) - a pure format-string wrapper    */
-/* around zabbix_log(), with no OpenIPMI object involved, so every ipmi_log_type_e value is exercised here. */
+/* zbx_vlog() is static, so the source file is included directly to reach it. It is OpenIPMI's log          */
+/* callback (registered via os_hnd->set_log_handler() in zbx_init_ipmi_handler()) - a pure format-string    */
+/* wrapper around zabbix_log(), with no OpenIPMI object involved, so every ipmi_log_type_e value is         */
+/* exercised here.                                                                                          */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"

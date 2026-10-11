@@ -13,18 +13,17 @@
 **/
 
 /* zbx_control_change_cb(), zbx_sensor_change_cb(), zbx_entity_change_cb() and zbx_connection_change_cb()   */
-/* are OpenIPMI callbacks; checks_ipmi.c is included directly to reach them and the 'hostset'               */
-/* RETURN_IF_CB_DATA_INVALID(cb_data, h) needs.                                                             */
+/* are OpenIPMI callbacks; checks_ipmi.c is included directly to reach them and the 'hosts' list            */
+/* RETURN_IF_CB_DATA_INVALID(cb_data, h) resolves cb_data against.                                          */
 /*                                                                                                          */
-/* zbx_control_change_cb()/zbx_sensor_change_cb(): IPMI_ADDED only calls                                    */
-/* zbx_allocate_ipmi_control_within_cb_only()/ zbx_allocate_ipmi_sensor_within_cb_only() (a real            */
-/* dereference) when the control/sensor isn't already known, so the ADDED case here pre-registers the same  */
-/* pointer to take the "already exists" path instead. IPMI_DELETED/ IPMI_CHANGED never dereference          */
-/* 'control'/'sensor' at all. The 'default' case (an invalid op) is out of scope: it calls                  */
-/* THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see zbxmocktest.c).                 */
-/* zbx_sensor_change_cb() additionally gates everything on ipmi_sensor_get_is_readable() first,             */
-/* unconditionally - wrapped below via a controllable flag so both the readable and non-readable paths can  */
-/* be exercised without a real sensor.                                                                      */
+/* zbx_control_change_cb()/zbx_sensor_change_cb(): IPMI_ADDED only calls zbx_allocate_ipmi_control()/       */
+/* zbx_allocate_ipmi_sensor() (a real dereference) when the control/sensor isn't already known, so the      */
+/* ADDED case here pre-registers the same pointer to take the "already exists" path instead.                */
+/* IPMI_DELETED/IPMI_CHANGED never dereference 'control'/'sensor' at all. The 'default' case (an invalid    */
+/* op) is out of scope: it calls THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see   */
+/* zbxmocktest.c). zbx_sensor_change_cb() additionally gates everything on ipmi_sensor_get_is_readable()    */
+/* first, unconditionally - wrapped below via a controllable flag so both the readable and non-readable     */
+/* paths can be exercised without a real sensor.                                                            */
 /*                                                                                                          */
 /* zbx_entity_change_cb(): IPMI_ADDED unconditionally registers real OpenIPMI handlers on 'entity' - out of */
 /* scope. For any other op, the only thing that could touch 'entity' for real is a debug-level log line     */
@@ -35,11 +34,11 @@
 /* ipmi_domain_close() (err branch) or ipmi_domain_add_entity_update_handler() (success branch), both real  */
 /* OpenIPMI calls that would dereference it for real, so both are wrapped below with call counters instead. */
 /*                                                                                                          */
-/* zbx_control_change_cb()'s/zbx_sensor_change_cb()'s "already exists" path calls                           */
-/* zbx_get_ipmi_control_within_cb_only()/ zbx_get_ipmi_sensor_within_cb_only() internally, which convert    */
-/* the incoming (fabricated) pointer to an ID via ipmi_control_convert_to_id()/ipmi_sensor_convert_to_id()  */
-/* - wrapped here to echo the pointer back into the ID instead of dereferencing it, matching the pre-       */
-/* registered control_id/sensor_id below.                                                                   */
+/* zbx_control_change_cb()'s/zbx_sensor_change_cb()'s "already exists" and IPMI_DELETED paths call          */
+/* zbx_get_ipmi_control()/zbx_get_ipmi_sensor() or zbx_delete_ipmi_control()/zbx_delete_ipmi_sensor()       */
+/* internally, which convert the incoming (fabricated) pointer to an ID via ipmi_control_convert_to_id()/   */
+/* ipmi_sensor_convert_to_id() - wrapped here to echo the pointer back into the ID instead of dereferencing */
+/* it, matching the pre-registered control_id/sensor_id below.                                              */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -47,47 +46,47 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control);
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor);
-int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *raw_sensor);
-int	__wrap_ipmi_domain_close(ipmi_domain_t *raw_domain, ipmi_domain_close_done_cb close_done, void *cb_data);
-int	__wrap_ipmi_domain_add_entity_update_handler(ipmi_domain_t *raw_domain, ipmi_domain_entity_cb handler,
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control);
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor);
+int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *sensor);
+int	__wrap_ipmi_domain_close(ipmi_domain_t *domain, ipmi_domain_close_done_cb close_done, void *cb_data);
+int	__wrap_ipmi_domain_add_entity_update_handler(ipmi_domain_t *domain, ipmi_domain_entity_cb handler,
 		void *cb_data);
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control)
 {
 	ipmi_control_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_control;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)control;
 
 	return id;
 }
 
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor)
 {
 	ipmi_sensor_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_sensor;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)sensor;
 
 	return id;
 }
 
 static int	sensor_readable = 1;
 
-int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *raw_sensor)
+int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *sensor)
 {
-	ZBX_UNUSED(raw_sensor);
+	ZBX_UNUSED(sensor);
 
 	return sensor_readable;
 }
 
 static int	domain_close_calls, domain_close_ret;
 
-int	__wrap_ipmi_domain_close(ipmi_domain_t *raw_domain, ipmi_domain_close_done_cb close_done, void *cb_data)
+int	__wrap_ipmi_domain_close(ipmi_domain_t *domain, ipmi_domain_close_done_cb close_done, void *cb_data)
 {
-	ZBX_UNUSED(raw_domain);
+	ZBX_UNUSED(domain);
 
 	domain_close_calls++;
 
@@ -100,10 +99,10 @@ int	__wrap_ipmi_domain_close(ipmi_domain_t *raw_domain, ipmi_domain_close_done_c
 
 static int	entity_handler_calls, entity_handler_ret;
 
-int	__wrap_ipmi_domain_add_entity_update_handler(ipmi_domain_t *raw_domain, ipmi_domain_entity_cb handler,
+int	__wrap_ipmi_domain_add_entity_update_handler(ipmi_domain_t *domain, ipmi_domain_entity_cb handler,
 		void *cb_data)
 {
-	ZBX_UNUSED(raw_domain);
+	ZBX_UNUSED(domain);
 	ZBX_UNUSED(handler);
 	ZBX_UNUSED(cb_data);
 
@@ -134,8 +133,6 @@ void	zbx_mock_test_entry(void **state)
 	enum ipmi_update_e	op = op_by_name(zbx_mock_get_parameter_string("in.op"));
 
 	ZBX_UNUSED(state);
-
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
@@ -180,6 +177,9 @@ void	zbx_mock_test_entry(void **state)
 		memset(s, 0, sizeof(*s));
 		s->sensor_id = ipmi_sensor_convert_to_id((ipmi_sensor_t *)&dummy_sensor);
 		s->full_name = zbx_strdup(NULL, "test sensor");
+		/* cached properties, so valgrind can tell whether IPMI_DELETED frees them */
+		s->type_str = zbx_strdup(NULL, "type");
+		s->reading_type_str = zbx_strdup(NULL, "reading_type");
 
 		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor,
 				ZBX_IPMI_HOST_CB_DATA(h));
@@ -187,7 +187,10 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_int_eq("sensor_count", exp_count, h->sensor_count);
 
 		if (0 < h->sensor_count)
+		{
 			zbx_free(h->sensors[0].full_name);
+			zbx_free_ipmi_sensor_properties(&h->sensors[0]);
+		}
 		zbx_free(h->sensors);
 	}
 	else if (0 == strcmp(cb, "sensor_change_not_readable"))
@@ -200,8 +203,8 @@ void	zbx_mock_test_entry(void **state)
 		zbx_sensor_change_cb(op, (ipmi_entity_t *)&dummy_entity, (ipmi_sensor_t *)&dummy_sensor,
 				ZBX_IPMI_HOST_CB_DATA(h));
 
-		/* the readability gate must reject the sensor before zbx_allocate_ipmi_sensor_within_cb_only() */
-		/* (a real dereference) is ever reached */
+		/* the readability gate must reject the sensor before zbx_allocate_ipmi_sensor() (a real */
+		/* dereference) is ever reached                                                          */
 		zbx_mock_assert_int_eq("sensor_count stays 0 when sensor is not readable", 0, h->sensor_count);
 	}
 	else if (0 == strcmp(cb, "entity_change"))
@@ -245,11 +248,10 @@ void	zbx_mock_test_entry(void **state)
 	else
 		fail_msg("unknown 'in.cb' value: %s", cb);
 
-	zbx_hashset_remove(&hostset, &h);
+	hosts = NULL;
 	zbx_free(h->err);
 	zbx_free(h->ip);
 	zbx_free(h->username);
 	zbx_free(h->password);
 	zbx_free(h);
-	zbx_hashset_destroy(&hostset);
 }

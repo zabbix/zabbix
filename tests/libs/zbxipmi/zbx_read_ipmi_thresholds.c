@@ -13,15 +13,15 @@
 **/
 
 /* zbx_read_ipmi_thresholds() is static, so the source file is included directly to reach it. See           */
-/* zbx_read_ipmi_sensor.c for the pointer-lifetime rationale - this covers the same class of regression     */
-/* for the threshold-reading path: ipmi_sensor_id_get_thresholds() must reject an IPMI_SENSOR_ID_INVALID    */
-/* sensor_id (a vanished sensor) without ever invoking its callback, exercised here against the real       */
-/* library. threshold_access is a cached, static field (see zbx_ipmi_sensor_t.threshold_access), so it's    */
-/* just set directly here rather than needing revalidation.                                                 */
+/* zbx_read_ipmi_sensor.c for the pointer-lifetime rationale - this covers the threshold-reading path:      */
+/* thresholds are requested by sensor_id via ipmi_sensor_id_get_thresholds(), exercised here against the    */
+/* real library, which fails synchronously without ever invoking its callback because this test process     */
+/* never calls ipmi_init(). threshold_access is a cached, static field (see                                 */
+/* zbx_ipmi_sensor_t.threshold_access), so it's just set directly here rather than needing revalidation.    */
 /*                                                                                                          */
 /* zbx_read_ipmi_thresholds() never sets h->err and h->done stays 0 on every path exercised here, so        */
-/* there is no return value that tells "not accessible"/"fixed" apart from "readable but the sensor is      */
-/* gone" - the thr_access check either skips ipmi_sensor_id_get_thresholds() entirely or calls it. That     */
+/* there is no return value that tells "not accessible"/"fixed" apart from "readable but the request        */
+/* failed" - the thr_access check either skips ipmi_sensor_id_get_thresholds() entirely or calls it. That   */
 /* call is wrapped below purely to count it (forwarding to the real, unmocked implementation via            */
 /* __real_ipmi_sensor_id_get_thresholds() so the "real library" property above still holds), so             */
 /* 'out.get_thresholds_calls' proves which branch actually ran.                                             */
@@ -52,15 +52,13 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
-
 	memset(&h, 0, sizeof(h));
 	h.ip = "127.0.0.1";
 	h.port = 623;
 
 	memset(&s, 0, sizeof(s));
 	s.threshold_access = zbx_mock_get_parameter_int("in.thr_access");
-	/* stands in for a sensor OpenIPMI has already destroyed - see zbx_read_ipmi_sensor.c */
+	/* never a usable id - see zbx_read_ipmi_sensor.c */
 	s.sensor_id = (ipmi_sensor_id_t)IPMI_SENSOR_ID_INVALID;
 
 	get_thresholds_calls = 0;
@@ -73,5 +71,4 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_get_parameter_int("out.get_thresholds_calls"), get_thresholds_calls);
 
 	zbx_free(h.err);
-	zbx_hashset_destroy(&hostset);
 }

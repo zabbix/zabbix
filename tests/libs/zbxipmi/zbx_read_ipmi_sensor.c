@@ -12,27 +12,25 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_read_ipmi_sensor() is static, so the source file is included directly to reach it. */
-/*                                                                                                         */
-/* Regression coverage for the OpenIPMI pointer-lifetime rule documented in <OpenIPMI/ipmiif.h> and in     */
-/* IPMI.pdf section 2.2.4: "The pointer is only valid inside a callback... the id is good outside          */
-/* callbacks." zbx_ipmi_sensor_t caches a raw ipmi_sensor_t* (needed only for identity matching inside     */
-/* real OpenIPMI callbacks) alongside an ipmi_sensor_id_t, and zbx_read_ipmi_sensor() must only ever issue */
-/* a *new* read through the latter - via ipmi_sensor_id_get_reading()/get_states(), which internally       */
-/* revalidate the id through ipmi_sensor_pointer_cb() - never via the former from outside a callback. The  */
-/* sensor's static properties (reading_type_str and friends) are a separate matter: per the same section   */
-/* of IPMI.pdf ("collect all the static information that you need from an object when it is reported to    */
-/* you"), those are captured once in zbx_allocate_ipmi_sensor_within_cb_only() and simply read back here,  */
-/* no revalidation needed - case 3 below exercises that a cached string is used as-is.                     */
-/*                                                                                                         */
-/* Case 1 and 2 simulate a sensor OpenIPMI has since destroyed (e.g. entity/sensor removed, or its domain  */
-/* closed) via IPMI_SENSOR_ID_INVALID, the same way the ZBX-25759 cb_data scenario is simulated in         */
-/* zbx_domain_closed_cb.c. Real OpenIPMI (not mocked) is exercised - ipmi_sensor_id_get_reading()/         */
-/* get_states() reject the invalid id synchronously with an error, without ever invoking their callback    */
-/* (verified against the real library, not assumed). 'out.err_contains' pins down the exact wording each   */
-/* branch produces (naming the specific OpenIPMI call that failed, or - for case 3 - the cached            */
-/* reading_type_str), so a case can only pass if the matching switch branch actually ran, not just any     */
-/* branch that happens to also set h->ret to NOTSUPPORTED.                                                 */
+/* zbx_read_ipmi_sensor() is static, so the source file is included directly to reach it.                   */
+/*                                                                                                          */
+/* Regression coverage for the OpenIPMI pointer-lifetime rule documented in <OpenIPMI/ipmiif.h> and in      */
+/* IPMI.pdf section 2.2.4: "The pointer is only valid inside a callback... the id is good outside           */
+/* callbacks." zbx_ipmi_sensor_t therefore keeps only an ipmi_sensor_id_t (sensor_id), never an             */
+/* ipmi_sensor_t pointer, and zbx_read_ipmi_sensor() issues a new read through it via                       */
+/* ipmi_sensor_id_get_reading()/ipmi_sensor_id_get_states(), which internally revalidate the id through     */
+/* ipmi_sensor_pointer_cb(). The sensor's static properties (reading_type_str and friends) are a separate   */
+/* matter: per the same section of IPMI.pdf ("collect all the static information that you need from an      */
+/* object when it is reported to you"), those are captured once in zbx_allocate_ipmi_sensor() and simply    */
+/* read back here, no revalidation needed - case 3 below exercises that a cached string is used as-is.      */
+/*                                                                                                          */
+/* Real OpenIPMI (not mocked) is exercised, but this test process never calls ipmi_init(), so               */
+/* ipmi_sensor_id_get_reading()/ipmi_sensor_id_get_states() fail synchronously with ECANCELED (0x7d)        */
+/* before even looking at the id, without ever invoking their callback - sensor_id is set to                */
+/* IPMI_SENSOR_ID_INVALID only so it is never mistaken for a usable one. 'out.err_contains' pins down the   */
+/* exact wording each branch produces (naming the specific OpenIPMI call that failed, or - for case 3 -     */
+/* the cached reading_type_str), so a case can only pass if the matching switch branch actually ran, not    */
+/* just any branch that happens to also set h->ret to NOTSUPPORTED.                                         */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -44,22 +42,21 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_ipmi_host_t		h;
 	zbx_ipmi_sensor_t	s;
+	char			reading_type_str[] = "unassigned";
 	int			reading_type = zbx_mock_get_parameter_int("in.reading_type");
 	const char		*err_contains = zbx_mock_get_parameter_string("out.err_contains");
 
 	ZBX_UNUSED(state);
-
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	memset(&h, 0, sizeof(h));
 	h.ip = "127.0.0.1";
 	h.port = 623;
 
 	memset(&s, 0, sizeof(s));
-	s.event_reading_type = reading_type;
-	s.event_reading_type_str = "unassigned"; /* as if cached at allocation time - see the file header comment */
+	s.reading_type = reading_type;
+	s.reading_type_str = reading_type_str;	/* as if cached at allocation time - see the file header comment */
 
-	/* stands in for a sensor OpenIPMI has already destroyed - see the file header comment */
+	/* never a usable id - see the file header comment */
 	s.sensor_id = (ipmi_sensor_id_t)IPMI_SENSOR_ID_INVALID;
 
 	zbx_read_ipmi_sensor(&h, &s);
@@ -73,5 +70,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_free(h.err);
-	zbx_hashset_destroy(&hostset);
 }

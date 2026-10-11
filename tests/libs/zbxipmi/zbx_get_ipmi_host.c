@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_get_ipmi_host(), zbx_allocate_ipmi_host() and the 'hostset' hashset they share are static, so the */
-/* source file is included directly to get access to them (ZBX-25759 regression coverage). */
+/* zbx_get_ipmi_host(), zbx_allocate_ipmi_host() and the 'hosts' list they share are static, so the source  */
+/* file is included directly to get access to them.                                                         */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -53,10 +53,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
-
-	/* two hosts are registered so a lookup can be shown to return the correctly matching struct */
-	/* (not garbage read past an undersized hashset entry, and not a neighbouring host's data)   */
+	/* two hosts are registered so a lookup can be shown to return the correctly matching struct, not a */
+	/* neighbouring host's data; zbx_allocate_ipmi_host() prepends, so 'host_b' ends up at the head of  */
+	/* 'hosts' and 'host_a' behind it, and the yaml cases look up each of them                          */
 	host_a = allocate_from_yaml("in.host_a");
 	host_b = allocate_from_yaml("in.host_b");
 
@@ -85,7 +84,10 @@ void	zbx_mock_test_entry(void **state)
 	else
 		zbx_mock_assert_ptr_eq("no host should be found", NULL, found);
 
+	if (host_b != hosts || host_a != hosts->next || NULL != host_a->next)
+		fail_msg("zbx_allocate_ipmi_host() should have prepended both hosts to 'hosts'");
+
+	hosts = NULL;
 	zbx_free_ipmi_host(host_a);
 	zbx_free_ipmi_host(host_b);
-	zbx_hashset_destroy(&hostset);
 }

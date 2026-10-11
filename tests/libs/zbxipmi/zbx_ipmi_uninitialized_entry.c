@@ -12,13 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* get_value_ipmi(), get_discovery_ipmi() and zbx_set_ipmi_control_value() are the three public entry      */
-/* points into this file, and all three start with the same guard: "if (NULL == os_hnd) { ...; return }".  */
-/* This test binary never calls zbx_init_ipmi(), so the static file-scope 'os_hnd' stays NULL (its default  */
-/* zero-init value) for the whole process, exercising that guard for real on all three functions without    */
-/* needing any IPMI connection at all. checks_ipmi.c is included directly to reach 'os_hnd' and confirm it  */
-/* really is NULL going in (defensive - a stray zbx_init_ipmi() call anywhere else in this TU would silently */
-/* invalidate the whole premise of this test).                                                              */
+/* get_value_ipmi(), get_discovery_ipmi() and zbx_set_ipmi_control_value() are the three public entry       */
+/* points into this file, and all three start with the same guard: "if (NULL == os_hnd) { ...; return }".   */
+/* This test binary never calls zbx_init_ipmi_handler(), so the static file-scope 'os_hnd' stays NULL (its  */
+/* default zero-init value) for the whole process, exercising that guard for real on all three functions    */
+/* without needing any IPMI connection at all. checks_ipmi.c is included directly to reach 'os_hnd' and     */
+/* confirm it really is NULL going in (defensive - a stray zbx_init_ipmi_handler() call anywhere else in    */
+/* this TU would silently invalidate the whole premise of this test).                                       */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"

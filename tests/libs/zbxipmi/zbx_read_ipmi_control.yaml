@@ -1,5 +1,5 @@
 ---
-test case: "1. reading a control that no longer exists is rejected via ipmi_control_get_val(), not read via a stale pointer"
+test case: "1. reading a readable control goes through its control_id and reports ipmi_control_get_val() failure"
 in:
   op: "read"
   is_readable: 1
@@ -7,7 +7,7 @@ in:
 out:
   err_contains: "ipmi_control_get_val()"
 ---
-test case: "2. setting a control that no longer exists is rejected via ipmi_control_set_val(), not set via a stale pointer"
+test case: "2. setting a settable control goes through its control_id and reports ipmi_control_set_val() failure"
 in:
   op: "set"
   is_readable: 1

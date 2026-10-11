@@ -12,29 +12,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_got_thresh_reading_cb(), zbx_got_discrete_states_cb() and zbx_got_thresholds_cb() are OpenIPMI      */
-/* callbacks; checks_ipmi.c is included directly to reach them and the 'hostset' RETURN_IF_CB_DATA_INVALID */
-/* needs.                                                                                                  */
+/* zbx_got_thresh_reading_cb(), zbx_got_discrete_states_cb() and zbx_got_thresholds_cb() are OpenIPMI       */
+/* callbacks; checks_ipmi.c is included directly to reach them and the 'hosts' list                         */
+/* RETURN_IF_CB_DATA_INVALID(cb_data, h) resolves cb_data against.                                          */
 /*                                                                                                          */
-/* ipmi_states_t is a real (not mocked) OpenIPMI object - ipmi_states_size()/ipmi_init_states() and the    */
-/* ipmi_set_*()/ipmi_is_*() accessors are plain, connection-independent utility functions operating on a   */
-/* caller-owned buffer, so a real, valid states object is used throughout, never a fabricated one.         */
+/* ipmi_states_t is a real (not mocked) OpenIPMI object - ipmi_states_size()/ipmi_init_states() and the     */
+/* ipmi_set_*()/ipmi_is_*() accessors are plain, connection-independent utility functions operating on a    */
+/* caller-owned buffer, so a real, valid states object is used throughout, never a fabricated one.          */
 /*                                                                                                          */
 /* The sensor argument, by contrast, is never dereferenced in any branch covered here - only compared by    */
-/* identity via zbx_get_ipmi_sensor_within_cb_only(), or (for zbx_got_discrete_states_cb()'s err!=0 branch) */
-/* not used at all once the sensor has been identified, since the error message is built purely from the    */
-/* already-owned s->sdr_id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a */
-/* real ipmi_sensor_*() getter on it (zbx_got_thresh_reading_cb()'s IPMI_BOTH_VALUES_PRESENT success path,  */
+/* identity via zbx_get_ipmi_sensor(), or (for zbx_got_discrete_states_cb()'s err!=0 branch) not used at    */
+/* all once the sensor has been identified, since the error message is built purely from the already-owned  */
+/* s->id/id_type/id_sz. So a fabricated address stands in for it. Branches that do call a real              */
+/* ipmi_sensor_*() getter on it (zbx_got_thresh_reading_cb()'s IPMI_BOTH_VALUES_PRESENT success path,       */
 /* zbx_got_thresholds_cb()'s "found" path, zbx_got_discrete_states_cb()'s state-processing loop) are out of */
 /* scope here. Also deliberately out of scope: every "sensor not found" branch, since all three call        */
 /* THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see zbxmocktest.c) - triggering it  */
 /* would kill the test process rather than fail one case, and bypasses atexit() so it wouldn't even earn    */
 /* coverage credit.                                                                                         */
 /*                                                                                                          */
-/* All three callbacks call zbx_get_ipmi_sensor_within_cb_only() internally, which converts the incoming    */
-/* (fabricated) 'sensor' pointer to an ID via ipmi_sensor_convert_to_id() - wrapped here to echo the        */
-/* pointer back into the ID instead of dereferencing it, matching the pre-registered                        */
-/* zbx_ipmi_sensor_t.sensor_id below.                                                                       */
+/* zbx_got_thresh_reading_cb() and zbx_got_discrete_states_cb() call zbx_get_ipmi_sensor() internally on    */
+/* some of the paths covered here, which converts the incoming (fabricated) 'sensor' pointer to an ID via   */
+/* ipmi_sensor_convert_to_id() - wrapped here to echo the pointer back into the ID instead of               */
+/* dereferencing it, matching the pre-registered zbx_ipmi_sensor_t.sensor_id below.                         */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -42,14 +42,14 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor);
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor);
 
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor)
 {
 	ipmi_sensor_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_sensor;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)sensor;
 
 	return id;
 }
@@ -77,8 +77,6 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
-
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
 	h->sensor_count = 1;
@@ -86,7 +84,9 @@ void	zbx_mock_test_entry(void **state)
 	s = &h->sensors[0];
 	memset(s, 0, sizeof(*s));
 	s->sensor_id = ipmi_sensor_convert_to_id((ipmi_sensor_t *)&dummy_sensor);
-	zbx_strlcpy(s->sdr_id, "s1", sizeof(s->sdr_id));
+	zbx_strlcpy(s->id, "s1", sizeof(s->id));
+	s->id_type = IPMI_ASCII_STR;
+	s->id_sz = 2;
 
 	h->done = 0;
 	h->ret = SUCCEED;
@@ -95,7 +95,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		int	err = 0;
 		enum ipmi_value_present_e	vp = IPMI_NO_VALUES_PRESENT;
-		ipmi_sensor_t			*raw_sensor = (ipmi_sensor_t *)&dummy_sensor;
+		ipmi_sensor_t			*sensor = (ipmi_sensor_t *)&dummy_sensor;
 
 		if (0 == strcmp(scenario, "err"))
 			err = 5;
@@ -108,12 +108,12 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for thresh_reading: %s", scenario);
 
-		zbx_got_thresh_reading_cb(raw_sensor, err, vp, 0, 0.0, states, ZBX_IPMI_HOST_CB_DATA(h));
+		zbx_got_thresh_reading_cb(sensor, err, vp, 0, 0.0, states, ZBX_IPMI_HOST_CB_DATA(h));
 	}
 	else if (0 == strcmp(cb, "discrete_states"))
 	{
 		int	err = 0;
-		ipmi_sensor_t	*raw_sensor = (ipmi_sensor_t *)&dummy_sensor;
+		ipmi_sensor_t	*sensor = (ipmi_sensor_t *)&dummy_sensor;
 
 		if (0 == strcmp(scenario, "scanning_disabled"))
 			states = make_states(0, 0);
@@ -127,7 +127,7 @@ void	zbx_mock_test_entry(void **state)
 		else
 			fail_msg("unknown 'in.scenario' value for discrete_states: %s", scenario);
 
-		zbx_got_discrete_states_cb(raw_sensor, err, states, ZBX_IPMI_HOST_CB_DATA(h));
+		zbx_got_discrete_states_cb(sensor, err, states, ZBX_IPMI_HOST_CB_DATA(h));
 	}
 	else if (0 == strcmp(cb, "thresholds"))
 	{
@@ -148,10 +148,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_free(states);
 	zbx_free(h->err);
 	zbx_free(h->sensors);
-	zbx_hashset_remove(&hostset, &h);
+	hosts = NULL;
 	zbx_free(h->ip);
 	zbx_free(h->username);
 	zbx_free(h->password);
 	zbx_free(h);
-	zbx_hashset_destroy(&hostset);
 }

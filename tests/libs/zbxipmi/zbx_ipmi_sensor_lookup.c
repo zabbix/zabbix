@@ -12,14 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_get_ipmi_sensor_within_cb_only(), zbx_get_ipmi_sensor_by_id(), zbx_get_ipmi_sensor_by_full_name()    */
-/* and zbx_delete_ipmi_sensor_within_cb_only() only ever scan h->sensors[] by ID identity (via              */
-/* ipmi_cmp_sensor_id(), a plain field comparison on a value-type struct - never a dereference) or string   */
-/* comparison, so a fabricated, never-dereferenced address (the address of a local int) stands in for a     */
-/* real ipmi_sensor_t* throughout this file. ipmi_sensor_convert_to_id() itself DOES dereference its        */
-/* argument in the real OpenIPMI implementation, so it is wrapped below to just echo the fabricated pointer */
-/* back into the ID, preserving pointer-identity semantics for this fixture without ever touching its       */
-/* memory.                                                                                                  */
+/* zbx_get_ipmi_sensor(), zbx_get_ipmi_sensor_by_id(), zbx_get_ipmi_sensor_by_full_name() and               */
+/* zbx_delete_ipmi_sensor() only ever scan h->sensors[] by ID identity (via ipmi_cmp_sensor_id(), a plain   */
+/* field comparison on a value-type struct - never a dereference) or string comparison, so a fabricated,    */
+/* never-dereferenced address (the address of a local int) stands in for a real ipmi_sensor_t* throughout   */
+/* this file. ipmi_sensor_convert_to_id() itself DOES dereference its argument in the real OpenIPMI         */
+/* implementation, so it is wrapped below to just echo the fabricated pointer back into the ID, preserving  */
+/* pointer-identity semantics for this fixture without ever touching its memory.                            */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -27,21 +26,21 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor);
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor);
 
-ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *raw_sensor)
+ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor)
 {
 	ipmi_sensor_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_sensor;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)sensor;
 
 	return id;
 }
 
 static int	dummy_a, dummy_b, dummy_c;
 
-static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor, const char *id, const char *full_name,
+static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor, const char *id, const char *full_name,
 		int reading_type)
 {
 	zbx_ipmi_sensor_t	*s;
@@ -51,14 +50,14 @@ static void	add_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *raw_sensor, const char
 
 	s = &h->sensors[h->sensor_count - 1];
 	memset(s, 0, sizeof(*s));
-	s->sensor_id = ipmi_sensor_convert_to_id(raw_sensor);
-	zbx_strlcpy(s->sdr_id, id, sizeof(s->sdr_id));
-	s->sdr_id_type = IPMI_ASCII_STR;
-	s->sdr_id_sz = (int)strlen(id);
+	s->sensor_id = ipmi_sensor_convert_to_id(sensor);
+	zbx_strlcpy(s->id, id, sizeof(s->id));
+	s->id_type = IPMI_ASCII_STR;
+	s->id_sz = (int)strlen(id);
 	s->full_name = zbx_strdup(NULL, full_name);
-	s->sensor_type_str = zbx_strdup(NULL, "type");
-	s->event_reading_type_str = zbx_strdup(NULL, "reading_type");
-	s->event_reading_type = reading_type;
+	s->type_str = zbx_strdup(NULL, "type");
+	s->reading_type_str = zbx_strdup(NULL, "reading_type");
+	s->reading_type = reading_type;
 }
 
 static void	free_sensors(zbx_ipmi_host_t *h)
@@ -66,8 +65,7 @@ static void	free_sensors(zbx_ipmi_host_t *h)
 	for (int i = 0; i < h->sensor_count; i++)
 	{
 		zbx_free(h->sensors[i].full_name);
-		zbx_free(h->sensors[i].sensor_type_str);
-		zbx_free(h->sensors[i].event_reading_type_str);
+		zbx_free_ipmi_sensor_properties(&h->sensors[i]);
 	}
 	zbx_free(h->sensors);
 }
@@ -101,9 +99,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 == strcmp(func, "by_id_prefers_threshold"))
 	{
-		/* Some devices present the same physical sensor as both a threshold and a discrete sensor    */
-		/* sharing the same id; zbx_get_ipmi_sensor_by_id() must always prefer the threshold one,      */
-		/* regardless of which one comes first in h->sensors[] (see the comment in the function).      */
+		/* Some devices present the same physical sensor as both a threshold and a discrete sensor */
+		/* sharing the same id; zbx_get_ipmi_sensor_by_id() must always prefer the threshold one,  */
+		/* regardless of which one comes first in h->sensors[] (see the comment in the function).  */
 		const char	*order = zbx_mock_get_parameter_string("in.order");
 
 		if (0 == strcmp(order, "threshold_first"))
@@ -137,7 +135,7 @@ void	zbx_mock_test_entry(void **state)
 	add_sensor(&h, (ipmi_sensor_t *)&dummy_b, "id-b", "Sensor B", IPMI_EVENT_READING_TYPE_DISCRETE_STATE);
 
 	if (0 == strcmp(func, "by_pointer"))
-		s = zbx_get_ipmi_sensor_within_cb_only(&h, sensor_by_name(zbx_mock_get_parameter_string("in.lookup")));
+		s = zbx_get_ipmi_sensor(&h, sensor_by_name(zbx_mock_get_parameter_string("in.lookup")));
 	else if (0 == strcmp(func, "by_id"))
 		s = zbx_get_ipmi_sensor_by_id(&h, zbx_mock_get_parameter_string("in.lookup"));
 	else if (0 == strcmp(func, "by_full_name"))
@@ -146,15 +144,15 @@ void	zbx_mock_test_entry(void **state)
 	{
 		int	exp_count = zbx_mock_get_parameter_int("out.sensor_count");
 
-		/* a third sensor lets 'delete the first of three' exercise a memmove() of more than one */
-		/* element, unlike the two-sensor cases below */
+		/* a third sensor lets 'delete the first of three' exercise a memmove() of more than one   */
+		/* element, unlike the two-sensor cases below                                              */
 		if (0 == strcmp(zbx_mock_get_parameter_string("in.three_sensors"), "yes"))
 		{
 			add_sensor(&h, (ipmi_sensor_t *)&dummy_d, "id-d", "Sensor D",
 					IPMI_EVENT_READING_TYPE_THRESHOLD);
 		}
 
-		zbx_delete_ipmi_sensor_within_cb_only(&h, sensor_by_name(zbx_mock_get_parameter_string("in.lookup")));
+		zbx_delete_ipmi_sensor(&h, sensor_by_name(zbx_mock_get_parameter_string("in.lookup")));
 		zbx_mock_assert_int_eq("sensor_count after delete", exp_count, h.sensor_count);
 
 		/* the surviving sensor(s) must still be intact - memmove() didn't corrupt them */

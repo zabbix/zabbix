@@ -12,12 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* Same rationale as zbx_ipmi_sensor_lookup.c, for the zbx_ipmi_control_t side:                             */
-/* zbx_get_ipmi_control_within_cb_only(), zbx_get_ipmi_control_by_name(),                                   */
-/* zbx_get_ipmi_control_by_full_name() and zbx_delete_ipmi_control_within_cb_only() only ever scan          */
-/* h->controls[] by ID identity (ipmi_cmp_control_id(), a plain value comparison) or string comparison.     */
-/* ipmi_control_convert_to_id() is wrapped to echo the fabricated pointer back into the ID, preserving      */
-/* pointer-identity semantics without dereferencing it - see zbx_ipmi_sensor_lookup.c.                      */
+/* Same rationale as zbx_ipmi_sensor_lookup.c, for the zbx_ipmi_control_t side: zbx_get_ipmi_control(),     */
+/* zbx_get_ipmi_control_by_name(), zbx_get_ipmi_control_by_full_name() and zbx_delete_ipmi_control() only   */
+/* ever scan h->controls[] by ID identity (ipmi_cmp_control_id(), a plain value comparison) or string       */
+/* comparison. ipmi_control_convert_to_id() is wrapped to echo the fabricated pointer back into the ID,     */
+/* preserving pointer-identity semantics without dereferencing it - see zbx_ipmi_sensor_lookup.c.           */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -25,21 +24,21 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control);
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control);
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control)
 {
 	ipmi_control_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_control;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)control;
 
 	return id;
 }
 
 static int	dummy_a, dummy_b, dummy_c, dummy_d;
 
-static void	add_control(zbx_ipmi_host_t *h, ipmi_control_t *raw_control, const char *c_name, const char *full_name)
+static void	add_control(zbx_ipmi_host_t *h, ipmi_control_t *control, const char *c_name, const char *full_name)
 {
 	zbx_ipmi_control_t	*c;
 
@@ -49,7 +48,7 @@ static void	add_control(zbx_ipmi_host_t *h, ipmi_control_t *raw_control, const c
 
 	c = &h->controls[h->control_count - 1];
 	memset(c, 0, sizeof(*c));
-	c->control_id = ipmi_control_convert_to_id(raw_control);
+	c->control_id = ipmi_control_convert_to_id(control);
 	c->c_name = zbx_strdup(NULL, c_name);
 	c->full_name = zbx_strdup(NULL, full_name);
 	c->num_values = 1;
@@ -97,7 +96,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 == strcmp(func, "by_pointer"))
 	{
-		c = zbx_get_ipmi_control_within_cb_only(&h,
+		c = zbx_get_ipmi_control(&h,
 				control_by_name(zbx_mock_get_parameter_string("in.lookup")));
 	}
 	else if (0 == strcmp(func, "by_name"))
@@ -113,11 +112,11 @@ void	zbx_mock_test_entry(void **state)
 		int	exp_count = zbx_mock_get_parameter_int("out.control_count");
 
 		/* a third control lets 'delete the first of three' exercise a memmove() of more than one */
-		/* element, unlike the two-control cases below */
+		/* element, unlike the two-control cases below                                            */
 		if (0 == strcmp(zbx_mock_get_parameter_string("in.three_controls"), "yes"))
 			add_control(&h, (ipmi_control_t *)&dummy_d, "ctrl-d", "Control D");
 
-		zbx_delete_ipmi_control_within_cb_only(&h, control_by_name(zbx_mock_get_parameter_string("in.lookup")));
+		zbx_delete_ipmi_control(&h, control_by_name(zbx_mock_get_parameter_string("in.lookup")));
 		zbx_mock_assert_int_eq("control_count after delete", exp_count, h.control_count);
 
 		if (0 < h.control_count)

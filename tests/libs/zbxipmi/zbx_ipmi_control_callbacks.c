@@ -12,21 +12,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_got_control_reading_cb() and zbx_got_control_setting_cb() are OpenIPMI callbacks; checks_ipmi.c is */
-/* included directly to reach them, alongside the 'hostset' RETURN_IF_CB_DATA_INVALID(cb_data, h) needs.  */
+/* zbx_got_control_reading_cb() and zbx_got_control_setting_cb() are OpenIPMI callbacks; checks_ipmi.c is   */
+/* included directly to reach them, alongside the 'hosts' list RETURN_IF_CB_DATA_INVALID(cb_data, h)        */
+/* resolves cb_data against.                                                                                */
 /*                                                                                                          */
-/* Only branches that never touch the 'control' argument for anything but pointer-identity matching are    */
-/* covered here, so a fabricated address stands in for a real ipmi_control_t*. Deliberately out of scope:  */
-/* - the "control not found" and "num_values == 0" branches in both callbacks call THIS_SHOULD_NEVER_HAPPEN, */
-/*   which this test harness wires to _exit(1) (see zbxmocktest.c) - triggering it would kill the test      */
-/*   process rather than fail one case, and bypasses atexit() so it wouldn't even earn coverage credit.     */
+/* Only branches that never touch the 'control' argument for anything but identity matching are covered     */
+/* here, so a fabricated address stands in for a real ipmi_control_t*. Deliberately out of scope:           */
+/* - the "control not found" and "num_values == 0" branches in both callbacks call                          */
+/*   THIS_SHOULD_NEVER_HAPPEN, which this test harness wires to _exit(1) (see zbxmocktest.c) - triggering   */
+/*   it would kill the test process rather than fail one case, and bypasses atexit() so it wouldn't even    */
+/*   earn coverage credit.                                                                                  */
 /* - zbx_got_control_reading_cb()'s "values present" success path dereferences 'control' for real via       */
 /*   ipmi_control_get_entity(), unconditionally - needs a real control object or a wrapped getter, neither  */
-/*   of which this file uses.                                                                                */
+/*   of which this file uses.                                                                               */
 /*                                                                                                          */
-/* Both callbacks call zbx_get_ipmi_control_within_cb_only() internally, which converts the incoming        */
-/* (fabricated) 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to echo the      */
-/* pointer back into the ID instead of dereferencing it, matching the pre-registered                        */
+/* zbx_got_control_setting_cb()'s success path calls zbx_get_ipmi_control() internally, which converts the  */
+/* incoming (fabricated) 'control' pointer to an ID via ipmi_control_convert_to_id() - wrapped here to echo */
+/* the pointer back into the ID instead of dereferencing it, matching the pre-registered                    */
 /* zbx_ipmi_control_t.control_id below.                                                                     */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
@@ -35,14 +37,14 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control);
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control);
 
-ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *raw_control)
+ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control)
 {
 	ipmi_control_id_t	id;
 
 	memset(&id, 0, sizeof(id));
-	id.mcid.domain_id.domain = (ipmi_domain_t *)raw_control;
+	id.mcid.domain_id.domain = (ipmi_domain_t *)control;
 
 	return id;
 }
@@ -59,8 +61,6 @@ void	zbx_mock_test_entry(void **state)
 	int			err = (0 == strcmp(scenario, "err")) ? 5 : 0;
 
 	ZBX_UNUSED(state);
-
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
 
 	h = zbx_allocate_ipmi_host("127.0.0.1", 623, 2, 4, "user", "pass");
 
@@ -94,10 +94,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_free(c->c_name);
 	zbx_free(c->val);
 	zbx_free(h->controls);
-	zbx_hashset_remove(&hostset, &h);
+	hosts = NULL;
 	zbx_free(h->ip);
 	zbx_free(h->username);
 	zbx_free(h->password);
 	zbx_free(h);
-	zbx_hashset_destroy(&hostset);
 }

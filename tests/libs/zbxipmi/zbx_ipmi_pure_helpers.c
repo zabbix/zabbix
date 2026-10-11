@@ -12,10 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* has_name_prefix(), get_domain_offset(), add_threshold_ipmi() and zbx_parse_ipmi_command() are pure    */
-/* string/data functions with no OpenIPMI object involved at all - none of them need a real sensor,      */
-/* control, or connection, so they're covered here directly, one cmocka binary testing all four via       */
-/* 'in.func'. checks_ipmi.c is included directly to reach the three static ones.                          */
+/* has_name_prefix(), get_domain_offset(), add_threshold_ipmi() and zbx_parse_ipmi_command() are pure       */
+/* string/data functions with no OpenIPMI object involved at all - none of them need a real sensor,         */
+/* control, or connection, so they're covered here directly, one cmocka binary testing all four via         */
+/* 'in.func'. checks_ipmi.c is included directly to reach the three static ones.                            */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"

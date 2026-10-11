@@ -11,7 +11,7 @@ in:
 out:
   processed: "yes"
 ---
-test case: "3. cb_data for a host removed from hostset (stale OpenIPMI callback) is rejected"
+test case: "3. cb_data for a host unlinked from the hosts list (stale OpenIPMI callback) is rejected"
 in:
   cb_data: "unregistered"
 out:

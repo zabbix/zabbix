@@ -11,7 +11,7 @@ in:
 out:
   get_thresholds_calls: 0
 ---
-test case: "3. thresholds are readable, but the sensor no longer exists"
+test case: "3. thresholds are readable - requested through sensor_id via ipmi_sensor_id_get_thresholds()"
 in:
   thr_access: 1  # IPMI_THRESHOLD_ACCESS_SUPPORT_READABLE
 out:

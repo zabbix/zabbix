@@ -15,15 +15,17 @@
 /* zbx_read_ipmi_control() and zbx_set_ipmi_control() are static, so the source file is included directly   */
 /* to reach them. See zbx_read_ipmi_sensor.c for the full rationale - this is the same regression, on the   */
 /* zbx_ipmi_control_t side: only zbx_ipmi_control_t.control_id may be used to issue a new read/write from   */
-/* outside a callback, via ipmi_control_id_get_val()/ipmi_control_id_set_val() (which internally revalidate */
-/* the id). is_readable/is_settable are a separate, static property captured once in                        */
-/* zbx_allocate_ipmi_control_within_cb_only() - simulated here as already-cached (both true), so the test   */
-/* actually reaches the id-based call being verified, rather than short-circuiting on the capability check. */
+/* outside a callback, via ipmi_control_id_get_val()/ipmi_control_id_set_val() (which internally            */
+/* revalidate the id). is_readable/is_settable are a separate, static property captured once in             */
+/* zbx_allocate_ipmi_control() - set directly here, so the test either reaches the id-based call being      */
+/* verified or short-circuits on the capability check, as each case requires.                               */
 /*                                                                                                          */
-/* An IPMI_CONTROL_ID_INVALID control_id stands in for a control OpenIPMI has since destroyed. Real         */
-/* OpenIPMI (not mocked) is exercised throughout. 'out.err_contains' pins down the exact wording each       */
-/* branch produces, so a case can only pass if the matching branch actually ran - not just any branch       */
-/* that happens to also set h->ret to NOTSUPPORTED.                                                         */
+/* Real OpenIPMI (not mocked) is exercised throughout, but this test process never calls ipmi_init(), so    */
+/* the id-based calls fail synchronously with ECANCELED (0x7d) before even looking at the id, without ever  */
+/* invoking their callback - the id is set to IPMI_CONTROL_ID_INVALID only so it is never mistaken for a    */
+/* usable one. 'out.err_contains' pins down the exact wording each branch produces, so a case can only      */
+/* pass if the matching branch actually ran - not just any branch that happens to also set h->ret to        */
+/* NOTSUPPORTED.                                                                                            */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -41,8 +43,6 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_hashset_create(&hostset, 0, zbx_ipmi_hostset_hash_func, zbx_ipmi_hostset_compare_func);
-
 	memset(&h, 0, sizeof(h));
 	h.ip = "127.0.0.1";
 	h.port = 623;
@@ -54,7 +54,7 @@ void	zbx_mock_test_entry(void **state)
 	/* as if cached at allocation time - see the file header comment */
 	c.is_readable = zbx_mock_get_parameter_int("in.is_readable");
 	c.is_settable = zbx_mock_get_parameter_int("in.is_settable");
-	/* stands in for a control OpenIPMI has already destroyed - see the file header comment */
+	/* never a usable id - see the file header comment */
 	c.control_id = (ipmi_control_id_t)IPMI_CONTROL_ID_INVALID;
 
 	if (0 == strcmp(op, "read"))
@@ -73,5 +73,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_free(h.err);
-	zbx_hashset_destroy(&hostset);
 }

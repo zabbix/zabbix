@@ -1,11 +1,11 @@
 ---
-test case: "1. threshold sensor that no longer exists is rejected via ipmi_sensor_get_reading(), not read via a stale pointer"
+test case: "1. threshold sensor is read through its sensor_id and ipmi_sensor_get_reading() failure is reported"
 in:
   reading_type: 1  # IPMI_EVENT_READING_TYPE_THRESHOLD
 out:
   err_contains: "ipmi_sensor_get_reading()"
 ---
-test case: "2. discrete sensor that no longer exists is rejected via ipmi_sensor_get_states(), not read via a stale pointer"
+test case: "2. discrete sensor is read through its sensor_id and ipmi_sensor_get_states() failure is reported"
 in:
   reading_type: 3  # IPMI_EVENT_READING_TYPE_DISCRETE_STATE
 out:
