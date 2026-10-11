@@ -188,13 +188,13 @@ $form_grid
 										(new CInput('hidden'))
 											->setAttribute('value', '#{operator}')
 											->setName('conditions[#{row_index}][operator]')
-											->setAttribute('data-field-type', 'hidden'),
+											->setAttribute('data-field-type', 'hidden')
 									)
 									->addItem(
 										(new CInput('hidden'))
 											->setAttribute('value', '#{groupid}')
 											->setName('conditions[#{row_index}][groupid]')
-											->setAttribute('data-field-type', 'hidden'),
+											->setAttribute('data-field-type', 'hidden')
 									)
 								)
 							)

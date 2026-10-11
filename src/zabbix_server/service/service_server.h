@@ -24,6 +24,6 @@ typedef struct
 }
 zbx_thread_service_manager_args;
 
-ZBX_THREAD_ENTRY(service_manager_thread, args);
+void	*zbx_service_manager_thread(void *args);
 
 #endif

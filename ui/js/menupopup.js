@@ -688,8 +688,11 @@ function getMenuPopupDashboard(options, trigger_element) {
  *        {bool}   options['allowed_ui_conf_hosts']       Whether user has access to Configuration > Hosts.
  *        {bool}   options['allowed_ui_latest_data']      Whether user has access to Monitoring > Latest data.
  *        {bool}   options['allowed_ui_problems']         Whether user has access to Monitoring > Problems.
+ *        {bool}   options['allowed_ui_conf_maintenance'] Whether user has access to Configuration > Maintenance.
+ *        {bool}   options['allowed_edit_maintenance']    Whether user has permission to edit Maintenance.
  *        {bool}   options['backurl']                     URL from where the menu popup was called.
  *        {bool}   options['show_events']                 Show Problems item enabled. Default: false.
+ *        {bool}   options['isWritable']                  Whether user has edit permission to related trigger.
  *        {string} options['eventid']                     (optional) Required for "Update problem" section and event
  *                                                        rank change.
  *        {array}  options['eventids']                    (optional)
@@ -937,6 +940,36 @@ function getMenuPopupTrigger(options, trigger_element) {
 			label: t('Problem'),
 			items: items
 		};
+	}
+
+	const has_eventid = options.eventid !== undefined && Number(options.eventid) > 0;
+
+	if (options.allowed_ui_conf_maintenance && options.allowed_edit_maintenance && has_eventid) {
+		const item_urls = [];
+
+		const maintenance = [
+			{label: t('Suppress host'), context: 'host'},
+			{label: t('Suppress trigger'), context: 'trigger'},
+			{label: t('Suppress by event name'), context: 'event_name'},
+			{label: t('Suppress by tags'), context: 'event_tags'}
+		];
+
+		for (const item of maintenance) {
+			item_urls.push({
+				label: item.label,
+				url: zabbixUrl({
+					action: 'popup',
+					popup: 'maintenance.edit',
+					context: item.context,
+					eventids: [options.eventid]
+				}),
+				disabled: !options.isWritable
+			});
+		}
+		sections.push({
+			label: t('Maintenance'),
+			items: item_urls
+		});
 	}
 
 	// urls

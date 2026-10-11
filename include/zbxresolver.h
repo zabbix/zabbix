@@ -15,14 +15,21 @@
 #ifndef ZABBIX_RESOLVER_H
 #define ZABBIX_RESOLVER_H
 #include "config.h"
-#ifdef HAVE_ARES_QUERY_CACHE
+
+#ifdef HAVE_ARES
 #include <ares.h>
-typedef struct ares_channeldata zbx_channel_t;
+typedef struct ares_channeldata zbx_ares_channel_t;
+
+#	ifdef HAVE_ARES_QUERY_CACHE
 
 void	zbx_ares_library_init(void);
 int	zbx_ares_getaddrinfo(const char *ip, const char *service, int ai_flags, int ai_family, int ai_socktype,
 		struct ares_addrinfo **ares_ai, char *error, int max_error_len);
 int	zbx_ares_getnameinfo(const struct sockaddr *sa, ares_socklen_t salen, char *host, size_t hostlen,
 		char *error, int max_error_len);
+#	endif
+#else
+typedef void zbx_ares_channel_t;
 #endif
+
 #endif

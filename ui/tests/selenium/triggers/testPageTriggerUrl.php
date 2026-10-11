@@ -102,6 +102,15 @@ class testPageTriggerUrl extends CWebTest {
 						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
+						// Links to the ad-hoc maintenance creation form.
+						'Suppress host' => 'zabbix.php?action=popup&popup=maintenance.edit&context=host&'.
+								'eventids%5B0%5D={event_id}',
+						'Suppress trigger' => 'zabbix.php?action=popup&popup=maintenance.edit&context=trigger&'.
+								'eventids%5B0%5D={event_id}',
+						'Suppress by event name' => 'zabbix.php?action=popup&popup=maintenance.edit&'.
+								'context=event_name&eventids%5B0%5D={event_id}',
+						'Suppress by tags' => 'zabbix.php?action=popup&popup=maintenance.edit&context=event_tags&'.
+								'eventids%5B0%5D={event_id}',
 						'Trigger URL' => 'menu-popup-item',
 						'Unique webhook url' => 'menu-popup-item',
 						'Webhook url for all' => 'menu-popup-item'
@@ -119,6 +128,15 @@ class testPageTriggerUrl extends CWebTest {
 						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
+						// Links to the ad-hoc maintenance creation form.
+						'Suppress host' => 'zabbix.php?action=popup&popup=maintenance.edit&context=host&'.
+								'eventids%5B0%5D={event_id}',
+						'Suppress trigger' => 'zabbix.php?action=popup&popup=maintenance.edit&context=trigger&'.
+								'eventids%5B0%5D={event_id}',
+						'Suppress by event name' => 'zabbix.php?action=popup&popup=maintenance.edit&'.
+								'context=event_name&eventids%5B0%5D={event_id}',
+						'Suppress by tags' => 'zabbix.php?action=popup&popup=maintenance.edit&context=event_tags&'.
+								'eventids%5B0%5D={event_id}',
 						'URL name for menu' => 'menu-popup-item',
 						'Webhook url for all' => 'menu-popup-item'
 					],
@@ -170,7 +188,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
-		$this->checkTriggerUrl($data, ['VIEW', 'ACTIONS', 'CONFIGURATION', 'LINKS']);
+		$this->checkTriggerUrl($data, ['VIEW', 'ACTIONS', 'CONFIGURATION', 'MAINTENANCE', 'LINKS']);
 	}
 
 	/**
@@ -212,7 +230,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * @param array $data		data provider with fields values
 	 * @param array $titles		titles in context menu
 	 */
-	private function checkTriggerUrl($data, $titles = ['VIEW', 'CONFIGURATION', 'PROBLEM', 'LINKS']) {
+	private function checkTriggerUrl($data, $titles = ['VIEW', 'CONFIGURATION', 'PROBLEM', 'MAINTENANCE', 'LINKS']) {
 		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
 
 		// Check trigger popup menu.
@@ -233,7 +251,9 @@ class testPageTriggerUrl extends CWebTest {
 			else {
 				// Check 1-level menu links.
 				if ($links !== '') {
-					$links = str_replace('{trigger_id}', self::$triggerids[$data['trigger']], $links);
+					$links = str_replace(['{trigger_id}', '{event_id}'],
+							[self::$triggerids[$data['trigger']], self::$eventids[$data['trigger']]], $links
+					);
 					$this->assertStringContainsString($links,
 							$trigger_popup->getItem($menu)->getAttribute($links === 'menu-popup-item' ? 'class' : 'href')
 					);

@@ -252,6 +252,11 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 		scope = 1 << ZBX_DIAGINFO_CONNECTOR;
 		ret = SUCCEED;
 	}
+	else if (0 == strcmp(buf, ZBX_DIAG_CEP))
+	{
+		scope = 1 << ZBX_DIAGINFO_CEP;
+		ret = SUCCEED;
+	}
 
 	if (0 != scope)
 		zbx_diag_log_info(scope, result);

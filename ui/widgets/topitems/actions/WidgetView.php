@@ -541,8 +541,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					foreach ($hostids as $hostid) {
 						$itemid = $itemids[$hostid] ?? null;
-						$value = array_key_exists($itemid, $db_values) ? $db_values[$itemid] : null;
-						$sparkline_value = array_key_exists($itemid, $db_sparkline_values)
+						$value = $itemid !== null && array_key_exists($itemid, $db_values) ? $db_values[$itemid] : null;
+						$sparkline_value = $itemid !== null && array_key_exists($itemid, $db_sparkline_values)
 							? $db_sparkline_values[$itemid]
 							: null;
 						$table[$hostid][$table_column_index] = [

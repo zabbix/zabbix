@@ -40,6 +40,7 @@ class CControllerTimeoutsEdit extends CController {
 			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
 			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
 			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
+			'timeout_telemetry_query' => CSettingsSchema::getDefault('timeout_telemetry_query'),
 			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
 			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
 			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),

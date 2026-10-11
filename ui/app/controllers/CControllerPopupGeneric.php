@@ -601,6 +601,7 @@ class CControllerPopupGeneric extends CController {
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
+			'without_proxy_group' =>				'in 1',
 			'with_graphs' =>						'in 1',
 			'with_hosts' =>							'in 1',
 			'with_templates' =>						'in 1',
@@ -1781,6 +1782,10 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['proxyid', 'name']
 				];
+
+				if ($this->hasInput('without_proxy_group')) {
+					$options['proxy_groupids'] = 0;
+				}
 
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['name']);

@@ -5,6 +5,7 @@ SUBDIRS = \
 	autoreg \
 	actions \
 	cachehistory \
+	cep \
 	dbconfig \
 	diag \
 	discovery \
@@ -35,6 +36,12 @@ zabbix_server_SOURCES = \
 	db_lengths_constants.h \
 	server_constants.h \
 	server.c
+
+if HAVE_ARES
+RESOLVER_LIB = $(top_builddir)/src/libs/zbxresolver/libzbxresolver.a
+else
+RESOLVER_LIB =
+endif
 
 zabbix_server_LDADD = \
 	cachehistory/libzbxcachehistory_server.a \
@@ -78,6 +85,8 @@ zabbix_server_LDADD = \
 	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	pgmanager/libzbxpgmanager.a \
+	cep/libzbxcep.a \
+	$(top_builddir)/src/libs/zbxmw/libzbxmw.a \
 	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -120,13 +129,14 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
+	$(RESOLVER_LIB) \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_builddir)/src/libs/zbxtelemetry/libzbxtelemetry.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
@@ -163,6 +173,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
+	$(top_builddir)/src/libs/zbxcep_client/libzbxcep_client.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a

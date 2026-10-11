@@ -15,6 +15,8 @@
 #include "discoverer_async.h"
 
 #include "discoverer_job.h"
+#include "discoverer_int.h"
+#include "discoverer_queue.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 
@@ -197,6 +199,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
 	item.snmp_oid = dcheck->key_;
 	item.timeout = dcheck->timeout;
+	item.snmp_retries = 0;
 
 	if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 	{
@@ -215,7 +218,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	if (SUCCEED != (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
 			poller_config->base, NULL, poller_config->dnsbase, poller_config->config_source_ip,
-			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES, 0)))
+			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));

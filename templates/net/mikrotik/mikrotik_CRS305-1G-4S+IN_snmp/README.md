@@ -1,5 +1,5 @@
 
-# MikroTik CRS305-1G-4SIN by SNMP
+# MikroTik CRS305-1G-4S+IN by SNMP
 
 ## Overview
 

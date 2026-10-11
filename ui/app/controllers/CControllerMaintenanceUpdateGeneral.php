@@ -36,9 +36,16 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 	final protected function processMaintenance(array &$maintenance): void {
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL) {
 			$maintenance += [
+				'event_names' => [],
 				'tags_evaltype' => $this->getInput('tags_evaltype'),
 				'tags' => []
 			];
+
+			foreach ($this->getInput('event_names', []) as $event_name) {
+				if (array_key_exists('value', $event_name) && $event_name['value'] !== '') {
+					$maintenance['event_names'][] = $event_name;
+				}
+			}
 
 			foreach ($this->getInput('tags', []) as $tag) {
 				if (array_key_exists('tag', $tag) && array_key_exists('value', $tag)
@@ -53,6 +60,6 @@ abstract class CControllerMaintenanceUpdateGeneral extends CController {
 		$absolute_time_parser = new CAbsoluteTimeParser();
 		$absolute_time_parser->parse($active_time);
 
-		return $absolute_time_parser->getDateTime(true)->getTimestamp();;
+		return $absolute_time_parser->getDateTime(true)->getTimestamp();
 	}
 }

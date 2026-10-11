@@ -1,5 +1,5 @@
 
-# MikroTik CRS328-4C-20S-4SRM by SNMP
+# MikroTik CRS328-4C-20S-4S+RM by SNMP
 
 ## Overview
 

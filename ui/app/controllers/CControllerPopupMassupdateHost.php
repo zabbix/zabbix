@@ -89,7 +89,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			);
 		}
 
-		if ($this->hasInput('backurl') && !CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+		if ($this->hasInput('backurl') && !(new CFrontendActionValidator())->validate($this->getInput('backurl'))) {
 			throw new CAccessDeniedException();
 		}
 
@@ -553,7 +553,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
 					->setArgument('page', CPagerHelper::loadPage('host.list'))
-					->getUrl()
+					->getUrl(),
+				'monitored_by' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+					? ZBX_MONITORED_BY_SERVER
+					: ZBX_MONITORED_BY_PROXY
 			];
 
 			$data['discovered_host'] = !(bool) API::Host()->get([

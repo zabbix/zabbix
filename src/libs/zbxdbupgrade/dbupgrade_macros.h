@@ -18,6 +18,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxexpr.h"
+#include "zbxstr.h"
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
 #define ZBX_DBPATCH_FUNCTION_UPDATE_PARAM		0x02
