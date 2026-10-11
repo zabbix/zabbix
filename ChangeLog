@@ -3,6 +3,7 @@ Changes for 8.0.0rc2
 New features:
 
 Bug fixes:
+...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0rc1
@@ -580,8 +581,12 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.16rc1
 
 New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-26854] fixed handling null as previous value in preprocessing during item test (vskalbins)
+..F....... [ZBX-23109] fixed to auto set SNMP max repetition count and community on SNMP version change for host interface (gberzina)
+.........T [ZBX-24844] fixed Linux template (kflorowski)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
 .......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
@@ -2212,8 +2217,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.32rc1
 
 New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-26854] fixed handling null as previous value in preprocessing during item test (vskalbins)
+..F....... [ZBX-23109] fixed to auto set SNMP max repetition count and community on SNMP version change for host interface (gberzina)
+.........T [ZBX-24844] fixed Linux template (kflorowski)
+...G...... [ZBX-27925] added flag AI_NUMERICHOST to suppresses potentially lengthy network host address lookups (jburlakovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
 .......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
@@ -6461,6 +6471,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.49rc1
 
 New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 
 Bug fixes:
