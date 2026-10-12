@@ -154,7 +154,7 @@ static os_handler_t	*os_hnd;
  *                                                                            *
  * Purpose: finds host by callback data created by ZBX_IPMI_HOST_CB_DATA()    *
  *                                                                            *
- * Parameters: cb_data - [IN] callback data                                   *
+ * Parameters: cb_data - [IN]                                                 *
  *                                                                            *
  * Return value: pointer to host data or NULL if host does not exist          *
  *                                                                            *
