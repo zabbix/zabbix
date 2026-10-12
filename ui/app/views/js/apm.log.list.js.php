@@ -162,6 +162,7 @@
 						.setWidth('auto'),
 					new CDataTableColumn('severity_number', <?= json_encode(_('Severity number')) ?>)
 						.setFields(['severity_number'])
+						.setRenderer('text_field')
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
