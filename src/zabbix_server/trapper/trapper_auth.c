@@ -23,7 +23,6 @@
 #include "db.h"
 #include "log.h"
 #include "sha512crypt.h"
-
 #include "../../libs/zbxserver/zabbix_users.h"
 
 /******************************************************************************
