@@ -1,1 +1,1 @@
-.......PS. [ZBX-25759] added callback data validation in IPMI checks (arimdjonoks, askolmeisters)
+.......PS. [ZBX-25759] replaced OpenIPMI cached pointers outside callbacks with sensor/control IDs (arimdjonoks, askolmeisters)
