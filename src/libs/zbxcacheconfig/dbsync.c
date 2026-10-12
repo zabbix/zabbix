@@ -1827,7 +1827,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null,i.query,i.time_shift,"
-				"i.lookback_limit,i.granularity"
+				"i.lookback_limit,i.granularity,i.storage_mode"
 			" from items i"
 			" left join item_rtdata ir on i.itemid=ir.itemid");
 

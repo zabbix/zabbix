@@ -216,6 +216,7 @@ typedef struct
 	int			lookback_limit;
 	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
 	int			granularity;
+	unsigned char		storage_mode;
 	zbx_tq_query_t		*telemetry_query;
 	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
 	int			snmp_max_repetitions;
@@ -328,6 +329,7 @@ typedef struct
 	int			lookback_limit;
 	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
 	int			granularity;
+	unsigned char		storage_mode;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
 	zbx_timespec_t		min_free_ts;

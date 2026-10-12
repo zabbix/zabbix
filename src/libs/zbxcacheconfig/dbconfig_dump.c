@@ -556,8 +556,10 @@ static void	DCdump_browseritem(const ZBX_DC_BROWSERITEM *browseritem)
 static void	DCdump_tqitem(const ZBX_DC_TQITEM *tqitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE,
-			"  telemetry_query:[query:'%s' time_shift:'%s' lookback_limit:'%s' granularity:'%s']",
-			tqitem->query, tqitem->time_shift, tqitem->lookback_limit, tqitem->granularity);
+			"  telemetry_query:[query:'%s' time_shift:'%s' lookback_limit:'%s' granularity:'%s'"
+			" storage_mode:%u]",
+			tqitem->query, tqitem->time_shift, tqitem->lookback_limit, tqitem->granularity,
+			tqitem->storage_mode);
 }
 
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
