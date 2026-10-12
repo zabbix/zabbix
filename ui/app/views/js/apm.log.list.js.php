@@ -23,6 +23,7 @@
 <script>
 	const view = new class {
 		#severity_classes = [
+			'status-amp-severity-unspecified',
 			'status-amp-severity-trace',
 			'status-amp-severity-debug',
 			'status-amp-severity-info',
@@ -317,9 +318,9 @@
 						return;
 					}
 
-					const severity_class = severity_number >= 1 && severity_number <= 24
-						? this.#severity_classes[Math.floor((severity_number - 1) / 4)]
-						: this.#severity_classes[0];
+					const severity_class = severity_number < 1 && severity_number > 24
+						? this.#severity_classes[0]
+						: this.#severity_classes[Math.floor((severity_number - 1) / 4) + 1];
 
 					const severity_span = document.createElement('span');
 					severity_span.classList.add(severity_class);

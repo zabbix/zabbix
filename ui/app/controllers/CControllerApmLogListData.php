@@ -73,8 +73,8 @@ class CControllerApmLogListData extends CControllerDataTable {
 			'service_name' => ['string', 'required'],
 			'scope_name' => ['string', 'required'],
 			'severities' => ['array', 'required', 'field' => ['integer',
-				'in' => [APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG, APM_LOG_SEVERITY_INFO,
-					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
+				'in' => [APM_LOG_SEVERITY_UNSPECIFIED, APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG,
+					APM_LOG_SEVERITY_INFO, APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
 			'log_attributes_evaltype' => $filter_attributes_evaltype,
@@ -117,7 +117,16 @@ class CControllerApmLogListData extends CControllerDataTable {
 			$severity_numbers = [];
 
 			foreach ($this->filter['severities'] as $severity) {
-				$severity_numbers = array_merge($severity_numbers, range($severity * 4 + 1, $severity * 4 + 4));
+				if ($severity == APM_LOG_SEVERITY_UNSPECIFIED) {
+					$severity_numbers[] = 0;
+
+					continue;
+				}
+
+				$start_severity_number = ($severity - 1) * 4 + 1;
+				$severity_numbers = array_merge($severity_numbers,
+					range($start_severity_number, $start_severity_number + 3)
+				);
 			}
 		}
 

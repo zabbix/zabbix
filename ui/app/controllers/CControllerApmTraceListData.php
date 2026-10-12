@@ -183,10 +183,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			}
 
 			$traces = API::ApmTrace()->get([
-				'output'    => $select_fields,
+				'output' => $select_fields,
 				'time_from' => $timeline['from_ts'],
 				'time_till' => $timeline['to_ts'],
-				'traceids'  => array_column($traces, 'traceid'),
+				'traceids' => array_column($traces, 'traceid'),
 				'sortfield' => $sort_field,
 				'sortorder' => $sort_order
 			]);

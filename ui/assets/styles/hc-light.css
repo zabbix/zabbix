@@ -4956,7 +4956,7 @@ section {
 .status-warning-bg,
 .status-average-bg,
 .status-high-bg,
-.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal {
+.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal, .status-amp-severity-unspecified {
   box-sizing: border-box;
   display: inline-block;
   min-width: 16px;
@@ -5059,6 +5059,10 @@ section {
   color: #4b0c0c;
   background-color: #e45959;
   border-color: #BC5051; }
+
+.status-amp-severity-unspecified {
+  background-color: transparent;
+  border-color: transparent; }
 
 .subfilter-option-grid {
   grid-template-columns: minmax(75px, max-content) auto;

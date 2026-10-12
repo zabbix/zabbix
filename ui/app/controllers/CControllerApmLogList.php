@@ -44,8 +44,8 @@ class CControllerApmLogList extends CController {
 			'filter_service_name' => ['string'],
 			'filter_scope_name' => ['string'],
 			'filter_severities' => ['array', 'field' => ['integer',
-				'in' => [APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG, APM_LOG_SEVERITY_INFO,
-					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
+				'in' => [APM_LOG_SEVERITY_UNSPECIFIED, APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG,
+					APM_LOG_SEVERITY_INFO, APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
 			'filter_log_attributes_evaltype' => $filter_attributes_evaltype,
