@@ -370,7 +370,7 @@ void	*zbx_apm_manager_thread(void *args)
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_uint64_t				cfg_revision = 0, quota, accepted_num = 0, dropped_num = 0;
 	char					*proxy_apm_config = NULL;
-	zbx_apm_config_t			apm_config = {0};
+	zbx_apm_config_t			apm_config;
 	zbx_apm_config_tls_t			apm_config_tls, *tls;
 	zbx_uint32_t				rtc_manager_msgs[] = {ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 
@@ -384,6 +384,7 @@ void	*zbx_apm_manager_thread(void *args)
 
 	tls = apm_manager_validate_tls(&apm_config_tls);
 
+	apm_config_init(&apm_config);
 	zbx_dc_config_local_acquire();
 	proxy_apm_config = zbx_dc_get_apm_config(proxy_apm_config, &cfg_revision);
 	if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
