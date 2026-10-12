@@ -1013,10 +1013,11 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			if (0 != (ret = ipmi_sensor_id_get_reading(s->sensor_id, zbx_got_thresh_reading_cb,
 					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may have disappeared during */
-				/* ipmi_sensor_get_reading(), as domain might be closed due to communication failure */
+				/* do not use pointer to sensor here - the sensor may have */
+				/* disappeared during ipmi_sensor_id_get_reading(), as     */
+				/* domain might be closed due to communication failure     */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_reading() return error: 0x%x", id_str,
+						" ipmi_sensor_id_get_reading() return error: 0x%x", id_str,
 						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
@@ -1053,10 +1054,11 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			if (0 != (ret = ipmi_sensor_id_get_states(s->sensor_id, zbx_got_discrete_states_cb,
 					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may have disappeared during */
-				/* ipmi_sensor_get_states(), as domain might be closed due to communication failure */
+				/* do not use pointer to sensor here - the sensor may     */
+				/* have disappeared during ipmi_sensor_id_get_states(),   */
+				/* as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_states() return error: 0x%x", id_str,
+						" ipmi_sensor_id_get_states() return error: 0x%x", id_str,
 						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
@@ -1098,7 +1100,7 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 
 	if (0 != (ret = ipmi_sensor_id_get_thresholds(s->sensor_id, zbx_got_thresholds_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\". ipmi_sensor_get_thresholds()"
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\". ipmi_sensor_id_get_thresholds()"
 				" return error: 0x%x", id_str, (unsigned int)ret);
 		goto out;
 	}
@@ -1223,9 +1225,9 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 
 	if (0 != (ret = ipmi_control_id_get_val(c->control_id, zbx_got_control_reading_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during */
-		/* ipmi_control_get_val(), as domain might be closed due to communication failure */
-		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_get_val() return error: 0x%x",
+		/* do not use pointer to control here - the control may have disappeared during      */
+		/* ipmi_control_id_get_val(), as domain might be closed due to communication failure */
+		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_id_get_val() return error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
@@ -1270,9 +1272,9 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 	if (0 != (ret = ipmi_control_id_set_val(c->control_id, c->val, zbx_got_control_setting_cb,
 			ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during */
-		/* ipmi_control_set_val(), as domain might be closed due to communication failure */
-		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_set_val() return error: 0x%x",
+		/* do not use pointer to control here - the control may have disappeared during      */
+		/* ipmi_control_id_set_val(), as domain might be closed due to communication failure */
+		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_id_set_val() return error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
