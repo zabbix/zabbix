@@ -29,7 +29,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	private static $hostid;
 	private static $itemIds = [];
-	private static $iterator;
 
 	const HOST_NAME = 'test_calc';
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
@@ -95,51 +94,65 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$hostid = $response['result']['hostids'][0];
 	}
 
-	private function createTrap()
-	{
-		self::$iterator++;
+	private function createItem(array $params): string {
+		$response = $this->call('item.create', $params);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$response = $this->call('item.create', [
+		/*
+		 * The trigger is needed to ensure that the value cache receives data immediately when history is added.
+		 * This prevents issues caused by Elasticsearch not returning newly added history data immediately.
+		 */
+		$response = $this->call('trigger.create', [
+			'description' => 'trigger '.$params['key_'],
+			'expression' => 'last(/'.self::HOST_NAME.'/'.$params['key_'].')'
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals(1, count($response['result']['triggerids']));
+
+		return $itemid;
+	}
+
+	private function createTrap(string $keySuffix): string {
+		$itemid = $this->createItem([
 			'hostid'		=> self::$hostid,
-			'name'			=> self::TRAPPER_ITEM_KEY . self::$iterator,
-			'key_'			=> self::TRAPPER_ITEM_KEY . self::$iterator,
+			'name'			=> self::TRAPPER_ITEM_KEY.'.'.$keySuffix,
+			'key_'			=> self::TRAPPER_ITEM_KEY.'.'.$keySuffix,
 			'type'			=> ITEM_TYPE_TRAPPER,
-			'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
+			'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
-			'tags'		=> [
+			'tags'			=> [
 				['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]
 			],
 			'preprocessing' => [
 				[
-					'type'			=> ZBX_PREPROC_TRIM,
-					'params'		=> ' ',
-					'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+					'type'					=> ZBX_PREPROC_TRIM,
+					'params'				=> ' ',
+					'error_handler'			=> ZBX_PREPROC_FAIL_DEFAULT,
 					'error_handler_params'	=> ''
 				]
 			]
 		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$itemIds = array_merge(self::$itemIds, $response['result']['itemids']);
 
-		return $response['result']['itemids'];
+		return $itemid;
 	}
 
 	// create calculated item with given formula and return its itemid
-	private function createCalculatedItemWithFormula($formula, $keySuffix, $delay = '1s')
-	{
-		$response = $this->call('item.create', [
-			'name'		=> self::CALCULATED_ITEM_KEY . '.' . $keySuffix,
-			'key_'		=> self::CALCULATED_ITEM_KEY . '.' . $keySuffix,
-			'type'		=> ITEM_TYPE_CALCULATED,
-			'params'	=> $formula,
-			'hostid'	=> self::$hostid,
-			'delay'		=> $delay,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
+	private function createCalculatedItemWithFormula(string $formula, string $keySuffix, string $delay = '1s',
+			int $value_type = ITEM_VALUE_TYPE_FLOAT): string {
+		$itemid = $this->createItem([
+			'name'			=> self::CALCULATED_ITEM_KEY.'.'.$keySuffix,
+			'key_'			=> self::CALCULATED_ITEM_KEY.'.'.$keySuffix,
+			'type'			=> ITEM_TYPE_CALCULATED,
+			'params'		=> $formula,
+			'hostid'		=> self::$hostid,
+			'delay'			=> $delay,
+			'value_type'	=> $value_type
 		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		return $response['result']['itemids'][0];
+
+		return $itemid;
 	}
 
 	private function sendIncrementingSequence($n, $itemkey)
@@ -213,14 +226,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_AvgOfLast5()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('avg5');
 
-		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#5)';
+		$formula = 'avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.avg5,#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // 1..5 -> avg = 3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY.'.avg5'); // 1..5 -> avg = 3
 		$history = $this->historyGet($trapId);
 
 		$values = $this->extractHistoryValues($history);
@@ -235,15 +247,14 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_AvgOfLast5MaxMinValue()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('avg5MaxValue');
 
-		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#5)';
+		$formula = 'avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.avg5MaxValue,#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
-		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY.'.avg5MaxValue');
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -264,14 +275,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_MaxOfLast4()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('max4');
 
-		$formula = 'max(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#4)';
+		$formula = 'max(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.max4,#4)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(4, self::TRAPPER_ITEM_KEY . self::$iterator); // last 4 are 1,2,3,4 -> max = 4
+		$this->sendIncrementingSequence(4, self::TRAPPER_ITEM_KEY.'.max4'); // last 4 are 1,2,3,4 -> max = 4
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -286,16 +296,15 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_MaxOfLast4MaxMinValue()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('max4MaxValue');
 
-		$formula = 'max(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#4)';
+		$formula = 'max(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.max4MaxValue,#4)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		// supported - 2 max and 2 min
-		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY.'.max4MaxValue');
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
@@ -316,14 +325,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_MinOfLast3()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('min3');
 
-		$formula = 'min(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
+		$formula = 'min(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.min3,#3)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are 3,4,5 -> min = 3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY.'.min3'); // last 3 are 3,4,5 -> min = 3
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -338,15 +346,14 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_MinOfLast5MaxMinValue()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('min3MaxValue');
 
-		$formula = 'min(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#5)';
+		$formula = 'min(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.min3MaxValue,#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
-		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
+		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY.'.min3MaxValue'); // last 3 are max values
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
@@ -368,14 +375,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_LastValue()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('last1');
 
-		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#1)';
+		$formula = 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.last1,#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY . self::$iterator); // last = 3
+		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY.'.last1'); // last = 3
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -390,15 +396,14 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_LastValueMaxValue()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('last1MaxValue');
 
-		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#1)';
+		$formula = 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.last1MaxValue,#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
-		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY.'.last1MaxValue');
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
@@ -420,12 +425,10 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		/* test timeleft */
 
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('timeleft_overflow');
 
-		$formula = 'timeleft(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, -1)';
-		$timeleft_itemid = $this->createCalculatedItemWithFormula($formula, 'timeleft_overflow', '1s');
-
-		self::$itemIds = array_merge(self::$itemIds, [$timeleft_itemid]);
+		$formula = 'timeleft(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.timeleft_overflow,#3, -1)';
+		$timeleft_itemid = $this->createCalculatedItemWithFormula($formula, 'timeleft_overflow');
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -433,9 +436,9 @@ class testCalculatedExpression extends CIntegrationTest {
 		$his2 = 2.0;
 		$his3 = 3.0;
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his2);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his3);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'.timeleft_overflow', $his1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'.timeleft_overflow', $his2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'.timeleft_overflow', $his3);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -457,10 +460,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		$his4 = 1.79e+10;
 		$his5 = 1.79e+300;
 
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('forecast_overflow');
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his4);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his5);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'.forecast_overflow', $his4);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'.forecast_overflow', $his5);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -472,10 +475,8 @@ class testCalculatedExpression extends CIntegrationTest {
 			],
 			array_map('floatval', $values)
 		);
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator .
-				',#2,3000w,"exponential")';
+		$formula = 'forecast(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.forecast_overflow,#2,3000w,"exponential")';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
-		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
@@ -499,15 +500,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('avg5_mul2');
 
-		$formula = '(avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator .
-			',#5) * 2) + 1';
+		$formula = '(avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.avg5_mul2,#5)*2)+1';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5_mul2');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // last5:1,2,3,4,5 avg=3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY.'.avg5_mul2'); // last5:1,2,3,4,5 avg=3
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -522,17 +521,16 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_CombinedFunctions()
 	{
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('sum_minus_avg5');
 
 		// formula: sum(last5) - avg(last5)
-		$formula = 'sum(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#5) - avg(/'
-			. self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#5)';
+		$formula = 'sum(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.sum_minus_avg5,#5)-'.
+			'avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.sum_minus_avg5,#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'sum_minus_avg5');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		// sum(1,2,3,4,5)-avg(1,2,3,4,5) = 15-3=12
-		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY.'.sum_minus_avg5');
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -547,18 +545,17 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_MultiItemAverage()
 	{
-		$trapIdFirst = $this->createTrap();
-		$trapIdSecond = $this->createTrap();
+		$trapIdFirst = $this->createTrap('multi_avg');
+		$trapIdSecond = $this->createTrap('multi_avg2');
 
 		// formula averaging two items' last values
-		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator-1 . ',#1) + avg(/'
-			. self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY. self::$iterator . ',#1)';
+		$formula = 'avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.multi_avg,#1)+'.
+			'avg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.multi_avg2,#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'multi_avg');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
-		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY . self::$iterator-1);
-		$this->sendScaledSequenceToSecondItem(self::TRAPPER_ITEM_KEY . self::$iterator, 3);
+		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY.'.multi_avg');
+		$this->sendScaledSequenceToSecondItem(self::TRAPPER_ITEM_KEY.'.multi_avg2', 3);
 
 		$history = $this->historyGet($trapIdFirst);
 		$values = $this->extractHistoryValues($history);
@@ -593,22 +590,10 @@ class testCalculatedExpression extends CIntegrationTest {
 	 * @depends testCalculatedExpression_CombinedFunctions
 	 * @depends testCalculatedExpression_MultiItemAverage
 	 */
-	public function testCalculatedExpression_ItemCount_TagFilter(){
-
+	public function testCalculatedExpression_ItemCount_TagFilter() {
 		$formula = 'item_count(/' . self::HOST_NAME . '/*?[tag="{$TAG_NAME}:{$TAG_VALUE}"])';
 
-		$response = $this->call('item.create', [
-			'name'		=> self::CALCULATED_ITEM_KEY . '.itemcount_tag',
-			'key_'		=> self::CALCULATED_ITEM_KEY . '.itemcount_tag',
-			'type'		=> ITEM_TYPE_CALCULATED,
-			'params'	=> $formula,
-			'hostid'	=> self::$hostid,
-			'delay'		=> '1s',
-			'value_type'	=> ITEM_VALUE_TYPE_UINT64
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$calcItemId = $response['result']['itemids'][0];
-		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
+		$calcItemId = $this->createCalculatedItemWithFormula($formula, 'itemcount_tag', '1s', ITEM_VALUE_TYPE_UINT64);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
 			" value:14 flags:uint64", true, 120);
@@ -623,27 +608,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		$trapperItemId;
 		// create a histogram bucket item (simulate with a trapper item for test)
 		foreach ([0.1, 0.5, 1, 2, 'Inf'] as $le) {
-			$response = $this->call('item.create', [
-				'hostid'	=> self::$hostid,
-				'name'		=> "bucket[$le]",
-				'key_'		=> self::TRAPPER_ITEM_KEY . ".bucket[$le]",
-				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
-				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
-				'preprocessing' => [
-					[
-						'type'			=> ZBX_PREPROC_TRIM,
-						'params'		=> ' ',
-						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
-						'error_handler_params'	=> ''
-					]
-				]
-			]);
-			$itemid = $response['result']['itemids'][0];
-			$this->assertEquals(1, count($response['result']['itemids']));
-			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-			$itemids = array_merge($itemids, [$itemid]);
-			$trapperItemId = $itemid;
+			$trapperItemId = $this->createTrap('bucket['.$le.']');
+			$itemids = array_merge($itemids, [$trapperItemId]);
 		}
 
 		$formula = 'histogram_quantile(0.25,' .
@@ -655,18 +621,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		')';
 
 		// create a calculated item using bucket_percentile
-		$response = $this->call('item.create', [
-			'name'		=> self::CALCULATED_ITEM_KEY . '.histogram_quantile',
-			'key_'		=> self::CALCULATED_ITEM_KEY . '.histogram_quantile',
-			'type'		=> ITEM_TYPE_CALCULATED,
-			'params'	=> $formula,
-			'hostid'	=> self::$hostid,
-			'delay'		=> '1s',
-			'value_type'	=> ITEM_VALUE_TYPE_FLOAT
-		]);
-		$calcItemId = $response['result']['itemids'][0];
-		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
+		$calcItemId = $this->createCalculatedItemWithFormula($formula, 'histogram_quantile');
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
 			" data:test.calc.calculated.histogram_quantile", true, 120);
@@ -729,43 +684,15 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$itemids = [];
 		// create several trapper items simulating disk usage for different filesystems
-		foreach( ['fs1', 'fs2', 'fs3', 'fs4'] as $i => $fs) {
-			$response = $this->call('item.create', [
-				'hostid'	=> self::$hostid,
-				'name'		=> "disk.pused[$fs]",
-				'key_'		=> self::TRAPPER_ITEM_KEY . ".disk.pused[$fs]",
-				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
-				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
-				'preprocessing' => [
-					[
-						'type'			=> ZBX_PREPROC_TRIM,
-						'params'		=> ' ',
-						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
-						'error_handler_params'	=> ''
-					]
-				]
-			]);
-			$itemid = $response['result']['itemids'][0];
-			$this->assertEquals(1, count($response['result']['itemids']));
-			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+		foreach( ['fs1', 'fs2', 'fs3', 'fs4'] as $fs) {
+			$itemid = $this->createTrap('disk.pused['.$fs.']');
 			$itemids = array_merge($itemids, [$itemid]);
 		}
 
 		$formula = 'count(last_foreach(/*/test.calc.trapper.disk.pused[*]),"gt",95)';
 
-		$response = $this->call('item.create', [
-			'name'		=> self::CALCULATED_ITEM_KEY . '.count_disk_pused_gt_95',
-			'key_'		=> self::CALCULATED_ITEM_KEY . '.count_disk_pused_gt_95',
-			'type'		=> ITEM_TYPE_CALCULATED,
-			'params'	=> $formula,
-			'hostid'	=> self::$hostid,
-			'delay'		=> '1s',
-			'value_type'	=> ITEM_VALUE_TYPE_UINT64
-		]);
-		$calcItemId = $response['result']['itemids'][0];
-		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
+		$calcItemId = $this->createCalculatedItemWithFormula($formula, 'count_disk_pused_gt_95', '1s',
+			ITEM_VALUE_TYPE_UINT64);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
 			" data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
@@ -814,12 +741,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		/* errors appearing as a result of scaling introduced to safeguard against */
 		/* overflow of double into 'inf'.                                          */
 
-		$trapId = $this->createTrap();
+		$trapId = $this->createTrap('trendAvg5MaxValue');
 
-		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',3h:now/h)';
-
+		$formula = 'trendavg(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_KEY.'.trendAvg5MaxValue,3h:now/h)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'trendAvg5MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
