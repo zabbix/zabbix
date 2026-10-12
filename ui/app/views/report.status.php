@@ -44,7 +44,6 @@ require_once __DIR__.'/js/report.status.js.php';
 				'user_type' => $data['user_type']
 			])
 		))
-			->addClass(ZBX_STYLE_CONTAINER)
 			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	)
 	->addItem(
@@ -57,7 +56,7 @@ require_once __DIR__.'/js/report.status.js.php';
 					'failover_delay' => null
 				])
 			))
-				->addClass(ZBX_STYLE_CONTAINER)
+				->addClass('ha-nodes')
 				->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 			: null
 	)

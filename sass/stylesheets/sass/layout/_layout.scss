@@ -70,10 +70,6 @@ main {
 	box-sizing: border-box;
 	min-inline-size: var(--min-content-size);
 	padding: 10px;
-
-	> .container:not(:first-of-type) {
-		margin-top: 10px;
-	}
 }
 
 footer {

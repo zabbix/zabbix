@@ -902,8 +902,6 @@ main {
   box-sizing: border-box;
   min-inline-size: var(--min-content-size);
   padding: 10px; }
-  main > .container:not(:first-of-type) {
-    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
@@ -9837,6 +9835,8 @@ main .server-name {
   float: right;
   margin: 10px;
   color: #333333; }
+main .ha-nodes {
+  margin-top: 10px; }
 
 .uppercase {
   text-transform: uppercase; }
