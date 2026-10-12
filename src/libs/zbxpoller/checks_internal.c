@@ -534,6 +534,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
+			case ZBX_PROCESS_TYPE_APM_MANAGER:
+			case ZBX_PROCESS_TYPE_APM_WORKER:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;

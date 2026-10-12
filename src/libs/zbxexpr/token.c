@@ -13,6 +13,7 @@
 **/
 
 #include "zbxexpr.h"
+#include "zbxstr.h"
 
 #include "zbx_expression_constants.h"
 
@@ -988,32 +989,3 @@ int	zbx_token_is_user_macro(const char *macro, const zbx_token_t *token)
 
 	return FAIL;
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compares substring at the specified location with the specified   *
- *          text                                                              *
- *                                                                            *
- * Parameters: src      - [IN] the source string                              *
- *             loc      - [IN] the substring location                         *
- *             text     - [IN] the text to compare with                       *
- *             text_len - [IN] the text length                                *
- *                                                                            *
- * Return value: -1 - the substring is less than the specified text           *
- *                0 - the substring is equal to the specified text            *
- *                1 - the substring is greater than the specified text        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
-{
-	size_t	src_len = loc->r - loc->l + 1;
-
-	if (src_len < text_len)
-		return -1;
-
-	if (src_len > text_len)
-		return 1;
-
-	return memcmp(src + loc->l, text, text_len);
-}
-

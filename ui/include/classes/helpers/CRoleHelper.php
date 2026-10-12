@@ -25,6 +25,9 @@ class CRoleHelper {
 	public const UI_MONITORING_LATEST_DATA = 'ui.monitoring.latest_data';
 	public const UI_MONITORING_MAPS = 'ui.monitoring.maps';
 	public const UI_MONITORING_DISCOVERY = 'ui.monitoring.discovery';
+	public const UI_APM_TRACES = 'ui.apm.traces';
+	public const UI_APM_METRICS = 'ui.apm.metrics';
+	public const UI_APM_LOGS = 'ui.apm.logs';
 	public const UI_INVENTORY_OVERVIEW = 'ui.inventory.overview';
 	public const UI_INVENTORY_HOSTS = 'ui.inventory.hosts';
 	public const UI_REPORTS_SYSTEM_INFO = 'ui.reports.system_info';
@@ -50,6 +53,7 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
+	public const UI_ADMINISTRATION_DATA_SOURCE = 'ui.administration.data_source';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
@@ -93,6 +97,7 @@ class CRoleHelper {
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
+	public const UI_SECTION_APM = 'ui.apm';
 	public const UI_SECTION_SERVICES = 'ui.services';
 	public const UI_SECTION_INVENTORY = 'ui.inventory';
 	public const UI_SECTION_REPORTS = 'ui.reports';
@@ -266,6 +271,9 @@ class CRoleHelper {
 			self::UI_MONITORING_HOSTS,
 			self::UI_MONITORING_LATEST_DATA,
 			self::UI_MONITORING_MAPS,
+			self::UI_APM_TRACES,
+			self::UI_APM_METRICS,
+			self::UI_APM_LOGS,
 			self::UI_SERVICES_SERVICES,
 			self::UI_SERVICES_SLA_REPORT,
 			self::UI_INVENTORY_OVERVIEW,
@@ -309,6 +317,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_AUTHENTICATION,
 				self::UI_ADMINISTRATION_LINKED_DEVICES,
 				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_ADMINISTRATION_DATA_SOURCE,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
 				self::UI_ADMINISTRATION_PROXY_GROUPS,
@@ -374,6 +383,7 @@ class CRoleHelper {
 		$sections = [
 			self::UI_SECTION_DASHBOARDS => _('Dashboards'),
 			self::UI_SECTION_MONITORING => _('Monitoring'),
+			self::UI_SECTION_APM => _('APM'),
 			self::UI_SECTION_SERVICES => _('Services'),
 			self::UI_SECTION_INVENTORY => _('Inventory'),
 			self::UI_SECTION_REPORTS => _('Reports')
@@ -424,6 +434,13 @@ class CRoleHelper {
 				}
 
 				return $labels;
+
+			case self::UI_SECTION_APM:
+				return [
+					self::UI_APM_TRACES => _('Traces'),
+					self::UI_APM_METRICS => _('Metrics'),
+					self::UI_APM_LOGS => _('Logs')
+				];
 
 			case self::UI_SECTION_SERVICES:
 				$labels = [self::UI_SERVICES_SERVICES => _('Services')];
@@ -541,6 +558,7 @@ class CRoleHelper {
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
+						self::UI_ADMINISTRATION_DATA_SOURCE => _('Data source'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
 						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),

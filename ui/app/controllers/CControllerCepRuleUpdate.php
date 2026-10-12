@@ -128,8 +128,8 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 				]
 			]],
 			'window_type' => ['db cep_rule_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
-				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-				CCepRuleHelper::WINDOW_PATTERN_MATCH
+				CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+				CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
 			'window' => ['object', 'required',
 				'fields' => [
@@ -173,8 +173,8 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
 				],
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(),
-					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_TAG_MATCH
+					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_NONE,
+						CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, CCepRuleHelper::WINDOW_SIMPLE_ONCE
 					]
 				]],
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(),

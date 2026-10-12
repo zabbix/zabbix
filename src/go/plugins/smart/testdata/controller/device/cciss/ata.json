@@ -1,0 +1,104 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      4
+    ],
+    "pre_release": false,
+    "svn_revision": "5530",
+    "platform_info": "x86_64-linux-generic",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "/dev/sg0",
+      "-d",
+      "cciss,1",
+      "-j"
+    ],
+    "messages": [
+      {
+        "string": "Warning: This result is based on an Attribute check.",
+        "severity": "warning"
+      }
+    ],
+    "exit_status": 0
+  },
+  "local_time": {
+    "time_t": 0,
+    "asctime": "Thu Jan  1 00:00:00 1970 UTC"
+  },
+  "device": {
+    "name": "/dev/sg0",
+    "info_name": "/dev/sg0 [cciss_disk_01] [SAT]",
+    "type": "sat",
+    "protocol": "ATA"
+  },
+  "model_family": "Generic Enterprise SSD",
+  "model_name": "TEST_SATA_SSD",
+  "serial_number": "TEST-CCISS-ATA-0002",
+  "firmware_version": "0001",
+  "user_capacity": {
+    "blocks": 1000000000,
+    "bytes": 512000000000
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 0,
+  "form_factor": {
+    "ata_value": 3,
+    "name": "2.5 inches"
+  },
+  "smart_support": {
+    "available": true,
+    "enabled": true
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "ata_smart_attributes": {
+    "revision": 1,
+    "table": [
+      {
+        "id": 5,
+        "name": "Reallocated_Sector_Ct",
+        "value": 100,
+        "worst": 100,
+        "thresh": 0,
+        "when_failed": "",
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      },
+      {
+        "id": 9,
+        "name": "Power_On_Hours",
+        "value": 100,
+        "worst": 100,
+        "thresh": 0,
+        "when_failed": "",
+        "raw": {
+          "value": 1000,
+          "string": "1000"
+        }
+      },
+      {
+        "id": 170,
+        "name": "Available_Reservd_Space",
+        "value": 100,
+        "worst": 100,
+        "thresh": 10,
+        "when_failed": "",
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      }
+    ]
+  }
+}

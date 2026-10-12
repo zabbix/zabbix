@@ -492,15 +492,14 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Checks absence of pid file after kill.
 	 *
-	 * @param string $component    component name
-	 *
+	 * @param string $parent_pid
 	 */
-	private static function checkPidKilled($component) {
+	private static function waitComponentStopped($parent_pid) {
 		$usleep_total = 0;
 
 		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			if (!file_exists(self::getPidPath($component))) {
-				return true;
+			if (!posix_kill($parent_pid, 0)) {
+				return;
 			}
 
 			if ($usleep_total < 1000000) {
@@ -512,36 +511,30 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
-
-		return false;
 	}
 
 	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component
+	 * @param string $parent_pid
 	 * @param array  $child_pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component, array $child_pids) {
+	protected static function waitForShutdown(string $component, string $parent_pid, array $child_pids) {
 		$start = microtime(true);
-		if (!self::checkPidKilled($component)) {
-			$pid = @file_get_contents(self::getPidPath($component));
-
-			if ($pid !== false && is_numeric($pid)) {
-				$child_pids[] = $pid;
-			}
-		}
+		self::waitComponentStopped($parent_pid);
 
 		$failed_pids = [];
 		$failed_kills = [];
 		$backtraces = [];
+		$child_pids[] = $parent_pid;
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
 				$bt_lines = [];
-				exec('gdb -batch -ex "set pagination 0" -ex "thread apply all bt" -p '.escapeshellarg($child_pid).' 2>&1', $bt_lines);
+				exec('gdb -batch -ex "set pagination 0" -ex "thread apply all bt" -p '.$child_pid.' 2>&1', $bt_lines);
 				$backtraces[$child_pid] = implode("\n", $bt_lines);
 				$failed_pids[] = $child_pid;
 			}
@@ -551,15 +544,14 @@ class CIntegrationTest extends CAPITest {
 			sleep(3);
 		}
 
-		foreach ($failed_pids as $child_pid) {
-			if (!posix_kill($child_pid, SIGKILL)) {
+		foreach ($failed_pids as $failed_pid) {
+			if (!posix_kill($failed_pid, SIGKILL)) {
 				$error_code = posix_get_last_error();
-				$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
+				$failed_kills[] = ' - '.$failed_pid.' ('.$error_code.') '.posix_strerror($error_code);
 			}
 		}
 
 		if (!$failed_pids) {
-
 			if (static::$trace_delays) {
 				self::recordDelay('shutdown', microtime(true) - $start);
 			}
@@ -829,17 +821,18 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$child_pids = [];
-		$pid = @file_get_contents(self::getPidPath($component));
+		$parent_pid = @file_get_contents(self::getPidPath($component));
 
-		if ($pid !== false && is_numeric($pid)) {
-			$output = shell_exec('pgrep -P '.$pid);
+		if ($parent_pid !== false && is_numeric($parent_pid)) {
+			$output = shell_exec('pgrep -P '.$parent_pid);
 			if ($output !== false && $output !== null) {
 				$child_pids = explode("\n", trim($output));
 			}
 
-			posix_kill($pid, SIGTERM);
+			posix_kill($parent_pid, SIGTERM);
+
+			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
-		self::waitForShutdown($component, $child_pids);
 	}
 
 	/**

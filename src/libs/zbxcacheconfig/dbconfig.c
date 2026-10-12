@@ -26,6 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxcfg.h"
 #include "zbxcrypto.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
@@ -1373,6 +1374,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 		proxy->location = ZBX_LOC_NOWHERE;
 	}
 
+	dc_strpool_release(proxy->apm);
 	dc_strpool_release(proxy->allowed_addresses);
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
@@ -2192,7 +2194,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 {
 	int			found;
 	ZBX_DC_SNMPINTERFACE	*snmp;
-	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol, max_repetitions;
+	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol;
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
@@ -2202,13 +2204,11 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	ZBX_STR2UCHAR(securitylevel, row[16]);
 	ZBX_STR2UCHAR(authprotocol, row[19]);
 	ZBX_STR2UCHAR(privprotocol, row[20]);
-	ZBX_STR2UCHAR(max_repetitions, row[22]);
 
 	if (0 != found)
 	{
 		if (snmp->bulk != bulk || version != snmp->version || securitylevel != snmp->securitylevel ||
-				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol ||
-				max_repetitions != snmp->max_repetitions)
+				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol)
 		{
 			*modified = 1;
 		}
@@ -2219,7 +2219,6 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	snmp->securitylevel = securitylevel;
 	snmp->authprotocol = authprotocol;
 	snmp->privprotocol = privprotocol;
-	snmp->max_repetitions = max_repetitions;
 
 	if (SUCCEED == dc_strpool_replace(found, &snmp->community, row[14]))
 		*modified = 1;
@@ -2230,6 +2229,10 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	if (SUCCEED == dc_strpool_replace(found, &snmp->privpassphrase, row[18]))
 		*modified = 1;
 	if (SUCCEED == dc_strpool_replace(found, &snmp->contextname, row[21]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->max_repetitions, row[22]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->retries, row[23]))
 		*modified = 1;
 
 	return snmp;
@@ -2254,6 +2257,8 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	dc_strpool_release(snmp->authpassphrase);
 	dc_strpool_release(snmp->privpassphrase);
 	dc_strpool_release(snmp->contextname);
+	dc_strpool_release(snmp->max_repetitions);
+	dc_strpool_release(snmp->retries);
 
 	zbx_hashset_remove_direct(&config->interfaces_snmp, snmp);
 
@@ -7352,6 +7357,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		proxy->mode = mode;
 		proxy->proxy_groupid = proxy_groupid;
 
+		dc_strpool_replace(found, &proxy->apm, row[28]);
+
 		proxy->revision = revision;
 	}
 
@@ -9494,7 +9501,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
-				dst_item->snmp_max_repetitions = snmp->max_repetitions;
+				zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+				zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 			}
 			else
 			{
@@ -9508,7 +9516,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				*dst_item->snmp_max_repetitions_orig = '\0';
 				dst_item->snmp_max_repetitions = 0;
+				*dst_item->snmp_retries_orig = '\0';
+				dst_item->snmp_retries = 0;
 				dst_item->timeout = 0;
 			}
 
@@ -9717,7 +9728,8 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		dst_item->snmpv3_privprotocol = snmp->privprotocol;
 		zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 		dst_item->snmp_version = snmp->version;
-		dst_item->snmp_max_repetitions = snmp->max_repetitions;
+		zbx_strscpy(dst_item->snmp_max_repetitions_orig, snmp->max_repetitions);
+		zbx_strscpy(dst_item->snmp_retries_orig, snmp->retries);
 	}
 	else
 	{
@@ -9731,6 +9743,11 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		dst_item->snmpv3_privprotocol = 0;
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+		*dst_item->snmp_max_repetitions_orig = '\0';
+		dst_item->snmp_max_repetitions = 0;
+		*dst_item->snmp_retries_orig = '\0';
+		dst_item->snmp_retries = 0;
+		dst_item->timeout = 0;
 		dst_item->snmp_max_repetitions = 0;
 	}
 
@@ -11771,6 +11788,53 @@ out:
 	return num;
 }
 
+void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location)
+{
+	const zbx_config_apm_global_db_t	*global_config;
+
+	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
+	{
+		zbx_apm_db_config_copy(out, local_apm_db_config);
+		return;
+	}
+
+	memset(out, 0, sizeof(*out));
+
+	RDLOCK_CACHE;
+
+	global_config = &config->config->apm_global_db;
+
+	out->status = (ZBX_APM_GLOBAL_DB_STATUS_CONFIGURED == global_config->status ? 1 : 0);
+
+	if (0 == out->status)
+	{
+		UNLOCK_CACHE;
+		return;
+	}
+
+	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
+	out->url = zbx_strdup(NULL, global_config->url);
+
+	if (ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_USR_PWD == global_config->authentication_type)
+	{
+		out->username = zbx_strdup(NULL, global_config->username);
+		out->password = zbx_strdup(NULL, global_config->password);
+	}
+
+	out->db = zbx_strdup(NULL, global_config->db);
+	out->ssl_verify_peer = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_ENABLED == global_config->ssl_verify_peer ? 1 : 0);
+	out->ssl_verify_host = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_ENABLED == global_config->ssl_verify_host ? 1 : 0);
+
+	UNLOCK_CACHE;
+
+	if (NULL != config_source_ip)
+		out->source_ip = zbx_strdup(NULL, config_source_ip);
+
+	if (NULL != config_ssl_ca_location)
+		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+}
+
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
 {
 	return (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type ? SUCCEED : FAIL);
@@ -12714,6 +12778,16 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 
 	dst_proxy->addr = NULL;
 	dst_proxy->port = 0;
+
+	if ('\0' != *src_proxy->apm)
+		dst_proxy->apm = zbx_strdup(NULL, src_proxy->apm);
+	else
+		dst_proxy->apm = NULL;
+}
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy)
+{
+	zbx_free(proxy->apm);
 }
 
 int	zbx_dc_config_get_last_sync_time(void)
@@ -17495,3 +17569,25 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
+
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
+{
+	char	*apm_config = old_config;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL == old_config || *revision < config->revision.settings_table)
+	{
+		if (NULL != dc_local()->apm_config)
+			apm_config = zbx_strdup(apm_config, dc_local()->apm_config);
+
+		*revision = config->revision.settings_table;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return apm_config;
+}
+
+
+

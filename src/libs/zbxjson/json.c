@@ -180,6 +180,12 @@ void	zbx_json_reset(struct zbx_json *j)
 	zbx_json_addobject(j, NULL);
 }
 
+void	zbx_json_reset_array(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
+	zbx_json_addarray(j, NULL);
+}
+
 void	zbx_json_free(struct zbx_json *j)
 {
 	assert(j);

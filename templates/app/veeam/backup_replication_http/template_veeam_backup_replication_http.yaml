@@ -6,9 +6,9 @@ zabbix_export:
   templates:
     - uuid: 738085dde4e749d49199e5e6fd4d56ab
       template: 'Veeam Backup and Replication by HTTP'
-      name: 'Veeam Backup and Replication by HTTP'
+      name: 'Veeam Backup & Replication by HTTP'
       description: |
-        This template is designed to monitor Veeam Backup and Replication.
+        This template is designed to monitor Veeam Backup & Replication.
         
         NOTE: The RESTful API may not be available for some editions, see (https://www.veeam.com/licensing-pricing.html) for more details.
         
@@ -26,7 +26,7 @@ zabbix_export:
       readme: |
         ## Overview
         
-        This template is designed to monitor Veeam Backup and Replication.
+        This template is designed to monitor Veeam Backup & Replication.
         It works without any external scripts and uses the script item.
         
         ***NOTE:*** The native Veeam Backup & Replication REST API (port 9419) is available only in editions that include REST API functionality.
@@ -56,7 +56,7 @@ zabbix_export:
         3. Configure the following host wizard configuration fields: `Address`, `Username`, and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.0-7
       groups:
         - name: Templates/Applications
       items:
@@ -212,7 +212,7 @@ zabbix_export:
             			Veeam.request.setProxy(Veeam.params.http_proxy);
             		}
             
-            		Zabbix.log(4, '[ Veeam Backup and Replication ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Veeam Backup & Replication ] Sending request: ' + url);
             		Veeam.request.clearHeader();
             
             		if (Veeam.token) {
@@ -260,7 +260,7 @@ zabbix_export:
             				data[key] = Veeam.getRequest(Veeam.params.api_endpoint + restricted_endpoints[key]);
             			}
             			catch (error) {
-            				Zabbix.log(3, '[ Veeam Backup and Replication ] Require the "Backup Administrator" role for endpoint "' + key + '": ' + error);
+            				Zabbix.log(3, '[ Veeam Backup & Replication ] Require the "Backup Administrator" role for endpoint "' + key + '": ' + error);
             			}
             		});
             		Veeam.logout();
@@ -275,7 +275,7 @@ zabbix_export:
             }
             catch (error) {
             	error += (String(error).slice(-1) === '.') ? '' : '.';
-            	Zabbix.log(3, '[ Veeam Backup and Replication ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Veeam Backup & Replication ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is returned as JSON.'
@@ -292,7 +292,7 @@ zabbix_export:
             - name: password
               value: '{$VEEAM.PASSWORD}'
             - name: tls_verify
-              value: '{$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}'
+              value: '{$HTTP.TLS.VERIFY:"Veeam Backup & Replication"}'
             - name: user
               value: '{$VEEAM.USER}'
           tags:
@@ -464,7 +464,7 @@ zabbix_export:
                   
                   var auth_response,
                   	token,
-                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.regsub("^(none|peer|full)$", "\1")}'),
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"Veeam Backup & Replication"}.regsub("^(none|peer|full)$", "\1")}'),
                   	request = new HttpRequest(tls.options),
                   	url = tls.checkURL('{$VEEAM.API.URL}' + '/api/v1/securityAnalyzer/bestPractices'),
                   	response;
@@ -488,7 +488,7 @@ zabbix_export:
                   request.addHeader('Authorization: Bearer ' + token);
                   request.addHeader('x-api-version: {$VEEAM.API.VERSION}');
                   
-                  Zabbix.log(4, '[ Veeam Backup and Replication ] Sending request: ' + url);
+                  Zabbix.log(4, '[ Veeam Backup & Replication ] Sending request: ' + url);
                   response = request.get(url);
                   
                   if (request.getStatus() === 403) {
@@ -1706,7 +1706,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$HTTP.TLS.VERIFY}'
           value: full
-          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup and Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup and Replication"}.'
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup & Replication", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup & Replication"}.'
           config:
             type: LIST
             priority: '4'
@@ -2029,12 +2029,12 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VEEAM.PASSWORD}'
           type: SECRET_TEXT
-          description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
+          description: 'The `password` of the Veeam Backup & Replication account. It is used to obtain an access token.'
           config:
             type: TEXT
             priority: '5'
             label: Password
-            description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
+            description: 'The `password` of the Veeam Backup & Replication account. It is used to obtain an access token.'
             required: 'YES'
         - macro: '{$VEEAM.REPOSITORY.SPACE.WARN}'
           value: '80'
@@ -2057,12 +2057,12 @@ zabbix_export:
             description: 'The update interval for the security analyzer best practices get metrics item in hours.'
         - macro: '{$VEEAM.USER}'
           type: SECRET_TEXT
-          description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'
+          description: 'The `username` of the Veeam Backup & Replication account. It is used to obtain an access token.'
           config:
             type: TEXT
             priority: '6'
             label: Username
-            description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'
+            description: 'The `username` of the Veeam Backup & Replication account. It is used to obtain an access token.'
             required: 'YES'
       dashboards:
         - uuid: 05043f8fa55845bfa5f07ed5f82e2d3a

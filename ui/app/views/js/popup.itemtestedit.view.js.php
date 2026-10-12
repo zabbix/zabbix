@@ -163,7 +163,7 @@ window.itemtestedit_view_popup = new class {
 		if (get_value_checked && this.#show_snmp_form) {
 			const snmp_version = this.#form.findFieldByName('interface[details][version]').getValue();
 
-			const show_row_classnames = ['js-popup-row-snmp-version'];
+			const show_row_classnames = ['js-popup-row-snmp-version', 'js-popup-row-snmp-retries'];
 
 			if (snmp_version == '<?= SNMP_V1 ?>') {
 				show_row_classnames.push('js-popup-row-snmp-community');
@@ -296,7 +296,8 @@ window.itemtestedit_view_popup = new class {
 		this.#setLoading();
 		const field_names = ['item_type', 'test_type', 'test_with', 'proxyid',
 			'interface[address]', 'interface[port]', 'interface[details][version]',
-			'interface[details][community]', 'interface[details][max_repetitions]', 'interface[details][securityname]',
+			'interface[details][community]', 'interface[details][max_repetitions]',
+			'interface[details][retries]', 'interface[details][securityname]',
 			'interface[details][securitylevel]', 'interface[details][authprotocol]',
 			'interface[details][authpassphrase]', 'interface[details][privprotocol]',
 			'interface[details][privpassphrase]'

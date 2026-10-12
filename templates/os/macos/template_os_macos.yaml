@@ -38,7 +38,7 @@ zabbix_export:
         Install Zabbix agent on macOS according to Zabbix documentation.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -275,15 +275,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: security
-        - uuid: bf99f88e47a64ecab98de4f3cfe6592f
-          name: 'Get filesystems'
-          key: vfs.fs.get
-          history: '0'
-          value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
-          tags:
-            - tag: component
-              value: raw
         - uuid: daf35c33bb84443f893bb06bfe10f870
           name: 'Available memory'
           key: 'vm.memory.size[available]'
@@ -335,8 +326,8 @@ zabbix_export:
       discovery_rules:
         - uuid: c537fbe006d7434dab08add1dcf87537
           name: 'Mounted filesystem discovery'
-          type: DEPENDENT
-          key: vfs.fs.dependent.discovery
+          key: 'vfs.fs.get[short]'
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
@@ -364,7 +355,7 @@ zabbix_export:
                   parameters:
                     - $.inodes.pfree
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -411,7 +402,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.free
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -433,7 +424,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.pfree
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -454,7 +445,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.pused
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -509,7 +500,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.total
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -528,7 +519,7 @@ zabbix_export:
                   parameters:
                     - $.bytes.used
               master_item:
-                key: 'vfs.fs.dependent[{#FSNAME},data]'
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: storage
@@ -538,22 +529,17 @@ zabbix_export:
                   value: '{#FSTYPE}'
             - uuid: c035c0bc26a24f58900e1af301007914
               name: 'FS [{#FSNAME}]: Get data'
-              type: DEPENDENT
-              key: 'vfs.fs.dependent[{#FSNAME},data]'
-              history: 1h
+              key: 'vfs.fs.get[full,{#FSNAME}]'
+              history: '0'
               value_type: TEXT
-              description: 'Intermediate data of `{#FSNAME}` filesystem.'
+              description: 'The `vfs.fs.get[full,{#FSNAME}]` key acquires disk space and inode statistics for the `{#FSNAME}` filesystem only. Later to be extracted by preprocessing in dependent items.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
-              master_item:
-                key: vfs.fs.get
+                    - '$[0]'
               tags:
                 - tag: component
                   value: raw
-                - tag: component
-                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
                 - tag: fstype
@@ -597,8 +583,6 @@ zabbix_export:
                   item:
                     host: 'macOS by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
-          master_item:
-            key: vfs.fs.get
           lld_macro_paths:
             - lld_macro: '{#FSNAME}'
               path: $.fsname
@@ -607,23 +591,9 @@ zabbix_export:
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var filesystems = JSON.parse(value);
-                  
-                  result = filesystems.map(function (filesystem) {
-                  	return {
-                  		'fsname': filesystem.fsname,
-                  		'fstype': filesystem.fstype,
-                  		'fsoptions': filesystem.fsoptions
-                  	};
-                  });
-                  
-                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 6h
           overrides:
             - name: 'Exclude dmg'
               step: '1'

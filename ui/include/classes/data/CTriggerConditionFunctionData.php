@@ -61,6 +61,7 @@ final class CTriggerConditionFunctionData {
 		'changecount' => [ZBX_FUNCTION_TYPE_HISTORY => self::ITEM_VALUE_TYPES_ALL],
 		'char' => [ZBX_FUNCTION_TYPE_STRING => self::ITEM_VALUE_TYPES_INT],
 		'concat' => [ZBX_FUNCTION_TYPE_STRING => self::ITEM_VALUE_TYPES_ALL],
+		'contains' => [ZBX_FUNCTION_TYPE_STRING => self::ITEM_VALUE_TYPES_STRING],
 		'cos' => [ZBX_FUNCTION_TYPE_MATH => self::ITEM_VALUE_TYPES_NUM],
 		'cosh' => [ZBX_FUNCTION_TYPE_MATH => self::ITEM_VALUE_TYPES_NUM],
 		'cot' => [ZBX_FUNCTION_TYPE_MATH => self::ITEM_VALUE_TYPES_NUM],
@@ -123,6 +124,7 @@ final class CTriggerConditionFunctionData {
 		'sqrt' => [ZBX_FUNCTION_TYPE_MATH => self::ITEM_VALUE_TYPES_NUM],
 		'stddevpop' => [ZBX_FUNCTION_TYPE_AGGREGATE => self::ITEM_VALUE_TYPES_NUM],
 		'stddevsamp' => [ZBX_FUNCTION_TYPE_AGGREGATE => self::ITEM_VALUE_TYPES_NUM],
+		'substring' => [ZBX_FUNCTION_TYPE_STRING => self::ITEM_VALUE_TYPES_STRING],
 		'sum' => [ZBX_FUNCTION_TYPE_AGGREGATE => self::ITEM_VALUE_TYPES_NUM,
 			ZBX_FUNCTION_TYPE_MATH => self::ITEM_VALUE_TYPES_NUM],
 		'sumofsquares' => [ZBX_FUNCTION_TYPE_AGGREGATE => self::ITEM_VALUE_TYPES_NUM],
@@ -172,6 +174,7 @@ final class CTriggerConditionFunctionData {
 			'changecount' => _('changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)'),
 			'char' => _('char() - Returns the character which represents the given ASCII code'),
 			'concat' => _('concat() - Returns a string that is the result of concatenating value to string'),
+			'contains' => _('contains() - Returns 1 if search value is found in value, 0 otherwise'),
 			'cos' => _('cos() - The cosine of a value, where the value is an angle expressed in radians'),
 			'cosh' => _('cosh() - The hyperbolic cosine of a value'),
 			'cot' => _('cot() - The cotangent of a value, where the value is an angle expressed in radians'),
@@ -207,7 +210,7 @@ final class CTriggerConditionFunctionData {
 			'ltrim' => _('ltrim() - Remove specified characters from the beginning of a string'),
 			'mad' => _('mad() - Median absolute deviation'),
 			'max' => _('max() - Maximum value for period T'),
-			'mid' => _('mid() - Returns a substring beginning at the character position specified by start for N characters'),
+			'mid' => _('mid() - Alias for substring()'),
 			'min' => _('min() - Minimum value for period T'),
 			'mod' => _('mod() - Division remainder'),
 			'monodec' => _('monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)'),
@@ -232,6 +235,7 @@ final class CTriggerConditionFunctionData {
 			'sqrt' => _('sqrt() - Square root of a value'),
 			'stddevpop' => _('stddevpop() - Population standard deviation'),
 			'stddevsamp' => _('stddevsamp() - Sample standard deviation'),
+			'substring' => _('substring() - Returns a substring beginning at the character position specified by start for N characters'),
 			'sum' => _('sum() - Sum of values of a period T'),
 			'sumofsquares' => _('sumofsquares() - The sum of squares'),
 			'tan' => _('tan() - The tangent of a value'),
@@ -762,6 +766,30 @@ final class CTriggerConditionFunctionData {
 						]
 					],
 					'string' => ['string', 'required', 'not_empty']
+				]],
+				'operator' => ['string', 'required', 'in' => self::OPERATORS],
+				'value' => ['string', 'required', 'not_empty']
+			]],
+			'contains' => [ZBX_FUNCTION_TYPE_STRING => [
+				'itemid' => ['db items.itemid', 'required'],
+				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_COUNTS]],
+				'params' => ['object', 'fields' => [
+					'shift' => ['string',
+						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
+					],
+					'last' => [
+						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
+							'messages' => [
+								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
+							]
+						],
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
+					],
+					'search' => ['string', 'required']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -2077,6 +2105,31 @@ final class CTriggerConditionFunctionData {
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
 			]],
+			'substring' => [ZBX_FUNCTION_TYPE_STRING => [
+				'itemid' => ['db items.itemid', 'required'],
+				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_COUNTS]],
+				'params' => ['object', 'fields' => [
+					'shift' => ['string',
+						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
+					],
+					'last' => [
+						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
+							'messages' => [
+								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
+							]
+						],
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
+					],
+					'start' => ['string', 'required', 'not_empty'],
+					'length' => ['string', 'required', 'not_empty']
+				]],
+				'operator' => ['string', 'required', 'in' => self::OPERATORS],
+				'value' => ['string', 'required', 'not_empty']
+			]],
 			'sum' => [
 				ZBX_FUNCTION_TYPE_AGGREGATE => [
 					'itemid' => ['db items.itemid', 'required'],
@@ -2719,6 +2772,17 @@ final class CTriggerConditionFunctionData {
 				'operator' => ['options' => self::OPERATORS],
 				'value' => ['label' => _('Result'), 'required' => true]
 			]],
+			'contains' => [ZBX_FUNCTION_TYPE_STRING => [
+				'itemid' => ['label' => _('Item'), 'required' => true],
+				'paramtype' => ['options' => [PARAM_TYPE_COUNTS]],
+				'params' => [
+					'shift' => ['label' => _('Time shift'), 'placeholder' => 'now-1h'],
+					'last' => ['label' => _('Last of').' (T)'],
+					'search' => ['label' => _('Search value')]
+				],
+				'operator' => ['options' => self::OPERATORS],
+				'value' => ['label' => _('Result'), 'required' => true]
+			]],
 			'cos' => [ZBX_FUNCTION_TYPE_MATH => [
 				'itemid' => ['label' => _('Item'), 'required' => true],
 				'paramtype' => ['options' => [PARAM_TYPE_COUNTS]],
@@ -3311,6 +3375,18 @@ final class CTriggerConditionFunctionData {
 				'operator' => ['options' => self::OPERATORS],
 				'value' => ['label' => _('Result'), 'required' => true]
 			]],
+			'substring' => [ZBX_FUNCTION_TYPE_STRING => [
+				'itemid' => ['label' => _('Item'), 'required' => true],
+				'paramtype' => ['options' => [PARAM_TYPE_COUNTS]],
+				'params' => [
+					'shift' => ['label' => _('Time shift'), 'placeholder' => 'now-1h'],
+					'last' => ['label' => _('Last of').' (T)'],
+					'start' => ['label' => _('Start'), 'required' => true],
+					'length' => ['label' => _('Length'), 'required' => true]
+				],
+				'operator' => ['options' => self::OPERATORS],
+				'value' => ['label' => _('Result'), 'required' => true]
+			]],
 			'sum' => [
 				ZBX_FUNCTION_TYPE_AGGREGATE => [
 					'itemid' => ['label' => _('Item'), 'required' => true],
@@ -3550,6 +3626,7 @@ final class CTriggerConditionFunctionData {
 			'min' => ['type' => CTextBox::class],
 			'max' => ['type' => CTextBox::class],
 			'string' => ['type' => CTextBox::class, 'attributes' => ['data-notrim' => '']],
+			'search' => ['type' => CTextBox::class, 'attributes' => ['data-notrim' => '']],
 			'values' => ['type' => CTextBox::class],
 			'start' => ['type' => CTextBox::class],
 			'length' => ['type' => CTextBox::class],

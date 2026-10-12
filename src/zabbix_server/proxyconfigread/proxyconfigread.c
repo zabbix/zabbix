@@ -14,6 +14,8 @@
 
 #include "proxyconfigread.h"
 
+#include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
 #include "zbxkvs.h"
@@ -404,7 +406,7 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 
 		zbx_json_addstring(j, NULL, row[0], ZBX_JSON_TYPE_STRING);
 
-		for (int i = 0; 0 != table->fields[i].name; i++)
+		for (int i = 0; NULL != table->fields[i].name; i++)
 		{
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
@@ -476,6 +478,11 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 				}
 
 				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
+			}
+			else if (0 == strcmp(name, ZBX_SETTINGS_APM) &&
+					0 == strcmp(table->fields[i].name, "value_str"))
+			{
+				zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm), ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{
@@ -1647,7 +1654,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
-	zbx_dc_proxy_t			proxy;
+	zbx_dc_proxy_t			proxy = {0};
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
@@ -1727,6 +1734,7 @@ out:
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_free(version_str);
+	zbx_dc_proxy_clear(&proxy);
 #ifdef	HAVE_MALLOC_TRIM
 	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
 	if (ZBX_PROXYCONFIG_STATUS_DATA == status)

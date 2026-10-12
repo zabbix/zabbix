@@ -1,5 +1,5 @@
 
-# MikroTik CCR1016-12S-1S by SNMP
+# MikroTik CCR1016-12S-1S+ by SNMP
 
 ## Overview
 

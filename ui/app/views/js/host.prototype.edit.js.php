@@ -545,6 +545,8 @@ window.host_prototype_edit_popup = new class {
 					details.contextname = details.contextname.trim();
 					details.privpassphrase = details.privpassphrase.trim();
 					details.securityname = details.securityname.trim();
+					details.max_repetitions = details.max_repetitions.trim();
+					details.retries = details.retries.trim();
 				}
 			}
 		}

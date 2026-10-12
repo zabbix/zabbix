@@ -277,9 +277,9 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-groupby'].closest('.form-field');
 			const display = [
-				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_ONCE ?>,
 				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
-				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
 				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 
@@ -289,9 +289,9 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-capacity'].closest('.form-field');
 			const display = [
-				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_ONCE ?>,
 				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
-				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
 				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 
@@ -301,9 +301,9 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-duration'].closest('.form-field');
 			const display = [
-				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE ?>,
+				<?= CCepRuleHelper::WINDOW_SIMPLE_ONCE ?>,
 				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
-				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
 				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 

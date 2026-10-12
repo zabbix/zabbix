@@ -380,6 +380,10 @@ class CAudit {
 		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
+		self::RESOURCE_SETTINGS => [
+			'paths' => ['settings.apm_global_db.password'],
+			'conditions' => ['authentication_type' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD]
+		],
 		self::RESOURCE_TEMPLATE => [
 			'paths' => ['template.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
@@ -639,6 +643,7 @@ class CAudit {
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
 		'proxy.hosts' => 'hostid',
+		'proxy.apm.additional_resource_attributes' => 'id',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',

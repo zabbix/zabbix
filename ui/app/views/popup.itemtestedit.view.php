@@ -197,11 +197,30 @@ if ($data['is_item_testable']) {
 						$data['inputs']['host']['interface']['details']['max_repetitions'], false,
 						DB::getFieldLength('interface_snmp', 'max_repetitions')
 					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->setAriaRequired()
 				))
 					->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 					->addClass('js-popup-row-snmp-max-repetition'),
+
+			(!str_starts_with($data['inputs']['item']['snmp_oid'], 'get[')
+				&& !str_starts_with($data['inputs']['item']['snmp_oid'], 'walk[')
+			)
+				? null
+				: [(new CLabel(_('Retries'), 'interface[details][retries]'))
+						->setAsteriskMark()
+						->addClass('js-popup-row-snmp-retries'),
+					(new CFormField(
+						(new CTextBox('interface[details][retries]',
+							$data['inputs']['host']['interface']['details']['retries'], false,
+							DB::getFieldLength('interface_snmp', 'retries')
+						))
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAriaRequired()
+					))
+						->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+						->addClass('js-popup-row-snmp-retries')
+				],
 
 			(new CLabel(_('Context name'), 'interface[details][contextname]'))
 				->addClass('js-popup-row-snmpv3-contextname'),

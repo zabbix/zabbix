@@ -196,8 +196,8 @@ class CControllerCepRuleEdit extends CController {
 	protected static function getOperationPopupValidationRules(): array {
 		return (new CFormValidator(['object', 'fields' => [
 			'window_type' => ['db cep_rule_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
-				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-				CCepRuleHelper::WINDOW_PATTERN_MATCH
+				CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+				CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
 			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
 				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
