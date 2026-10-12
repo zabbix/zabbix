@@ -37,7 +37,7 @@ int	zbx_db_check_user_perm2system(zbx_uint64_t userid)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		res = SUCCEED;
+	int		res = FAIL;
 
 	result = zbx_db_select(
 			"select count(*)"
@@ -47,8 +47,9 @@ int	zbx_db_check_user_perm2system(zbx_uint64_t userid)
 				" and g.users_status=%d",
 			userid, GROUP_STATUS_DISABLED);
 
-	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]) && atoi(row[0]) > 0)
-		res = FAIL;
+	/* deny access if the query failed */
+	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]) && 0 == atoi(row[0]))
+		res = SUCCEED;
 
 	zbx_db_free_result(result);
 
