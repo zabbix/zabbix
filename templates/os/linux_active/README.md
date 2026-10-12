@@ -103,7 +103,6 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 |System uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent (active)|system.uptime|
 |Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent (active)|system.users.num|
 |Checksum of /etc/passwd||Zabbix agent (active)|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get|
 |Get network interfaces|<p>The `net.if.get` key acquires raw information set about the network interfaces. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|net.if.get|
 |Get block devices|<p>The `vfs.dev.get` key acquires raw information set about the block devices. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.dev.get[disk_stats,.*]|
 |Available memory|<p>The available memory:</p><p>- in Linux = free + buffers + cache;</p><p>- on other platforms calculation may vary.</p><p></p><p>See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p>|Zabbix agent (active)|vm.memory.size[available]|
@@ -197,13 +196,13 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>The discovery of mounted filesystems with different types.</p>|Dependent item|vfs.fs.dependent.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Mounted filesystem discovery|<p>The discovery of mounted filesystems with different types.</p>|Zabbix agent (active)|vfs.fs.get[short]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Mounted filesystem discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FS [{#FSNAME}]: Get data|<p>Intermediate data of `{#FSNAME}` filesystem.</p>|Dependent item|vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.fsname=='{#FSNAME}')].first()`</p></li></ul>|
+|FS [{#FSNAME}]: Get data|<p>The `vfs.fs.get[full,{#FSNAME}]` key acquires disk space and inode statistics for the `{#FSNAME}` filesystem only. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get[full,{#FSNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
 |FS [{#FSNAME}]: Option: Read-only|<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p>|Dependent item|vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.options`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Regular expression: `(?:^|,)ro\b 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Used|<p>Used storage expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.used`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Total|<p>Total space expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},total]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.total`</p></li></ul>|

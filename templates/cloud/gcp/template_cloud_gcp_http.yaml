@@ -969,7 +969,7 @@ zabbix_export:
           - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
       vendor:
         name: Zabbix
-        version: 8.0-8
+        version: 8.0-9
       groups:
         - name: Templates/Cloud
       items:
@@ -1167,7 +1167,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3ac5c859692140c0b686e772efa05032
-          name: 'Instances get'
+          name: 'Cloud SQL instances get'
           type: DEPENDENT
           key: gcp.cloudsql.instances.get
           history: '0'
@@ -1405,7 +1405,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 461e72fb7e104261831455ae3cc87358
-          name: 'Instances get'
+          name: 'GCE instances get'
           type: DEPENDENT
           key: gcp.gce.instances.get
           history: '0'

@@ -147,6 +147,13 @@
 		.wrap-multiple-controls {
 			display: flex;
 		}
+
+		.form-fields-hint {
+			font-size: 11px;
+			line-height: 16px;
+			white-space: nowrap;
+			color: $form-field-hint-color;
+		}
 	}
 
 	.table-subforms {

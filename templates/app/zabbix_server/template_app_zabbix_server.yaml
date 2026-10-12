@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -1293,6 +1293,36 @@ zabbix_export:
               event_name: 'Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 9a43331eb41742bd8100b8e968211a00
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "telemetry query poller" processes started.'
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: 44d17d30e2794ceabcf60cc2a4290049
+              expression: 'avg(/Remote Zabbix server health/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.SERVER.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix server: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix server: Utilization of telemetry query poller processes over {$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -3289,6 +3319,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -3307,6 +3340,11 @@ zabbix_export:
                       value:
                         host: 'Remote Zabbix server health'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Remote Zabbix server health'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -3315,7 +3353,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -3970,7 +4008,7 @@ zabbix_export:
         Link this template to the local Zabbix server host.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -4933,6 +4971,28 @@ zabbix_export:
               event_name: 'Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 53f21ecbde1e48b2a4e2714214a872bf
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,telemetry query poller,avg,busy]'
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: eb0d8f0795bd43bc9f2cd79ec340dad6
+              expression: 'avg(/Zabbix server health/zabbix[process,telemetry query poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,telemetry query poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix server: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix server: Utilization of telemetry query poller processes over {$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -6985,6 +7045,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -7003,6 +7066,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix server health'
                         key: 'zabbix[process,snmp poller,avg,busy]'
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix server health'
+                        key: 'zabbix[process,telemetry query poller,avg,busy]'
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -7011,7 +7079,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -7684,7 +7752,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -8953,6 +9021,36 @@ zabbix_export:
               event_name: 'Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 2c728442469546709b93d9321c871cb6
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "telemetry query poller" processes started.'
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: 69efcd436dba4c37931660b1cb9e12d1
+              expression: 'avg(/Zabbix server health by Zabbix agent/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health by Zabbix agent/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.SERVER.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix server: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix server: Utilization of telemetry query poller processes over {$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -10946,6 +11044,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -10964,6 +11065,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix server health by Zabbix agent'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix server health by Zabbix agent'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -10972,7 +11078,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'
@@ -11627,7 +11733,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -12896,6 +13002,36 @@ zabbix_export:
               event_name: 'Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               description: 'Indicates potential performance issues with the task manager, which may affect monitoring efficiency and response times.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: c8a325d1fa1e4f65a0a4f70ff47a5156
+          name: 'Utilization of telemetry query poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.telemetry_query_poller.avg.busy
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the telemetry query poller processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''telemetry query poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "telemetry query poller" processes started.'
+          master_item:
+            key: 'zabbix.stats[{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]'
+          tags:
+            - tag: component
+              value: gathering-process
+          triggers:
+            - uuid: 4a190a50621745e893ed4e277cbea86b
+              expression: 'avg(/Zabbix server health by Zabbix agent active/process.telemetry_query_poller.avg.busy,10m)>{$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health by Zabbix agent active/process.telemetry_query_poller.avg.busy,10m)<{$ZABBIX.SERVER.UTIL.MIN:"telemetry query poller"}'
+              name: 'Zabbix server: Utilization of telemetry query poller processes is high'
+              event_name: 'Zabbix server: Utilization of telemetry query poller processes over {$ZABBIX.SERVER.UTIL.MAX:"telemetry query poller"}%'
+              priority: AVERAGE
+              description: 'Indicates potential performance issues with the telemetry query poller, which may affect monitoring efficiency and response times.'
               tags:
                 - tag: scope
                   value: performance
@@ -14892,6 +15028,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.color.2
                       value: 6a3d9a
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: ff7f00
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -14910,6 +15049,11 @@ zabbix_export:
                       value:
                         host: 'Zabbix server health by Zabbix agent active'
                         key: process.snmp_poller.avg.busy
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Zabbix server health by Zabbix agent active'
+                        key: process.telemetry_query_poller.avg.busy
                     - type: STRING
                       name: lefty_max
                       value: '100'
@@ -14918,7 +15062,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '3'
+                      value: '4'
                     - type: INTEGER
                       name: legend_statistic
                       value: '1'

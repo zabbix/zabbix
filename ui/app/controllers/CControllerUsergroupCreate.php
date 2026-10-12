@@ -69,6 +69,10 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
+			'proxy_mode' => ['integer', 'in' => [PROXY_MODE_ALLOW, PROXY_MODE_DENY]],
+			'proxyids' => ['array', 'required', 'field' => ['db proxy.proxyid']],
+			'proxy_group_mode' => ['integer', 'in' => [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY]],
+			'proxy_groupids' => ['array', 'required', 'field' => ['db proxy_group.proxy_groupid']],
 			'tag_filters' => ['objects', 'required',
 				'fields' => [
 					'groupid' => ['db tag_filter.groupid', 'required'],
@@ -111,9 +115,22 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 	protected function doAction(): void {
 		$user_group = self::processUserGroupInputData($this->getUserGroupInputData());
 
-		$result = (bool) API::UserGroup()->create($user_group);
+		$this->validateProxiesNotInProxyGroup();
 
 		$output = [];
+
+		if ($messages = get_and_clear_messages()) {
+			$output['error'] = [
+				'title' => _('Cannot add user group'),
+				'messages' => array_column($messages, 'message')
+			];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
+			return;
+		}
+
+		$result = (bool) API::UserGroup()->create($user_group);
 
 		if ($result) {
 			$output['success']['title'] = _('User group added');

@@ -6,6 +6,7 @@ SERVER_tests = \
 	zbx_evaluate \
 	zbx_evaluate_unknown \
 	zbx_evaluate_function \
+	evaluate_nodata_proxied \
 	zbx_STL \
 	zbx_get_percentage_of_deviations_in_stl_remainder \
 	evaluate_value_by_map \
@@ -80,6 +81,44 @@ zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_recalc_time_period \
 	-Wl,--wrap=zbx_history_get_trends_flags \
 	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+evaluate_nodata_proxied_SOURCES = \
+	evaluate_nodata_proxied.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_nodata_proxied_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+evaluate_nodata_proxied_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+evaluate_nodata_proxied_LDADD += @SERVER_LIBS@
+
+evaluate_nodata_proxied_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_baseline_get_data \
+	-Wl,--wrap=zbx_recalc_time_period \
+	-Wl,--wrap=zbx_dc_get_proxy_nodata_win \
+	-Wl,--wrap=zbx_vps_monitor_add_collected \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets \
+	-Wl,--wrap=open \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=close \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=fstat \
+	-Wl,--wrap=__xstat \
+	-Wl,--wrap=__fxstat \
+	-Wl,--wrap=connect \
+	-Wl,--wrap=poll \
+	-Wl,--wrap=read \
+	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+evaluate_nodata_proxied_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
 
 zbx_STL_SOURCES = \
 	zbx_STL.c \

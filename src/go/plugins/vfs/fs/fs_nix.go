@@ -40,48 +40,101 @@ func init() {
 	}
 }
 
-func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
-	allData, err := p.getFsInfo()
+func filterByMountpoint(data []*FsInfo, mountpoint string) []*FsInfo {
+	if mountpoint == "" {
+		return data
+	}
+
+	filtered := make([]*FsInfo, 0)
+
+	for _, info := range data {
+		if *info.FsName == mountpoint {
+			filtered = append(filtered, info)
+		}
+	}
+
+	return filtered
+}
+
+func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
+	allData, err := p.getMountedFilesystems()
 	if err != nil {
 		return nil, err
 	}
 
-	fsmap := make(map[string]*FsInfoNew)
+	allData = filterByMountpoint(allData, mountpoint)
+
 	fsStatCaller := p.newFSCaller(getFsStats, len(allData))
 	fsInodeCaller := p.newFSCaller(getFsInode, len(allData))
 
+	fsmap := make(map[string]*FsInfoNew, len(allData))
+
 	for _, info := range allData {
-		bytes, err := fsStatCaller.run(*info.FsName)
-		if err != nil {
-			p.Debugf(`cannot discern stats for the mount %s: %s`, *info.FsName, err.Error())
+		bytes, fsErr := fsStatCaller.run(*info.FsName)
+		if fsErr != nil {
+			p.Debugf(`cannot discern stats for the mount %s: %s`, *info.FsName, fsErr.Error())
 			continue
 		}
 
-		inodes, err := fsInodeCaller.run(*info.FsName)
-		if err != nil {
-			p.Debugf(`cannot discern inode for the mount %s: %s`, *info.FsName, err.Error())
+		inodes, fsErr := fsInodeCaller.run(*info.FsName)
+		if fsErr != nil {
+			p.Debugf(`cannot discern inode for the mount %s: %s`, *info.FsName, fsErr.Error())
 			continue
 		}
 
-		fsmap[*info.FsName+*info.FsType] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
+		key := *info.FsName + *info.FsType
+		fsmap[key] = &FsInfoNew{
+			FsName:    info.FsName,
+			FsType:    info.FsType,
+			Bytes:     bytes,
+			Inodes:    inodes,
+			FsOptions: info.FsOptions,
+		}
 	}
 
-	allData, err = p.getFsInfo()
+	allData, err = p.getMountedFilesystems()
 	if err != nil {
 		return nil, err
 	}
 
+	allData = filterByMountpoint(allData, mountpoint)
+
+	data := make([]*FsInfoNew, 0, len(fsmap))
 	for _, info := range allData {
-		if fsInfo, ok := fsmap[*info.FsName+*info.FsType]; ok {
+		key := *info.FsName + *info.FsType
+		if fsInfo, ok := fsmap[key]; ok {
 			data = append(data, fsInfo)
 		}
 	}
 
-	return
+	return data, nil
 }
 
-func (p *Plugin) readMounts(file io.Reader) (data []*FsInfo, err error) {
+func (p *Plugin) getFsInfoShort(mountpoint string) ([]*FsInfoNew, error) {
+	allData, err := p.getMountedFilesystems()
+	if err != nil {
+		return nil, err
+	}
+
+	allData = filterByMountpoint(allData, mountpoint)
+
+	data := make([]*FsInfoNew, 0)
+	for _, info := range allData {
+		data = append(data, &FsInfoNew{
+			FsName:    info.FsName,
+			FsType:    info.FsType,
+			FsOptions: info.FsOptions,
+		})
+	}
+
+	return data, nil
+}
+
+func (p *Plugin) readMounts(file io.Reader) ([]*FsInfo, error) {
 	scanner := bufio.NewScanner(file)
+
+	var data []*FsInfo
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		mnt := strings.Split(line, " ")
@@ -92,21 +145,7 @@ func (p *Plugin) readMounts(file io.Reader) (data []*FsInfo, err error) {
 		data = append(data, &FsInfo{FsName: &mnt[1], FsType: &mnt[2], FsOptions: &mnt[3]})
 	}
 
-	if err = scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return
-}
-
-func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
-	file, err := os.Open("/proc/mounts")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	data, err = p.readMounts(file)
+	err := scanner.Err()
 	if err != nil {
 		return nil, err
 	}
@@ -114,11 +153,27 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 	return data, nil
 }
 
-func getFsStats(path string) (stats *FsStats, err error) {
+func (p *Plugin) getMountedFilesystems() ([]*FsInfo, error) {
+	file, err := os.Open("/proc/mounts")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	data, err := p.readMounts(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getFsStats(path string) (*FsStats, error) {
 	var pused float64
 
 	fs := unix.Statfs_t{}
-	err = unix.Statfs(path, &fs)
+
+	err := unix.Statfs(path, &fs)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +196,7 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		pused = 0
 	}
 
-	stats = &FsStats{
+	stats := &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
@@ -149,14 +204,15 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		PUsed: pused,
 	}
 
-	return
+	return stats, nil
 }
 
-func getFsInode(path string) (stats *FsStats, err error) {
+func getFsInode(path string) (*FsStats, error) {
 	var pfree, pused float64
 
 	fs := unix.Statfs_t{}
-	err = unix.Statfs(path, &fs)
+
+	err := unix.Statfs(path, &fs)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +229,7 @@ func getFsInode(path string) (stats *FsStats, err error) {
 		pused = 0.0
 	}
 
-	stats = &FsStats{
+	stats := &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
@@ -181,5 +237,5 @@ func getFsInode(path string) (stats *FsStats, err error) {
 		PUsed: pused,
 	}
 
-	return
+	return stats, nil
 }

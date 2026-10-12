@@ -99,6 +99,11 @@
 	@extend %icon-small;
 }
 
+.zi-chevron-up-small {
+	@extend .zi-chevron-up;
+	@extend %icon-small;
+}
+
 .zi-copy {
 	@extend %icon-small;
 }

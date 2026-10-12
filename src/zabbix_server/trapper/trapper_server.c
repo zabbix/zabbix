@@ -21,6 +21,8 @@
 #include "../proxyconfigread/proxyconfigread.h"
 #include "../reporter/reporter.h"
 
+#include "zbx_cep_client.h"
+#include "zbxcommon.h"
 #include "zbxtrapper.h"
 #include "zbxdbhigh.h"
 #include "zbxalerter.h"
@@ -248,6 +250,83 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process cep rule reset trapper request                            *
+ *                                                                            *
+ * Parameters: sock                      - [IN] client connection             *
+ *             jp                        - [IN] request data                  *
+ *             config_timeout            - [IN] timeout for sending response  *
+ *             config_tls                - [IN] TLS configuration             *
+ *             config_frontend_allowed_ip - [IN] allowed frontend IP          *
+ *                                                                            *
+ ******************************************************************************/
+static void	trapper_process_cep_rule_reset(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
+	const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
+{
+	int			ret = FAIL;
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], *error = NULL, *errmsg = NULL;
+	zbx_uint64_t		cep_ruleid;
+	struct zbx_json		json;
+	struct zbx_json_parse	jp_data;
+	zbx_user_t		user;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
+		goto out;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_user_init(&user);
+
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
+	{
+		error = zbx_strdup(NULL, "Permission denied.");
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_CEP_RULEID, tmp, sizeof(tmp), NULL) ||
+			SUCCEED != zbx_is_uint64(tmp, &cep_ruleid))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_CEP_RULEID);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_cep_reset_rule(cep_ruleid, &errmsg))
+	{
+		error = zbx_dsprintf(NULL, "Cannot rest CEP rule: %s", errmsg);
+		zbx_free(errmsg);
+		goto fail;
+	}
+
+	ret = SUCCEED;
+
+fail:
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == ret ? ZBX_PROTO_VALUE_SUCCESS :
+				ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED != ret)
+	{
+		if (NULL != error && '\0' != *error)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+	}
+
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
+
+	zbx_free(error);
+	zbx_json_free(&json);
+
+	zbx_user_free(&user);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+}
+
 int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
@@ -305,6 +384,13 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_HISTORY_PUSH))
 	{
 		trapper_process_history_push(sock, jp, config_comms->config_timeout, config_tls,
+			config_frontend_allowed_ip);
+
+		return SUCCEED;
+	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_CEP_RULE_RESET))
+	{
+		trapper_process_cep_rule_reset(sock, jp, config_comms->config_timeout, config_tls,
 			config_frontend_allowed_ip);
 
 		return SUCCEED;

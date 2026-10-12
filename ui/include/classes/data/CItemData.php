@@ -108,14 +108,14 @@ final class CItemData {
 			'vfs.file.size[file,<mode>]',
 			'vfs.file.time[file,<mode>]',
 			'vfs.fs.discovery',
-			'vfs.fs.get',
+			'vfs.fs.get[<mode>,<mountpoint>]',
 			'vfs.fs.inode[fs,<mode>]',
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
 			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'web.page.get[host,<path>,<port>,<redirect_limit>]',
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]',
 			'wmi.get[namespace,query]',
 			'wmi.getall[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
@@ -216,14 +216,14 @@ final class CItemData {
 			'vfs.file.size[file,<mode>]',
 			'vfs.file.time[file,<mode>]',
 			'vfs.fs.discovery',
-			'vfs.fs.get',
+			'vfs.fs.get[<mode>,<mountpoint>]',
 			'vfs.fs.inode[fs,<mode>]',
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
 			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'web.page.get[host,<path>,<port>,<redirect_limit>]',
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]',
 			'wmi.get[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
@@ -364,6 +364,7 @@ final class CItemData {
 			'snmptrap[<regex>]'
 		],
 		ITEM_TYPE_INTERNAL => [
+			'zabbix[apm,<type>]',
 			'zabbix[boottime]',
 			'zabbix[connector_queue]',
 			'zabbix[db,pool]',
@@ -581,6 +582,11 @@ final class CItemData {
 					'filter_delay'
 				],
 				ITEM_TYPE_TELNET => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TELEMETRY_QUERY => [
 					'js-filter-delay-label',
 					'js-filter-delay-field',
 					'filter_delay'
@@ -918,6 +924,35 @@ final class CItemData {
 				],
 				ITEM_TYPE_NESTED => [
 					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_TELEMETRY_QUERY => [
+					'js-item-signal-type-label',
+					'js-item-signal-type-field',
+					'js-item-metric-point-type-label',
+					'js-item-metric-point-type-field',
+					'js-item-columns-label',
+					'js-item-columns-field',
+					'js-item-aggregated-columns-label',
+					'js-item-aggregated-columns-field',
+					'js-item-evaltype-label',
+					'js-item-evaltype-field',
+					'js-item-conditions-label',
+					'js-item-conditions-field',
+					'js-item-time-shift-label',
+					'js-item-time-shift-field',
+					'js-item-lookback-limit-label',
+					'js-item-lookback-limit-field',
+					'js-item-granularity-label',
+					'js-item-granularity-field',
+					'js-item-delay-label',
+					'js-item-delay-field',
+					'delay',
+					'js-item-flex-intervals-label',
+					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.
@@ -1864,8 +1899,8 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.fs.discovery'
 				]
 			],
-			'vfs.fs.get' => [
-				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON'),
+			'vfs.fs.get[<mode>,<mountpoint>]' => [
+				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. Mode: full(default), short; mountpoint: exact match.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.fs.get',
@@ -2744,7 +2779,7 @@ final class CItemData {
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.vm.vfs.fs.size'
 				]
 			],
-			'web.page.get[host,<path>,<port>]' => [
+			'web.page.get[host,<path>,<port>,<redirect_limit>]' => [
 				'description' => _('Get content of web page. Returns web page source as text'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
@@ -2752,7 +2787,7 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#web.page.get'
 				]
 			],
-			'web.page.perf[host,<path>,<port>]' => [
+			'web.page.perf[host,<path>,<port>,<redirect_limit>]' => [
 				'description' => _('Loading time of full web page (in seconds). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
@@ -2760,7 +2795,7 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#web.page.perf'
 				]
 			],
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]' => [
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>,<redirect_limit>]' => [
 				'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter'),
 				'value_type' => ITEM_VALUE_TYPE_STR,
 				'documentation_link' => [
@@ -2797,6 +2832,13 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#zabbix.stats',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#zabbix.stats'
+				]
+			],
+			'zabbix[apm,<type>]' => [
+				'description' => _('APM statistics for <type>. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#apm'
 				]
 			],
 			'zabbix[boottime]' => [

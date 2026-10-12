@@ -78,7 +78,6 @@ typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, zbx_uint32_t, cons
 
 /* provider API */
 int	zbx_rtc_init(zbx_rtc_t *rtc, zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb,
-		zbx_get_config_forks_f get_config_forks_cb,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb, char **error);
 void 	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_t *message,
 		zbx_rtc_process_request_ex_func_t cb_proc_req);

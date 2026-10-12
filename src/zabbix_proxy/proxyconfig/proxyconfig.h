@@ -18,6 +18,7 @@
 #include "zbxcfg.h"
 #include "zbxvault.h"
 #include "zbxcomms.h"
+#include "zbxtypes.h"
 
 typedef struct
 {
@@ -35,7 +36,7 @@ typedef struct
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_find_psk_in_cache_f		zbx_find_psk_in_cache_cb_arg;
 #endif
-
+	zbx_dbconn_pool_t	*dbpool;
 }
 zbx_thread_proxyconfig_args;
 

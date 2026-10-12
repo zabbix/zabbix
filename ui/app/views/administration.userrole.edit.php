@@ -145,6 +145,42 @@ $form_grid->addItem([
 $form_grid
 	->addItem(
 		new CFormField(
+			(new CTag('h4', true, _('User profile settings')))->addClass('input-section-header')
+		)
+	)
+	->addItem([
+		new CLabel(
+			[
+				_('Enforce redirect after login'),
+				makeHelpIcon(sprintf('%1$s'."\n".'%2$s',
+					_('Enabled: Users are restricted to Redirect URL after login.'),
+					_('Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback.')
+				))
+			],
+			$data['readonly'] ? '' : 'profile-redirect-enforce'
+		),
+		new CFormField(
+			(new CCheckBox('profile_redirect_enforce', 1))
+				->setId('profile-redirect-enforce')
+				->setChecked($data['rules'][CRoleHelper::PROFILE_REDIRECT_ENFORCE])
+				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Redirect URL after login'), 'profile-redirect-url')),
+		new CFormField(
+			(new CTextAreaFlexible('profile_redirect_url', $data['rules'][CRoleHelper::PROFILE_REDIRECT_URL]))
+				->setId('profile-redirect-url')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('role_rule', 'value_str'))
+				->setReadonly($data['readonly'])
+		)
+	]);
+
+$form_grid
+	->addItem(
+		new CFormField(
 			(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
 		)
 	)

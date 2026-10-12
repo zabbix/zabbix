@@ -17,7 +17,7 @@
 #define PROMETHEUS_TEST_H
 
 #include "zbxalgo.h"
-#include "zbxexpr.h"
+#include "zbxstr.h"
 
 typedef struct
 {
