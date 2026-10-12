@@ -299,6 +299,10 @@ class CTrend extends CApiService {
 				? static fn (float $value): string => sprintf('%.0f', $value)
 				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
 
+			if (!array_key_exists('group_by_itemid', $data)) {
+				continue;
+			}
+
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
 					foreach ($item['group_by_clock']['buckets'] as $histogram) {

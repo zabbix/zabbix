@@ -894,6 +894,10 @@ class CHistoryManager {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
+			if (!array_key_exists('group_by_itemid', $data)) {
+				continue;
+			}
+
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
 					|| !is_array($item['group_by_script']['buckets'])) {
