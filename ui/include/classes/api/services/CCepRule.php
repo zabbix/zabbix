@@ -1091,7 +1091,8 @@ class CCepRule extends CApiService {
 
 			$db_cep_rule = $db_cep_rules[$cep_rule['cep_ruleid']];
 
-			if ($cep_rule['window']['group_by_tags'] != $db_cep_rule['window']['group_by_tags']
+			if (array_key_exists('group_by_tags', $cep_rule['window'])
+					&& $cep_rule['window']['group_by_tags'] != $db_cep_rule['window']['group_by_tags']
 					&& $db_cep_rule['window']['group_by_tags'] == CCepRuleHelper::GROUP_BY_YES) {
 				$cep_rule['window'] += ['tags' => []];
 			}
