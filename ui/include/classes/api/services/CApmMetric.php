@@ -276,9 +276,16 @@ class CApmMetric extends CApmGeneral {
 					}
 
 					if (array_key_exists($field, $db_schema[$table])) {
-						CClickHouseHelper::selectForType($sub_query, $db_schema[$table][$field]['type'], $field,
-							$table_alias
+						$custom_select = CClickHouseHelper::getCustomTypeSelect($db_schema[$table][$field]['type'],
+							$field, $table_alias
 						);
+
+						if ($custom_select !== null) {
+							$sub_query->select($custom_select, $field);
+						}
+						else {
+							$sub_query->select($table_alias.'.'.$field);
+						}
 					}
 					else {
 						$sub_query->select(self::CLICKHOUSE_FIELDS_DEFAULTS[$field], $field);

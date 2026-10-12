@@ -203,26 +203,24 @@ final class CClickHouseHelper {
 		$table_schema = $db_schema[$table];
 
 		foreach (array_intersect_key($table_schema, array_flip($options['output'])) as $field => ['type' => $type]) {
-			self::selectForType($query, $type, $field, $table_alias);
+			$custom_select = self::getCustomTypeSelect($type, $field, $table_alias);
+
+			if ($custom_select !== null) {
+				$query->select($custom_select, $field);
+			}
+			else {
+				$query->select($table_alias.'.'.$field);
+			}
 		}
 	}
 
-	public static function selectForType(CClickHouseQuery $query, string $type, string $field, string $table_alias)
-			: void {
-		switch ($type) {
-			case 'DateTime64(9)':
-				$query->select('toUnixTimestamp64Nano(toDateTime64('.$table_alias.'.'.$field.',9))', $field);
-				break;
-
-			case 'Array(DateTime64(9))':
-				$query->select('arrayMap(p -> toUnixTimestamp64Nano(toDateTime64(p,9)),'.$table_alias.'.'.$field.')',
-					$field
-				);
-				break;
-
-			default:
-				$query->select($table_alias.'.'.$field);
-		}
+	public static function getCustomTypeSelect(string $type, string $field, string $table_alias): ?string {
+		return match ($type) {
+			'DateTime64(9)' => 'toUnixTimestamp64Nano(toDateTime64('.$table_alias.'.'.$field.',9))',
+			'Array(DateTime64(9))' =>
+				'arrayMap(p -> toUnixTimestamp64Nano(toDateTime64(p,9)),'.$table_alias.'.'.$field.')',
+			default => null
+		};
 	}
 
 	public static function addAttributeFilter(CClickHouseQuery $query, string $field, array $list, int $eval_type)

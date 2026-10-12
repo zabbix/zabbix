@@ -205,14 +205,28 @@ class CApmTrace extends CApmGeneral {
 			$query->select('count(DISTINCT t.TraceId) as rowscount');
 		}
 		else {
+			$table_schema = $db_schema['otel_traces'];
+
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
-				$query->select(match($field) {
-					'TraceId' => 't.TraceId',
-					'Timestamp' => 'anyIf(toUnixTimestamp64Nano(t.Timestamp),t.ParentSpanId=\'\')',
-					'span_count' => 'count()',
-					'error_count' => 'countIf(t.StatusCode=\'Error\')',
-					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-				}, $field);
+				if ($field === 'span_count') {
+					$query->select('count()', $field);
+				}
+				elseif ($field === 'error_count') {
+					$query->select('countIf(t.StatusCode=\'Error\')', $field);
+				}
+				else {
+					$custom_select = CClickHouseHelper::getCustomTypeSelect($table_schema[$field]['type'], $field, 't');
+
+					$select = $custom_select ?? 't.'.$field;
+					$select_alias = $custom_select !== null ? $field : null;
+
+					if ($field !== 'TraceId') {
+						$select = 'anyIf('.$select.',t.ParentSpanId=\'\')';
+						$select_alias = $field;
+					}
+
+					$query->select($select, $select_alias);
+				}
 			}
 
 			foreach ($options['sortfield'] as $i => $field) {
