@@ -545,6 +545,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const SCALAR_VALUE_LIST_FIELD = [
+		'ceprule.window.tags',
 		'item.query.aggregated_columns.parameters',
 		'itemprototype.query.aggregated_columns.parameters'
 	];

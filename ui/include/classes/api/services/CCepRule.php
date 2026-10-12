@@ -398,8 +398,6 @@ class CCepRule extends CApiService {
 		self::updateWindow($cep_rules);
 		self::updateOperations($cep_rules);
 
-		self::convertWindowTagsToString($cep_rules);
-
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_CEP_RULE, $cep_rules);
 
 		return ['cep_ruleids' => array_column($cep_rules, 'cep_ruleid')];
@@ -1348,21 +1346,6 @@ class CCepRule extends CApiService {
 		unset($operation);
 	}
 
-	private static function convertWindowTagsToString(array &$cep_rules, ?array &$db_cep_rules = null): void {
-		foreach ($cep_rules as &$cep_rule) {
-			if (array_key_exists('window', $cep_rule) && array_key_exists('tags', $cep_rule['window'])) {
-				$cep_rule['window']['tags'] = implode(PHP_EOL, $cep_rule['window']['tags']);
-			}
-
-			if ($db_cep_rules !== null && array_key_exists('window', $db_cep_rules[$cep_rule['cep_ruleid']])
-					&& array_key_exists('tags', $db_cep_rules[$cep_rule['cep_ruleid']]['window'])) {
-				$db_cep_rules[$cep_rule['cep_ruleid']]['window']['tags'] =
-					implode(PHP_EOL, $db_cep_rules[$cep_rule['cep_ruleid']]['window']['tags']);
-			}
-		}
-		unset($cep_rule);
-	}
-
 	public function update(array $cep_rules): array {
 		$this->validateUpdate($cep_rules, $db_cep_rules);
 
@@ -1612,8 +1595,6 @@ class CCepRule extends CApiService {
 		self::updateFilters($cep_rules, $db_cep_rules);
 		self::updateWindow($cep_rules, $db_cep_rules);
 		self::updateOperations($cep_rules, $db_cep_rules);
-
-		self::convertWindowTagsToString($cep_rules, $db_cep_rules);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CEP_RULE, $cep_rules, $db_cep_rules);
 	}
