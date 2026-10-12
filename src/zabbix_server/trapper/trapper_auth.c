@@ -24,6 +24,8 @@
 #include "log.h"
 #include "sha512crypt.h"
 
+#include "../../libs/zbxserver/zabbix_users.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: takes a string token, hashes it with sha-512 and then formats the *
@@ -61,7 +63,8 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
  *             user       - [OUT] the user data                               *
  *             result     - [OUT] error logging                               *
  *                                                                            *
- * Return value: SUCCEED - managed to find and authenticate user              *
+ * Return value: SUCCEED - managed to find and authenticate user, user is not *
+ *                         disabled                                           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -104,6 +107,9 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 		ret = FAIL;
 		goto out;
 	}
+
+	if (SUCCEED == ret && SUCCEED != check_perm2system(user->userid))
+		ret = FAIL;
 
 	if (FAIL == ret && NULL != result)
 		*result = zbx_dsprintf(*result, "Permission denied.");
