@@ -129,7 +129,9 @@ func parse(rec Record) (r *Rule, err error) {
 			return nil, errRegexpPatternMustNotBeEmpty
 		}
 
-		r.Regexp, err = regexp.Compile(rec.Pattern)
+		anchored := fmt.Sprintf(`\A(?:%s)\z`, rec.Pattern)
+
+		r.Regexp, err = regexp.Compile(anchored)
 		if err != nil {
 			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
 		}
