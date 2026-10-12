@@ -201,7 +201,7 @@ class ZNavigationTree extends HTMLElement {
 
 		if (has_children) {
 			toggle.type = 'button';
-			toggle.classList.add('btn-icon', is_expanded ? ZBX_ICON_CHEVRON_DOWN : ZBX_ICON_CHEVRON_UP);
+			toggle.classList.add('btn-icon', is_expanded ? ZBX_ICON_CHEVRON_UP : ZBX_ICON_CHEVRON_DOWN);
 		}
 		else {
 			toggle.disabled = true;
