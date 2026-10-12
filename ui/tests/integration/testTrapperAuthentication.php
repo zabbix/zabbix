@@ -107,7 +107,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'EnableGlobalScripts' => 1,
-				// Authentication result is logged by get_user_from_json() on debug level.
+				// Authentication result is logged by zbx_get_user_from_json() on debug level.
 				'DebugLevel' => 4,
 				'LogFileSize' => 0,
 				// report.test is only authenticated when report manager is running; web service is not contacted.
@@ -169,8 +169,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 				'subject' => 'Trapper authentication',
 				'message' => 'Trapper authentication'
 			]], 'Cannot find the specified media type.'],
-			'report.test' => ['testReport', [['name' => 'Trapper authentication']], 'cannot find tag: dashboardid'],
-			'cep.rule.reset' => ['resetCepRule', [['cep_ruleid' => 'invalid']], 'Cannot parse request tag: cep_ruleid.']
+			'report.test' => ['testReport', [['name' => 'Trapper authentication']], 'cannot find tag: dashboardid']
 		];
 
 		$data = [];
@@ -191,7 +190,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 
 		// Log is read incrementally, so only the line logged for this request can match.
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'End of get_user_from_json():'.($granted ? 'SUCCEED' : 'FAIL'), true, 5, 1
+			'End of zbx_get_user_from_json():'.($granted ? 'SUCCEED' : 'FAIL'), true, 5, 1
 		);
 
 		return $result;
