@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-07-01 07:27+0000\n"
+"PO-Revision-Date: 2026-10-02 07:43+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -138,9 +138,9 @@ msgstr[2] "akcie %1$s "
 msgctxt "screen reader"
 msgid "%1$s action have been taken"
 msgid_plural "%1$s actions have been taken"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Akcia %1$ sbola vykonaná"
+msgstr[1] "Akcie %1$s boli vykonané"
+msgstr[2] "Akcie %1$s boli vykonané"
 
 #: jsLoader.php:321
 #, c-format
@@ -1014,7 +1014,7 @@ msgstr "Pridať od templatu"
 
 #: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
 msgid "Add graph to Favorite graphs widget"
-msgstr ""
+msgstr "Pridaj graf do widgetu Oblúbené grafy"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -1037,7 +1037,7 @@ msgstr "Pridať položku"
 
 #: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
 msgid "Add map to Favorite maps widget"
-msgstr ""
+msgstr "Pridaj mapu do widgetu Oblúbené mapy"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -4478,7 +4478,7 @@ msgstr "Zmeniť indikátor"
 
 #: include/classes/html/CMacroValue.php:163
 msgid "Change macro value type"
-msgstr ""
+msgstr "Zmen typ hodnoty makra"
 
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
@@ -4759,7 +4759,7 @@ msgstr "Zavrieť konštruktéra výrazu"
 
 #: jsLoader.php:321
 msgid "Close modal window"
-msgstr ""
+msgstr "Zatvor dialógové okno"
 
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
@@ -4768,7 +4768,7 @@ msgstr "Zavrieť nový event"
 
 #: include/func.inc.php:1690 jsLoader.php:221
 msgid "Close notification"
-msgstr ""
+msgstr "Zatvor notifikáciu"
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4798,7 +4798,7 @@ msgstr "Zavrieť"
 #: include/classes/html/CSectionCollapsible.php:41 jsLoader.php:333
 #: jsLoader.php:338
 msgid "Collapse section"
-msgstr ""
+msgstr "Zbaľ sekciu"
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -5937,7 +5937,7 @@ msgstr "Dashboard „%1$s“ sa používa v reporte „%2$s“."
 
 #: app/views/monitoring.dashboard.view.php:122
 msgid "Dashboard actions"
-msgstr ""
+msgstr "Akcie dashboardu"
 
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
@@ -6298,7 +6298,7 @@ msgstr "Predvolená autentifikácia"
 
 #: include/classes/html/CTabFilter.php:169
 msgid "Default filter tab"
-msgstr ""
+msgstr "Preddefinovaná karta filtra"
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6853,7 +6853,7 @@ msgstr "Závislá položka"
 
 #: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
 msgid "Dependent trigger"
-msgstr ""
+msgstr "Závislý spúšťač"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7716,7 +7716,7 @@ msgstr "Upraviť dashboard"
 
 #: jsLoader.php:479
 msgid "Edit filter properties"
-msgstr ""
+msgstr "Upraviť vlastnosti filtra"
 
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
@@ -7737,7 +7737,7 @@ msgstr "Upraviť widget"
 
 #: jsLoader.php:183
 msgid "Edit widget settings"
-msgstr ""
+msgstr "Upraviť nastavenia widgetu"
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8132,7 +8132,7 @@ msgstr "Anglicky (en_US)"
 
 #: include/html.inc.php:201
 msgid "Enter full screen mode"
-msgstr ""
+msgstr "Režim cez celú obrazovku"
 
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
@@ -8425,7 +8425,7 @@ msgstr "Existuje"
 
 #: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
 msgid "Exit full screen mode"
-msgstr ""
+msgstr "Opustiť režim cez celú obrazovku"
 
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -8443,7 +8443,7 @@ msgstr "Rozbaľte makrá"
 #: include/classes/html/CSectionCollapsible.php:44 jsLoader.php:332
 #: jsLoader.php:337
 msgid "Expand section"
-msgstr ""
+msgstr "Rozbaliť sekciu"
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9120,7 +9120,7 @@ msgstr "Prejsť na poslednú stranu, %1$s"
 
 #: include/classes/html/CTabFilter.php:387
 msgid "Go to next filter tab"
-msgstr ""
+msgstr "Prejdi do dlašieho filtra karty"
 
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
@@ -9139,7 +9139,7 @@ msgstr "Prejsť na stránku %1$s, aktuálna strana"
 
 #: include/classes/html/CTabFilter.php:400
 msgid "Go to previous filter tab"
-msgstr ""
+msgstr "Prejdi do predošlého filtra karty"
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -10682,7 +10682,7 @@ msgstr "Neprístupná skupina používateľov"
 
 #: include/classes/helpers/CItemGeneralHelper.php:276
 msgid "Inaccessible value mapping"
-msgstr ""
+msgstr "Nedostupné mapovanie hodnoty"
 
 #: jsLoader.php:153
 msgid "Inaccessible widget"
@@ -12907,7 +12907,7 @@ msgstr "Zoznam inštancií objektov počítadiel výkonu systému Windows. Vrát
 
 #: include/classes/html/CTabFilter.php:382
 msgid "List of open filter tabs"
-msgstr ""
+msgstr "Zoznam otvorených filtrov kariet"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -13507,7 +13507,7 @@ msgstr "Maximálny počet opakovaní sa vzťahuje len na prehľadávanie a snmpw
 
 #: app/partials/configuration.host.interface.row.php:116
 msgid "Max repetition count is applicable to walk only."
-msgstr ""
+msgstr "Maximálny počet opakovaní je možné aplikovať iba na \"walk\"."
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
@@ -14095,11 +14095,11 @@ msgstr "Najkritickejšie z podradených služieb"
 
 #: include/classes/html/CFilter.php:254 include/classes/html/CTabFilter.php:332
 msgid "Move time range backward"
-msgstr ""
+msgstr "Posuň časovú os naspať"
 
 #: include/classes/html/CFilter.php:259 include/classes/html/CTabFilter.php:339
 msgid "Move time range forward"
-msgstr ""
+msgstr "Posuň časovú os dopredu"
 
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
@@ -15759,7 +15759,7 @@ msgstr "Otvor URL"
 #: app/views/popup.generic.php:460 include/classes/html/CHtmlPage.php:175
 #: jsLoader.php:322
 msgid "Open Zabbix documentation in a new tab"
-msgstr ""
+msgstr "Otvor dokumentáciu Zabbix v novej karte"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15771,7 +15771,7 @@ msgstr "Otvoriť log"
 
 #: jsLoader.php:184
 msgid "Open widget actions"
-msgstr ""
+msgstr "Otvor akcie widgetu"
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16363,7 +16363,7 @@ msgstr "Rodičovské templaty"
 
 #: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
 msgid "Parent trigger"
-msgstr ""
+msgstr "Nadradený spúšťač"
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -16952,17 +16952,17 @@ msgstr "Problém vyriešený"
 #: include/actions.inc.php:1724
 msgctxt "screen reader"
 msgid "Problem severity changed"
-msgstr ""
+msgstr "Severity problému zmenená"
 
 #: include/actions.inc.php:1714
 msgctxt "screen reader"
 msgid "Problem severity decreased"
-msgstr ""
+msgstr "Severity problému bola znížená"
 
 #: include/actions.inc.php:1719
 msgctxt "screen reader"
 msgid "Problem severity increased"
-msgstr ""
+msgstr "Severity problému bola zvýšená"
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -17744,7 +17744,7 @@ msgstr "Zmazať zo skupín"
 
 #: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
 msgid "Remove graph from the Favorite graphs widget"
-msgstr ""
+msgstr "Odstráň graf z widgetu Oblúbené grafy"
 
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
@@ -17756,7 +17756,7 @@ msgstr "Odstráňte tagy hosta"
 
 #: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
 msgid "Remove map from the Favorite maps widget"
-msgstr ""
+msgstr "Odstráň mapu z widgetu Oblúbené mapy"
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18902,7 +18902,7 @@ msgstr "Výberom SLA zobrazíte správu SLA."
 
 #: include/classes/html/CDateSelector.php:198
 msgid "Select date"
-msgstr ""
+msgstr "Zvoľ dátum"
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -19366,7 +19366,7 @@ msgstr "Zobraziť funkciu agregácie"
 
 #: include/events.inc.php:755
 msgid "Show all tags"
-msgstr ""
+msgstr "Zobraz všetky tagy"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -19417,7 +19417,7 @@ msgstr "Zobraziť riadky"
 
 #: include/classes/html/CHtmlPage.php:146
 msgid "Show main menu"
-msgstr ""
+msgstr "Zobraz hlavné menu"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
