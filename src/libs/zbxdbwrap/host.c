@@ -389,7 +389,8 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 				zbx_snprintf(error, max_error_len,
 						"failed to retrieve trigger description or host for triggerid "
 						ZBX_FS_UI64 " and hostid " ZBX_FS_UI64, triggerid, hostid);
-				THIS_SHOULD_NEVER_HAPPEN_MSG("%s", error);
+				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_ERR, "%s", error);
 			}
 
 			ret = FAIL;
