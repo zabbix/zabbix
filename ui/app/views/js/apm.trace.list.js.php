@@ -240,6 +240,7 @@
 
 					row.setAttribute('data-traceid', row_data[traceid] ?? '');
 					row.setAttribute('data-timestamp', Math.floor((row_data[timestamp] ?? Date.now()) / 1000000000));
+					row.setAttribute('tabindex', '0');
 
 					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
 				})
@@ -408,33 +409,41 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', e => {
+						const rowSelected = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
-							const selection = window.getSelection();
 
-							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
+							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
-							if (this.#selected_traceid !== traceid) {
-								if (this.#selected_traceid !== null) {
-									const row_selected = datatable_element
-										.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
-									row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
-								}
-
-								this.#selected_traceid = traceid;
-								row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
-
-								this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
+							if (this.#selected_traceid === traceid) {
+								return;
 							}
-							else {
-								this.#selected_traceid = null;
-								row.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-								this.#side_drawer.close();
+							datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
+								?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#selected_traceid = traceid;
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
+						};
+
+						row.addEventListener('keyup', e => {
+							if (e.key === 'Enter') {
+								rowSelected(e);
 							}
+						});
+
+						row.addEventListener('click', e => {
+							const selection = window.getSelection();
+
+							if (selection && selection.toString().length > 0) {
+								return;
+							}
+
+							rowSelected(e);
 						});
 					}
 				})
@@ -473,6 +482,9 @@
 
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
+
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
 
 			this.#trace_view_page?.destroy();
 
@@ -519,6 +531,8 @@
 
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			row_selected.focus();
 
 			this.#selected_traceid = null;
 

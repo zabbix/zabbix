@@ -397,6 +397,7 @@
 					const row_hash = this.#hashRowData(row_data);
 
 					row.dataset.rowHash = row_hash;
+					row.setAttribute('tabindex', '0');
 
 					const row_data_o = Object.create(null);
 
@@ -442,22 +443,15 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', e => {
+						const rowSelected = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
-							const selection = window.getSelection();
 
-							if (target.tagName === 'A') {
-								return;
-							}
-
-							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
+							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
 							if (this.#selected_row_hash === row_hash) {
-								this.#side_drawer.close();
-
 								return;
 							}
 
@@ -469,6 +463,22 @@
 							this.#selected_row_hash = row_hash;
 
 							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_hash));
+						};
+
+						row.addEventListener('keyup', e => {
+							if (e.key === 'Enter') {
+								rowSelected(e);
+							}
+						});
+
+						row.addEventListener('click', e => {
+							const selection = window.getSelection();
+
+							if (selection && selection.toString().length > 0) {
+								return;
+							}
+
+							rowSelected(e);
 						});
 					}
 				})
@@ -495,6 +505,9 @@
 				groups: this.#createDetailGroups(e.detail.response)
 			});
 
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
+
 			this.#details_panel.get().addEventListener('close', () => {
 				this.#side_drawer.close();
 			});
@@ -510,8 +523,10 @@
 
 			const datatable_element = this.#datatable.getElement();
 
-			datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
-				?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			row_selected.focus();
 
 			this.#scheduleRefresh();
 		}
