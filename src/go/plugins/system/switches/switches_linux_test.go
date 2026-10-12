@@ -17,15 +17,8 @@ package switches
 import (
 	_ "embed"
 	"errors"
-	"io/fs"
-	"os"
-	"path/filepath"
 	"testing"
-
-	"github.com/google/go-cmp/cmp"
 )
-
-const testKey = "system.cpu.switches"
 
 //go:embed testdata/system.cpu.switches_valid.txt
 var validContent []byte
@@ -51,110 +44,79 @@ var invalidValueContent []byte
 //go:embed testdata/system.cpu.switches_no_value.txt
 var noValueContent []byte
 
-func TestPlugin_Export(t *testing.T) {
+func Test_parseSwitches(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		key    string
-		params []string
-	}
-
 	tests := []struct {
-		name            string
-		args            args
-		procStatContent []byte
-		want            any
-		wantErr         error
+		name    string
+		content []byte
+		want    uint64
+		wantErr error
 	}{
 		{
-			name:            "+valid",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: validContent,
-			want:            uint64(232483817),
+			name:    "+valid",
+			content: validContent,
+			want:    232483817,
 		},
 		{
-			name:            "+validMinimalProcStat",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: validMinimalContent,
-			want:            uint64(1000),
+			name:    "+validMinimalProcStat",
+			content: validMinimalContent,
+			want:    1000,
 		},
 		{
-			name:            "+multipleCtxtEntries",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: multipleCtxtContent,
-			want:            uint64(232483817),
+			name:    "+multipleCtxtEntries",
+			content: multipleCtxtContent,
+			want:    232483817,
 		},
 		{
-			name:            "+firstCtxtInvalid",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: firstInvalidCtxtContent,
-			want:            uint64(232483817),
+			name:    "+firstCtxtInvalid",
+			content: firstInvalidCtxtContent,
+			want:    232483817,
 		},
 		{
-			name:            "+whitespaceVariations",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: whitespaceVariationsContent,
-			want:            uint64(232483817),
+			name:    "+whitespaceVariations",
+			content: whitespaceVariationsContent,
+			want:    232483817,
 		},
 		{
-			name:            "+ctxtPrefixedToken",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: []byte("cpu  1 2 3 4\nctxtx 4242\nbtime 1\n"),
-			want:            uint64(4242),
+			name:    "+ctxtPrefixedToken",
+			content: []byte("cpu  1 2 3 4\nctxtx 4242\nbtime 1\n"),
+			want:    4242,
 		},
 		{
-			name:            "+trailingNonDigits",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: []byte("cpu  1 2 3 4\nctxt 4242abc\nbtime 1\n"),
-			want:            uint64(4242),
+			name:    "+trailingNonDigits",
+			content: []byte("cpu  1 2 3 4\nctxt 4242abc\nbtime 1\n"),
+			want:    4242,
 		},
 		{
-			name:            "+withEmptyParamIgnored",
-			args:            args{key: testKey, params: []string{""}},
-			procStatContent: validContent,
-			want:            uint64(232483817),
+			name:    "+noTrailingNewline",
+			content: []byte("cpu  1 2 3 4\nctxt 4242"),
+			want:    4242,
 		},
 		{
-			name:            "+withParamIgnored",
-			args:            args{key: testKey, params: []string{"param"}},
-			procStatContent: validContent,
-			want:            uint64(232483817),
+			name:    "-missingCtxt",
+			content: missingCtxtContent,
+			wantErr: errCtxtNotFound,
 		},
 		{
-			name:            "+withMultipleParamsIgnored",
-			args:            args{key: testKey, params: []string{"param1", "param2"}},
-			procStatContent: validContent,
-			want:            uint64(232483817),
+			name:    "-ctxtNotAtLineStart",
+			content: []byte("cpu  1 2 3 4\n ctxt 4242\nbtime 1\n"),
+			wantErr: errCtxtNotFound,
 		},
 		{
-			name:            "-missingCtxt",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: missingCtxtContent,
-			wantErr:         errCtxtNotFound,
+			name:    "-invalidCtxtValue",
+			content: invalidValueContent,
+			wantErr: errCtxtNotFound,
 		},
 		{
-			name:            "-ctxtNotAtLineStart",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: []byte("cpu  1 2 3 4\n ctxt 4242\nbtime 1\n"),
-			wantErr:         errCtxtNotFound,
+			name:    "-ctxtNoValue",
+			content: noValueContent,
+			wantErr: errCtxtNotFound,
 		},
 		{
-			name:            "-invalidCtxtValue",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: invalidValueContent,
-			wantErr:         errCtxtNotFound,
-		},
-		{
-			name:            "-ctxtNoValue",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: noValueContent,
-			wantErr:         errCtxtNotFound,
-		},
-		{
-			name:            "-emptyFile",
-			args:            args{key: testKey, params: []string{}},
-			procStatContent: nil,
-			wantErr:         errCtxtNotFound,
+			name:    "-emptyContent",
+			content: nil,
+			wantErr: errCtxtNotFound,
 		},
 	}
 
@@ -162,51 +124,14 @@ func TestPlugin_Export(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			p := &Plugin{
-				procStatFilepath: createMockFile(t, tt.procStatContent),
-			}
-
-			got, err := p.Export(tt.args.key, tt.args.params, nil)
+			got, err := parseSwitches(tt.content)
 			if !errors.Is(err, tt.wantErr) {
-				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("parseSwitches() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("Plugin.Export() mismatch (-want +got):\n%s", diff)
+			if got != tt.want {
+				t.Fatalf("parseSwitches() = %d, want %d", got, tt.want)
 			}
 		})
 	}
-}
-
-func TestPlugin_Export_fileMissing(t *testing.T) {
-	t.Parallel()
-
-	p := &Plugin{
-		procStatFilepath: filepath.Join(t.TempDir(), "missing"),
-	}
-
-	got, err := p.Export(testKey, []string{}, nil)
-	if !errors.Is(err, fs.ErrNotExist) {
-		t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, fs.ErrNotExist)
-	}
-
-	if got != nil {
-		t.Fatalf("Plugin.Export() = %v, want nil", got)
-	}
-}
-
-func createMockFile(t *testing.T, content []byte) string {
-	t.Helper()
-
-	var (
-		tmpDir = t.TempDir()
-		path   = filepath.Join(tmpDir, "stat")
-	)
-
-	err := os.WriteFile(path, content, 0600)
-	if err != nil {
-		t.Fatalf("failed to write temp mock file: %v", err)
-	}
-
-	return path
 }

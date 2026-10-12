@@ -35,8 +35,6 @@ var errCtxtNotFound = errs.New("ctxt line not found")
 // Plugin is a base struct for a plugin.
 type Plugin struct {
 	plugin.Base
-
-	procStatFilepath string
 }
 
 //nolint:gochecknoinits
@@ -50,30 +48,37 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
-
-	impl.procStatFilepath = procStatFilepath
 }
 
 // Export implements plugin.Exporter interface. Parameters are ignored, as in the C agent.
-func (p *Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, error) {
-	parser := procfs.NewParser().
-		SetScanStrategy(procfs.StrategyOSReadFile).
-		SetPattern(pattern).
-		SetMatchMode(procfs.ModePrefix)
-
-	lines, err := parser.Parse(p.procStatFilepath)
+func (*Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, error) {
+	content, err := procfs.ReadAll(procStatFilepath)
 	if err != nil {
-		return nil, errs.Wrapf(err, "failed to parse %q", p.procStatFilepath)
+		return nil, errs.Wrapf(err, "failed to read %q", procStatFilepath)
 	}
 
-	for _, line := range lines {
+	value, err := parseSwitches(content)
+	if err != nil {
+		return nil, errs.Wrapf(err, "failed to get context switches from %q", procStatFilepath)
+	}
+
+	return value, nil
+}
+
+// parseSwitches returns the value of the first parsable line starting with "ctxt" in /proc/stat content.
+func parseSwitches(content []byte) (uint64, error) {
+	for line := range strings.Lines(string(content)) {
+		if !strings.HasPrefix(line, pattern) {
+			continue
+		}
+
 		value, ok := parseValue(line)
 		if ok {
 			return value, nil
 		}
 	}
 
-	return nil, errs.Wrapf(errCtxtNotFound, "failed to get context switches from %q", p.procStatFilepath)
+	return 0, errCtxtNotFound
 }
 
 // parseValue mirrors C sscanf(line, "%*s %llu"): leading digits of the second field.
