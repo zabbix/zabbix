@@ -71,7 +71,7 @@ class CCepRuleHelper {
 	public const WHEN_EVENT_EVICTED = 2;
 	public const WHEN_WINDOW_CLOSED = 3;
 	public const WHEN_PATTERN_MATCHED = 4;
-	public const WHEN_EVENT_CLOSED  = 5;
+	public const WHEN_EVENT_CLOSED = 5;
 
 	public const EXECUTE_WHEN_ORDER = [
 		self::WHEN_EVENT_OCCURRED,
