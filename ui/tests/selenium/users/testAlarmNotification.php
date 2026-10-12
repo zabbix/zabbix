@@ -20,8 +20,6 @@ require_once __DIR__ . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
- *
- * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
@@ -219,6 +217,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -295,6 +294,11 @@ class testAlarmNotification extends CWebTest {
 			}
 		}
 
+		// Check that clicking close button twice (simulating double-click) closes the dialog without producing an error.
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->click();
+		$alarm_dialog->waitUntilNotVisible();
+		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
+
 		// Close problem and open Problem page.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
 		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
@@ -312,6 +316,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
@@ -440,6 +445,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
+	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 *
 	 * @dataProvider getDisplayedProblemsData
 	 */
@@ -604,6 +611,7 @@ class testAlarmNotification extends CWebTest {
 	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
@@ -656,9 +664,6 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Delete the events so they don't appear in the next test case.
-	 *
-	 * TODO: test fails on Jenkins with error "Failed to write session data".
-	 * Adding DB::delete in onAfter instead of at the end of the test might help.
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
@@ -693,7 +698,8 @@ class testAlarmNotification extends CWebTest {
 		// Get alarm color codes.
 		$alarm_colors = [];
 		foreach ($notification_color_class as $color_class) {
-			$bg_color = $alarm_dialog->query('class', $color_class)->one()->getCSSValue('background-color');
+			$bg_color = $alarm_dialog->query('class', $color_class)->waitUntilPresent()->one()
+					->getCSSValue('background-color');
 			$alarm_colors[] = $bg_color;
 		}
 

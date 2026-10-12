@@ -89,7 +89,7 @@ function updateMessageSettings($messages) {
 	}
 	if (isset($messages['triggers.severities'])) {
 		$messages['triggers.severities'] = serialize(array_filter($messages['triggers.severities'], function($v) {
-			return $v == 1;
+			return $v == TRIGGER_SEVERITY_ON;
 		}));
 	}
 

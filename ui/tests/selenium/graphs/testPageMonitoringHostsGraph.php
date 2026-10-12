@@ -880,8 +880,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
-			$this->assertEquals($data['graphs_amount'],
-					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
+			// Wait for all charts to be rendered by JS (charts.view uses native fetch, not tracked by waitUntilReady).
+			// img[@src] is set by chart.refresh() which runs after replacePaging(), ensuring table-stats is stable.
+			$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]//img[@src]')
+					->waitUntilCount($data['graphs_amount']);
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
@@ -917,7 +919,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'=now&filter_search_type=0&filter_set=1')->waitUntilReady();
 
 		// Check Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.
@@ -925,7 +927,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
 
 		// Return to normal view.
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.

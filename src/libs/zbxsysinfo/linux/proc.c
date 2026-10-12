@@ -720,7 +720,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				ret = SYSINFO_RET_FAIL;
 				goto clean_re;
@@ -1104,7 +1104,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				ret = SYSINFO_RET_FAIL;
 				goto clean;
@@ -2018,7 +2018,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 != errno)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s.",
 							zbx_strerror(errno)));
 				return SYSINFO_RET_FAIL;
 			}

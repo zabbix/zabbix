@@ -440,6 +440,9 @@ class CHost extends CHostGeneral {
 
 		// search
 		if (is_array($options['search'])) {
+			unset($options['search']['tls_psk_identity']);
+			unset($options['search']['tls_psk']);
+
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
@@ -467,6 +470,9 @@ class CHost extends CHostGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
+			unset($options['filter']['tls_psk_identity']);
+			unset($options['filter']['tls_psk']);
+
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
 			if (array_key_exists('hostid', $options['filter'])) {
@@ -505,7 +511,7 @@ class CHost extends CHostGeneral {
 		 */
 		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
 			$all_keys[] = 'active_available';
@@ -1744,8 +1750,6 @@ class CHost extends CHostGeneral {
 			'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 			'elementid' => $hostids
 		]);
-
-		self::deleteHgSets($db_hosts);
 
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);

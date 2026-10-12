@@ -20,8 +20,6 @@ require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
 require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
@@ -2365,7 +2363,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$check_form = $dialog_check->asForm();
 			$this->assertEquals($itemName, $check_form->getField('Name')->getValue());
 			$this->assertEquals($keyName, $check_form->getField('Key')->getValue());
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+			$this->query('id:name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 
 			switch ($type) {

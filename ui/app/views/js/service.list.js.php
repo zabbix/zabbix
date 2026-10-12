@@ -31,9 +31,10 @@
 			this.is_refresh_pending = false;
 		}
 
-		init({serviceid, path = null, is_filtered = null, mode_switch_url, parent_url = null, refresh_url,
-				refresh_interval, back_url = null}) {
+		init({serviceid, is_inaccessible, path = null, is_filtered = null, mode_switch_url, parent_url = null,
+				refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
+			this._is_inaccessible = is_inaccessible;
 			this.path = path;
 			this.is_filtered = is_filtered;
 			this.mode_switch_url = mode_switch_url;
@@ -43,9 +44,16 @@
 			this.back_url = back_url;
 
 			this._initViewModeSwitcher();
-			this._initTagFilter();
+
+			if (!this._is_inaccessible) {
+				this._initTagFilter();
+			}
+
 			this._initActions();
-			this._initRefresh();
+
+			if (!this._is_inaccessible) {
+				this._initRefresh();
+			}
 		}
 
 		_initViewModeSwitcher() {
@@ -202,7 +210,7 @@
 		}
 
 		_refresh() {
-			if (this.is_refresh_paused || this.is_refresh_pending) {
+			if (this._is_inaccessible || this.is_refresh_paused || this.is_refresh_pending) {
 				return;
 			}
 

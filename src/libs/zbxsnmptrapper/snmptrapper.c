@@ -411,7 +411,14 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 
 		pzbegin = c;
 
-		c += 7;	/* c now points to the delimiter between "ZBXTRAP" and address */
+		c += 7;	/* c now is expected to point to the delimiter between "ZBXTRAP" and address */
+
+		if (('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c)) || (buffer != pzbegin &&
+				'\0' != *(pzbegin - 1) && NULL == strchr(ZBX_WHITESPACE, *(pzbegin - 1))))
+		{
+			c++;
+			continue;
+		}
 
 		while ('\0' != *c && NULL != strchr(ZBX_WHITESPACE, *c))
 			c++;
