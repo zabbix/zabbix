@@ -104,7 +104,7 @@ $filter = (new CFilter())
 						]
 					],
 					[
-						'evaltype_field_name' => 'filter_resource_evaltype',
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
 						'attribute_field_name' => 'filter_resource_attributes'
 					])->setId('filter-resource-attributes')
 				)
@@ -119,7 +119,7 @@ $filter = (new CFilter())
 						]
 					],
 					[
-						'evaltype_field_name' => 'filter_scope_evaltype',
+						'evaltype_field_name' => 'filter_scope_attributes_evaltype',
 						'attribute_field_name' => 'filter_scope_attributes'
 					])->setId('filter-scope-attributes')
 				)
