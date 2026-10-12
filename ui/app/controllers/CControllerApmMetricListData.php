@@ -66,10 +66,10 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
 				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM
 			]]],
-			'attributes_evaltype' => ['integer', 'required',
+			'metric_attributes_evaltype' => ['integer', 'required',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
 			],
-			'attributes' => ['objects', 'required', 'fields' => [
+			'metric_attributes' => ['objects', 'required', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
 					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
@@ -134,7 +134,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'to' => $this->filter['to']
 		]);
 
-		$attributes = array_filter($this->filter['attributes'],
+		$metric_attributes = array_filter($this->filter['metric_attributes'],
 			static fn (array $attribute) => $attribute['key'] !== ''
 		);
 
@@ -168,8 +168,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'types' => $this->filter['types'] ?: null,
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
-			'attributes_evaltype' => $this->filter['attributes_evaltype'],
-			'attributes' => $attributes ?: null,
+			'attributes_evaltype' => $this->filter['metric_attributes_evaltype'],
+			'attributes' => $metric_attributes ?: null,
 			'resource_attributes_evaltype' => $this->filter['resource_attributes_evaltype'],
 			'resource_attributes' => $resource_attributes ?: null,
 			'scope_attributes_evaltype' => $this->filter['scope_attributes_evaltype'],

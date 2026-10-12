@@ -104,7 +104,7 @@ $filter = (new CFilter())
 					], [
 						'attribute_field_name' => 'filter_resource_attributes',
 						'evaltype_field_name' => 'filter_resource_attributes_evaltype'
-					])
+					])->setId('filter-resource-attributes')
 				)
 			])
 			->addItem([
@@ -116,7 +116,7 @@ $filter = (new CFilter())
 					], [
 						'attribute_field_name' => 'filter_span_attributes',
 						'evaltype_field_name' => 'filter_span_attributes_evaltype'
-					])
+					])->setId('filter-span-attributes')
 				)
 			])
 			->addItem([
@@ -162,15 +162,20 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => 0
-		])
-	)
-	->show();
+foreach (['resource', 'span'] as $key) {
+	(new CTemplateTag('filter-'.$key.'-attributes-row-tmpl'))
+		->addItem(
+			CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
+				'key' => '#{key}',
+				'value' => '#{value}',
+				'operator' => CONDITION_OPERATOR_LIKE
+			],
+			[
+				'attribute_field_name' => 'filter_'.$key.'_attributes'
+			])
+		)
+		->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([

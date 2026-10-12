@@ -121,38 +121,18 @@
 				to: filter_options.timeselector.to
 			};
 
-			$('#filter-attributes')
-				.dynamicRows({template: '#filter-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
+			for (const key of ['metric', 'resource', 'scope']) {
+				$(`#filter-${key}-attributes`)
+					.dynamicRows({template: `#filter-${key}-attributes-row-tmpl`})
+					.on('afteradd.dynamicRows', function () {
+						const rows = this.querySelectorAll('.form_row');
+						new CApmAttrFilterItem(rows[rows.length - 1]);
+					});
+
+				document.querySelectorAll(`#filter-${key}-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
+					new CApmAttrFilterItem(row);
 				});
-
-			document.querySelectorAll(`#filter-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
-
-			$('#filter-resource-attributes')
-				.dynamicRows({template: '#filter-resource-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
-
-			document.querySelectorAll(`#filter-resource-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
-
-			$('#filter-scope-attributes')
-				.dynamicRows({template: '#filter-scope-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
-
-			document.querySelectorAll(`#filter-scope-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
+			}
 		}
 
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
