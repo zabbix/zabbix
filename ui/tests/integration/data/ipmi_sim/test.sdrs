@@ -1,10 +1,9 @@
 # SDR definitions for the testIpmiChecks integration test BMC, installed as the persistent main SDR
 # repository of the simulated BMC (mc address 0x20).
 #
-# testIpmiChecks.php compiles this at runtime with sdrcomp if it is installed; otherwise it falls back
-# to the pre-compiled test.bsdr checked in alongside this file (some environments ship ipmi_sim/ipmitool
-# without the rest of the openipmi package, i.e. without sdrcomp). After editing this file, regenerate
-# test.bsdr so the fallback stays in sync:
+# testIpmiChecks.php never compiles this file at runtime - it always installs the pre-compiled test.bsdr
+# checked in alongside it (some environments ship ipmi_sim/ipmitool without the rest of the openipmi
+# package, i.e. without sdrcomp). After editing this file, regenerate test.bsdr:
 #
 #   sdrcomp -o test.bsdr test.sdrs
 
@@ -59,6 +58,13 @@ sdr type 1
 	unc_thrsh_readable	true
 	uc_thrsh_readable	true
 	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
 	id_string		"Temp"
 endsdr
 
@@ -204,4 +210,131 @@ sdr type 1
 	sensor_maximum		255
 	sensor_minimum		0
 	id_string		"WattsHour"
+endsdr
+
+# Two sensors sharing the id string "Dup" (sensor numbers 7 and 8): a discrete one listed first and a
+# threshold one listed second. Some real BMCs expose a sensor this way; zbx_get_ipmi_sensor_by_id() must
+# keep scanning past the discrete match and prefer the threshold one.
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		7
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"Dup"
+endsdr
+
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		8
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"Dup"
+endsdr
+
+# A threshold sensor whose reading (see cmds.emu) is above its upper non-critical and upper critical
+# thresholds, to exercise the threshold "state" bits/text in discovery (every other threshold sensor here
+# is in range).
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		9
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
+	id_string		"Hot"
+endsdr
+
+# A discrete sensor with two state bits asserted at once (see cmds.emu), to exercise the ", "-joined
+# state text in discovery ("Presence" only ever has a single bit set).
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		10
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"MultiState"
 endsdr

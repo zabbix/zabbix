@@ -4,9 +4,10 @@ mc_setbmc 0x20
 mc_add 0x20 0 no-device-sdrs 0x23 9 8 0x9f 0x1291 0xf02 persist_sdr
 mc_enable 0x20
 
-# Threshold temperature sensor (sensor number 1), matching the "Temp" SDR.
+# Threshold temperature sensor (sensor number 1), matching the "Temp" SDR. Threshold values are listed
+# from upper non-recoverable down to lower non-critical.
 sensor_add 0x20 0 1 1 0x01
-sensor_set_threshold 0x20 0 1 readable 111111 90 80 70 20 10 5
+sensor_set_threshold 0x20 0 1 readable 111111 90 80 70 5 10 20
 sensor_set_value 0x20 0 1 50 1
 
 # Discrete presence sensor (sensor number 2), matching the "Presence" SDR.
@@ -35,3 +36,27 @@ sensor_set_value 0x20 0 5 75 0
 sensor_add 0x20 0 6 1 0x01
 sensor_set_threshold 0x20 0 6 none 000000 0 0 0 0 0 0
 sensor_set_value 0x20 0 6 30 0
+
+# Discrete "Dup" sensor (sensor number 7), bit 0 asserted - reads as 1 if (wrongly) picked.
+sensor_add 0x20 0 7 37 0x6f
+sensor_set_event_support 0x20 0 7 enable scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
+sensor_set_bit 0x20 0 7 0 1 0
+
+# Threshold "Dup" sensor (sensor number 8) - the one an item with sensor "Dup" must read.
+sensor_add 0x20 0 8 1 0x01
+sensor_set_threshold 0x20 0 8 none 000000 0 0 0 0 0 0
+sensor_set_value 0x20 0 8 33 0
+
+# Out-of-range threshold sensor (sensor number 9), matching the "Hot" SDR: 85 is above
+# upper non-critical (70) and upper critical (80), below upper non-recoverable (90).
+sensor_add 0x20 0 9 1 0x01
+sensor_set_threshold 0x20 0 9 readable 111111 90 80 70 5 10 20
+sensor_set_value 0x20 0 9 85 0
+
+# Discrete sensor with bits 0 and 1 both asserted (sensor number 10), matching the "MultiState" SDR.
+sensor_add 0x20 0 10 37 0x6f
+sensor_set_event_support 0x20 0 10 enable scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
+sensor_set_bit 0x20 0 10 0 1 0
+sensor_set_bit 0x20 0 10 1 1 0
