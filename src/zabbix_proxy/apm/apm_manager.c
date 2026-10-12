@@ -460,9 +460,14 @@ void	*zbx_apm_manager_thread(void *args)
 
 			apm_enabled_new = apm_config.enabled;
 
-			if (APM_STATUS_ENABLED == apm_enabled_new && 0 == apm_args->export_config->status)
+			if (APM_STATUS_ENABLED == apm_enabled_new)
 			{
-				apm_manager_update_global_config(manager, apm_args->source_ip, apm_args->ca_location);
+				if (0 == apm_args->export_config->status)
+				{
+					apm_manager_update_global_config(manager, apm_args->source_ip,
+							apm_args->ca_location);
+				}
+
 				if (FAIL == apm_exporter_pool_is_active(manager->exporters))
 					apm_enabled_new = APM_STATUS_DISABLED;
 			}

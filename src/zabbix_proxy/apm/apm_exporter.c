@@ -275,9 +275,10 @@ static int	apm_exporter_cfg_compare(const zbx_apm_exporter_cfg_t *cfg, const zbx
  ******************************************************************************/
 static void	apm_exporter_pool_set_config(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_cfg_t *cfg)
 {
-	zbx_apm_exporter_cfg_t	*cfg_old = pool->cfg;
+	zbx_apm_exporter_cfg_t	*cfg_old;
 
 	pthread_mutex_lock(&pool->lock);
+	cfg_old = pool->cfg;
 	pool->cfg = cfg;
 	pthread_mutex_unlock(&pool->lock);
 
@@ -304,14 +305,26 @@ static void	apm_exporter_pool_set_config(zbx_apm_exporter_pool_t *pool, zbx_apm_
 int	apm_exporter_pool_update_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config,
 		char **error)
 {
-	if (NULL != pool->cfg && SUCCEED == apm_exporter_cfg_compare(pool->cfg, apm_config))
+	zbx_apm_exporter_cfg_t	*cfg;
+	int			ret = FAIL;
+
+	pthread_mutex_lock(&pool->lock);
+	cfg = (NULL != pool->cfg ? apm_exporter_cfg_acquire(pool->cfg) : NULL);
+	pthread_mutex_unlock(&pool->lock);
+
+	if (NULL != cfg)
+	{
+		ret = apm_exporter_cfg_compare(cfg, apm_config);
+		apm_exporter_cfg_release(cfg);
+	}
+
+	if (SUCCEED == ret)
 		return SUCCEED;
 
-	zbx_apm_exporter_cfg_t	*cfg_new = apm_exporter_cfg_create(apm_config, error);
+	cfg = apm_exporter_cfg_create(apm_config, error);
+	apm_exporter_pool_set_config(pool, cfg);
 
-	apm_exporter_pool_set_config(pool, cfg_new);
-
-	return (NULL == pool->cfg ? FAIL : SUCCEED);
+	return (NULL == cfg ? FAIL : SUCCEED);
 }
 
 /******************************************************************************
@@ -335,7 +348,13 @@ void	apm_exporter_pool_clear_config(zbx_apm_exporter_pool_t *pool)
  ******************************************************************************/
 int	apm_exporter_pool_is_active(zbx_apm_exporter_pool_t *pool)
 {
-	return (NULL == pool->cfg ? FAIL : SUCCEED);
+	int	ret;
+
+	pthread_mutex_lock(&pool->lock);
+	ret = (NULL == pool->cfg ? FAIL : SUCCEED);
+	pthread_mutex_unlock(&pool->lock);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -368,8 +387,8 @@ static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
  * Return value: acquired exporter connection, or NULL if pool is not         *
  *               configured                                                   *
  *                                                                            *
- * Comments: Terminates the process if a new exporter connection cannot       *
- *           be created.                                                      *
+ * Comments: If a new exporter connection cannot be created, the pool         *
+ *           configuration is cleared, making the pool inactive.              *
  *                                                                            *
  ******************************************************************************/
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
@@ -388,9 +407,11 @@ zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 		{
 			if (NULL == (exporter = apm_exporter_create(pool, &error)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot create Open Telemetry exporter: %s", error);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot create Open Telemetry exporter: %s", error);
 				zbx_free(error);
-				zbx_exit(EXIT_FAILURE);
+				apm_exporter_cfg_release(pool->cfg);
+				pool->cfg = NULL;
+				break;
 			}
 		}
 		else

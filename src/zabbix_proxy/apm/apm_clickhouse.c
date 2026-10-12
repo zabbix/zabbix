@@ -77,6 +77,12 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 			cfg->ssl_verify_peer, cfg->ssl_verify_host, cfg->source_ip, cfg->ssl_ca_location,
 			cfg->ssl_cert_location, cfg->ssl_key_location, error);
 out:
+	if (SUCCEED != ret)
+	{
+		curl_easy_cleanup(conn->handle);
+		conn->handle = NULL;
+	}
+
 	return ret;
 }
 
