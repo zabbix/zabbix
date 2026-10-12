@@ -233,14 +233,30 @@ class CSvgGraphHelper {
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = array_key_exists('color', $data_set)
-				? CColorPicker::getColorVariations($data_set['color'], count($items))
-				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
+			if ($data_set['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
+				$colors = array_key_exists('color', $data_set)
+					? CColorPicker::getColorVariations($data_set['color'], count($items))
+					: CColorPicker::getPaletteColors($data_set['color_palette'], count($items));
 
-			foreach ($items as $item) {
-				$data_set['color'] = array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-				$max_metrics--;
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$data_set['color'] = array_shift($colors);
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
+			}
+			else {
+				$data_set['color'] = array_key_exists('color', $data_set)
+					? '#'.$data_set['color']
+					: CColorPicker::getPaletteColors($data_set['color_palette'], 1)[0];
+
+				unset($data_set['color_palette']);
+
+				foreach ($items as $item) {
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
 			}
 		}
 	}
@@ -975,20 +991,31 @@ class CSvgGraphHelper {
 			if ($metric['points']) {
 				switch ($metric['options']['approximation']) {
 					case APPROXIMATION_MIN:
-						$values = array_column($metric['points'], 'min');
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = $min_values;
+						$max_values = $min_values;
 						break;
 					case APPROXIMATION_MAX:
-						$values = array_column($metric['points'], 'max');
+						$max_values = array_column($metric['points'], 'max');
+						$min_values = $max_values;
+						$avg_values = $max_values;
+						break;
+					case APPROXIMATION_ALL:
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = array_column($metric['points'], 'avg');
+						$max_values = array_column($metric['points'], 'max');
 						break;
 					default:
-						$values = array_column($metric['points'], 'avg');
+						$avg_values = array_column($metric['points'], 'avg');
+						$min_values = $avg_values;
+						$max_values = $avg_values;
 				}
 
 				$item += [
 					'units' => $metric['units'],
-					'min' => min($values),
-					'avg' => array_sum($values) / count($values),
-					'max' => max($values)
+					'min' => min($min_values),
+					'avg' => array_sum($avg_values) / count($avg_values),
+					'max' => max($max_values)
 				];
 			}
 

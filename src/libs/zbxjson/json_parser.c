@@ -323,7 +323,6 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
  ******************************************************************************/
 zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, char **error)
 {
-#define ZBX_MAX_JSON_DEPTH	64
 	const char	*ptr = start;
 	zbx_int64_t	len;
 	char		*str = NULL;
@@ -331,10 +330,14 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 
 	if (ZBX_MAX_JSON_DEPTH < depth)
 	{
-		char	err_buf[MAX_STRING_LEN];
+		char		*err_str;
+		zbx_int64_t	ret;
 
-		zbx_snprintf(err_buf, sizeof(err_buf), "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
-		return json_error(err_buf, ptr, error);
+		err_str = zbx_dsprintf(NULL, "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
+		ret = json_error(err_str, ptr, error);
+		zbx_free(err_str);
+
+		return ret;
 	}
 
 	depth++;
@@ -404,7 +407,6 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 	}
 
 	return ptr - start + len;
-#undef ZBX_MAX_JSON_DEPTH
 }
 
 /******************************************************************************

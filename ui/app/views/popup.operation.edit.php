@@ -74,7 +74,7 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 		->setId('operation_esc_step_from');
 	$step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 
-	$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+	$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false))
 		->setAttribute('value', $operation['esc_step_to'] ?? 0)
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 

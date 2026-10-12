@@ -18,6 +18,7 @@ require_once 'vendor/autoload.php';
 require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Exception\TimeoutException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Dashboard element.
@@ -76,7 +77,18 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		$widget = $query->asWidget()->one($should_exist);
+		try {
+			$widget = $query->asWidget()->one($should_exist);
+		}
+		catch (NoSuchElementException $exception) {
+			/*
+			 * While a widget loads, its header shows the widget type instead of the name, so the name can flicker away
+			 * between waiting for it and retrieving it. Wait for the name again and retry.
+			 */
+			$query->waitUntilPresent();
+			$widget = $query->asWidget()->one($should_exist);
+		}
+
 		if ($widget->isValid() && $should_exist) {
 				$widget->waitUntilReady();
 		}
@@ -203,7 +215,7 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()
 				->select('Delete')->waitUntilNotVisible();
 
 		return $this;
@@ -219,7 +231,7 @@ class CDashboardElement extends CElement {
 	public function copyWidget($name) {
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
 	}
@@ -250,7 +262,7 @@ class CDashboardElement extends CElement {
 
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
 	}

@@ -139,8 +139,8 @@ class testFormEventCorrelation extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Check modal header buttons.
-		foreach (['Help', 'Close'] as $button_title) {
-			$this->assertTrue($dialog->query('xpath:.//*[@title="'.$button_title.'"]')->one()->isClickable());
+		foreach (['Open Zabbix documentation in a new tab', 'Close modal window'] as $button_arialabel) {
+			$this->assertTrue($dialog->query('xpath:.//*[@aria-label="'.$button_arialabel.'"]')->one()->isClickable());
 		}
 
 		// Check form labels.

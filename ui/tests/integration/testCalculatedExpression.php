@@ -35,6 +35,9 @@ class testCalculatedExpression extends CIntegrationTest {
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
 
+	const TAG_NAME = 'env';
+	const TAG_VALUE = 'prod';
+
 	const DBL_MAX = '1.7976931348623157e308';
 	const MINUS_DBL_MAX = '-1.7976931348623157e308';
 
@@ -74,6 +77,16 @@ class testCalculatedExpression extends CIntegrationTest {
 				[
 					'groupid' => 4 // Zabbix servers
 				]
+			],
+			'macros' => [
+				[
+					'macro' => '{$TAG_NAME}',
+					'value' => self::TAG_NAME
+				],
+				[
+					'macro' => '{$TAG_VALUE}',
+					'value' => self::TAG_VALUE
+				]
 			]
 		]);
 
@@ -93,7 +106,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			'type'			=> ITEM_TYPE_TRAPPER,
 			'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 			'tags'		=> [
-				['tag' => 'env', 'value' => 'prod']
+				['tag' => self::TAG_NAME, 'value' => self::TAG_VALUE]
 			],
 			'preprocessing' => [
 				[
@@ -581,7 +594,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	 */
 	public function testCalculatedExpression_ItemCount_TagFilter(){
 
-		$formula = 'item_count(/test_calc/*?[tag="env:prod"])';
+		$formula = 'item_count(/' . self::HOST_NAME . '/*?[tag="{$TAG_NAME}:{$TAG_VALUE}"])';
 
 		$response = $this->call('item.create', [
 			'name'		=> self::CALCULATED_ITEM_KEY . '.itemcount_tag',

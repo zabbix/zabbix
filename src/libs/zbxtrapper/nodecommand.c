@@ -419,6 +419,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
 		}
+
+		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+		{
+			zbx_uint64_t	proxyid;
+
+			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
+				host.proxyid = proxyid;
+			else
+				host.proxyid = 0;
+		}
 	}
 	else /* eventid */
 	{
@@ -492,6 +502,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			goto fail;
 		}
+	}
+
+	if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by && 0 == host.proxyid &&
+			ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on &&
+			ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+	{
+		zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		goto fail;
 	}
 
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
@@ -763,11 +782,6 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
-	if (SUCCEED != zbx_db_check_user_perm2system(user.userid))
-	{
-		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
-		goto finish;
-	}
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 	if (SUCCEED != check_user_administration_actions_permissions(&user,
@@ -839,7 +853,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		}
 	}
 
-	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
+	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
 	/* which do not pass our current IPv6 address validation. In the future, when we   */
 	/* fix our IPv6 address validation we could consider adding it here.               */
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))

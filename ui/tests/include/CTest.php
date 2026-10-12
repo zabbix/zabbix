@@ -29,6 +29,10 @@ require_once __DIR__.'/helpers/CDateTimeHelper.php';
 require_once __DIR__.'/helpers/CTestDBSettingsHelper.php';
 require_once __DIR__.'/helpers/CMfaTotpHelper.php';
 
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+define('TEST_ERROR', 2);
+
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
 define('USER_ACTION_REMOVE', 'remove');

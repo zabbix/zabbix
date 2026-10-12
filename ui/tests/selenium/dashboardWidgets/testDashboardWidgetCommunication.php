@@ -2981,7 +2981,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'No data':
 				case 'No permissions to referred object or it does not exist!':
 					$class = ($outcome === 'No data') ? 'svg-honeycomb-content' : 'no-data-message';
-					$no_data_message = $listener->query('class', $class)->one();
+					$no_data_message = $listener->query('class', $class)->waitUntilVisible()->one();
 					$this->assertTrue($no_data_message->isDisplayed(), 'No data message is missing.');
 					$this->assertEquals($outcome, $no_data_message->getText());
 					break;
@@ -3999,7 +3999,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
 	protected function closeOpenedPopup() {
-		$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false);
+		$dialog = $this->query('css:div.overlay-dialogue.wordbreak')->one(false);
 		if ($dialog->isValid()) {
 			$dialog->query('class:btn-overlay-close')->one()->click();
 		}
@@ -4121,12 +4121,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					break;
 
 				case 'geomap':
+					$hintbox = 'xpath://div[contains(@class, "hintbox-static")]';
 					foreach ($values as $icon_index => $popup_values) {
-						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
-								->one()->click();
-						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue wordbreak"]');
-						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
-								->one()->click();
+						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')->one()->click();
+						$this->assertTableData([$popup_values], $hintbox);
+						$this->query($hintbox)->query('class:btn-overlay-close')->one()->click();
 					}
 					break;
 

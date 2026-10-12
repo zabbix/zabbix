@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 
@@ -39,6 +40,7 @@ type UserParameterPlugin struct {
 	unsafeUserParameters int
 	userParameterDir     string
 	executor             zbxcmd.Executor
+	executorInitMu       sync.Mutex
 }
 
 var userParameter UserParameterPlugin
@@ -117,11 +119,9 @@ func (p *UserParameterPlugin) Export(
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
 	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
-	if p.executor == nil {
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err = p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
 	stdoutStderr, err := p.executor.Execute(
@@ -221,4 +221,22 @@ func InitUserParameterPlugin(
 	userParameter.userParameterDir = userParameterDir
 
 	return keys, nil
+}
+
+func (p *UserParameterPlugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }

@@ -10,6 +10,8 @@ This template set is designed for the effortless deployment of VMware vCenter an
 
 For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.4/manual/vm_monitoring).
 
+**Note:** VMware alarm item/trigger prototype names include the alarm entity name since template version 7.4.10. The entity name value itself is only returned by Zabbix server 7.4.12 and higher - on earlier servers, `{#VMWARE.ALARMS.ENTITY.NAME}` will remain unresolved.
+
 ## Requirements
 
 Zabbix version: 7.4 and higher.
@@ -51,6 +53,7 @@ Additional resources:
 |{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service `{$USERNAME}` user password.</p>||
 |{$VMWARE.PROXY}|<p>Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "VMware", e.g. {$HTTP.TLS.VERIFY:"VMware"}.</p>|`full`|
 |{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 |{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|

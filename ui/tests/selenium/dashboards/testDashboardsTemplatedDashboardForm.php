@@ -20,6 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * @backup dashboard, hosts
@@ -2927,7 +2928,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -2938,7 +2939,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -2949,7 +2950,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -3449,8 +3450,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'Template graph prototype {#KEY}',
-						'Columns' => '',
-						'Rows' => ''
+						'Columns' => 0,
+						'Rows' => 0
 					],
 					'swap_expected' => [
 						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
@@ -3588,10 +3589,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Item value with missing field values',
 						'Advanced configuration' => true,
 						'id:description' => '',
-						'id:desc_size' => '',
-						'id:decimal_size' => '',
-						'id:value_size' => '',
-						'id:units_size' => '',
+						'id:desc_size' => 0,
+						'id:decimal_size' => 0,
+						'id:value_size' => 0,
+						'id:units_size' => 0,
 						'Aggregation function' => 'min',
 						'Time period' => 'Custom',
 						'id:time_period_from' => '',
@@ -3831,7 +3832,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
 						'Name' => 'Item history widget with empty Items',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => [
 						'Invalid parameter "Items": cannot be empty.',
@@ -3954,7 +3955,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
 						'Name' => 'Problems widget with empty Show lines',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
@@ -4265,7 +4266,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
 						'Name' => 'Top triggers widget with empty Trigger limit',
-						'Trigger limit' => ''
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
@@ -4786,7 +4787,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
-			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+			/*
+			 * Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+			 * while being clicked. Retry the click if that happens.
+			 */
+			$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+			try {
+				$add_button->click();
+			}
+			catch (ElementNotInteractableException $exception) {
+				$add_button->click();
+			}
+
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();
 
