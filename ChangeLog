@@ -3,6 +3,7 @@ Changes for 8.0.0rc2
 New features:
 
 Bug fixes:
+....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
 ...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
 
 --------------------------------------------------------------------------------
@@ -584,6 +585,7 @@ New features:
 A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ..F....... [ZBX-26854] fixed handling null as previous value in preprocessing during item test (vskalbins)
 ..F....... [ZBX-23109] fixed to auto set SNMP max repetition count and community on SNMP version change for host interface (gberzina)
 .........T [ZBX-24844] fixed Linux template (kflorowski)
@@ -2220,6 +2222,7 @@ New features:
 A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ..F....... [ZBX-26854] fixed handling null as previous value in preprocessing during item test (vskalbins)
 ..F....... [ZBX-23109] fixed to auto set SNMP max repetition count and community on SNMP version change for host interface (gberzina)
 .........T [ZBX-24844] fixed Linux template (kflorowski)
