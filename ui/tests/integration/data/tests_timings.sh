@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4606
+  [Integration]=4533
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
