@@ -49,7 +49,7 @@ require_once __DIR__.'/js/report.status.js.php';
 	)
 	->addItem(
 		(($data['user_type'] == USER_TYPE_ZABBIX_ADMIN || $data['user_type'] == USER_TYPE_SUPER_ADMIN)
-			&& $data['system_info']['ha_cluster_enabled'])
+				&& $data['system_info']['ha_cluster_enabled'])
 			? (new CDiv(
 				new CPartial('administration.ha.nodes', [
 					'ha_nodes' => $data['system_info']['ha_nodes'],
