@@ -15,10 +15,8 @@
 package switches
 
 import (
-	"errors"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
@@ -32,8 +30,7 @@ const (
 	pattern          = "ctxt"
 )
 
-// Error texts match the C agent's system_cpu_switches(), which always names /proc/stat.
-var errCtxtNotFound = errs.New(`cannot find a line with "ctxt" in /proc/stat`)
+var errCtxtNotFound = errs.New("ctxt line not found")
 
 // Plugin is a base struct for a plugin.
 type Plugin struct {
@@ -66,7 +63,7 @@ func (p *Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, er
 
 	lines, err := parser.Parse(p.procStatFilepath)
 	if err != nil {
-		return nil, openError(err)
+		return nil, errs.Wrapf(err, "failed to parse %q", p.procStatFilepath)
 	}
 
 	for _, line := range lines {
@@ -76,7 +73,7 @@ func (p *Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, er
 		}
 	}
 
-	return nil, errCtxtNotFound
+	return nil, errs.Wrapf(errCtxtNotFound, "failed to get context switches from %q", p.procStatFilepath)
 }
 
 // parseValue mirrors C sscanf(line, "%*s %llu"): leading digits of the second field.
@@ -99,18 +96,4 @@ func parseValue(line string) (uint64, bool) {
 	}
 
 	return value, true
-}
-
-// openError formats a read failure like the C agent: "Cannot open /proc/stat: [errno] strerror".
-func openError(err error) error {
-	var errno syscall.Errno
-
-	if !errors.As(err, &errno) {
-		return errs.Wrap(err, "cannot open /proc/stat")
-	}
-
-	// Go's errno texts are glibc's strerror() with a lowercase first letter.
-	text := errno.Error()
-
-	return errs.Errorf("cannot open /proc/stat: [%d] %s", int(errno), strings.ToUpper(text[:1])+text[1:])
 }

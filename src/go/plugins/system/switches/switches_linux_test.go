@@ -16,6 +16,8 @@ package switches
 
 import (
 	_ "embed"
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,10 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-const (
-	testKey     = "system.cpu.switches"
-	notFoundMsg = `Cannot find a line with "ctxt" in /proc/stat.`
-)
+const testKey = "system.cpu.switches"
 
 //go:embed testdata/system.cpu.switches_valid.txt
 var validContent []byte
@@ -65,7 +64,7 @@ func TestPlugin_Export(t *testing.T) {
 		args            args
 		procStatContent []byte
 		want            any
-		wantErrMsg      string
+		wantErr         error
 	}{
 		{
 			name:            "+valid",
@@ -131,31 +130,31 @@ func TestPlugin_Export(t *testing.T) {
 			name:            "-missingCtxt",
 			args:            args{key: testKey, params: []string{}},
 			procStatContent: missingCtxtContent,
-			wantErrMsg:      notFoundMsg,
+			wantErr:         errCtxtNotFound,
 		},
 		{
 			name:            "-ctxtNotAtLineStart",
 			args:            args{key: testKey, params: []string{}},
 			procStatContent: []byte("cpu  1 2 3 4\n ctxt 4242\nbtime 1\n"),
-			wantErrMsg:      notFoundMsg,
+			wantErr:         errCtxtNotFound,
 		},
 		{
 			name:            "-invalidCtxtValue",
 			args:            args{key: testKey, params: []string{}},
 			procStatContent: invalidValueContent,
-			wantErrMsg:      notFoundMsg,
+			wantErr:         errCtxtNotFound,
 		},
 		{
 			name:            "-ctxtNoValue",
 			args:            args{key: testKey, params: []string{}},
 			procStatContent: noValueContent,
-			wantErrMsg:      notFoundMsg,
+			wantErr:         errCtxtNotFound,
 		},
 		{
 			name:            "-emptyFile",
 			args:            args{key: testKey, params: []string{}},
 			procStatContent: nil,
-			wantErrMsg:      notFoundMsg,
+			wantErr:         errCtxtNotFound,
 		},
 	}
 
@@ -168,14 +167,8 @@ func TestPlugin_Export(t *testing.T) {
 			}
 
 			got, err := p.Export(tt.args.key, tt.args.params, nil)
-
-			gotErrMsg := ""
-			if err != nil {
-				gotErrMsg = err.Error()
-			}
-
-			if gotErrMsg != tt.wantErrMsg {
-				t.Fatalf("Plugin.Export() error = %q, want %q", gotErrMsg, tt.wantErrMsg)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
@@ -193,13 +186,8 @@ func TestPlugin_Export_fileMissing(t *testing.T) {
 	}
 
 	got, err := p.Export(testKey, []string{}, nil)
-	if err == nil {
-		t.Fatalf("Plugin.Export() error = nil, want error for missing file")
-	}
-
-	want := "Cannot open /proc/stat: [2] No such file or directory."
-	if err.Error() != want {
-		t.Fatalf("Plugin.Export() error = %q, want %q", err.Error(), want)
+	if !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, fs.ErrNotExist)
 	}
 
 	if got != nil {
