@@ -134,7 +134,6 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
-
 	if (NULL == (wd = webdriver_create(env->browser_endpoint, env->config_source_ip, &error)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot create webdriver: %s", error);
@@ -152,6 +151,19 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
 		goto out;
+	}
+
+	if (0 < env->timeout)
+	{
+		int	timeout_ms = env->timeout * 1000;
+
+		if (SUCCEED != webdriver_set_timeouts(wd, timeout_ms, timeout_ms, -1, &error))
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot set webdriver timeouts: %s",
+					error);
+
+			goto out;
+		}
 	}
 
 	duk_push_c_function(ctx, es_browser_dtor, 1);

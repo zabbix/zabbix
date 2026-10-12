@@ -1,5 +1,5 @@
 
-# MikroTik CCR1009-7G-1C-1SPC by SNMP
+# MikroTik CCR1009-7G-1C-1S+PC by SNMP
 
 ## Overview
 
