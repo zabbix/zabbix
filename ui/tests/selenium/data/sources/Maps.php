@@ -88,9 +88,11 @@ class Maps {
 						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 7,
-						'label' => 'Test phone icon',
-						'x' => 151,
-						'y' => 101,
+						'label' => '',
+						'label_location' => MAP_LABEL_LOC_TOP,
+						'x' => 113,
+						'y' => 113,
+						'use_iconmap' => 0,
 						'zindex' => 0
 					],
 					// Map (Cloud symbol small).
@@ -98,9 +100,10 @@ class Maps {
 						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP,
 						'iconid_off' => 3,
-						'label' => 'Map element (Local network)',
-						'x' => 401,
-						'y' => 101,
+						'label' => '',
+						'x' => 551,
+						'y' => 112,
+						'use_iconmap' => 0,
 						'elements' => [['sysmapid' => 1]],
 						'urls' => [['name' => 'Zabbix home', 'url' => 'http://www.zabbix.com']],
 						'zindex' => 1
@@ -111,8 +114,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 15,
 						'label' => 'Trigger element (CPU load)',
-						'x' => 101,
-						'y' => 301,
+						'x' => 77,
+						'y' => 327,
 						'elements' => [['triggerid' => $map_links_triggerid]],
 						'urls' => [['name' => 'blog.zabbix.com', 'url' => 'https://blog.zabbix.com/']],
 						'zindex' => 2
@@ -123,19 +126,20 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 						'iconid_off' => 1,
 						'label' => 'Host group element (Linux servers)',
-						'x' => 301,
-						'y' => 351,
+						'x' => 311,
+						'y' => 341,
 						'elements' => [['groupid' => 4]], // Zabbix servers.
 						'zindex' => 3
 					],
-					// Host (Disk array symbol).
+					// Host (House symbol).
 					[
 						'selementid' => 5,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-						'iconid_off' => 19,
+						'iconid_off' => 34,
 						'label' => 'Host element (Zabbix Server)',
-						'x' => 501,
-						'y' => 301,
+						'x' => 546,
+						'y' => 343,
+						'use_iconmap' => 0,
 						'elements' => [['hostid' => $result['hostids']['Host for map with links']]],
 						'zindex' => 4
 					]
@@ -159,10 +163,10 @@ class Maps {
 					// Green dashed border rectangle.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
-						'x' => 113,
-						'y' => 82,
-						'width' => 124,
-						'height' => 86,
+						'x' => 76,
+						'y' => 63,
+						'width' => 198,
+						'height' => 123,
 						'text' => '',
 						'border_type' => SYSMAP_SHAPE_BORDER_TYPE_DASHED,
 						'border_width' => 5,
@@ -172,10 +176,10 @@ class Maps {
 					// Pink ellipse.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_ELLIPSE,
-						'x' => 426,
-						'y' => 258,
-						'width' => 200,
-						'height' => 136,
+						'x' => 478,
+						'y' => 93,
+						'width' => 296,
+						'height' => 166,
 						'text' => '',
 						'border_width' => 2,
 						'background_color' => 'FFCCCC',
@@ -238,8 +242,9 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host for map for form testing']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
-						'x' => 139,
-						'y' => 27,
+						'x' => 60,
+						'y' => 69,
+						'use_iconmap' => 0,
 						'zindex' => 0
 					],
 					// Image.
@@ -247,8 +252,8 @@ class Maps {
 						'selementid' => 7,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
-						'x' => 250,
-						'y' => 350,
+						'x' => 300,
+						'y' => 15,
 						'zindex' => 1
 					],
 					// Trigger.
@@ -257,8 +262,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 146,
 						'elements' => [['triggerid' => $map_form_triggerid]],
-						'x' => 350,
-						'y' => 200,
+						'x' => 240,
+						'y' => 227,
 						'zindex' => 2
 					]
 				],
@@ -283,7 +288,7 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
 						'x' => 139,
-						'y' => 27,
+						'y' => 69,
 						'zindex' => 0
 					],
 					// Host 2.
@@ -292,8 +297,8 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host_2']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 151,
-						'x' => 89,
-						'y' => 377,
+						'x' => 339,
+						'y' => 27,
 						'zindex' => 1
 					],
 					// Image.
