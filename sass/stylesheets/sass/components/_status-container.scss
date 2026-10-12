@@ -113,7 +113,7 @@
 	(status-amp-severity-info, $alt-yellow, $status-apm-severity-info-border-color),
 	(status-amp-severity-warn, $alt-orange, $status-apm-severity-warn-border-color),
 	(status-amp-severity-error, $alt-dark-orange, $status-apm-severity-error-border-color),
-	(status-amp-severity-fatal, $alt-red, $status-apm-severity-fatal-border-color),
+	(status-amp-severity-fatal, $alt-red, $status-apm-severity-fatal-border-color)
 ) {
 	.#{$status-amp-severity} {
 		@extend %status;
