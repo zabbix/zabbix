@@ -65,8 +65,8 @@ class testReportTest extends CIntegrationTest {
 		]);
 		self::$groupids = $response['result']['usrgrpids'];
 
-		foreach (['reader' => USER_TYPE_ZABBIX_USER, 'owner' => USER_TYPE_ZABBIX_ADMIN,
-				'superadmin' => USER_TYPE_SUPER_ADMIN] as $name => $type) {
+		foreach (['reader' => USER_TYPE_ZABBIX_USER, 'admin_reader' => USER_TYPE_ZABBIX_ADMIN,
+				'owner' => USER_TYPE_ZABBIX_ADMIN,'superadmin' => USER_TYPE_SUPER_ADMIN] as $name => $type) {
 			$response = $this->call('role.create', ['name' => 'Report test '.$name, 'type' => $type]);
 			self::$roleids[$name] = $response['result']['roleids'][0];
 			$response = $this->call('user.create', [
@@ -112,13 +112,13 @@ class testReportTest extends CIntegrationTest {
 		foreach ($dashboard_names as $name) {
 			$dashboard = [
 				'name' => 'Report test '.$name,
-				'userid' => self::$userids[$name === 'own' ? 'reader' : 'owner'],
+				'userid' => self::$userids[$name === 'own' ? 'admin_reader' : 'owner'],
 				'private' => $name === 'public' ? PUBLIC_SHARING : PRIVATE_SHARING,
 				'pages' => [[]]
 			];
 			if (in_array($name, ['user_read', 'user_write'])) {
 				$dashboard['users'] = [[
-					'userid' => self::$userids['reader'],
+					'userid' => self::$userids['admin_reader'],
 					'permission' => $name === 'user_read' ? PERM_READ : PERM_READ_WRITE
 				]];
 			}
@@ -133,7 +133,6 @@ class testReportTest extends CIntegrationTest {
 		}
 		self::$dashboardids['missing'] = '0';
 
-		// A nonempty URL allows job creation; no frontend or SMTP service is needed.
 		$this->call('settings.update', ['url' => 'http://127.0.0.1/report-test']);
 	}
 
@@ -143,18 +142,25 @@ class testReportTest extends CIntegrationTest {
 			'spoof dashboard owner' => ['reader', 'private', false, 'owner'],
 			'spoof superadmin' => ['reader', 'private', false, 'superadmin'],
 			'private dashboard without userid' => ['reader', 'private', false, null],
-			'own dashboard' => ['reader', 'own', true, null],
-			'public dashboard' => ['reader', 'public', true, null],
-			'user read sharing' => ['reader', 'user_read', true, null],
-			'user write sharing' => ['reader', 'user_write', true, null],
-			'group read sharing' => ['reader', 'group_read', true, null],
-			'group write sharing' => ['reader', 'group_write', true, null],
-			'legacy userid accepted' => ['reader', 'public', true, 'reader'],
-			'spoofed userid ignored' => ['reader', 'public', true, 'owner'],
+			'own dashboard' => ['reader', 'own', false, null],
+			'public dashboard' => ['reader', 'public', false, null],
+			'user read sharing' => ['reader', 'user_read', false, null],
+			'user write sharing' => ['reader', 'user_write', false, null],
+			'group read sharing' => ['reader', 'group_read', false, null],
+			'group write sharing' => ['reader', 'group_write', false, null],
+			'legacy userid accepted' => ['reader', 'public', false, 'reader'],
+			'spoofed userid ignored' => ['reader', 'public', false, 'owner'],
+			'missing dashboard' => ['reader', 'missing', false, 'owner'],
+			'admin private dashboard denied' => ['admin_reader', 'private', false, null],
+			'admin own dashboard' => ['admin_reader', 'own', true, null],
+			'admin public dashboard' => ['admin_reader', 'public', true, null],
+			'admin user read sharing' => ['admin_reader', 'user_read', true, null],
+			'admin user write sharing' => ['admin_reader', 'user_write', true, null],
+			'admin group read sharing' => ['admin_reader', 'group_read', true, null],
+			'admin group write sharing' => ['admin_reader', 'group_write', true, null],
 			'admin owner' => ['owner', 'private', true, null],
-			'admin without access' => ['owner', 'own', false, 'reader'],
-			'superadmin' => ['superadmin', 'private', true, null],
-			'missing dashboard' => ['reader', 'missing', false, 'owner']
+			'admin without access' => ['owner', 'own', false, 'admin_reader'],
+			'superadmin' => ['superadmin', 'private', true, null]
 		];
 	}
 
@@ -198,9 +204,14 @@ class testReportTest extends CIntegrationTest {
 	 * @dataProvider dashboardAccessProvider
 	 */
 	public function testReportTest_dashboardAccess($user, $dashboard, $allowed, $viewer) {
-		$error = $allowed
-			? "No media configured for the report recipient 'report_test_".$user."'"
-			: 'no access to dashboard';
+		if ($user === 'reader') {
+			$error = 'no access to scheduled reports';
+		} elseif ($allowed) {
+			$error = "No media configured for the report recipient 'report_test_".$user."'";
+		} else {
+			$error = 'no access to dashboard';
+		}
+
 		$this->checkReport($user, $dashboard, $error, $viewer);
 	}
 
@@ -211,21 +222,21 @@ class testReportTest extends CIntegrationTest {
 	}
 
 	public function testReportTest_revokedSharing() {
-		$error = "No media configured for the report recipient 'report_test_reader'";
+		$error = "No media configured for the report recipient 'report_test_admin_reader'";
 
-		$this->checkReport('reader', 'user_read', $error);
+		$this->checkReport('admin_reader', 'user_read', $error);
 		$this->call('dashboard.update', ['dashboardid' => self::$dashboardids['user_read'], 'users' => []]);
-		$this->checkReport('reader', 'user_read', 'no access to dashboard', 'owner');
+		$this->checkReport('admin_reader', 'user_read', 'no access to dashboard', 'owner');
 	}
 
 	public function testReportTest_revokedGroupMembership() {
-		$error = "No media configured for the report recipient 'report_test_reader'";
+		$error = "No media configured for the report recipient 'report_test_admin_reader'";
 
-		$this->checkReport('reader', 'group_read', $error);
+		$this->checkReport('admin_reader', 'group_read', $error);
 		$this->call('user.update', [
-			'userid' => self::$userids['reader'], 'usrgrps' => [['usrgrpid' => self::$groupids[0]]]
+			'userid' => self::$userids['admin_reader'], 'usrgrps' => [['usrgrpid' => self::$groupids[0]]]
 		]);
-		$this->checkReport('reader', 'group_read', 'no access to dashboard', 'owner');
+		$this->checkReport('admin_reader', 'group_read', 'no access to dashboard', 'owner');
 	}
 
 	public static function clearData(): void {
