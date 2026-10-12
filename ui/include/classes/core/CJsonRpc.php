@@ -85,8 +85,8 @@ class CJsonRpc {
 			$auth['auth'] = $session->extractSessionId();
 		}
 
-		$calls_data = [];
-		$calls_data_auth = [];
+		$no_auth_calls = [];
+		$auth_calls = [];
 		$api_method_names = [];
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -113,7 +113,7 @@ class CJsonRpc {
 				continue;
 			}
 
-			if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE
+			if ($auth['type'] != CJsonRpc::AUTH_TYPE_COOKIE
 					&& !$this->apiClient->requiresAuthentication($api, $method)
 					&& !$this->apiClient->supportsAuthentication($api, $method)) {
 				$this->jsonError($call, '-32602',
@@ -125,46 +125,49 @@ class CJsonRpc {
 				continue;
 			}
 
-			$call_data = [
+			$call = [
 				'api' => $request_api,
-				'method' => $request_method,
-				'params' => $call['params']
-			];
+				'method' => $request_method
+			] + array_intersect_key($call, array_flip(['params', 'id']));
 
-			if (array_key_exists('id', $call)) {
-				$call_data += ['id' => $call['id']];
-			}
-
-			if ($this->apiClient->requiresAuthentication($api, $method) || $auth['auth'] !== null) {
-				$calls_data_auth[] =$call_data;
+			if ($this->apiClient->requiresAuthentication($api, $method)) {
+				$auth_calls[] = $call;
 			}
 			else {
-				$calls_data[] = $call_data;
+				$no_auth_calls[] = $call;
 			}
 		}
 
-		if ($calls_data_auth) {
-			$authenticate_response = $this->apiClient->authenticate($auth, implode(',', $api_method_names));
+		$auth_response = $auth_calls || $auth['auth'] !== null
+			? $this->apiClient->authenticate($auth, implode(',', $api_method_names))
+			: null;
 
-			if ($authenticate_response->errorCode === null) {
-				foreach ($calls_data_auth as $call) {
-					$result =
-						$this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+		$is_auth_error = $auth_response !== null && $auth_response->errorCode !== null;
 
-					$this->processResult($call, $result);
-				}
+		if ($is_auth_error) {
+			foreach ($auth_calls as $call) {
+				$this->processResult($call, $auth_response);
 			}
-			else {
-				foreach ($calls_data_auth as $call) {
-					$this->processResult($call, $authenticate_response);
-				}
+		}
+		else {
+			foreach ($auth_calls as $call) {
+				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+
+				$this->processResult($call, $result);
 			}
 		}
 
-		foreach ($calls_data as $call) {
-			$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+		if ($auth['auth'] !== null && $is_auth_error) {
+			foreach ($no_auth_calls as $call) {
+				$this->processResult($call, $auth_response);
+			}
+		}
+		else {
+			foreach ($no_auth_calls as $call) {
+				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
-			$this->processResult($call, $result);
+				$this->processResult($call, $result);
+			}
 		}
 
 		$response = new CHttpResponse();

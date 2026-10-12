@@ -16,7 +16,6 @@
 #include "zbxhttp.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
-#include "zbxexpr.h"
 
 static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
 {

@@ -22,13 +22,15 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_telemetry_query_items
  * @backup history
+ * @onBefore initEnv
+ * @onAfter clearEnv
  */
 class testTelemetryQueryItems extends CIntegrationTest {
 	/* CLICKHOUSE_* constants must not contain \ or " (must not require escaping) */
 	const CLICKHOUSE_URL = 'http://127.0.0.1:8123';
-	const CLICKHOUSE_USERNAME = 'otel';
-	const CLICKHOUSE_PASSWORD = 'otelpass';
-	const CLICKHOUSE_DB = 'otel';
+	const CLICKHOUSE_USERNAME = 'zb';
+	const CLICKHOUSE_PASSWORD = '2b';
+	const CLICKHOUSE_DB = 'zabbix';
 
 	const COLLECTOR_ADDRESS = 'localhost:4317';
 	const PROTO_DIR = PHPUNIT_BASEDIR . '/src/zabbix_proxy/apm/';
@@ -108,7 +110,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->fail($msg2);
 	}
 
-	private function sendOTLP(string $import_path, string $proto, string $payload, string $address, string $method): void {
+	private function trySendOTLP(string $import_path, string $proto, string $payload, string $address, string $method, array &$output_lines): int {
 		$cmd =
 			'grpcurl '.
 			'-plaintext ' .
@@ -118,12 +120,35 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			escapeshellarg($address) . ' ' .
 			escapeshellarg($method);
 
+		$exit_code = 0;
+		exec($cmd, $output_lines, $exit_code);
+
+		return $exit_code;
+	}
+
+	private function waitForSendOTLP(
+		string $import_path,
+		string $proto,
+		string $payload,
+		string $address,
+		string $method,
+		int $iterations = 30,
+		int $delay = 1): void {
 		$output_lines = [];
 		$exit_code = 0;
 
-		exec($cmd, $output_lines, $exit_code);
+		for ($i = 0; $i < $iterations; $i++) {
+			$output_lines = [];
+			$exit_code = $this->trySendOTLP($import_path, $proto, $payload, $address, $method, $output_lines);
 
-		$this->assertEquals(0, $exit_code, "Unexpected exit code: " . $exit_code . ", output_lines:\n" . implode("\n", $output_lines));
+			if ($exit_code === 0) {
+				return;
+			}
+
+			sleep($delay);
+		}
+
+		$this->fail('Failed to send OTLP request: last exit_code: ' . $exit_code . ', last output_lines: ' . implode("\n", $output_lines));
 	}
 
 	private function sendInput(array $input): void {
@@ -132,7 +157,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			$payload['resourceMetrics'] = $input['metrics'];
 			$json = json_encode($payload);
 
-			$this->sendOTLP(
+			$this->waitForSendOTLP(
 				self::PROTO_DIR,
 				'opentelemetry/proto/collector/metrics/v1/metrics_service.proto',
 				$json,
@@ -146,7 +171,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			$payload['resourceSpans'] = $input['traces'];
 			$json = json_encode($payload);
 
-			$this->sendOTLP(
+			$this->waitForSendOTLP(
 				self::PROTO_DIR,
 				'opentelemetry/proto/collector/trace/v1/trace_service.proto',
 				$json,
@@ -160,7 +185,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			$payload['resourceLogs'] = $input['logs'];
 			$json = json_encode($payload);
 
-			$this->sendOTLP(
+			$this->waitForSendOTLP(
 				self::PROTO_DIR,
 				'opentelemetry/proto/collector/logs/v1/logs_service.proto',
 				$json,
@@ -242,6 +267,14 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		}
 
 		$this->deleteTQItem($itemid);
+	}
+
+	public function initEnv(): void {
+		/* empty */
+	}
+
+	public function clearEnv(): void {
+		$this->deleteOTData();
 	}
 
 	public static function createHost(): void {

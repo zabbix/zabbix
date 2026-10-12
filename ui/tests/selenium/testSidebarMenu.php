@@ -64,6 +64,24 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
+					'section' => 'APM',
+					'page' => 'Traces'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Metrics'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Logs'
+				]
+			],
+			[
+				[
 					'section' => 'Services',
 					'page' => 'Services'
 				]
@@ -239,6 +257,12 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
+					'section' => 'Users',
+					'page' => 'Devices'
+				]
+			],
+			[
+				[
 					'section' => 'Administration',
 					'page' => 'Data source',
 					'third_level' =>
@@ -317,6 +341,12 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'User settings',
 					'page' => 'API tokens'
+				]
+			],
+			[
+				[
+					'section' => 'User settings',
+					'page' => 'Devices'
 				]
 			]
 		];

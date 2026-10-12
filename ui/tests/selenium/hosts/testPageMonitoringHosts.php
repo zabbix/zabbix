@@ -1207,7 +1207,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'counters' => [
 						[
 							'column' => 'Dashboards',
-							'counter' => 4
+							'counter' => 2
 						],
 						[
 							'column' => 'Problems',

@@ -161,7 +161,8 @@ class AdapterServer(ThreadingHTTPServer):
                             {
                                 "@type": "bridge_jsonrpc.ErrorInfo",
                                 "reason": "DEVICE_LIMIT_EXCEEDED",
-                                "domain": "bridge.device"
+                                "domain": "bridge.device",
+                                "detailed_message": "Mock bridge-adapter device limit exceeded"
                             }
                         ]
                     }

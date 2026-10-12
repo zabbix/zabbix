@@ -29,12 +29,11 @@ final class CClickHouseHelper {
 			'searchWildcardsEnabled' => false,
 			'sortfield' => null,
 			'sortorder' => null,
-			'limit' => null
+			'limit' => null,
+			'offset' => null
 		], $options);
 
-		$query = (new CClickHouseQuery())
-			->from($table, $table_alias)
-			->limit($options['limit']);
+		$query = (new CClickHouseQuery())->from($table, $table_alias);
 
 		if ($options['filter']) {
 			self::addQueryFilterOptions($query, $options, $db_schema, $table, $table_alias);
@@ -55,6 +54,10 @@ final class CClickHouseHelper {
 		if ($options['output']) {
 			self::addQueryOutputOptions($query, $options, $db_schema, $table, $table_alias);
 		}
+
+		$query
+			->limit($options['limit'])
+			->offset($options['offset']);
 
 		return $query;
 	}
@@ -108,7 +111,10 @@ final class CClickHouseHelper {
 					break;
 
 				case 'String':
-					$values_prepared = $values;
+					foreach ($values as $value) {
+						$values_prepared[] = (string) $value;
+					}
+
 					break;
 
 				default:
@@ -196,10 +202,26 @@ final class CClickHouseHelper {
 			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
-		$output = array_intersect(array_keys($table_schema), $options['output']);
+		foreach (array_intersect_key($table_schema, array_flip($options['output'])) as $field => ['type' => $type]) {
+			self::selectForType($query, $type, $field, $table_alias);
+		}
+	}
 
-		foreach ($output as $field) {
-			$query->select($table_alias.'.'.$field);
+	public static function selectForType(CClickHouseQuery $query, string $type, string $field, string $table_alias)
+			: void {
+		switch ($type) {
+			case 'DateTime64(9)':
+				$query->select('toUnixTimestamp64Nano(toDateTime64('.$table_alias.'.'.$field.',9))', $field);
+				break;
+
+			case 'Array(DateTime64(9))':
+				$query->select('arrayMap(p -> toUnixTimestamp64Nano(toDateTime64(p,9)),'.$table_alias.'.'.$field.')',
+					$field
+				);
+				break;
+
+			default:
+				$query->select($table_alias.'.'.$field);
 		}
 	}
 
@@ -208,6 +230,10 @@ final class CClickHouseHelper {
 		$list_grouped = [];
 
 		foreach ($list as $attribute) {
+			if ($attribute['operator'] == CONDITION_OPERATOR_LIKE && $attribute['value'] === '') {
+				$attribute['operator'] = CONDITION_OPERATOR_EXISTS;
+			}
+
 			$list_grouped[$attribute['key']][$attribute['operator']][] = $attribute['value'];
 		}
 
@@ -216,60 +242,62 @@ final class CClickHouseHelper {
 		$index = 0;
 
 		foreach ($list_grouped as $key => $operators) {
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EXISTS, $operators)
-					&& array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EXISTS, $operators)) {
+			if (array_key_exists(CONDITION_OPERATOR_EXISTS, $operators)
+					&& array_key_exists(CONDITION_OPERATOR_NOT_EXISTS, $operators)) {
 				continue;
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EQUAL, $operators)
-					|| array_key_exists(APM_ATTRIBUTE_OPERATOR_LIKE, $operators)) {
-				unset($operators[APM_ATTRIBUTE_OPERATOR_EXISTS]);
+			if (array_key_exists(CONDITION_OPERATOR_EQUAL, $operators)
+					|| array_key_exists(CONDITION_OPERATOR_LIKE, $operators)) {
+				unset($operators[CONDITION_OPERATOR_EXISTS]);
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, $operators)
-					|| array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_LIKE, $operators)) {
-				unset($operators[APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]);
+			if (array_key_exists(CONDITION_OPERATOR_NOT_EQUAL, $operators)
+					|| array_key_exists(CONDITION_OPERATOR_NOT_LIKE, $operators)) {
+				unset($operators[CONDITION_OPERATOR_NOT_EXISTS]);
 			}
 
-			$query->param('filter_'.$index.'_key', $key);
+			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$index;
 
-			$field_param = $field.'[{filter_'.$index.'_key:String}]';
+			$query->param($param_prefix.'_key', $key);
+
+			$field_param = $field.'[{'.$param_prefix.'_key:String}]';
 
 			$where_or = [];
 			$where_and = [];
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EQUAL, $operators)) {
-				$query->param('filter_'.$index.'_equal', $operators[APM_ATTRIBUTE_OPERATOR_EQUAL]);
-				$where_or[] = $field_param.' IN {filter_'.$index.'_equal:Array(String)}';
+			if (array_key_exists(CONDITION_OPERATOR_EQUAL, $operators)) {
+				$query->param($param_prefix.'_equal', $operators[CONDITION_OPERATOR_EQUAL]);
+				$where_or[] = $field_param.' IN {'.$param_prefix.'_equal:Array(String)}';
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_LIKE, $operators)) {
-				foreach ($operators[APM_ATTRIBUTE_OPERATOR_LIKE] as $value_index => $value) {
-					$query->param('filter_'.$index.'_like_'.$value_index, $value);
+			if (array_key_exists(CONDITION_OPERATOR_LIKE, $operators)) {
+				foreach ($operators[CONDITION_OPERATOR_LIKE] as $value_index => $value) {
+					$query->param($param_prefix.'_like_'.$value_index, $value);
 					$where_or[] = 'positionCaseInsensitive('.$field_param.','.
-						'{filter_'.$index.'_like_'.$value_index.':String})>0';
+						'{'.$param_prefix.'_like_'.$value_index.':String})>0';
 				}
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EXISTS, $operators)) {
-				$where_or[] = 'NOT mapContains('.$field.',{filter_'.$index.'_key:String})';
+			if (array_key_exists(CONDITION_OPERATOR_NOT_EXISTS, $operators)) {
+				$where_or[] = 'NOT mapContains('.$field.',{'.$param_prefix.'_key:String})';
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, $operators)) {
-				$query->param('filter_'.$index.'_not_equal', $operators[APM_ATTRIBUTE_OPERATOR_NOT_EQUAL]);
-				$where_and[] = $field_param.' NOT IN {filter_'.$index.'_not_equal:Array(String)}';
+			if (array_key_exists(CONDITION_OPERATOR_NOT_EQUAL, $operators)) {
+				$query->param($param_prefix.'_not_equal', $operators[CONDITION_OPERATOR_NOT_EQUAL]);
+				$where_and[] = $field_param.' NOT IN {'.$param_prefix.'_not_equal:Array(String)}';
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_LIKE, $operators)) {
-				foreach ($operators[APM_ATTRIBUTE_OPERATOR_NOT_LIKE] as $value_index => $value) {
-					$query->param('filter_'.$index.'_like_'.$value_index, $value);
+			if (array_key_exists(CONDITION_OPERATOR_NOT_LIKE, $operators)) {
+				foreach ($operators[CONDITION_OPERATOR_NOT_LIKE] as $value_index => $value) {
+					$query->param($param_prefix.'_not_like_'.$value_index, $value);
 					$where_and[] = 'positionCaseInsensitive('.$field_param.','.
-						'{filter_'.$index.'_like_'.$value_index.':String})=0';
+						'{'.$param_prefix.'_not_like_'.$value_index.':String})=0';
 				}
 			}
 
-			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EXISTS, $operators)) {
-				$where_or[] = 'mapContains('.$field.',{filter_'.$index.'_key:String})';
+			if (array_key_exists(CONDITION_OPERATOR_EXISTS, $operators)) {
+				$where_or[] = 'mapContains('.$field.',{'.$param_prefix.'_key:String})';
 			}
 
 			if ($where_or) {
@@ -280,10 +308,15 @@ final class CClickHouseHelper {
 			}
 
 			$where[] = implode(' AND ', $where_and);
+
+			$index++;
 		}
 
 		if ($where) {
-			$query->where(implode($eval_type === APM_ATTRIBUTE_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where));
+			$where_sql = implode($eval_type === CONDITION_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where);
+			$where_sql = count($where) > 1 ? '('.$where_sql.')' : $where_sql;
+
+			$query->where($where_sql);
 		}
 	}
 }

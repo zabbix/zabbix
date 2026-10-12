@@ -643,8 +643,12 @@ class testPageProblems extends CWebTest {
 		}
 
 		// Check column list updates in datatable.
+		$rows_count = $table->getRows()->count();
+
 		foreach (['Tags' => false, 'Operational data' => true] as $column => $new_state) {
 			$this->updateColumnList([$column => $new_state]);
+			// Showing a new column reloads the table, so wait until rows are rendered before the next action.
+			$table->waitUntilRowsCount($rows_count);
 			$this->assertEquals($new_state, in_array($column, $table->getHeadersText()));
 			// Change the column back to its default state and verify that changes are applied.
 			$this->updateColumnList([$column => !$new_state]);
@@ -1991,7 +1995,7 @@ class testPageProblems extends CWebTest {
 				}
 				else {
 					$this->assertTrue($tick->exists());
-					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
+					$cell->query('tag:button')->waitUntilClickable()->one()->click();
 					$action_dialog = $this->query($dialog_selector)->asOverlayDialog()->waitUntilReady()->one();
 					$this->assertTableData($action, $dialog_selector.'//table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();

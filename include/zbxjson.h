@@ -144,6 +144,7 @@
 #define ZBX_PROTO_TAG_PRIVPROTOCOL		"privprotocol"
 #define ZBX_PROTO_TAG_CONTEXTNAME		"contextname"
 #define ZBX_PROTO_TAG_MAX_REPS			"max_repetitions"
+#define ZBX_PROTO_TAG_RETRIES			"retries"
 #define ZBX_PROTO_TAG_IPMI_SENSOR		"ipmi_sensor"
 #define ZBX_PROTO_TAG_TIMEOUT			"timeout"
 #define ZBX_PROTO_TAG_URL			"url"
@@ -344,6 +345,7 @@ void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len);
 void	zbx_json_reset(struct zbx_json *j);
+void	zbx_json_reset_array(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
@@ -444,5 +446,13 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, con
 zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
 void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
 int	zbx_json_validate_ext(const char *start, char **error);
+int	zbx_jsonobj_query_vector_str(const zbx_jsonobj_t *obj, const char *path, zbx_vector_str_t *output);
+int	zbx_jsonobj_query_ext_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path,
+		zbx_vector_str_t *output);
+int	zbx_jsonobj_query_ext_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
+		zbx_jsonpath_t *jsonpath, zbx_vector_str_t *output);
+int	zbx_jsonobj_query_precompiled_vector_str(const zbx_jsonobj_t *obj, zbx_jsonpath_t *jsonpath,
+		zbx_vector_str_t *output);
+
 
 #endif /* ZABBIX_ZJSON_H */
