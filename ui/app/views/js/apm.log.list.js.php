@@ -207,7 +207,7 @@
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('log_attributes', <?= json_encode(_('Log attributes')); ?>)
-						.setFields(['attributes'])
+						.setFields(['log_attributes'])
 						.setVisible(false)
 						.setRenderer('attributes')
 						.setColumnOptions({
