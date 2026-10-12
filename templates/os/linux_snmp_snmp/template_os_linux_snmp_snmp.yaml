@@ -63,7 +63,7 @@ zabbix_export:
         You can also try to use `snmpconf`: http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -1473,6 +1473,21 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
               - macro: '{#SNMPVALUE}'

@@ -349,6 +349,10 @@ function PopUp(action, parameters, {
 		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
 	}
 
+	if (action === 'template.edit') {
+		parameters = JSON.stringify(parameters);
+	}
+
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
@@ -402,6 +406,9 @@ function PopUp(action, parameters, {
 					script_inline: resp.script_inline,
 					data: resp.data || null
 				});
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
 
 				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
@@ -1214,8 +1221,16 @@ function objectSetDeepValue(object, path, value) {
 	while (path.length > 1) {
 		const key = path.shift();
 
-		if (!(key in tmp)) {
-			tmp[key] = {};
+		if (!Object.hasOwn(tmp, key)) {
+			tmp[key] = Object.create(null);
+		}
+		else if (tmp[key] === null) {
+			if (value === null) {
+				return object;
+			}
+			else {
+				throw Error('Trying to set value to null object.');
+			}
 		}
 
 		if (typeof tmp[key] !== 'object') {

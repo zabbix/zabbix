@@ -17,6 +17,7 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -634,6 +635,37 @@ func Test_ValidateOptions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestProfilerDirConfiguration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("default", func(t *testing.T) {
+		t.Parallel()
+
+		var options AgentOptions
+
+		err := conf.UnmarshalStrict([]byte{}, &options)
+		if err != nil {
+			t.Fatalf("cannot create default configuration: %s", err)
+		}
+
+		if options.ProfilerDir == "" {
+			t.Fatal("default ProfilerDir is empty")
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		t.Parallel()
+
+		var options AgentOptions
+
+		err := conf.UnmarshalStrict([]byte("ProfilerDir="), &options)
+		if err == nil || !strings.Contains(err.Error(), "invalid parameter ProfilerDir") ||
+			!strings.Contains(err.Error(), conf.ErrValueCannotBeEmpty.Error()) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
 
 func TestParseServerActive(t *testing.T) {

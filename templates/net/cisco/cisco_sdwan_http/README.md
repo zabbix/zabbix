@@ -49,6 +49,7 @@ This template has been tested on:
 |{$SDWAN.DEVICE.NAME.MATCHES}|<p>This macro is used in device discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SDWAN.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in device discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$SDWAN.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco SD-WAN", e.g. {$HTTP.TLS.VERIFY:"Cisco SD-WAN"}.</p>|`full`|
 
 ### Items
 
@@ -84,6 +85,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco SD-WAN device", e.g. {$HTTP.TLS.VERIFY:"Cisco SD-WAN device"}.</p>|`full`|
 |{$SDWAN.API.URL}|<p>Cisco SD-WAN Monitor API URL.</p>||
 |{$SDWAN.TOKEN}|<p>Cisco SD-WAN Monitor API token.</p>||
 |{$SDWAN.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|

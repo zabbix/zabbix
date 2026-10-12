@@ -275,12 +275,12 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilReady();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilReady()->one();
 			$help_message = "Password requirements:\n".
 					"must be at least 8 characters long\n".
 					"must not contain user's name, surname or username\n".
 					"must not be one of common or context-specific passwords";
-			$this->assertEquals($help_message, $hint->one()->getText());
+			$this->assertEquals($help_message, $hint->getText());
 			$hint->query('class:btn-overlay-close')->one()->click();
 
 			$info_message = 'Password is not mandatory for non internal authentication type.';
@@ -292,7 +292,7 @@ class testFormUser extends CWebTest {
 		// Check hintbox contains correct text message.
 		foreach ($data['hintbox_warning'] as $field => $text) {
 			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}
@@ -779,7 +779,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -795,7 +795,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Creating user by specifying only mandatory parameters.
@@ -1329,7 +1329,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #26 Incorrect URL protocol.
@@ -1340,7 +1340,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #27 Updating LDAP user with empty password fields.
@@ -1455,7 +1455,7 @@ class testFormUser extends CWebTest {
 		}
 
 		if ($update_user === 'Admin') {
-			$this->assertTrue($form->query('id:current_password')->one()->isVisible());
+			$form->query('id:current_password')->waitUntilVisible();
 		}
 		else {
 			$this->assertFalse($form->query('id:current_password')->one(false)->isValid());

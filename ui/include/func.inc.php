@@ -1650,7 +1650,7 @@ function makeMessageBox(string $class, array $messages, mixed $title = null, boo
 			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-				->setTitle(_('Close'))
+				->setAttribute('aria-label', _('Close notification'))
 		);
 	}
 
@@ -2015,6 +2015,17 @@ function parse_period($str) {
 			];
 		}
 	}
+
+	foreach ($out as &$periods) {
+		usort($periods, static function(array $p1, array $p2): int {
+			if ($p1['start_h'] == $p2['start_h']) {
+				return $p1['start_m'] <=> $p2['start_m'];
+			}
+
+			return $p1['start_h'] <=> $p2['start_h'];
+		});
+	}
+	unset($periods);
 
 	return $out;
 }

@@ -134,6 +134,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
+			$this->query('class:zi-sign-out')->waitUntilPresent();
 			$this->page->assertUserIsLoggedIn();
 			// Check that no error messages are displayed after logging in.
 			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
@@ -294,6 +295,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('class:zi-sign-out')->waitUntilPresent();
 	}
 
 	/**

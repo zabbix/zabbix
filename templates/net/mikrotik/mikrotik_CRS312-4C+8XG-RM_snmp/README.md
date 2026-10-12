@@ -1,5 +1,5 @@
 
-# MikroTik CRS312-4C8XG-RM by SNMP
+# MikroTik CRS312-4C+8XG-RM by SNMP
 
 ## Overview
 

@@ -27,9 +27,8 @@ This template has been tested on:
 1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
 2. Set the {$CEPH.CONNSTRING} such as <protocol(host:port)> or named session.
 3. Set the user name and password in host macros ({$CEPH.USER}, {$CEPH.API.KEY}) if you want to override parameters from the Zabbix agent configuration file.
-4. Set the mode of data collection in {$CEPH.MODE} if you want to override the default `restful` mode. Supported value is `restful` (deprecated), `native`.
 
-Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]`
+Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]`
 
 
 ### Macros used
@@ -39,17 +38,16 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 |{$CEPH.USER}||`zabbix`|
 |{$CEPH.API.KEY}||`zabbix_pass`|
 |{$CEPH.CONNSTRING}||`https://localhost:8003`|
-|{$CEPH.MODE}|<p>The mode of data collection. Supported value is `restful` (deprecated), `native`.</p>|`restful`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get overall cluster status||Zabbix agent|ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
-|Get OSD stats||Zabbix agent|ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
-|Get OSD dump||Zabbix agent|ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
-|Get df||Zabbix agent|ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
-|Ping||Zabbix agent|ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Get overall cluster status||Zabbix agent|ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
+|Get OSD stats||Zabbix agent|ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
+|Get OSD dump||Zabbix agent|ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
+|Get df||Zabbix agent|ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
+|Ping||Zabbix agent|ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
 |Number of Monitors|<p>The number of Monitors configured in a Ceph cluster.</p>|Dependent item|ceph.num_mon<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.num_mon`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
 |Overall cluster status|<p>The overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR.</p>|Dependent item|ceph.overall_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overall_status`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Minimum Mon release version|<p>min_mon_release_name</p>|Dependent item|ceph.min_mon_release_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min_mon_release_name`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -101,7 +99,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ceph: Can not connect to cluster|<p>The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).</p>|`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"])=0`|Average||
+|Ceph: Can not connect to cluster|<p>The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).</p>|`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0`|Average||
 |Ceph: Cluster in ERROR state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2`|Average|**Manual close**: Yes|
 |Ceph: Cluster in WARNING state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ceph: Cluster in ERROR state</li></ul>|
 |Ceph: Minimum monitor release version has changed|<p>A Ceph version has changed. Acknowledge to close the problem manually.</p>|`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0`|Info|**Manual close**: Yes|
@@ -110,7 +108,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OSD||Zabbix agent|ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
+|OSD||Zabbix agent|ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
 
 ### Item prototypes for OSD
 
@@ -135,7 +133,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pool||Zabbix agent|ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]|
+|Pool||Zabbix agent|ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]|
 
 ### Item prototypes for Pool
 
@@ -144,7 +142,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 |[{#POOLNAME}] Pool Used|<p>The total bytes used in a pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",bytes_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].bytes_used`</p></li></ul>|
 |[{#POOLNAME}] Max available|<p>The maximum available space in the given pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",max_avail]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].max_avail`</p></li></ul>|
 |[{#POOLNAME}] Pool RAW Used|<p>Bytes used in pool including the copies made.</p>|Dependent item|ceph.pool["{#POOLNAME}",stored_raw]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].stored_raw`</p></li></ul>|
-|[{#POOLNAME}] Pool Percent Used|<p>The percentage of the storage used per pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",percent_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].percent_used`</p></li></ul>|
+|[{#POOLNAME}] Pool Percent Used|<p>The percentage of the storage used per pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",percent_used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].percent_used`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |[{#POOLNAME}] Pool objects|<p>The number of objects in the pool.</p>|Dependent item|ceph.pool["{#POOLNAME}",objects]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].objects`</p></li></ul>|
 |[{#POOLNAME}] Pool Read bandwidth|<p>The read rate per pool (bytes per second).</p>|Dependent item|ceph.pool["{#POOLNAME}",rd_bytes.rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].rd_bytes`</p></li><li>Change per second</li></ul>|
 |[{#POOLNAME}] Pool Write bandwidth|<p>The write rate per pool (bytes per second).</p>|Dependent item|ceph.pool["{#POOLNAME}",wr_bytes.rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pools["{#POOLNAME}"].wr_bytes`</p></li><li>Change per second</li></ul>|

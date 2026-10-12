@@ -164,9 +164,10 @@ class testTimescaleDb extends CIntegrationTest {
 			if ($res) {
 				list($major, $minor, $patch) = explode('.', $res['extversion']);
 
-				$ver = $major * 10000;
-				$ver += $minor * 100;
-				$ver += $patch;
+				$ver = (int) $major * 10000;
+				$ver += (int) $minor * 100;
+				/* type cast trims non-numeric part from $patch "2.27.0-dev" */
+				$ver += (int) $patch;
 
 				self::$tsdbVersion = $ver;
 			}

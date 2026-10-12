@@ -335,9 +335,6 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
-			// TODO: unstable screenshot on Jenkins. Added border radius and color for zoom elements.
-			$this->page->getDriver()->executeScript('arguments[0].style.cssText +=\'border-radius: 0; border-color: #000;\';',
-				[$element->query('class:leaflet-control-zoom')->one()]);
 
 			$count = count($this->errors);
 			$this->assertScreenshot($element, $id);
