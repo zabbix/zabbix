@@ -20,6 +20,7 @@
 
 extern "C" {
 #include "zbxjson.h"
+#include "zbxnum.h"
 }
 
 namespace otlpm = opentelemetry::proto::metrics::v1;
@@ -126,7 +127,11 @@ static std::string	any_value_to_string(const opentelemetry::proto::common::v1::A
 		case AV::kIntValue:
 			return std::to_string(v.int_value());
 		case AV::kDoubleValue:
-			return std::to_string(v.double_value());
+		{
+			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
+
+			return zbx_print_double(buf, sizeof(buf), v.double_value());
+		}
 		case AV::kBytesValue:
 			return bytes_to_hex(v.bytes_value());
 		case AV::kKvlistValue:
