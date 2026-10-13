@@ -211,7 +211,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 				ok = keyaccess.CheckRules(key, params)
 			}
 			if !ok {
-				err = fmt.Errorf("Unknown metric %s", key)
+				err = errs.New("Unsupported item key.")
 			} else {
 				err = c.addRequest(p, r, update.sink, now, update.firstActiveChecksRefreshed)
 			}
