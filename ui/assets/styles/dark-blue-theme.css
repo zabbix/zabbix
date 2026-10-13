@@ -3079,6 +3079,11 @@ button {
   #datatable-logs .datatable-row:not(.row-selected):hover .datatable-cell {
     border-block-end-color: #003a7a;
     background-color: rgba(0, 58, 122, 0.35); }
+#datatable-traces .datatable-row:focus,
+#datatable-metrics .datatable-row:focus,
+#datatable-logs .datatable-row:focus {
+  background-color: rgba(0, 58, 122, 0.35);
+  outline: none; }
 
 #datatable-traces .span-count {
   color: #939ca4; }

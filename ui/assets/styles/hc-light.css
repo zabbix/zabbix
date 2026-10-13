@@ -3016,6 +3016,11 @@ button {
   #datatable-logs .datatable-row:not(.row-selected):hover .datatable-cell {
     border-block-end-color: #9f9f9f;
     background-color: #f4f4f4; }
+#datatable-traces .datatable-row:focus,
+#datatable-metrics .datatable-row:focus,
+#datatable-logs .datatable-row:focus {
+  background-color: #f4f4f4;
+  outline: none; }
 
 #datatable-traces .span-count {
   color: #333333; }
@@ -3040,7 +3045,7 @@ button {
     display: flex;
     align-items: center;
     height: inherit;
-    background-color: #f0f0f0; }
+    background-color: #d9d9d9; }
   #datatable-traces .duration .duration-time-units {
     z-index: 1;
     display: flex;
