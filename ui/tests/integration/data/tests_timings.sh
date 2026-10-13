@@ -11,6 +11,7 @@ declare -A BASELINE_TIMES=(
   [testLLDHistorySyncAtScale]=300
   [testMacros]=279
   [testItemTimeouts]=209
+  [testIpmiChecks]=215
   [testAgentJsonProtocol]=188
   [testLLDProxyHistorySyncAtScale]=180
   [testHighAvailability]=165
