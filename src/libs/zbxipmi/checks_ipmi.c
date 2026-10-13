@@ -307,6 +307,55 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(const zbx_ipmi_host_t *h, ipmi_sen
 	return s;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds sensor by its OpenIPMI sensor ID                            *
+ *                                                                            *
+ * Parameters: h         - [IN]                                               *
+ *             sensor_id - [IN]                                               *
+ *                                                                            *
+ * Return value: pointer to sensor data or NULL if sensor does not exist      *
+ *                                                                            *
+ * Comments: Sensors are reallocated when OpenIPMI adds or deletes them while *
+ *           processing events, so pointers to sensors must be looked up      *
+ *           again after every zbx_perform_openipmi_ops() call.               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_sensor_id(const zbx_ipmi_host_t *h, ipmi_sensor_id_t sensor_id)
+{
+	for (int i = 0; i < h->sensor_count; i++)
+	{
+		if (0 == ipmi_cmp_sensor_id(h->sensors[i].sensor_id, sensor_id))
+			return &h->sensors[i];
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds control by its OpenIPMI control ID                          *
+ *                                                                            *
+ * Parameters: h          - [IN]                                              *
+ *             control_id - [IN]                                              *
+ *                                                                            *
+ * Return value: pointer to control data or NULL if control does not exist    *
+ *                                                                            *
+ * Comments: see zbx_get_ipmi_sensor_by_sensor_id()                           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_control_id(const zbx_ipmi_host_t *h,
+		ipmi_control_id_t control_id)
+{
+	for (int i = 0; i < h->control_count; i++)
+	{
+		if (0 == ipmi_cmp_control_id(h->controls[i].control_id, control_id))
+			return &h->controls[i];
+	}
+
+	return NULL;
+}
+
 static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_id(const zbx_ipmi_host_t *h, const char *id)
 {
 	zbx_ipmi_sensor_t	*s = NULL;
@@ -1393,6 +1442,13 @@ static void	zbx_domain_closed_cb(void *cb_data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __func__, (void *)h, h->ip, h->port);
 
+	/* domain closing started on connection failure may complete while another operation is in progress */
+	if (SUCCEED == h->ret)
+	{
+		h->err = zbx_strdup(h->err, "IPMI domain was closed");
+		h->ret = NETWORK_ERROR;
+	}
+
 	h->domain_up = 0;
 	h->done = 1;
 
@@ -1838,9 +1894,19 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	}
 
 	if (NULL != s)
+	{
+		ipmi_sensor_id_t	sensor_id = s->sensor_id;
+
 		zbx_read_ipmi_sensor(h, s);
+		s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_id);
+	}
 	else
+	{
+		ipmi_control_id_t	control_id = c->control_id;
+
 		zbx_read_ipmi_control(h, c);
+		c = zbx_get_ipmi_control_by_control_id(h, control_id);
+	}
 
 	if (h->ret != SUCCEED)
 	{
@@ -1848,6 +1914,13 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 			*value = zbx_strdup(*value, h->err);
 
 		return h->ret;
+	}
+
+	if (NULL == s && NULL == c)
+	{
+		*value = zbx_dsprintf(*value, "sensor or control %s@[%s]:%d was deleted while being read", sensor,
+				h->ip, h->port);
+		return NOTSUPPORTED;
 	}
 
 	if (NULL != s)
@@ -1893,8 +1966,10 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 #define ZBX_IPMI_TAG_CRIT		"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER	"non_recover"
 
-	zbx_ipmi_host_t	*h;
-	struct zbx_json	json;
+	zbx_ipmi_host_t		*h;
+	struct zbx_json		json;
+	ipmi_sensor_id_t	*sensor_ids;
+	int			sensor_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 
@@ -1918,29 +1993,49 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (int i = 0; i < h->sensor_count; i++)
-	{
-		const char 	*p;
-		char 		state_name[MAX_STRING_LEN];
-		size_t		offset = 0;
-		zbx_uint64_t	state;
+	/* sensors may be added or deleted while OpenIPMI processes events during reading, */
+	/* so they are iterated by their IDs and looked up again after every read          */
+	sensor_num = h->sensor_count;
+	sensor_ids = (ipmi_sensor_id_t *)zbx_malloc(NULL, sizeof(ipmi_sensor_id_t) * (size_t)(sensor_num + 1));
 
-		zbx_read_ipmi_sensor(h, &h->sensors[i]);
+	for (int i = 0; i < sensor_num; i++)
+		sensor_ids[i] = h->sensors[i].sensor_id;
+
+	for (int i = 0; i < sensor_num; i++)
+	{
+		const char 		*p;
+		char 			state_name[MAX_STRING_LEN];
+		size_t			offset = 0;
+		zbx_uint64_t		state;
+		zbx_ipmi_sensor_t	*s;
+
+		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+			continue;
+
+		zbx_read_ipmi_sensor(h, s);
+
+		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+			continue;
+
 		if (SUCCEED != h->ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",h->sensors[i].id,
+			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",s->id,
 					ZBX_NULL2EMPTY_STR(h->err));
 
 			continue;
 		}
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD == h->sensors[i].reading_type)
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
 		{
-			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
+			zbx_read_ipmi_thresholds(h, s);
+
+			if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+				continue;
+
 			if (SUCCEED != h->ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",
-						h->sensors[i].id, ZBX_NULL2EMPTY_STR(h->err));
+						s->id, ZBX_NULL2EMPTY_STR(h->err));
 
 				continue;
 			}
@@ -1948,24 +2043,24 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 		zbx_json_addobject(&json, NULL);
 
-		zbx_json_addstring(&json, ZBX_IPMI_TAG_ID, h->sensors[i].id, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_IPMI_TAG_NAME, h->sensors[i].full_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_IPMI_TAG_ID, s->id, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_IPMI_TAG_NAME, s->full_name, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_SENSOR);
-		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].type);
-		p = h->sensors[i].type_str;
+		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)s->type);
+		p = s->type_str;
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_READING);
-		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].reading_type);
-		p = h->sensors[i].reading_type_str;
+		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)s->reading_type);
+		p = s->reading_type_str;
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type)	/* discrete */
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD != s->reading_type)	/* discrete */
 		{
-			state = h->sensors[i].value.discrete;
+			state = s->value.discrete;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
 			zbx_json_adduint64(&json, ZBX_IPMI_TAG_STATE, state);
 
@@ -1974,7 +2069,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			{
 				if (0 != (state & (1u << j)))
 				{
-					if (NULL != (p = h->sensors[i].reading_names[j]))
+					if (NULL != (p = s->reading_names[j]))
 					{
 						if (0 < offset)
 							offset += zbx_snprintf(state_name + offset,
@@ -1990,7 +2085,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		}
 		else	/* threshold */
 		{
-			state = (zbx_uint64_t)h->sensors[i].state;
+			state = (zbx_uint64_t)s->state;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
 			zbx_json_adduint64(&json, ZBX_IPMI_TAG_STATE, state);
 
@@ -2010,32 +2105,30 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, state_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json);
 
-			zbx_json_addfloat(&json, ZBX_IPMI_TAG_VALUE, h->sensors[i].value.threshold);
+			zbx_json_addfloat(&json, ZBX_IPMI_TAG_VALUE, s->value.threshold);
 
-			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS, h->sensors[i].units, ZBX_JSON_TYPE_STRING);
-
-			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
+			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS, s->units, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_THRESHOLD);
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOWER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					&h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
+					&s->thresholds[IPMI_LOWER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					&h->sensors[i].thresholds[IPMI_LOWER_CRITICAL]);
+					&s->thresholds[IPMI_LOWER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					&h->sensors[i].thresholds[IPMI_LOWER_NON_RECOVERABLE]);
+					&s->thresholds[IPMI_LOWER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_UPPER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					&h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
+					&s->thresholds[IPMI_UPPER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					&h->sensors[i].thresholds[IPMI_UPPER_CRITICAL]);
+					&s->thresholds[IPMI_UPPER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					&h->sensors[i].thresholds[IPMI_UPPER_NON_RECOVERABLE]);
+					&s->thresholds[IPMI_UPPER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 			zbx_json_close(&json);
@@ -2043,6 +2136,9 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		zbx_json_close(&json);
 
 	}
+
+	zbx_free(sensor_ids);
+
 	zbx_json_close(&json);
 
 	*value = zbx_strdup(*value, json.buffer);
