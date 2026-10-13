@@ -395,6 +395,7 @@ class CControllerItemMassupdate extends CController {
 					->setArgument('action', 'item.prototype.list')
 					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('uncheck', 1)
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES
@@ -405,6 +406,7 @@ class CControllerItemMassupdate extends CController {
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'item.list')
 					->setArgument('context', $this->getInput('context'))
+					->setArgument('uncheck', 1)
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES
