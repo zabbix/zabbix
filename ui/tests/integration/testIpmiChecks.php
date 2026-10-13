@@ -1901,7 +1901,6 @@ class testIpmiChecks extends CIntegrationTest {
 		}, 60);
 		$sensor_count = count(json_decode($item['lastvalue'], true));
 
-		$drop_clock = time();
 		self::ipmiSimStop(self::SIM_DISCOVERY_DROP_IP);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'IPMI agent item "ipmi.get" on host "'.
@@ -1915,7 +1914,9 @@ class testIpmiChecks extends CIntegrationTest {
 			'output' => ['clock', 'value'],
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'itemids' => [self::$itemids[self::HOST_DISCOVERY_DROP.':ipmi.get']],
-			'time_from' => $drop_clock + 1
+			// Every value collected before the drop is complete, so the values are checked starting from the
+			// complete one above - the drop may be noticed within the same second.
+			'time_from' => $item['lastclock']
 		]);
 
 		foreach ($response['result'] as $value) {
