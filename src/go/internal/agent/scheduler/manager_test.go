@@ -781,6 +781,7 @@ func TestUpdateRequestAccessRules(t *testing.T) {
 			manager := newSystemRunTestManager(t)
 
 			var cache resultCacheMock
+
 			update := updateRequest{
 				clientID: tt.clientID,
 				sink:     &cache,
