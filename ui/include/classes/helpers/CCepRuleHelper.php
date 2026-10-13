@@ -77,9 +77,9 @@ class CCepRuleHelper {
 		self::WHEN_EVENT_OCCURRED,
 		self::WHEN_EVENT_ADDED,
 		self::WHEN_EVENT_EVICTED,
+		self::WHEN_EVENT_CLOSED,
 		self::WHEN_WINDOW_CLOSED,
-		self::WHEN_PATTERN_MATCHED,
-		self::WHEN_EVENT_CLOSED
+		self::WHEN_PATTERN_MATCHED
 	];
 
 	public const GROUP_BY_NO = 0;
