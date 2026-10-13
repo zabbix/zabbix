@@ -218,14 +218,12 @@ if (isset($_REQUEST['favobj'])) {
 					throw new Exception(_('Map update failed.'));
 				}
 
-				$url = (new CUrl('sysmaps.php'))
-					->setArgument('page', CPagerHelper::loadPage('sysmaps.php', null))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'map.view')
+					->setArgument('sysmapid', getRequest('sysmapid'))
 					->getUrl();
 
-				echo
-					'if (confirm('.json_encode(_('Map is updated! Return to map list?')).')) {'.
-						'location.href = "'.$url.'";'.
-					'}';
+				echo 'location.href = "'.$url.'";';
 			}
 			catch (Exception $e) {
 				$msg = [$e->getMessage()];
