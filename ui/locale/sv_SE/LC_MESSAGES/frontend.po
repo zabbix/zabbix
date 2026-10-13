@@ -10548,6 +10548,10 @@ msgstr "Otillgänglig användare"
 msgid "Inaccessible user group"
 msgstr "Otillgänglig användargrupp"
 
+#: include/classes/helpers/CItemGeneralHelper.php:276
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "Otillgänglig widget"
@@ -13354,6 +13358,10 @@ msgstr "Max antal repetitioner"
 #: app/partials/configuration.host.interface.row.php:121
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Max antal repetitioner gäller endast för upptäckt och promenad."
+
+#: app/partials/configuration.host.interface.row.php:116
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"

@@ -646,7 +646,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect arguments passed to function.'
+					'error' => 'interfaces/1: Incorrect value for field "community": cannot be empty.'
 				]
 			],
 			// #19 Zero in SNMP Max repetition count.
@@ -665,7 +665,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect arguments passed to function.'
+					'error' => 'interfaces/1: Incorrect value for field "max_repetitions": value must be no less than "1".'
 				]
 			],
 			// #20 Empty proxy multiselect.
@@ -1286,7 +1286,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect arguments passed to function.'
+					'error' => 'interfaces/2: Incorrect value for field "community": cannot be empty.'
 				]
 			],
 			// Zero Max repetition count.
@@ -1306,7 +1306,7 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect arguments passed to function.'
+					'error' => 'interfaces/2: Incorrect value for field "max_repetitions": value must be no less than "1".'
 				]
 			],
 			// Empty proxy.
