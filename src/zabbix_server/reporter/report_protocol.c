@@ -386,7 +386,7 @@ static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 			" where d.templateid is null"
 			" and ("
 				"d.userid=" ZBX_FS_UI64
-				" or d.private=" ZBX_FS_UI64
+				" or d.private=%d"
 				" or exists ("
 					"select null from dashboard_user du"
 					" where d.dashboardid=du.dashboardid and du.userid=" ZBX_FS_UI64
@@ -425,12 +425,8 @@ static int	check_report_generation_access(const zbx_user_t *user)
 	if (USER_TYPE_ZABBIX_ADMIN > user->type)
 		return FAIL;
 
-	if (SUCCEED != zbx_db_check_user_perm2system(user->userid))
-		return FAIL;
-
-	if (USER_TYPE_SUPER_ADMIN != user->type &&
-			SUCCEED != zbx_db_user_has_administration_actions_permissions(user,
-			"actions.default_access", "actions.manage_scheduled_reports"))
+	if (SUCCEED != zbx_db_user_has_administration_actions_permissions(user, "actions.default_access",
+			"actions.manage_scheduled_reports"))
 	{
 		return FAIL;
 	}
