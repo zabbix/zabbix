@@ -295,13 +295,14 @@ class CTrend extends CApiService {
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
-			$value_to_string = $type == ITEM_VALUE_TYPE_UINT64
-				? static fn (float $value): string => sprintf('%.0f', $value)
-				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
 
 			if (!array_key_exists('group_by_itemid', $data)) {
 				continue;
 			}
+
+			$value_to_string = $type == ITEM_VALUE_TYPE_UINT64
+				? static fn (float $value): string => sprintf('%.0f', $value)
+				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
