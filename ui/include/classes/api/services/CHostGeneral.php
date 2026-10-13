@@ -295,13 +295,14 @@ abstract class CHostGeneral extends CHostBase {
 	private static function createHostHgSets(array $hgsets): void {
 		$ins_host_hgsets = [];
 
-		$options = [
-			'output' => ['hgsetid', 'hash'],
-			'filter' => ['hash' => array_keys($hgsets)]
-		];
-		$result = DBselect(DB::makeSql('hgset', $options));
+		$resource = DBselect(
+			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+			' FROM hgset hs'.
+			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+			' GROUP BY hs.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($hgsets[$row['hash']]['hostids'] as $hostid) {
 				$ins_host_hgsets[] = [
 					'hostid' => $hostid,
@@ -331,64 +332,33 @@ abstract class CHostGeneral extends CHostBase {
 	private static function updateHostHgSets(array $hgsets): void {
 		$upd_host_hgsets = [];
 
-		$db_hgsetids = array_flip(self::getDbHgSetIds($hgsets));
+		$resource = DBselect(
+			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+			' FROM hgset hs'.
+			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+			' GROUP BY hs.hash'
+		);
 
-		$empty_hgset_hash = hash('sha256', '');
-
-		if (array_key_exists($empty_hgset_hash, $hgsets)) {
-			DB::delete('host_hgset', ['hostid' => $hgsets[$empty_hgset_hash]['hostids']]);
-			unset($hgsets[$empty_hgset_hash]);
+		while ($row = DBfetch($resource)) {
+			$upd_host_hgsets[] = [
+				'values' => ['hgsetid' => $row['hgsetid']],
+				'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
+			];
+			unset($hgsets[$row['hash']]);
 		}
 
 		if ($hgsets) {
-			$options = [
-				'output' => ['hgsetid', 'hash'],
-				'filter' => ['hash' => array_keys($hgsets)]
-			];
-			$result = DBselect(DB::makeSql('hgset', $options));
+			self::createHgSets($hgsets);
 
-			while ($row = DBfetch($result)) {
+			foreach ($hgsets as $hgset) {
 				$upd_host_hgsets[] = [
-					'values' => ['hgsetid' => $row['hgsetid']],
-					'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
+					'values' => ['hgsetid' => $hgset['hgsetid']],
+					'where' => ['hostid' => $hgset['hostids']]
 				];
-
-				if (array_key_exists($row['hgsetid'], $db_hgsetids)) {
-					unset($db_hgsetids[$row['hgsetid']]);
-				}
-
-				unset($hgsets[$row['hash']]);
 			}
-
-			if ($hgsets) {
-				self::createHgSets($hgsets);
-
-				foreach ($hgsets as $hgset) {
-					$upd_host_hgsets[] = [
-						'values' => ['hgsetid' => $hgset['hgsetid']],
-						'where' => ['hostid' => $hgset['hostids']]
-					];
-				}
-			}
-
-			DB::update('host_hgset', $upd_host_hgsets);
 		}
 
-		self::deleteUnusedHgSets(array_keys($db_hgsetids));
-	}
-
-	private static function getDbHgSetIds(array $hgsets): array {
-		$hostids = [];
-
-		foreach ($hgsets as $hgset) {
-			$hostids = array_merge($hostids, $hgset['hostids']);
-		}
-
-		return DBfetchColumn(DBselect(
-			'SELECT DISTINCT hh.hgsetid'.
-			' FROM host_hgset hh'.
-			' WHERE '.dbConditionId('hh.hostid', $hostids)
-		), 'hgsetid');
+		DB::update('host_hgset', $upd_host_hgsets);
 	}
 
 	private static function createHgSets(array &$hgsets): void {
@@ -467,20 +437,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ins_permissions) {
 			DB::insert('permission', $ins_permissions, false);
-		}
-	}
-
-	private static function deleteUnusedHgSets(array $db_hgsetids): void {
-		$del_hgsetids = DBfetchColumn(DBselect(
-			'SELECT h.hgsetid'.
-			' FROM hgset h'.
-			' LEFT JOIN host_hgset hh ON h.hgsetid=hh.hgsetid'.
-			' WHERE '.dbConditionId('h.hgsetid', $db_hgsetids).
-				' AND hh.hostid IS NULL'
-		), 'hgsetid');
-
-		if ($del_hgsetids) {
-			DB::delete('hgset', ['hgsetid' => $del_hgsetids]);
 		}
 	}
 
@@ -1401,18 +1357,5 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 		unset($host);
-	}
-
-	protected static function deleteHgSets(array $db_hosts): void {
-		$hgsets = [];
-		$hgset_hash = self::getHgSetHash([]);
-
-		foreach ($db_hosts as $hostid => $foo) {
-			$hgsets[$hgset_hash]['hash'] = $hgset_hash;
-			$hgsets[$hgset_hash]['groupids'] = [];
-			$hgsets[$hgset_hash]['hostids'][] = $hostid;
-		}
-
-		self::updateHostHgSets($hgsets);
 	}
 }

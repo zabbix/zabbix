@@ -61,7 +61,7 @@ $filter = (new CFilter())
 					->setId('filter-expires-state')
 					->onClick('view.expiresDaysHandler()'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CNumericBox('filter_expires_days', $data['filter']['expires_days'], 3, false, false, false))
+				(new CNumericBox('filter_expires_days', $data['filter']['expires_days'], 3, false, false))
 					->setId('filter-expires-days')
 					->setEnabled($data['filter']['expires_state'])
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),

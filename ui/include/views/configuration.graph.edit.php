@@ -35,9 +35,15 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('context', $data['context']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('graphid', $data['graphid']);
+}
+
+$url = $url->getUrl();
 
 // Create form.
 $graphForm = (new CForm('post', $url))
@@ -60,7 +66,7 @@ if ($data['graphid'] != 0) {
 $graphFormList = new CFormList('graphFormList');
 
 $is_templated = (bool) $data['templates'];
-if ($is_templated) {
+if ($is_templated && $data['form'] !== 'clone') {
 	$graphFormList->addRow(_('Parent graphs'), $data['templates']);
 }
 
@@ -70,7 +76,7 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 }
 
 $readonly = false;
-if ($is_templated || $discovered_graph) {
+if (($is_templated || $discovered_graph) && $data['form'] !== 'clone') {
 	$readonly = true;
 	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
@@ -489,7 +495,7 @@ $graphPreviewTable = (new CTable())
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // Append buttons to form.
-if ($data['graphid'] != 0) {
+if ($data['graphid'] != 0 && $data['form'] !== 'clone') {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
@@ -533,6 +539,8 @@ $graphForm->addItem($graphTab);
 $html_page
 	->addItem($graphForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

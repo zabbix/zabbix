@@ -50,6 +50,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$VEEAM.MANAGER.API.URL}|<p>Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.</p>|`https://localhost:9398`|
 |{$VEEAM.MANAGER.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Veeam Backup Enterprise Manager", e.g. {$HTTP.TLS.VERIFY:"Veeam Backup Enterprise Manager"}.</p>|`full`|
 |{$VEEAM.MANAGER.PASSWORD}|<p>The `password` of the Veeam Backup Enterprise Manager account.</p>||
 |{$VEEAM.MANAGER.USER}|<p>The `user name` of the Veeam Backup Enterprise Manager account .</p>||
 |{$VEEAM.MANAGER.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`10`|

@@ -75,17 +75,15 @@ function escapeHtml(string) {
  * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
  *
  * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
- * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
- *                                           with "0".
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
  * @param {number}           min_length      Pad number with zeroes to maintain min length.
  */
-function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+function normalizeNumericBox(input, {allow_negative, min_length}) {
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		input.value = '0'.repeat(Math.max(min_length, 1));
 	}
 	else {
 		if (num < 0 && !allow_negative) {
@@ -673,7 +671,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			jQuery('<button>')
 				.addClass('btn-overlay-close')
 				.attr('type', 'button')
-				.attr('title', t('Close'))
+				.attr('aria-label', t('Close notification'))
 				.click(function() {
 					jQuery(this)
 						.closest(`.${classes[type]}`)
@@ -712,7 +710,9 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
 		$labels_clone,
-		labels_height = labels.length ? labels.height() : 0,
+		labels_height = labels.length
+			? labels.height() + Math.max(0, parseFloat(getComputedStyle(labels[0]).top) || 0)
+			: 0,
 		context2d;
 
 	// Clone only svg styles.
@@ -762,7 +762,7 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
-	a.href = img.src;
+	a.href = img.src + "&download=1";
 	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';

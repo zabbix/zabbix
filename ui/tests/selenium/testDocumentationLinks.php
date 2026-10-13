@@ -2778,6 +2778,9 @@ class testDocumentationLinks extends CWebTest {
 	 * Open the Mass update overlay dialog.
 	 */
 	private function openMassUpdate() {
+		// Wait for loading to finish first, otherwise selecting the checkbox acts on an element that is about to
+		// be replaced and raises a StaleElementReferenceException.
+		$this->query('xpath://*[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$this->query('xpath://input[contains(@id, "all_")]')->asCheckbox()->one()->set(true);
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 	}

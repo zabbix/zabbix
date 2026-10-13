@@ -2760,11 +2760,11 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			/* Using dc_item to pass itemid and hostid only, all other fields are not initialized! */
 
-			if (EVENT_SOURCE_TRIGGERS == event->source && 0 == strcmp(m, MVAR_TRIGGER_ID))
+			if (NULL != event && EVENT_SOURCE_TRIGGERS == event->source && 0 == strcmp(m, MVAR_TRIGGER_ID))
 			{
 				replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
-			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+			else if (NULL != dc_item)
 			{
 				if (SUCCEED == token_is_user_macro(m, &token))
 				{
