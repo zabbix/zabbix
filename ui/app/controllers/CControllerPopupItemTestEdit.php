@@ -465,8 +465,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				}
 
 				if ($texts_having_macros) {
-					$supported_macros = array_merge_recursive($supported_macros, $macros);
-					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
 					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 
 					if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
