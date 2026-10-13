@@ -33,50 +33,43 @@ func Minimize(pattern string) string {
 
 // Match matches string value to specified wildcard.
 // Asterisk (*) characters match to any characters of any length.
-func Match(value string, pattern string) bool {
-	var vi, pi, vp, pp int = 0, 0, 0, 0
+// It mirrors zbx_wildcard_match in src/libs/zbxregexp/zbxregexp.c.
+//
+//nolint:cyclop, gocyclo
+func Match(value, pattern string) bool {
+	var vi, pi, vp, pp = 0, 0, 0, 0
 
-	for i, c := range pattern {
-		if c == '*' {
-			vi, pi = i, i
-			break
-		}
-		if i >= len(value) {
-			break
-		}
-		if pattern[i] != value[i] {
+	for vi < len(value) && (pi >= len(pattern) || pattern[pi] != '*') {
+		if pi >= len(pattern) || value[vi] != pattern[pi] {
 			return false
 		}
+
+		vi++
+		pi++
 	}
-	for vi < len(value) && pi < len(pattern) {
-		if pattern[pi] == '*' {
+
+	for vi < len(value) {
+		switch {
+		case pi < len(pattern) && pattern[pi] == '*':
 			pi++
 			if pi >= len(pattern) {
 				return true
 			}
+
 			pp, vp = pi, vi+1
-		} else if value[vi] == pattern[pi] {
+		case pi < len(pattern) && value[vi] == pattern[pi]:
 			pi++
 			vi++
-		} else {
+		default:
 			pi = pp
 			vi = vp
 			vp++
-		}
-		if pi >= len(pattern) && vi < len(value) {
-			pi = pp
-			vi = vp
-			vp++
-		}
-	}
-	if vi < len(value) {
-		return len(pattern) > 0 && pattern[len(pattern)-1] == '*'
-	}
-	for ; pi < len(pattern); pi++ {
-		if pattern[pi] != '*' {
-			break
 		}
 	}
 
-	return pi >= len(pattern)
+	for pi < len(pattern) && pattern[pi] == '*' {
+		pi++
+	}
+
+	return pi == len(pattern)
 }
