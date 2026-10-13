@@ -91,8 +91,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 }
 
 void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
-		zbx_uint64_t *userid, int *report_time, unsigned char *period,
-		zbx_vector_ptr_pair_t *params)
+		zbx_uint64_t *userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params)
 {
 	int		params_num;
 	zbx_uint32_t	len;
@@ -501,8 +500,7 @@ void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, st
 		goto out;
 	}
 
-	size = report_serialize_test_report(&data, name, dashboardid, user->userid, report_time, period,
-			&params);
+	size = report_serialize_test_report(&data, name, dashboardid, user->userid, report_time, period, &params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,
 			SEC_PER_MIN, data, size, &response, &error))
