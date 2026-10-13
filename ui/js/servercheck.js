@@ -105,6 +105,27 @@ jQuery(function($) {
 		},
 
 		updateWidth: function() {
+			const split_view = document.querySelector('body > z-split-view');
+
+			if (split_view) {
+				let width_modifier = 20;
+
+				const rect = split_view.getBoundingClientRect();
+
+				const wrapper = split_view.querySelector(':scope > .wrapper');
+
+				if (wrapper.scrollHeight > wrapper.clientHeight) {
+					width_modifier += 15;
+				}
+
+				this.$elem.css({
+					left: rect.left + 10,
+					width: rect.width - width_modifier,
+				});
+
+				return;
+			}
+
 			const wrapper_rect = document.querySelector('main').getBoundingClientRect();
 
 			this.$elem.css({
