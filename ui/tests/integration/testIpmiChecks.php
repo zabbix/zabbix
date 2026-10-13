@@ -26,6 +26,8 @@ class testIpmiChecks extends CIntegrationTest {
 	// Dedicated simulator for testIpmiChecks_reconnect(), which kills and restarts it mid-session - a separate
 	// instance keeps that from disturbing every other host's connection.
 	const SIM_RECONNECT_IP = '127.0.11.6';
+	// Dedicated simulator for testIpmiChecks_discoveryConnectionLoss(), killed mid-session as well.
+	const SIM_DISCOVERY_DROP_IP = '127.0.11.7';
 	const SIM_USERNAME = 'zbxipmi';
 	const SIM_PASSWORD = 'zbxipmipw';
 	const SIM_BMC_NAME = 'zbxtest';
@@ -86,6 +88,8 @@ class testIpmiChecks extends CIntegrationTest {
 	// poll of them keeps an IPMI poller busy for several seconds.
 	const HOST_BADPASS = 'ipmi-badpass';
 	const HOST_CLOSEDPORT = 'ipmi-closedport';
+	// Only has a discovery item, so that discovery is always the first request after its BMC is killed.
+	const HOST_DISCOVERY_DROP = 'ipmi-discovery-drop';
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -383,6 +387,7 @@ class testIpmiChecks extends CIntegrationTest {
 	public function prepareData() {
 		self::ipmiSimStart(self::SIM_IP);
 		self::ipmiSimStart(self::SIM_RECONNECT_IP);
+		self::ipmiSimStart(self::SIM_DISCOVERY_DROP_IP);
 
 		do {
 			$closed_port = self::freeUdpPort();
@@ -539,6 +544,23 @@ class testIpmiChecks extends CIntegrationTest {
 				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
 				'ipmi_username' => self::SIM_USERNAME,
 				'ipmi_password' => self::SIM_PASSWORD
+			],
+			[
+				'host' => self::HOST_DISCOVERY_DROP,
+				'interfaces' => [[
+					'type' => INTERFACE_TYPE_IPMI,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
+					'ip' => self::SIM_DISCOVERY_DROP_IP,
+					'dns' => '',
+					'port' => (string) self::simPort()
+				]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'status' => HOST_STATUS_MONITORED,
+				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
+				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
+				'ipmi_username' => self::SIM_USERNAME,
+				'ipmi_password' => self::SIM_PASSWORD
 			]
 		];
 
@@ -627,7 +649,8 @@ class testIpmiChecks extends CIntegrationTest {
 			['host' => self::HOST_ANON, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
 			['host' => self::HOST_ALTAUTH, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
 			['host' => self::HOST_BADPASS, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
-			['host' => self::HOST_CLOSEDPORT, 'key' => 'ipmi.temp', 'sensor' => 'Temp']
+			['host' => self::HOST_CLOSEDPORT, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
+			['host' => self::HOST_DISCOVERY_DROP, 'key' => 'ipmi.get', 'sensor' => '']
 		];
 
 		$item_data = [];
@@ -1859,6 +1882,50 @@ class testIpmiChecks extends CIntegrationTest {
 		});
 
 		return $response['result'][0];
+	}
+
+	/**
+	 * When the BMC connection drops while discovery reads the sensors one by one, OpenIPMI closes the domain and
+	 * deletes every sensor in the middle of the loop. Discovery must then fail with a network error - returning
+	 * the sensors read so far (or none) as a successful value would make LLD treat all the others as lost.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_discoveryConnectionLoss(): void {
+		$item = $this->waitForItem(self::HOST_DISCOVERY_DROP.':ipmi.get', function(array $item) {
+			$json = ($item['state'] == ITEM_STATE_NORMAL) ? json_decode($item['lastvalue'], true) : null;
+
+			return (is_array($json) && $json !== []) ? true : 'waiting for discovery, got state:'.$item['state'].
+				' value:"'.$item['lastvalue'].'" error:"'.$item['error'].'"';
+		}, 60);
+		$sensor_count = count(json_decode($item['lastvalue'], true));
+
+		$drop_clock = time();
+		self::ipmiSimStop(self::SIM_DISCOVERY_DROP_IP);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'IPMI agent item "ipmi.get" on host "'.
+				self::HOST_DISCOVERY_DROP.'" failed: first network error', true, 90, 1
+		);
+
+		// Values are written to history asynchronously and none at all is expected, so there is nothing to poll for.
+		sleep(3);
+
+		$response = $this->call('history.get', [
+			'output' => ['clock', 'value'],
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [self::$itemids[self::HOST_DISCOVERY_DROP.':ipmi.get']],
+			'time_from' => $drop_clock + 1
+		]);
+
+		foreach ($response['result'] as $value) {
+			$json = json_decode($value['value'], true);
+
+			$this->assertFalse(is_array($json) && count($json) < $sensor_count,
+					'Discovery returned '.count($json).' of '.$sensor_count.' sensors as a successful value after the '.
+					'BMC connection was lost: '.$value['value']
+			);
+		}
 	}
 
 	/**
