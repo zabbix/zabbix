@@ -616,7 +616,6 @@ class testCalculatedExpression extends CIntegrationTest {
 	public function testCalculatedExpression_HistogramQuantile()
 	{
 		$itemids = [];
-		$trapperItemId;
 		// create a histogram bucket item (simulate with a trapper item for test)
 		foreach ([0.1, 0.5, 1, 2, 'Inf'] as $le) {
 			$trapperItemId = $this->createTrap('bucket['.$le.']');
@@ -645,15 +644,11 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, null, 1);
-		for ($i = 0; $i < 30; $i++) {
-			$history = $this->historyGet([$trapperItemId]);
-			if (count($history) === 5) {
-				break;
-			}
-			usleep(100000);
-		}
 
-		$history = $this->historyGet($itemids);
+		$history = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => $itemids,
+			'history' => ITEM_VALUE_TYPE_FLOAT
+		], 60, 1, static fn(array $response) => count($response['result']) === count($itemids));
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
@@ -803,26 +798,15 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEqualsWithDelta((float)self::DBL_MAX, (float)$this->getItemLastValue($itemid), 1e294);
 
 		self::stopComponent(self::COMPONENT_SERVER);
+		/* All values calculated before the restart have clock not later than the current second. */
+		$time_from = time() + 1;
 		self::startComponent(self::COMPONENT_SERVER);
 
-		for ($i = 0; $i < 100; $i++) {
-			$history = $this->historyGet([$itemid]);
-			if (count($history) === 2) {
-				break;
-			}
-			usleep(100000);
-		}
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 2,
-			'itemids' => [$itemid],
-			'history' => 0
+		$this->callUntilDataIsPresent('history.get', [
+			'itemids' => $itemid,
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'time_from' => $time_from
 		], 60, 1);
-
-		$history = $this->historyGet([$itemid]);
-		$values = $this->extractHistoryValues($history);
 
 		$this->assertEqualsWithDelta((float)self::DBL_MAX, (float)$this->getItemLastValue($itemid), 1e294);
 	}
