@@ -43,8 +43,35 @@ class testIpmiChecks extends CIntegrationTest {
 		7 => 1,		// discrete Dup: bit 0
 		8 => 33,	// threshold Dup
 		9 => 85,	// Hot
-		10 => 3		// MultiState: bits 0 and 1
+		10 => 3,	// MultiState: bits 0 and 1
+		11 => 40,	// NoScan
+		12 => 1,	// NoScanDisc: bit 0
+		14 => 5,	// InfThr: 10^(2*5)
+		15 => 20,	// Rate
+		16 => 30,	// MulUnit
+		18 => 251,	// Negative: -5 in 2s complement
+		19 => 25,	// Fraction: 25 * 5 * 10^-1
+		20 => 16,	// SixteenCharIdStr
+		21 => 7		// Masked: bits 0-2, only bits 0 and 1 are readable
 	];
+
+	// "Temp" sensor number, see self::SIM_SENSOR_VALUES.
+	const SIM_SENSOR_TEMP = 1;
+
+	// IPMI sensor types (IPMI v2.0 table 42-3) and event/reading type codes (table 42-1) of the fixture sensors, as
+	// reported by discovery.
+	const IPMI_SENSOR_TYPE_TEMPERATURE = 0x01;
+	const IPMI_SENSOR_TYPE_ENTITY_PRESENCE = 0x25;
+	const IPMI_READING_TYPE_THRESHOLD = 0x01;
+	const IPMI_READING_TYPE_SENSOR_SPECIFIC = 0x6f;
+
+	// Threshold sensor state bits, OpenIPMI's enum ipmi_thresh_e.
+	const IPMI_UPPER_NON_CRITICAL = 3;
+	const IPMI_UPPER_CRITICAL = 4;
+
+	// Discrete state bits of an entity presence sensor (IPMI v2.0 table 42-3, sensor type 0x25).
+	const IPMI_ENTITY_PRESENT = 0x01;
+	const IPMI_ENTITY_ABSENT = 0x02;
 
 	const ITEM_DELAY = '1s';
 
@@ -52,6 +79,13 @@ class testIpmiChecks extends CIntegrationTest {
 	const HOST_MACRO = 'ipmi-macro';
 	const HOST_BADPORT = 'ipmi-badport';
 	const HOST_RECONNECT = 'ipmi-reconnect';
+	// Same BMC as HOST_NORMAL, but other credentials - each gets its own zbx_ipmi_host_t (and OpenIPMI domain).
+	const HOST_ANON = 'ipmi-anon';
+	const HOST_ALTAUTH = 'ipmi-altauth';
+	// Connection failures, created disabled and only enabled by testIpmiChecks_connectionFailure(), since every
+	// poll of them keeps an IPMI poller busy for several seconds.
+	const HOST_BADPASS = 'ipmi-badpass';
+	const HOST_CLOSEDPORT = 'ipmi-closedport';
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -110,19 +144,30 @@ class testIpmiChecks extends CIntegrationTest {
 	 */
 	private static function simPort(): int {
 		if (self::$sim_port === null) {
-			$socket = @stream_socket_server('udp://0.0.0.0:0', $errno, $errstr, STREAM_SERVER_BIND);
-
-			if ($socket === false) {
-				throw new Exception('Cannot obtain a free UDP port for ipmi_sim: '.$errstr);
-			}
-
-			$name = (string) stream_socket_get_name($socket, false);
-			fclose($socket);
-
-			self::$sim_port = (int) substr($name, strrpos($name, ':') + 1);
+			self::$sim_port = self::freeUdpPort();
 		}
 
 		return self::$sim_port;
+	}
+
+	/**
+	 * A UDP port that is free on every address at the time of the call.
+	 *
+	 * @throws Exception  if no port can be obtained
+	 *
+	 * @return int
+	 */
+	private static function freeUdpPort(): int {
+		$socket = @stream_socket_server('udp://0.0.0.0:0', $errno, $errstr, STREAM_SERVER_BIND);
+
+		if ($socket === false) {
+			throw new Exception('Cannot obtain a free UDP port: '.$errstr);
+		}
+
+		$name = (string) stream_socket_get_name($socket, false);
+		fclose($socket);
+
+		return (int) substr($name, strrpos($name, ':') + 1);
 	}
 
 	/**
@@ -216,8 +261,9 @@ class testIpmiChecks extends CIntegrationTest {
 	 *
 	 * @param string $ip
 	 * @param array  $sensor_values  [sensor number => value] overriding self::SIM_SENSOR_VALUES
+	 * @param array  $drop_sdr_ids   id strings of the sensors whose SDRs are left out of the repository
 	 */
-	private static function ipmiSimStart(string $ip, array $sensor_values = []): void {
+	private static function ipmiSimStart(string $ip, array $sensor_values = [], array $drop_sdr_ids = []): void {
 		self::ipmiSimStop($ip);
 
 		$datadir = self::simDataDir();
@@ -240,9 +286,25 @@ class testIpmiChecks extends CIntegrationTest {
 		// on sdrcomp being installed (see the comment at the top of test.sdrs for how to regenerate it after
 		// editing test.sdrs - sdrcomp itself is only needed for that one-off regeneration, never at test run
 		// time; some environments ship ipmi_sim/ipmitool without the rest of the openipmi package).
-		if (!copy($datadir.'/test.bsdr', $mcdir.'/sdr.20.main')) {
+		$sdrs = @file($datadir.'/test.bsdr');
+
+		if ($sdrs === false) {
 			throw new Exception('Cannot read pre-compiled SDR fixture "'.$datadir.'/test.bsdr"');
 		}
+
+		// The repository is stored one SDR per line, ending with the id string preceded by its type/length byte,
+		// which is always escaped as "\xx" (8-bit ASCII type, 0xc0 | length).
+		$sdrs = array_filter($sdrs, function(string $sdr) use ($drop_sdr_ids) {
+			foreach ($drop_sdr_ids as $id) {
+				if (preg_match('/\\\\[0-9a-f]{2}'.preg_quote($id, '/').'$/', rtrim($sdr, "\n")) === 1) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+		file_put_contents($mcdir.'/sdr.20.main', implode('', $sdrs));
 
 		// lan.conf references the chassis-control hook script by an absolute path substituted here,
 		// since ipmi_sim rejects every Chassis Control (power/reset) command without one configured.
@@ -322,18 +384,23 @@ class testIpmiChecks extends CIntegrationTest {
 		self::ipmiSimStart(self::SIM_IP);
 		self::ipmiSimStart(self::SIM_RECONNECT_IP);
 
+		do {
+			$closed_port = self::freeUdpPort();
+		}
+		while ($closed_port == self::simPort());
+
 		$hosts = [
 			[
 				'host' => self::HOST_NORMAL,
 				'interfaces' => [[
 					'type' => INTERFACE_TYPE_IPMI,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => self::SIM_IP,
 					'dns' => '',
 					'port' => (string) self::simPort()
 				]],
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
 				'status' => HOST_STATUS_MONITORED,
 				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
 				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
@@ -344,13 +411,13 @@ class testIpmiChecks extends CIntegrationTest {
 				'host' => self::HOST_MACRO,
 				'interfaces' => [[
 					'type' => INTERFACE_TYPE_IPMI,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => self::SIM_IP,
 					'dns' => '',
 					'port' => '{$IPMI_TEST_PORT}'
 				]],
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
 				'status' => HOST_STATUS_MONITORED,
 				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
 				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
@@ -365,15 +432,15 @@ class testIpmiChecks extends CIntegrationTest {
 				'host' => self::HOST_BADPORT,
 				'interfaces' => [[
 					'type' => INTERFACE_TYPE_IPMI,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => self::SIM_IP,
 					'dns' => '',
 					// Non-numeric: exercises zbx_ipmi_port_expand_macros()'s "Invalid port value" branch.
 					// No network I/O is involved, so this cannot hang like a real connection failure would.
 					'port' => '{$IPMI_BAD_PORT}'
 				]],
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
 				'status' => HOST_STATUS_MONITORED,
 				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
 				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
@@ -388,14 +455,86 @@ class testIpmiChecks extends CIntegrationTest {
 				'host' => self::HOST_RECONNECT,
 				'interfaces' => [[
 					'type' => INTERFACE_TYPE_IPMI,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => self::SIM_RECONNECT_IP,
 					'dns' => '',
 					'port' => (string) self::simPort()
 				]],
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
 				'status' => HOST_STATUS_MONITORED,
+				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
+				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
+				'ipmi_username' => self::SIM_USERNAME,
+				'ipmi_password' => self::SIM_PASSWORD
+			],
+			[
+				// Anonymous user (lan.conf user 1) - no authentication, "user" privilege.
+				'host' => self::HOST_ANON,
+				'interfaces' => [[
+					'type' => INTERFACE_TYPE_IPMI,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
+					'ip' => self::SIM_IP,
+					'dns' => '',
+					'port' => (string) self::simPort()
+				]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'status' => HOST_STATUS_MONITORED,
+				'ipmi_authtype' => IPMI_AUTHTYPE_NONE,
+				'ipmi_privilege' => IPMI_PRIVILEGE_USER,
+				'ipmi_username' => '',
+				'ipmi_password' => ''
+			],
+			[
+				// Default authentication type (let OpenIPMI pick, zbx_init_ipmi_host()'s IPMI_AUTHTYPE_DEFAULT
+				// branch) and "operator" privilege.
+				'host' => self::HOST_ALTAUTH,
+				'interfaces' => [[
+					'type' => INTERFACE_TYPE_IPMI,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
+					'ip' => self::SIM_IP,
+					'dns' => '',
+					'port' => (string) self::simPort()
+				]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'status' => HOST_STATUS_MONITORED,
+				'ipmi_authtype' => IPMI_AUTHTYPE_DEFAULT,
+				'ipmi_privilege' => IPMI_PRIVILEGE_OPERATOR,
+				'ipmi_username' => self::SIM_USERNAME,
+				'ipmi_password' => self::SIM_PASSWORD
+			],
+			[
+				'host' => self::HOST_BADPASS,
+				'interfaces' => [[
+					'type' => INTERFACE_TYPE_IPMI,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
+					'ip' => self::SIM_IP,
+					'dns' => '',
+					'port' => (string) self::simPort()
+				]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
+				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
+				'ipmi_username' => self::SIM_USERNAME,
+				'ipmi_password' => 'wrong-password'
+			],
+			[
+				'host' => self::HOST_CLOSEDPORT,
+				'interfaces' => [[
+					'type' => INTERFACE_TYPE_IPMI,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
+					'ip' => self::SIM_IP,
+					'dns' => '',
+					// Nothing listens there.
+					'port' => (string) $closed_port
+				]],
+				'groups' => [['groupid' => 4]], // Zabbix servers
+				'status' => HOST_STATUS_NOT_MONITORED,
 				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
 				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
 				'ipmi_username' => self::SIM_USERNAME,
@@ -461,7 +600,34 @@ class testIpmiChecks extends CIntegrationTest {
 			// restarts - each kind is looked up through its own OpenIPMI id after the reconnect.
 			['host' => self::HOST_RECONNECT, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
 			['host' => self::HOST_RECONNECT, 'key' => 'ipmi.presence', 'sensor' => 'Presence'],
-			['host' => self::HOST_RECONNECT, 'key' => 'ipmi.power', 'sensor' => 'power']
+			['host' => self::HOST_RECONNECT, 'key' => 'ipmi.power', 'sensor' => 'power'],
+			// Discovery output is built from the sensor properties cached when OpenIPMI added the sensor - must be
+			// built from the recreated sensors after a reconnect.
+			['host' => self::HOST_RECONNECT, 'key' => 'ipmi.get', 'sensor' => ''],
+			// Reading type string cached from the sensor, used in the error message.
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.unsupported', 'sensor' => 'Unsupported'],
+			// OpenIPMI's standard "reset" control (lib/chassis.c) is settable, but not readable - exercises the
+			// readability cached from the control.
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.reset', 'sensor' => 'reset'],
+			// Control by its full name (entity 23.1 is OpenIPMI's chassis entity), see
+			// zbx_get_ipmi_control_by_full_name().
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.power.byname', 'sensor' => 'name:(23.1).power'],
+			// Readings flagged "scanning disabled".
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.noscan', 'sensor' => 'NoScan'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.noscandisc', 'sensor' => 'NoScanDisc'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.negative', 'sensor' => 'Negative'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.fraction', 'sensor' => 'Fraction'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.masked', 'sensor' => 'Masked'],
+			// Longest possible sensor id, and ids differing from it by one character at the end.
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.longid', 'sensor' => 'SixteenCharIdStr'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.longid.shorter', 'sensor' => 'SixteenCharIdSt'],
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.longid.longer', 'sensor' => 'SixteenCharIdStrX'],
+			// Event-only sensors are not readable and must never be added.
+			['host' => self::HOST_NORMAL, 'key' => 'ipmi.eventonly', 'sensor' => 'EventOnly'],
+			['host' => self::HOST_ANON, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
+			['host' => self::HOST_ALTAUTH, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
+			['host' => self::HOST_BADPASS, 'key' => 'ipmi.temp', 'sensor' => 'Temp'],
+			['host' => self::HOST_CLOSEDPORT, 'key' => 'ipmi.temp', 'sensor' => 'Temp']
 		];
 
 		$item_data = [];
@@ -480,7 +646,7 @@ class testIpmiChecks extends CIntegrationTest {
 
 		// Discrete sensor values must be stored as unsigned, not float.
 		foreach ($item_data as &$data) {
-			if (in_array($data['key_'], ['ipmi.presence', 'ipmi.multistate'])) {
+			if (in_array($data['key_'], ['ipmi.presence', 'ipmi.multistate', 'ipmi.noscandisc', 'ipmi.masked'])) {
 				$data['value_type'] = ITEM_VALUE_TYPE_UINT64;
 			}
 		}
@@ -567,7 +733,10 @@ class testIpmiChecks extends CIntegrationTest {
 				'StartIPMIPollers' => 2,
 				// Retry quickly after testIpmiChecks_reconnect() drops its BMC, instead of the default 15s/60s.
 				'UnreachableDelay' => 1,
-				'UnavailableDelay' => 5
+				'UnavailableDelay' => 5,
+				// Make testIpmiChecks_connectionFailure() interfaces unavailable (which is when the error is stored)
+				// sooner than the default 45s.
+				'UnreachablePeriod' => 10
 			]
 		];
 	}
@@ -679,7 +848,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
 				'ipmi.presence is unexpectedly unsupported: '.$item['error']
 		);
-		$this->assertEquals(1, (int) $item['lastvalue'], 'ipmi.presence bit 0 should be asserted');
+		$this->assertEquals(self::IPMI_ENTITY_PRESENT, (int) $item['lastvalue'], 'ipmi.presence should be present');
 	}
 
 	/**
@@ -968,11 +1137,12 @@ class testIpmiChecks extends CIntegrationTest {
 	 * Discovery entries whose "id" (the bare SDR id string) is exactly $id.
 	 *
 	 * @param string $id
+	 * @param string $host
 	 *
 	 * @return array  [entries, raw discovery value]
 	 */
-	private function getDiscoveryEntriesById(string $id): array {
-		$discovery = $this->getItemResult(self::HOST_NORMAL.':ipmi.get');
+	private function getDiscoveryEntriesById(string $id, string $host = self::HOST_NORMAL): array {
+		$discovery = $this->getItemResult($host.':ipmi.get');
 		$json = json_decode($discovery['lastvalue'], true);
 		$this->assertIsArray($json, 'ipmi.get did not return a JSON array: '.$discovery['lastvalue']);
 
@@ -1026,8 +1196,9 @@ class testIpmiChecks extends CIntegrationTest {
 		$this->assertCount(1, $entries, 'Expected exactly one "Hot" discovery entry: '.$raw);
 		$entry = $entries[0];
 
-		// Bits are IPMI_UPPER_NON_CRITICAL (3) and IPMI_UPPER_CRITICAL (4), but not IPMI_UPPER_NON_RECOVERABLE.
-		$this->assertEquals((1 << 3) | (1 << 4), $entry['state']['state'],
+		// Upper non-critical and upper critical, but not upper non-recoverable.
+		$this->assertEquals((1 << self::IPMI_UPPER_NON_CRITICAL) | (1 << self::IPMI_UPPER_CRITICAL),
+				$entry['state']['state'],
 				'Unexpected threshold state for "Hot": '.json_encode($entry)
 		);
 		$this->assertSame('upper non-critical - out of range, upper critical - out of range',
@@ -1049,13 +1220,17 @@ class testIpmiChecks extends CIntegrationTest {
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'], 'ipmi.multistate is unexpectedly unsupported: '.
 				$item['error']
 		);
-		$this->assertEquals(3, (int) $item['lastvalue'], 'ipmi.multistate should have bits 0 and 1 asserted');
+		$this->assertEquals(self::IPMI_ENTITY_PRESENT | self::IPMI_ENTITY_ABSENT, (int) $item['lastvalue'],
+				'ipmi.multistate should have bits 0 and 1 asserted'
+		);
 
 		[$entries, $raw] = $this->getDiscoveryEntriesById('MultiState');
 		$this->assertCount(1, $entries, 'Expected exactly one "MultiState" discovery entry: '.$raw);
 		$entry = $entries[0];
 
-		$this->assertEquals(3, $entry['state']['state'], 'Unexpected state for "MultiState": '.json_encode($entry));
+		$this->assertEquals(self::IPMI_ENTITY_PRESENT | self::IPMI_ENTITY_ABSENT, $entry['state']['state'],
+				'Unexpected state for "MultiState": '.json_encode($entry)
+		);
 		$this->assertSame('entity present, entity absent', $entry['state']['text'],
 				'Unexpected state text for "MultiState": '.json_encode($entry)
 		);
@@ -1088,8 +1263,7 @@ class testIpmiChecks extends CIntegrationTest {
 			return (int) $entry['reading']['type'];
 		}, $entries);
 		sort($reading_types);
-		// 0x01 - threshold, 0x6f - sensor-specific discrete.
-		$this->assertSame([0x01, 0x6f], $reading_types,
+		$this->assertSame([self::IPMI_READING_TYPE_THRESHOLD, self::IPMI_READING_TYPE_SENSOR_SPECIFIC], $reading_types,
 				'Expected one threshold and one sensor-specific "Dup" sensor: '.$raw
 		);
 	}
@@ -1102,7 +1276,10 @@ class testIpmiChecks extends CIntegrationTest {
 	public function sensorNotFoundDataProvider(): array {
 		return [
 			['ipmi.temp.lowercase'],
-			['ipmi.temp.nameprefix']
+			['ipmi.temp.nameprefix'],
+			['ipmi.longid.shorter'],
+			['ipmi.longid.longer'],
+			['ipmi.eventonly']
 		];
 	}
 
@@ -1149,6 +1326,14 @@ class testIpmiChecks extends CIntegrationTest {
 			['power', null],
 			// Tab separator, case-insensitive keyword.
 			["power\tON", null],
+			// A settable, but not readable control.
+			['reset', null],
+			// Control by its full name - zbx_set_ipmi_control_value()'s zbx_get_ipmi_control_by_full_name() branch.
+			['name:(23.1).power on', null],
+			// "name:" requires the full name, the bare control name must not match.
+			['name:power on', 'does not exist'],
+			// "id:" prefix - same lookup as the bare control name.
+			['id:power on', null],
 			// Control names are matched case-sensitively.
 			['Power on', 'does not exist'],
 			// Longest control name zbx_parse_ipmi_command() accepts (ZBX_ITEM_IPMI_SENSOR_LEN) - parsed fine,
@@ -1251,6 +1436,412 @@ class testIpmiChecks extends CIntegrationTest {
 	}
 
 	/**
+	 * @return array<int, array>
+	 */
+	public function sensorValueDataProvider(): array {
+		// [item key, expected value]
+		return [
+			// Negative and fractional readings - get_value_ipmi() formats the double OpenIPMI converted.
+			['ipmi.negative', -5],
+			['ipmi.fraction', 12.5],
+			// Longest possible sensor id - zbx_get_sensor_id()/zbx_sensor_id_to_str() buffers.
+			['ipmi.longid', 16],
+			// Bits 0-2 are asserted, but bit 2 is not readable - zbx_got_discrete_states_cb() must only take
+			// the bits ipmi_sensor_discrete_event_readable() allows.
+			['ipmi.masked', self::IPMI_ENTITY_PRESENT | self::IPMI_ENTITY_ABSENT]
+		];
+	}
+
+	/**
+	 * @dataProvider sensorValueDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_sensorValue(string $key, float $expected): void {
+		$item = $this->getItemResult(self::HOST_NORMAL.':'.$key);
+
+		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'], $key.' is unexpectedly unsupported: '.$item['error']);
+		$this->assertEqualsWithDelta($expected, (float) $item['lastvalue'], abs($expected) * 1e-9 + 0.001,
+				$key.' value mismatch'
+		);
+	}
+
+	/**
+	 * @return array<int, array>
+	 */
+	public function itemErrorDataProvider(): array {
+		// [item key, expected error]
+		return [
+			// The reading type string is the one cached when the sensor was added.
+			['ipmi.unsupported', 'Cannot read sensor "Unsupported". IPMI reading type "invalid" is not supported'],
+			// Control readability is cached when the control is added.
+			['ipmi.reset', 'control is not readable'],
+			// Readings flagged "scanning disabled", threshold and discrete.
+			['ipmi.noscan', 'sensor data is not available'],
+			['ipmi.noscandisc', 'sensor data is not available']
+		];
+	}
+
+	/**
+	 * Sensors and controls that exist, but cannot be read.
+	 *
+	 * @dataProvider itemErrorDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_itemError(string $key, string $expected_error): void {
+		$item = $this->getItemResult(self::HOST_NORMAL.':'.$key);
+
+		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'], $key.' should be unsupported, got value: '.
+				$item['lastvalue']
+		);
+		$this->assertSame($expected_error, $item['error'], 'Unexpected error for '.$key);
+	}
+
+	/**
+	 * "name:" prefix on a control - zbx_get_ipmi_control_by_full_name() success path.
+	 *
+	 * @depends testIpmiChecks_powerControlRead
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_controlByFullName(): void {
+		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.power.byname');
+
+		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'], 'ipmi.power.byname is unexpectedly unsupported: '.
+				$item['error']
+		);
+		$this->assertIsNumeric($item['lastvalue'], 'ipmi.power.byname did not return a numeric value');
+	}
+
+	/**
+	 * Single discovery entry with the given id.
+	 *
+	 * @param string $id
+	 * @param string $host
+	 *
+	 * @return array
+	 */
+	private function getDiscoveryEntry(string $id, string $host = self::HOST_NORMAL): array {
+		[$entries, $raw] = $this->getDiscoveryEntriesById($id, $host);
+		$this->assertCount(1, $entries, 'Expected exactly one "'.$id.'" discovery entry: '.$raw);
+
+		return $entries[0];
+	}
+
+	/**
+	 * Sensor properties reported by discovery - type, reading type, units and state names are cached when the
+	 * sensor is added, since the OpenIPMI sensor pointer is not valid outside of callbacks.
+	 *
+	 * @depends testIpmiChecks_discovery
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_discoveryProperties(): void {
+		$temp = $this->getDiscoveryEntry('Temp');
+		$this->assertEquals(['type' => self::IPMI_SENSOR_TYPE_TEMPERATURE, 'text' => 'temperature'], $temp['sensor'],
+				json_encode($temp)
+		);
+		$this->assertEquals(['type' => self::IPMI_READING_TYPE_THRESHOLD, 'text' => 'threshold'], $temp['reading'],
+				json_encode($temp)
+		);
+		$this->assertSame('C', $temp['units'], json_encode($temp));
+		$this->assertEqualsWithDelta(50, $temp['value'], 0.001, json_encode($temp));
+
+		$presence = $this->getDiscoveryEntry('Presence');
+		$this->assertEquals(['type' => self::IPMI_SENSOR_TYPE_ENTITY_PRESENCE, 'text' => 'entity_presence'],
+				$presence['sensor'], json_encode($presence)
+		);
+		$this->assertEquals(['type' => self::IPMI_READING_TYPE_SENSOR_SPECIFIC, 'text' => 'sensor specific'],
+				$presence['reading'], json_encode($presence)
+		);
+		$this->assertEquals(['state' => self::IPMI_ENTITY_PRESENT, 'text' => 'entity present'], $presence['state'],
+				json_encode($presence)
+		);
+		$this->assertArrayNotHasKey('units', $presence, json_encode($presence));
+		$this->assertArrayNotHasKey('threshold', $presence, json_encode($presence));
+
+		// Bit 2 is asserted, but not readable - neither in the state nor in its text.
+		$masked = $this->getDiscoveryEntry('Masked');
+		$this->assertEquals(['state' => self::IPMI_ENTITY_PRESENT | self::IPMI_ENTITY_ABSENT,
+			'text' => 'entity present, entity absent'
+		], $masked['state'],
+				json_encode($masked)
+		);
+
+		// Rate unit, and the other "base OP modifier" operator than "WattsHour" (see testIpmiChecks_discovery()).
+		$rate = $this->getDiscoveryEntry('Rate');
+		$this->assertSame('C/sec', $rate['units'], json_encode($rate));
+		$mul = $this->getDiscoveryEntry('MulUnit');
+		$wph = $this->getDiscoveryEntry('WattsHour');
+		$this->assertNotSame($wph['units'], $mul['units'], json_encode([$wph, $mul]));
+		$this->assertSame(['*', '/'], [strpbrk($wph['units'], '*/')[0], strpbrk($mul['units'], '*/')[0]],
+				json_encode([$wph, $mul])
+		);
+
+		// An infinite threshold is left out, a finite one of the same sensor is kept.
+		$inf = $this->getDiscoveryEntry('InfThr');
+		$this->assertEquals(['lower' => ['non_crit' => 1], 'upper' => []], $inf['threshold'], json_encode($inf));
+		$this->assertEqualsWithDelta(1e10, $inf['value'], 1, json_encode($inf));
+
+		$this->assertEqualsWithDelta(-5, $this->getDiscoveryEntry('Negative')['value'], 0.001);
+		$this->assertEqualsWithDelta(12.5, $this->getDiscoveryEntry('Fraction')['value'], 0.001);
+		$this->assertEqualsWithDelta(16, $this->getDiscoveryEntry('SixteenCharIdStr')['value'], 0.001);
+
+		// Readings with scanning disabled, event-only sensors (never added) and unsupported reading types are
+		// left out.
+		foreach (['NoScan', 'NoScanDisc', 'EventOnly', 'Unsupported'] as $id) {
+			[$entries, $raw] = $this->getDiscoveryEntriesById($id);
+			$this->assertSame([], $entries, '"'.$id.'" should not be discovered: '.$raw);
+		}
+
+		// Every readable, supported sensor of the fixture, each once - "Dup" twice.
+		[, $raw] = $this->getDiscoveryEntriesById('');
+		$ids = array_count_values(array_column(json_decode($raw, true), 'id'));
+		ksort($ids);
+		$this->assertSame(['Dup' => 2, 'Fraction' => 1, 'Hot' => 1, 'InfThr' => 1, 'Masked' => 1,
+			'MulUnit' => 1, 'MultiState' => 1, 'Negative' => 1, 'NoThresh' => 1, 'Percent' => 1, 'Presence' => 1,
+			'Rate' => 1, 'SixteenCharIdStr' => 1, 'Temp' => 1, 'WattsHour' => 1
+		], $ids, 'Unexpected discovered sensors: '.$raw);
+	}
+
+	/**
+	 * Both "Dup" sensors have the same id string, so only their OpenIPMI sensor ids tell them apart when the
+	 * reading callbacks look them up - each must get its own value.
+	 *
+	 * @depends testIpmiChecks_duplicateSensorId
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_duplicateSensorIdValues(): void {
+		[$entries, $raw] = $this->getDiscoveryEntriesById('Dup');
+		$this->assertCount(2, $entries, 'Discovery should list both "Dup" sensors: '.$raw);
+
+		foreach ($entries as $entry) {
+			if ($entry['reading']['type'] == self::IPMI_READING_TYPE_THRESHOLD) {
+				$this->assertEqualsWithDelta(33, $entry['value'], 0.001, 'Threshold "Dup": '.$raw);
+				$this->assertSame('C', $entry['units'], 'Threshold "Dup": '.$raw);
+			}
+			else {
+				$this->assertEquals(['state' => self::IPMI_ENTITY_PRESENT, 'text' => 'entity present'], $entry['state'],
+						'Discrete "Dup": '.$raw
+				);
+			}
+		}
+	}
+
+	/**
+	 * @return array<int, array>
+	 */
+	public function credentialsDataProvider(): array {
+		return [
+			[self::HOST_ANON],
+			[self::HOST_ALTAUTH]
+		];
+	}
+
+	/**
+	 * Other credentials for the same BMC as HOST_NORMAL - a separate zbx_ipmi_host_t and OpenIPMI domain, whose
+	 * callbacks must be routed to it, not to another host of the same IPMI poller.
+	 *
+	 * @dataProvider credentialsDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_credentials(string $host): void {
+		$item = $this->getItemResult($host.':ipmi.temp');
+
+		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'], 'ipmi.temp on '.$host.' is unexpectedly unsupported: '.
+				$item['error']
+		);
+		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001);
+	}
+
+	/**
+	 * @return array<int, array>
+	 */
+	public function connectionFailureDataProvider(): array {
+		return [
+			[self::HOST_BADPASS],
+			[self::HOST_CLOSEDPORT]
+		];
+	}
+
+	/**
+	 * A BMC that rejects the credentials or does not answer at all: OpenIPMI reports the connection failure to
+	 * zbx_connection_change_cb(), which closes the domain - the item must fail with a network error (interface
+	 * deactivated, item state left as is), not become unsupported, and the IPMI poller must neither hang nor crash
+	 * when the domain of the same zbx_ipmi_host_t is reopened on the next poll.
+	 *
+	 * @dataProvider connectionFailureDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_connectionFailure(string $host): void {
+		$this->call('host.update', ['hostid' => self::$hostids[$host], 'status' => HOST_STATUS_MONITORED]);
+
+		try {
+			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+					'IPMI agent item "ipmi.temp" on host "'.$host.'" failed: first network error', true, 60, 1
+			);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+					'checks on host "'.$host.'": interface unavailable', true, 60, 1
+			);
+
+			$response = $this->callUntilDataIsPresent('hostinterface.get', [
+				'output' => ['available', 'error'],
+				'interfaceids' => [self::$interfaceids[$host]]
+			], 30, 1, function(array $response) {
+				$interface = $response['result'][0];
+
+				return ($interface['available'] == INTERFACE_AVAILABLE_FALSE && $interface['error'] !== '')
+					? true
+					: 'waiting for the interface to become unavailable, got: '.json_encode($interface);
+			});
+			$this->assertStringContainsStringIgnoringCase('cannot connect to IPMI host',
+					$response['result'][0]['error']
+			);
+
+			$item = $this->call('item.get', [
+				'output' => ['lastclock', 'state', 'error'],
+				'itemids' => [self::$itemids[$host.':ipmi.temp']]
+			])['result'][0];
+			$this->assertEquals(ITEM_STATE_NORMAL, $item['state'], 'A network error must not make the item '.
+					'unsupported: '.$item['error']
+			);
+			$this->assertEquals(0, $item['lastclock'], 'No value should have been collected');
+
+			// Setting a control fails the same way - zbx_set_ipmi_control_value() with the domain down.
+			if (CAPIHelper::getSessionId() === null) {
+				$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+			}
+
+			$response = CAPIHelper::call('script.execute', [
+				'scriptid' => self::$scriptids['power_on'],
+				'hostid' => self::$hostids[$host]
+			]);
+			$this->assertArrayHasKey('error', $response, 'script.execute("power on") on '.$host.' should fail: '.
+					json_encode($response)
+			);
+			$this->assertStringContainsStringIgnoringCase('cannot connect to IPMI host', $response['error']['data'],
+					json_encode($response['error'])
+			);
+
+			// The other hosts are still polled.
+			$start = time();
+			$this->waitForItem(self::HOST_NORMAL.':ipmi.temp', function(array $item) use ($start) {
+				return ($item['state'] == ITEM_STATE_NORMAL && $item['lastclock'] >= $start)
+					? true
+					: 'waiting for a fresh value, got state:'.$item['state'].' error:"'.$item['error'].'"';
+			}, 60);
+		}
+		finally {
+			$this->call('host.update', ['hostid' => self::$hostids[$host], 'status' => HOST_STATUS_NOT_MONITORED]);
+		}
+	}
+
+	/**
+	 * IPMI item test (frontend "Test" button) - values requested by a client instead of the IPMI manager's own
+	 * queue, against a host the IPMI pollers may not have seen yet.
+	 *
+	 * @return array<int, array>
+	 */
+	public function itemTestDataProvider(): array {
+		// [ipmi_sensor, expected value (null - error expected), expected error]
+		return [
+			['Temp', 50, null],
+			['Fraction', 12.5, null],
+			['Masked', 3, null],
+			['does-not-exist', null, 'does not exist'],
+			['reset', null, 'control is not readable'],
+			['NoScan', null, 'sensor data is not available']
+		];
+	}
+
+	/**
+	 * @dataProvider itemTestDataProvider
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_itemTest(string $sensor, ?float $expected, ?string $expected_error): void {
+		$result = $this->testIpmiItem($sensor);
+
+		if ($expected !== null) {
+			$this->assertArrayNotHasKey('error', $result['item'], 'Item test failed: '.json_encode($result));
+			$this->assertEqualsWithDelta($expected, (float) $result['item']['result'], 0.001, json_encode($result));
+		}
+		else {
+			$this->assertArrayHasKey('error', $result['item'], 'Item test should fail: '.json_encode($result));
+			$this->assertStringContainsString($expected_error, $result['item']['error'], json_encode($result));
+		}
+	}
+
+	/**
+	 * Item test of "ipmi.get" (discovery) - also exercises get_discovery_ipmi() through a client request.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testIpmiChecks_itemTestDiscovery(): void {
+		$result = $this->testIpmiItem('', 'ipmi.get', ITEM_VALUE_TYPE_TEXT);
+
+		$this->assertArrayNotHasKey('error', $result['item'], 'Item test failed: '.json_encode($result));
+		$json = json_decode($result['item']['result'], true);
+		$this->assertIsArray($json, 'Not a JSON array: '.$result['item']['result']);
+		$this->assertContains('Temp', array_column($json, 'id'), $result['item']['result']);
+	}
+
+	/**
+	 * Send an "item.test" request for an IPMI item against the HOST_NORMAL BMC.
+	 *
+	 * @param string $sensor
+	 * @param string $key
+	 * @param int    $value_type
+	 *
+	 * @return array  "item.test" response data
+	 */
+	private function testIpmiItem(string $sensor, string $key = 'ipmi.test', int $value_type = ITEM_VALUE_TYPE_FLOAT):
+			array {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				30, 30, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
+		);
+
+		$result = $server->testItem([
+			'item' => [
+				'type' => ITEM_TYPE_IPMI,
+				'key' => $key,
+				'ipmi_sensor' => $sensor,
+				'value_type' => $value_type
+			],
+			'host' => [
+				'tls_connect' => HOST_ENCRYPTION_NONE,
+				'proxyid' => '0',
+				'ipmi_authtype' => IPMI_AUTHTYPE_MD5,
+				'ipmi_privilege' => IPMI_PRIVILEGE_ADMIN,
+				'ipmi_username' => self::SIM_USERNAME,
+				'ipmi_password' => self::SIM_PASSWORD,
+				'interface' => [
+					'address' => self::SIM_IP,
+					'port' => self::simPort(),
+					'useip' => INTERFACE_USE_IP,
+					'type' => INTERFACE_TYPE_IPMI
+				]
+			]
+		], CAPIHelper::getSessionId());
+
+		$this->assertIsArray($result, 'item.test failed: '.$server->getError());
+		$this->assertArrayHasKey('item', $result, json_encode($result));
+
+		return $result;
+	}
+
+	/**
 	 * Poll an item until $callback accepts it.
 	 *
 	 * @param string   $key       fully qualified "host:key" identifier used in self::$itemids
@@ -1271,7 +1862,7 @@ class testIpmiChecks extends CIntegrationTest {
 	}
 
 	/**
-	 * ZBX-25759: OpenIPMI sensor/control objects are only valid inside OpenIPMI callbacks. When the BMC connection
+	 * OpenIPMI sensor/control objects are only valid inside OpenIPMI callbacks. When the BMC connection
 	 * drops, OpenIPMI closes the domain and destroys every sensor and control (IPMI_DELETED), and recreates them
 	 * once the domain is reopened on the same zbx_ipmi_host_t. Everything Zabbix keeps between polls (sensor and
 	 * control lookups, readings, control setting, callback data) must survive that, so this kills the dedicated
@@ -1297,25 +1888,20 @@ class testIpmiChecks extends CIntegrationTest {
 
 		// Connection is up and all three kinds of checks work before the drop.
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(50), 30);
-		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(1), 30);
+		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(self::IPMI_ENTITY_PRESENT), 30);
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.power', function(array $item) {
 			return ($item['state'] == ITEM_STATE_NORMAL && $item['lastclock'] != 0) ? true : 'no power reading yet';
 		}, 30);
+		$discovery_before = $this->waitForReconnectDiscovery(50);
 
-		self::ipmiSimStop(self::SIM_RECONNECT_IP);
-
-		$lines = [];
-		foreach (['ipmi.temp', 'ipmi.presence', 'ipmi.power'] as $key) {
-			$lines[] = 'IPMI agent item "'.$key.'" on host "'.self::HOST_RECONNECT.'" failed: first network error';
-		}
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $lines, true, 90, 1);
+		$this->dropReconnectBmc();
 
 		// Same BMC, different "Temp" reading - proves the value below is read through the recreated sensor
 		// rather than left over from before the drop.
-		self::ipmiSimStart(self::SIM_RECONNECT_IP, [1 => 60]);
+		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_SENSOR_TEMP => 60]);
 
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(60), 120);
-		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(1), 60);
+		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(self::IPMI_ENTITY_PRESENT), 60);
 
 		$power_clock = time();
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.power', function(array $item) use ($power_clock) {
@@ -1340,5 +1926,95 @@ class testIpmiChecks extends CIntegrationTest {
 		$this->assertEquals('success', $response['result']['response'],
 				'script.execute("power on") after reconnect did not report success: '.json_encode($response['result'])
 		);
+
+		// Discovery is built from the sensor properties cached when the recreated sensors were added: the same
+		// sensors, each once (none left over from before the drop), with the same properties and the new value.
+		$discovery_after = $this->waitForReconnectDiscovery(60);
+		$this->assertSame(self::discoverySummary($discovery_before), self::discoverySummary($discovery_after),
+				'Discovery after the reconnect differs from the one before it'
+		);
+
+		// The BMC comes back without the "Presence" sensor - its entry must be gone with the deleted sensor, not
+		// left pointing at a sensor id OpenIPMI no longer knows (which would fail to read instead).
+		$this->dropReconnectBmc();
+		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_SENSOR_TEMP => 65], ['Presence']);
+
+		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(65), 120);
+		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', function(array $item) {
+			return ($item['state'] == ITEM_STATE_NOTSUPPORTED && strpos($item['error'], 'does not exist') !== false)
+				? true
+				: 'waiting for "Presence" to disappear, got state:'.$item['state'].' error:"'.$item['error'].'"';
+		}, 60);
+
+		$discovery_reduced = $this->waitForReconnectDiscovery(65);
+		$expected = self::discoverySummary($discovery_before);
+		unset($expected['Presence']);
+		$this->assertSame($expected, self::discoverySummary($discovery_reduced),
+				'Discovery after the "Presence" sensor was removed is unexpected'
+		);
+	}
+
+	/**
+	 * Stop the testIpmiChecks_reconnect() BMC and wait until the server notices.
+	 */
+	private function dropReconnectBmc(): void {
+		self::ipmiSimStop(self::SIM_RECONNECT_IP);
+
+		$lines = [];
+		foreach (['ipmi.temp', 'ipmi.presence', 'ipmi.power', 'ipmi.get'] as $key) {
+			$lines[] = 'IPMI agent item "'.$key.'" on host "'.self::HOST_RECONNECT.'" failed: first network error';
+		}
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $lines, true, 90, 1);
+	}
+
+	/**
+	 * Wait for a discovery value of HOST_RECONNECT reporting the given "Temp" reading.
+	 *
+	 * @param float $temp
+	 *
+	 * @return array  decoded discovery value
+	 */
+	private function waitForReconnectDiscovery(float $temp): array {
+		$item = $this->waitForItem(self::HOST_RECONNECT.':ipmi.get', function(array $item) use ($temp) {
+			$json = ($item['state'] == ITEM_STATE_NORMAL) ? json_decode($item['lastvalue'], true) : null;
+
+			if (is_array($json)) {
+				foreach ($json as $entry) {
+					if ($entry['id'] === 'Temp' && abs($entry['value'] - $temp) < 0.001) {
+						return true;
+					}
+				}
+			}
+
+			return 'waiting for discovery with "Temp" '.$temp.', got state:'.$item['state'].' value:"'.
+				$item['lastvalue'].'" error:"'.$item['error'].'"';
+		}, 120);
+
+		return json_decode($item['lastvalue'], true);
+	}
+
+	/**
+	 * Discovery entries without their readings, keyed by id - entries with the same id are listed together.
+	 *
+	 * @param array $discovery  decoded discovery value
+	 *
+	 * @return array
+	 */
+	private static function discoverySummary(array $discovery): array {
+		$summary = [];
+
+		foreach ($discovery as $entry) {
+			unset($entry['value']);
+			$summary[$entry['id']][] = json_encode($entry);
+		}
+
+		foreach ($summary as &$entries) {
+			sort($entries);
+		}
+		unset($entries);
+
+		ksort($summary);
+
+		return $summary;
 	}
 }

@@ -69,3 +69,57 @@ sensor_set_event_support 0x20 0 9 disable scanning none \
 sensor_add 0x20 0 10 37 0x6f poll 1000 file "__STATE_DIR__/sensor_10"
 sensor_set_event_support 0x20 0 10 enable scanning per-state \
 	000000000000011 000000000000011 000000000000011 000000000000011
+
+# Threshold (sensor number 11) and discrete (sensor number 12) sensors with scanning turned off once they have
+# been polled, matching the "NoScan" and "NoScanDisc" SDRs. Scanning is enabled first only so that ipmi_sim polls
+# the value file - a sensor never polled is answered with 0xCE instead of a reading flagged "scanning disabled".
+sensor_add 0x20 0 11 1 0x01 poll 1000 file "__STATE_DIR__/sensor_11"
+sensor_set_threshold 0x20 0 11 readable 111111 90 80 70 5 10 20
+sensor_set_event_support 0x20 0 11 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_set_event_support 0x20 0 11 disable no-scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_add 0x20 0 12 37 0x6f poll 1000 file "__STATE_DIR__/sensor_12"
+sensor_set_event_support 0x20 0 12 enable scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
+sensor_set_event_support 0x20 0 12 enable no-scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
+
+# Non-linear threshold sensor (sensor number 14), matching the "InfThr" SDR: only upper non-critical (raw 255,
+# converts to infinity) and lower non-critical (raw 0, converts to 1) are enabled.
+sensor_add 0x20 0 14 1 0x01 poll 1000 file "__STATE_DIR__/sensor_14"
+sensor_set_threshold 0x20 0 14 readable 001001 0 0 255 0 0 0
+sensor_set_event_support 0x20 0 14 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+
+# Threshold sensors without thresholds (sensor numbers 15, 16, 18, 19 and 20), matching the "Rate", "MulUnit",
+# "Negative", "Fraction" and "SixteenCharIdStr" SDRs.
+sensor_add 0x20 0 15 1 0x01 poll 1000 file "__STATE_DIR__/sensor_15"
+sensor_set_threshold 0x20 0 15 none 000000 0 0 0 0 0 0
+sensor_set_event_support 0x20 0 15 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_add 0x20 0 16 1 0x01 poll 1000 file "__STATE_DIR__/sensor_16"
+sensor_set_threshold 0x20 0 16 none 000000 0 0 0 0 0 0
+sensor_set_event_support 0x20 0 16 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_add 0x20 0 18 1 0x01 poll 1000 file "__STATE_DIR__/sensor_18"
+sensor_set_threshold 0x20 0 18 none 000000 0 0 0 0 0 0
+sensor_set_event_support 0x20 0 18 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_add 0x20 0 19 1 0x01 poll 1000 file "__STATE_DIR__/sensor_19"
+sensor_set_threshold 0x20 0 19 none 000000 0 0 0 0 0 0
+sensor_set_event_support 0x20 0 19 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+sensor_add 0x20 0 20 1 0x01 poll 1000 file "__STATE_DIR__/sensor_20"
+sensor_set_threshold 0x20 0 20 none 000000 0 0 0 0 0 0
+sensor_set_event_support 0x20 0 20 disable scanning none \
+	000000000000000 000000000000000 000000000000000 000000000000000
+
+# Event-only sensor (sensor number 17), matching the "EventOnly" SDR - never read.
+sensor_add 0x20 0 17 37 0x6f event-only
+
+# Discrete sensor with bits 0-2 asserted but only bits 0 and 1 readable (sensor number 21), matching the
+# "Masked" SDR.
+sensor_add 0x20 0 21 37 0x6f poll 1000 file "__STATE_DIR__/sensor_21"
+sensor_set_event_support 0x20 0 21 enable scanning per-state \
+	000000000000011 000000000000011 000000000000011 000000000000011
