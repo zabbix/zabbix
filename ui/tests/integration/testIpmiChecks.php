@@ -26,11 +26,25 @@ class testIpmiChecks extends CIntegrationTest {
 	// Dedicated simulator for testIpmiChecks_reconnect(), which kills and restarts it mid-session - a separate
 	// instance keeps that from disturbing every other host's connection.
 	const SIM_RECONNECT_IP = '127.0.11.6';
-	const SIM_PORT = 16230;
 	const SIM_USERNAME = 'zbxipmi';
 	const SIM_PASSWORD = 'zbxipmipw';
 	const SIM_BMC_NAME = 'zbxtest';
 	const SIM_DATA_DIR_REL_PATH = 'data/ipmi_sim';
+
+	// Initial readings of the polled simulator sensors, by sensor number (see data/ipmi_sim/cmds.emu). Discrete
+	// sensor values are bitmasks of asserted states.
+	const SIM_SENSOR_VALUES = [
+		1 => 50,	// Temp
+		2 => 1,		// Presence: bit 0
+		3 => 42,	// NoThresh
+		4 => 1,		// Unsupported
+		5 => 75,	// Percent
+		6 => 30,	// WattsHour
+		7 => 1,		// discrete Dup: bit 0
+		8 => 33,	// threshold Dup
+		9 => 85,	// Hot
+		10 => 3		// MultiState: bits 0 and 1
+	];
 
 	const ITEM_DELAY = '1s';
 
@@ -44,6 +58,13 @@ class testIpmiChecks extends CIntegrationTest {
 	private static $scriptids = [];
 	private static $interfaceids = [];
 
+	// Per-run temporary directory, see simBaseDir().
+	private static $sim_base_dir = null;
+	// [address => PID] of the simulator instances started by this run.
+	private static $sim_pids = [];
+	// UDP port of every simulator instance of this run, see simPort().
+	private static $sim_port = null;
+
 	/**
 	 * Absolute path to the directory holding lan.conf/cmds.emu/test.sdrs.
 	 *
@@ -54,6 +75,57 @@ class testIpmiChecks extends CIntegrationTest {
 	}
 
 	/**
+	 * Absolute path to the temporary directory holding the state of every simulator instance of this run. It is
+	 * created on first use with the PID, time and a random suffix in its name, so that concurrent runs on the same
+	 * system never share it, and is removed by ipmiSimCleanup() - also at process exit, should the suite abort.
+	 *
+	 * @throws Exception  if the directory cannot be created
+	 *
+	 * @return string
+	 */
+	private static function simBaseDir(): string {
+		if (self::$sim_base_dir === null) {
+			$dir = sys_get_temp_dir().'/zbx_ipmi_sim_'.getmypid().'_'.time().'_'.bin2hex(random_bytes(4));
+
+			if (!mkdir($dir, 0700)) {
+				throw new Exception('Cannot create ipmi_sim base directory "'.$dir.'"');
+			}
+
+			self::$sim_base_dir = $dir;
+			register_shutdown_function([self::class, 'ipmiSimCleanup']);
+		}
+
+		return self::$sim_base_dir;
+	}
+
+	/**
+	 * UDP port all simulator instances of this run listen on. ipmi_sim binds its port with SO_REUSEADDR, so a
+	 * fixed port would let concurrent runs on the same system silently share it and answer each other's requests.
+	 * Instead a port that is free on every address is chosen once per run (kept across simulator restarts, as the
+	 * hosts' interfaces refer to it).
+	 *
+	 * @throws Exception  if no port can be obtained
+	 *
+	 * @return int
+	 */
+	private static function simPort(): int {
+		if (self::$sim_port === null) {
+			$socket = @stream_socket_server('udp://0.0.0.0:0', $errno, $errstr, STREAM_SERVER_BIND);
+
+			if ($socket === false) {
+				throw new Exception('Cannot obtain a free UDP port for ipmi_sim: '.$errstr);
+			}
+
+			$name = (string) stream_socket_get_name($socket, false);
+			fclose($socket);
+
+			self::$sim_port = (int) substr($name, strrpos($name, ':') + 1);
+		}
+
+		return self::$sim_port;
+	}
+
+	/**
 	 * Absolute path to the (ephemeral) ipmi_sim persistent state directory of a simulator instance.
 	 *
 	 * @param string $ip  address the instance listens on, one instance per address
@@ -61,7 +133,7 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @return string
 	 */
 	private static function simStateDir(string $ip): string {
-		return sys_get_temp_dir().'/zbx_ipmi_sim_'.str_replace('.', '_', $ip).'_state';
+		return self::simBaseDir().'/'.str_replace('.', '_', $ip);
 	}
 
 	/**
@@ -93,20 +165,59 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @param string $ip  simulator instance, see simStateDir()
 	 */
 	private static function ipmiSimStop(string $ip): void {
-		// Match on the (unique) state dir rather than the exact command line: ipmiSimStart() writes a
-		// resolved copy of lan.conf into the state dir, so the running process's "-c" argument does not
-		// point at data/ipmi_sim/lan.conf.
-		shell_exec('pkill -f '.escapeshellarg('ipmi_sim .* '.self::simStateDir($ip).'( |$)').' > /dev/null 2>&1');
-		usleep(300000);
+		if (!array_key_exists($ip, self::$sim_pids)) {
+			return;
+		}
+
+		// Only the process started by this run is signalled, never another run's simulator. Wait for it to exit,
+		// so that a restart on the same address and port does not race with it.
+		$pid = self::$sim_pids[$ip];
+		unset(self::$sim_pids[$ip]);
+
+		shell_exec('kill '.$pid.' > /dev/null 2>&1');
+
+		for ($i = 0; $i < 30; $i++) {
+			if (!self::isProcessAlive($pid)) {
+				return;
+			}
+
+			usleep(100000);
+		}
+
+		shell_exec('kill -9 '.$pid.' > /dev/null 2>&1');
+		usleep(100000);
+	}
+
+	/**
+	 * @param int $pid
+	 *
+	 * @return bool
+	 */
+	private static function isProcessAlive(int $pid): bool {
+		return trim((string) shell_exec('kill -0 '.$pid.' > /dev/null 2>&1 && echo alive')) === 'alive';
+	}
+
+	/**
+	 * Stop every simulator instance of this run and remove its temporary files. Safe to call more than once.
+	 */
+	public static function ipmiSimCleanup(): void {
+		foreach (array_keys(self::$sim_pids) as $ip) {
+			self::ipmiSimStop($ip);
+		}
+
+		if (self::$sim_base_dir !== null) {
+			shell_exec('rm -rf '.escapeshellarg(self::$sim_base_dir));
+			self::$sim_base_dir = null;
+		}
 	}
 
 	/**
 	 * Start (or restart from scratch) a simulator instance serving the data/ipmi_sim fixtures on $ip.
 	 *
 	 * @param string $ip
-	 * @param array  $cmds_replace  [search => replace] pairs applied to cmds.emu, e.g. to change sensor values
+	 * @param array  $sensor_values  [sensor number => value] overriding self::SIM_SENSOR_VALUES
 	 */
-	private static function ipmiSimStart(string $ip, array $cmds_replace = []): void {
+	private static function ipmiSimStart(string $ip, array $sensor_values = []): void {
 		self::ipmiSimStop($ip);
 
 		$datadir = self::simDataDir();
@@ -137,26 +248,49 @@ class testIpmiChecks extends CIntegrationTest {
 		// since ipmi_sim rejects every Chassis Control (power/reset) command without one configured.
 		$lanconf = $statedir.'/lan.conf';
 		$lanconf_contents = str_replace(
-				['__CHASSISCONTROL_SCRIPT__', self::SIM_IP],
-				[$datadir.'/chassiscontrol.sh', $ip],
+				['__CHASSISCONTROL_SCRIPT__', '__SIM_ADDR__', '__SIM_PORT__'],
+				[$datadir.'/chassiscontrol.sh', $ip, self::simPort()],
 				(string) file_get_contents($datadir.'/lan.conf')
 		);
 		file_put_contents($lanconf, $lanconf_contents);
 
+		// Every readable sensor is polled from a value file in the state directory, see data/ipmi_sim/cmds.emu.
+		foreach (array_replace(self::SIM_SENSOR_VALUES, $sensor_values) as $num => $value) {
+			file_put_contents($statedir.'/sensor_'.$num, $value."\n");
+		}
+
 		$cmds = $statedir.'/cmds.emu';
-		file_put_contents($cmds, strtr((string) file_get_contents($datadir.'/cmds.emu'), $cmds_replace));
+		file_put_contents($cmds,
+				str_replace('__STATE_DIR__', $statedir, (string) file_get_contents($datadir.'/cmds.emu'))
+		);
 
 		$cmd = 'ipmi_sim'.
 				' -c '.escapeshellarg($lanconf).
 				' -f '.escapeshellarg($cmds).
 				' -s '.escapeshellarg($statedir).
-				' -n < /dev/null > '.escapeshellarg($statedir.'/ipmi_sim.log').' 2>&1 &';
-		shell_exec($cmd);
+				' -n < /dev/null > '.escapeshellarg($statedir.'/ipmi_sim.log').' 2>&1 & echo $!';
+		$pid = (int) shell_exec($cmd);
+
+		if ($pid <= 0) {
+			throw new Exception('Cannot start ipmi_sim');
+		}
+
+		self::$sim_pids[$ip] = $pid;
 
 		for ($i = 0; $i < 50; $i++) {
-			$out = (string) shell_exec(self::ipmitoolCmd($ip, self::SIM_PORT).' mc info 2>&1');
+			// Make sure the answer below comes from the instance just started, e.g. not from a previous one
+			// still shutting down, while this one failed to start.
+			if (!self::isProcessAlive($pid)) {
+				unset(self::$sim_pids[$ip]);
 
-			if (strpos($out, 'Device ID') !== false) {
+				throw new Exception('ipmi_sim exited unexpectedly. Log: '.
+						(string) @file_get_contents($statedir.'/ipmi_sim.log')
+				);
+			}
+
+			$out = (string) shell_exec(self::ipmitoolCmd($ip, self::simPort()).' mc info 2>&1');
+
+			if (strpos($out, 'Device ID') !== false && self::isProcessAlive($pid)) {
 				return;
 			}
 
@@ -197,7 +331,7 @@ class testIpmiChecks extends CIntegrationTest {
 					'useip' => 1,
 					'ip' => self::SIM_IP,
 					'dns' => '',
-					'port' => (string) self::SIM_PORT
+					'port' => (string) self::simPort()
 				]],
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED,
@@ -224,7 +358,7 @@ class testIpmiChecks extends CIntegrationTest {
 				'ipmi_password' => self::SIM_PASSWORD,
 				'macros' => [[
 					'macro' => '{$IPMI_TEST_PORT}',
-					'value' => (string) self::SIM_PORT
+					'value' => (string) self::simPort()
 				]]
 			],
 			[
@@ -258,7 +392,7 @@ class testIpmiChecks extends CIntegrationTest {
 					'useip' => 1,
 					'ip' => self::SIM_RECONNECT_IP,
 					'dns' => '',
-					'port' => (string) self::SIM_PORT
+					'port' => (string) self::simPort()
 				]],
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED,
@@ -417,8 +551,7 @@ class testIpmiChecks extends CIntegrationTest {
 		self::$interfaceids = [];
 		self::$scriptids = [];
 
-		self::ipmiSimStop(self::SIM_IP);
-		self::ipmiSimStop(self::SIM_RECONNECT_IP);
+		self::ipmiSimCleanup();
 	}
 
 	/**
@@ -1179,9 +1312,7 @@ class testIpmiChecks extends CIntegrationTest {
 
 		// Same BMC, different "Temp" reading - proves the value below is read through the recreated sensor
 		// rather than left over from before the drop.
-		self::ipmiSimStart(self::SIM_RECONNECT_IP, [
-			"sensor_set_value 0x20 0 1 50 1\n" => "sensor_set_value 0x20 0 1 60 1\n"
-		]);
+		self::ipmiSimStart(self::SIM_RECONNECT_IP, [1 => 60]);
 
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(60), 120);
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(1), 60);
