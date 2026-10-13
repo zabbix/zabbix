@@ -425,6 +425,9 @@ static int	check_report_generation_access(const zbx_user_t *user)
 	if (USER_TYPE_ZABBIX_ADMIN > user->type)
 		return FAIL;
 
+	/* No super admin exception here. Any role, including a super admin role, can have the         */
+	/* "Manage scheduled reports" action disabled, and the frontend API then denies report.create, */
+	/* report.update and report.delete for that user. Report testing must be denied the same way.  */
 	if (SUCCEED != zbx_db_user_has_administration_actions_permissions(user, "actions.default_access",
 			"actions.manage_scheduled_reports"))
 	{
@@ -494,6 +497,11 @@ void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, st
 		goto out;
 	}
 
+	/* Super admins skip the sharing check. check_dashboard_access() only grants access to the   */
+	/* dashboard owner, public dashboards, and dashboards shared with the user or the user's     */
+	/* groups. The frontend applies those sharing rules only to Zabbix users and Zabbix admins,  */
+	/* so a super admin can see and pick any dashboard for a report, including private ones that */
+	/* are not shared with them. Running the check for super admins would reject such reports.   */
 	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != check_dashboard_access(user->userid, dashboardid))
 	{
 		error = zbx_strdup(error, "no access to dashboard");
