@@ -535,6 +535,8 @@
 
 			this.#selected_row_hash = null;
 
+			row_selected.focus();
+
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
