@@ -4,21 +4,28 @@ mc_setbmc 0x20
 mc_add 0x20 0 no-device-sdrs 0x23 9 8 0x9f 0x1291 0xf02 persist_sdr
 mc_enable 0x20
 
+# sensor_set_event_support uses the numeric "<events enable> <scanning> <event support>" form, as older ipmi_sim
+# versions (e.g. 2.0.19) do not understand the "enable scanning per-state" keywords. Those versions also leave
+# a sensor's scanning disabled unless set here, so it is enabled explicitly for threshold sensors as well
+# (events disabled, no event support), otherwise every reading fails.
+
 # Threshold temperature sensor (sensor number 1), matching the "Temp" SDR. Threshold values are listed
 # from upper non-recoverable down to lower non-critical.
 sensor_add 0x20 0 1 1 0x01
+sensor_set_event_support 0x20 0 1 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 1 readable 111111 90 80 70 5 10 20
 sensor_set_value 0x20 0 1 50 1
 
 # Discrete presence sensor (sensor number 2), matching the "Presence" SDR.
 sensor_add 0x20 0 2 37 0x6f
-sensor_set_event_support 0x20 0 2 enable scanning per-state \
+sensor_set_event_support 0x20 0 2 1 1 0 \
 	000000000000011 000000000000011 000000000000011 000000000000011
 sensor_set_bit 0x20 0 2 0 1 1
 
 # Threshold sensor with threshold access explicitly off (sensor number 3), matching
 # the "NoThresh" SDR.
 sensor_add 0x20 0 3 1 0x01
+sensor_set_event_support 0x20 0 3 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 3 none 000000 0 0 0 0 0 0
 sensor_set_value 0x20 0 3 42 0
 
@@ -29,34 +36,38 @@ sensor_set_value 0x20 0 4 1 0
 
 # Percentage threshold sensor (sensor number 5), matching the "Percent" SDR.
 sensor_add 0x20 0 5 1 0x01
+sensor_set_event_support 0x20 0 5 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 5 none 000000 0 0 0 0 0 0
 sensor_set_value 0x20 0 5 75 0
 
 # Base/modifier-unit threshold sensor (sensor number 6), matching the "WattsHour" SDR.
 sensor_add 0x20 0 6 1 0x01
+sensor_set_event_support 0x20 0 6 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 6 none 000000 0 0 0 0 0 0
 sensor_set_value 0x20 0 6 30 0
 
 # Discrete "Dup" sensor (sensor number 7), bit 0 asserted - reads as 1 if (wrongly) picked.
 sensor_add 0x20 0 7 37 0x6f
-sensor_set_event_support 0x20 0 7 enable scanning per-state \
+sensor_set_event_support 0x20 0 7 1 1 0 \
 	000000000000011 000000000000011 000000000000011 000000000000011
 sensor_set_bit 0x20 0 7 0 1 0
 
 # Threshold "Dup" sensor (sensor number 8) - the one an item with sensor "Dup" must read.
 sensor_add 0x20 0 8 1 0x01
+sensor_set_event_support 0x20 0 8 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 8 none 000000 0 0 0 0 0 0
 sensor_set_value 0x20 0 8 33 0
 
 # Out-of-range threshold sensor (sensor number 9), matching the "Hot" SDR: 85 is above
 # upper non-critical (70) and upper critical (80), below upper non-recoverable (90).
 sensor_add 0x20 0 9 1 0x01
+sensor_set_event_support 0x20 0 9 0 1 3 000000000000000 000000000000000 000000000000000 000000000000000
 sensor_set_threshold 0x20 0 9 readable 111111 90 80 70 5 10 20
 sensor_set_value 0x20 0 9 85 0
 
 # Discrete sensor with bits 0 and 1 both asserted (sensor number 10), matching the "MultiState" SDR.
 sensor_add 0x20 0 10 37 0x6f
-sensor_set_event_support 0x20 0 10 enable scanning per-state \
+sensor_set_event_support 0x20 0 10 1 1 0 \
 	000000000000011 000000000000011 000000000000011 000000000000011
 sensor_set_bit 0x20 0 10 0 1 0
 sensor_set_bit 0x20 0 10 1 1 0

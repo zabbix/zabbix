@@ -471,7 +471,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.temp');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.temp is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.temp is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001);
 	}
@@ -485,7 +485,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.temp.byid');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.temp.byid is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.temp.byid is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001, 'ipmi.temp.byid value mismatch');
 	}
@@ -530,7 +530,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.temp.byname');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.temp.byname ("name:'.$full_name.'") is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.temp.byname ("name:'.$full_name.'") is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001, 'ipmi.temp.byname value mismatch');
 	}
@@ -544,7 +544,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.presence');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.presence is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.presence is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertEquals(1, (int) $item['lastvalue'], 'ipmi.presence bit 0 should be asserted');
 	}
@@ -558,7 +558,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.get');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.get is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.get is unexpectedly unsupported: '.$item['error']
 		);
 
 		$json = json_decode($item['lastvalue'], true);
@@ -628,15 +628,23 @@ class testIpmiChecks extends CIntegrationTest {
 	*/
 
 	/**
+	 * The server is restarted for every test method while this host is polled all along, so the item state found
+	 * in the database at start may be left over from a previous server instance. Wait for a value collected by
+	 * the current one instead of accepting the first "not supported" state seen.
+	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testIpmiChecks_portMacro(): void {
-		$item = $this->getItemResult(self::HOST_MACRO.':ipmi.temp');
+		$start = time();
 
-		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.temp via a macro-expanded port is unexpectedly unsupported: '.$item['lastvalue']
-		);
+		$item = $this->waitForItem(self::HOST_MACRO.':ipmi.temp', function(array $item) use ($start) {
+			return ($item['state'] == ITEM_STATE_NORMAL && $item['lastclock'] >= $start)
+				? true
+				: 'waiting for ipmi.temp via a macro-expanded port, got state:'.$item['state'].' error:"'.
+					$item['error'].'"';
+		}, 30);
+
 		$this->assertEqualsWithDelta(50, (float) $item['lastvalue'], 0.001);
 	}
 
@@ -684,7 +692,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.power');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.power is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.power is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertIsNumeric($item['lastvalue'], 'ipmi.power did not return a numeric value');
 	}
@@ -798,7 +806,7 @@ class testIpmiChecks extends CIntegrationTest {
 		$item = $this->getItemResult(self::HOST_NORMAL.':ipmi.nothresh');
 
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-				'ipmi.nothresh is unexpectedly unsupported: '.$item['lastvalue']
+				'ipmi.nothresh is unexpectedly unsupported: '.$item['error']
 		);
 		$this->assertEqualsWithDelta(42, (float) $item['lastvalue'], 0.001);
 
