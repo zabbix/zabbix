@@ -115,13 +115,6 @@ class CTagFilterFieldHelper {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		];
 
-		if ($i === null) {
-			foreach ($items as $item) {
-				$item->removeId();
-				$item->removeAttribute('focusable-element-id');
-			}
-		}
-
 		return (new CRow($items))->addClass('form_row');
 	}
 }

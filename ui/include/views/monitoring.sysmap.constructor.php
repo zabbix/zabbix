@@ -869,8 +869,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
 					])
 			)
-	])
-	->show();
+	])->show();
 
 (new CTemplateTag('mapMassFormListRow', new CRow(['#{elementType}', '#{*elementName}'])))->show();
 
@@ -1029,8 +1028,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
 					])
 			)
-	])
-	->show();
+	])->show();
 
 (new CTemplateTag('elementLinkTableRowTpl',
 	new CRow([

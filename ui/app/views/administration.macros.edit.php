@@ -137,7 +137,7 @@ $html_page
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setAttribute('placeholder', _('description'))
 					->setErrorContainer('macro_#{rowNum}_error_container')
 					->setErrorLabel(_('Description'))
