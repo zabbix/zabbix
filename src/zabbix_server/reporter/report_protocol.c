@@ -377,6 +377,8 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
  ******************************************************************************/
 static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
+#define ZBX_PUBLIC_SHARING	0
+
 	zbx_db_result_t	result;
 	int		ret = FAIL;
 
@@ -384,7 +386,7 @@ static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 			" where d.templateid is null"
 			" and ("
 				"d.userid=" ZBX_FS_UI64
-				" or d.private=0"
+				" or d.private=" ZBX_FS_UI64
 				" or exists ("
 					"select null from dashboard_user du"
 					" where d.dashboardid=du.dashboardid and du.userid=" ZBX_FS_UI64
@@ -396,7 +398,7 @@ static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 				")"
 			")"
 			" and d.dashboardid=" ZBX_FS_UI64,
-			userid, userid, userid, dashboardid);
+			userid, ZBX_PUBLIC_SHARING, userid, userid, dashboardid);
 
 	if (NULL != zbx_db_fetch(result))
 		ret = SUCCEED;
@@ -404,6 +406,8 @@ static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 	zbx_db_free_result(result);
 
 	return ret;
+
+#undef ZBX_PUBLIC_SHARING
 }
 
 /******************************************************************************
@@ -412,8 +416,8 @@ static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
  *                                                                            *
  * Parameters: user - [IN]                                                    *
  *                                                                            *
- * Return value: SUCCEED - yes                                                *
- *               FAIL    - no                                                 *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
 static int	check_report_generation_access(const zbx_user_t *user)
