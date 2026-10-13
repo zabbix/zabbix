@@ -17,12 +17,14 @@ require_once __DIR__.'/../include/CIntegrationTest.php';
 
 class CReportTestClient extends CZabbixClient {
 
-	public function sendRequest(array $data, string $sessionid) {
-		return parent::request([
-			'request' => 'report.test',
-			'sid' => $sessionid,
-			'data' => $data
-		]);
+	public function sendRequest(array $data, ?string $sessionid) {
+		$request = ['request' => 'report.test'];
+
+		if ($sessionid !== null) {
+			$request['sid'] = $sessionid;
+		}
+
+		return parent::request($request + ['data' => $data]);
 	}
 }
 
@@ -65,15 +67,53 @@ class testReportTest extends CIntegrationTest {
 		]);
 		self::$groupids = $response['result']['usrgrpids'];
 
-		foreach (['reader' => USER_TYPE_ZABBIX_USER, 'admin_reader' => USER_TYPE_ZABBIX_ADMIN,
-				'owner' => USER_TYPE_ZABBIX_ADMIN,'superadmin' => USER_TYPE_SUPER_ADMIN] as $name => $type) {
-			$response = $this->call('role.create', ['name' => 'Report test '.$name, 'type' => $type]);
+		$roles = [
+			'reader' => ['type' => USER_TYPE_ZABBIX_USER],
+			'admin_reader' => ['type' => USER_TYPE_ZABBIX_ADMIN],
+			'owner' => ['type' => USER_TYPE_ZABBIX_ADMIN],
+			'superadmin' => ['type' => USER_TYPE_SUPER_ADMIN],
+			'no_report_action' => [
+				'type' => USER_TYPE_ZABBIX_ADMIN,
+				'rules' => [
+					'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_DISABLED]]
+				]
+			],
+			// Action rule equal to the default is not stored, so the server falls back to actions.default_access.
+			'default_denied' => [
+				'type' => USER_TYPE_ZABBIX_ADMIN,
+				'rules' => [
+					'actions.default_access' => ZBX_ROLE_RULE_DISABLED,
+					'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_DISABLED]]
+				]
+			],
+			'report_action_only' => [
+				'type' => USER_TYPE_ZABBIX_ADMIN,
+				'rules' => [
+					'actions.default_access' => ZBX_ROLE_RULE_DISABLED,
+					'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_ENABLED]]
+				]
+			],
+			'outsider' => ['type' => USER_TYPE_ZABBIX_ADMIN],
+			'role_changes' => ['type' => USER_TYPE_ZABBIX_ADMIN],
+			'superadmin_no_report_action' => [
+				'type' => USER_TYPE_SUPER_ADMIN,
+				'rules' => [
+					'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_DISABLED]]
+				]
+			]
+		];
+
+		foreach ($roles as $name => $role) {
+			$response = $this->call('role.create', ['name' => 'Report test '.$name] + $role);
 			self::$roleids[$name] = $response['result']['roleids'][0];
 			$response = $this->call('user.create', [
 				'username' => 'report_test_'.$name,
 				'passwd' => self::PASSWORD,
 				'roleid' => $response['result']['roleids'][0],
-				'usrgrps' => array_map(static fn($id) => ['usrgrpid' => $id], self::$groupids)
+				// Outsider is not a member of the group the dashboards are shared with.
+				'usrgrps' => array_map(static fn($id) => ['usrgrpid' => $id],
+					$name === 'outsider' ? [self::$groupids[0]] : self::$groupids
+				)
 			]);
 			self::$userids[$name] = $response['result']['userids'][0];
 
@@ -104,6 +144,21 @@ class testReportTest extends CIntegrationTest {
 		$this->checkResult($response);
 		self::$sessions['unknown'] = bin2hex(random_bytes(16));
 		self::$sessions['malformed'] = 'invalid';
+		self::$sessions['empty'] = '';
+		self::$sessions['missing'] = null;
+
+		$tokens = [
+			'token_admin_reader' => ['userid' => self::$userids['admin_reader']],
+			'token_reader' => ['userid' => self::$userids['reader']],
+			'token_disabled' => ['userid' => self::$userids['admin_reader'], 'status' => ZBX_AUTH_TOKEN_DISABLED],
+			'token_expired' => ['userid' => self::$userids['admin_reader'], 'expires_at' => time() - SEC_PER_HOUR]
+		];
+
+		foreach ($tokens as $name => $token) {
+			$response = $this->call('token.create', ['name' => 'Report test '.$name] + $token);
+			$response = $this->call('token.generate', $response['result']['tokenids']);
+			self::$sessions[$name] = $response['result'][0]['token'];
+		}
 
 		$dashboard_names = [
 			'own', 'private', 'public', 'user_read', 'user_write', 'group_read', 'group_write'
@@ -136,22 +191,33 @@ class testReportTest extends CIntegrationTest {
 		$this->call('settings.update', ['url' => 'http://127.0.0.1/report-test']);
 	}
 
+	/**
+	 * Users (all are members of both user groups, except outsider):
+	 *   reader       - User type role, denied by the user type check before the dashboard is checked;
+	 *   admin_reader - Admin, owns "own", has direct sharing on "user_*" and group sharing on "group_*";
+	 *   owner        - Admin, owns all dashboards except "own";
+	 *   superadmin   - Super admin, has access to all dashboards;
+	 *   outsider     - Admin, member of "Report test users" only, owns nothing and has no sharing.
+	 *
+	 * Dashboards:
+	 *   own          - private, owned by admin_reader;
+	 *   private      - private, owned by owner, not shared;
+	 *   public       - public, owned by owner;
+	 *   user_read    - private, owned by owner, shared with admin_reader (read);
+	 *   user_write   - private, owned by owner, shared with admin_reader (read-write);
+	 *   group_read   - private, owned by owner, shared with "Report test dashboard readers" group (read);
+	 *   group_write  - private, owned by owner, shared with "Report test dashboard readers" group (read-write);
+	 *   missing      - nonexistent dashboard ID.
+	 *
+	 * Columns: user whose session sends the request, dashboard, whether access is expected, user ID sent in the
+	 * legacy "userid" field (spoofing attempt, ignored by server) or null to omit it.
+	 */
 	public static function dashboardAccessProvider() {
 		return [
-			'private dashboard denied' => ['reader', 'private', false, 'reader'],
-			'spoof dashboard owner' => ['reader', 'private', false, 'owner'],
-			'spoof superadmin' => ['reader', 'private', false, 'superadmin'],
-			'private dashboard without userid' => ['reader', 'private', false, null],
-			'own dashboard' => ['reader', 'own', false, null],
-			'public dashboard' => ['reader', 'public', false, null],
-			'user read sharing' => ['reader', 'user_read', false, null],
-			'user write sharing' => ['reader', 'user_write', false, null],
-			'group read sharing' => ['reader', 'group_read', false, null],
-			'group write sharing' => ['reader', 'group_write', false, null],
-			'legacy userid accepted' => ['reader', 'public', false, 'reader'],
-			'spoofed userid ignored' => ['reader', 'public', false, 'owner'],
-			'missing dashboard' => ['reader', 'missing', false, 'owner'],
+			'user type denied' => ['reader', 'public', false, null],
 			'admin private dashboard denied' => ['admin_reader', 'private', false, null],
+			'admin spoofs dashboard owner' => ['admin_reader', 'private', false, 'owner'],
+			'admin spoofs superadmin' => ['admin_reader', 'private', false, 'superadmin'],
 			'admin own dashboard' => ['admin_reader', 'own', true, null],
 			'admin public dashboard' => ['admin_reader', 'public', true, null],
 			'admin user read sharing' => ['admin_reader', 'user_read', true, null],
@@ -160,7 +226,14 @@ class testReportTest extends CIntegrationTest {
 			'admin group write sharing' => ['admin_reader', 'group_write', true, null],
 			'admin owner' => ['owner', 'private', true, null],
 			'admin without access' => ['owner', 'own', false, 'admin_reader'],
-			'superadmin' => ['superadmin', 'private', true, null]
+			'superadmin' => ['superadmin', 'private', true, null],
+			'admin missing dashboard' => ['admin_reader', 'missing', false, null],
+			'outsider public dashboard' => ['outsider', 'public', true, null],
+			'outsider user read sharing' => ['outsider', 'user_read', false, null],
+			'outsider user write sharing' => ['outsider', 'user_write', false, null],
+			'outsider group read sharing' => ['outsider', 'group_read', false, null],
+			'outsider group write sharing' => ['outsider', 'group_write', false, null],
+			'outsider spoofs sharee' => ['outsider', 'user_read', false, 'admin_reader']
 		];
 	}
 
@@ -215,8 +288,81 @@ class testReportTest extends CIntegrationTest {
 		$this->checkReport($user, $dashboard, $error, $viewer);
 	}
 
+	public static function roleRulesProvider() {
+		return [
+			'manage scheduled reports disabled' => ['no_report_action', false],
+			'actions disabled by default' => ['default_denied', false],
+			'manage scheduled reports overrides default' => ['report_action_only', true],
+			// API enforces the action rule for every user type, including super admin (CReport::ACCESS_RULES).
+			'superadmin manage scheduled reports disabled' => ['superadmin_no_report_action', false]
+		];
+	}
+
+	/**
+	 * @dataProvider roleRulesProvider
+	 */
+	public function testReportTest_roleRules($user, $allowed) {
+		$error = $allowed
+			? "No media configured for the report recipient 'report_test_".$user."'"
+			: 'no access to scheduled reports';
+
+		$this->checkReport($user, 'public', $error);
+	}
+
+	public static function tokenProvider() {
+		return [
+			'token allowed' => ['token_admin_reader', 'public',
+				"No media configured for the report recipient 'report_test_admin_reader'"
+			],
+			'token dashboard denied' => ['token_admin_reader', 'private', 'no access to dashboard'],
+			'token user type denied' => ['token_reader', 'public', 'no access to scheduled reports'],
+			'disabled token' => ['token_disabled', 'public', 'Permission denied.'],
+			'expired token' => ['token_expired', 'public', 'Permission denied.']
+		];
+	}
+
+	/**
+	 * @dataProvider tokenProvider
+	 */
+	public function testReportTest_tokens($token, $dashboard, $error) {
+		$this->checkReport($token, $dashboard, $error);
+	}
+
+	/**
+	 * Role changes do not terminate sessions, so permissions must be checked on every request.
+	 */
+	public function testReportTest_roleChanges() {
+		$allowed = "No media configured for the report recipient 'report_test_role_changes'";
+		$denied = 'no access to scheduled reports';
+		$roleid = self::$roleids['role_changes'];
+
+		$this->checkReport('role_changes', 'public', $allowed);
+
+		$this->call('role.update', ['roleid' => $roleid, 'rules' => [
+			'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_DISABLED]]
+		]]);
+		$this->checkReport('role_changes', 'public', $denied);
+
+		$this->call('role.update', ['roleid' => $roleid, 'rules' => [
+			'actions' => [['name' => 'manage_scheduled_reports', 'status' => ZBX_ROLE_RULE_ENABLED]]
+		]]);
+		$this->checkReport('role_changes', 'public', $allowed);
+
+		$this->call('role.update', ['roleid' => $roleid, 'type' => USER_TYPE_ZABBIX_USER]);
+		$this->checkReport('role_changes', 'public', $denied);
+
+		$this->call('role.update', ['roleid' => $roleid, 'type' => USER_TYPE_ZABBIX_ADMIN]);
+		$this->checkReport('role_changes', 'public', $allowed);
+
+		$this->call('user.update', ['userid' => self::$userids['role_changes'], 'roleid' => self::$roleids['reader']]);
+		$this->checkReport('role_changes', 'public', $denied);
+
+		$this->call('user.update', ['userid' => self::$userids['role_changes'], 'roleid' => $roleid]);
+		$this->checkReport('role_changes', 'public', $allowed);
+	}
+
 	public function testReportTest_invalidSessions() {
-		foreach (['inactive', 'unknown', 'malformed'] as $session) {
+		foreach (['inactive', 'unknown', 'malformed', 'empty', 'missing'] as $session) {
 			$this->checkReport($session, 'public', 'Permission denied.', 'owner');
 		}
 	}
