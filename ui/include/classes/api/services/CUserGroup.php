@@ -820,10 +820,11 @@ class CUserGroup extends CApiService {
 		}
 
 		if ($changed_permissions) {
-			$ugset_permissions = self::getUgSetPermissions($changed_permissions);
+			$changed_ugset_permissions = self::getChangedUgSetPermissions($changed_permissions);
 
-			if ($ugset_permissions) {
-				$db_ugset_permissions = self::getDbUgSetPermissions($ugset_permissions, $changed_permissions);
+			if ($changed_ugset_permissions) {
+				[$ugset_permissions, $db_ugset_permissions] =
+					self::prepareUgSetPermissions($changed_ugset_permissions, $changed_permissions);
 
 				self::updatePermissions($ugset_permissions, $db_ugset_permissions);
 			}
@@ -858,7 +859,7 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	private static function getUgSetPermissions(array $changed_permissions): array {
+	private static function getChangedUgSetPermissions(array $changed_permissions): array {
 		$ugset_permissions = [];
 
 		$options = [
@@ -885,7 +886,7 @@ class CUserGroup extends CApiService {
 		return $ugset_permissions;
 	}
 
-	private static function getDbUgSetPermissions(array &$ugset_permissions, array $changed_permissions): array {
+	private static function prepareUgSetPermissions(array $ugset_permissions, array $changed_permissions): array {
 		$db_ugset_permissions = array_fill_keys(array_keys($ugset_permissions), []);
 
 		$result = DBselect(
@@ -919,7 +920,23 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		return $db_ugset_permissions;
+		foreach ($ugset_permissions as $ugsetid => $group_permissions) {
+			foreach ($group_permissions as $groupid => $permission) {
+				$db_permission = array_key_exists($groupid, $db_ugset_permissions[$ugsetid])
+					? $db_ugset_permissions[$ugsetid][$groupid]
+					: PERM_NONE;
+
+				if ($permission == $db_permission) {
+					unset($ugset_permissions[$ugsetid][$groupid]);
+				}
+			}
+
+			if (!$ugset_permissions[$ugsetid]) {
+				unset($ugset_permissions[$ugsetid]);
+			}
+		}
+
+		return [$ugset_permissions, $db_ugset_permissions];
 	}
 
 	private static function updatePermissions(array $ugset_permissions, array $db_ugset_permissions): void {
