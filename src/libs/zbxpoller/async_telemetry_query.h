@@ -33,6 +33,7 @@ typedef struct
 	char			*posts;
 	unsigned char		preprocessing;
 	zbx_tq_query_t		*query;
+	unsigned char		storage_mode;
 	time_t			newlasttimestamp;
 	zbx_timespec_t		min_free_ts;
 	zbx_apm_db_type_t	db_type;

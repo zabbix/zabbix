@@ -181,18 +181,25 @@ int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_c
 	{
 		for (int i = 0; i < values.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): row #%d: '%s'", __func__, i + 1, values.values[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): bucket %d: '%s'", __func__, i, values.values[i]);
 		}
 	}
 
-	if (0 != values.values_num)
+	if (ZBX_TQ_STORAGE_MODE_MULTIPLE_VALUES == item->storage_mode)
 	{
-		SET_TEXT_RESULT(result, values.values[0]);
-		values.values[0] = NULL;
+		if (0 != values.values_num)
+		{
+			SET_TEXT_RESULT(result, values.values[0]);
+			values.values[0] = NULL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): no buckets, not setting value", __func__);
+		}
 	}
-	else
+	else /* ZBX_TQ_STORAGE_MODE_SINGLE == item->storage_mode */
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): no buckets, not setting value", __func__);
+		SET_TEXT_RESULT(result, zbx_tq_combine_values(&values));
 	}
 
 	ret = SUCCEED;
