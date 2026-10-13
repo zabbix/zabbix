@@ -36,45 +36,42 @@ func Minimize(pattern string) string {
 	return res.String()
 }
 
-// Match matches string value to specified wildcard.
-// Asterisk (*) characters match to any characters of any length.
-// It mirrors zbx_wildcard_match in src/libs/zbxregexp/zbxregexp.c.
-//
-//nolint:cyclop, gocyclo
+// Match reports whether the entire value matches pattern.
+// Asterisk (*) matches any number of bytes, including zero.
+// Matching follows zbx_wildcard_match in src/libs/zbxregexp/zbxregexp.c.
 func Match(value, pattern string) bool {
-	var vi, pi, vp, pp = 0, 0, 0, 0
+	patternParts := strings.Split(pattern, "*")
+	if len(patternParts) == 1 {
+		return value == pattern
+	}
 
-	for vi < len(value) && (pi >= len(pattern) || pattern[pi] != '*') {
-		if pi >= len(pattern) || value[vi] != pattern[pi] {
+	// The first and last literal parts must match the ends of the value.
+	var (
+		prefix = patternParts[0]
+		suffix = patternParts[len(patternParts)-1]
+	)
+
+	if !strings.HasPrefix(value, prefix) {
+		return false
+	}
+
+	value = value[len(prefix):]
+	if !strings.HasSuffix(value, suffix) {
+		return false
+	}
+
+	value = value[:len(value)-len(suffix)]
+
+	// Asterisks cover the gaps between the remaining literal parts.
+	middleParts := patternParts[1 : len(patternParts)-1]
+	for _, middlePart := range middleParts {
+		index := strings.Index(value, middlePart)
+		if index == -1 {
 			return false
 		}
 
-		vi++
-		pi++
+		value = value[index+len(middlePart):]
 	}
 
-	for vi < len(value) {
-		switch {
-		case pi < len(pattern) && pattern[pi] == '*':
-			pi++
-			if pi >= len(pattern) {
-				return true
-			}
-
-			pp, vp = pi, vi+1
-		case pi < len(pattern) && value[vi] == pattern[pi]:
-			pi++
-			vi++
-		default:
-			pi = pp
-			vi = vp
-			vp++
-		}
-	}
-
-	for pi < len(pattern) && pattern[pi] == '*' {
-		pi++
-	}
-
-	return pi == len(pattern)
+	return true
 }
