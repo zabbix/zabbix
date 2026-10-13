@@ -120,7 +120,7 @@ jQuery(function($) {
 
 				this.$elem.css({
 					left: rect.left + 10,
-					width: rect.width - width_modifier,
+					width: rect.width - width_modifier
 				});
 
 				return;
