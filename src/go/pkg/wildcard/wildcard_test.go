@@ -94,3 +94,44 @@ func TestWildcardMatchNeagtive(t *testing.T) {
 		}
 	}
 }
+
+func TestMatchRegression(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		value   string
+		pattern string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"+literalCommandMatches", args{"/usr/bin/uptime", "/usr/bin/uptime"}, true},
+		{"+explicitAsteriskMatchesRepeatedLiteral", args{"fooXfoo", "foo*foo"}, true},
+		{"+utf8LiteralMatches", args{"é", "é"}, true},
+		{"+utf8PrefixMatches", args{"é args", "é*"}, true},
+		{"+utf8SuffixBacktracks", args{"éXé", "*é"}, true},
+		{"-literalValueEmpty", args{"", "foo"}, false},
+		{"-literalValueRepeated", args{"foofoo", "foo"}, false},
+		{"-literalValueSandwiched", args{"fooXfoo", "foo"}, false},
+		{
+			"-literalCommandSandwiched",
+			args{"/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime", "/usr/bin/uptime"},
+			false,
+		},
+		{"-utf8PrefixDiffers", args{"é", "ê*"}, false},
+		{"-utf8PrefixDiffersWithSuffix", args{"é args", "ê*"}, false},
+		{"-prefixAndSuffixCannotOverlap", args{"abc", "ab*bc"}, false},
+		{"-middleCannotOverlapSuffix", args{"abc", "a*b*bc"}, false},
+		{"-middlePartsCannotOverlap", args{"abbc", "a*bb*b*c"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := Match(tt.args.value, tt.args.pattern)
+			if got != tt.want {
+				t.Errorf("Match(%q, %q) = %v, want %v", tt.args.value, tt.args.pattern, got, tt.want)
+			}
+		})
+	}
+}
