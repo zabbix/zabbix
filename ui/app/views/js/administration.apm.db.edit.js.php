@@ -103,10 +103,10 @@ const view = new class {
 		this.#change_password_btn?.addEventListener('click', e => {
 			this.#password_changed = true;
 
-			this.#password_input?.focus();
-
 			this.#updateDisplayState([this.#password_input], true);
 			this.#updateDisabledState([this.#password_input], false);
+
+			this.#password_input?.focus();
 
 			e.target.hidden = true;
 		});
