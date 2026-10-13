@@ -53,11 +53,13 @@ class ZNavigationTree extends HTMLElement {
 	#addEventListeners() {
 		this.#content.addEventListener('deselect', this.#onDeselect);
 		this.#content.addEventListener('click', this.#onClick);
+		this.#content.addEventListener('keyup', this.#onKeyUp);
 	}
 
 	#removeEventListeners() {
 		this.#content.removeEventListener('click', this.#onClick);
 		this.#content.removeEventListener('deselect', this.#onDeselect);
+		this.#content.removeEventListener('keyup', this.#onKeyUp);
 	}
 
 	#onClick = e => {
@@ -75,8 +77,34 @@ class ZNavigationTree extends HTMLElement {
 			return;
 		}
 
-		if (event.target.closest('.z-navigation-tree-toggle') !== null) {
+		if (e.target.closest('.z-navigation-tree-toggle') !== null) {
 			this.#toggle(id);
+			return;
+		}
+
+		this.#select(id);
+	}
+
+	#onKeyUp = e => {
+		if (e.key !== 'Enter') {
+			return;
+		}
+
+		if (e.target.classList.contains('z-navigation-tree-toggle')) {
+			return;
+		}
+
+		const row = e.target instanceof Element
+			? e.target.closest('.z-navigation-tree-row')
+			: null;
+
+		if (row === null || !this.#content.contains(row)) {
+			return;
+		}
+
+		const id = row.dataset.id;
+
+		if (id === undefined) {
 			return;
 		}
 
@@ -104,6 +132,8 @@ class ZNavigationTree extends HTMLElement {
 
 		this.#render();
 
+		document.querySelector(`[data-id="${id}"] > .z-navigation-tree-toggle`).focus();
+
 		this.dispatchEvent(new CustomEvent('toggle', {
 			bubbles: true,
 			detail: {
@@ -121,6 +151,8 @@ class ZNavigationTree extends HTMLElement {
 
 		this.#selected_id = id;
 		this.#render();
+
+		document.querySelector(`[data-id="${id}"]`).focus();
 
 		this.dispatchEvent(new CustomEvent('select', {
 			bubbles: true,
@@ -176,6 +208,7 @@ class ZNavigationTree extends HTMLElement {
 		element.dataset.id = item.id;
 		element.style.setProperty('--navigation-tree-depth', String(row.depth));
 		element.toggleAttribute('selected', this.#selected_id === item.id);
+		element.setAttribute('tabindex', '0');
 
 		const content = document.createElement('div');
 		content.className = 'z-navigation-tree-item';

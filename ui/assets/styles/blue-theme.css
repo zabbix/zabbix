@@ -6313,11 +6313,15 @@ z-navigation-tree {
     padding-inline: calc(8px + var(--navigation-tree-depth) * var(--navigation-tree-indent-size)) 8px;
     grid-template-columns: 18px minmax(0, 1fr) auto;
     column-gap: 4px; }
+    z-navigation-tree .z-navigation-tree-row:focus {
+      outline: none; }
     z-navigation-tree .z-navigation-tree-row[selected] {
       background: var(--navigation-tree-selected-bg-color); }
     z-navigation-tree .z-navigation-tree-row:not([selected]):hover {
       background: var(--navigation-tree-hover-bg-color);
       cursor: pointer; }
+    z-navigation-tree .z-navigation-tree-row:not([selected]):focus {
+      background-color: #e8f5ff; }
   z-navigation-tree .z-navigation-tree-toggle {
     display: inline-flex;
     justify-content: center;

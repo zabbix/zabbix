@@ -483,15 +483,15 @@
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
-			Focuser.recoverFocus(this.#side_drawer.getElement());
-			Focuser.containFocus(this.#side_drawer.getElement());
-
 			this.#trace_view_page?.destroy();
 
 			const trace_view_element = element.querySelector('.trace-view');
 			if (trace_view_element !== null) {
 				this.#trace_view_page = new TraceViewPage(trace_view_element, trace_view_data);
 			}
+
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
 
 			this.#unscheduleRefresh();
 		}
