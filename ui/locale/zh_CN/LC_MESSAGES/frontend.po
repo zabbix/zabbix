@@ -11173,6 +11173,10 @@ msgstr "用户无法访问"
 msgid "Inaccessible user group"
 msgstr "无法访问用户组"
 
+#: include/classes/helpers/CItemGeneralHelper.php:283
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "不可访问的小组件"

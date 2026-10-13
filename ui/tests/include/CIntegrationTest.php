@@ -233,6 +233,26 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Determine which TLS library the server/agent/proxy binaries were built with.
+	 *
+	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
+	 * default to OpenSSL. Read directly from the environment, the same way IntegrationTests::suite()
+	 * reads DB/HISTORY_STORAGE to decide which suites to run.
+	 *
+	 * @return string 'gnutls', 'openssl' or 'none'
+	 */
+	protected static function detectTLSLibrary(): string {
+		switch (strtoupper((string) getenv('ENCRYPTION'))) {
+			case 'GNUTLS':
+				return 'gnutls';
+			case 'NONE':
+				return 'none';
+			default:
+				return 'openssl';
+		}
+	}
+
+	/**
 	 * Callback executed before every test case.
 	 *
 	 * @before
@@ -457,15 +477,14 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Checks absence of pid file after kill.
 	 *
-	 * @param string $component    component name
-	 *
+	 * @param string $parent_pid
 	 */
-	private static function checkPidKilled($component) {
+	private static function waitComponentStopped($parent_pid) {
 		$usleep_total = 0;
 
 		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			if (!file_exists(self::getPidPath($component))) {
-				return true;
+			if (!posix_kill($parent_pid, 0)) {
+				return;
 			}
 
 			if ($usleep_total < 1000000) {
@@ -477,30 +496,24 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
-
-		return false;
 	}
 
 	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component
+	 * @param string $parent_pid
 	 * @param array  $child_pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component, array $child_pids) {
+	protected static function waitForShutdown(string $component, string $parent_pid, array $child_pids) {
 		$start = microtime(true);
-		if (!self::checkPidKilled($component)) {
-			$pid = @file_get_contents(self::getPidPath($component));
-
-			if ($pid !== false && is_numeric($pid)) {
-				$child_pids[] = $pid;
-			}
-		}
+		self::waitComponentStopped($parent_pid);
 
 		$failed_pids = [];
 		$failed_kills = [];
+		$child_pids[] = $parent_pid;
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
@@ -513,7 +526,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (!$failed_pids) {
-
 			if (static::$trace_delays) {
 				self::recordDelay('shutdown', microtime(true) - $start);
 			}
@@ -745,17 +757,18 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$child_pids = [];
-		$pid = @file_get_contents(self::getPidPath($component));
+		$parent_pid = @file_get_contents(self::getPidPath($component));
 
-		if ($pid !== false && is_numeric($pid)) {
-			$output = shell_exec('pgrep -P '.$pid);
+		if ($parent_pid !== false && is_numeric($parent_pid)) {
+			$output = shell_exec('pgrep -P '.$parent_pid);
 			if ($output !== false && $output !== null) {
 				$child_pids = explode("\n", trim($output));
 			}
 
-			posix_kill($pid, SIGTERM);
+			posix_kill($parent_pid, SIGTERM);
+
+			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
-		self::waitForShutdown($component, $child_pids);
 	}
 
 	/**

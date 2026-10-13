@@ -1,0 +1,61 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 3],
+    "pre_release": false,
+    "platform_info": "x86_64-w64-mingw32-generic",
+    "argv": ["smartctl", "-a", "/dev/csmi0,3", "-j"],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/csmi0,3",
+    "info_name": "/dev/csmi0,3",
+    "type": "ata",
+    "protocol": "ATA"
+  },
+  "model_name": "TEST_CSMI_HDD",
+  "serial_number": "TEST-CSMI-HDD-0003",
+  "firmware_version": "TEST0001",
+  "rotation_rate": 7200,
+  "smart_status": {
+    "passed": true
+  },
+  "ata_smart_attributes": {
+    "revision": 16,
+    "table": [
+      {
+        "id": 5,
+        "name": "Reallocated_Sector_Ct",
+        "value": 100,
+        "worst": 100,
+        "thresh": 10,
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      },
+      {
+        "id": 9,
+        "name": "Power_On_Hours",
+        "value": 99,
+        "worst": 99,
+        "thresh": 0,
+        "raw": {
+          "value": 2000,
+          "string": "2000"
+        }
+      },
+      {
+        "id": 197,
+        "name": "Current_Pending_Sector",
+        "value": 100,
+        "worst": 100,
+        "thresh": 0,
+        "raw": {
+          "value": 0,
+          "string": "0"
+        }
+      }
+    ]
+  }
+}

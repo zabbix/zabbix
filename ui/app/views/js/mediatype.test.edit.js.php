@@ -86,7 +86,7 @@ window.mediatype_test_edit_popup = new class {
 			content.appendChild(logitems);
 		}
 
-		overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Media type test log')) ?>,
 			content,
 			class: 'modal-popup modal-popup-generic debug-modal',
@@ -103,6 +103,9 @@ window.mediatype_test_edit_popup = new class {
 			position: Overlay.prototype.POSITION_CENTER,
 			trigger_element
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
 	}
 
 	/**

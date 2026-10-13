@@ -496,7 +496,7 @@ class CHost extends CHostGeneral {
 		 */
 		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
 			$all_keys[] = 'active_available';

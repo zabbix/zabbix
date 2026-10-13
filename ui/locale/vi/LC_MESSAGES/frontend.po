@@ -11167,6 +11167,10 @@ msgstr " Người dùng không thể truy cập"
 msgid "Inaccessible user group"
 msgstr ""
 
+#: include/classes/helpers/CItemGeneralHelper.php:283
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr ""

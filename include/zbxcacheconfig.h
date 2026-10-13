@@ -1606,4 +1606,9 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
+int	zbx_macro_event_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 #endif

@@ -135,6 +135,7 @@ Access rights are set using policies. Each service has its own policy file, ther
 |{$OPENSTACK.KEYSTONE.API.ENDPOINT}|<p>API endpoint for Identity Service, e.g., https://local.openstack:5000.</p>||
 |{$OPENSTACK.AUTH.INTERVAL}|<p>API token regeneration interval, in minutes. By default, OpenStack API tokens expire after 60m.</p>|`50m`|
 |{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "OpenStack Nova", e.g. {$HTTP.TLS.VERIFY:"OpenStack"}.</p>|`full`|
 |{$OPENSTACK.APP.CRED.ID}|<p>Application credential ID for monitoring user access.</p>||
 |{$OPENSTACK.APP.CRED.SECRET}|<p>Application credential password for monitoring user access.</p>||
 
@@ -221,6 +222,7 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 |{$OPENSTACK.NOVA.SERVICE.URL}|<p>API endpoint for Nova Service, e.g., https://local.openstack:8774/v2.1.</p>||
 |{$OPENSTACK.TOKEN}|<p>API token for the monitoring user.</p>||
 |{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for script and HTTP agent items. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "OpenStack Nova", e.g. {$HTTP.TLS.VERIFY:"OpenStack Nova"}.</p>|`full`|
 |{$OPENSTACK.NOVA.TENANT.PERIOD}|<p>Period for which tenant usage statistics will be queried. Possible values are:</p><p> 'y' - current year until now,</p><p> 'm' - current month until now,</p><p> 'w' - current week until now,</p><p> 'd' - current day until now.</p>|`m`|
 |{$OPENSTACK.NOVA.INTERVAL.LIMITS}|<p>Interval for absolute limit HTTP agent item query.</p>|`3m`|
 |{$OPENSTACK.NOVA.INTERVAL.SERVERS}|<p>Interval for server HTTP agent item queries.</p>|`3m`|

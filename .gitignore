@@ -262,6 +262,7 @@ tests/libs/zbxexpr/zbx_substitute_snmp_oid_params
 tests/libs/zbxexpression/zbx_evaluate
 tests/libs/zbxexpression/zbx_evaluate_unknown
 tests/libs/zbxexpression/zbx_evaluate_function
+tests/libs/zbxexpression/evaluate_nodata_proxied
 tests/libs/zbxexpression/zbx_format_value
 tests/libs/zbxexpression/zbx_get_percentage_of_deviations_in_stl_remainder
 tests/libs/zbxexpression/zbx_STL
