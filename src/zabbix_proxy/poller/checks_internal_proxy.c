@@ -13,8 +13,46 @@
 **/
 
 #include "poller_proxy.h"
+#include "zbx_apm_client.h"
 #include "zbxproxybuffer.h"
 #include "zbxcacheconfig.h"
+
+static int	get_apm_export_stats(AGENT_RESULT *result)
+{
+	zbx_apm_stats_t	stats;
+	char		*error = NULL;
+
+	if (FAIL == zbx_apm_get_stats(&stats, &error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get APM statistics: %s", error));
+		zbx_free(error);
+
+		return NOTSUPPORTED;
+	}
+
+	zbx_json_t	j;
+
+	zbx_json_init(&j, 1024);
+
+	zbx_json_addobject(&j, "rows");
+	zbx_json_adduint64(&j, "logs", stats.written_logs);
+	zbx_json_adduint64(&j, "traces", stats.written_traces);
+	zbx_json_adduint64(&j, "metrics_gauge", stats.written_metrics_gauge);
+	zbx_json_adduint64(&j, "metrics_sum", stats.written_metrics_sum);
+	zbx_json_adduint64(&j, "metrics_histogram", stats.written_metrics_histogram);
+	zbx_json_adduint64(&j, "metrics_exponential_histogram", stats.written_metrics_exponential_histogram);
+	zbx_json_adduint64(&j, "metrics_summary", stats.written_metrics_summary);
+	zbx_json_close(&j);
+	zbx_json_addobject(&j, "requests");
+	zbx_json_adduint64(&j, "accepted", stats.accepted_requests);
+	zbx_json_adduint64(&j, "dropped", stats.dropped_requests);
+
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -49,8 +87,7 @@ int	zbx_get_value_internal_ext_proxy(const zbx_dc_item_t *item, const char *para
 		SET_UI64_RESULT(result, zbx_pb_history_get_unsent_num());
 		return SUCCEED;
 	}
-
-	if (0 == strcmp(param1, "proxy_buffer"))
+	else if (0 == strcmp(param1, "proxy_buffer"))
 	{
 		const char	*param2, *param3;
 		int		params_num;
@@ -130,6 +167,30 @@ int	zbx_get_value_internal_ext_proxy(const zbx_dc_item_t *item, const char *para
 			return SUCCEED;
 		}
 
+	}
+	else if (0 == strcmp(param1, "apm"))
+	{
+		const char	*param2;
+		int		params_num;
+
+		params_num = get_rparams_num(request);
+
+		if (2 != params_num)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			return NOTSUPPORTED;
+		}
+
+		param2 = get_rparam(request, 1);
+		if (0 == strcmp(param2, "export"))
+		{
+			return get_apm_export_stats(result);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return NOTSUPPORTED;
+		}
 	}
 	else
 		return FAIL;

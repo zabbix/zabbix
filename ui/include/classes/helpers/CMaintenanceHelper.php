@@ -119,4 +119,28 @@ class CMaintenanceHelper {
 
 		return '';
 	}
+
+	public static function getNextIndexedName(string $base_name): string {
+		$max_length = DB::getFieldLength('maintenances', 'name');
+		$reserved_length = 3;
+
+		$db_names = array_column(API::Maintenance()->get([
+			'output' => ['name'],
+			'search' => [
+				'name' => rtrim(mb_substr($base_name, 0, $max_length - $reserved_length))
+			],
+			'startSearch' => true
+		]), 'name', 'name');
+
+		for ($i = 0; $i < pow(10, $reserved_length - 1); $i++) {
+			$suffix = $i == 0 ? '' : ' '.$i;
+			$name = rtrim(mb_substr($base_name, 0, $max_length - strlen($suffix))).$suffix;
+
+			if (!array_key_exists($name, $db_names)) {
+				return $name;
+			}
+		}
+
+		return mb_substr($base_name, 0, $max_length);
+	}
 }

@@ -205,6 +205,10 @@ $geomap-marker-selected-stroke: #747474;
 // Statuses
 $status-disabled-border-color: rgba(#000000, 0.2);
 
+$btn-plus-more: #333333;
+$btn-plus-more-bg-color: #ffffff;
+$btn-plus-more-border-color: #888888;
+
 // Multiselect
 $multiselect-selected-bg-color: #777777;
 
@@ -743,6 +747,17 @@ textarea.has-error {
 		border-color: rgba($ui-bg-color, .2);
 		background-color: $ui-bg-selected-color;
 		color: $ui-bg-color;
+	}
+}
+
+.status-container {
+	.status-amp-severity-trace,
+	.status-amp-severity-debug,
+	.status-amp-severity-info,
+	.status-amp-severity-warn,
+	.status-amp-severity-error,
+	.status-amp-severity-fatal {
+		color: $font-color;
 	}
 }
 

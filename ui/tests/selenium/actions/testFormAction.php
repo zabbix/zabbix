@@ -1619,7 +1619,7 @@ class testFormAction extends CLegacyWebTest {
 				'FROM actions a '.
 				'INNER JOIN conditions c ON c.actionid = a.actionid '.
 				'INNER JOIN operations o on o.actionid = c.actionid '.
-				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid';
+				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid, c.conditionid';
 
 		$original_hash = CDBHelper::getHash($sql);
 

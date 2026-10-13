@@ -36,7 +36,7 @@ class CControllerHintboxActionlist extends CController {
 			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
 				'selectAcknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity', 'old_severity',
-					'suppress_until', 'maintenanceid'
+					'suppress_until', 'maintenanceid', 'details', 'cep_ruleid'
 				],
 				'eventids' => (array) $this->getInput('eventid')
 			]);
@@ -69,6 +69,15 @@ class CControllerHintboxActionlist extends CController {
 
 	protected function doAction(): void {
 		$actions = getEventDetailsActions($this->event);
+		$ceprule_actions = array_filter($actions['actions'], fn (array $action) =>
+			array_key_exists('action_type', $action) && $action['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE
+		);
+
+		$ceprules = $ceprule_actions ? API::CepRule()->get([
+			'output' => ['name'],
+			'cep_ruleids' => array_column($ceprule_actions, 'cep_ruleid'),
+			'preservekeys' => true
+		]) : [];
 
 		$users = $actions['userids']
 			? API::User()->get([
@@ -98,6 +107,7 @@ class CControllerHintboxActionlist extends CController {
 			'actions' => $actions['actions'],
 			'users' => $users,
 			'mediatypes' => $mediatypes,
+			'ceprules' => $ceprules,
 			'maintenances' => $maintenances,
 			'foot_note' => ($actions['count'] > ZBX_WIDGET_ROWS)
 				? _s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $actions['count'])

@@ -111,6 +111,34 @@ class API {
 	}
 
 	/**
+	 * @return CApmTrace
+	 */
+	public static function ApmTrace() {
+		return self::getApi('apmtrace');
+	}
+
+	/**
+	 * @return CApmSpan
+	 */
+	public static function ApmSpan() {
+		return self::getApi('apmspan');
+	}
+
+	/**
+	 * @return CApmLog
+	 */
+	public static function ApmLog() {
+		return self::getApi('apmlog');
+	}
+
+	/**
+	 * @return CApmMetric
+	 */
+	public static function ApmMetric() {
+		return self::getApi('apmmetric');
+	}
+
+	/**
 	 * @return CAuditLog
 	 */
 	public static function AuditLog() {
@@ -129,6 +157,13 @@ class API {
 	 */
 	public static function Autoregistration() {
 		return self::getApi('autoregistration');
+	}
+
+	/**
+	 * @return CCepRule
+	 */
+	public static function CepRule() {
+		return self::getApi('ceprule');
 	}
 
 	/**

@@ -762,9 +762,10 @@ class CHostPrototype extends CHostBase {
 													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('interface_snmp', 'community')]
 						]],
 						'max_repetitions' =>	['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V2C, SNMP_V3])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+													['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V2C, SNMP_V3])], 'type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'length' => DB::getFieldLength('interface_snmp', 'max_repetitions')],
 													['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('interface_snmp', 'max_repetitions')]
 						]],
+						'retries' =>			['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [SNMP_RETRIES_MIN, SNMP_RETRIES_MAX]), 'length' => DB::getFieldLength('interface_snmp', 'retries')],
 						'contextname' =>		['type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
 													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('interface_snmp', 'contextname')]
@@ -999,7 +1000,8 @@ class CHostPrototype extends CHostBase {
 		if ($details_interfaces) {
 			$options = [
 				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
-					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
+					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname',
+					'max_repetitions', 'retries'
 				],
 				'filter' => ['interfaceid' => array_keys($details_interfaces)]
 			];
@@ -1567,8 +1569,8 @@ class CHostPrototype extends CHostBase {
 	private static function getInterfaceId(array $interface, array $db_interfaces): ?string {
 		$def_interface = array_intersect_key(DB::getDefaults('interface'), array_flip(['ip', 'dns']));
 		$def_details = array_intersect_key(DB::getDefaults('interface_snmp'), array_flip(['bulk', 'community',
-			'max_repetitions', 'contextname', 'securityname', 'securitylevel', 'authprotocol', 'authpassphrase',
-			'privprotocol', 'privpassphrase'
+			'max_repetitions', 'retries', 'contextname', 'securityname', 'securitylevel', 'authprotocol',
+			'authpassphrase', 'privprotocol', 'privpassphrase'
 		]));
 
 		$interface += $def_interface;

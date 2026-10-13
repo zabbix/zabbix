@@ -934,7 +934,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 			$form->fill(['Host groups' => $data['hostgroup']]);
 		}
 		// Change host group prototype.
@@ -944,10 +943,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickButtonMultiselect('add_templates_');
-			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find(1)->one()->setDataContext('Templates');
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$dialog->asForm()->fill(['Templates' => $data['template']]);
 		}
 
 		// Change inventory mode.

@@ -104,6 +104,7 @@ This is the default behaviour.
 |----|-----------|-------|
 |{$ACRONIS.CPC.DATACENTER.URL}|<p>Acronis Cyber Protect Cloud datacenter URL, e.g., https://eu2-cloud.acronis.com.</p>||
 |{$ACRONIS.CPC.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Acronis Cyber Protect Cloud MSP", e.g. {$HTTP.TLS.VERIFY:"Acronis Cyber Protect Cloud MSP"}.</p>|`full`|
 |{$ACRONIS.CPC.CYBERFIT.WARN}|<p>CyberFit score threshold for "warning" severity trigger.</p>|`669`|
 |{$ACRONIS.CPC.CYBERFIT.HIGH}|<p>CyberFit score threshold for "high" severity trigger.</p>|`579`|
 |{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}|<p>Offset time in seconds for scheduled antimalware scan trigger check.</p>|`-180`|

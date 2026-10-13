@@ -19,6 +19,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"GitHub"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "GitHub", e.g. {$HTTP.TLS.VERIFY:"GitHub"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|The URL of the Zabbix frontend.|
 |github_api_version|2022\-11\-28|The API version that is used in the headers of HTTP requests.|
 |github_token|\<PLACE GITHUB TOKEN\>|The API access token.|

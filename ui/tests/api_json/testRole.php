@@ -216,7 +216,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							],
 							[
-								'name' => 'configuration.event_correlation',
+								'name' => 'configuration.ceprules',
 								'status' => '1'
 							],
 							[
@@ -481,6 +481,72 @@ class testRole extends CAPITest {
 				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-not-allowed-systeminfo".'
 			]
 		];
+	}
+
+	public static function dataProviderCreateRuleApiAccess() {
+		yield '"api.access" default for USER_TYPE_ZABBIX_USER is ZBX_ROLE_RULE_DISABLED' => [
+			[[
+				'name' => 'default "api.access" for USER_TYPE_ZABBIX_USER',
+				'type' => USER_TYPE_ZABBIX_USER
+			]],
+			[
+				'default "api.access" for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED]
+			]
+		];
+
+		yield '"api.access" ZBX_ROLE_RULE_ENABLED for user "type" USER_TYPE_ZABBIX_USER' => [
+			[[
+				'name' => '"api.access" ZBX_ROLE_RULE_ENABLED for USER_TYPE_ZABBIX_USER',
+				'type' => USER_TYPE_ZABBIX_USER,
+				'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+			]],
+			[
+				'"api.access" ZBX_ROLE_RULE_ENABLED for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_ENABLED]
+			]
+		];
+
+		yield '"api.access" is disabled by default' => [
+			[
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN',
+					'type' => USER_TYPE_SUPER_ADMIN
+				],
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_ZABBIX_USER',
+					'type' => USER_TYPE_ZABBIX_USER
+				],
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN',
+					'type' => USER_TYPE_ZABBIX_ADMIN
+				]
+			],
+			[
+				'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
+				'bulk create default "api.access" for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
+				'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderCreateRuleApiAccess
+	 */
+	public function testCreateRuleApiAccess(array $roles, array $expected) {
+		['roleids' => $roleids] = $this->call('role.create', $roles)['result'];
+		self::$roleids = array_merge(self::$roleids, $roleids);
+
+		$db_roles = $this->call('role.get', [
+			'output' => ['name'],
+			'selectRules' => ['api.access'],
+			'roleids' => $roleids
+		])['result'];
+		$actual = [];
+
+		foreach ($db_roles as $db_role) {
+			$actual[$db_role['name']] = $db_role['rules'];
+		}
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
@@ -842,6 +908,18 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'apm.traces',
+									'status' => '1'
+								],
+								[
+									'name' => 'apm.metrics',
+									'status' => '1'
+								],
+								[
+									'name' => 'apm.logs',
+									'status' => '1'
+								],
+								[
 									'name' => 'services.services',
 									'status' => '1'
 								],
@@ -934,7 +1012,7 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
-									'name' => 'configuration.event_correlation',
+									'name' => 'configuration.ceprules',
 									'status' => '1'
 								],
 								[
@@ -971,6 +1049,10 @@ class testRole extends CAPITest {
 								],
 								[
 									'name' => 'administration.general',
+									'status' => '1'
+								],
+								[
+									'name' => 'administration.data_source',
 									'status' => '1'
 								],
 								[

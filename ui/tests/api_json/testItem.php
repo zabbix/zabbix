@@ -14,8 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/traitItemTelemetryQueryTests.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @backup items
@@ -23,7 +25,165 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testItem extends CAPITest {
 
-	protected static $items;
+	use traitItemTelemetryQueryTests;
+
+	protected static array $items;
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testHostItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':host:telemetry_query_host',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_host_create_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$i++;
+
+		$this->call('item.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testTemplateItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':template:telemetry_query_template',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_template_create_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$i++;
+
+		$this->call('item.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testHostItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:host_item_telemetry_query'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataTelemetryQueryTypeChange
+	 */
+	public function testHostItemTelemetryQueryTypeChange(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:host_item_script'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testTemplateItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:template_item_telemetry_query'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataTelemetryQueryTypeChange
+	 */
+	public function testTemplateItemTelemetryQueryTypeChange(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:template_item_script'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderHostInheritedTelemetryQueryUpdate
+	 */
+	public function testHostInheritedItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		static $inherited = [];
+
+		$item += [
+			'itemid' => 'template_item_telemetry_query',
+			'hostid' => ':host:telemetry_query_host'
+		];
+		$hostid = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		unset($item['hostid']);
+		$key = $hostid.'-'.$item['itemid'];
+
+		if (!array_key_exists($key, $inherited)) {
+			['result' => $result] = $this->call('item.get', [
+				'output' => ['itemid'],
+				'hostids' => $hostid,
+				'filter' => ['key_' => $item['itemid']],
+				'inherited' => true
+			]);
+			['itemid' => $inherited[$key]] = reset($result);
+		}
+
+		$item['itemid'] = $inherited[$key];
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	public function testTemplateItemTelemetryQueryUpdateConflictingWithInheritedItem(): void {
+		$template_itemid = CTestDataHelper::getConvertedValueReference(':item:template_item_telemetry_query');
+		$hostid = CTestDataHelper::getConvertedValueReference(':host:telemetry_query_host');
+
+		$this->call('item.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '10m',
+			'granularity' => '1m'
+		]);
+
+		['result' => $result] = $this->call('item.get', [
+			'output' => ['itemid'],
+			'hostids' => $hostid,
+			'filter' => ['key_' => 'template_item_telemetry_query'],
+			'inherited' => true
+		]);
+		$inherited_itemid = $result[0]['itemid'];
+
+		$this->call('item.update', [
+			'itemid' => $inherited_itemid,
+			'granularity' => '5m'
+		]);
+
+		$this->call('item.update', [
+			'itemid' => $template_itemid,
+			'lookback_limit' => '2m'
+		], 'Cannot update inherited item with key "template_item_telemetry_query" on host "telemetry_query_host" because granularity cannot be greater than lookback limit.');
+
+		['result' => $result] = $this->call('item.get', [
+			'output' => ['lookback_limit', 'granularity'],
+			'itemids' => [$template_itemid, $inherited_itemid],
+			'preservekeys' => true
+		]);
+
+		$this->assertSame('10m', $result[$template_itemid]['lookback_limit']);
+		$this->assertSame('1m', $result[$template_itemid]['granularity']);
+		$this->assertSame('10m', $result[$inherited_itemid]['lookback_limit']);
+		$this->assertSame('5m', $result[$inherited_itemid]['granularity']);
+	}
 
 	public static function getItemCreateData() {
 		$valid_item_types = [
@@ -766,7 +926,7 @@ class testItem extends CAPITest {
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT,
-					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 				]).'.'
 			],
 			// Test update interval for mqtt key of the Agent item type.
@@ -1062,6 +1222,7 @@ class testItem extends CAPITest {
 		]);
 
 		self::$items = $result['itemids'];
+		self::initItemTestsData();
 	}
 
 	public static function getItemUpdateData() {

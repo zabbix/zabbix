@@ -154,9 +154,11 @@ class testFormMaintenance extends CWebTest {
 					'Periods' => [],
 					'Host groups' => '',
 					'Hosts' => '',
+					'Triggers' => '',
+					'id:event_names_0_operator' => 'Contains',
 					'id:tags_evaltype' => 'And/Or',
 					'id:tags_0_tag' => '',
-					'id:tags_0_operator' => 'Contains',
+					'name:tags[0][operator]' => 'Contains',
 					'id:tags_0_value' => '',
 					'Description' => ''
 				];
@@ -167,7 +169,7 @@ class testFormMaintenance extends CWebTest {
 			// Check asterisk in required field labels.
 			$this->assertEquals(['Name', 'Active since', 'Active till', 'Periods'], $form->getRequiredLabels());
 			$this->assertTrue($this->query('xpath://label[contains(@class,"form-label-asterisk") and contains(text(),'.
-				'"At least one host group or host must be selected.")]')->exists()
+				'"At least one host group, host or trigger must be selected.")]')->exists()
 			);
 
 			$check_fields = [
@@ -176,6 +178,8 @@ class testFormMaintenance extends CWebTest {
 				'id:active_till' => ['maxlength' => 255, 'placeholder' => 'YYYY-MM-DD hh:mm'],
 				'id:groupids__ms' => ['placeholder' => 'type here to search'],
 				'id:hostids__ms' => ['placeholder' => 'type here to search'],
+				'id:triggerids__ms' => ['placeholder' => 'type here to search'],
+				'id:event_names_0_value' =>  ['maxlength' => 2048, 'placeholder' => 'value'],
 				'id:tags_0_tag' => ['maxlength' => 255, 'placeholder' => 'tag'],
 				'id:tags_0_value' => ['maxlength' => 255, 'placeholder' => 'value'],
 				'Description' => ['maxlength' => 65535]
@@ -190,7 +194,8 @@ class testFormMaintenance extends CWebTest {
 			$radio_buttons = [
 				'Maintenance type' => ['With data collection', 'No data collection'],
 				'id:tags_evaltype' => ['And/Or', 'Or'],
-				'id:tags_0_operator' => ['Contains', 'Equals']
+				'id:event_names_0_operator' => ['Contains', 'Does not contain']
+
 			];
 			foreach ($radio_buttons as $name => $labels) {
 				$this->assertEquals($labels, $form->getField($name)->getLabels()->asText());
@@ -209,6 +214,12 @@ class testFormMaintenance extends CWebTest {
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 
+			// Check Event name table.
+			$event_table = $form->query('id:event_names')->asMultifieldTable()->one();
+			$this->assertSame( ['Operator', 'Name'], $event_table->getHeadersText());
+			$this->assertEquals(2, $event_table->query('button', ['Add', 'Remove'])->all()
+					->filter(CElementFilter::CLICKABLE)->count());
+
 			// Check Tags table.
 			$tags_table = $form->query('id:tags')->asMultifieldTable()->one();
 			$tags_rows_count = $is_update ? 2 : 1;
@@ -216,20 +227,22 @@ class testFormMaintenance extends CWebTest {
 			$this->assertEquals($tags_rows_count + 1, $tags_table->query('button', ['Add', 'Remove'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
+			$this->assertSame(['Equals', 'Contains', 'Does not equal', 'Does not contain'],
+					$form->getField('name:tags[0][operator]')->getOptions()->asText()
+			);
 
-			// Change to 'No data collection' and assert tags table elements are disabled.
+			// Change to 'No data collection' and assert tags table, event table and triggers field elements are disabled.
 			$form->fill(['Maintenance type' => 'No data collection']);
-			$state_changing_fields = [
-				'id:tags_evaltype',
-				'id:tags_0_tag',
-				'id:tags_0_operator',
-				'id:tags_0_value'
-			];
+			$state_changing_fields = ['id:tags_evaltype', 'id:tags_0_tag', 'name:tags[0][operator]', 'id:tags_0_value',
+					'Triggers', 'id:event_names_0_operator_0', 'id:event_names_0_value'];
 			foreach ($state_changing_fields as $field) {
 				$this->assertFalse($form->getField($field)->isEnabled());
 			}
 
 			$this->assertEquals(0, $tags_table->query('button', ['Add', 'Remove'])->all()
+					->filter(CElementFilter::CLICKABLE)->count()
+			);
+			$this->assertEquals(0, $event_table->query('button', ['Add', 'Remove'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 
@@ -238,8 +251,10 @@ class testFormMaintenance extends CWebTest {
 			foreach ($state_changing_fields as $field) {
 				$this->assertTrue($form->getField($field)->isEnabled());
 			}
-
 			$this->assertEquals($tags_rows_count + 1, $tags_table->query('button', ['Add', 'Remove'])->all()
+					->filter(CElementFilter::CLICKABLE)->count()
+			);
+			$this->assertEquals(2, $event_table->query('button', ['Add', 'Remove'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 
@@ -249,7 +264,7 @@ class testFormMaintenance extends CWebTest {
 			}
 
 			// Check Select buttons and dialogs they open.
-			foreach (['Host groups', 'Hosts'] as $field) {
+			foreach (['Host groups', 'Hosts', 'Triggers'] as $field) {
 				$this->assertTrue($form->getField($field)->query('button:Select')->one()->isClickable());
 				$form->getField($field)->query('button:Select')->one()->click();
 
@@ -898,7 +913,7 @@ class testFormMaintenance extends CWebTest {
 						'id:active_since' => 'This field cannot be empty.',
 						'id:active_till' => 'This field cannot be empty.',
 						'xpath://table[@id="timeperiods"]/..' => 'At least one period must be added.',
-						'Host groups' => 'At least one host group or host must be selected.'
+						'Host groups' => 'At least one host group, host or trigger must be selected.'
 					]
 				]
 			],
@@ -1104,8 +1119,6 @@ class testFormMaintenance extends CWebTest {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 
-		$form->fill($data['fields']);
-
 		if ($update) {
 			// Remove all periods.
 			$existing_periods = $this->query(self::PERIODS_TABLE)->asTable()->one()->getRows();
@@ -1124,6 +1137,8 @@ class testFormMaintenance extends CWebTest {
 				$period_overlay->waitUntilNotVisible();
 			}
 		}
+
+		$form->fill($data['fields']);
 
 		$form->submit();
 		$this->page->waitUntilReady();

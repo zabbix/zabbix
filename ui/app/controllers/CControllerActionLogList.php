@@ -185,7 +185,9 @@ class CControllerActionLogList extends CController {
 		$response->setTitle(_('Action log'));
 
 		if ($data['action'] === 'actionlog.csv') {
-			$response->setFileName('zbx_actionlog_export.csv');
+			$response
+				->setFileName('zbx_actionlog_export.csv')
+				->setFileMimeType('text/csv');
 		}
 
 		$this->setResponse($response);
