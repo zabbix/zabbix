@@ -1831,7 +1831,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 			" from items i"
 			" left join item_rtdata ir on i.itemid=ir.itemid");
 
-	dbsync_prepare(sync, 54, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 55, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
