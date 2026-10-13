@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testCalculatedExpression extends CIntegrationTest {
 
 	private static $hostid;
-	private static $itemIds = [];
 
 	const HOST_NAME = 'test_calc';
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
@@ -99,7 +98,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		/*
 		 * The trigger is needed to ensure that the value cache receives data immediately when history is added.
@@ -192,6 +190,20 @@ class testCalculatedExpression extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('result', $response);
 		return $response['result'][$itemid]['lastvalue'];
+	}
+
+	/**
+	 * Wait until the item has a last value (equal to the expected one, if given). A value reaches the history storage
+	 * some time after it is calculated (history syncer, Elasticsearch index refresh), so a result seen in the server
+	 * log may not be available through the API yet.
+	 */
+	private function waitForItemLastValue(string $itemid, ?string $expected_value = null): void {
+		$this->callUntilDataIsPresent('item.get', [
+			'output' => ['lastclock', 'lastvalue'],
+			'itemids' => $itemid
+		], 60, 1, static fn(array $response) => $response['result'][0]['lastclock'] !== '0'
+			&& ($expected_value === null || $response['result'][0]['lastvalue'] === $expected_value)
+		);
 	}
 
 	private function historyGet($itemid)
@@ -591,14 +603,13 @@ class testCalculatedExpression extends CIntegrationTest {
 	 * @depends testCalculatedExpression_MultiItemAverage
 	 */
 	public function testCalculatedExpression_ItemCount_TagFilter() {
-		$formula = 'item_count(/' . self::HOST_NAME . '/*?[tag="{$TAG_NAME}:{$TAG_VALUE}"])';
+		$formula = 'item_count(/'.self::HOST_NAME.'/*?[tag="{$TAG_NAME}:{$TAG_VALUE}"])';
 
 		$calcItemId = $this->createCalculatedItemWithFormula($formula, 'itemcount_tag', '1s', ITEM_VALUE_TYPE_UINT64);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
 			" value:14 flags:uint64", true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:14 flags:uint64", true, 120);
+		$this->waitForItemLastValue($calcItemId);
 		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
 	}
 
@@ -667,6 +678,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "zbx_expression_eval_execute() expression:" .
 			"'histogram_quantile(0.25,0.1,last(0),0.5,last(1),1.0,last(2),2.0,last(3),\"+Inf\",last(4))'",
 			true, 120);
+		$this->waitForItemLastValue($calcItemId);
 
 		/* Histogram_quantile(0.25, ...) calculates the 25th percentile (quantile φ=0.25) from the histogram buckets. */
 		/* Bucket boundaries and cumulative counts: */
@@ -712,13 +724,19 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
 			" value:var vector[0:4] flags:vector", true, 120);
 
-		$history = $this->historyGet($itemids);
+		$history = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => $itemids,
+			'history' => ITEM_VALUE_TYPE_FLOAT
+		], 60, 1, static fn(array $response) => count($response['result']) === count($itemids));
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			['80', '90', '96', '97'],
 			$values
 		);
+
+		/* Values calculated before all trapper values arrived are in history too (an empty vector gives 0). */
+		$this->waitForItemLastValue($calcItemId, '2');
 
 		/* We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. */
 		/* So expected result is 2. */
@@ -750,20 +768,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		/* There seems to be no way to calculate historical trends. */
 		$this->assertTrue(DBexecute(
-			'INSERT INTO trends (itemid, clock, num, value_min, value_avg, value_max)
-				VALUES (' .
-				(int)$trapId[0] . ',' .
-				(time() - (3600 * 2)) . ',' .
-				'1,' .
-				(float)self::DBL_MAX . ',' .
-				(float)self::DBL_MAX . ',' .
-				(float)self::DBL_MAX .
-				')'
+			'INSERT INTO trends (itemid,clock,num,value_min,value_avg,value_max)
+				VALUES ('.$trapId.','.(time() - (3600 * 2)).',1,'.self::DBL_MAX.','.self::DBL_MAX.','.self::DBL_MAX.')'
 		));
 
 		for ($i = 0; $i <= 3; $i++) {
 			$response = $this->call('history.push', [
-				'itemid' => $trapId[0],
+				'itemid' => $trapId,
 				'value' => (float)self::DBL_MAX,
 				'clock' => time() - 3600 - 70 - $i,
 				'ns' => 255
@@ -817,12 +828,6 @@ class testCalculatedExpression extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
-
-		if (!empty(self::$itemIds)) {
-			CDataHelper::call('item.delete', self::$itemIds);
-			self::$itemIds = [];
-		}
-
 		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 
