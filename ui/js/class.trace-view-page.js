@@ -292,6 +292,11 @@ class TraceViewPage {
 		row_element.classList.add('trace-waterfall-row');
 		row_element.dataset.spanId = span.id;
 
+		let start = 0;
+		let width = 0;
+
+		const span_color = span.color || this.#getColor(span.index || 0);
+
 		if (this.#spanIntersectsSelectedRange(span)) {
 			const value = Number(span.end) - Number(span.start);
 
@@ -299,20 +304,30 @@ class TraceViewPage {
 			label.classList.add('trace-span-label');
 			label.textContent = this.#formatTime(value, this.#getTimeUnit(value));
 
+			start = this.#getClampedStartRatio(span) * 100;
+			width = start + this.#getClampedWidthRatio(span) * 100;
+
 			const bar = document.createElement('div');
 			bar.classList.add('trace-span-bar');
-			bar.style.setProperty('--trace-span-start', `${this.#getClampedStartRatio(span) * 100}%`);
-			bar.style.setProperty('--trace-span-width', `${this.#getClampedWidthRatio(span) * 100}%`);
-			bar.style.setProperty('--trace-span-color', span.color || this.#getColor(span.index || 0));
+			bar.style.setProperty('--trace-span-start', `${start}%`);
+			bar.style.setProperty('--trace-span-width', `${width}%`);
+			bar.style.setProperty('--trace-span-color', span_color);
 			bar.appendChild(label);
 
 			row_element.appendChild(bar);
 		}
 
 		for (const group of this.#getMarkerGroups(span.events)) {
+			const marker_position = group.ratio * 100;
+
 			const marker = document.createElement('span');
 			marker.classList.add('trace-event-marker');
-			marker.style.setProperty('--trace-event-position', `${group.ratio * 100}%`);
+			marker.style.setProperty('--trace-event-position', `${marker_position}%`);
+			marker.style.setProperty('--trace-marker-border-color', span_color);
+
+			if (start > marker_position || marker_position > start + width) {
+				marker.style.setProperty('--trace-marker-bg-color', span_color);
+			}
 
 			if (group.events.length > 1) {
 				marker.dataset.count = String(group.events.length);

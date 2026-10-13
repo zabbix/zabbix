@@ -6072,8 +6072,8 @@ section {
     box-sizing: border-box;
     inline-size: var(--trace-marker-size);
     block-size: var(--trace-marker-size);
-    border: 1px solid var(--trace-bg-color);
-    background: #fff;
+    border: 1px solid var(--trace-marker-border-color);
+    background: var(--trace-marker-bg-color, #ffffff);
     transform: translate(-50%, -50%) rotate(45deg);
     cursor: default; }
     .trace-view .trace-event-marker[data-count]::after {
@@ -6084,7 +6084,7 @@ section {
       block-size: 12px;
       border-radius: 6px;
       background: #0275b8;
-      color: #fff;
+      color: #ffffff;
       font-size: 9px;
       line-height: 12px;
       text-align: center;
