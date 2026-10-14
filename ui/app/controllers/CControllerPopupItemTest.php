@@ -1105,7 +1105,7 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 
 				foreach ($inputs[$field] as &$entry) {
-					if (strpos($entry['name'], '{') !== false) {
+					if (str_contains($entry['name'], '{')) {
 						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['name'], $types);
 
 						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -1117,7 +1117,7 @@ abstract class CControllerPopupItemTest extends CController {
 						}
 					}
 
-					if (strpos($entry['value'], '{') !== false) {
+					if (str_contains($entry['value'], '{')) {
 						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['value'], $types);
 
 						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
