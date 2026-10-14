@@ -63,7 +63,8 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'min_duration' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => null, 'max' => null]]],
 			'max_duration' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => null, 'max' => null]]],
 			'statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
-				APM_TRACE_STATUS_ERROR]]],
+				APM_TRACE_STATUS_ERROR
+			]]],
 			'resource_attributes_evaltype' => ['integer', 'required',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
 			],
@@ -72,19 +73,21 @@ class CControllerApmTraceListData extends CControllerDataTable {
 					'key' => ['string'],
 					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
 						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+						CONDITION_OPERATOR_NOT_LIKE
+					]],
 					'value' => ['string']
 				]]
 			],
-			'span_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
-			],
+			'span_attributes_evaltype' => ['integer', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR,
+				CONDITION_EVAL_TYPE_OR
+			]],
 			'span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
 					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
 						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+						CONDITION_OPERATOR_NOT_LIKE
+					]],
 					'value' => ['string']
 				]]
 			],
@@ -137,10 +140,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			: [];
 
 		$resource_attributes = array_key_exists('resource_attributes', $this->filter)
-			&& $this->filter['resource_attributes']
-				? array_filter($this->filter['resource_attributes'],
-					static fn (array $attribute) => $attribute['key'] !== '')
-				: null;
+				&& $this->filter['resource_attributes']
+			? array_filter($this->filter['resource_attributes'],
+				static fn (array $attribute) => $attribute['key'] !== '')
+			: null;
 
 		$span_attributes = array_key_exists('span_attributes', $this->filter) && $this->filter['span_attributes']
 			? array_filter($this->filter['span_attributes'], static fn (array $attribute) => $attribute['key'] !== '')
@@ -277,7 +280,8 @@ class CControllerApmTraceListData extends CControllerDataTable {
 	protected function isDataSourceConfigured(): bool {
 		try {
 			ApmDb::getInstance()->getConfig();
-		} catch (DBException) {
+		}
+		catch (DBException) {
 			return false;
 		}
 
