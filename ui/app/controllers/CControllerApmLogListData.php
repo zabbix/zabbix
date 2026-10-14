@@ -96,14 +96,6 @@ class CControllerApmLogListData extends CControllerDataTable {
 			];
 		}
 
-		if (!$this->getDataFields()) {
-			return [
-				'no_data_icon' => ZBX_ICON_SEARCH_LARGE,
-				'no_data_message' => _('No columns selected'),
-				'no_data_description' => _('Add columns in the Customize table panel')
-			];
-		}
-
 		$data_fields = $this->getDataFields($this->allowed_data_fields);
 
 		$sort_field = $this->getInput('sort_field', 'timestamp');

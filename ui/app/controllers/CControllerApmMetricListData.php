@@ -115,14 +115,6 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			];
 		}
 
-		if (!$this->getDataFields()) {
-			return [
-				'no_data_icon' => ZBX_ICON_SEARCH_LARGE,
-				'no_data_message' => _('No columns selected'),
-				'no_data_description' => _('Add columns in the Customize table panel')
-			];
-		}
-
 		$sort_field = $this->getInput('sort_field', 'metric_name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
 

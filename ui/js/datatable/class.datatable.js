@@ -2144,6 +2144,18 @@ class CDataTable {
 			return;
 		}
 
+		if (this.#visible_columns.length === 0) {
+			this.#renderEmptyState({
+				icon: ZBX_ICON_SEARCH_LARGE,
+				message: t('No columns selected'),
+				description: t('Add columns in the Customize table panel'),
+			});
+
+			this.#footer.classList.add(ZBX_STYLE_HIDDEN);
+
+			return;
+		}
+
 		if (!('data' in response) || response.data.length === 0) {
 			this.#renderEmptyState({
 				icon: response.no_data_icon,
