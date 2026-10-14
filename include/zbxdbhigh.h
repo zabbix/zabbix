@@ -705,6 +705,8 @@ typedef struct
 	zbx_vector_db_value_ptr_t	rows;
 	/* index of autoincrement field */
 	int				autoincrement;
+	/* database connection options */
+	int 				connect_options;
 	/* the last id assigned by autoincrement */
 	zbx_uint64_t			lastid;
 	char				*clause;
@@ -714,10 +716,10 @@ zbx_db_insert_t;
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+void	zbx_db_insert_prepare_once(zbx_db_insert_t *self, const char *table, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
-int	zbx_db_insert_execute_once(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);

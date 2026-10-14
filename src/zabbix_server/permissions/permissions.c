@@ -229,9 +229,9 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 		gsetid++;
 	}
 
-	if (FAIL == zbx_db_insert_execute_once(db_gset) ||
-			FAIL == zbx_db_insert_execute_once(db_gset_groups) ||
-			FAIL == zbx_db_insert_execute_once(db_gset_parents))
+	if (FAIL == zbx_db_insert_execute(db_gset) ||
+			FAIL == zbx_db_insert_execute(db_gset_groups) ||
+			FAIL == zbx_db_insert_execute(db_gset_parents))
 	{
 		return FAIL;
 	}
@@ -278,9 +278,9 @@ static int	permission_hgsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_t	db_insert, db_insert_groups, db_insert_hosts;
 
 	zbx_hashset_create(&hgsets, 1, permission_group_set_hash, permission_group_set_compare);
-	zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_groups, "hgset_group", "hgsetid", "groupid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert, "hgset", "hgsetid", "hash", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert_groups, "hgset_group", "hgsetid", "groupid", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "hostid", "groupid", "hosts_groups", &hgsets, 0)))
 		ret = permission_groupsets_insert("hgset", &hgsets, &db_insert, &db_insert_groups, &db_insert_hosts);
@@ -301,9 +301,9 @@ static int	permission_ugsets_add(zbx_vector_uint64_t *ids)
 	zbx_db_insert_t		db_insert, db_insert_groups, db_insert_users;
 
 	zbx_hashset_create(&ugsets, 1, permission_group_set_hash, permission_group_set_compare);
-	zbx_db_insert_prepare(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
 
 	if (SUCCEED == (ret = permission_groupsets_make(ids, "userid", "usrgrpid", "users_groups", &ugsets, 1)))
 		ret = permission_groupsets_insert("ugset", &ugsets, &db_insert, &db_insert_groups, &db_insert_users);
@@ -440,7 +440,7 @@ static void	permissions_rebuild_task(void)
 	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert;
 
-	zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
+	zbx_db_insert_prepare_once(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
 
 	result = zbx_db_select_once("select u.ugsetid,h.hgsetid,max(r.permission)"
 			" from hgset h"
@@ -478,7 +478,7 @@ static void	permissions_rebuild_task(void)
 	}
 	zbx_db_free_result(result);
 
-	res = zbx_db_insert_execute_once(&db_insert);
+	res = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED != res)
