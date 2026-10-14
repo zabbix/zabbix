@@ -904,7 +904,8 @@ main {
   padding: 10px; }
 
 footer {
-  margin-top: auto; }
+  margin-top: auto;
+  min-width: var(--min-content-size); }
 
 output {
   display: block; }
