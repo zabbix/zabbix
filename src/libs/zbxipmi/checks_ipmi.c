@@ -136,6 +136,9 @@ typedef struct zbx_ipmi_host
 	int			control_count;
 	ipmi_con_t		*con;
 	int			domain_up;
+	int			domain_opening;	/* ipmi_open_domain() was called, but neither domain up */
+						/* nor domain closed callback was received yet */
+	time_t			domain_open_start;	/* time when opening of the domain was started */
 	int			done;
 	time_t			lastaccess;	/* Time of last access attempt. Used to detect and delete inactive */
 						/* (disabled) IPMI hosts from OpenIPMI to stop polling them. */
@@ -1483,6 +1486,7 @@ static void	zbx_domain_closed_cb(void *cb_data)
 	}
 
 	h->domain_up = 0;
+	h->domain_opening = 0;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1537,6 +1541,7 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 			h->port, (void *)domain, cb_data);
 
 	h->domain_up = 1;
+	h->domain_opening = 0;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1603,10 +1608,14 @@ static void	zbx_free_ipmi_host(zbx_ipmi_host_t *h)
 	{
 		zbx_free(h->controls[i].c_name);
 		zbx_free(h->controls[i].val);
+		zbx_free(h->controls[i].full_name);
 	}
 
 	for (int i = 0; i < h->sensor_count; i++)
+	{
+		zbx_free(h->sensors[i].full_name);
 		zbx_free_ipmi_sensor_properties(&h->sensors[i]);
+	}
 
 	zbx_free(h->sensors);
 	zbx_free(h->controls);
@@ -1641,6 +1650,8 @@ void	zbx_free_ipmi_handler(void)
 static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username,
 		const char *password)
 {
+#define ZBX_IPMI_DOMAIN_OPEN_TIMEOUT	60	/* seconds to wait for domain being opened before starting again */
+
 	zbx_ipmi_host_t		*h;
 	ipmi_open_option_t	options[4];
 
@@ -1667,6 +1678,29 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 	{
 		if (1 == h->domain_up)
 			goto out;
+
+		if (1 == h->domain_opening)
+		{
+			if (ZBX_IPMI_DOMAIN_OPEN_TIMEOUT > time(NULL) - h->domain_open_start)
+			{
+				/* Opening the domain may take longer than one wait. Opening another domain would */
+				/* make both of them report the same sensors to this host once they are up. */
+				h->ret = SUCCEED;
+				h->done = 0;
+
+				zbx_perform_openipmi_ops(h, __func__);	/* result is checked below */
+				goto check;
+			}
+
+			/* the domain is still not up - start from scratch */
+			if (SUCCEED != zbx_close_ipmi_domain(h))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot close IPMI domain of host [%s]:%d", __func__,
+						h->ip, h->port);
+			}
+
+			h->domain_opening = 0;
+		}
 	}
 	else
 		h = zbx_allocate_ipmi_host(ip, port, authtype, privilege, username, password);
@@ -1719,7 +1753,17 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	h->domain_opening = 1;
+	h->domain_open_start = time(NULL);
+
+	zbx_perform_openipmi_ops(h, __func__);	/* result is checked below */
+check:
+	/* the domain continues to be opened in the background if it is not up yet */
+	if (0 == h->domain_up && SUCCEED == h->ret)
+	{
+		h->err = zbx_dsprintf(h->err, "connecting to IPMI host [%s]:%d is not finished", h->ip, h->port);
+		h->ret = NETWORK_ERROR;
+	}
 out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
@@ -1727,6 +1771,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p domain_nr:%u", __func__, (void *)h, h->domain_nr);
 
 	return h;
+
+#undef ZBX_IPMI_DOMAIN_OPEN_TIMEOUT
 }
 
 static ipmi_domain_id_t	domain_id;		/* Global variable for passing OpenIPMI domain ID between callbacks. */
