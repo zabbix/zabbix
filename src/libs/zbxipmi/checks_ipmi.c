@@ -453,6 +453,7 @@ static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_
 }
 
 static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor);
+static int	zbx_close_ipmi_domain(zbx_ipmi_host_t *h);
 
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
@@ -1042,6 +1043,38 @@ void	zbx_perform_all_openipmi_ops(int timeout)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: waits until OpenIPMI operation started for host is completed      *
+ *                                                                            *
+ * Parameters: h         - [IN]                                               *
+ *             func_name - [IN] name of function which started the operation  *
+ *                                                                            *
+ * Comments: Operation which is not completed in time leaves the domain in    *
+ *           unknown state - its callbacks may still arrive and complete a    *
+ *           later operation, or a domain still being opened may come up      *
+ *           next to the one opened by the next attempt. So the domain is     *
+ *           closed and the next attempt starts from scratch.                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_wait_openipmi_op(zbx_ipmi_host_t *h, const char *func_name)
+{
+	if (SUCCEED == zbx_perform_openipmi_ops(h, func_name))
+		return;
+
+	if (SUCCEED == h->ret)
+	{
+		h->err = zbx_dsprintf(h->err, "timeout while waiting for IPMI host [%s]:%d", h->ip, h->port);
+		h->ret = NETWORK_ERROR;
+	}
+
+	if (SUCCEED != zbx_close_ipmi_domain(h))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot close IPMI domain of host [%s]:%d", func_name, h->ip,
+				h->port);
+	}
+}
+
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 {
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
@@ -1122,7 +1155,7 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1154,7 +1187,7 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1282,7 +1315,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1329,7 +1362,7 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1686,7 +1719,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
@@ -1734,12 +1767,22 @@ static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 		domain_close_ok = 1;
 }
 
-static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: closes OpenIPMI domain of host and waits until it is closed       *
+ *                                                                            *
+ * Parameters: h - [IN]                                                       *
+ *                                                                            *
+ * Return value: SUCCEED - domain was closed or does not exist                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_close_ipmi_domain(zbx_ipmi_host_t *h)
 {
 	char	domain_name[11];	/* max int length */
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __func__, h->ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __func__, h->ip, h->port);
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
@@ -1769,9 +1812,22 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	}
 
 	/* The domain was either successfully closed or not found. */
-	zbx_free_ipmi_host(h);
 	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __func__, h->ip);
+
+	if (SUCCEED == (ret = zbx_close_ipmi_domain(h)))
+		zbx_free_ipmi_host(h);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
