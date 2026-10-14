@@ -39,7 +39,7 @@ ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor);
 ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control);
 int			__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *sensor);
 int			__wrap_ipmi_sensor_pointer_cb(ipmi_sensor_id_t id, ipmi_sensor_ptr_cb handler, void *cb_data);
-OBint			__wrap_ipmi_control_pointer_cb(ipmi_control_id_t id, ipmi_control_ptr_cb handler,
+int			__wrap_ipmi_control_pointer_cb(ipmi_control_id_t id, ipmi_control_ptr_cb handler,
 					void *cb_data);
 
 static int	old_object, new_object, other_object, entity, object_id, other_object_id, sensor_readable = 1;
