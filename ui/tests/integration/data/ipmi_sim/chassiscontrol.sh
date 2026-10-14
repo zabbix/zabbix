@@ -6,8 +6,8 @@
 # controls (created in lib/chassis.c for any MC advertising chassis support) cannot be
 # set. This stub just accepts get/set for power/reset/boot without doing anything real.
 #
-#  chassiscontrol.sh <device> get [parm [parm ...]]
-#  chassiscontrol.sh <device> set [parm val [parm val ...]]
+#  chassiscontrol.sh <device> get [param [param ...]]
+#  chassiscontrol.sh <device> set [param val [param val ...]]
 
 device=$1
 if [ "x$device" = "x" ]; then
@@ -44,16 +44,16 @@ do_get() {
 
 do_set() {
 	while [ "x$1" != "x" ]; do
-		parm="$1"
+		param="$1"
 		shift
 		if [ "x$1" = "x" ]; then
-			echo "No value present for parameter $parm"
+			echo "No value present for parameter $param"
 			exit 1
 		fi
 		val="$1"
 		shift
 
-		case $parm in
+		case $param in
 			power|reset)
 				;;
 			boot)
@@ -70,7 +70,7 @@ do_set() {
 				shift
 				;;
 			*)
-				echo "Invalid parameter: $parm"
+				echo "Invalid parameter: $param"
 				exit 1
 				;;
 		esac
