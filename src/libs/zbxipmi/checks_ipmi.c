@@ -567,7 +567,10 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 		if (h->sensor_count != i)
 			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (size_t)(h->sensor_count - i));
 
-		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
+		if (0 == h->sensor_count)
+			zbx_free(h->sensors);
+		else
+			h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
 
 		break;
 	}
@@ -708,7 +711,10 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 		if (h->control_count != i)
 			memmove(&h->controls[i], &h->controls[i + 1], sz * (size_t)(h->control_count - i));
 
-		h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
+		if (0 == h->control_count)
+			zbx_free(h->controls);
+		else
+			h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
 
 		break;
 	}
@@ -1370,6 +1376,80 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
 
+typedef struct
+{
+	const void	*deleted;	/* object being deleted */
+	int		ret;		/* SUCCEED if another object has the same ID */
+}
+zbx_ipmi_replaced_t;
+
+/* callback function invoked from OpenIPMI */
+static void	zbx_sensor_replaced_cb(ipmi_sensor_t *sensor, void *cb_data)
+{
+	zbx_ipmi_replaced_t	*replaced = (zbx_ipmi_replaced_t *)cb_data;
+
+	if ((const void *)sensor != replaced->deleted)
+		replaced->ret = SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if sensor being deleted is replaced by another one         *
+ *                                                                            *
+ * Parameters: sensor - [IN]                                                  *
+ *                                                                            *
+ * Return value: SUCCEED - OpenIPMI already has another sensor with the same  *
+ *                         ID, which replaces the one being deleted           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: OpenIPMI removes a destroyed sensor from its lookup right away,  *
+ *           but may report its deletion only after the replacing sensor      *
+ *           (with the same ID) was added. Must be called within OpenIPMI     *
+ *           callback.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_ipmi_sensor_is_replaced(ipmi_sensor_t *sensor)
+{
+	zbx_ipmi_replaced_t	replaced = {sensor, FAIL};
+
+	if (0 != ipmi_sensor_pointer_cb(ipmi_sensor_convert_to_id(sensor), zbx_sensor_replaced_cb, &replaced))
+		return FAIL;
+
+	return replaced.ret;
+}
+
+/* callback function invoked from OpenIPMI */
+static void	zbx_control_replaced_cb(ipmi_control_t *control, void *cb_data)
+{
+	zbx_ipmi_replaced_t	*replaced = (zbx_ipmi_replaced_t *)cb_data;
+
+	if ((const void *)control != replaced->deleted)
+		replaced->ret = SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if control being deleted is replaced by another one        *
+ *                                                                            *
+ * Parameters: control - [IN]                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - OpenIPMI already has another control with the      *
+ *                         same ID, which replaces the one being deleted      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: see zbx_ipmi_sensor_is_replaced()                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_ipmi_control_is_replaced(ipmi_control_t *control)
+{
+	zbx_ipmi_replaced_t	replaced = {control, FAIL};
+
+	if (0 != ipmi_control_pointer_cb(ipmi_control_convert_to_id(control), zbx_control_replaced_cb, &replaced))
+		return FAIL;
+
+	return replaced.ret;
+}
+
 /* callback function invoked from OpenIPMI */
 static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
 {
@@ -1390,7 +1470,9 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 					zbx_allocate_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_DELETED:
-				zbx_delete_ipmi_sensor(h, sensor);
+				/* the entry is kept for the replacing sensor, which has the same ID */
+				if (SUCCEED != zbx_ipmi_sensor_is_replaced(sensor))
+					zbx_delete_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_CHANGED:
 				break;
@@ -1419,7 +1501,9 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 				zbx_allocate_ipmi_control(h, control);
 			break;
 		case IPMI_DELETED:
-			zbx_delete_ipmi_control(h, control);
+			/* the entry is kept for the replacing control, which has the same ID */
+			if (SUCCEED != zbx_ipmi_control_is_replaced(control))
+				zbx_delete_ipmi_control(h, control);
 			break;
 		case IPMI_CHANGED:
 			break;

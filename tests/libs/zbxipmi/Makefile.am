@@ -54,7 +54,9 @@ zbx_ipmi_change_callbacks_LDADD += @SERVER_LIBS@
 CHANGE_CALLBACKS_WRAP_FUNCS = \
 	-Wl,--wrap=ipmi_sensor_convert_to_id \
 	-Wl,--wrap=ipmi_control_convert_to_id \
-	-Wl,--wrap=ipmi_sensor_get_is_readable
+	-Wl,--wrap=ipmi_sensor_get_is_readable \
+	-Wl,--wrap=ipmi_sensor_pointer_cb \
+	-Wl,--wrap=ipmi_control_pointer_cb
 
 zbx_ipmi_change_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) \
 	$(CHANGE_CALLBACKS_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)

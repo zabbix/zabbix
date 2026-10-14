@@ -12,18 +12,22 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/* zbx_sensor_change_cb() and zbx_control_change_cb() are static OpenIPMI callbacks, so checks_ipmi.c is      */
-/* included directly to reach them and the 'hosts' list their cb_data is resolved against.                   */
-/*                                                                                                            */
-/* When OpenIPMI replaces a sensor or control (e.g. its SDR changed while it was being read), the new object   */
-/* gets the same OpenIPMI ID as the old one, and IPMI_ADDED for the new object may be reported before          */
-/* IPMI_DELETED for the old one. The fabricated 'old' and 'new' objects below are therefore converted to the   */
-/* same ID by the wrapped ipmi_sensor_convert_to_id()/ipmi_control_convert_to_id(). The objects are never      */
-/* dereferenced: the entry for the old object is registered directly, so IPMI_ADDED for an already known ID    */
+/* zbx_sensor_change_cb() and zbx_control_change_cb() are static OpenIPMI callbacks, so checks_ipmi.c is        */
+/* included directly to reach them and the 'hosts' list their cb_data is resolved against.                      */
+/*                                                                                                              */
+/* When OpenIPMI replaces a sensor or control (e.g. its SDR changed while it was being read), the new object    */
+/* gets the same OpenIPMI ID as the old one, and IPMI_ADDED for the new object may be reported before           */
+/* IPMI_DELETED for the old one. The fabricated 'old' and 'new' objects below are therefore converted to the    */
+/* same ID by the wrapped ipmi_sensor_convert_to_id()/ipmi_control_convert_to_id(). The objects are never       */
+/* dereferenced: the entry for the old object is registered directly, so IPMI_ADDED for an already known ID     */
 /* does not reach zbx_allocate_ipmi_sensor()/zbx_allocate_ipmi_control(). The 'other' object has its own ID.    */
-/*                                                                                                            */
-/* Events may also be sent with the cb_data of another host, of a host which does not exist (e.g. freed before */
-/* a late callback) or with NULL cb_data - such callbacks must not touch the tested host.                     */
+/*                                                                                                              */
+/* Events may also be sent with the cb_data of another host, of a host which does not exist (e.g. freed before  */
+/* a late callback) or with NULL cb_data - such callbacks must not touch the tested host.                       */
+/*                                                                                                              */
+/* OpenIPMI keeps one object per ID in its lookup: an added object takes the slot of its ID, and a destroyed    */
+/* object is removed from it before its deletion is reported. The wrapped ipmi_sensor_pointer_cb()/             */
+/* ipmi_control_pointer_cb() return the object in the slot, which the test updates the same way per event.      */
 #include "../../../src/libs/zbxipmi/checks_ipmi.c"
 
 #include "zbxmocktest.h"
@@ -34,6 +38,9 @@
 ipmi_sensor_id_t	__wrap_ipmi_sensor_convert_to_id(ipmi_sensor_t *sensor);
 ipmi_control_id_t	__wrap_ipmi_control_convert_to_id(ipmi_control_t *control);
 int			__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *sensor);
+int			__wrap_ipmi_sensor_pointer_cb(ipmi_sensor_id_t id, ipmi_sensor_ptr_cb handler, void *cb_data);
+OBint			__wrap_ipmi_control_pointer_cb(ipmi_control_id_t id, ipmi_control_ptr_cb handler,
+					void *cb_data);
 
 static int	old_object, new_object, other_object, entity, object_id, other_object_id, sensor_readable = 1;
 
@@ -68,6 +75,38 @@ int	__wrap_ipmi_sensor_get_is_readable(ipmi_sensor_t *sensor)
 	ZBX_UNUSED(sensor);
 
 	return sensor_readable;
+}
+
+/* objects currently in OpenIPMI lookup for the shared ID and for the other ID */
+static void	*slot_object, *slot_other;
+
+static void	**slot_by_id(const ipmi_domain_t *id)
+{
+	return id == (const ipmi_domain_t *)&other_object_id ? &slot_other : &slot_object;
+}
+
+int	__wrap_ipmi_sensor_pointer_cb(ipmi_sensor_id_t id, ipmi_sensor_ptr_cb handler, void *cb_data)
+{
+	void	*object = *slot_by_id(id.mcid.domain_id.domain);
+
+	if (NULL == object)
+		return EINVAL;
+
+	handler((ipmi_sensor_t *)object, cb_data);
+
+	return 0;
+}
+
+int	__wrap_ipmi_control_pointer_cb(ipmi_control_id_t id, ipmi_control_ptr_cb handler, void *cb_data)
+{
+	void	*object = *slot_by_id(id.mcid.domain_id.domain);
+
+	if (NULL == object)
+		return EINVAL;
+
+	handler((ipmi_control_t *)object, cb_data);
+
+	return 0;
 }
 
 static enum ipmi_update_e	op_by_name(const char *name)
@@ -152,6 +191,9 @@ void	zbx_mock_test_entry(void **state)
 	else
 		register_old_control(h);
 
+	slot_object = &old_object;
+	slot_other = NULL;
+
 	hevents = zbx_mock_get_parameter_handle("in.events");
 
 	while (ZBX_MOCK_SUCCESS == (err = zbx_mock_vector_element(hevents, &hevent)))
@@ -181,6 +223,18 @@ void	zbx_mock_test_entry(void **state)
 				cb_data = NULL;
 			else if (0 != strcmp(value, "tested"))
 				fail_msg("unknown host: %s", value);
+		}
+
+		if (IPMI_ADDED == op)
+		{
+			*slot_by_id(object_id_by_object(object)) = object;
+		}
+		else if (IPMI_DELETED == op)
+		{
+			void	**slot = slot_by_id(object_id_by_object(object));
+
+			if (object == *slot)
+				*slot = NULL;
 		}
 
 		if (1 == is_sensor)
