@@ -45,6 +45,10 @@
 #define ZBX_TQ_GRANULARITY_MIN		1
 #define ZBX_TQ_GRANULARITY_MAX		SEC_PER_DAY
 
+/* SYNC WITH PHP! */
+#define ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN	255
+#define ZBX_TQ_CONDITION_VALUE_LEN		255
+
 #define ZBX_TQ_MAX_RESULT_ROWS	10000	/* maximum amount of values saved by a single check, */
 					/* overflow results in partial result being saved    */
 

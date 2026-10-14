@@ -1180,6 +1180,50 @@ static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, co
 	zbx_free(msg);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: str must hold a valid query, all fields must be set (not NULL)   *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_query_field_lengths(const char *str, char *error, size_t max_error_len)
+{
+	int		ret = FAIL;
+	zbx_tq_query_t	query;
+
+	if (SUCCEED != zbx_tq_parse_query(&query, str, error, max_error_len))
+		return FAIL;
+
+	/* no need to prepare query for field presence validation since it was prepared (and thus validated) */
+	/* while making the item */
+
+	for (int i = 0; i < query.conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query.conditions.values[i];
+
+		/* attribute_key and value are valid UTF-8 since parsing succeeded */
+
+		if (zbx_strlen_utf8(cond->attribute_key) > ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
+			goto out;
+		}
+
+		if (zbx_strlen_utf8(cond->value) > ZBX_TQ_CONDITION_VALUE_LEN)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_tq_query_clean(&query);
+
+	return ret;
+}
+
 static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -1288,6 +1332,12 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				}
 
 				lld_item_add_error(item, error, "invalid trends storage period \"%s\"", *field);
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_QUERY:
+				if (SUCCEED == lld_validate_query_field_lengths(*field, errmsg_buf, sizeof(errmsg_buf)))
+					return;
+
+				lld_item_add_error(item, error, "%s", errmsg_buf);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT:
 			case ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT:
@@ -2078,7 +2128,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->query = zbx_strdup(NULL, item_prototype->query);
 	item->query_orig = NULL;
 
-	if (SUCCEED == ret && FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj, err,
+	if (SUCCEED == ret && ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type &&
+			FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj, err,
 			sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in query: %s.\n", err);
@@ -2500,19 +2551,22 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->query);
 
-	if (SUCCEED == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, err, sizeof(err)))
+	if (ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type)
 	{
-		if (0 != strcmp(item->query, buffer))
+		if (SUCCEED == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, err, sizeof(err)))
 		{
-			item->query_orig = item->query;
-			item->query = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY;
+			if (0 != strcmp(item->query, buffer))
+			{
+				item->query_orig = item->query;
+				item->query = buffer;
+				buffer = NULL;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY;
+			}
 		}
-	}
-	else
-	{
-		*error = zbx_strdcatf(*error, "Cannot update item, error in query: %s.\n", err);
+		else
+		{
+			*error = zbx_strdcatf(*error, "Cannot update item, error in query: %s.\n", err);
+		}
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->time_shift);

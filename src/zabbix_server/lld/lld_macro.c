@@ -896,28 +896,8 @@ int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t 
 {
 	int			ret = FAIL;
 	zbx_tq_query_t		query;
-	const zbx_db_table_t	*table = NULL;
-	const zbx_db_field_t	*field;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (NULL == (table = zbx_db_get_table("items")))
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("%s(): cannot find table 'items'", __func__);
-		return FAIL;
-	}
-
-	if (NULL == (field = zbx_db_get_field(table, "query")))
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("%s(): cannot find field 'query' in table 'items'", __func__);
-		return FAIL;
-	}
-
-	if (NULL != field->default_value && 0 == strcmp(*data, field->default_value))
-	{
-		ret = SUCCEED;
-		goto out;
-	}
 
 	if (SUCCEED != zbx_tq_parse_query(&query, *data, error, maxerrlen))
 		goto out;
