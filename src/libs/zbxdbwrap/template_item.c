@@ -189,7 +189,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.ssl_cert_file,ti.ssl_key_file,ti.ssl_key_password,ti.verify_peer,ti.verify_host,"
 				"ti.allow_traps,ti.discover,ti.lifetime_type,ti.enabled_lifetime,"
 				"ti.enabled_lifetime_type,ti.query,ti.time_shift,ti.lookback_limit,"
-				"ti.granularity,ti.storage_mode"
+				"ti.granularity,ti.storage_mode,"
 				"hi.interfaceid,hi.templateid,hi.name,hi.type,hi.value_type,hi.delay,hi.history,"
 				"hi.trends,hi.status,hi.trapper_hosts,hi.units,hi.formula,hi.logtimefmt,hi.valuemapid,"
 				"hi.params,hi.ipmi_sensor,hi.snmp_oid,hi.authtype,hi.username,hi.password,hi.publickey,"
