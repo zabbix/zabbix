@@ -1774,14 +1774,16 @@ class testIpmiChecks extends CIntegrationTest {
 				30, 30, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
 		);
 
-		// The first request may make an IPMI poller open an OpenIPMI domain, which fails if the simulator does not
-		// answer in time (seen right after the server start). So the BMC is first required to answer one request,
-		// once per suite, before any case is checked.
+		// The first request may make an IPMI poller open an OpenIPMI domain, which is not ready if the simulator does
+		// not answer in time (seen right after the server start) - the request is then answered with an error or
+		// with "no value". So the BMC is first required to answer one request, once per suite, before any case is
+		// checked.
 		if (!self::$item_test_ready) {
 			for ($i = 0; $i < 30; $i++) {
 				$result = $this->sendIpmiItemTest($server, 'Temp', 'ipmi.test', ITEM_VALUE_TYPE_FLOAT);
 
-				if (is_array($result) && !array_key_exists('error', $result['item'])) {
+				if (is_array($result) && !array_key_exists('error', $result['item'])
+						&& $result['item']['result'] !== 'no value') {
 					break;
 				}
 

@@ -1052,9 +1052,9 @@ void	zbx_perform_all_openipmi_ops(int timeout)
  *                                                                            *
  * Comments: Operation which is not completed in time leaves the domain in    *
  *           unknown state - its callbacks may still arrive and complete a    *
- *           later operation, or a domain still being opened may come up      *
- *           next to the one opened by the next attempt. So the domain is     *
- *           closed and the next attempt starts from scratch.                 *
+ *           later operation. So the domain is closed and the next attempt    *
+ *           starts from scratch. Not used for opening the domain, which may  *
+ *           take longer and is let complete in the background instead.       *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_wait_openipmi_op(zbx_ipmi_host_t *h, const char *func_name)
@@ -1719,7 +1719,7 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	zbx_wait_openipmi_op(h, __func__);
+	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
 out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
