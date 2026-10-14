@@ -45,30 +45,3 @@ ORDER BY (ServiceName, SpanName, toDateTime(Timestamp))
 TTL toDateTime(Timestamp) + toIntervalSecond($CH_TTL)
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1
 EOF
-
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-CREATE TABLE $CH_DB.otel_traces_trace_id_ts
-(
-	TraceId String CODEC(ZSTD(1)),
-	Start DateTime CODEC(Delta, ZSTD(1)),
-	End DateTime CODEC(Delta, ZSTD(1)),
-	INDEX idx_trace_id TraceId TYPE bloom_filter(0.01) GRANULARITY 1
-)
-ENGINE = $CH_ENGINE
-PARTITION BY $CH_PARTITION(Start)
-ORDER BY (TraceId, Start)
-TTL toDateTime(Start) + toIntervalSecond($CH_TTL)
-SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1
-EOF
-
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-CREATE MATERIALIZED VIEW $CH_DB.otel_traces_trace_id_ts_mv
-TO $CH_DB.otel_traces_trace_id_ts
-AS SELECT
-	TraceId,
-	min(Timestamp) AS Start,
-	max(Timestamp) AS End
-FROM $CH_DB.otel_traces
-WHERE TraceId != ''
-GROUP BY TraceId
-EOF
