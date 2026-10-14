@@ -21,7 +21,7 @@ require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
  * @onBefore prepareTestData
  * @onAfter  cleanTestData
  */
-class testUserMacroAccess extends CAPITest {
+class testUserMacroPermissions extends CAPITest {
 
 	public static function prepareTestData(): void {
 		CTestDataHelper::createObjects([
@@ -296,7 +296,7 @@ class testUserMacroAccess extends CAPITest {
 	/**
 	 * @dataProvider getProvider
 	 */
-	public function testUserMacroAccessGet(array $login, array $request, array|string $expected): void {
+	public function testUserMacroPermissions_Get(array $login, array $request, array|string $expected): void {
 		if (is_array($expected)) {
 			CTestDataHelper::convertUserMacroReferences($expected);
 		}
@@ -359,7 +359,7 @@ class testUserMacroAccess extends CAPITest {
 	/**
 	 * @dataProvider updateProvider
 	 */
-	public function testUserMacroAccessUpdate(array $login, array $request, array $expected, ?string $error): void {
+	public function testUserMacroPermissions_Update(array $login, array $request, array $expected, ?string $error): void {
 		if (array_key_exists('hostmacroid', $request)) {
 			$request['hostmacroid'] = CTestDataHelper::getConvertedValueReference($request['hostmacroid']);
 		}
@@ -371,11 +371,8 @@ class testUserMacroAccess extends CAPITest {
 		$this->authorize($login['username'], $login['password']);
 		$result = $this->call('usermacro.update', $request, $error);
 
-		if ($error !== null) {
-			return;
+		if ($error === null) {
+			$this->assertSame($expected, $result['result']);
 		}
-
-		$this->assertArrayHasKey('result', $result);
-		$this->assertSame($expected, $result['result']);
 	}
 }
