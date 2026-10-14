@@ -1202,14 +1202,14 @@ static int	lld_validate_query_field_lengths(const char *str, char *error, size_t
 
 		/* attribute_key and value are valid UTF-8 since parsing succeeded */
 
-		if (zbx_strlen_utf8(cond->attribute_key) > ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN)
+		if (ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN < zbx_strlen_utf8(cond->attribute_key))
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
 			goto out;
 		}
 
-		if (zbx_strlen_utf8(cond->value) > ZBX_TQ_CONDITION_VALUE_LEN)
+		if (ZBX_TQ_CONDITION_VALUE_LEN < zbx_strlen_utf8(cond->value))
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
 					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
