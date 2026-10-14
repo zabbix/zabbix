@@ -741,7 +741,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$response = $this->call('host.create', [
 			'host' => $host,
-			'groups' => [['groupid' => 4]],
+			'groups' => [['groupid' => 4]], // Zabbix servers
 			'status' => HOST_STATUS_MONITORED
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
