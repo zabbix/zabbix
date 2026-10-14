@@ -4393,6 +4393,18 @@ HEREDOC;
 			];
 		}
 
+		if ($tag_on_close) {
+			// Unconditional like the "close" above: every event the closing window held has to carry it, the ones
+			// closed long before the window ended included.
+			$operations[] = [
+				'sortorder' => 4,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => self::CEP_TAG_WINDOW_CLOSED,
+				'tag_value' => self::CEP_TAG_WINDOW_CLOSED_VALUE
+			];
+		}
+
 		// Unsuppressing is something the rule does to a suppression of its own, so the flavour that asks for it
 		// is one of those that suppress at every point - there is nothing for it to lift otherwise.
 		$this->assertFalse($unsuppress_on_close && !$suppress_points,
