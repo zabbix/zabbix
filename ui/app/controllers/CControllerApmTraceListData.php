@@ -160,7 +160,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 
 		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp']);
 
-		$limit = (int)CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
 			'output' => ['traceid'],
 			'time_from' => $timeline['from_ts'],
