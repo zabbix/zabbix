@@ -27,6 +27,130 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       discovery_rules:
+        - uuid: 7c72b62ff55d49a4a69a0b9d199ff522
+          name: 'Timer units discovery'
+          key: 'systemd.timer.discovery'
+          delay: 30m
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#TIMER.ACTIVESTATE}'
+                value: '{$SYSTEMD.ACTIVESTATE.TIMER.MATCHES}'
+              - macro: '{#TIMER.ACTIVESTATE}'
+                value: '{$SYSTEMD.ACTIVESTATE.TIMER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#TIMER.ID}'
+                value: '{$SYSTEMD.NAME.TIMER.MATCHES}'
+              - macro: '{#TIMER.ID}'
+                value: '{$SYSTEMD.NAME.TIMER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#TIMER.UNITFILESTATE}'
+                value: '{$SYSTEMD.UNITFILESTATE.TIMER.MATCHES}'
+              - macro: '{#TIMER.UNITFILESTATE}'
+                value: '{$SYSTEMD.UNITFILESTATE.TIMER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Discover systemd timer units and their details.'
+          item_prototypes:
+            - uuid: 2fb2a5db32a84214ab4012926c790711
+              name: '{#TIMER.ID}: service active state'
+              type: DEPENDENT
+              key: 'systemd.service.active_state["{#TIMER.UNIT}"]'
+              valuemap:
+                name: 'Unit Active State'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.ActiveState.state
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: 'systemd.unit.get["{#TIMER.UNIT}"]'
+              tags:
+                - tag: component
+                  value: timer
+              trigger_prototypes:
+                - uuid: 46c1c02b69af4e4d93b5bda30461d7ff
+                  expression: 'last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#TIMER.UNIT}"])=4 or last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#TIMER.UNIT}"])=0'
+                  name: 'Systemd: {#TIMER.ID}: last service run has failed'
+                  priority: WARNING
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: health
+            - uuid: 45aa4ff8a75e4f3dac2f698be53ec181
+              name: '{#TIMER.ID}: service last run duration'
+              type: 'DEPENDENT'
+              key: 'systemd.service.last_run_duration["{#TIMER.UNIT}"]'
+              units: 's'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      data = JSON.parse(value);
+                      if (data.InactiveExitTimestamp == 0 && data.InactiveEnterTimestampMonotonic == 0) {
+                        // the service was never started
+                        return 0;
+                      }
+                      else if (data.InactiveExitTimestamp > data.InactiveEnterTimestamp) {
+                        // the service is running
+                        return Math.floor(Date.now() / 1000 - data.InactiveExitTimestamp / 1000000);
+                      }
+                      // else if (data.InactiveExitTimestamp <= data.InactiveEnterTimestamp)
+                      // the service is not running and had run
+                      return Math.floor((data.InactiveEnterTimestamp - data.InactiveExitTimestamp) / 1000000);
+              master_item:
+                key: systemd.unit.get["{#TIMER.UNIT}"]
+              tags:
+                - tag: component
+                  value: timer
+              trigger_prototypes:
+                - uuid: f8e978a86c9645639ec9786f3daedb9c
+                  expression: 'last(/Systemd by Zabbix agent 2/systemd.service.last_run_duration["{#TIMER.UNIT}"])>{$SYSTEMD.TIMER.DURATION_THRESHOLD:"{#TIMER.ID}"}'
+                  name: 'Systemd: {#TIMER.ID}: current/last service execution take/took too long'
+                  priority: 'WARNING'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: health
+            - uuid: 49091846ce384572925f94d7e3a4ef6b
+              name: '{#TIMER.ID}: time since last service start'
+              type: 'DEPENDENT'
+              key: 'systemd.service.time_since_last_start["{#TIMER.UNIT}"]'
+              units: 's'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      data = JSON.parse(value);
+                      if (data.InactiveExitTimestamp == 0 && data.InactiveEnterTimestampMonotonic == 0) {
+                        // the service was never started
+                        return Math.floor(Date.now() / 1000);
+                      }
+                      return Math.floor(Date.now() / 1000 - data.InactiveExitTimestamp / 1000000);
+              master_item:
+                key: systemd.unit.get["{#TIMER.UNIT}"]
+              tags:
+                - tag: component
+                  value: timer
+              trigger_prototypes:
+                - uuid: 608372ef501341e880ce7db2b351bcb9
+                  expression: 'last(/Systemd by Zabbix agent 2/systemd.service.time_since_last_start["{#TIMER.UNIT}"])>{$SYSTEMD.TIMER.LAST_START_THRESHOLD:"{#TIMER.ID}"}'
+                  name: 'Systemd: {#TIMER.ID}: current/last service execution is too old'
+                  priority: 'WARNING'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: health
+            - uuid: 9599a8578b9f4db796a41e235d77c566
+              name: '{#TIMER.ID}: Get associated service unit info'
+              key: 'systemd.unit.get["{#TIMER.UNIT}"]'
+              value_type: 'TEXT'
+              trends: '0'
+              description: 'Returns all properties of a systemd timer associated service unit.'
+              tags:
+                - tag: component
+                  value: timer
         - uuid: 0dfbc5994c1e44a6a1a2aa8ecc2f0347
           name: 'Service units discovery'
           key: 'systemd.unit.discovery[service]'
@@ -369,6 +493,54 @@ zabbix_export:
             section_name: Filters
             label: 'Systemd socket unit file state filter (exclude)'
             description: 'Filter of systemd socket units by unit file state.'
+        - macro: '{$SYSTEMD.ACTIVESTATE.TIMER.MATCHES}'
+          value: .+
+          description: 'Filter of systemd timer units by active state'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Filters
+            label: 'Systemd timer active state filter (include)'
+            description: 'Filter of systemd timer units by active state.'
+        - macro: '{$SYSTEMD.ACTIVESTATE.TIMER.NOT_MATCHES}'
+          value: ^inactive$
+          description: 'Filter of systemd timer units by active state'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Filters
+            label: 'Systemd timer active state filter (exclude)'
+            description: 'Filter of systemd timer units by active state.'
+        - macro: '{$SYSTEMD.NAME.TIMER.MATCHES}'
+          value: .+
+          description: 'Filter of systemd timer units by name.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Filters
+            label: 'Systemd timer name filter (include)'
+            description: 'Filter of systemd timer units by name.'
+        - macro: '{$SYSTEMD.NAME.TIMER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: Filter of systemd timer units by name
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Filters
+            label: 'Systemd timer name filter (exclude)'
+            description: 'Filter of systemd timer units by name.'
+        - macro: '{$SYSTEMD.TIMER.DURATION_THRESHOLD}'
+          value: '1800'
+          description: systemd timer maximum duration
+        - macro: '{$SYSTEMD.TIMER.LAST_START_THRESHOLD}'
+          value: '90000'
+          description: systemd timer maximum time since last start
+        - macro: '{$SYSTEMD.UNITFILESTATE.TIMER.MATCHES}'
+          value: enabled|static
+          description: Filter of systemd timer units by unit file state
+        - macro: '{$SYSTEMD.UNITFILESTATE.TIMER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: Filter of systemd timer units by unit file state
       dashboards:
         - uuid: 35c40e164dc64c3997206b042a49f5c4
           name: 'Systemd: Overview'
