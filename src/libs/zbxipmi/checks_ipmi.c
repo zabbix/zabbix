@@ -1964,6 +1964,13 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 		c = zbx_get_ipmi_control_by_control_id(h, control_id);
 	}
 
+	/* the domain is closed when connection is lost during reading, but the pending reading reports its own error */
+	if (0 == h->domain_up)
+	{
+		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
+		return NETWORK_ERROR;
+	}
+
 	if (h->ret != SUCCEED)
 	{
 		if (NULL != h->err)
@@ -2070,6 +2077,9 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 		zbx_read_ipmi_sensor(h, s);
 
+		if (0 == h->domain_up)
+			break;
+
 		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
 			continue;
 
@@ -2084,6 +2094,9 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
 		{
 			zbx_read_ipmi_thresholds(h, s);
+
+			if (0 == h->domain_up)
+				break;
 
 			if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
 				continue;
@@ -2194,6 +2207,15 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	}
 
 	zbx_free(sensor_ids);
+
+	/* only sensors read before connection was lost would be reported, as if the others did not exist */
+	if (0 == h->domain_up)
+	{
+		zbx_json_free(&json);
+		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
+
+		return NETWORK_ERROR;
+	}
 
 	zbx_json_close(&json);
 
