@@ -201,6 +201,7 @@ typedef struct
 	char				*column;
 	const zbx_tq_column_info_t	*col_info; /* stored here in order to not look it up every time */
 	char				*attribute_key;
+	char				*attribute_key_orig;
 	char				*value;
 	zbx_tq_operator_t		operator;
 }

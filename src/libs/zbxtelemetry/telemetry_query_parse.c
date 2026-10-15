@@ -867,7 +867,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 /******************************************************************************
  *                                                                            *
  * Purpose: parses json_str contents and stores them into query, does not set *
- *          col_info or formula_ctx, does not expand macros, does not         *
+ *          col_info, formula_ctx or *_orig, does not expand macros, does not *
  *          validate any field presence or values                             *
  *                                                                            *
  * Parameters: query         - [OUT] parsed query, must not be initialized    *
@@ -931,23 +931,27 @@ static int	tq_expand_macros_field(char **text, zbx_tq_macro_expand_func_t macro_
 static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx, char *error, size_t max_error_len)
 {
-	if (NULL != macro_expand_cb)
+	for (int i = 0; i < query->conditions.values_num; i++)
 	{
-		for (int i = 0; i < query->conditions.values_num; i++)
-		{
-			if (SUCCEED != tq_expand_macros_field(&query->conditions.values[i].attribute_key,
-					macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY,
-					error, max_error_len))
-			{
-				return FAIL;
-			}
+		zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-			if (SUCCEED != tq_expand_macros_field(&query->conditions.values[i].value,
-					macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_VALUE,
-					error, max_error_len))
-			{
-				return FAIL;
-			}
+		cond->attribute_key_orig = zbx_strdup(NULL, cond->attribute_key);
+
+		if (NULL == macro_expand_cb)
+			continue;
+
+		if (SUCCEED != tq_expand_macros_field(&cond->attribute_key,
+				macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY,
+				error, max_error_len))
+		{
+			return FAIL;
+		}
+
+		if (SUCCEED != tq_expand_macros_field(&cond->value,
+				macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_VALUE,
+				error, max_error_len))
+		{
+			return FAIL;
 		}
 	}
 
@@ -956,8 +960,8 @@ static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_fun
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expands macros in query, sets col_info and formula_ctx, validates *
- *          field presence and values in query                                *
+ * Purpose: expands macros in query, sets col_info, formula_ctx and *_orig,   *
+ *          validates field presence and values in query                      *
  *                                                                            *
  * Parameters: query            - [IN/OUT]                                    *
  *             macro_expand_cb  - [IN] NULL or callback called on every field *

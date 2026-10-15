@@ -73,6 +73,7 @@ void	tq_condition_init(zbx_tq_condition_t *condition)
 	condition->column		= NULL;
 	condition->col_info		= NULL;
 	condition->attribute_key	= NULL;
+	condition->attribute_key_orig	= NULL;
 	condition->value		= NULL;
 	condition->operator		= ZBX_TQ_OPERATOR_UNKNOWN;
 }
@@ -81,6 +82,7 @@ void	tq_condition_clean(zbx_tq_condition_t *condition)
 {
 	zbx_free(condition->column);
 	zbx_free(condition->attribute_key);
+	zbx_free(condition->attribute_key_orig);
 	zbx_free(condition->value);
 }
 
@@ -191,7 +193,7 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 		return column_name_cmp_res;
 	}
 
-	return strcmp(cond_a->attribute_key, cond_b->attribute_key);
+	return strcmp(cond_a->attribute_key_orig, cond_b->attribute_key_orig);
 }
 
 void	tq_get_conditions_and_or_sorted(zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
