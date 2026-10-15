@@ -293,6 +293,7 @@ class CDatatableBehavior extends CBehavior {
 	 * @param array $column_state_changes   list of columns which state should be changed
 	 */
 	public function updateColumnList($column_state_changes) {
+		$table = $this->getDatatable();
 		$popup_dialog = $this->getDatatableConfigurationDialog();
 
 		foreach ($column_state_changes as $field => $value) {
