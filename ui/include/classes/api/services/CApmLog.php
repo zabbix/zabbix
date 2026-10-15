@@ -184,7 +184,17 @@ class CApmLog extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
+				if ($real_count_output) {
+					return (string) $row['rowscount'];
+				}
+
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($options['limit'], $count);
+				}
+
+				return array_fill(0, $count, []);
 			}
 
 			$db_logs[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
