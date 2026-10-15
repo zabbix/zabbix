@@ -137,7 +137,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
-			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($item)],
+			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
@@ -154,7 +154,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
-			'query' =>			['type' => API_OBJECT, 'flags' => $db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? 0 : API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($db_item)],
+			'query' =>			['type' => API_OBJECT, 'flags' => $db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? 0 : API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
@@ -473,14 +473,11 @@ class CItemTypeTelemetryQuery extends CItemType {
 		return $query;
 	}
 
-	private static function getQueryFieldValidationRules(array $item): array {
-		$api_allow_lld_macro = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
-		$macro_flags = API_ALLOW_USER_MACRO | $api_allow_lld_macro;
-
+	private static function getQueryFieldValidationRules(): array {
 		$condition_fields = [
 			'column' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'attribute_key' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | $macro_flags, 'length' => 255],
+									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]],
 			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
@@ -488,8 +485,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
 			]],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | $macro_flags, 'length' => 255],
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | $macro_flags, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]
 		];
