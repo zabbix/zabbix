@@ -913,13 +913,19 @@ out:
 	return ret;
 }
 
-static int	tq_expand_macros_field(char **text, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx,
-		const char *tag, char *error, size_t max_error_len)
+static int	tq_expand_macros_field(char **str, char **str_orig, zbx_tq_macro_expand_func_t macro_expand_cb,
+		void *macro_expand_ctx, const char *tag, char *error, size_t max_error_len)
 {
-	if (NULL == *text)
+	if (NULL == *str)
 		return SUCCEED;
 
-	if (SUCCEED != macro_expand_cb(text, macro_expand_ctx))
+	if (NULL != str_orig)
+		*str_orig =  zbx_strdup(NULL, *str);
+
+	if (NULL == macro_expand_cb)
+		return SUCCEED;
+
+	if (SUCCEED != macro_expand_cb(str, macro_expand_ctx))
 	{
 		zbx_snprintf(error, max_error_len, "Failed to expand macros in \"%s\"", tag);
 		return FAIL;
@@ -935,19 +941,14 @@ static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_fun
 	{
 		zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-		cond->attribute_key_orig = zbx_strdup(NULL, cond->attribute_key);
-
-		if (NULL == macro_expand_cb)
-			continue;
-
-		if (SUCCEED != tq_expand_macros_field(&cond->attribute_key,
+		if (SUCCEED != tq_expand_macros_field(&cond->attribute_key, &cond->attribute_key_orig,
 				macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY,
 				error, max_error_len))
 		{
 			return FAIL;
 		}
 
-		if (SUCCEED != tq_expand_macros_field(&cond->value,
+		if (SUCCEED != tq_expand_macros_field(&cond->value, NULL,
 				macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_VALUE,
 				error, max_error_len))
 		{
