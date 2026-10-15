@@ -1134,7 +1134,7 @@ abstract class CControllerPopupItemTest extends CController {
 			elseif ($field === 'query') {
 				$query = json_decode($inputs[$field], true);
 
-				if (!isset($query['filter']['conditions'])) {
+				if (!array_key_exists('conditions', $query['filter'])) {
 					continue;
 				}
 
