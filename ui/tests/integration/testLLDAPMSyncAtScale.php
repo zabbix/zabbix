@@ -61,7 +61,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
 	const LLD_DISCOVERY_COUNT = 10000;
-	const PROBLEM_DEVICE_COUNT = 1000; // TODO: increase
+	const PROBLEM_DEVICE_COUNT = 9000;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
 	const TRIGGER_ITERATIONS = 60;
@@ -182,7 +182,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 					['column' => 'ResourceAttributes', 'attribute_key' => 'host.name']
 				],
 				'aggregated_columns' => [
-					['column' => 'Value', 'function' => AGGREGATE_MAX, 'parameters' => [], 'alias' => 'status']
+					['column' => 'Value', 'function' => AGGREGATE_MAX, 'parameters' => [], 'alias' => 'value']
 				],
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -228,7 +228,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 			'preprocessing' => [
 				[
 					'type' => ZBX_PREPROC_JSONPATH,
-					'params' => '$[?(@.columns["ResourceAttributes.host.name"] == "'.self::LLD_MACRO.'")].columns.status.first()',
+					'params' => '$[?(@.columns["ResourceAttributes.host.name"] == "'.self::LLD_MACRO.'")].columns.value.first()',
 					'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
 					'error_handler_params' => ''
 				]
