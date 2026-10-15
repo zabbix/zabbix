@@ -333,8 +333,9 @@ const view = new class {
 		})
 		.catch(error => {
 			if (error?.name === 'TimeoutError') {
-				const $msg_box = makeMessageBox('bad',
-					[<?= json_encode(_('Could not connect to APM data source.')) ?>]);
+				const $msg_box = makeMessageBox('bad', [],
+					<?= json_encode(_s('Connection timeout of %1$s seconds exceeded when connecting to APM data source.', 5)) ?>
+				);
 
 				addMessage($msg_box[0]);
 
