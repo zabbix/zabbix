@@ -38,6 +38,10 @@
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
+#define ZBX_IPMI_DOMAIN_STATE_CLOSED	0	/* domain is not opened or was closed */
+#define ZBX_IPMI_DOMAIN_STATE_OPENING	1	/* ipmi_open_domain() was called, domain is not up yet */
+#define ZBX_IPMI_DOMAIN_STATE_UP	2	/* domain is up */
+
 #include <OpenIPMI/ipmiif.h>
 #include <OpenIPMI/ipmi_posix.h>
 #include <OpenIPMI/ipmi_lan.h>
@@ -135,9 +139,7 @@ typedef struct zbx_ipmi_host
 	int			sensor_count;
 	int			control_count;
 	ipmi_con_t		*con;
-	int			domain_up;
-	int			domain_opening;	/* ipmi_open_domain() was called, but neither domain up */
-						/* nor domain closed callback was received yet */
+	int			domain_state;	/* ZBX_IPMI_DOMAIN_STATE_* */
 	int			done;
 	time_t			lastaccess;	/* Time of last access attempt. Used to detect and delete inactive */
 						/* (disabled) IPMI hosts from OpenIPMI to stop polling them. */
@@ -1568,8 +1570,7 @@ static void	zbx_domain_closed_cb(void *cb_data)
 		h->ret = NETWORK_ERROR;
 	}
 
-	h->domain_up = 0;
-	h->domain_opening = 0;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_CLOSED;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1623,8 +1624,7 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' domain:%p cb_data:%p", __func__, h->ip,
 			h->port, (void *)domain, cb_data);
 
-	h->domain_up = 1;
-	h->domain_opening = 0;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_UP;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1757,10 +1757,10 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	if (NULL != (h = zbx_get_ipmi_host(ip, port, authtype, privilege, username, password)))
 	{
-		if (1 == h->domain_up)
+		if (ZBX_IPMI_DOMAIN_STATE_UP == h->domain_state)
 			goto out;
 
-		if (1 == h->domain_opening)
+		if (ZBX_IPMI_DOMAIN_STATE_OPENING == h->domain_state)
 		{
 			/* Opening the domain may take longer than one wait. Opening another domain would */
 			/* make both of them report the same sensors to this host once they are up. */
@@ -1822,12 +1822,12 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	h->domain_opening = 1;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_OPENING;
 
 	zbx_perform_openipmi_ops(h, __func__);	/* result is checked below */
 check:
 	/* the domain continues to be opened in the background if it is not up yet */
-	if (0 == h->domain_up && SUCCEED == h->ret)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state && SUCCEED == h->ret)
 	{
 		h->err = zbx_dsprintf(h->err, "connecting to IPMI host [%s]:%d is not finished", h->ip, h->port);
 		h->ret = NETWORK_ERROR;
@@ -2036,7 +2036,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 
 	h->lastaccess = time(NULL);
 
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 			*value = zbx_strdup(*value, h->err);
@@ -2077,7 +2077,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	}
 
 	/* the domain is closed when connection is lost during reading, but the pending reading reports its own error */
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
 		return NETWORK_ERROR;
@@ -2158,7 +2158,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 	h->lastaccess = time(NULL);
 
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 			*value = zbx_strdup(*value, h->err);
@@ -2189,7 +2189,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 		zbx_read_ipmi_sensor(h, s);
 
-		if (0 == h->domain_up)
+		if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 			break;
 
 		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
@@ -2207,7 +2207,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		{
 			zbx_read_ipmi_thresholds(h, s);
 
-			if (0 == h->domain_up)
+			if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 				break;
 
 			if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
@@ -2321,7 +2321,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	zbx_free(sensor_ids);
 
 	/* only sensors read before connection was lost would be reported, as if the others did not exist */
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		zbx_json_free(&json);
 		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
@@ -2427,7 +2427,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 	h = zbx_init_ipmi_host(addr, port, authtype, privilege, username, password);
 
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 		{
