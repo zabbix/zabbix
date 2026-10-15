@@ -1175,6 +1175,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 
+	if ('\0' == *s)
+		return FAIL;
+
 	if ('{' != *s)
 	{
 		now = zbx_time();
