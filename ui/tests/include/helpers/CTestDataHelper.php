@@ -127,7 +127,7 @@ class CTestDataHelper {
 			return;
 		}
 
-		$template_macro = [];
+		$macro_templates = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -141,11 +141,7 @@ class CTestDataHelper {
 			];
 
 			if (array_key_exists('macros', $template)) {
-				foreach ($template['macros'] as $macro) {
-					$template_macro[] = $macro + ['hostid' => ':template:'.$template['host']];
-				}
-
-				unset($template['macros']);
+				$macro_templates[] = ':template:'.$template['host'];
 			}
 
 			if (array_key_exists('value_maps', $template)) {
@@ -182,7 +178,7 @@ class CTestDataHelper {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
-		self::createUserMacro($template_macro);
+		self::createMacroReferences(self::getConvertedValueReferences($macro_templates));
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -202,7 +198,7 @@ class CTestDataHelper {
 			return;
 		}
 
-		$host_macro = [];
+		$macro_hosts = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -217,11 +213,7 @@ class CTestDataHelper {
 			];
 
 			if (array_key_exists('macros', $host)) {
-				foreach ($host['macros'] as $macro) {
-					$host_macro[] = $macro + ['hostid' => ':host:'.$host['host']];
-				}
-
-				unset($host['macros']);
+				$macro_hosts[] = ':host:'.$host['host'];
 			}
 
 			if (array_key_exists('value_maps', $host)) {
@@ -266,7 +258,7 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
-		self::createUserMacro($host_macro);
+		self::createMacroReferences(self::getConvertedValueReferences($macro_hosts));
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -280,17 +272,18 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'proxyid');
 	}
 
-	private static function createUserMacro(array $user_macro): void {
-		if (!$user_macro) {
+	private static function createMacroReferences(array $hostids): void {
+		if (!$hostids) {
 			return;
 		}
 
-		self::convertUserMacroReferences($user_macro);
+		$db_macros = CDataHelper::call('usermacro.get', [
+			'output' => ['hostmacroid', 'macro'],
+			'hostids' => $hostids
+		]);
 
-		$result = CDataHelper::call('usermacro.create', $user_macro);
-
-		foreach ($user_macro as $macro) {
-			self::$objectids['user_macro'][$macro['macro']] = array_shift($result['hostmacroids']);
+		foreach ($db_macros as $db_macro) {
+			self::$objectids['user_macro'][$db_macro['macro']] = $db_macro['hostmacroid'];
 		}
 	}
 
