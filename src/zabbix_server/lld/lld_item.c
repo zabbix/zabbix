@@ -2506,8 +2506,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in query: %s.\n", err);
 	}
-
-	if (0 != strcmp(item->query, buffer))
+	else if (0 != strcmp(item->query, buffer))
 	{
 		item->query_orig = item->query;
 		item->query = buffer;
