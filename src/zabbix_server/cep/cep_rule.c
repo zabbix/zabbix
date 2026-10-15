@@ -272,23 +272,6 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 	}
 }
 
-
-static int	cep_operation_condition_match_key(const zbx_cep_op_condition_t *oc1, const zbx_cep_op_condition_t *oc2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(oc1->type, oc2->type);
-
-	switch (oc1->type)
-	{
-		case ZBX_CONDITION_TYPE_EVENT_TAG:
-			return strcmp(oc1->args.tag_name.tag, oc2->args.tag_name.tag);
-		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
-			return strcmp(oc1->args.tag_value.tag, oc2->args.tag_value.tag);
-		default:
-			return 0;
-	}
-}
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate AND/OR operation conditions                              *
@@ -299,8 +282,8 @@ static int	cep_operation_condition_match_key(const zbx_cep_op_condition_t *oc1, 
  *                                                                            *
  * Return value: SUCCEED if all condition groups are met, FAIL otherwise      *
  *                                                                            *
- * Comments: Conditions of the same type (and tag name for tag conditions)    *
- *           are OR-ed; the resulting groups are AND-ed.                      *
+ * Comments: Conditions of the same type are OR-ed; the resulting groups are  *
+ *           AND-ed.                                                          *
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_op_condition_eval_func_t eval_func,
@@ -310,14 +293,9 @@ static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_op_c
 	{
 		int	ret = 0;
 
-		for (j = i; j < op->conditions.values_num; j++)
+		for (j = i; j < op->conditions.values_num &&
+				op->conditions.values[j].type == op->conditions.values[i].type; j++)
 		{
-			if (0 != cep_operation_condition_match_key(&op->conditions.values[j],
-					&op->conditions.values[i]))
-			{
-				break;
-			}
-
 			if (0 == ret)
 				ret = eval_func(&op->conditions.values[j], ctx);
 		}

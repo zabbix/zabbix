@@ -4482,14 +4482,13 @@ HEREDOC;
 			// closed with one - it leaves nothing at all behind. What is discarded here are the "down" values of a
 			// single id (getCloseWindowDiscardService()), so the ids around it keep filling their windows and
 			// the "up" values still end them: the operations above are left to do their work, and the one id whose
-			// event was dropped is what shows the difference. Conditions on distinct tags are AND-ed, so this
-			// matches an event that is both a "down" one and of that id.
+			// event was dropped is what shows the difference. The conditions are AND-ed, so this matches an event
+			// that is both a "down" one and of that id.
 			//
 			// Both halves of that are tag NAME conditions by default: the state is carried by the name of the
 			// CEP_STATE_TAG_DOWN tag and the id by the name of the per-id CEP_SERVICE_TAG one, exactly as the
-			// windowless flavours single an id out (buildWindowNoneServiceCondition()). What the server groups
-			// AND/OR conditions by is the type and the tag name together (cep_operation_condition_match_key()), so
-			// two conditions of the same type on different tag names are AND-ed just as differing types would be.
+			// windowless flavours single an id out (buildWindowNoneServiceCondition()). AND/OR would OR them, as it
+			// groups conditions by type alone, so the filter is a plain AND.
 			//
 			// $discard_by_tag_value asks the id half to compare the value of the plain 'service' tag instead, which
 			// is the same discard expressed the other way round - see
@@ -4512,7 +4511,7 @@ HEREDOC;
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_DISCARD,
 				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'evaltype' => CONDITION_EVAL_TYPE_AND,
 					'conditions' => [
 						[
 							'type' => CCepRuleHelper::CONDITION_TAG,

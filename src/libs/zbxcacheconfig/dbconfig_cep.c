@@ -63,22 +63,14 @@ static int	cep_op_condition_compare_by_id(const void *a1, const void *a2)
 	return 0;
 }
 
-static int	cep_op_condition_compare_by_condition(const void *a1, const void *a2)
+static int	cep_op_condition_compare_by_type(const void *a1, const void *a2)
 {
 	const zbx_cep_op_condition_t *oc1 = (const zbx_cep_op_condition_t *)a1;
 	const zbx_cep_op_condition_t *oc2 = (const zbx_cep_op_condition_t *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(oc1->type, oc2->type);
 
-	switch (oc1->type)
-	{
-		case ZBX_CONDITION_TYPE_EVENT_TAG:
-			return strcmp(oc1->args.tag_name.tag, oc2->args.tag_name.tag);
-		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
-			return strcmp(oc1->args.tag_value.tag, oc2->args.tag_value.tag);
-		default:
-			return 0;
-	}
+	return 0;
 }
 
 /******************************************************************************
@@ -1630,7 +1622,7 @@ static void	cep_rule_prepare_operations(zbx_cep_rule_t *rule)
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
 		zbx_vector_cep_op_condition_sort(&rule->operations.values[i].conditions,
-				cep_op_condition_compare_by_condition);
+				cep_op_condition_compare_by_type);
 	}
 }
 
