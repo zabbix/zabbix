@@ -883,7 +883,7 @@ exit:
 
 static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
 {
-	const zbx_lld_entry_t *lld_obj = (const zbx_lld_entry_t *)ctx;
+	const zbx_lld_entry_t	*lld_obj = (const zbx_lld_entry_t *)ctx;
 
 	zbx_substitute_lld_macros(text, lld_obj, ZBX_MACRO_ANY, NULL, 0);
 

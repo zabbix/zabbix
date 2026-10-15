@@ -259,7 +259,9 @@ static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_st
 	{
 		if (NULL == zbx_json_decodevalue_dyn(p, buf, buf_alloc, &type) || ZBX_JSON_TYPE_STRING != type ||
 				SUCCEED != zbx_is_utf8(*buf))
+		{
 			goto out;
+		}
 
 		zbx_vector_str_append(parameters, zbx_strdup(NULL, *buf));
 	}
@@ -865,7 +867,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 /******************************************************************************
  *                                                                            *
  * Purpose: parses json_str contents and stores them into query, does not set *
-*           col_info or formula_ctx, does not expand macros, does not         *
+ *          col_info or formula_ctx, does not expand macros, does not         *
  *          validate any field presence or values                             *
  *                                                                            *
  * Parameters: query         - [OUT] parsed query, must not be initialized    *
@@ -931,7 +933,8 @@ static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_fun
 {
 	if (NULL != macro_expand_cb)
 	{
-		for (int i = 0; i < query->conditions.values_num; i++) {
+		for (int i = 0; i < query->conditions.values_num; i++)
+		{
 			if (SUCCEED != tq_expand_macros_field(&query->conditions.values[i].attribute_key,
 					macro_expand_cb, macro_expand_ctx, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY,
 					error, max_error_len))
