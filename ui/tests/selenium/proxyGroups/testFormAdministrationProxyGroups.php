@@ -20,7 +20,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * Test for checking Proxy group form.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup proxy
  */
@@ -613,7 +613,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 
 	public static function getDeleteData() {
 		return [
-			// Attempt to delete a proxy group that has proxies assigned.
+			// #0 Attempt to delete a proxy group that has proxies assigned.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -621,7 +621,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					'error' => 'Proxy group "Default values - recovering" is used by proxy "passive_proxy7".'
 				]
 			],
-			// Attempt to delete a proxy group that has no proxies but has an assigned host.
+			// #1 Attempt to delete a proxy group that has no proxies but has an assigned host.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -630,7 +630,23 @@ class testFormAdministrationProxyGroups extends CWebTest {
 							' with linked host".'
 				]
 			],
-			// Delete a proxy group that has nothing linked to it.
+			// #2 Attempt to delete a proxy group that is used in an Autoregistration action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'group' => 'Proxy group for Actions 2',
+					'error' => 'Proxy group "Proxy group for Actions 2" is used by action "Autoregistration action 1".'
+				]
+			],
+			// #3 Attempt to delete a proxy group that is used in a Discovery action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'group' => 'Proxy group for Actions 3',
+					'error' => 'Proxy group "Proxy group for Actions 3" is used by action "Discovery action with proxy groups".'
+				]
+			],
+			// #4 Delete a proxy group that has nothing linked to it.
 			[
 				[
 					'group' => 'Group without proxies'

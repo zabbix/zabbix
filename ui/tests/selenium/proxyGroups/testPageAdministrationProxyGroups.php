@@ -20,7 +20,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * Test for checking Proxy groups page.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup proxy_group
  *
@@ -196,6 +196,33 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						' Proxy_2 for filter'
 			],
 			[
+				'Name' => 'Proxy group for Actions 1',
+				'State' => 'Unknown',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '2',
+				7 => 'Proxy for Proxy groups 1, Proxy for Proxy groups 2'
+			],
+			[
+				'Name' => 'Proxy group for Actions 2',
+				'State' => '',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '',
+				7 => ''
+			],
+			[
+				'Name' => 'Proxy group for Actions 3',
+				'State' => '',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '',
+				7 => ''
+			],
+			[
 				'Name' => '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown',
 				'State' => 'Unknown',
 				'Failover period' => '123s',
@@ -258,7 +285,10 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'2nd Online proxy group',
 						'Degrading proxy group',
 						'Multiple spaces in proxy group',
-						'Online proxy group'
+						'Online proxy group',
+						'Proxy group for Actions 1',
+						'Proxy group for Actions 2',
+						'Proxy group for Actions 3'
 					]
 				]
 			],
@@ -318,7 +348,10 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Group without proxies with linked host',
 						'Multiple spaces in proxy group',
 						'Offline group',
-						'Online proxy group'
+						'Online proxy group',
+						'Proxy group for Actions 1',
+						'Proxy group for Actions 2',
+						'Proxy group for Actions 3'
 					]
 				]
 			],

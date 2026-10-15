@@ -56,6 +56,9 @@ class Actions {
 				],
 				[
 					'name' => 'Proxy group for Actions 2'
+				],
+				[
+					'name' => 'Proxy group for Actions 3'
 				]
 			]
 		);
@@ -485,6 +488,39 @@ class Actions {
 						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => ['mediatypeid' => 3], // SMS.
 						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+					]
+				]
+			],
+			// Discovery action.
+			[
+				'name' => 'Discovery action with proxy groups',
+				'eventsource' => EVENT_SOURCE_DISCOVERY,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => $proxy_groupids['Proxy group for Actions 1']
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => $proxy_groupids['Proxy group for Actions 3']
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => self::ZABBIX_ADMIN_GROUPID
+							]
+						]
 					]
 				]
 			]
