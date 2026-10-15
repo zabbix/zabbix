@@ -1009,6 +1009,14 @@ $formgrid->addItem([
 	]))->setId('js-item-timeout-field')
 ]);
 
+$formgrid->addItem([
+	(new CLabel(_('Single value history'), 'storage_mode'))->setId('js-item-storage-mode-label'),
+	(new CFormField(
+		(new CCheckBox('storage_mode', ITEM_STORAGE_MODE_SINGLE))
+			->setChecked($item['storage_mode'] == ITEM_STORAGE_MODE_SINGLE)
+	))->setId('js-item-storage-mode-field')
+]);
+
 $hint = null;
 if ($data['source'] === 'item' && $data['history_hint']
 		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {

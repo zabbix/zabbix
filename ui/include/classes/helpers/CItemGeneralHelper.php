@@ -103,6 +103,7 @@ JAVASCRIPT;
 			'time_shift' => DB::getDefault('items', 'time_shift'),
 			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
 			'granularity' => DB::getDefault('items', 'granularity'),
+			'storage_mode' => DB::getDefault('items', 'storage_mode'),
 			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 			'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 			'columns' => [],

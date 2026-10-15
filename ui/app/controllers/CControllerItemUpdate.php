@@ -410,6 +410,9 @@ class CControllerItemUpdate extends CControllerItem {
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_DAY, 'usermacros' => true]],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
+			'storage_mode' => ['db items.storage_mode',
+				'in' => [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE]
+			],
 			'signal_type' => ['integer', 'required',
 				'in' => [
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,

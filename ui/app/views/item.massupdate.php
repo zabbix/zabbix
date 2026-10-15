@@ -307,6 +307,15 @@ $item_form_list
 		(new CVisibilityBox('visible[granularity]', 'granularity', _('Original')))->setLabel(_('Granularity')),
 		(new CTextBox('granularity', DB::getDefault('items', 'granularity')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
+	// Append Single value history (Telemetry query) to form list.
+	->addRow(
+		(new CVisibilityBox('visible[storage_mode]', 'storage_mode', _('Original')))
+			->setLabel(_('Single value history')),
+		(new CRadioButtonList('storage_mode', (int) DB::getDefault('items', 'storage_mode')))
+			->addValue(_('Yes'), ITEM_STORAGE_MODE_SINGLE)
+			->addValue(_('No'), ITEM_STORAGE_MODE_MULTIPLE_VALUES)
+			->setModern(true)
+	)
 	// Append history to form list.
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history-field', _('Original')))

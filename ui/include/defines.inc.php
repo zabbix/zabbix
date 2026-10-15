@@ -1973,6 +1973,10 @@ define('ITEM_STORAGE_CUSTOM',	1);
 // Item history and trends storage value to define 0 storage period.
 define('ITEM_NO_STORAGE_VALUE',	0);
 
+// Item history and trends storage modes.
+define('ITEM_STORAGE_MODE_MULTIPLE_VALUES',	0);
+define('ITEM_STORAGE_MODE_SINGLE',			1);
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 

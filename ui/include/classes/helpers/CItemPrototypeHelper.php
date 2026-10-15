@@ -222,7 +222,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 				'publickey', 'privatekey',
 
 				// Telemetry query
-				'time_shift', 'lookback_limit', 'granularity', 'query'
+				'time_shift', 'lookback_limit', 'granularity', 'storage_mode', 'query'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],

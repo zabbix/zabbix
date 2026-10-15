@@ -75,7 +75,8 @@ class CControllerItemMassupdate extends CController {
 			// Telemetry query item type specific fields.
 			'time_shift' => 'string',
 			'lookback_limit' => 'string',
-			'granularity' => 'string'
+			'granularity' => 'string',
+			'storage_mode' => 'in '.implode(',', [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -178,7 +179,8 @@ class CControllerItemMassupdate extends CController {
 				// Telemetry query item type specific fields.
 				'time_shift' => DB::getDefault('items', 'time_shift'),
 				'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
-				'granularity' => DB::getDefault('items', 'granularity')
+				'granularity' => DB::getDefault('items', 'granularity'),
+				'storage_mode' => DB::getDefault('items', 'storage_mode')
 			];
 
 			$input = array_intersect_key($input, $this->getInput('visible', []));

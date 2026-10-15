@@ -55,7 +55,7 @@ abstract class CItemType {
 		'publickey', 'privatekey',
 
 		// Telemetry query
-		'time_shift', 'lookback_limit', 'granularity', 'query'
+		'time_shift', 'lookback_limit', 'granularity', 'storage_mode', 'query'
 	];
 
 	/**
@@ -516,6 +516,7 @@ abstract class CItemType {
 			'time_shift' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'time_shift')],
 			'lookback_limit' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'lookback_limit')],
 			'granularity' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'granularity')],
+			'storage_mode' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'storage_mode')],
 			'query' =>				['type' => API_OBJECTS, 'length' => 0]
 		];
 	}

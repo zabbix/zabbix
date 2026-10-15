@@ -898,6 +898,10 @@ class C80ImportValidator extends CImportValidatorGeneral {
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
+							'storage_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'query' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_ARRAY | XML_REQUIRED, 'prefix' => 'query', 'rules' => self::getTelemetryQueryFieldSchema()],
 															['else' => true, 'type' => XML_IGNORE_TAG]
@@ -1290,6 +1294,10 @@ class C80ImportValidator extends CImportValidatorGeneral {
 									]],
 									'granularity' =>			['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'storage_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'query' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -2165,6 +2173,10 @@ class C80ImportValidator extends CImportValidatorGeneral {
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
+							'storage_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'query' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_ARRAY | XML_REQUIRED, 'prefix' => 'query', 'rules' => self::getTelemetryQueryFieldSchema()],
 															['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2552,6 +2564,10 @@ class C80ImportValidator extends CImportValidatorGeneral {
 									]],
 									'granularity' =>			['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'storage_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'query' =>					['type' => XML_MULTIPLE, 'rules' => [

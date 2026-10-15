@@ -342,8 +342,6 @@ class CItemPrototype extends CItemGeneral {
 
 				$item['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($item['query']);
 			}
-			// Make telemetry query field storage_mode inaccessible.
-			unset($item['storage_mode']);
 		}
 		unset($item);
 	}

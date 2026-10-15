@@ -212,7 +212,9 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
-					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+					$item += array_intersect_key($db_item, array_flip(
+						['granularity', 'lookback_limit', 'storage_mode']
+					));
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
@@ -320,7 +322,9 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
-					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+					$item += array_intersect_key($db_item, array_flip(
+						['granularity', 'lookback_limit', 'storage_mode']
+					));
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
@@ -1606,6 +1610,7 @@ abstract class CItemGeneral extends CApiService {
 			'time_shift' => DB::getDefault('items', 'time_shift'),
 			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
 			'granularity' => DB::getDefault('items', 'granularity'),
+			'storage_mode' => DB::getDefault('items', 'storage_mode'),
 			'query' => []
 		];
 

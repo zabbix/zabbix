@@ -272,7 +272,8 @@
 					formula: form_data['formula'],
 					time_shift: form_data['time_shift'],
 					lookback_limit: form_data['lookback_limit'],
-					granularity: form_data['granularity']
+					granularity: form_data['granularity'],
+					storage_mode: form_data['storage_mode']
 				};
 				break;
 		}
