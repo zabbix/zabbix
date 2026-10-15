@@ -152,7 +152,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				' WHERE hostid='.zbx_dbstr($maintenace_hostid)
 		);
 
-		// Change datatable initial layout to make sure that the maintenance icon and tags column edit buton are visible.
+		// Change datatable initial layout to make sure that the maintenance icon and tags column edit button are visible.
 		$layout = '{"columns":[{"id":"datatable-host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"},'.
 				'{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
 				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
