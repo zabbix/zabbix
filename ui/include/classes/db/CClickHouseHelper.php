@@ -16,6 +16,43 @@
 
 final class CClickHouseHelper {
 
+	public const INT8_MIN = -128;
+	public const INT8_MAX = 127;
+	public const INT16_MIN = -32768;
+	public const INT16_MAX = 32767;
+	public const INT32_MIN = -2147483648;
+	public const INT32_MAX = 2147483647;
+	public const INT64_MIN = -9223372036854775808;
+	public const INT64_MAX = 9223372036854775807;
+
+	public const UINT8_MAX = 255;
+	public const UINT16_MAX = 65535;
+	public const UINT32_MAX = 4294967295;
+	public const UINT64_MAX = '18446744073709551615';
+
+	public static function getIntMin(string $type): int {
+		return match ($type) {
+			'Int8' => self::INT8_MIN,
+			'Int16' => self::INT16_MIN,
+			'Int32' => self::INT32_MIN,
+			'Int64' => self::INT64_MIN,
+			'UInt8', 'UInt16', 'UInt32', 'UInt64' => 0
+		};
+	}
+
+	public static function getIntMax(string $type): int|string {
+		return match ($type) {
+			'Int8' => self::INT8_MAX,
+			'Int16' => self::INT16_MAX,
+			'Int32' => self::INT32_MAX,
+			'Int64' => self::INT64_MAX,
+			'UInt8' => self::UINT8_MAX,
+			'UInt16' => self::UINT16_MAX,
+			'UInt32' => self::UINT32_MAX,
+			'UInt64' => self::UINT64_MAX
+		};
+	}
+
 	public static function createQueryFromOptions(string $table, string $table_alias, array $db_schema, array $options)
 			: CClickHouseQuery {
 		$options = array_replace([
@@ -73,27 +110,40 @@ final class CClickHouseHelper {
 		}
 
 		$filter_prepared = [];
+		$filter_prepared_params = [];
+
+		$has_never_matched_fields = false;
 
 		foreach ($filter as $field => ['type' => $type]) {
 			$values = $options['filter'][$field];
 			$values_prepared = [];
+
+			$field_never_matches = false;
 
 			switch ($type) {
 				case 'Int8':
 				case 'Int16':
 				case 'Int32':
 				case 'Int64':
-				case 'Int128':
-				case 'Int256':
 				case 'UInt8':
 				case 'UInt16':
 				case 'UInt32':
 				case 'UInt64':
-				case 'UInt128':
-				case 'UInt256':
 					foreach ($values as $value) {
 						if (!is_int($value) && (!is_string($value) || !preg_match('/^'.ZBX_PREG_INT.'$/', $value))) {
-							continue;
+							$field_never_matches = true;
+							break 2;
+						}
+
+						$value_min = self::getIntMin($type);
+						$value_max = self::getIntMax($type);
+
+						if ((is_int($value) && $value < $value_min)
+								|| (is_int($value) && is_int($value_max) && $value > $value_max)
+								|| bccomp((string) $value, (string) $value_min) === -1
+								|| bccomp((string) $value, (string) $value_max) === 1) {
+							$field_never_matches = true;
+							break 2;
 						}
 
 						$values_prepared[] = $value;
@@ -121,8 +171,19 @@ final class CClickHouseHelper {
 					throw new InvalidArgumentException();
 			}
 
-			$query->param('filter_'.$field, $values_prepared);
-			$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
+			if ($field_never_matches) {
+				$has_never_matched_fields = true;
+			}
+			else {
+				$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
+				$filter_prepared_params['filter_'.$field] = $values_prepared;
+			}
+		}
+
+		if ($has_never_matched_fields && (!$filter_prepared || !$options['searchByAny'])) {
+			$query->where('0');
+
+			return;
 		}
 
 		$where = implode($options['searchByAny'] ? ' OR ' : ' AND ', $filter_prepared);
@@ -131,7 +192,9 @@ final class CClickHouseHelper {
 			$where = '('.$where.')';
 		}
 
-		$query->where($where);
+		$query
+			->where($where)
+			->params($filter_prepared_params);
 	}
 
 	private static function addQuerySearchOptions(CClickHouseQuery $query, array $options, array $db_schema,
