@@ -40,12 +40,14 @@ class CControllerApmLogListData extends CControllerDataTable {
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
 		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$validator->addErrorsToGlobal();
+
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 
 			return false;
@@ -164,10 +166,16 @@ class CControllerApmLogListData extends CControllerDataTable {
 		];
 
 		$search_limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$num_rows = (int) API::ApmLog()->get($options + [
+		$num_rows = API::ApmLog()->get($options + [
 			'countOutput' => true,
 			'limit' => $search_limit
 		]);
+
+		if ($num_rows === false) {
+			throw new Exception();
+		}
+
+		$num_rows = (int) $num_rows;
 
 		if ($num_rows > 0) {
 			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), null, $offset, $limit);
@@ -189,6 +197,10 @@ class CControllerApmLogListData extends CControllerDataTable {
 				'offset' => $offset,
 				'limit' => $limit
 			]);
+
+			if ($logs === false) {
+				throw new Exception();
+			}
 
 			if (in_array('timestamp', $select_fields)) {
 				$today = strtotime('today');

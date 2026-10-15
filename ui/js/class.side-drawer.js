@@ -137,7 +137,12 @@ class CSideDrawer {
 	}
 
 	#handleError(error) {
-		const $msg_box = makeMessageBox('bad', error.messages ?? [], error.title ?? t('Unexpected server error.'));
+		const title = error.title || null;
+		const messages = error.messages || [];
+
+		const $msg_box = title === null && messages.length === 0
+			? makeMessageBox('bad', [], t('Unexpected server error.'))
+			: makeMessageBox('bad', messages, title)
 
 		this.#drawer_element.innerHTML = '';
 		this.#drawer_element.appendChild($msg_box[0]);

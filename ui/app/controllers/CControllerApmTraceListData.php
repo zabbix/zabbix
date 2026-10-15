@@ -39,12 +39,14 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
 		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$validator->addErrorsToGlobal();
+
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 
 			return false;
@@ -178,6 +180,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'limit' => $limit
 		]);
 
+		if ($traces === false) {
+			throw new Exception();
+		}
+
 		if ($traces) {
 			$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
 
@@ -193,6 +199,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 				'sortfield' => $sort_field,
 				'sortorder' => $sort_order
 			]);
+
+			if ($traces === false) {
+				throw new Exception();
+			}
 		}
 
 		$rows = [];
