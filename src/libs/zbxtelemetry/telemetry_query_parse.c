@@ -920,7 +920,7 @@ static int	tq_expand_macros_field(char **str, char **str_orig, zbx_tq_macro_expa
 		return SUCCEED;
 
 	if (NULL != str_orig)
-		*str_orig =  zbx_strdup(NULL, *str);
+		*str_orig = zbx_strdup(NULL, *str);
 
 	if (NULL == macro_expand_cb)
 		return SUCCEED;
