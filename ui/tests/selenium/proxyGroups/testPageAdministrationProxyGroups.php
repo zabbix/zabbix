@@ -479,7 +479,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 
 	public static function getDeleteData() {
 		return [
-			// Attempt to delete a proxy group that has proxies assigned.
+			// #0 Attempt to delete a proxy group that has proxies assigned.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -487,7 +487,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					'error' => 'Proxy group "Default values - recovering" is used by proxy "passive_proxy7".'
 				]
 			],
-			// Attempt to delete a proxy group that has no proxies but has an assigned host.
+			// #1 Attempt to delete a proxy group that has no proxies but has an assigned host.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -496,7 +496,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 							' with linked host".'
 				]
 			],
-			// Attempt to delete two proxy groups one of which has a linked proxy.
+			// #2 Attempt to delete two proxy groups one of which has a linked proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -504,13 +504,29 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					'error' => 'Proxy group "Offline group" is used by proxy "active_proxy7".'
 				]
 			],
-			// Delete a proxy group that has nothing linked to it.
+			// #3 Attempt to delete a proxy group that is used in an Autoregistration action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'groups' => ['Proxy group for Actions 2'],
+					'error' => 'Proxy group "Proxy group for Actions 2" is used by action "Autoregistration action 1".'
+				]
+			],
+			// #4 Attempt to delete a proxy group that is used in a Discovery action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'groups' => ['Proxy group for Actions 3'],
+					'error' => 'Proxy group "Proxy group for Actions 3" is used by action "Discovery action with proxy groups".'
+				]
+			],
+			// #5 Delete a proxy group that has nothing linked to it.
 			[
 				[
 					'groups' => ['Group without proxies']
 				]
 			],
-			// Delete multiple proxy groups that have nothing linked to them.
+			// #6 Delete multiple proxy groups that have nothing linked to them.
 			[
 				[
 					'groups' => ['Delete me 1', 'Delete me 2']
