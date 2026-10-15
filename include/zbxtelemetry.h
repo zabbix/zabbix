@@ -242,6 +242,10 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
 
+int			zbx_tq_column_type_is_array(zbx_tq_column_type_t type);
+int			zbx_tq_column_type_is_attributes(zbx_tq_column_type_t type);
+zbx_tq_column_type_t	zbx_tq_get_base_column_type(zbx_tq_column_type_t type);
+
 void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql);
 

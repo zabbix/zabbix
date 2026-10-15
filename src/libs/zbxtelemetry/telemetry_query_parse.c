@@ -843,13 +843,13 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			}
 
 			if (ZBX_TQ_OPERATOR_EXISTS == cond->operator
-					&& SUCCEED != tq_column_type_is_attributes(cond->col_info->type))
+					&& SUCCEED != zbx_tq_column_type_is_attributes(cond->col_info->type))
 			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Operator \"exists\" selected for non-attribute condition #%d", i);
 			}
 
-			if (SUCCEED == tq_column_type_is_attributes(cond->col_info->type) &&
+			if (SUCCEED == zbx_tq_column_type_is_attributes(cond->col_info->type) &&
 					(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ||
 					ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator))
 			{

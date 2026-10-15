@@ -881,6 +881,70 @@ exit:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate telemetry query fields after macro expansion             *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
+{
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+
+		if (SUCCEED != zbx_is_utf8(cond->attribute_key))
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_tq_column_type_is_attributes(cond->col_info->type) && '\0' == *cond->attribute_key)
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" cannot be empty in attribute condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN < zbx_strlen_utf8(cond->attribute_key))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_utf8(cond->value))
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+
+		if ((ZBX_TQ_OPERATOR_CONTAINS == cond->operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator) &&
+				'\0' == *cond->value)
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" cannot be empty for operator \"%s\" in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE,
+					(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ? "contains" : "not contains"),
+					i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_CONDITION_VALUE_LEN < zbx_strlen_utf8(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
 {
 	const zbx_lld_entry_t	*lld_obj = (const zbx_lld_entry_t *)ctx;
@@ -906,6 +970,9 @@ int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t 
 	{
 		goto clean;
 	}
+
+	if (SUCCEED != lld_validate_telemetry_query(&query, error, maxerrlen))
+		goto clean;
 
 	zbx_free(*data);
 	*data = zbx_tq_serialize_query(&query);

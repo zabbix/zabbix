@@ -1180,49 +1180,6 @@ static void	lld_item_add_error(const zbx_lld_item_full_t *item, char **error, co
 	zbx_free(msg);
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: str must hold a valid query, all fields must be set (not NULL)   *
- *                                                                            *
- ******************************************************************************/
-static int	lld_validate_query_field_lengths(const char *str, char *error, size_t max_error_len)
-{
-	int		ret = FAIL;
-	zbx_tq_query_t	query;
-
-	if (SUCCEED != zbx_tq_parse_query(&query, str, error, max_error_len))
-		return FAIL;
-
-	/* no need to prepare query for field presence validation since query is assumed to be valid */
-
-	for (int i = 0; i < query.conditions.values_num; i++)
-	{
-		const zbx_tq_condition_t	*cond = &query.conditions.values[i];
-
-		/* attribute_key and value are valid UTF-8 since parsing succeeded */
-
-		if (ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN < zbx_strlen_utf8(cond->attribute_key))
-		{
-			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
-					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
-			goto out;
-		}
-
-		if (ZBX_TQ_CONDITION_VALUE_LEN < zbx_strlen_utf8(cond->value))
-		{
-			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded for condition #%d",
-					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
-			goto out;
-		}
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_tq_query_clean(&query);
-
-	return ret;
-}
-
 static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -1331,17 +1288,6 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				}
 
 				lld_item_add_error(item, error, "invalid trends storage period \"%s\"", *field);
-				break;
-			case ZBX_FLAG_LLD_ITEM_UPDATE_QUERY:
-				if (ITEM_TYPE_TELEMETRY_QUERY != item->type)
-					return;
-
-				/* ITEM_TYPE_TELEMETRY_QUERY == item->type, therefore query JSON has been generated */
-				/* during LLD macro expansion, so query is valid with all fields present */
-				if (SUCCEED == lld_validate_query_field_lengths(*field, errmsg_buf, sizeof(errmsg_buf)))
-					return;
-
-				lld_item_add_error(item, error, "%s", errmsg_buf);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT:
 			case ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT:

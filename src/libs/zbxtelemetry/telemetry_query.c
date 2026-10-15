@@ -163,7 +163,7 @@ void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 {
-	if (SUCCEED == tq_column_type_is_attributes(col->col_info->type))
+	if (SUCCEED == zbx_tq_column_type_is_attributes(col->col_info->type))
 		return zbx_dsprintf(NULL, "%s.%s", col->column, col->attribute_key);
 	else
 		return zbx_strdup(NULL, col->column);
@@ -180,8 +180,8 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 	if (0 != column_name_cmp_res)
 		return column_name_cmp_res;
 
-	is_attr_a = tq_column_type_is_attributes(cond_a->col_info->type);
-	is_attr_b = tq_column_type_is_attributes(cond_b->col_info->type);
+	is_attr_a = zbx_tq_column_type_is_attributes(cond_a->col_info->type);
+	is_attr_b = zbx_tq_column_type_is_attributes(cond_b->col_info->type);
 
 	if (SUCCEED != is_attr_a || SUCCEED != is_attr_b)
 	{
