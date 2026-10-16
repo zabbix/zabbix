@@ -41,6 +41,22 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Exemplars.FilteredAttributes'
 	];
 
+	public const NUMERIC_COLUMN_NAME = [
+		'Duration', 'TraceFlags', 'SeverityNumber', 'ScopeDroppedAttrCount', 'Value', 'Flags', 'AggregationTemporality',
+		'Count', 'Sum', 'Min', 'Max', 'Scale', 'ZeroCount', 'PositiveOffset', 'NegativeOffset'
+	];
+
+	public const COMPLEX_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS
+	];
+	public const NUMERIC_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_MORE_EQUAL,
+		CONDITION_OPERATOR_LESS_EQUAL
+	];
+	public const SIMPLE_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+	];
+
 	// SIGNAL_TYPE_TRACES column names
 	public const TRACES_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
@@ -123,7 +139,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	];
 	public const LOGS_CONDITIONS_COLUMN = [
 		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
-		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
+		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName', 'SeverityNumber'
 	];
 
 	/**
@@ -333,7 +349,11 @@ class CItemTypeTelemetryQuery extends CItemType {
 			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
 		};
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)]
+			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
+			'value' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'column', 'in' => implode(',', self::NUMERIC_COLUMN_NAME)], 'type' => API_FLOAT],
+								['else' => true, 'type' => API_STRING_UTF8]
+			]]
 		]];
 
 		return CApiInputValidator::validate($api_input_rules, $item['query']['filter']['conditions'],
@@ -481,12 +501,13 @@ class CItemTypeTelemetryQuery extends CItemType {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]],
 			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS])],
-									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
+									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', self::COMPLEX_COLUMN_OPERATORS)],
+									['if' => ['field' => 'column', 'in' => implode(',', self::NUMERIC_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', self::NUMERIC_COLUMN_OPERATORS)],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', self::SIMPLE_COLUMN_OPERATORS)]
 			]],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]
 		];
