@@ -1,20 +1,25 @@
 Changes for 7.0.32rc1
 
 New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
+..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
+..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
+...G...... [ZBX-27925] added AI_NUMERICHOST flag to suppress potentially lengthy network host address lookups (jburlakovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
-.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
-..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+.......PS. [ZBX-27888] resumed VMware data collection after pause of more than 1 hour (MVekslers)
+..F....... [ZBX-27778] fixed keyboard navigation to "Edit filter properties" button (aluchko)
 A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
 A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
-..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
+..F....... [ZBX-27909] fixed text area maximum length in host inventory (uolekss)
 ..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
-...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
-..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
-..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+...G...... [ZBX-26359] fixed Smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed misplacement of "Update" and "Save" buttons after switching filter tabs in Safari (gklavins)
 ..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
 ........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
 
@@ -4250,9 +4255,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.49rc1
 
 New features:
-A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
-
-Bug fixes:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48
