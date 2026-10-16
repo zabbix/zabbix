@@ -209,16 +209,17 @@
 					}
 				}
 			}
+		}
+	}
 
-			.trace-details {
-				min-inline-size: 0;
-				min-block-size: min-content;
+	.trace-details {
+		min-inline-size: 0;
+		min-block-size: min-content;
+		overflow: auto;
 
-				.details-panel {
-					inline-size: var(--trace-details-width);
-					border-inline-start: 1px solid var(--trace-border-color);
-				}
-			}
+		.details-panel {
+			min-inline-size: var(--trace-details-width);
+			border-inline-start: 1px solid var(--trace-border-color);
 		}
 	}
 

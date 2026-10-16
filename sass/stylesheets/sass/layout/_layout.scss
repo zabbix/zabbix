@@ -27,15 +27,6 @@ body {
 			inset-block-start: 0;
 			z-index: 998;
 		}
-
-		&:has(.side-drawer.closed) {
-			grid-template-columns: none;
-
-			.side-drawer,
-			> z-split-view-handle {
-				display: none;
-			}
-		}
 	}
 
 	> z-split-view,

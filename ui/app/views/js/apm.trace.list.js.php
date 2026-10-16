@@ -557,9 +557,18 @@
 				title: <?= json_encode(_('Span details')); ?>,
 				groups: this.#collectSpanDetailsGroups(span)
 			});
+
+			trace_details.open();
 		}
 
 		#onSideDrawerSpanDetailsClose = () => {
+			const trace_details = this.#side_drawer.getElement().querySelector('[data-trace-details]');
+			if (trace_details === null) {
+				return;
+			}
+
+			trace_details.close();
+
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 

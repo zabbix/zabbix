@@ -891,11 +891,6 @@ body {
     position: sticky;
     inset-block-start: 0;
     z-index: 998; }
-  body > z-split-view:has(.side-drawer.closed) {
-    grid-template-columns: none; }
-    body > z-split-view:has(.side-drawer.closed) .side-drawer,
-    body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
-      display: none; }
   body > z-split-view,
   body > .wrapper {
     grid-area: content;
@@ -6035,12 +6030,13 @@ section {
             box-sizing: border-box;
             min-inline-size: 0;
             min-block-size: var(--trace-row-block-size); }
-      .trace-view .trace-view-container .trace-scroll .trace-details {
-        min-inline-size: 0;
-        min-block-size: min-content; }
-        .trace-view .trace-view-container .trace-scroll .trace-details .details-panel {
-          inline-size: var(--trace-details-width);
-          border-inline-start: 1px solid var(--trace-border-color); }
+  .trace-view .trace-details {
+    min-inline-size: 0;
+    min-block-size: min-content;
+    overflow: auto; }
+    .trace-view .trace-details .details-panel {
+      min-inline-size: var(--trace-details-width);
+      border-inline-start: 1px solid var(--trace-border-color); }
   .trace-view .trace-grid-line {
     position: absolute;
     inset-inline-start: var(--trace-grid-line-position);
@@ -6603,6 +6599,11 @@ z-split-view {
       cursor: col-resize; }
     z-split-view[resizing][vertical] {
       cursor: row-resize; }
+  z-split-view:has(> z-split-view-pane.closed) {
+    grid-template-columns: none; }
+    z-split-view:has(> z-split-view-pane.closed) > .closed,
+    z-split-view:has(> z-split-view-pane.closed) > z-split-view-handle {
+      display: none; }
 
 z-textarea-flexible {
   display: inline-grid; }
