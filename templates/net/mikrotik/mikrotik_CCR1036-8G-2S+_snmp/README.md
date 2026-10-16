@@ -1,5 +1,5 @@
 
-# MikroTik CCR1036-8G-2S by SNMP
+# MikroTik CCR1036-8G-2S+ by SNMP
 
 ## Overview
 

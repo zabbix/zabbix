@@ -487,17 +487,13 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t1.description,h2.host"
-				" from items i1,functions f1,triggers t1,functions f2,items i2,hosts h2"
-				" where i1.itemid=f1.itemid"
-					" and f1.triggerid=t1.triggerid"
-					" and t1.triggerid=f2.triggerid"
-					" and f2.itemid=i2.itemid"
-					" and i2.hostid=h2.hostid"
-					" and h2.status=%d"
-					" and",
-				HOST_STATUS_TEMPLATE);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select f1.triggerid,i2.hostid"
+				" from items i1"
+				" join functions f1 on f1.itemid=i1.itemid"
+				" join functions f2 on f2.triggerid=f1.triggerid"
+				" join items i2 on i2.itemid=f2.itemid"
+				" where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.hostid",
 				templateids->values, templateids->values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
@@ -508,10 +504,39 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
+			zbx_uint64_t	triggerid, hostid;
+			zbx_db_result_t	error_result;
+			zbx_db_row_t	error_row;
+
+			ZBX_STR2UINT64(triggerid, row[0]);
+			ZBX_STR2UINT64(hostid, row[1]);
+
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select t.description,h.host"
+					" from triggers t,hosts h"
+					" where t.triggerid=" ZBX_FS_UI64
+						" and h.hostid=" ZBX_FS_UI64,
+					triggerid, hostid);
+
+			error_result = zbx_db_select_n(sql, 1);
+
+			if (NULL != (error_row = zbx_db_fetch(error_result)))
+			{
+				zbx_snprintf(error, max_error_len,
+						"trigger \"%s\" has items from template \"%s\"",
+						error_row[0], error_row[1]);
+			}
+			else
+			{
+				zbx_snprintf(error, max_error_len,
+						"failed to retrieve trigger description or host for triggerid "
+						ZBX_FS_UI64 " and hostid " ZBX_FS_UI64, triggerid, hostid);
+				THIS_SHOULD_NEVER_HAPPEN_MSG("%s", error);
+			}
+
 			ret = FAIL;
-			zbx_snprintf(error, max_error_len,
-					"trigger \"%s\" has items from template \"%s\"",
-					row[0], row[1]);
+			zbx_db_free_result(error_result);
 		}
 		zbx_db_free_result(result);
 	}

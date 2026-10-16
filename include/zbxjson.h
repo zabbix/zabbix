@@ -296,6 +296,7 @@ zbx_json_status_t;
 
 #define ZBX_JSON_STAT_BUF_LEN 4096
 #define ZBX_JSON_TEST_DATA_MAX_SIZE (512 * ZBX_KIBIBYTE)
+#define ZBX_MAX_JSON_DEPTH	64
 
 struct zbx_json
 {

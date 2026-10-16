@@ -56,7 +56,7 @@
 		}
 
 		#resetDefaults(reset_button) {
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				title: <?= json_encode(_('Reset confirmation')) ?>,
 				content: document.createElement('span').innerText = <?= json_encode(
 					_('Reset all fields to default values?')
@@ -92,6 +92,9 @@
 				position: Overlay.prototype.POSITION_CENTER,
 				trigger_element: reset_button
 			});
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$head.$close_button.show();
 		}
 	};
 </script>

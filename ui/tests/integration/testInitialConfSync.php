@@ -1699,6 +1699,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_old = $this->getStringPoolCount();
+		$stringpool_old--;	/* timer for baselinedev is still running, remove it from calculation */
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);

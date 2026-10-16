@@ -1,1 +1,0 @@
-........S. [ZBX-28002] fixed nodata() trigger from flapping into unknown state when 1) log history with only metadata is received 2) preprocessing discards history 3) only old entries outside nodata() period are received (arimdjonoks)
