@@ -127,7 +127,9 @@ class CControllerUsergroupEdit extends CController {
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
-		$data['resource_attributes'] = $this->hasInput('usrgrpid') ? $this->user_group['resource_attributes'] : [];
+		// TODO: replace this line with the one below when API is ready
+		$data['resource_attributes'] = [];
+//		$data['resource_attributes'] = $this->hasInput('usrgrpid') ? $this->user_group['resource_attributes'] : [];
 
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $tag_filter) {
