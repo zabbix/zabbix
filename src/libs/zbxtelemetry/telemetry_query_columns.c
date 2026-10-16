@@ -75,6 +75,7 @@ static const zbx_tq_column_info_t	column_info_metrics_sum[] = {
 	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
+	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM,		0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_BOOL,	0		},
 	{0}
@@ -98,6 +99,7 @@ static const zbx_tq_column_info_t	column_info_metrics_gauge[] = {
 	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
+	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM,		0	},
 	{0}
 };
 
@@ -120,6 +122,7 @@ static const zbx_tq_column_info_t	column_info_metrics_histogram[] = {
 	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM,		0	},
 	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
@@ -149,6 +152,7 @@ static const zbx_tq_column_info_t	column_info_metrics_exponential_histogram[] = 
 	{"NegativeOffset",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM,		0	},
 	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		ZBX_TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
@@ -211,6 +215,13 @@ int	zbx_tq_column_type_is_array(zbx_tq_column_type_t type)
 int	zbx_tq_column_type_is_attributes(zbx_tq_column_type_t type)
 {
 	return ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type || ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ? SUCCEED : FAIL;
+}
+
+int	zbx_tq_column_type_requires_numeric_comparison(zbx_tq_column_type_t type)
+{
+	return ZBX_TQ_COLUMN_TYPE_NUM == type || ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == type ||
+			ZBX_TQ_COLUMN_TYPE_TIMESTAMP == type || ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP == type ||
+			ZBX_TQ_COLUMN_TYPE_BOOL == type || ZBX_TQ_COLUMN_TYPE_ARRAY_BOOL == type ? SUCCEED : FAIL;
 }
 
 zbx_tq_column_type_t	zbx_tq_get_base_column_type(zbx_tq_column_type_t type)

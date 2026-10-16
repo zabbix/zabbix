@@ -170,6 +170,8 @@ typedef enum
 	ZBX_TQ_OPERATOR_NOT_EQUAL	= 1,
 	ZBX_TQ_OPERATOR_CONTAINS	= 2,
 	ZBX_TQ_OPERATOR_NOT_CONTAINS	= 3,
+	ZBX_TQ_OPERATOR_MORE_EQUAL	= 5,
+	ZBX_TQ_OPERATOR_LESS_EQUAL	= 6,
 	ZBX_TQ_OPERATOR_EXISTS		= 12,
 }
 zbx_tq_operator_t;
@@ -243,8 +245,11 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
 
+int	zbx_tq_validate_numeric_condition_value(const char *value);
+
 int			zbx_tq_column_type_is_array(zbx_tq_column_type_t type);
 int			zbx_tq_column_type_is_attributes(zbx_tq_column_type_t type);
+int			zbx_tq_column_type_requires_numeric_comparison(zbx_tq_column_type_t type);
 zbx_tq_column_type_t	zbx_tq_get_base_column_type(zbx_tq_column_type_t type);
 
 void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,

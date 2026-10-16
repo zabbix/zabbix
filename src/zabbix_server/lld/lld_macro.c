@@ -940,6 +940,8 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
 			return FAIL;
 		}
+
+		/* value being numeric for numeric conditions is validated when preparing query */
 	}
 
 	return SUCCEED;

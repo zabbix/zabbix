@@ -165,6 +165,8 @@ static zbx_tq_operator_t	tq_match_operator(int x)
 		case ZBX_TQ_OPERATOR_NOT_EQUAL:
 		case ZBX_TQ_OPERATOR_CONTAINS:
 		case ZBX_TQ_OPERATOR_NOT_CONTAINS:
+		case ZBX_TQ_OPERATOR_MORE_EQUAL:
+		case ZBX_TQ_OPERATOR_LESS_EQUAL:
 		case ZBX_TQ_OPERATOR_EXISTS:
 			return x;
 		default:
@@ -735,8 +737,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						i);
 			}
 
-			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_info->type
-					|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_info->type))
+			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_info->type ||
+					ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_info->type))
 			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Unsupported column type for aggregated column #%d", i);
@@ -833,13 +835,33 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 			}
 
-			if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_STR == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_ARRAY_STR == cond->col_info->type))
+			/* all column types are supported in conditions */
+
+			if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(cond->col_info->type))
 			{
-				return ret_errf(FAIL, error, max_error_len, "Unsupported column type for condition #%d",
-						i);
+				if (!(ZBX_TQ_OPERATOR_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_MORE_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_LESS_EQUAL == cond->operator))
+				{
+					return ret_errf(FAIL, error, max_error_len,
+							"Unsupported \"%s\" selected for numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_OPERATOR, i);
+				}
+
+				if (SUCCEED != zbx_tq_validate_numeric_condition_value(cond->value))
+				{
+					return ret_errf(FAIL, error, max_error_len,
+							"\"%s\" is not numeric for numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_VALUE, i);
+				}
+			}
+			else if (ZBX_TQ_OPERATOR_MORE_EQUAL == cond->operator ||
+					ZBX_TQ_OPERATOR_LESS_EQUAL == cond->operator)
+			{
+				return ret_errf(FAIL, error, max_error_len,
+							"Unsupported \"%s\" selected for non-numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_OPERATOR, i);
 			}
 
 			if (ZBX_TQ_OPERATOR_EXISTS == cond->operator

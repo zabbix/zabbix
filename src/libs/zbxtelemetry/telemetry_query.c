@@ -231,3 +231,8 @@ int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
 			return FAIL;
 	}
 }
+
+int	zbx_tq_validate_numeric_condition_value(const char *value)
+{
+	return zbx_is_double(value, NULL);
+}
