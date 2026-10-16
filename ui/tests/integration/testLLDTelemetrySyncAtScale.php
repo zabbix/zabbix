@@ -162,6 +162,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			'key_' => self::TQ_ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			// The value holds rows of all devices, storing it on every poll is too expensive.
+			'history' => '0',
 			'timeout' => '3s',
 			'delay' => self::TQ_DELAY,
 			'time_shift' => self::TQ_TIME_SHIFT,
