@@ -42,8 +42,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	];
 
 	public const NUMERIC_COLUMN_NAME = [
-		'Duration', 'TraceFlags', 'SeverityNumber', 'ScopeDroppedAttrCount', 'Value', 'Flags', 'AggregationTemporality',
-		'Count', 'Sum', 'Min', 'Max', 'Scale', 'ZeroCount', 'PositiveOffset', 'NegativeOffset'
+		'Timestamp', 'Duration', 'TraceFlags', 'SeverityNumber', 'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix',
+		'Value', 'Flags', 'Exemplars.Value', 'AggregationTemporality', 'IsMonotonic', 'Count', 'Sum', 'Min', 'Max',
+		'Scale', 'ZeroCount', 'PositiveOffset', 'NegativeOffset'
 	];
 
 	public const COMPLEX_COLUMN_OPERATORS = [
@@ -66,8 +67,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Timestamp', 'Duration'
 	];
 	public const TRACES_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName', 'ResourceAttributes',
-		'SpanAttributes', 'ScopeName', 'ScopeVersion', 'StatusCode', 'StatusMessage', 'Events.Attributes', 'Events.Name'
+		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
+		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode', 'StatusMessage',
+		'Events.Attributes', 'Events.Name'
 	];
 
 	// SIGNAL_TYPE_METRICS column names
@@ -111,20 +113,29 @@ class CItemTypeTelemetryQuery extends CItemType {
 	];
 	public const METRICS_CONDITIONS_COLUMN = [
 		self::METRICS_POINT_SUM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value', 'AggregationTemporality', 'IsMonotonic'
 		],
 		self::METRICS_POINT_GAUGE => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value'
 		],
 		self::METRICS_POINT_HISTOGRAM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value', 'Min', 'Max', 'AggregationTemporality'
 		],
 		self::METRICS_POINT_EXPONENTIAL_HISTOGRAM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount', 'PositiveOffset',
+			'NegativeOffset', 'Flags', 'Exemplars.FilteredAttributes', 'Exemplars.Value', 'Min', 'Max',
+			'AggregationTemporality'
 		]
 	];
 
@@ -138,8 +149,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Timestamp', 'SeverityNumber'
 	];
 	public const LOGS_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
-		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName', 'SeverityNumber'
+		'Timestamp', 'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'SeverityNumber', 'ServiceName', 'Body',
+		'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes',
+		'LogAttributes', 'EventName'
 	];
 
 	/**
