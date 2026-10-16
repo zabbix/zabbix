@@ -706,7 +706,7 @@ typedef struct
 	/* index of autoincrement field */
 	int				autoincrement;
 	/* database connection options */
-	int 				connect_options;
+	int				connect_options;
 	/* the last id assigned by autoincrement */
 	zbx_uint64_t			lastid;
 	char				*clause;

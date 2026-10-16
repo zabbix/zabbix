@@ -2884,6 +2884,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	self->autoincrement = -1;
 	self->lastid = 0;
 	self->clause = NULL;
+	self->connect_options = ZBX_DB_CONNECT_NORMAL;
 
 	zbx_vector_db_field_ptr_create(&self->fields);
 	zbx_vector_db_value_ptr_create(&self->rows);
@@ -2958,8 +2959,6 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 {
 	va_list	args;
 
-	self->connect_options = ZBX_DB_CONNECT_NORMAL;
-
 	va_start(args, table);
 	db_insert_prepare(self, table, args);
 	va_end(args);
@@ -2983,11 +2982,11 @@ void	zbx_db_insert_prepare_once(zbx_db_insert_t *self, const char *table, ...)
 {
 	va_list	args;
 
-	self->connect_options = ZBX_DB_CONNECT_ONCE;
-
 	va_start(args, table);
 	db_insert_prepare(self, table, args);
 	va_end(args);
+
+	self->connect_options = ZBX_DB_CONNECT_ONCE;
 }
 
 /******************************************************************************
@@ -3188,7 +3187,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	{
 		zbx_uint64_t	id;
 
-		if (ZBX_DB_CONNECT_ONCE == self->connect_options)
+		if (ZBX_DB_CONNECT_NORMAL != self->connect_options)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
@@ -3277,7 +3276,10 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	contexts = (zbx_db_bind_context_t *)zbx_malloc(NULL, sizeof(zbx_db_bind_context_t) * self->fields.values_num);
 
 retry_oracle:
-	zbx_db_statement_prepare(sql_command);
+	if (ZBX_DB_CONNECT_NORMAL == self->connect_options)
+		zbx_db_statement_prepare(sql_command);
+	else if (ZBX_DB_OK > zbx_db_statement_prepare_basic(sql_command))
+		goto out;
 
 	for (j = 0; j < self->fields.values_num; j++)
 	{
