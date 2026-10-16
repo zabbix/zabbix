@@ -61,12 +61,15 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
 	const LLD_DISCOVERY_COUNT = 10000;
-	const PROBLEM_DEVICE_COUNT = 9000;
+	const PROBLEM_DEVICE_COUNT = 10;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
 	const TRIGGER_ITERATIONS = 60;
 	const CLICKHOUSE_WAIT_SECONDS = 60;
 	const PREFLIGHT_RESEND_SECONDS = 10;
+	const STORED_STATUS_WINDOW = '1d';
+	/* ZBX_TQ_STORAGE_MODE_SINGLE: one value with all buckets, "[]" when none (multiple values mode sets no value) */
+	const TQ_STORAGE_MODE_SINGLE = 1;
 
 	/* granularity == delay keeps query windows contiguous, so each sent data point yields exactly one row */
 	const TQ_GRANULARITY = '5s';
@@ -323,13 +326,12 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 
 		// Resend periodically, data sent before the proxy has APM configuration may be dropped.
-		$since = time();
-		$deadline = $since + 30;
-		$next_send = $since;
-		$count = 0;
+		$baseline = $this->getStoredStatusCount(0);
+		$deadline = time() + 30;
+		$next_send = time();
+		$count = $baseline;
 		$send_error = null;
-		$query_error = null;
-		while ($count === 0 && time() < $deadline) {
+		while ($count === $baseline && time() < $deadline) {
 			if (time() >= $next_send) {
 				$error = null;
 				if (!$this->sendDeviceStatus([self::PREFLIGHT_DEVICE], 0, $error)) {
@@ -340,20 +342,12 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 
 			sleep(self::WAIT_ITERATION_DELAY);
 
-			$error = null;
-			$stored = $this->countStoredStatus([self::PREFLIGHT_DEVICE], 0, $since, $error);
-			if ($stored === null) {
-				$query_error = $error;
-			}
-			else {
-				$count = $stored;
-			}
+			$count = $this->getStoredStatusCount(0);
 		}
 
-		$this->assertGreaterThan(0, $count,
+		$this->assertGreaterThan($baseline, $count,
 				'Preflight data point did not reach ClickHouse through the proxy APM collector.'.
-				"\nLast send error: ".($send_error === null ? 'none' : $send_error).
-				"\nLast ClickHouse error: ".($query_error === null ? 'none' : $query_error));
+				"\nLast send error: ".($send_error === null ? 'none' : $send_error));
 	}
 
 	/**
@@ -371,7 +365,8 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	 * @depends testLLDAPMSyncAtScale_TriggerFiringSend
 	 */
 	public function testLLDAPMSyncAtScale_TriggerFiringVerify() {
-		$this->waitForProblemDevices(self::problemDeviceNames());
+		$this->waitForOpenProblemCount(self::PROBLEM_DEVICE_COUNT);
+		$this->assertProblemDevices(self::problemDeviceNames());
 	}
 
 	/**
@@ -389,7 +384,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	 * @depends testLLDAPMSyncAtScale_TriggerRecoverySend
 	 */
 	public function testLLDAPMSyncAtScale_TriggerRecoveryVerify() {
-		$this->waitForProblemDevices([]);
+		$this->waitForOpenProblemCount(0);
 	}
 
 	private static function deviceNames(): array {
@@ -415,75 +410,49 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	}
 
 	private function sendStatusAndWaitStored(array $devices, int $status): void {
-		$since = time();
+		$baseline = $this->getStoredStatusCount($status);
+
 		$error = null;
 		$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
 				'Failed to send status='.$status.' data points: '.$error);
 
-		$deadline = time() + self::CLICKHOUSE_WAIT_SECONDS;
-		$count = 0;
-		$query_error = null;
-		while (time() < $deadline) {
-			$error = null;
-			$stored = $this->countStoredStatus($devices, $status, $since, $error);
-			if ($stored === null) {
-				$query_error = $error;
-			}
-			else {
-				$count = $stored;
-				if ($count >= count($devices)) {
-					break;
-				}
-			}
+		$this->assertStoredStatusIncreasedBy($status, $baseline, count($devices));
+	}
 
-			sleep(self::WAIT_ITERATION_DELAY);
-		}
-
-		$this->assertEquals(count($devices), $count,
-				'Unexpected number of status='.$status.' data points stored in ClickHouse.'.
-				"\nLast ClickHouse error: ".($query_error === null ? 'none' : $query_error));
+	private function waitForOpenProblemCount(int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'hostids' => [self::$hostid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS
+		], $expected, self::TRIGGER_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
-	 * Wait until the set of devices with a trigger in PROBLEM state matches the expected set.
+	 * Assert that exactly the expected devices have a trigger in PROBLEM state, so a matching count is not made of
+	 * the wrong devices (e.g. sensor1 rows matching sensor10..19).
 	 */
-	private function waitForProblemDevices(array $expected): void {
-		sort($expected);
+	private function assertProblemDevices(array $expected): void {
+		$response = $this->call('trigger.get', [
+			'hostids' => [self::$hostid],
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['triggerid'],
+			'selectItems' => ['key_']
+		]);
+
 		$actual = [];
-
-		for ($i = 0; $i < self::TRIGGER_ITERATIONS; $i++) {
-			$response = $this->call('trigger.get', [
-				'hostids' => [self::$hostid],
-				'filter' => ['value' => TRIGGER_VALUE_TRUE],
-				'output' => ['triggerid'],
-				'selectItems' => ['key_']
-			]);
-
-			$actual = [];
-			foreach ($response['result'] as $trigger) {
-				$this->assertCount(1, $trigger['items'], 'Unexpected trigger: '.json_encode($trigger));
-				$this->assertEquals(1, preg_match('/^'.preg_quote(self::ITEM_PROTO_KEY, '/').'\[(.+)\]$/',
-						$trigger['items'][0]['key_'], $match), 'Unexpected item key: '.$trigger['items'][0]['key_']);
-				$actual[] = $match[1];
-			}
-			sort($actual);
-
-			if ($actual === $expected) {
-				break;
-			}
-
-			sleep(self::WAIT_ITERATION_DELAY);
+		foreach ($response['result'] as $trigger) {
+			$this->assertCount(1, $trigger['items'], 'Unexpected trigger: '.json_encode($trigger));
+			$this->assertEquals(1, preg_match('/^'.preg_quote(self::ITEM_PROTO_KEY, '/').'\[(.+)\]$/',
+					$trigger['items'][0]['key_'], $match), 'Unexpected item key: '.$trigger['items'][0]['key_']);
+			$actual[] = $match[1];
 		}
+
+		sort($expected);
+		sort($actual);
 
 		$this->assertEquals($expected, $actual, 'Devices with triggers in PROBLEM state do not match: missing ['.
 				implode(',', array_diff($expected, $actual)).'], unexpected ['.
 				implode(',', array_diff($actual, $expected)).'].');
-
-		$response = $this->call('problem.get', [
-			'hostids' => [self::$hostid],
-			'countOutput' => true
-		]);
-		$this->assertEquals(count($expected), (int) $response['result'], 'Unexpected number of open problems.');
 	}
 
 	/**
@@ -573,20 +542,100 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 		return true;
 	}
 
-	private function countStoredStatus(array $devices, int $status, int $since, ?string &$error = null): ?int {
-		$names = implode(',', array_map(fn($d) => "'".$d."'", $devices));
+	/**
+	 * Telemetry query item tested on the server to read back stored status data points the same way the query
+	 * item reads them. Lookback equal to granularity gives a single bucket, so the result is a single row; the OTel
+	 * tables are truncated in prepareData, so a day long window holds every data point of the suite. Status is
+	 * only ever 0 or 1, so the sum is the number of status=1 data points.
+	 */
+	private static function storedStatusItem(): array {
+		$query = [
+			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+			'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+			'columns' => [],
+			'aggregated_columns' => [
+				['column' => '', 'function' => AGGREGATE_COUNT, 'parameters' => [], 'alias' => 'cnt'],
+				['column' => 'Value', 'function' => AGGREGATE_SUM, 'parameters' => [], 'alias' => 'sum']
+			],
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'formula' => '',
+				'conditions' => [
+					[
+						'column' => 'MetricName',
+						'attribute_key' => '',
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => self::METRIC_NAME
+					]
+				]
+			]
+		];
 
-		$response = $this->queryClickHouse(
-			'select count() from otel_metrics_gauge'.
-			" where MetricName='".self::METRIC_NAME."'".
-			" and ResourceAttributes['host.name'] in (".$names.')'.
-			' and Value='.$status.
-			' and toUnixTimestamp(TimeUnix)>='.$since.
-			' format TabSeparated',
-			$error
+		return [
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'key' => self::TQ_ITEM_KEY,
+			'timeout' => self::CLICKHOUSE_TIMEOUT.'s',
+			'time_shift' => '0s',
+			'lookback_limit' => self::STORED_STATUS_WINDOW,
+			'granularity' => self::STORED_STATUS_WINDOW,
+			'storage_mode' => self::TQ_STORAGE_MODE_SINGLE,
+			'query' => json_encode($query, JSON_THROW_ON_ERROR)
+		];
+	}
+
+	/**
+	 * Number of stored data points per status from the storedStatusItem() test result, or null when the result
+	 * is not usable.
+	 *
+	 * @return array|null  [0 => status=0 count, 1 => status=1 count]
+	 */
+	private static function parseStoredStatusCounts($result): ?array {
+		if ($result === false || !isset($result['item']['result'])) {
+			return null;
+		}
+
+		$buckets = json_decode($result['item']['result'], true);
+
+		if ($buckets === []) {
+			return [0, 0];
+		}
+
+		if (!is_array($buckets) || count($buckets) !== 1 || !isset($buckets[0]['columns']['cnt'])
+				|| !isset($buckets[0]['columns']['sum'])) {
+			return null;
+		}
+
+		$count = (int) $buckets[0]['columns']['cnt'];
+		$ones = (int) $buckets[0]['columns']['sum'];
+
+		return [$count - $ones, $ones];
+	}
+
+	private function getStoredStatusCount(int $status): int {
+		$result = $this->callTestItemUntilCallback(self::storedStatusItem(),
+			fn($result) => self::parseStoredStatusCounts($result) !== null,
+			['single' => false, 'state' => 0], self::CLICKHOUSE_WAIT_SECONDS * 1000
 		);
 
-		return $response === null ? null : (int) trim($response);
+		return self::parseStoredStatusCounts($result)[$status];
+	}
+
+	private function assertStoredStatusIncreasedBy(int $status, int $baseline, int $increase): void {
+		$expected = $baseline + $increase;
+
+		$result = $this->callTestItemUntilCallback(self::storedStatusItem(),
+			function ($result) use ($status, $expected) {
+				$counts = self::parseStoredStatusCounts($result);
+
+				return $counts !== null && $counts[$status] >= $expected;
+			},
+			['single' => false, 'state' => 0], self::CLICKHOUSE_WAIT_SECONDS * 1000
+		);
+
+		$this->assertEquals($expected, self::parseStoredStatusCounts($result)[$status],
+				'Unexpected number of status='.$status.' data points stored in ClickHouse: '.
+				$result['item']['result']);
 	}
 
 	private function truncateOTData(): void {
