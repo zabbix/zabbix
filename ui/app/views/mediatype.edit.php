@@ -75,7 +75,7 @@ $mediatype_form_grid = (new CFormGrid())
 		(new CLabel(_('SMTP server port'), 'smtp_port'))->setId('smtp-port-label'),
 		(new CFormField(
 			(new CNumericBox(
-				'smtp_port', $data['smtp_port'], 5, false, false, false)
+				'smtp_port', $data['smtp_port'], 5, false, false)
 			)->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		))->setId('smtp-port-field')
 	])
@@ -440,7 +440,7 @@ $media_options_form_grid = (new CFormGrid())
 				->addValue(_('Custom'), 'custom')
 				->setModern(true)
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
+			(new CNumericBox('maxsessions', $max_sessions, 3, false, false))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		]))->addClass(ZBX_STYLE_NOWRAP)
@@ -448,7 +448,7 @@ $media_options_form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Attempts'), 'maxattempts'))->setAsteriskMark(),
 		new CFormField(
-			(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
+			(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)

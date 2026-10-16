@@ -96,7 +96,7 @@ $form_grid = (new CFormGrid())
 					->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
 					->setModern()
 			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
+			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->addClass(ZBX_STYLE_DISPLAY_NONE)
 				->setAriaRequired()
