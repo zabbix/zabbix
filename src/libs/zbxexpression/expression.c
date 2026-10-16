@@ -654,7 +654,7 @@ static int	token_is_user_macro(const char *macro, const zbx_token_t *token)
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
@@ -675,8 +675,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	unsigned char			macro_env = ZBX_MACRO_ENV_DEFAULT;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
-
-	ZBX_UNUSED(hostid);
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -800,7 +798,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			um_handle = zbx_dc_open_user_macros_masked();
 		}
 
-		if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
+		if (0 != (macro_type & (ZBX_MACRO_TYPE_SCRIPT_NORMAL | ZBX_MACRO_TYPE_SCRIPT_RECOVERY |
+				ZBX_MACRO_TYPE_SCRIPT)) && 0 == strcmp(m, MVAR_MANUALINPUT))
+		{
+			if (0 == indexed_macro && NULL != manualinput)
+				replace_to = zbx_strdup(replace_to, manualinput);
+		}
+		else if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 				ZBX_MACRO_TYPE_MESSAGE_UPDATE |
 				ZBX_MACRO_TYPE_SCRIPT_NORMAL | ZBX_MACRO_TYPE_SCRIPT_RECOVERY)))
 		/* ZBX_MACRO_TYPE_SCRIPT_NORMAL and ZBX_MACRO_TYPE_SCRIPT_RECOVERY behave pretty similar to */
@@ -3205,13 +3209,13 @@ exit:
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen)
 {
-	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
-			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
+	return substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert,
+			ack, service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 }
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers)
@@ -3226,7 +3230,7 @@ void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, c
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen)
@@ -3236,7 +3240,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 	um_handle = zbx_dc_open_user_macros_secure();
 
-	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
+	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert, ack,
 			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 
 	zbx_dc_close_user_macros(um_handle);
