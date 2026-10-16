@@ -405,13 +405,14 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t		itemid, hostid;
+		zbx_uint64_t		itemid;
 		int			trends, value_type;
 		zbx_hk_history_rule_t	*rule, *rule_add;
+		zbx_dc_host_t		dc_host;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
-		ZBX_STR2UINT64(hostid, row[4]);
+		ZBX_STR2UINT64(dc_host.hostid, row[4]);
 
 		if (value_type <= ITEM_VALUE_TYPE_BIN &&
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
@@ -419,7 +420,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			int	history;
 
 			tmp = zbx_strdup(tmp, row[2]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL,
 					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
@@ -455,7 +456,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				rule_add = rule;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL,
 					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))

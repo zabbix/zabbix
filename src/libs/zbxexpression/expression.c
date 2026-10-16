@@ -676,6 +676,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
 
+	ZBX_UNUSED(hostid);
+
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:EMPTY", __func__);
@@ -2460,8 +2462,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			if (SUCCEED == token_is_user_macro(m, &token))
 			{
-				if (NULL != hostid)
-					zbx_dc_get_user_macro(um_handle, m, hostid, 1, &replace_to);
+				if (NULL != dc_host)
+					zbx_dc_get_user_macro(um_handle, m, &dc_host->hostid, 1, &replace_to);
 				else
 					zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
 
@@ -2913,7 +2915,7 @@ out:
 
 typedef struct
 {
-	zbx_uint64_t				*hostid;
+	const zbx_dc_host_t			*dc_host;
 	zbx_dc_item_t				*dc_item;
 	const struct zbx_json_parse		*jp_row;
 	const zbx_vector_lld_macro_path_ptr_t	*lld_macro_paths;
@@ -2930,7 +2932,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 			char **param)
 {
 	replace_key_param_data_t		*replace_key_param_data = (replace_key_param_data_t *)cb_data;
-	zbx_uint64_t				*hostid = replace_key_param_data->hostid;
+	const zbx_dc_host_t			*dc_host = replace_key_param_data->dc_host;
 	zbx_dc_item_t				*dc_item = replace_key_param_data->dc_item;
 	const struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
 	const zbx_vector_lld_macro_path_ptr_t	*lld_macros = replace_key_param_data->lld_macro_paths;
@@ -2950,7 +2952,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 		zbx_unquote_key_param(*param);
 
 	if (NULL == jp_row)
-		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
+		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, dc_host, dc_item, NULL, NULL, NULL, NULL,
 				NULL, NULL, param, macro_type, NULL, 0);
 	else
 		zbx_substitute_lld_macros(param, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -2997,7 +2999,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *           ifInOctets.{#SNMPINDEX} | 1      | ifInOctets.1      | SUCCEED   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+int	substitute_key_macros_impl(char **data, const zbx_dc_host_t *dc_host, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		int macro_type, char *error, size_t maxerrlen)
 {
@@ -3006,7 +3008,7 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
-	replace_key_param_data.hostid = hostid;
+	replace_key_param_data.dc_host = dc_host;
 	replace_key_param_data.dc_item = dc_item;
 	replace_key_param_data.jp_row = jp_row;
 	replace_key_param_data.lld_macro_paths = lld_macro_paths;
@@ -3279,11 +3281,12 @@ int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, c
  * Purpose: substitute_key_macros with masked secret macros.                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+int	zbx_substitute_key_macros(char **data, const zbx_dc_host_t *dc_host, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		int macro_type, char *error, size_t maxerrlen)
 {
-	return substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
+	return substitute_key_macros_impl(data, dc_host, dc_item, jp_row, lld_macro_paths, macro_type, error,
+			maxerrlen);
 }
 
 /******************************************************************************
@@ -3291,7 +3294,7 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
  * Purpose: substitute_key_macros with unmasked secret macros.                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+int	zbx_substitute_key_macros_unmasked(char **data, const zbx_dc_host_t *dc_host, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		int macro_type, char *error, size_t maxerrlen)
 {
@@ -3300,7 +3303,7 @@ int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc
 
 	um_handle = zbx_dc_open_user_macros_secure();
 
-	ret = substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
+	ret = substitute_key_macros_impl(data, dc_host, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
 
 	zbx_dc_close_user_macros(um_handle);
 

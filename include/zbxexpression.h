@@ -163,10 +163,10 @@ double	zbx_evaluate_string_to_double(const char *in);
 
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
-int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+int	zbx_substitute_key_macros(char **data, const zbx_dc_host_t *dc_host, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		int macro_type, char *error, size_t maxerrlen);
-int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+int	zbx_substitute_key_macros_unmasked(char **data, const zbx_dc_host_t *dc_host, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		int macro_type, char *error, size_t maxerrlen);
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,

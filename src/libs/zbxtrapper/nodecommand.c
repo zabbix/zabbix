@@ -638,7 +638,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 	}
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;
