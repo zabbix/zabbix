@@ -35,11 +35,6 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  */
 class testLLDAPMSyncAtScale extends CIntegrationTest {
 
-	/* CLICKHOUSE_* constants must not contain \ or " (must not require escaping) */
-	const CLICKHOUSE_URL = 'http://127.0.0.1:8123';
-	const CLICKHOUSE_USERNAME = 'zabbix';
-	const CLICKHOUSE_PASSWORD = 'zabbix';
-	const CLICKHOUSE_DB = 'zabbix';
 	const CLICKHOUSE_TIMEOUT = 10;
 
 	const COLLECTOR_ADDRESS = 'localhost:4317';
@@ -89,11 +84,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configurationProvider() {
-		$telemetry_provider = 'clickhouse;url="'.self::CLICKHOUSE_URL.'",'.
-				'username="'.self::CLICKHOUSE_USERNAME.'",'.
-				'password="'.self::CLICKHOUSE_PASSWORD.'",'.
-				'db="'.self::CLICKHOUSE_DB.'"';
-
+		// TelemetryProvider of server and proxy comes from $TELEMETRY_PROVIDERS of the frontend configuration.
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 8,
@@ -104,8 +95,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
 				'StartDBSyncers' => '4',
-				'StartTelemetryQueryPollers' => '1',
-				'TelemetryProvider' => $telemetry_provider
+				'StartTelemetryQueryPollers' => '1'
 			],
 			self::COMPONENT_PROXY => [
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -117,8 +107,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 				'LogFileSize' => 8,
 				'DebugLevel' => 3,
 				'LogSlowQueries' => '60000',
-				'StartAPMCollectors' => 1,
-				'TelemetryProvider' => $telemetry_provider
+				'StartAPMCollectors' => 1
 			]
 		];
 	}
@@ -638,26 +627,47 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 				$result['item']['result']);
 	}
 
+	/**
+	 * The ClickHouse telemetry provider of the frontend configuration, the same one server and proxy are configured
+	 * with (see getDefaultComponentConfiguration()).
+	 */
+	private function getClickHouseProvider(): array {
+		global $TELEMETRY_PROVIDERS;
+
+		if (isset($TELEMETRY_PROVIDERS)) {
+			foreach ($TELEMETRY_PROVIDERS as $provider) {
+				if ($provider['provider'] === 'clickhouse') {
+					return $provider + ['db' => '', 'username' => '', 'password' => ''];
+				}
+			}
+		}
+
+		$this->fail('No ClickHouse provider in $TELEMETRY_PROVIDERS, set it in ui/conf/zabbix.conf.php.');
+	}
+
 	private function truncateOTData(): void {
+		$provider = $this->getClickHouseProvider();
+
 		$error = null;
 		$this->assertNotNull(
-			$this->queryClickHouse('truncate all tables from '.self::CLICKHOUSE_DB." like 'otel_%'", $error),
+			$this->queryClickHouse('truncate all tables from '.$provider['db']." like 'otel_%'", $error),
 			'Cannot truncate OTel tables: '.$error
 		);
 	}
 
 	private function queryClickHouse(string $sql, ?string &$error = null): ?string {
+		$provider = $this->getClickHouseProvider();
 		$handle = curl_init();
 
 		curl_setopt_array($handle, [
-			CURLOPT_URL => self::CLICKHOUSE_URL.'/?database='.self::CLICKHOUSE_DB,
+			CURLOPT_URL => rtrim($provider['url'], '/').'/?database='.urlencode($provider['db']),
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $sql,
 			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-			CURLOPT_USERNAME => self::CLICKHOUSE_USERNAME,
-			CURLOPT_PASSWORD => self::CLICKHOUSE_PASSWORD,
+			CURLOPT_USERNAME => $provider['username'],
+			CURLOPT_PASSWORD => $provider['password'],
 			CURLOPT_CONNECTTIMEOUT => self::CLICKHOUSE_TIMEOUT,
 			CURLOPT_TIMEOUT => self::CLICKHOUSE_TIMEOUT
 		]);

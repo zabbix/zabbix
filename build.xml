@@ -728,7 +728,30 @@
 		</and>
 	</condition>
 
-	<target name="create-frontend-nosql-configs" depends="create-frontend-elasticsearch-configs,create-frontend-clickhouse-configs"/>
+	<target name="create-frontend-telemetry-clickhouse-configs" if="telemetry_clickhouse">
+		<property name="clickhouse_url" value="${CLICKHOUSE_URL}"/>
+		<property name="clickhouse_user" value="${CLICKHOUSE_USER}"/>
+		<property name="clickhouse_password" value="${CLICKHOUSE_PASSWORD}"/>
+		<property name="clickhouse_dbname" value="${CLICKHOUSE_DBNAME}"/>
+
+		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$TELEMETRY_PROVIDERS[] = [${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'clickhouse',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${clickhouse_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${clickhouse_user}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${clickhouse_password}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${clickhouse_dbname}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
+	</target>
+
+	<condition property="telemetry_clickhouse">
+		<and>
+			<isset property="TELEMETRY_STORAGE"/>
+			<equals arg1="${TELEMETRY_STORAGE}" arg2="CH"/>
+		</and>
+	</condition>
+
+	<target name="create-frontend-nosql-configs" depends="create-frontend-elasticsearch-configs,create-frontend-clickhouse-configs,create-frontend-telemetry-clickhouse-configs"/>
 	<target name="create-db-nosql" depends="create-db-elasticsearch,create-db-clickhouse"/>
 
 	<target name="init-integration-postgresql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">

@@ -78,6 +78,8 @@ require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
+require_once dirname(__FILE__).'/testLLDAPMSyncAtScale.php';
+
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
@@ -165,6 +167,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
+		$suite->addTestSuite('testLLDAPMSyncAtScale');
+		
+		
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		/* $suite->addTestSuite('testTelemetryQueryItems'); */
