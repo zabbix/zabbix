@@ -738,7 +738,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		if (0 != (macro_type & (ZBX_MACRO_TYPE_SCRIPT_NORMAL | ZBX_MACRO_TYPE_SCRIPT_RECOVERY |
 				ZBX_MACRO_TYPE_SCRIPT)) && 0 == strcmp(m, MVAR_MANUALINPUT))
 		{
-			if (NULL != manualinput)
+			if (0 == indexed_macro && NULL != manualinput)
 				replace_to = zbx_strdup(replace_to, manualinput);
 		}
 		else if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
