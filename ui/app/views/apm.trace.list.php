@@ -101,7 +101,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
 						'attributes' => $data['filter']['resource_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					], [
 						'attribute_field_name' => 'filter_resource_attributes',
@@ -115,7 +115,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['span_attributes_evaltype'],
 						'attributes' => $data['filter']['span_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					], [
 						'attribute_field_name' => 'filter_span_attributes',
@@ -172,7 +172,7 @@ foreach (['resource', 'span'] as $key) {
 			CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 				'key' => '#{key}',
 				'value' => '#{value}',
-				'operator' => CONDITION_OPERATOR_LIKE
+				'operator' => TAG_OPERATOR_LIKE
 			],
 			[
 				'attribute_field_name' => 'filter_'.$key.'_attributes'

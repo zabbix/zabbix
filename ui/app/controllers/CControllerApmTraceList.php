@@ -187,8 +187,7 @@ class CControllerApmTraceList extends CController {
 
 		foreach (['resource', 'span'] as $type) {
 			CProfile::update('web.apm.trace.filter_'.$type.'_attributes_evaltype',
-				$this->getInput('filter_'.$type.'_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR),
-				PROFILE_TYPE_INT
+				$this->getInput('filter_'.$type.'_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 			);
 
 			$filter_attributes = [];
