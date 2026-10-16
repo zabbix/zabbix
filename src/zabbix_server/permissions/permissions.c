@@ -119,27 +119,24 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sets nextid in table ids for the specified table                  *
+ * Purpose: makes sure that table ids has a nextid record for the specified   *
+ *          table                                                             *
  *                                                                            *
  * Parameters: tablename - [IN] the name of a table                           *
- *             num       - [IN] the number of reserved records                *
  *                                                                            *
- * Return value: SUCCEED - nextid was set successfully                        *
+ * Return value: SUCCEED - nextid record exists or was created                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: This function is used only for the hgset and ugset tables. The   *
- *           correct way to get the next id and update the table ids is to    *
- *           call zbx_db_get_maxid_num(). However, that function calls        *
- *           zbx_db_select(), which must not be used with ZBX_DB_CONNECT_ONCE *
- *           connections. Since this function is used only for these two      *
- *           tables, which are always empty at this point, nextid can be set  *
- *           directly.                                                        *
+ * Comments: Must be called before the table is cleared, so that the maximum  *
+ *           id is calculated from the existing records.                      *
  *                                                                            *
  ******************************************************************************/
-static int	set_group_nextid(const char *tablename, int num)
+static int	group_nextid_init(const char *tablename)
 {
-	zbx_db_result_t		result = NULL;
-	int			ret = SUCCEED;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	int			ret = SUCCEED, found;
+	zbx_uint64_t		maxid = 0;
 	const zbx_db_table_t	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
@@ -157,31 +154,39 @@ static int	set_group_nextid(const char *tablename, int num)
 
 	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch nextid for table %s and field name from %s", table->table,
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch nextid for table %s and field name %s", table->table,
 				table->recid);
 		ret = FAIL;
 		goto out;
 	}
 
-	if (NULL != zbx_db_fetch(result))
+	found = (NULL != zbx_db_fetch(result));
+	zbx_db_free_result(result);
+
+	if (0 != found)
+		goto out;
+
+	result = zbx_db_select_once("select max(%s) from %s", table->recid, table->table);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
-		if (ZBX_DB_OK > zbx_db_execute_once("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and"
-				" field_name='%s'", (zbx_uint64_t) num, table->table, table->recid))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot update nextid for table %s and field name from %s",
-					table->table, table->recid);
-			ret = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch maximum %s from table %s", table->recid, table->table);
+		ret = FAIL;
+		goto out;
 	}
-	else if (ZBX_DB_OK > zbx_db_execute_once("insert into ids (table_name,field_name,nextid)"
-			" values ('%s','%s'," ZBX_FS_UI64 ")", table->table, table->recid, (zbx_uint64_t) num))
+
+	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
+		ZBX_STR2UINT64(maxid, row[0]);
+
+	zbx_db_free_result(result);
+
+	if (ZBX_DB_OK > zbx_db_execute_once("insert into ids (table_name,field_name,nextid)"
+			" values ('%s','%s'," ZBX_FS_UI64 ")", table->table, table->recid, maxid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot insert nextid for table %s and field name from %s", table->table,
+		zabbix_log(LOG_LEVEL_WARNING, "cannot insert nextid for table %s and field name %s", table->table,
 				table->recid);
 		ret = FAIL;
 	}
-
-	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s tablename:'%s'", __func__, zbx_result_string(ret), tablename);
 
@@ -190,23 +195,82 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: This function is used only for the hgset and ugset tables. Since *
- *           these two tables are always empty at this point, the next        *
- *           hgsetid and ugsetid values are always 1.                         *
+ * Purpose: reserves a range of ids in table ids for the specified table      *
+ *                                                                            *
+ * Parameters: tablename - [IN] the name of a table                           *
+ *             num       - [IN] the number of reserved ids                    *
+ *             first_id  - [OUT] the first reserved id                        *
+ *                                                                            *
+ * Return value: SUCCEED - ids were reserved successfully                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function is used only for the hgset and ugset tables.       *
+ *           The nextid record is updated before it is read, so the record is *
+ *           locked until the end of the transaction and the reserved range   *
+ *           cannot be taken by the frontend or LLD server processes.         *
  *                                                                            *
  ******************************************************************************/
+static int	group_nextid_reserve(const char *tablename, int num, zbx_uint64_t *first_id)
+{
+	zbx_db_result_t		result = NULL;
+	zbx_db_row_t		row;
+	int			ret = FAIL, rc;
+	zbx_uint64_t		nextid;
+	const zbx_db_table_t	*table;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s' num:%d", __func__, tablename, num);
+
+	if (NULL == (table = zbx_db_get_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
+
+	if (ZBX_DB_OK >= (rc = zbx_db_execute_once("update ids set nextid=nextid+%d where table_name='%s' and"
+			" field_name='%s'", num, table->table, table->recid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot update nextid for table %s and field name %s%s", table->table,
+				table->recid, ZBX_DB_OK == rc ? ": record not found" : "");
+		goto out;
+	}
+
+	result = zbx_db_select_once("select nextid from ids where table_name='%s' and field_name='%s'", table->table,
+			table->recid);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result ||
+			NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch nextid for table %s and field name %s", table->table,
+				table->recid);
+		goto out;
+	}
+
+	ZBX_STR2UINT64(nextid, row[0]);
+	*first_id = nextid - (zbx_uint64_t)num + 1;
+
+	ret = SUCCEED;
+out:
+	if (NULL != result)
+		zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s first_id:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			SUCCEED == ret ? *first_id : 0);
+
+	return ret;
+}
+
 static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *group_sets, zbx_db_insert_t *db_gset,
 		zbx_db_insert_t *db_gset_groups, zbx_db_insert_t *db_gset_parents)
 {
-#define FIRST_ID	1
-	zbx_uint64_t		gsetid = FIRST_ID;
+	zbx_uint64_t		gsetid;
 	zbx_hashset_iter_t	iter;
 	zbx_group_set_t		*gset_ptr;
 
 	if (0 == group_sets->num_data)
 		return SUCCEED;
 
-	if (SUCCEED != set_group_nextid(tbl_name, group_sets->num_data))
+	if (SUCCEED != group_nextid_reserve(tbl_name, group_sets->num_data, &gsetid))
 		return FAIL;
 
 	zbx_hashset_iter_reset(group_sets, &iter);
@@ -237,7 +301,6 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 	}
 
 	return SUCCEED;
-#undef FIRST_ID
 }
 
 static zbx_hash_t	permission_group_set_hash(const void *data)
@@ -386,6 +449,12 @@ static void	permissions_rebuild_task(void)
 
 		res = FAIL;
 		goto skip;
+	}
+
+	if (SUCCEED != (res = group_nextid_init("hgset")) || SUCCEED != (res = group_nextid_init("ugset")))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize nextid for permission cache tables");
+		goto out;
 	}
 
 	for (int i = 0; i < (int)ARRSIZE(tables); i++)
