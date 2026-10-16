@@ -953,6 +953,12 @@ static int	tq_expand_macros_field(char **str, char **str_orig, zbx_tq_macro_expa
 		return FAIL;
 	}
 
+	if (SUCCEED != zbx_is_utf8(*str))
+	{
+		zbx_snprintf(error, max_error_len, "\"%s\" has invalid UTF-8 sequence after macro expansion", tag);
+		return FAIL;
+	}
+
 	return SUCCEED;
 }
 
