@@ -883,7 +883,10 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate telemetry query fields after macro expansion             *
+ * Purpose: validate that telemetry query fields are valid to save after LLD  *
+ *          macro expansion (e.g. length of fields in query is intentionally  *
+ *          not checked after expanding user macros but is checked before     *
+ *          saving item during LLD)                                           *
  *                                                                            *
  ******************************************************************************/
 static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
@@ -892,13 +895,7 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 	{
 		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-		if (SUCCEED != zbx_is_utf8(cond->attribute_key))
-		{
-			zbx_snprintf(error, max_error_len,
-					"\"%s\" has invalid UTF-8 sequence in condition #%d",
-					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
-			return FAIL;
-		}
+		/* fields being valid UTF-8 after macro expansion is checked when preparing the query */
 
 		if (SUCCEED == zbx_tq_column_type_is_attributes(cond->col_info->type) && '\0' == *cond->attribute_key)
 		{
@@ -912,14 +909,6 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
-			return FAIL;
-		}
-
-		if (SUCCEED != zbx_is_utf8(cond->value))
-		{
-			zbx_snprintf(error, max_error_len,
-					"\"%s\" has invalid UTF-8 sequence in condition #%d",
-					ZBX_TQ_QUERY_TAG_VALUE, i);
 			return FAIL;
 		}
 
