@@ -22,10 +22,10 @@
 $attribute = [
 	'key' => '',
 	'value' => '',
-	'signal_type' => SIGNAL_TYPE_TRACES
+	'signal_type' => $data['default_signal_type']
 ];
 
-(new CTemplateTag('attr-row-tmpl', renderProxyApmAttrRow('#{rowNum}', $attribute, [
+(new CTemplateTag('attr-row-tmpl', renderApmAttrRow('#{rowNum}', $attribute, [
 	'add_post_js' => false,
 	'signal_types' => $data['signal_types'],
 	'field_name' => $data['field_name'],

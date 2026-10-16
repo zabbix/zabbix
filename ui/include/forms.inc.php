@@ -688,7 +688,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	return array_filter([$fields_row, $error_container_row]);
 }
 
-function renderProxyApmAttrRow($index, array $attribute, array $options = []): array {
+function renderApmAttrRow($index, array $attribute, array $options = []): array {
 	$fields_row = (new CRow([
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))

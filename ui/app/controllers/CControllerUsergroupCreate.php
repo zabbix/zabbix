@@ -84,6 +84,16 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 						]
 					]]
 				]
+			],
+			'resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
+				'fields' => [
+					'key' => ['required', 'string', 'not_empty'],
+					'value' => ['required', 'string'],
+					'signal_type' => ['required', 'integer',
+						'in' => [SIGNAL_TYPE_ALL, SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
+					]
+				],
+				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
 			]
 		]];
 	}
