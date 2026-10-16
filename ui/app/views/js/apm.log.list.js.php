@@ -443,7 +443,7 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						const rowSelected = e => {
+						const selectRow = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
 
@@ -465,9 +465,11 @@
 							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_hash));
 						};
 
-						row.addEventListener('keyup', e => {
+						row.addEventListener('keydown', e => {
 							if (e.key === 'Enter') {
-								rowSelected(e);
+								e.preventDefault();
+
+								selectRow(e);
 							}
 						});
 
@@ -478,7 +480,7 @@
 								return;
 							}
 
-							rowSelected(e);
+							selectRow(e);
 						});
 					}
 				})

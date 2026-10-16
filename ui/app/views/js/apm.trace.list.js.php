@@ -409,7 +409,7 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						const rowSelected = e => {
+						const selectRow = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
 
@@ -430,9 +430,11 @@
 							this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
 						};
 
-						row.addEventListener('keyup', e => {
+						row.addEventListener('keydown', e => {
 							if (e.key === 'Enter') {
-								rowSelected(e);
+								e.preventDefault();
+
+								selectRow(e);
 							}
 						});
 
@@ -443,7 +445,7 @@
 								return;
 							}
 
-							rowSelected(e);
+							selectRow(e);
 						});
 					}
 				})
