@@ -43,12 +43,14 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
 		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$validator->addErrorsToGlobal();
+
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 
 			return false;
@@ -66,10 +68,10 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
 				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM
 			]]],
-			'attributes_evaltype' => ['integer', 'required',
+			'metric_attributes_evaltype' => ['integer', 'required',
 				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
-			'attributes' => ['objects', 'required', 'fields' => [
+			'metric_attributes' => ['objects', 'required', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
 					'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
@@ -134,7 +136,7 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'to' => $this->filter['to']
 		]);
 
-		$attributes = array_filter($this->filter['attributes'],
+		$metric_attributes = array_filter($this->filter['metric_attributes'],
 			static fn (array $attribute) => $attribute['key'] !== ''
 		);
 
@@ -168,8 +170,8 @@ class CControllerApmMetricListData extends CControllerDataTable {
 			'types' => $this->filter['types'] ?: null,
 			'time_from' => $timeline['from_ts'],
 			'time_till' => $timeline['to_ts'],
-			'attributes_evaltype' => $this->filter['attributes_evaltype'],
-			'attributes' => $attributes ?: null,
+			'attributes_evaltype' => $this->filter['metric_attributes_evaltype'],
+			'attributes' => $metric_attributes ?: null,
 			'resource_attributes_evaltype' => $this->filter['resource_attributes_evaltype'],
 			'resource_attributes' => $resource_attributes ?: null,
 			'scope_attributes_evaltype' => $this->filter['scope_attributes_evaltype'],
@@ -184,10 +186,16 @@ class CControllerApmMetricListData extends CControllerDataTable {
 		];
 
 		$search_limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$num_rows = (int) API::ApmMetric()->get($options + [
+		$num_rows = API::ApmMetric()->get($options + [
 			'countOutput' => true,
 			'limit' => $search_limit
 		]);
+
+		if ($num_rows === false) {
+			throw new Exception();
+		}
+
+		$num_rows = (int) $num_rows;
 
 		if ($num_rows > 0) {
 			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), null, $offset, $limit);
@@ -197,6 +205,10 @@ class CControllerApmMetricListData extends CControllerDataTable {
 				'offset' => $offset,
 				'limit' => $limit
 			]);
+
+			if ($metrics === false) {
+				throw new Exception();
+			}
 
 			$result['rows'] = [];
 

@@ -410,12 +410,13 @@ define('APM_METRIC_TYPE_SUM',					1);
 define('APM_METRIC_TYPE_HISTOGRAM',				2);
 define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
 
-define('APM_LOG_SEVERITY_TRACE',	0);
-define('APM_LOG_SEVERITY_DEBUG',	1);
-define('APM_LOG_SEVERITY_INFO',		2);
-define('APM_LOG_SEVERITY_WARNING',	3);
-define('APM_LOG_SEVERITY_ERROR',	4);
-define('APM_LOG_SEVERITY_FATAL',	5);
+define('APM_LOG_SEVERITY_UNSPECIFIED',	0);
+define('APM_LOG_SEVERITY_TRACE',		1);
+define('APM_LOG_SEVERITY_DEBUG',		2);
+define('APM_LOG_SEVERITY_INFO',			3);
+define('APM_LOG_SEVERITY_WARNING',		4);
+define('APM_LOG_SEVERITY_ERROR',		5);
+define('APM_LOG_SEVERITY_FATAL',		6);
 
 define('PROXY_OPERATING_MODE_ACTIVE',	0);
 define('PROXY_OPERATING_MODE_PASSIVE',	1);
@@ -2197,7 +2198,6 @@ define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
 define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
-define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINE_CLAMP', 'line-clamp');

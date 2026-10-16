@@ -121,38 +121,18 @@
 				to: filter_options.timeselector.to
 			};
 
-			$('#filter-attributes')
-				.dynamicRows({template: '#filter-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
+			for (const key of ['metric', 'resource', 'scope']) {
+				$(`#filter-${key}-attributes`)
+					.dynamicRows({template: `#filter-${key}-attributes-row-tmpl`})
+					.on('afteradd.dynamicRows', function () {
+						const rows = this.querySelectorAll('.form_row');
+						new CApmAttrFilterItem(rows[rows.length - 1]);
+					});
+
+				document.querySelectorAll(`#filter-${key}-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
+					new CApmAttrFilterItem(row);
 				});
-
-			document.querySelectorAll(`#filter-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
-
-			$('#filter-resource-attributes')
-				.dynamicRows({template: '#filter-resource-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
-
-			document.querySelectorAll(`#filter-resource-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
-
-			$('#filter-scope-attributes')
-				.dynamicRows({template: '#filter-scope-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
-
-			document.querySelectorAll(`#filter-scope-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
+			}
 		}
 
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
@@ -269,6 +249,7 @@
 					const row_hash = this.#hashRowData(row_data);
 
 					row.dataset.rowHash = row_hash;
+					row.setAttribute('tabindex', '0');
 
 					const row_data_o = Object.create(null);
 
@@ -434,18 +415,15 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', e => {
+						const selectRow = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
-							const selection = window.getSelection();
 
-							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
+							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
 							if (this.#selected_row_hash === row_hash) {
-								this.#side_drawer.close();
-
 								return;
 							}
 
@@ -457,6 +435,24 @@
 							this.#selected_row_hash = row_hash;
 
 							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_hash));
+						};
+
+						row.addEventListener('keydown', e => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+
+								selectRow(e);
+							}
+						});
+
+						row.addEventListener('click', e => {
+							const selection = window.getSelection();
+
+							if (selection && selection.toString().length > 0) {
+								return;
+							}
+
+							selectRow(e);
 						});
 					}
 				})
@@ -523,6 +519,9 @@
 				this.#prepareDetailsData(e.detail.response)
 			);
 
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
+
 			this.#details_panel.get().addEventListener('close', () => {
 				this.#side_drawer.close();
 			});
@@ -537,6 +536,8 @@
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
 			this.#selected_row_hash = null;
+
+			row_selected.focus();
 
 			this.#details_panel?.destroy();
 			this.#details_panel = null;

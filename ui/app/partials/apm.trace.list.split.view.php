@@ -57,44 +57,51 @@ $trace_view = (new CDiv())
 			)
 	)
 	->addItem(
-		(new CDiv())
-			->addClass('trace-view-container')
-			->addItem(
-				(new CSplitView())
-					->setMinPosition('10%')
-					->setMaxPosition('90%')
-					->setFixed(CSplitView::PANE_FIXED_START)
-					->setFixedSize('294px')
-					->setFixed('start')
-					->addClass('trace-scroll')
-					->setAttribute('data-trace-scroll', '')
-					->addItem(
-						(new CSplitViewPane())
-							->addClass('trace-tree')
-							->addItem([
-								(new CDiv(
-									(new CSpan(_('Span tree')))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS))
-								)->addClass('trace-tree-header'),
-								(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
-							])
-					)
-					->addItem(
-						(new CSplitViewPane())
-							->addClass('trace-body')
-							->addItem([
-								(new CDiv())
-									->addClass('trace-time')
-									->addItem([
-										(new CDiv())->addClass('trace-time-header')
-											->setAttribute('data-trace-time-header', ''),
-										(new CDiv())
-											->addClass('trace-waterfall')
-											->setAttribute('data-trace-waterfall', '')
-									]),
-								(new CDiv())->addClass('trace-details')->setAttribute('data-trace-details', '')
-							])
-					)
-			)
+		(new CSplitView([
+			(new CSplitViewPane())
+				->addClass('trace-view-container')
+				->addItem(
+					(new CSplitView())
+						->setMinPosition('10%')
+						->setMaxPosition('90%')
+						->setFixed(CSplitView::PANE_FIXED_START)
+						->setFixedSize('294px')
+						->setFixed('start')
+						->addClass('trace-scroll')
+						->setAttribute('data-trace-scroll', '')
+						->addItem(
+							(new CSplitViewPane())
+								->addClass('trace-tree')
+								->addItem([
+									(new CDiv(
+										(new CSpan(_('Span tree')))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS))
+									)->addClass('trace-tree-header'),
+									(new CTag('z-navigation-tree', true))->setAttribute('data-trace-tree', '')
+								])
+						)
+						->addItem(
+							(new CSplitViewPane())
+								->addClass('trace-body')
+								->addItem([
+									(new CDiv())
+										->addClass('trace-time')
+										->addItem([
+											(new CDiv())->addClass('trace-time-header')
+												->setAttribute('data-trace-time-header', ''),
+											(new CDiv())
+												->addClass('trace-waterfall')
+												->setAttribute('data-trace-waterfall', '')
+										])
+								])
+						)
+				),
+			(new CSplitViewPane())
+				->addClass('closed')
+				->addClass('trace-details')->setAttribute('data-trace-details', '')
+		]))
+			->setMinPosition('10%')
+			->setMaxPosition('90%')
+			->setFixedSize('294px')
 	);
 
 $trace_view->show();

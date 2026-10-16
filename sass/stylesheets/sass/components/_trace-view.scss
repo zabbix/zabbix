@@ -209,16 +209,17 @@
 					}
 				}
 			}
+		}
+	}
 
-			.trace-details {
-				min-inline-size: 0;
-				min-block-size: min-content;
+	.trace-details {
+		min-inline-size: 0;
+		min-block-size: min-content;
+		overflow: auto;
 
-				.details-panel {
-					inline-size: var(--trace-details-width);
-					border-inline-start: 1px solid var(--trace-border-color);
-				}
-			}
+		.details-panel {
+			min-inline-size: var(--trace-details-width);
+			border-inline-start: 1px solid var(--trace-border-color);
 		}
 	}
 
@@ -265,8 +266,8 @@
 		box-sizing: border-box;
 		inline-size: var(--trace-marker-size);
 		block-size: var(--trace-marker-size);
-		border: 1px solid var(--trace-bg-color);
-		background: #fff;
+		border: 1px solid var(--trace-marker-border-color);
+		background: var(--trace-marker-bg-color, $ui-bg-color);
 		transform: translate(-50%, -50%) rotate(45deg);
 		cursor: default;
 
@@ -277,8 +278,8 @@
 			min-inline-size: 12px;
 			block-size: 12px;
 			border-radius: 6px;
-			background: #{$ui-selected-bg-color};
-			color: #fff;
+			background: $ui-selected-bg-color;
+			color: #ffffff;
 			font-size: 9px;
 			line-height: 12px;
 			text-align: center;

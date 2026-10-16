@@ -891,11 +891,6 @@ body {
     position: sticky;
     inset-block-start: 0;
     z-index: 998; }
-  body > z-split-view:has(.side-drawer.closed) {
-    grid-template-columns: none; }
-    body > z-split-view:has(.side-drawer.closed) .side-drawer,
-    body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
-      display: none; }
   body > z-split-view,
   body > .wrapper {
     grid-area: content;
@@ -918,7 +913,8 @@ main {
   padding: 10px; }
 
 footer {
-  margin-top: auto; }
+  margin-top: auto;
+  min-width: var(--min-content-size); }
 
 output {
   display: block; }
@@ -3079,6 +3075,11 @@ button {
   #datatable-logs .datatable-row:not(.row-selected):hover .datatable-cell {
     border-block-end-color: #303030;
     background-color: #383838; }
+#datatable-traces .datatable-row:focus,
+#datatable-metrics .datatable-row:focus,
+#datatable-logs .datatable-row:focus {
+  background-color: #383838;
+  outline: none; }
 
 #datatable-traces .span-count {
   color: #737373; }
@@ -5029,7 +5030,7 @@ section {
 .status-warning-bg,
 .status-average-bg,
 .status-high-bg,
-.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal {
+.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal, .status-amp-severity-unspecified {
   box-sizing: border-box;
   display: inline-block;
   min-width: 16px;
@@ -5132,6 +5133,10 @@ section {
   color: #4b0c0c;
   background-color: #e45959;
   border-color: #BC5051; }
+
+.status-amp-severity-unspecified {
+  background-color: transparent;
+  border-color: transparent; }
 
 .subfilter-option-grid {
   grid-template-columns: minmax(75px, max-content) auto;
@@ -6025,12 +6030,13 @@ section {
             box-sizing: border-box;
             min-inline-size: 0;
             min-block-size: var(--trace-row-block-size); }
-      .trace-view .trace-view-container .trace-scroll .trace-details {
-        min-inline-size: 0;
-        min-block-size: min-content; }
-        .trace-view .trace-view-container .trace-scroll .trace-details .details-panel {
-          inline-size: var(--trace-details-width);
-          border-inline-start: 1px solid var(--trace-border-color); }
+  .trace-view .trace-details {
+    min-inline-size: 0;
+    min-block-size: min-content;
+    overflow: auto; }
+    .trace-view .trace-details .details-panel {
+      min-inline-size: var(--trace-details-width);
+      border-inline-start: 1px solid var(--trace-border-color); }
   .trace-view .trace-grid-line {
     position: absolute;
     inset-inline-start: var(--trace-grid-line-position);
@@ -6068,8 +6074,8 @@ section {
     box-sizing: border-box;
     inline-size: var(--trace-marker-size);
     block-size: var(--trace-marker-size);
-    border: 1px solid var(--trace-bg-color);
-    background: #fff;
+    border: 1px solid var(--trace-marker-border-color);
+    background: var(--trace-marker-bg-color, #2b2b2b);
     transform: translate(-50%, -50%) rotate(45deg);
     cursor: default; }
     .trace-view .trace-event-marker[data-count]::after {
@@ -6080,7 +6086,7 @@ section {
       block-size: 12px;
       border-radius: 6px;
       background: #0275b8;
-      color: #fff;
+      color: #ffffff;
       font-size: 9px;
       line-height: 12px;
       text-align: center;
@@ -6301,11 +6307,15 @@ z-navigation-tree {
     padding-inline: calc(8px + var(--navigation-tree-depth) * var(--navigation-tree-indent-size)) 8px;
     grid-template-columns: 18px minmax(0, 1fr) auto;
     column-gap: 4px; }
+    z-navigation-tree .z-navigation-tree-row:focus {
+      outline: none; }
     z-navigation-tree .z-navigation-tree-row[selected] {
       background: var(--navigation-tree-selected-bg-color); }
     z-navigation-tree .z-navigation-tree-row:not([selected]):hover {
       background: var(--navigation-tree-hover-bg-color);
       cursor: pointer; }
+    z-navigation-tree .z-navigation-tree-row:not([selected]):focus {
+      background-color: #383838; }
   z-navigation-tree .z-navigation-tree-toggle {
     display: inline-flex;
     justify-content: center;
@@ -6586,6 +6596,11 @@ z-split-view {
       cursor: col-resize; }
     z-split-view[resizing][vertical] {
       cursor: row-resize; }
+  z-split-view:has(> z-split-view-pane.closed) {
+    grid-template-columns: none; }
+    z-split-view:has(> z-split-view-pane.closed) > .closed,
+    z-split-view:has(> z-split-view-pane.closed) > z-split-view-handle {
+      display: none; }
 
 z-textarea-flexible {
   display: inline-grid; }
@@ -9889,6 +9904,8 @@ main .server-name {
   float: right;
   margin: 10px;
   color: #737373; }
+main .ha-nodes {
+  margin-top: 10px; }
 
 .uppercase {
   text-transform: uppercase; }

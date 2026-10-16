@@ -78,9 +78,7 @@ $filter = (new CFilter())
 					(new CTextBox('filter_scope_name', $data['filter']['scope_name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-			]),
-		(new CFormGrid())
-			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			])
 			->addItem([
 				(new CLabel(_('Severity'), 'filter_severities')),
 				new CFormField(
@@ -92,7 +90,9 @@ $filter = (new CFilter())
 						->setVertical()
 						->showTitles()
 				)
-			])
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
 				(new CLabel(_('Log attributes'), 'filter_log_attributes')),
 				new CFormField(

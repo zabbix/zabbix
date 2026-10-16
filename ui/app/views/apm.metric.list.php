@@ -83,15 +83,14 @@ $filter = (new CFilter())
 				(new CLabel(_('Attributes'), 'filter_attributes')),
 				new CFormField(
 					CApmAttrFilterFieldHelper::getFilterField([
-						'evaltype' => $data['filter']['attributes_evaltype'],
-						'attributes' => $data['filter']['attributes'] ?: [
+						'evaltype' => $data['filter']['metric_attributes_evaltype'],
+						'attributes' => $data['filter']['metric_attributes'] ?: [
 							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_attributes_evaltype',
-						'attribute_field_name' => 'filter_attributes'
-					])
+					], [
+						'evaltype_field_name' => 'filter_metric_attributes_evaltype',
+						'attribute_field_name' => 'filter_metric_attributes'
+					])->setId('filter-metric-attributes')
 				)
 			])
 			->addItem([
@@ -102,9 +101,8 @@ $filter = (new CFilter())
 						'attributes' => $data['filter']['resource_attributes'] ?: [
 							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_resource_evaltype',
+					], [
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
 						'attribute_field_name' => 'filter_resource_attributes'
 					])->setId('filter-resource-attributes')
 				)
@@ -117,9 +115,8 @@ $filter = (new CFilter())
 						'attributes' => $data['filter']['scope_attributes'] ?: [
 							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_scope_evaltype',
+					], [
+						'evaltype_field_name' => 'filter_scope_attributes_evaltype',
 						'attribute_field_name' => 'filter_scope_attributes'
 					])->setId('filter-scope-attributes')
 				)
@@ -156,44 +153,20 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => TAG_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_attributes'
-		])
-	)
-	->show();
-
-(new CTemplateTag('filter-resource-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => TAG_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_resource_attributes'
-		])
-	)
-	->show();
-
-(new CTemplateTag('filter-scope-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => TAG_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_scope_attributes'
-		])
-	)
-	->show();
+foreach (['metric', 'resource', 'scope'] as $key) {
+	(new CTemplateTag('filter-'.$key.'-attributes-row-tmpl'))
+		->addItem(
+			CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
+				'key' => '#{key}',
+				'value' => '#{value}',
+				'operator' => TAG_OPERATOR_LIKE
+			],
+			[
+				'attribute_field_name' => 'filter_'.$key.'_attributes'
+			])
+		)
+		->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([

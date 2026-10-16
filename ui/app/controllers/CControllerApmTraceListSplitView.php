@@ -54,26 +54,51 @@ class CControllerApmTraceListSplitView extends CController {
 		$time_from = $this->getInput('timestamp') - 1;
 		$time_to = $this->getInput('timestamp') + 1;
 
-		$traces = API::ApmTrace()->get([
-			'time_from' => $time_from,
-			'time_till' => $time_to,
-			'traceids' => [$traceid]
-		]);
-		$trace = $traces[0] ?? null;
+		try {
+			$traces = API::ApmTrace()->get([
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'traceids' => [$traceid]
+			]);
 
-		if (!$trace) {
-			throw new Exception(_('Trace not found.'));
+			if ($traces === false) {
+				throw new Exception();
+			}
+
+			$trace = $traces[0] ?? null;
+
+			if (!$trace) {
+				error(_('Trace not found.'));
+
+				throw new Exception();
+			}
+
+			$spans = API::ApmSpan()->get([
+				'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp',
+					'duration', 'events', 'resource_attributes', 'span_attributes'
+				],
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'traceids' => [$traceid],
+				'sortfield' => 'timestamp',
+				'sortorder' => ZBX_SORT_UP
+			]);
+
+			if ($spans === false) {
+				throw new Exception();
+			}
 		}
+		catch (Throwable) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)]))->disableView()
+			);
 
-		$spans = API::ApmSpan()->get([
-			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp', 'duration',
-				'events', 'resource_attributes', 'span_attributes'],
-			'time_from' => $time_from,
-			'time_till' => $time_to,
-			'traceids' => [$traceid],
-			'sortfield' => 'timestamp',
-			'sortorder' => ZBX_SORT_UP
-		]);
+			return;
+		}
 
 		$span_counts = [];
 		foreach ($spans as $span) {

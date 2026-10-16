@@ -40,12 +40,14 @@ class CControllerApmLogListData extends CControllerDataTable {
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
 		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$validator->addErrorsToGlobal();
+
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 
 			return false;
@@ -73,8 +75,8 @@ class CControllerApmLogListData extends CControllerDataTable {
 			'service_name' => ['string', 'required'],
 			'scope_name' => ['string', 'required'],
 			'severities' => ['array', 'required', 'field' => ['integer',
-				'in' => [APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG, APM_LOG_SEVERITY_INFO,
-					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
+				'in' => [APM_LOG_SEVERITY_UNSPECIFIED, APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG,
+					APM_LOG_SEVERITY_INFO, APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
 			'log_attributes_evaltype' => $filter_attributes_evaltype,
@@ -117,7 +119,16 @@ class CControllerApmLogListData extends CControllerDataTable {
 			$severity_numbers = [];
 
 			foreach ($this->filter['severities'] as $severity) {
-				$severity_numbers = array_merge($severity_numbers, range($severity * 4 + 1, $severity * 4 + 4));
+				if ($severity == APM_LOG_SEVERITY_UNSPECIFIED) {
+					$severity_numbers[] = 0;
+
+					continue;
+				}
+
+				$start_severity_number = ($severity - 1) * 4 + 1;
+				$severity_numbers = array_merge($severity_numbers,
+					range($start_severity_number, $start_severity_number + 3)
+				);
 			}
 		}
 
@@ -155,10 +166,16 @@ class CControllerApmLogListData extends CControllerDataTable {
 		];
 
 		$search_limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$num_rows = (int) API::ApmLog()->get($options + [
+		$num_rows = API::ApmLog()->get($options + [
 			'countOutput' => true,
 			'limit' => $search_limit
 		]);
+
+		if ($num_rows === false) {
+			throw new Exception();
+		}
+
+		$num_rows = (int) $num_rows;
 
 		if ($num_rows > 0) {
 			$this->paging = $this->paginateNumRows($num_rows, $this->getInput('page', 1), null, $offset, $limit);
@@ -180,6 +197,10 @@ class CControllerApmLogListData extends CControllerDataTable {
 				'offset' => $offset,
 				'limit' => $limit
 			]);
+
+			if ($logs === false) {
+				throw new Exception();
+			}
 
 			if (in_array('timestamp', $select_fields)) {
 				$today = strtotime('today');
