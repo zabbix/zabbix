@@ -52,7 +52,8 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CONDITION_OPERATOR_LESS_EQUAL
 				]
 			],
-			'value' => ['string']
+			'value' => ['string'],
+			'parent_discoveryid' => ['db items.itemid']
 		]];
 	}
 
@@ -77,7 +78,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	private static function getFormValidationRules(): array {
+	private static function getFormValidationRules(bool $allow_lld_macro): array {
 		$complex_columns = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
 
 		return ['object', 'fields' => [
@@ -102,7 +103,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				'when' => ['column', 'in' => $complex_columns]
 			],
 			'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
-			'value' => CTelemetryHelper::getConditionValueValidationRules()
+			'value' => CTelemetryHelper::getConditionValueValidationRules($allow_lld_macro)
 		]];
 	}
 
@@ -117,7 +118,9 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'attribute_key' => $this->getInput('attribute_key', ''),
 			'operator' => $this->getInput('operator', CONDITION_OPERATOR_EQUAL),
 			'value' => $this->getInput('value', ''),
-			'js_validation_rules' => (new CFormValidator(self::getFormValidationRules()))->getRules(),
+			'js_validation_rules' => (new CFormValidator(
+				self::getFormValidationRules($this->hasInput('parent_discoveryid'))
+			))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

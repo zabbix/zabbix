@@ -259,12 +259,14 @@ class CTelemetryHelper {
 	/**
 	 * Validation rules for the "value" field of a condition.
 	 *
+	 * @param bool $allow_lld_macro
+	 *
 	 * @return array
 	 */
-	public static function getConditionValueValidationRules(): array {
+	public static function getConditionValueValidationRules(bool $allow_lld_macro): array {
 		return [
 			['string', 'required', 'length' => 255, 'not_empty',
-				'use' => [CNumberParser::class, []],
+				'use' => [CNumberParser::class, ['usermacros' => true, 'lldmacros' => $allow_lld_macro]],
 				'messages' => ['use' => _('A floating point value is expected.')],
 				'when' => ['column', 'in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME]
 			],

@@ -185,7 +185,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
 					'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
-					'value' => CTelemetryHelper::getConditionValueValidationRules()
+					'value' => CTelemetryHelper::getConditionValueValidationRules($allow_lld_macro)
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
@@ -212,8 +212,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
 			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+			$item_flags = $this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE
+				? ZBX_FLAG_DISCOVERY_PROTOTYPE
+				: ZBX_FLAG_DISCOVERY_NORMAL;
 
-			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
+			if (!CItemTypeTelemetryQuery::validateFilter($item, $item_flags, '', $error)) {
 				error($error);
 
 				return false;

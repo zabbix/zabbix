@@ -471,7 +471,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
 					'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
-					'value' => CTelemetryHelper::getConditionValueValidationRules()
+					'value' => CTelemetryHelper::getConditionValueValidationRules(allow_lld_macro: true)
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
