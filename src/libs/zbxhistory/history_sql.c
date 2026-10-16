@@ -18,7 +18,6 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
-#include "zbxnix.h"
 
 typedef struct
 {
@@ -165,7 +164,7 @@ static int	sql_writer_flush(void)
 			zbx_db_insert_execute(db_insert);
 		}
 	}
-	while (ZBX_DB_DOWN == (txn_error = zbx_db_commit()) && 0 != ZBX_IS_RUNNING());
+	while (ZBX_DB_DOWN == (txn_error = zbx_db_commit()) && SUCCEED != zbx_db_shutdown_timeout_expired());
 
 	sql_writer_release();
 

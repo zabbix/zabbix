@@ -650,7 +650,7 @@ static int	update_host_maintenances(void)
 		zbx_vector_host_maintenance_diff_ptr_clear_ext(&updates, zbx_host_maintenance_diff_free);
 		zbx_vector_uint64_clear(&maintenanceids);
 	}
-	while (ZBX_DB_DOWN == tnx_error && 0 != ZBX_IS_RUNNING());
+	while (ZBX_DB_DOWN == tnx_error && SUCCEED != zbx_db_shutdown_timeout_expired());
 
 	zbx_vector_host_maintenance_diff_ptr_destroy(&updates);
 	zbx_vector_uint64_destroy(&maintenanceids);
@@ -730,7 +730,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 					zbx_dc_maintenance_set_update_flags();
 					while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
 							args_in->get_process_forks_cb_arg) &&
-							0 != ZBX_IS_RUNNING())
+							SUCCEED != zbx_db_shutdown_timeout_expired())
 						;
 
 					zbx_dc_maintenance_reset_update_flag(process_num);
@@ -754,7 +754,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 			while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
 					args_in->get_process_forks_cb_arg) &&
-					0 != ZBX_IS_RUNNING())
+					SUCCEED != zbx_db_shutdown_timeout_expired())
 				;
 
 			info_offset = 0;

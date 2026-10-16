@@ -103,6 +103,7 @@ typedef enum
 zbx_err_codes_t;
 
 zbx_err_codes_t	zbx_db_last_errcode(void);
+time_t		zbx_db_get_down_since(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);

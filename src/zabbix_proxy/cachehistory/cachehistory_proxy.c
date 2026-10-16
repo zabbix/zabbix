@@ -25,7 +25,6 @@
 #include "zbx_item_constants.h"
 #include "zbxproxybuffer.h"
 #include "zbxhash.h"
-#include "zbxnix.h"
 
 static char	*sql = NULL;
 static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -405,7 +404,8 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 				zbx_db_begin();
 				DBmass_proxy_update_items(&item_diff);
 			}
-			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()) && 0 != ZBX_IS_RUNNING());
+			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()) &&
+					SUCCEED != zbx_db_shutdown_timeout_expired());
 		}
 
 		zbx_dbcache_lock();

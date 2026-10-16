@@ -14,7 +14,6 @@
 
 #include "pb_history.h"
 #include "proxybuffer.h"
-#include "zbxnix.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcacheconfig.h"
@@ -802,7 +801,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 			zbx_db_begin();
 			pb_history_add_rows_db(&data->rows, next, &lastid);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
+		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
 	}
 	else
 	{
@@ -813,7 +812,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 			zbx_db_begin();
 			(void)zbx_db_insert_execute(&data->db_insert);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
+		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
 
 		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}

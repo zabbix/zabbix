@@ -1209,9 +1209,18 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 
-		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
-		zbx_db_close();
+		if (SUCCEED != zbx_threads_db_unavailable())
+		{
+			zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+			zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+			zbx_db_close();
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "skipping history cache synchronization because database is not"
+					" responding: unsaved data is lost");
+			zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
+		}
 
 		zbx_free_configuration_cache();
 
@@ -1711,6 +1720,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
+
+	if (SUCCEED != zbx_threads_db_wait_init(zbx_threads_num, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database wait slots: %s", error);
+		zbx_free(error);
+		return FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
