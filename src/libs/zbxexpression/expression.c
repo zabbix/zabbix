@@ -2716,8 +2716,8 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 	um_handle = zbx_dc_open_user_macros_secure();
 
-	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert,
-			ack, service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
+	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert, ack,
+			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 
 	zbx_dc_close_user_macros(um_handle);
 
