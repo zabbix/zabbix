@@ -83,9 +83,6 @@ static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
  ******************************************************************************/
 static int	substitute_webhook_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
 {
-	if (NULL == manualinput || NULL == data || NULL == *data || '\0' == **data)
-		return SUCCEED;
-
 	return zbx_substitute_macros(data, error, maxerrlen, &macro_webhook_resolv, manualinput);
 }
 
