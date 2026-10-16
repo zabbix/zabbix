@@ -482,26 +482,8 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
-					'operator' => [
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
-							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						],
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-								CONDITION_OPERATOR_NOT_LIKE
-							],
-							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						]
-					],
-					'value' => [
-						['string', 'required', 'length' => 255,
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
-						],
-						['string', 'required', 'length' => 255, 'not_empty',
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-						]
-					]
+					'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
+					'value' => CTelemetryHelper::getConditionValueValidationRules()
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],

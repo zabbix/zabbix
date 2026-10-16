@@ -48,7 +48,8 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'attribute_key' => ['string'],
 			'operator' => ['integer',
 				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS
+					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_MORE_EQUAL,
+					CONDITION_OPERATOR_LESS_EQUAL
 				]
 			],
 			'value' => ['string']
@@ -100,26 +101,8 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 				'when' => ['column', 'in' => $complex_columns]
 			],
-			'operator' => [
-				['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
-					'when' => ['column', 'in' => $complex_columns]
-				],
-				['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE
-					],
-					'when' => ['column', 'not_in' => $complex_columns]
-				]
-			],
-			'value' => [
-				['string', 'required', 'length' => 255,
-					'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
-				],
-				['string', 'required', 'length' => 255, 'not_empty',
-					'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-				]
-			]
+			'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
+			'value' => CTelemetryHelper::getConditionValueValidationRules()
 		]];
 	}
 
@@ -150,6 +133,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 		}
 		$data['operators'] = CTelemetryHelper::getOperatorLabels();
 		$data['complex_columns'] = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
+		$data['numeric_columns'] = CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME;
 		$data['condition_operators'] = CTelemetryHelper::getConditionOperators();
 
 		$this->setResponse(new CControllerResponseData($data));

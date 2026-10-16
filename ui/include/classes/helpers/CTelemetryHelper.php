@@ -213,6 +213,8 @@ class CTelemetryHelper {
 			CONDITION_OPERATOR_NOT_EQUAL => _('does not equal'),
 			CONDITION_OPERATOR_LIKE => _('contains'),
 			CONDITION_OPERATOR_NOT_LIKE => _('does not contain'),
+			CONDITION_OPERATOR_MORE_EQUAL => _('is greater than or equals'),
+			CONDITION_OPERATOR_LESS_EQUAL => _('is less than or equals'),
 			CONDITION_OPERATOR_EXISTS => _('exists')
 		];
 	}
@@ -224,16 +226,59 @@ class CTelemetryHelper {
 	 */
 	public static function getConditionOperators(): array {
 		return [
-			'complex' => [
-				CONDITION_OPERATOR_EQUAL,
-				CONDITION_OPERATOR_NOT_EQUAL,
-				CONDITION_OPERATOR_EXISTS
+			'complex' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_OPERATORS,
+			'numeric' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_OPERATORS,
+			'simple' => CItemTypeTelemetryQuery::SIMPLE_COLUMN_OPERATORS
+		];
+	}
+
+	/**
+	 * Validation rules for the "operator" field of a condition.
+	 *
+	 * @return array
+	 */
+	public static function getConditionOperatorValidationRules(): array {
+		return [
+			['integer', 'required',
+				'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_OPERATORS,
+				'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 			],
-			'simple' => [
-				CONDITION_OPERATOR_EQUAL,
-				CONDITION_OPERATOR_NOT_EQUAL,
-				CONDITION_OPERATOR_LIKE,
-				CONDITION_OPERATOR_NOT_LIKE
+			['integer', 'required',
+				'in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_OPERATORS,
+				'when' => ['column', 'in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME]
+			],
+			['integer', 'required',
+				'in' => CItemTypeTelemetryQuery::SIMPLE_COLUMN_OPERATORS,
+				'when' => ['column', 'not_in' => array_merge(CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME,
+					CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME
+				)]
+			]
+		];
+	}
+
+	/**
+	 * Validation rules for the "value" field of a condition.
+	 *
+	 * @return array
+	 */
+	public static function getConditionValueValidationRules(): array {
+		return [
+			['string', 'required', 'length' => 255, 'not_empty',
+				'use' => [CNumberParser::class, []],
+				'messages' => ['use' => _('A floating point value is expected.')],
+				'when' => ['column', 'in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME]
+			],
+			['string', 'required', 'length' => 255,
+				'when' => [
+					['column', 'not_in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME],
+					['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
+				]
+			],
+			['string', 'required', 'length' => 255, 'not_empty',
+				'when' => [
+					['column', 'not_in' => CItemTypeTelemetryQuery::NUMERIC_COLUMN_NAME],
+					['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+				]
 			]
 		];
 	}
