@@ -168,8 +168,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		$suite->addTestSuite('testLLDAPMSyncAtScale');
-		
-		
+
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		/* $suite->addTestSuite('testTelemetryQueryItems'); */
