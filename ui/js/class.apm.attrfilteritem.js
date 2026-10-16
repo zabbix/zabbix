@@ -38,8 +38,7 @@ class CApmAttrFilterItem extends CBaseComponent {
 			 * Event called when operation field changes.
 			 */
 			changeOperation: (ev) => {
-				const operator = parseInt(ev.target.value);
-				const show_value = ![CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS].includes(operator);
+				const show_value = ![TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS].includes(Number(ev.target.value));
 
 				if (this._value.hasClass('display-none') !== show_value) {
 					return;

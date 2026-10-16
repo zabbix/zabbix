@@ -291,8 +291,8 @@ final class CClickHouseHelper {
 		$list_grouped = [];
 
 		foreach ($list as $attribute) {
-			if ($attribute['operator'] == CONDITION_OPERATOR_LIKE && $attribute['value'] === '') {
-				$attribute['operator'] = CONDITION_OPERATOR_EXISTS;
+			if ($attribute['operator'] == TAG_OPERATOR_LIKE && $attribute['value'] === '') {
+				$attribute['operator'] = TAG_OPERATOR_EXISTS;
 			}
 
 			$list_grouped[$attribute['key']][$attribute['operator']][] = $attribute['value'];
@@ -303,19 +303,19 @@ final class CClickHouseHelper {
 		$index = 0;
 
 		foreach ($list_grouped as $key => $operators) {
-			if (array_key_exists(CONDITION_OPERATOR_EXISTS, $operators)
-					&& array_key_exists(CONDITION_OPERATOR_NOT_EXISTS, $operators)) {
+			if (array_key_exists(TAG_OPERATOR_EXISTS, $operators)
+					&& array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operators)) {
 				continue;
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_EQUAL, $operators)
-					|| array_key_exists(CONDITION_OPERATOR_LIKE, $operators)) {
-				unset($operators[CONDITION_OPERATOR_EXISTS]);
+			if (array_key_exists(TAG_OPERATOR_EQUAL, $operators)
+					|| array_key_exists(TAG_OPERATOR_LIKE, $operators)) {
+				unset($operators[TAG_OPERATOR_EXISTS]);
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_NOT_EQUAL, $operators)
-					|| array_key_exists(CONDITION_OPERATOR_NOT_LIKE, $operators)) {
-				unset($operators[CONDITION_OPERATOR_NOT_EXISTS]);
+			if (array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operators)
+					|| array_key_exists(TAG_OPERATOR_NOT_LIKE, $operators)) {
+				unset($operators[TAG_OPERATOR_NOT_EXISTS]);
 			}
 
 			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$index;
@@ -327,37 +327,37 @@ final class CClickHouseHelper {
 			$where_or = [];
 			$where_and = [];
 
-			if (array_key_exists(CONDITION_OPERATOR_EQUAL, $operators)) {
-				$query->param($param_prefix.'_equal', $operators[CONDITION_OPERATOR_EQUAL]);
+			if (array_key_exists(TAG_OPERATOR_EQUAL, $operators)) {
+				$query->param($param_prefix.'_equal', $operators[TAG_OPERATOR_EQUAL]);
 				$where_or[] = $field_param.' IN {'.$param_prefix.'_equal:Array(String)}';
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_LIKE, $operators)) {
-				foreach ($operators[CONDITION_OPERATOR_LIKE] as $value_index => $value) {
+			if (array_key_exists(TAG_OPERATOR_LIKE, $operators)) {
+				foreach ($operators[TAG_OPERATOR_LIKE] as $value_index => $value) {
 					$query->param($param_prefix.'_like_'.$value_index, $value);
 					$where_or[] = 'positionCaseInsensitive('.$field_param.','.
 						'{'.$param_prefix.'_like_'.$value_index.':String})>0';
 				}
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_NOT_EXISTS, $operators)) {
+			if (array_key_exists(TAG_OPERATOR_NOT_EXISTS, $operators)) {
 				$where_or[] = 'NOT mapContains('.$field.',{'.$param_prefix.'_key:String})';
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_NOT_EQUAL, $operators)) {
-				$query->param($param_prefix.'_not_equal', $operators[CONDITION_OPERATOR_NOT_EQUAL]);
+			if (array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operators)) {
+				$query->param($param_prefix.'_not_equal', $operators[TAG_OPERATOR_NOT_EQUAL]);
 				$where_and[] = $field_param.' NOT IN {'.$param_prefix.'_not_equal:Array(String)}';
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_NOT_LIKE, $operators)) {
-				foreach ($operators[CONDITION_OPERATOR_NOT_LIKE] as $value_index => $value) {
+			if (array_key_exists(TAG_OPERATOR_NOT_LIKE, $operators)) {
+				foreach ($operators[TAG_OPERATOR_NOT_LIKE] as $value_index => $value) {
 					$query->param($param_prefix.'_not_like_'.$value_index, $value);
 					$where_and[] = 'positionCaseInsensitive('.$field_param.','.
 						'{'.$param_prefix.'_not_like_'.$value_index.':String})=0';
 				}
 			}
 
-			if (array_key_exists(CONDITION_OPERATOR_EXISTS, $operators)) {
+			if (array_key_exists(TAG_OPERATOR_EXISTS, $operators)) {
 				$where_or[] = 'mapContains('.$field.',{'.$param_prefix.'_key:String})';
 			}
 
@@ -374,7 +374,7 @@ final class CClickHouseHelper {
 		}
 
 		if ($where) {
-			$where_sql = implode($eval_type === CONDITION_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where);
+			$where_sql = implode($eval_type === TAG_EVAL_TYPE_AND_OR ? ' AND ' : ' OR ', $where);
 			$where_sql = count($where) > 1 ? '('.$where_sql.')' : $where_sql;
 
 			$query->where($where_sql);

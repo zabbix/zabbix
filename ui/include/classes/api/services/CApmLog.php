@@ -80,22 +80,22 @@ class CApmLog extends CApmGeneral {
 			'severity_numbers' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '1:24', 'uniq' => true, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'log_attributes' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['severity_text', 'service_name', 'body', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],

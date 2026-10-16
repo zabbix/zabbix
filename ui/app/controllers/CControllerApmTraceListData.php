@@ -65,26 +65,26 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
 				APM_TRACE_STATUS_ERROR]]],
 			'resource_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'resource_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
+						TAG_OPERATOR_NOT_LIKE]],
 					'value' => ['string']
 				]]
 			],
 			'span_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
+						TAG_OPERATOR_NOT_LIKE]],
 					'value' => ['string']
 				]]
 			],

@@ -36,7 +36,7 @@ class CApmAttrFilterFieldHelper {
 		];
 
 		$data += [
-			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'evaltype' => TAG_EVAL_TYPE_AND_OR,
 			'attributes' => []
 		];
 
@@ -45,8 +45,8 @@ class CApmAttrFilterFieldHelper {
 			->addRow(
 				(new CCol(
 					(new CRadioButtonList($options['evaltype_field_name'], (int) $data['evaltype']))
-						->addValue(_('And/Or'), CONDITION_EVAL_TYPE_AND_OR)
-						->addValue(_('Or'), CONDITION_EVAL_TYPE_OR)
+						->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+						->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 						->setModern()
 						->setId($options['evaltype_field_name'])
 				))->setColSpan(4)
@@ -92,12 +92,12 @@ class CApmAttrFilterFieldHelper {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CSelect($options['attribute_field_name'].'['.$index.'][operator]'))
 				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_OPERATOR_EXISTS => _('Exists'),
-					CONDITION_OPERATOR_EQUAL => _('Equals'),
-					CONDITION_OPERATOR_LIKE => _('Contains'),
-					CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
-					CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
-					CONDITION_OPERATOR_NOT_LIKE => _('Does not contain')
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
 				->setValue((int) $attribute['operator'])
 				->setFocusableElementId(''.$options['attribute_field_name'].'-'.$index.'-operator-select')

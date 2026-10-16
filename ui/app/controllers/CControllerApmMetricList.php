@@ -32,36 +32,36 @@ class CControllerApmMetricList extends CController {
 			'filter_scope_name' => ['string'],
 			'filter_types' => ['array', 'field' => ['integer', 'in' => [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM,
 				APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]]],
-			'filter_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
+			'filter_attributes_evaltype' => ['integer', 'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]],
 			'filter_attributes' => ['objects', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
+						TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS
 					]
 				],
 				'value' => ['string', 'required']
 			]],
 			'filter_resource_attributes_evaltype' => ['integer',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'filter_resource_attributes' => ['objects', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
+						TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS
 					]
 				],
 				'value' => ['string', 'required']
 			]],
 			'filter_scope_attributes_evaltype' => ['integer',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'filter_scope_attributes' => ['objects', 'fields' => [
 				'key' => ['string', 'required'],
 				'operator' => ['integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+					'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
+						TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS
 					]
 				],
 				'value' => ['string', 'required']
@@ -148,15 +148,15 @@ class CControllerApmMetricList extends CController {
 			'service_name' => CProfile::get('web.apm.metric.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.metric.filter_scope_name', ''),
 			'attributes_evaltype' => CProfile::get('web.apm.metric.filter_attributes_evaltype',
-				CONDITION_EVAL_TYPE_AND_OR
+				TAG_EVAL_TYPE_AND_OR
 			),
 			'attributes' => $filter_attributes,
 			'resource_attributes_evaltype' => CProfile::get('web.apm.metric.filter_resource_attributes_evaltype',
-				CONDITION_EVAL_TYPE_AND_OR
+				TAG_EVAL_TYPE_AND_OR
 			),
 			'resource_attributes' => $filter_resource_attributes,
 			'scope_attributes_evaltype' => CProfile::get('web.apm.metric.filter_scope_attributes_evaltype',
-				CONDITION_EVAL_TYPE_AND_OR
+				TAG_EVAL_TYPE_AND_OR
 			),
 			'scope_attributes' => $filter_scope_attributes
 		];
@@ -227,7 +227,7 @@ class CControllerApmMetricList extends CController {
 			PROFILE_TYPE_STR
 		);
 		CProfile::update('web.apm.metric.filter_attributes_evaltype',
-			$this->getInput('filter_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+			$this->getInput('filter_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_attributes.key', array_column($filter_attributes, 'key'),
 			PROFILE_TYPE_STR
@@ -239,7 +239,7 @@ class CControllerApmMetricList extends CController {
 			PROFILE_TYPE_INT
 		);
 		CProfile::update('web.apm.metric.filter_resource_attributes_evaltype',
-			$this->getInput('filter_resource_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+			$this->getInput('filter_resource_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_resource_attributes.key',
 			array_column($filter_resource_attributes, 'key'), PROFILE_TYPE_STR
@@ -251,7 +251,7 @@ class CControllerApmMetricList extends CController {
 			array_column($filter_resource_attributes, 'operator'), PROFILE_TYPE_INT
 		);
 		CProfile::update('web.apm.metric.filter_scope_attributes_evaltype',
-			$this->getInput('filter_scope_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
+			$this->getInput('filter_scope_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 		);
 		CProfile::updateArray('web.apm.metric.filter_scope_attributes.key',
 			array_column($filter_scope_attributes, 'key'), PROFILE_TYPE_STR

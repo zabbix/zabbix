@@ -13,9 +13,6 @@
 **/
 
 
-const TAG_OPERATOR_EXISTS = '4';
-const TAG_OPERATOR_NOT_EXISTS = '5';
-
 class CTagFilterItem extends CBaseComponent {
 
 	constructor(target) {
@@ -41,7 +38,7 @@ class CTagFilterItem extends CBaseComponent {
 			 * Event called when operation field changes.
 			 */
 			changeOperation: (ev) => {
-				const show_value = ev.target.value != TAG_OPERATOR_EXISTS && ev.target.value != TAG_OPERATOR_NOT_EXISTS;
+				const show_value = ![TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS].includes(Number(ev.target.value));
 
 				if (this._value.hasClass('display-none') != show_value) {
 					return;

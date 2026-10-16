@@ -85,7 +85,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['attributes_evaltype'],
 						'attributes' => $data['filter']['attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					],
 					[
@@ -100,7 +100,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
 						'attributes' => $data['filter']['resource_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					],
 					[
@@ -115,7 +115,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['scope_attributes_evaltype'],
 						'attributes' => $data['filter']['scope_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					],
 					[
@@ -161,7 +161,7 @@ $html_page->show();
 		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 			'key' => '#{key}',
 			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
+			'operator' => TAG_OPERATOR_LIKE
 		],
 		[
 			'attribute_field_name' => 'filter_attributes'
@@ -174,7 +174,7 @@ $html_page->show();
 		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 			'key' => '#{key}',
 			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
+			'operator' => TAG_OPERATOR_LIKE
 		],
 		[
 			'attribute_field_name' => 'filter_resource_attributes'
@@ -187,7 +187,7 @@ $html_page->show();
 		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 			'key' => '#{key}',
 			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
+			'operator' => TAG_OPERATOR_LIKE
 		],
 		[
 			'attribute_field_name' => 'filter_scope_attributes'

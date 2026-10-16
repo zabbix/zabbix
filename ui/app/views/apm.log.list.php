@@ -99,7 +99,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['log_attributes_evaltype'],
 						'attributes' => $data['filter']['log_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					], [
 						'evaltype_field_name' => 'filter_log_attributes_evaltype',
@@ -113,7 +113,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
 						'attributes' => $data['filter']['resource_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					], [
 						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
@@ -127,7 +127,7 @@ $filter = (new CFilter())
 					CApmAttrFilterFieldHelper::getFilterField([
 						'evaltype' => $data['filter']['scope_attributes_evaltype'],
 						'attributes' => $data['filter']['scope_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
 					], [
 						'evaltype_field_name' => 'filter_scope_attributes_evaltype',
@@ -173,7 +173,7 @@ foreach (['log', 'resource', 'scope'] as $type) {
 			CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
 				'key' => '#{key}',
 				'value' => '#{value}',
-				'operator' => CONDITION_OPERATOR_LIKE
+				'operator' => TAG_OPERATOR_LIKE
 			], [
 				'attribute_field_name' => 'filter_'.$type.'_attributes'
 			])

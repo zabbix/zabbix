@@ -36,23 +36,23 @@ class CControllerApmTraceList extends CController {
 			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => null, 'max' => null]]],
 			'filter_statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
 				APM_TRACE_STATUS_ERROR]]],
-			'filter_resource_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
+			'filter_resource_attributes_evaltype' => ['integer', 'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]],
 			'filter_resource_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string', 'required'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
+						TAG_OPERATOR_NOT_LIKE]],
 					'value' => ['string', 'required']
 				]]
 			],
-			'filter_span_attributes_evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
+			'filter_span_attributes_evaltype' => ['integer', 'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]],
 			'filter_span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string', 'required'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
+						TAG_OPERATOR_NOT_LIKE]],
 					'value' => ['string', 'required']
 				]]
 			],
@@ -103,7 +103,7 @@ class CControllerApmTraceList extends CController {
 
 		$filter_resource_attributes = [];
 		$filter_resource_attributes_evaltype = CProfile::get('web.apm.trace.filter_resource_attributes_evaltype',
-			CONDITION_EVAL_TYPE_AND_OR);
+			TAG_EVAL_TYPE_AND_OR);
 
 		foreach (CProfile::getArray('web.apm.trace.filter_resource_attributes.key', []) as $i => $attribute) {
 			$filter_resource_attributes[] = [
@@ -114,12 +114,12 @@ class CControllerApmTraceList extends CController {
 		}
 
 		if (!$filter_resource_attributes) {
-			$filter_resource_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE];
+			$filter_resource_attributes[] = ['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE];
 		}
 
 		$filter_span_attributes = [];
 		$filter_span_attributes_evaltype = CProfile::get('web.apm.trace.filter_span_attributes_evaltype',
-			CONDITION_EVAL_TYPE_AND_OR);
+			TAG_EVAL_TYPE_AND_OR);
 
 		foreach (CProfile::getArray('web.apm.trace.filter_span_attributes.key', []) as $i => $attribute) {
 			$filter_span_attributes[] = [
@@ -130,7 +130,7 @@ class CControllerApmTraceList extends CController {
 		}
 
 		if (!$filter_span_attributes) {
-			$filter_span_attributes[] = ['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE];
+			$filter_span_attributes[] = ['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE];
 		}
 
 		$filter = [
@@ -212,7 +212,7 @@ class CControllerApmTraceList extends CController {
 		}
 
 		CProfile::update('web.apm.trace.filter_resource_attributes_evaltype',
-			$this->getInput('filter_resource_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+			$this->getInput('filter_resource_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
 		CProfile::updateArray('web.apm.trace.filter_resource_attributes.key',
 			array_column($filter_resource_attributes, 'key'), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.trace.filter_resource_attributes.value',
@@ -233,7 +233,7 @@ class CControllerApmTraceList extends CController {
 		}
 
 		CProfile::update('web.apm.trace.filter_span_attributes_evaltype',
-			$this->getInput('filter_span_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+			$this->getInput('filter_span_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
 		CProfile::updateArray('web.apm.trace.filter_span_attributes.key',
 			array_column($filter_span_attributes, 'key'), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.apm.trace.filter_span_attributes.value',

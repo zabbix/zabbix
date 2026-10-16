@@ -55,12 +55,12 @@ class CControllerApmLogListData extends CControllerDataTable {
 	}
 
 	protected static function getFilterValidationRules(): array {
-		$filter_attributes_evaltype = ['integer', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]];
+		$filter_attributes_evaltype = ['integer', 'required', 'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]];
 		$filter_attributes = ['objects', 'required', 'fields' => [
 			'key' => ['string', 'required'],
 			'operator' => ['integer', 'required',
-				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+				'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
+					TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS
 				]
 			],
 			'value' => ['string', 'required']
