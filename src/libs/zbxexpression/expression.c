@@ -585,7 +585,7 @@ static int	token_is_user_macro(const char *macro, const zbx_token_t *token)
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manual_input,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
@@ -738,8 +738,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		if (0 != (macro_type & (ZBX_MACRO_TYPE_SCRIPT_NORMAL | ZBX_MACRO_TYPE_SCRIPT_RECOVERY |
 				ZBX_MACRO_TYPE_SCRIPT)) && 0 == strcmp(m, MVAR_MANUALINPUT))
 		{
-			if (NULL != manual_input)
-				replace_to = zbx_strdup(replace_to, manual_input);
+			if (NULL != manualinput)
+				replace_to = zbx_strdup(replace_to, manualinput);
 		}
 		else if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 				ZBX_MACRO_TYPE_MESSAGE_UPDATE |
@@ -2691,12 +2691,12 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manual_input,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen)
 {
-	return substitute_simple_macros_impl(actionid, event, r_event, userid, manual_input, dc_host, dc_item, alert,
+	return substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert,
 			ack, service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 }
 
@@ -2706,7 +2706,7 @@ int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_even
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manual_input,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, char **data, int macro_type, char *error, int maxerrlen)
@@ -2716,7 +2716,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 	um_handle = zbx_dc_open_user_macros_secure();
 
-	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, manual_input, dc_host, dc_item, alert,
+	ret = substitute_simple_macros_impl(actionid, event, r_event, userid, manualinput, dc_host, dc_item, alert,
 			ack, service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 
 	zbx_dc_close_user_macros(um_handle);
