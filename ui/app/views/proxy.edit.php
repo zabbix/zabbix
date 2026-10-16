@@ -288,7 +288,7 @@ $apm_tab = (new CFormGrid())
 		(new CLabel([_('Add resource attributes')], 'additional_resource_attributes'))
 			->addClass('js-apm-attributes'),
 		(new CFormField(
-			(new CDiv(new CPartial('proxy.apm.attributes', [
+			(new CDiv(new CPartial('apm.attributes', [
 				'source' => 'proxy',
 				'attributes' => $data['form']['additional_resource_attributes'],
 				'field_name' => 'additional_resource_attributes',
@@ -299,7 +299,8 @@ $apm_tab = (new CFormGrid())
 					SIGNAL_TYPE_TRACES => _('Traces'),
 					SIGNAL_TYPE_METRICS => _('Metrics'),
 					SIGNAL_TYPE_LOGS => _('Logs')
-				]
+				],
+				'default_signal_type' => SIGNAL_TYPE_TRACES
 			])))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addClass('form-field-apm-attributes')
