@@ -486,7 +486,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
 					"enabled_lifetime_type,evaltype,flags,discover,query,time_shift,lookback_limit,"
-					"granularity,storage_mode"
+					"granularity"
 				" from items"
 				" where");
 
@@ -787,12 +787,6 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 			item->granularity = zbx_strdup(NULL, row[54]);
 			item->granularity_orig = NULL;
-
-			if ((unsigned char)atoi(row[55]) != item_prototype->storage_mode)
-			{
-				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_STORAGE_MODE;
-				item->storage_mode_orig = (unsigned char)atoi(row[55]);
-			}
 
 			item->lld_row = NULL;
 
@@ -3102,7 +3096,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
 				item_prototype->evaltype, item_prototype->discover, item_prototype->query,
 				item->time_shift, item->lookback_limit,
-				item->granularity, item_prototype->storage_mode);
+				item->granularity);
 
 		/* In the case of prototype item discovery find the discovered LLD rule id */
 		if (NULL != rule_index)
@@ -3635,17 +3629,9 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	{
 		value_esc = zbx_db_dyn_escape_string(item->granularity);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sgranularity='%s'", d, value_esc);
-		d = ",";
 		zbx_audit_item_update_json_update_granularity(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, item->granularity_orig, item->granularity);
 		zbx_free(value_esc);
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_STORAGE_MODE))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstorage_mode=%d", d,
-				(int)item_prototype->storage_mode);
-		zbx_audit_item_update_json_update_storage_mode(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-				item->item_flags, (int)item->storage_mode_orig, (int)item_prototype->storage_mode);
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
@@ -3819,7 +3805,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				"ssl_key_password", "verify_peer", "verify_host", "allow_traps",
 				"lifetime", "lifetime_type", "enabled_lifetime", "enabled_lifetime_type",
 				"evaltype", "discover", "query", "time_shift", "lookback_limit", "granularity",
-				"storage_mode", (char *)NULL);
+				(char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", "lldruleid", (char *)NULL);
@@ -4556,7 +4542,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
 				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover,"
 				"i.lifetime,i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.evaltype,"
-				"i.flags,i.query,i.time_shift,i.lookback_limit,i.granularity,i.storage_mode"
+				"i.flags,i.query,i.time_shift,i.lookback_limit,i.granularity"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.lldruleid=" ZBX_FS_UI64,
@@ -4627,7 +4613,6 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		item_prototype->time_shift = zbx_strdup(NULL, row[52]);
 		item_prototype->lookback_limit = zbx_strdup(NULL, row[53]);
 		item_prototype->granularity = zbx_strdup(NULL, row[54]);
-		ZBX_STR2UCHAR(item_prototype->storage_mode, row[55]);
 
 		zbx_vector_lld_row_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_lld_item_preproc_ptr_create(&item_prototype->preproc_ops);
@@ -4963,7 +4948,6 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 	zabbix_log(LOG_LEVEL_TRACE, "  query:%s", item_prototype->query);
 	zabbix_log(LOG_LEVEL_TRACE, "  time_shift:%s lookback_limit:%s granularity:%s", item_prototype->time_shift,
 			item_prototype->lookback_limit, item_prototype->granularity);
-	zabbix_log(LOG_LEVEL_TRACE, "  storage_mode:%u", item_prototype->storage_mode);
 
 	if (0 != (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 	{

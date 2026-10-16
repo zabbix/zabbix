@@ -90,7 +90,6 @@ PREPARE_AUDIT_ITEM_UPDATE_H(query, const char*)
 PREPARE_AUDIT_ITEM_UPDATE_H(time_shift, const char*)
 PREPARE_AUDIT_ITEM_UPDATE_H(lookback_limit, const char*)
 PREPARE_AUDIT_ITEM_UPDATE_H(granularity, const char*)
-PREPARE_AUDIT_ITEM_UPDATE_H(storage_mode, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(key_, const char*)
 
 void	zbx_audit_item_delete(int audit_context_mode, zbx_vector_uint64_t *itemids);

@@ -116,8 +116,6 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 			item->lookback_limit);
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "granularity", "granularity",
 			item->granularity);
-	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "storage_mode", "storage_mode",
-			item_prototype->storage_mode);
 
 	if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{

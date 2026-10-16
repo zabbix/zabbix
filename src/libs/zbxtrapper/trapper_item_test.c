@@ -84,7 +84,6 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  time_shift: %d", item->time_shift);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  lookback_limit: %d", item->lookback_limit);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  granularity: %d", item->granularity);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  storage_mode: %u", item->storage_mode);
 		zbx_log_handle(LOG_LEVEL_TRACE, "interfaceid: " ZBX_FS_UI64, item->interface.interfaceid);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  useip: %u", item->interface.useip);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
@@ -418,7 +417,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			item.lookback_limit_orig, sizeof(item.lookback_limit_orig));
 	db_string_from_json(&jp_item, ZBX_PROTO_TAG_GRANULARITY, table_items, "granularity", item.granularity_orig,
 			sizeof(item.granularity_orig));
-	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_STORAGE_MODE, table_items, "storage_mode", &item.storage_mode);
 
 	zbx_vector_ptr_pair_create(&item.script_params);
 	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&

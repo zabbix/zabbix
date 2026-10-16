@@ -228,7 +228,6 @@ typedef struct
 	char					*time_shift;
 	char					*lookback_limit;
 	char					*granularity;
-	unsigned char				storage_mode;
 	unsigned char				type;
 	unsigned char				value_type;
 	unsigned char				status;
@@ -322,7 +321,6 @@ struct zbx_lld_item_full_s
 #define ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT		__UINT64_C(0x0008000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT		__UINT64_C(0x0010000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY		__UINT64_C(0x0020000000000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_STORAGE_MODE		__UINT64_C(0x0040000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t				flags;
 	char					*key_proto;
@@ -415,7 +413,6 @@ struct zbx_lld_item_full_s
 	char					*lookback_limit_orig;
 	char					*granularity;
 	char					*granularity_orig;
-	unsigned char				storage_mode_orig;
 
 	char					*lifetime_orig;
 	char					*enabled_lifetime_orig;

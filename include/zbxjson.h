@@ -160,7 +160,6 @@
 #define ZBX_PROTO_TAG_TIME_SHIFT		"time_shift"
 #define ZBX_PROTO_TAG_LOOKBACK_LIMIT		"lookback_limit"
 #define ZBX_PROTO_TAG_GRANULARITY		"granularity"
-#define ZBX_PROTO_TAG_STORAGE_MODE		"storage_mode"
 #define ZBX_PROTO_TAG_MAINTENANCE_STATUS	"maintenance_status"
 #define ZBX_PROTO_TAG_MAINTENANCE_TYPE		"maintenance_type"
 #define ZBX_PROTO_TAG_IPMI_AUTHTYPE		"ipmi_authtype"

@@ -251,7 +251,6 @@ typedef struct
 	const char	*time_shift;
 	const char	*lookback_limit;
 	const char	*granularity;
-	unsigned char	storage_mode;
 	time_t		lasttimestamp;
 	zbx_timespec_t	min_free_ts;
 }

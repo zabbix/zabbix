@@ -195,7 +195,6 @@ PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(time_shift,		const char*,	string)
 PREPARE_AUDIT_ITEM_UPDATE(lookback_limit,	const char*,	string)
 PREPARE_AUDIT_ITEM_UPDATE(granularity,		const char*,	string)
-PREPARE_AUDIT_ITEM_UPDATE(storage_mode,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(key_,			const char*,	string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE

@@ -48,9 +48,6 @@
 #define ZBX_TQ_MAX_RESULT_ROWS	10000	/* maximum amount of values saved by a single check, */
 					/* overflow results in partial result being saved    */
 
-#define ZBX_TQ_STORAGE_MODE_MULTIPLE_VALUES	0
-#define ZBX_TQ_STORAGE_MODE_SINGLE		1
-
 /* apm db */
 
 typedef enum zbx_apm_db_type
@@ -246,7 +243,5 @@ void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
 
 void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
-
-char	*zbx_tq_combine_values(zbx_vector_str_t *values);
 
 #endif

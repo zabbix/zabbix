@@ -61,8 +61,6 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	telemetry_query_context->item_context.flags = item->flags;
 	telemetry_query_context->item_context.preprocessing = item->preprocessing;
 
-	telemetry_query_context->item_context.storage_mode = item->storage_mode;
-
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE != apm_db_config->db_type)
 		THIS_SHOULD_NEVER_HAPPEN;
 

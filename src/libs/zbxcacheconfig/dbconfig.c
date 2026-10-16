@@ -3206,7 +3206,6 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			dc_strpool_replace(found, &item->itemtype.tqitem->time_shift, row[51]);
 			dc_strpool_replace(found, &item->itemtype.tqitem->lookback_limit, row[52]);
 			dc_strpool_replace(found, &item->itemtype.tqitem->granularity, row[53]);
-			item->itemtype.tqitem->storage_mode = (unsigned char)atoi(row[54]);
 			break;
 	}
 
@@ -9586,7 +9585,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
 			zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
 			zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
-			dst_item->storage_mode = src_item->itemtype.tqitem->storage_mode;
 			dst_item->telemetry_query = NULL;
 			break;
 		case ITEM_TYPE_SCRIPT:
@@ -9854,7 +9852,6 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
 	zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
 	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
-	dst_item->storage_mode = src_item->itemtype.tqitem->storage_mode;
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
 	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;

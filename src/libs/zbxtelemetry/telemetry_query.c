@@ -229,21 +229,3 @@ int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
 			return FAIL;
 	}
 }
-
-char	*zbx_tq_combine_values(zbx_vector_str_t *values)
-{
-	struct zbx_json	j;
-	char		*str;
-
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	for (int i = 0; i < values->values_num; i++)
-	{
-		zbx_json_addraw(&j, NULL, values->values[i]);
-	}
-
-	str = zbx_strdup(NULL, j.buffer);
-	zbx_json_free(&j);
-
-	return str;
-}
