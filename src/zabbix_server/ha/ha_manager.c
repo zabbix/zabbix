@@ -1688,7 +1688,6 @@ int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error)
 	args.args = (void *)ha_config;
 	args.info.process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
 	args.info.process_num = ZBX_HA_PROCESS_NUM;
-	args.info.server_num = 0;	/* not one of main process child slots, see zbx_thread_start() */
 	zbx_thread_start(ha_manager_thread, &args, &ha_pid);
 
 	if (ZBX_THREAD_ERROR == ha_pid)

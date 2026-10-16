@@ -1147,6 +1147,8 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	zbx_pb_disable();
+
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
@@ -1158,26 +1160,12 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	/* Disable proxy buffer only after child processes have exited - a child process can hold its lock while */
-	/* waiting for database. Data written to memory buffer meanwhile is flushed to database below.          */
-	zbx_pb_disable();
-
 	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
-	if (SUCCEED != zbx_threads_db_unavailable())
-	{
-		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
-		zbx_pb_flush();
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "skipping history cache and proxy buffer synchronization because"
-				" database is not responding: unsaved data is lost");
-		zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
-	}
-
+	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
 	zbx_db_close();
@@ -1765,13 +1753,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
-
-	if (SUCCEED != zbx_threads_db_wait_init(zbx_threads_num, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database wait slots: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{

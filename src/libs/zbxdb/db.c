@@ -16,7 +16,6 @@
 
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxthreads.h"
 #include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
@@ -72,10 +71,6 @@ static int		config_log_slow_queries;
 static int		db_auto_increment;
 
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
-
-static time_t		db_down_since = 0;	/* start of the first failed operation since database is down */
-static time_t		db_op_start;		/* start of the current outermost database operation */
-static int		db_op_depth = 0;	/* nesting level of database operations */
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -202,61 +197,6 @@ const char	*zbx_db_last_strerr(void)
 zbx_err_codes_t	zbx_db_last_errcode(void)
 {
 	return last_db_errcode;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: marks start of a blocking database operation                      *
- *                                                                            *
- ******************************************************************************/
-static void	db_op_begin(void)
-{
-	if (0 != db_op_depth++)
-		return;
-
-	db_op_start = time(NULL);
-	zbx_threads_db_wait_set(0 != db_down_since ? db_down_since : db_op_start);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: marks end of a blocking database operation                        *
- *                                                                            *
- * Parameters: down - [IN] SUCCEED - operation failed because database is     *
- *                                   down                                     *
- *                         FAIL    - database responded                       *
- *                                                                            *
- * Comments: While database is down the wait slot is not cleared, so it       *
- *           covers also reconnect attempts and sleeps between them.          *
- *                                                                            *
- ******************************************************************************/
-static void	db_op_end(int down)
-{
-	if (0 != --db_op_depth)
-		return;
-
-	if (SUCCEED == down)
-	{
-		if (0 == db_down_since)
-			db_down_since = db_op_start;
-	}
-	else
-		db_down_since = 0;
-
-	zbx_threads_db_wait_set(db_down_since);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get time since database is down for the current process           *
- *                                                                            *
- * Return value: start time of the first failed operation since database is   *
- *               down or 0 if the last operation reached database             *
- *                                                                            *
- ******************************************************************************/
-time_t	zbx_db_get_down_since(void)
-{
-	return db_down_since;
 }
 
 #if defined(HAVE_ORACLE)
@@ -506,8 +446,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	txn_error = ZBX_DB_OK;
 	txn_level = 0;
-
-	db_op_begin();
 
 #if defined(HAVE_MYSQL)
 	if (NULL == (conn = mysql_init(NULL)))
@@ -1007,8 +945,6 @@ out:
 	if (ZBX_DB_OK != ret)
 		zbx_db_close_basic();
 
-	db_op_end(ZBX_DB_DOWN == ret ? SUCCEED : FAIL);
-
 	txn_error = last_txn_error;
 	txn_level = last_txn_level;
 
@@ -1192,12 +1128,8 @@ int	zbx_db_commit_basic(void)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
 
 #if defined(HAVE_ORACLE)
-	db_op_begin();
-
 	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
 		rc = OCI_handle_sql_error(ERR_Z3005, err, "commit failed");
-
-	db_op_end(ZBX_DB_DOWN == rc ? SUCCEED : FAIL);
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute_basic("commit;");
 #endif
@@ -1247,12 +1179,8 @@ int	zbx_db_rollback_basic(void)
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute_basic("rollback;");
 #elif defined(HAVE_ORACLE)
-	db_op_begin();
-
 	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
 		rc = OCI_handle_sql_error(ERR_Z3005, err, "rollback failed");
-
-	db_op_end(ZBX_DB_DOWN == rc ? SUCCEED : FAIL);
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute_basic("rollback;");
 	zbx_mutex_unlock(sqlite_access);
@@ -1549,14 +1477,10 @@ int	zbx_db_statement_execute(int iters)
 		goto out;
 	}
 
-	db_op_begin();
-
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(iters, &nrows)))
 		ret = OCI_handle_sql_error((ORA_ERR_UNIQ_CONSTRAINT == err ? ERR_Z3008 : ERR_Z3007), err, NULL);
 	else
 		ret = (int)nrows;
-
-	db_op_end(ZBX_DB_DOWN == ret ? SUCCEED : FAIL);
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
@@ -1687,8 +1611,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level,
 			db_replace_nonprintable_chars(sql, &sql_printable));
-
-	db_op_begin();
 
 #if defined(HAVE_MYSQL)
 	if (NULL == conn)
@@ -1821,8 +1743,6 @@ lbl_exec:
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	db_op_end(ZBX_DB_DOWN == ret ? SUCCEED : FAIL);
-
 	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;
@@ -1884,8 +1804,6 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level,
 			db_replace_nonprintable_chars(sql, &sql_printable));
-
-	db_op_begin();
 
 #if defined(HAVE_MYSQL)
 	result = (zbx_db_result_t)zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -2142,8 +2060,6 @@ lbl_get_table:
 	if (0 == txn_level)
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
-	db_op_end((zbx_db_result_t)ZBX_DB_DOWN == result ? SUCCEED : FAIL);
-
 	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;

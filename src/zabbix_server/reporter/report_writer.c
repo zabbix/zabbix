@@ -461,10 +461,6 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
-			/* report manager closes its service on shutdown */
-			if (!ZBX_IS_RUNNING())
-				break;
-
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot read reporter service request");
 			exit(EXIT_FAILURE);
 		}

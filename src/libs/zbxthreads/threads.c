@@ -37,106 +37,6 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 	_endthreadex(SUCCEED);
 }
 #else
-/* Shared between main process and its child processes, one slot per child process (indexed by server_num - 1). */
-/* Holds time since child process is waiting for database (0 if it is not), used by main process during        */
-/* shutdown to terminate child processes stuck on unresponsive database.                                       */
-static time_t	*db_wait_slots = NULL;
-static int	db_wait_slots_num = 0;
-
-/* slot of the current child process */
-static time_t	*db_wait_slot = NULL;
-
-/* main process has terminated a child process stuck on unresponsive database */
-static int	db_wait_killed = 0;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: allocates shared database wait slots for child processes          *
- *                                                                            *
- * Parameters: threads_num - [IN] number of child processes                   *
- *             error       - [OUT]                                            *
- *                                                                            *
- * Return value: SUCCEED - slots were allocated or reset                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: Must be called by main process before forking child processes.   *
- *           Child processes are attached to slots by zbx_thread_start().     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_threads_db_wait_init(int threads_num, char **error)
-{
-	int	shmid;
-	void	*addr;
-
-	if (NULL != db_wait_slots && threads_num != db_wait_slots_num)
-	{
-		(void)shmdt(db_wait_slots);
-		db_wait_slots = NULL;
-		db_wait_slots_num = 0;
-	}
-
-	if (NULL == db_wait_slots && 0 < threads_num)
-	{
-		if (-1 == (shmid = shmget(IPC_PRIVATE, (size_t)threads_num * sizeof(time_t),
-				IPC_CREAT | IPC_EXCL | 0600)))
-		{
-			*error = zbx_dsprintf(*error, "cannot allocate shared memory for database wait slots: %s",
-					zbx_strerror(errno));
-			return FAIL;
-		}
-
-		addr = shmat(shmid, NULL, 0);
-
-		/* mark segment for removal, it stays available while attached, also to forked child processes */
-		(void)shmctl(shmid, IPC_RMID, NULL);
-
-		if ((void *)-1 == addr)
-		{
-			*error = zbx_dsprintf(*error, "cannot attach shared memory for database wait slots: %s",
-					zbx_strerror(errno));
-			return FAIL;
-		}
-
-		db_wait_slots = (time_t *)addr;
-		db_wait_slots_num = threads_num;
-	}
-
-	if (NULL != db_wait_slots)
-		memset(db_wait_slots, 0, (size_t)db_wait_slots_num * sizeof(time_t));
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sets database wait slot of the current child process              *
- *                                                                            *
- * Parameters: since - [IN] time since process is waiting for database or 0   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_threads_db_wait_set(time_t since)
-{
-	if (NULL != db_wait_slot)
-		*db_wait_slot = since;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: checks if main process has terminated a child process stuck on    *
- *          unresponsive database during shutdown                             *
- *                                                                            *
- * Return value: SUCCEED - a child process was terminated                     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: Used by main process after child processes have exited to skip   *
- *           database operations that would hang on the same database.        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_threads_db_unavailable(void)
-{
-	return 0 != db_wait_killed ? SUCCEED : FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking.                           *
@@ -232,9 +132,6 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 
 	if (0 == *thread)	/* child process */
 	{
-		if (0 < thread_args->info.server_num && thread_args->info.server_num <= db_wait_slots_num)
-			db_wait_slot = &db_wait_slots[thread_args->info.server_num - 1];
-
 		(*handler)(thread_args);
 
 		/* The zbx_thread_exit must be called from the handler. */
@@ -341,68 +238,6 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 	}
 }
 
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-/******************************************************************************
- *                                                                            *
- * Purpose: waits until processes with specified priority exit, terminates    *
- *          the ones stuck on unresponsive database                           *
- *                                                                            *
- * Parameters: threads       - [IN/OUT] handles to processes                  *
- *             threads_num   - [IN] number of handles                         *
- *             threads_flags - [IN] thread priority flags                     *
- *             priority      - [IN] wait for processes with this priority     *
- *                                                                            *
- * Comments: A process that is busy, but not waiting for database, is waited  *
- *           for without a timeout. Database wait slots are indexed in the    *
- *           same way as threads array.                                       *
- *                                                                            *
- ******************************************************************************/
-static void	threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority)
-{
-	struct timespec	poll_delay = {0, 100000000};
-
-	for (;;)
-	{
-		int	alive = 0;
-		time_t	now = time(NULL);
-
-		for (int i = 0; i < threads_num; i++)
-		{
-			pid_t	pid;
-			int	status;
-
-			if (!threads[i] || priority != threads_flags[i])
-				continue;
-
-			if (0 != (pid = waitpid(threads[i], &status, WNOHANG)) && (-1 != pid || EINTR != errno))
-			{
-				threads[i] = ZBX_THREAD_HANDLE_NULL;
-				continue;
-			}
-
-			alive++;
-
-			if (i < db_wait_slots_num && 0 != db_wait_slots[i] &&
-					ZBX_DB_SHUTDOWN_TIMEOUT <= now - db_wait_slots[i])
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "process with PID %d is waiting for database for more"
-						" than %d seconds: terminating it, unsaved data may be lost",
-						(int)threads[i], ZBX_DB_SHUTDOWN_TIMEOUT);
-
-				db_wait_slots[i] = 0;
-				db_wait_killed = 1;
-				zbx_thread_kill_fatal(threads[i]);
-			}
-		}
-
-		if (0 == alive)
-			break;
-
-		nanosleep(&poll_delay, NULL);
-	}
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Kills and waits until the threads are in the signalled state.     *
@@ -431,7 +266,16 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	for (int j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
 	{
 		threads_kill(threads, threads_num, threads_flags, j, ret);
-		threads_wait(threads, threads_num, threads_flags, j);
+
+		for (int i = 0; i < threads_num; i++)
+		{
+			if (!threads[i] || j != threads_flags[i])
+				continue;
+
+			zbx_thread_wait(threads[i]);
+
+			threads[i] = ZBX_THREAD_HANDLE_NULL;
+		}
 	}
 
 	/* signal idle threads to exit */

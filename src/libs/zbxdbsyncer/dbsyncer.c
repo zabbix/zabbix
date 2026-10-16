@@ -258,22 +258,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	if (0 != zbx_hc_release())
 	{
 		struct timespec	poll_delay = {0, 1e8};
-		time_t		wait_start = time(NULL);
 
-		/* Wait for other syncers to finish history synchronization before synchronizing trends, but not */
-		/* forever in case a syncer has exited without releasing history cache. Trends left unsynced are */
-		/* synchronized by main process on exit.                                                        */
 		while (0 != zbx_hc_refcount_peek())
-		{
-			if (ZBX_DB_SHUTDOWN_TIMEOUT <= time(NULL) - wait_start)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s #%d timed out waiting for other history syncers to"
-						" finish", process_name, process_num);
-				break;
-			}
-
 			nanosleep(&poll_delay, NULL);
-		}
 	}
 
 	zbx_log_sync_history_cache_progress();
