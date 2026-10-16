@@ -289,6 +289,12 @@ class CHistFunctionValidatorTest extends TestCase {
 			['item_count(/host/key)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['item_count(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "item_count"']],
 
+			['jsonpath(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "jsonpath"']],
+			['jsonpath(/host/key, 1m)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "jsonpath"']],
+			['jsonpath(/host/key, 1m, "$.path")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(/host/key, #10, "$.path")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(/host/key, 1m, "$.path", "extra")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+
 			['kurtosis(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "kurtosis"']],
 			['kurtosis(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "kurtosis"']],
 			['kurtosis(/host/key,0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "kurtosis"']],
@@ -816,6 +822,12 @@ class CHistFunctionValidatorTest extends TestCase {
 			['varsamp(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
 			['varsamp(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
 			['varsamp(/host/key, #256,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']],
+
+			['xmlxpath(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "xmlxpath"']],
+			['xmlxpath(/host/key, 1m)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "xmlxpath"']],
+			['xmlxpath(/host/key, 1m, "/path")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(/host/key, #10, "/path")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(/host/key, 1m, "/path", "extra")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']],
 
 			['avg_foreach(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "avg_foreach"']],
 			['avg_foreach(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "avg_foreach"']],

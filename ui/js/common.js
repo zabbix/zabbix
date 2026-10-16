@@ -376,6 +376,9 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
+
 				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
 						form.dispatchEvent(new CustomEvent('form.destroyed'));

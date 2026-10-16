@@ -32,10 +32,10 @@ class CRole extends CApiService {
 
 	public const OUTPUT_FIELDS = ['roleid', 'name', 'type', 'readonly'];
 
-	private const RULES_OUTPUT_FIELDS = ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list',
-		'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
-		'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access',
-		'devices.access', 'devices.actions', 'devices.actions.default_access'
+	private const RULES_OUTPUT_FIELDS = ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url',
+		'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list',
+		'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions',
+		'actions.default_access', 'devices.access', 'devices.actions', 'devices.actions.default_access'
 	];
 
 	/**
@@ -180,6 +180,8 @@ class CRole extends CApiService {
 					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
 				'ui.default_access' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'profile.redirect.enforce' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'profile.redirect.url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 				'services.read.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.read.list' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
@@ -300,6 +302,8 @@ class CRole extends CApiService {
 					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
 				'ui.default_access' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'profile.redirect.enforce' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'profile.redirect.url' =>			['type' => API_FRONTEND_ACTION, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 				'services.read.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.read.list' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
@@ -933,6 +937,8 @@ class CRole extends CApiService {
 		$default_rules = [
 			'ui' => [],
 			'ui.default_access' => ZBX_ROLE_RULE_ENABLED,
+			'profile.redirect.enforce' => ZBX_ROLE_RULE_DISABLED,
+			'profile.redirect.url' => '',
 			'services.read.mode' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL,
 			'services.read.list' => [],
 			'services.read.tag' => ['tag' => '', 'value' => ''],
@@ -960,6 +966,7 @@ class CRole extends CApiService {
 
 			$rules[$roleid] = array_merge(
 				self::compileUiRules((int) $type, $old_rules, $new_rules),
+				self::compileRedirectRules($new_rules),
 				self::compileServicesReadRules($new_rules),
 				self::compileServicesWriteRules($new_rules),
 				self::compileModulesRules($old_rules, $new_rules),
@@ -1068,6 +1075,29 @@ class CRole extends CApiService {
 			'name' => 'ui.default_access',
 			'type' => self::RULE_TYPE_INT32,
 			'value' => $new_rules['ui.default_access']
+		];
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private static function compileRedirectRules(array $new_rules): array {
+		$compiled_rules = [];
+
+		$compiled_rules[] = [
+			'name' => 'profile.redirect.enforce',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['profile.redirect.enforce']
+		];
+
+		$compiled_rules[] = [
+			'name' => 'profile.redirect.url',
+			'type' => self::RULE_TYPE_STR,
+			'value' => $new_rules['profile.redirect.url']
 		];
 
 		return $compiled_rules;
@@ -1401,6 +1431,7 @@ class CRole extends CApiService {
 			foreach ($result as $roleid => &$role) {
 				$role['rules'] = array_merge(
 					$this->getRelatedUiRules($roles_rules[$roleid], $output, (int) $role['type']),
+					$this->getRelatedRedirectRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesReadRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
 					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
@@ -1447,6 +1478,34 @@ class CRole extends CApiService {
 
 		if (in_array('ui.default_access', $output, true)) {
 			$result['ui.default_access'] = $ui_default_access;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 *
+	 * @return array
+	 */
+	private function getRelatedRedirectRules(array $rules, array $output): array {
+		$profile_redirect_enforce = array_key_exists('profile.redirect.enforce', $rules)
+			? $rules['profile.redirect.enforce']
+			: (string) ZBX_ROLE_RULE_DISABLED;
+
+		$profile_redirect_url = array_key_exists('profile.redirect.url', $rules)
+			? $rules['profile.redirect.url']
+			: '';
+
+		$result = [];
+
+		if (in_array('profile.redirect.enforce', $output, true)) {
+			$result['profile.redirect.enforce'] = $profile_redirect_enforce;
+		}
+
+		if (in_array('profile.redirect.url', $output, true)) {
+			$result['profile.redirect.url'] = $profile_redirect_url;
 		}
 
 		return $result;

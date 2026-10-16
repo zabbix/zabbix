@@ -366,16 +366,10 @@ class CControllerHostPrototypeEdit extends CController {
 		$data['ms_proxy_group'] = [];
 
 		if ($data['parent_host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'proxyids' => $data['parent_host']['proxyid']
-			]), ['proxyid' => 'id']);
+			$data['ms_proxy'] = [CProxyHelper::resolveProxyOption($data['parent_host']['proxyid'])];
 		}
 		elseif ($data['parent_host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-			$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
-				'output' => ['proxy_groupid', 'name'],
-				'proxy_groupids' => $data['parent_host']['proxy_groupid']
-			]), ['proxy_groupid' => 'id']);
+			$data['ms_proxy_group'] = [CProxyHelper::resolveProxyGroupOption($data['parent_host']['proxy_groupid'])];
 		}
 
 		self::extendLinkedTemplates($data);
@@ -383,8 +377,7 @@ class CControllerHostPrototypeEdit extends CController {
 		$data += [
 			'readonly' => $data['host_prototype']['templateid'] != 0 || $data['is_discovered_prototype'],
 			'user' => [
-				'debug_mode' => $this->getDebugMode(),
-				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
@@ -422,7 +415,8 @@ class CControllerHostPrototypeEdit extends CController {
 
 		// Parent discovery rules.
 		$data['templates'] = makeHostPrototypeTemplatesHtml($data['hostid'],
-			getHostPrototypeParentTemplates([$data['host_prototype']]), $data['user']['can_edit_templates']
+			getHostPrototypeParentTemplates([$data['host_prototype']]),
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();

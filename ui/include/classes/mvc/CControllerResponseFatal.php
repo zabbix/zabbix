@@ -14,9 +14,23 @@
 **/
 
 
-class CControllerResponseFatal extends CControllerResponse {
+class CControllerResponseFatal extends CControllerResponseRedirect {
 
 	public function __construct() {
-		$this->location = 'zabbix.php?action=system.warning';
+		parent::__construct((new CUrl('zabbix.php'))->setArgument('action', 'system.warning'));
+	}
+
+	public function redirect(): void {
+		CMessageHelper::addError('Controller: '.CRouter::getInstance()->getAction());
+
+		$request = $_REQUEST;
+		unset($request[CSRF_TOKEN_NAME]);
+		ksort($request);
+
+		foreach ($request as $key => $value) {
+			CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
+		}
+
+		parent::redirect();
 	}
 }

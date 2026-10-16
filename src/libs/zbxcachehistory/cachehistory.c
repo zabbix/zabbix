@@ -37,7 +37,6 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
-#include "zbxipcservice.h"
 #include "zbxexpr.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
@@ -2133,7 +2132,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 
 		do
 		{
-			sync_history_cache_cb(events_cbs, NULL, &stats);
+			sync_history_cache_cb(events_cbs, ZBX_HISTORY_SYNC_SKIP_TRIGGERS, &stats);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)stats.values_num / (cache->history_num + stats.values_num) * 100);
@@ -2253,17 +2252,14 @@ static void	zbx_log_sync_trends_cache_progress(void)
  * Purpose: writes updates and new data from history cache to database                 *
  *                                                                                     *
  * Parameters: events_cbs - [IN]                                                       *
- *             rtc        - [IN] RTC socket                                            *
  *             stats      - [OUT]                                                      *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		zbx_history_sync_stats_t *stats)
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_history_sync_stats_t *stats)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
-	/* zbx_sync_history_cache_server or zbx_sync_history_cache_proxy */
-	sync_history_cache_cb(events_cbs, rtc, stats);
+	sync_history_cache_cb(events_cbs, ZBX_HISTORY_SYNC_DEFAULT, stats);
 }
 
 /******************************************************************************

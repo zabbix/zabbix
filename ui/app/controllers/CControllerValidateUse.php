@@ -29,7 +29,7 @@ class CControllerValidateUse extends CController {
 					'field' => ['string', 'required'],
 					'value' => ['string', 'required'],
 					'class' => ['string', 'required', 'not_empty'],
-					'options' => ['array'],
+					'options' => [],
 					'error_msg' => ['string']
 				],
 				'count_values' => ['field_rules' => ['field'], 'max' => VALIDATE_USE_CHUNK_SIZE]

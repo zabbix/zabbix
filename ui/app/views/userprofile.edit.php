@@ -248,7 +248,22 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
+$default_url_label = $data['profile_redirect_url'] !== ''
+	?  (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	: null;
+
 $form_list
+	->addRow((new CLabel(_('Default maintenance period'), 'default_maintenance_period'))->setAsteriskMark(),
+		(new CTextBox('default_maintenance_period', $data['default_maintenance_period'], false,
+			DB::getFieldLength('users', 'default_maintenance_period'))
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -259,10 +274,14 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url'], false, DB::getFieldLength('users', 'url')))
+	->addRow(_('URL (after login)'), [
+		(new CTextAreaFlexible('url', $data['url']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+			->setMaxlength(DB::getFieldLength('users', 'url'))
+			->setEnabled(!$data['profile_redirect_enforce'])
+			->setSingleline($data['profile_redirect_enforce']),
+		$default_url_label
+	]);
 
 $tabs->addTab('userTab', _('User'), $form_list);
 

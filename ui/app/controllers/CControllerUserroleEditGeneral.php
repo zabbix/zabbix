@@ -27,6 +27,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 		return array_merge(
 			$this->getUiSectionRules($user_type),
+			$this->getProfileSectionRules(),
 			$this->getServiceSectionRules(),
 			$ZBX_FEATURE_FLAGS['modules_config_enabled'] ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
@@ -47,6 +48,13 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				CRoleHelper::getUiElementsByUserType($user_type)
 			),
 			'ui.default_access' => $this->getInput('ui_default_access', ZBX_ROLE_RULE_ENABLED)
+		];
+	}
+
+	private function getProfileSectionRules(): array {
+		return [
+			'profile.redirect.enforce' => $this->getInput('profile_redirect_enforce', ZBX_ROLE_RULE_DISABLED),
+			'profile.redirect.url' => $this->getInput('profile_redirect_url', '')
 		];
 	}
 

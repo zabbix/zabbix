@@ -179,7 +179,6 @@ class testEscalations extends CIntegrationTest {
 	 * @backup actions,alerts,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledAction() {
-		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'status' => 1
@@ -205,7 +204,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,triggers,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledTrigger() {
-		$this->clearLog(self::COMPONENT_SERVER);
+		$this->skipLog(self::COMPONENT_SERVER);
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
 			'status' => 1
@@ -237,7 +236,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
 	public function testEscalations_checkScenario1() {
-		$this->clearLog(self::COMPONENT_SERVER);
+		$this->skipLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 		// Create maintenance period
 		self::$maint_start_tm = time();
