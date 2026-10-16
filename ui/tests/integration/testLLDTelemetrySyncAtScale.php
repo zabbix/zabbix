@@ -33,7 +33,7 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * @configurationDataProvider configurationProvider
  * @onAfter clearData
  */
-class testLLDAPMSyncAtScale extends CIntegrationTest {
+class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	const CLICKHOUSE_TIMEOUT = 10;
 
@@ -43,10 +43,10 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	const METRICS_METHOD = 'opentelemetry.proto.collector.metrics.v1.MetricsService/Export';
 	const OTLP_TIMEOUT = 10;
 
-	const HOSTNAME = 'test_lld_apm_sync_at_scale';
-	const TEMPLATE_NAME = 'test_lld_apm_sync_at_scale_template';
-	const PROXY_NAME = 'test_lld_apm_sync_at_scale_proxy';
-	const SERVICE_NAME = 'apm-sync-at-scale';
+	const HOSTNAME = 'test_lld_telemetry_sync_at_scale';
+	const TEMPLATE_NAME = 'test_lld_telemetry_sync_at_scale_template';
+	const PROXY_NAME = 'test_lld_telemetry_sync_at_scale_proxy';
+	const SERVICE_NAME = 'telemetry-sync-at-scale';
 	const METRIC_NAME = 'device.status';
 	const TQ_ITEM_KEY = 'apm.device.status.query';
 	const LLD_RULE_KEY = 'apm.device.discovery';
@@ -281,7 +281,7 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	 * Send the device list to the LLD rule and wait until one dependent item and one trigger is
 	 * discovered per device.
 	 */
-	public function testLLDAPMSyncAtScale_LLDDiscovery() {
+	public function testLLDTelemetrySyncAtScale_LLDDiscovery() {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$data = [];
@@ -308,9 +308,9 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	 * Make sure the proxy APM collector accepts data and writes it to ClickHouse before relying on it.
 	 * The proxy receives its APM configuration from the server, so the first sends may be rejected or dropped.
 	 *
-	 * @depends testLLDAPMSyncAtScale_LLDDiscovery
+	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
 	 */
-	public function testLLDAPMSyncAtScale_IngestPreflight() {
+	public function testLLDTelemetrySyncAtScale_IngestPreflight() {
 		// Proxy monitors no hosts, it only needs the APM configuration from the server.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 
@@ -342,18 +342,18 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	/**
 	 * Send status=1 for the problem devices and wait until it is stored in ClickHouse.
 	 *
-	 * @depends testLLDAPMSyncAtScale_IngestPreflight
+	 * @depends testLLDTelemetrySyncAtScale_IngestPreflight
 	 */
-	public function testLLDAPMSyncAtScale_TriggerFiringSend() {
+	public function testLLDTelemetrySyncAtScale_TriggerFiringSend() {
 		$this->sendStatusAndWaitStored(self::problemDeviceNames(), 1);
 	}
 
 	/**
 	 * Verify that exactly the triggers of the problem devices fire.
 	 *
-	 * @depends testLLDAPMSyncAtScale_TriggerFiringSend
+	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringSend
 	 */
-	public function testLLDAPMSyncAtScale_TriggerFiringVerify() {
+	public function testLLDTelemetrySyncAtScale_TriggerFiringVerify() {
 		$this->waitForOpenProblemCount(self::PROBLEM_DEVICE_COUNT);
 		$this->assertProblemDevices(self::problemDeviceNames());
 	}
@@ -361,18 +361,18 @@ class testLLDAPMSyncAtScale extends CIntegrationTest {
 	/**
 	 * Send status=0 for the same devices and wait until it is stored in ClickHouse.
 	 *
-	 * @depends testLLDAPMSyncAtScale_TriggerFiringVerify
+	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringVerify
 	 */
-	public function testLLDAPMSyncAtScale_TriggerRecoverySend() {
+	public function testLLDTelemetrySyncAtScale_TriggerRecoverySend() {
 		$this->sendStatusAndWaitStored(self::problemDeviceNames(), 0);
 	}
 
 	/**
 	 * Verify that all triggers recover.
 	 *
-	 * @depends testLLDAPMSyncAtScale_TriggerRecoverySend
+	 * @depends testLLDTelemetrySyncAtScale_TriggerRecoverySend
 	 */
-	public function testLLDAPMSyncAtScale_TriggerRecoveryVerify() {
+	public function testLLDTelemetrySyncAtScale_TriggerRecoveryVerify() {
 		$this->waitForOpenProblemCount(0);
 	}
 
