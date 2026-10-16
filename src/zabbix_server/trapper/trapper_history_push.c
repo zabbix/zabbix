@@ -695,9 +695,7 @@ static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json
 
 	zbx_user_init(&user);
 
-	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) ||
-			SUCCEED != zbx_db_check_user_perm2system(user.userid) ||
-			SUCCEED != check_user_role_permissions(&user))
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || SUCCEED != check_user_role_permissions(&user))
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;

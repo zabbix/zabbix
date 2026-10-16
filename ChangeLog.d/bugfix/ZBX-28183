@@ -1,1 +1,0 @@
-...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
