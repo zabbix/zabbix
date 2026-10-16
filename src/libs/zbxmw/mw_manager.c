@@ -176,6 +176,11 @@ static int	mw_manager_scale_workers(zbx_mw_manager_t *manager)
 			}
 		}
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get timekeeper statistics: %s", error);
+		zbx_free(error);
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() usage:%.1f low_load_ticks:%d", __func__, usage,
 			manager->low_load_ticks);
