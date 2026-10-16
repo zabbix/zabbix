@@ -7487,9 +7487,11 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     border-right-width: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-      content: attr(data-placeholder);
-      color: #bbbbbb !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
+      background-color: #383838; }
+      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+        content: attr(data-placeholder);
+        color: #bbbbbb !important; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #000000; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {

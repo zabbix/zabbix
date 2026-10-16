@@ -7484,9 +7484,11 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     border-right-width: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-      content: attr(data-placeholder);
-      color: #777777 !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
+      background-color: #ffffff; }
+      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+        content: attr(data-placeholder);
+        color: #777777 !important; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #f0f0f0; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {
