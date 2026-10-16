@@ -1301,7 +1301,6 @@ class CConfigurationExportBuilder {
 				'time_shift' => $item['time_shift'],
 				'lookback_limit' => $item['lookback_limit'],
 				'granularity' => $item['granularity'],
-				'storage_mode' => $item['storage_mode'],
 				'query' => $item['query']
 			];
 

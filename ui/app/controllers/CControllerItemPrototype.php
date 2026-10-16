@@ -78,7 +78,6 @@ abstract class CControllerItemPrototype extends CController {
 			'time_shift'			=> 'db items.time_shift',
 			'lookback_limit'		=> 'db items.lookback_limit',
 			'granularity'			=> 'db items.granularity',
-			'storage_mode'			=> 'in '.implode(',', [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE]),
 			'signal_type'			=> 'in '.implode(',', [CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS, CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS]),
 			'metric_point_type'		=> 'in '.implode(',', [CItemTypeTelemetryQuery::METRICS_POINT_SUM, CItemTypeTelemetryQuery::METRICS_POINT_GAUGE, CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM, CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM]),
 			'columns'				=> 'array',
@@ -184,7 +183,6 @@ abstract class CControllerItemPrototype extends CController {
 			'discover' => ZBX_PROTOTYPE_NO_DISCOVER,
 			'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
 			'output_format' => HTTPCHECK_STORE_RAW,
-			'storage_mode' => ITEM_STORAGE_MODE_MULTIPLE_VALUES,
 			'status' => ITEM_STATUS_DISABLED,
 			'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 			'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF

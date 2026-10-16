@@ -144,8 +144,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'uuid', 'time_shift', 'lookback_limit', 'granularity', 'storage_mode',
-				'query'
+				'verify_host', 'allow_traps', 'uuid', 'time_shift', 'lookback_limit', 'granularity', 'query'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
@@ -162,8 +161,7 @@ class CConfigurationExport {
 				'flags', 'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters',
 				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover', 'uuid', 'time_shift', 'lookback_limit', 'granularity',
-				'storage_mode', 'query'
+				'verify_host', 'allow_traps', 'discover', 'uuid', 'time_shift', 'lookback_limit', 'granularity', 'query'
 			],
 			'trigger_prototype' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments',
 				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',

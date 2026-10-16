@@ -24,9 +24,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	public const FIELD_NAMES = [
-		'time_shift', 'lookback_limit', 'granularity', 'storage_mode', 'query', 'timeout', 'delay'
-	];
+	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query', 'timeout', 'delay'];
 
 	public const SIGNAL_TYPE_TRACES = 0;
 	public const SIGNAL_TYPE_METRICS = 1;
@@ -139,7 +137,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
-			'storage_mode' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE]), 'length' => DB::getFieldLength('items', 'storage_mode'), 'default' => DB::getDefault('items', 'storage_mode')],
 			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
@@ -157,7 +154,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
-			'storage_mode' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE]), 'length' => DB::getFieldLength('items', 'storage_mode')],
 			'query' =>			['type' => API_OBJECT, 'flags' => $db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY ? 0 : API_REQUIRED, 'fields' => self::getQueryFieldValidationRules()],
 			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
@@ -175,7 +171,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
 			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
-			'storage_mode' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_STORAGE_MODE_MULTIPLE_VALUES, ITEM_STORAGE_MODE_SINGLE]), 'length' => DB::getFieldLength('items', 'storage_mode')],
 			'query' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
@@ -190,7 +185,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'time_shift' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'lookback_limit' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'granularity' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'storage_mode' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'query' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')

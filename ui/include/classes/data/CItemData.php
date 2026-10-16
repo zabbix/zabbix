@@ -944,8 +944,6 @@ final class CItemData {
 					'js-item-lookback-limit-field',
 					'js-item-granularity-label',
 					'js-item-granularity-field',
-					'js-item-storage-mode-label',
-					'js-item-storage-mode-field',
 					'js-item-delay-label',
 					'js-item-delay-field',
 					'delay',

@@ -30,7 +30,7 @@ class CItem extends CItemGeneral {
 		'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 		'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 		'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue', 'name_resolved',
-		'time_shift', 'lookback_limit', 'granularity', 'storage_mode', 'query'
+		'time_shift', 'lookback_limit', 'granularity', 'query'
 	];
 
 	/**
@@ -493,6 +493,8 @@ class CItem extends CItemGeneral {
 
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
 			unset($item['discover']);
+			// Make telemetry query field storage_mode inaccessible.
+			unset($item['storage_mode']);
 		}
 		unset($item);
 	}
