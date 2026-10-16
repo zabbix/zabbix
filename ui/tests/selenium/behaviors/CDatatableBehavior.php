@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -319,14 +320,14 @@ class CDatatableBehavior extends CBehavior {
 
 		try {
 			$button->click();
-			$this->test->query($dialog_selector)->waitUntilVisible();
+			$this->test->query($dialog_selector)->waitUntilVisible(3);
 		}
-		catch (Exception $e) {
+		catch (TimeoutException $e) {
 			$button->invalidate();
 			$button->click();
 		}
 
-		return $this->test->query($dialog_selector)->waitUntilVisible()->one();
+		return $this->test->query($dialog_selector)->waitUntilVisible(3)->one();
 	}
 
 	/**
