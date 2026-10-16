@@ -30,10 +30,10 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxexpr.h"
 #include "zbx_expression_constants.h"
 
 /******************************************************************************
