@@ -330,7 +330,6 @@ typedef struct
 	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
-	zbx_timespec_t		min_free_ts;
 	unsigned char		preprocessing;
 }
 zbx_dc_telemetry_query_item_t;
@@ -347,13 +346,11 @@ typedef union
 zbx_dc_poller_item_t;
 
 #define ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP	__UINT64_C(0x0001)
-#define ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS		__UINT64_C(0x0002)
 
 typedef struct
 {
 	zbx_uint64_t	upd_flags;
 	time_t		lasttimestamp;
-	zbx_timespec_t	min_free_ts;
 }
 zbx_dc_cached_data_t;
 
