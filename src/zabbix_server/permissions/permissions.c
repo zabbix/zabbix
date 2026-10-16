@@ -119,16 +119,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: makes sure that table ids has a nextid record for the specified   *
- *          table                                                             *
+ * Purpose: locks group set records and nextid record of the specified table  *
+ *          until the end of the transaction, creates the nextid record if it *
+ *          does not exist                                                    *
  *                                                                            *
  * Parameters: tablename - [IN] the name of a table                           *
  *                                                                            *
- * Return value: SUCCEED - nextid record exists or was created                *
+ * Return value: SUCCEED - records were locked                                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: Must be called before the table is cleared, so that the maximum  *
  *           id is calculated from the existing records.                      *
+ *           LLD and frontend transactions that reuse existing group          *
+ *           sets or create new ones wait for the rebuild to finish.          *
  *                                                                            *
  ******************************************************************************/
 static int	group_nextid_init(const char *tablename)
@@ -149,8 +152,19 @@ static int	group_nextid_init(const char *tablename)
 		goto out;
 	}
 
-	result = zbx_db_select_once("select nextid from ids where table_name='%s' and field_name='%s'", table->table,
-			table->recid);
+	result = zbx_db_select_once("select null from %s" ZBX_FOR_UPDATE, table->table);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot lock records of table %s", table->table);
+		ret = FAIL;
+		goto out;
+	}
+
+	zbx_db_free_result(result);
+
+	result = zbx_db_select_once("select nextid from ids where table_name='%s' and field_name='%s'" ZBX_FOR_UPDATE,
+			table->table, table->recid);
 
 	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
@@ -205,9 +219,8 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function is used only for the hgset and ugset tables.       *
- *           The nextid record is updated before it is read, so the record is *
- *           locked until the end of the transaction and the reserved range   *
- *           cannot be taken by the frontend or LLD server processes.         *
+ *           The nextid record is updated before it is read and locked until  *
+ *           the end of the transaction                                       *
  *                                                                            *
  ******************************************************************************/
 static int	group_nextid_reserve(const char *tablename, int num, zbx_uint64_t *first_id)
