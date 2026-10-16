@@ -9330,9 +9330,11 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-bottom-right-radius: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-      content: attr(data-placeholder);
-      color: #939ca4 !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
+      background-color: #001f42; }
+      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+        content: attr(data-placeholder);
+        color: #939ca4 !important; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #002956; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {

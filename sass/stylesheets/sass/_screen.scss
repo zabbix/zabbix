@@ -1240,9 +1240,13 @@ select {
 			padding-top: 1px;
 		}
 
-		&.multilineinput-preview-placeholder::before {
-			content: attr(data-placeholder);
-			color: $input-placeholder-color !important;
+		&.multilineinput-preview-placeholder {
+			background-color: $form-bg-color;
+
+			&::before {
+				content: attr(data-placeholder);
+				color: $input-placeholder-color !important;
+			}
 		}
 	}
 
