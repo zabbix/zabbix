@@ -56,7 +56,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
 	const LLD_DISCOVERY_COUNT = 10000;
-	const PROBLEM_DEVICE_COUNT = 10;
+	const PROBLEM_DEVICE_COUNT = 9999;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
 	const TRIGGER_ITERATIONS = 60;
