@@ -53,10 +53,13 @@ type smartMetric struct {
 // Plugin hold plugin data.
 type Plugin struct {
 	plugin.Base
+
 	options  Options
 	ctl      SmartController
 	cpuCount int
 	metrics  map[metricKey]*smartMetric
+
+	maxConsecutiveRaidErrors int
 }
 
 //nolint:gochecknoinits

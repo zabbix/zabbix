@@ -10568,6 +10568,10 @@ msgstr "משתמש בלתי נגיש"
 msgid "Inaccessible user group"
 msgstr "קבוצת משתמשים בלתי נגישה"
 
+#: include/classes/helpers/CItemGeneralHelper.php:276
+msgid "Inaccessible value mapping"
+msgstr ""
+
 #: jsLoader.php:153
 msgid "Inaccessible widget"
 msgstr "וידג׳ט בלתי נגיש"
@@ -13377,6 +13381,10 @@ msgstr "כמות החזרות המרבית"
 #: app/partials/configuration.host.interface.row.php:121
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "כמות החזרות המרבית חלה על גילוי ו־walk (הליכה) בלבד."
+
+#: app/partials/configuration.host.interface.row.php:116
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"

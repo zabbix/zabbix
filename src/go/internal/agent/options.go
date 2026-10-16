@@ -477,6 +477,10 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 }
 
 func ValidateOptions(options *AgentOptions) error {
+	if options.ProfilerDir == "" {
+		return errors.New("ProfilerDir cannot be empty")
+	}
+
 	var err error
 	var maxLen int
 

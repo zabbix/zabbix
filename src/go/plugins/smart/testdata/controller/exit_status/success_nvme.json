@@ -1,0 +1,27 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "argv": ["smartctl", "-a", "/dev/nvme0", "-j"],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/nvme0",
+    "info_name": "/dev/nvme0",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "TEST NVME 1TB",
+  "serial_number": "TEST-NVME-0001",
+  "firmware_version": "1.0",
+  "smart_status": {
+    "passed": true
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 32,
+    "percentage_used": 2,
+    "power_on_hours": 7908,
+    "media_errors": 0
+  }
+}

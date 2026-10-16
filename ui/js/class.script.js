@@ -316,7 +316,7 @@ class Script {
 			content.classList.add('confirmation-msg');
 			content.textContent = confirmation;
 
-			overlayDialogue({
+			const overlay = overlayDialogue({
 				title: dialogue_title,
 				content: content.outerHTML,
 				class: 'modal-popup modal-popup-small position-middle',
@@ -336,6 +336,9 @@ class Script {
 					}
 				]
 			}, trigger_element);
+
+			// Display the close button after the screen reader announces the dialog title.
+			overlay.$dialogue.$close_btn.show();
 		});
 	}
 
