@@ -9334,8 +9334,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
       content: attr(data-placeholder);
       color: #9d9d9d !important; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
-    background-color: #ebebeb;
-    line-height: 24px; }
+    background-color: #ebebeb; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {
     background-color: #ebebeb;
     border-color: #ccd5d9;
