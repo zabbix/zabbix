@@ -52,8 +52,8 @@
  * Return value:  SUCCEED - resolved successfully                             *
  *                                                                            *
  ******************************************************************************/
-static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
-		char **data, char *error, size_t maxerrlen)
+static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
 {
 	const char	*manualinput = va_arg(args, const char *);
 
@@ -61,11 +61,8 @@ static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	if (0 == p->indexed && NULL != p->macro && NULL != manualinput &&
-			0 == strcmp(p->macro, MVAR_MANUALINPUT))
-	{
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
 		*replace_to = zbx_strdup(*replace_to, manualinput);
-	}
 
 	return SUCCEED;
 }
@@ -595,15 +592,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command,
-				macro_type, error, sizeof(error)))
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type,
+				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
 		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid,
-				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig,
-				macro_type, error, sizeof(error)))
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type,
+				error, sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
