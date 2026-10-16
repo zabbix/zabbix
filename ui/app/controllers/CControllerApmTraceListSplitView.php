@@ -78,6 +78,7 @@ class CControllerApmTraceListSplitView extends CController {
 					'events', 'resource_attributes', 'span_attributes'],
 				'time_from' => $time_from,
 				'time_till' => $time_to,
+				'traceids' => [$traceid],
 				'sortfield' => 'timestamp',
 				'sortorder' => ZBX_SORT_UP
 			]);
