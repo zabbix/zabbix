@@ -37,6 +37,9 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 	_endthreadex(SUCCEED);
 }
 #else
+/* returns amount of data left to synchronize, used by main process to track shutdown progress */
+static zbx_threads_progress_func_t	progress_cb = NULL;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking.                           *
@@ -238,6 +241,101 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 	}
 }
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+static time_t	monotonic_time(void)
+{
+	struct timespec	ts;
+
+	if (0 != clock_gettime(CLOCK_MONOTONIC, &ts))
+		return time(NULL);
+
+	return ts.tv_sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: waits until processes with specified priority exit, terminates    *
+ *          them if shutdown stops making progress                            *
+ *                                                                            *
+ * Parameters: threads       - [IN/OUT] handles to processes                  *
+ *             threads_num   - [IN] number of handles                         *
+ *             threads_flags - [IN] thread priority flags                     *
+ *             priority      - [IN] wait for processes with this priority     *
+ *                                                                            *
+ * Comments: Shutdown makes progress while processes keep exiting or amount   *
+ *           of data left to synchronize keeps changing. Processes that are   *
+ *           busy synchronizing large amount of data are waited for without   *
+ *           timeout, while processes stuck on unresponsive database are      *
+ *           terminated after ZBX_SHUTDOWN_TIMEOUT seconds without progress.  *
+ *           Monotonic clock is used, so system clock changes and suspend do  *
+ *           not count as time without progress.                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority)
+{
+	struct timespec	poll_delay = {0, 100000000};
+	time_t		progress_time = 0;
+	zbx_uint64_t	backlog = 0, backlog_last = 0;
+	int		alive_last = -1, terminated = 0;
+
+	for (;;)
+	{
+		int	alive = 0;
+		time_t	now;
+
+		for (int i = 0; i < threads_num; i++)
+		{
+			pid_t	pid;
+			int	status;
+
+			if (!threads[i] || priority != threads_flags[i])
+				continue;
+
+			if (0 != (pid = waitpid(threads[i], &status, WNOHANG)) && (-1 != pid || EINTR != errno))
+			{
+				threads[i] = ZBX_THREAD_HANDLE_NULL;
+				continue;
+			}
+
+			alive++;
+		}
+
+		if (0 == alive)
+			break;
+
+		if (NULL != progress_cb)
+			backlog = progress_cb();
+
+		now = monotonic_time();
+
+		if (alive != alive_last || backlog != backlog_last)
+		{
+			alive_last = alive;
+			backlog_last = backlog;
+			progress_time = now;
+		}
+		else if (0 == terminated && ZBX_SHUTDOWN_TIMEOUT <= now - progress_time)
+		{
+			for (int i = 0; i < threads_num; i++)
+			{
+				if (!threads[i] || priority != threads_flags[i])
+					continue;
+
+				zabbix_log(LOG_LEVEL_WARNING, "process with PID %d made no shutdown progress for %d"
+						" seconds: terminating it, unsaved data may be lost", (int)threads[i],
+						ZBX_SHUTDOWN_TIMEOUT);
+
+				zbx_thread_kill_fatal(threads[i]);
+			}
+
+			terminated = 1;
+		}
+
+		nanosleep(&poll_delay, NULL);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Kills and waits until the threads are in the signalled state.     *
@@ -266,16 +364,7 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 	for (int j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
 	{
 		threads_kill(threads, threads_num, threads_flags, j, ret);
-
-		for (int i = 0; i < threads_num; i++)
-		{
-			if (!threads[i] || j != threads_flags[i])
-				continue;
-
-			zbx_thread_wait(threads[i]);
-
-			threads[i] = ZBX_THREAD_HANDLE_NULL;
-		}
+		threads_wait(threads, threads_num, threads_flags, j);
 	}
 
 	/* signal idle threads to exit */
@@ -298,6 +387,56 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets function used to track shutdown progress                     *
+ *                                                                            *
+ * Parameters: cb - [IN] returns amount of data left to synchronize           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_threads_set_progress_cb(zbx_threads_progress_func_t cb)
+{
+	progress_cb = cb;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: executes function in child process and waits for it to finish,    *
+ *          terminates child process if it stops making progress              *
+ *                                                                            *
+ * Parameters: func - [IN] function to execute                                *
+ *             args - [IN] function arguments                                 *
+ *                                                                            *
+ * Comments: Used by main process on shutdown to synchronize data with        *
+ *           database without risk of hanging on unresponsive database. If    *
+ *           child process cannot be created, function is executed by calling *
+ *           process.                                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_threads_exec_supervised(void (*func)(void *), void *args)
+{
+	pid_t	pid;
+	int	flags = ZBX_THREAD_PRIORITY_FIRST;
+
+	zbx_child_fork(&pid);
+
+	if (0 == pid)
+	{
+		func(args);
+		_exit(EXIT_SUCCESS);
+	}
+
+	if (-1 == pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot create process for database synchronization: %s",
+				zbx_strerror(errno));
+		func(args);
+		return;
+	}
+
+	threads_wait(&pid, 1, &flags, ZBX_THREAD_PRIORITY_FIRST);
+}
+
 void	zbx_pthread_init_attr(pthread_attr_t *attr)
 {
 	if (0 != pthread_attr_init(attr))

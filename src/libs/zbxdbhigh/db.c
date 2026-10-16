@@ -95,6 +95,9 @@ int	zbx_trigger_diff_compare_func(const void *d1, const void *d2)
 }
 
 static int	connection_failure;
+static int	db_read_only;		/* last connection attempt found database read-only */
+static time_t	db_down_since;		/* monotonic time when retrying of failed database operation started */
+static time_t	db_shutdown_since;	/* monotonic time when retrying process first noticed shutdown */
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;
 
@@ -247,13 +250,77 @@ void	zbx_db_init_autoincrement_options(void)
 	zbx_db_init_autoincrement_options_basic();
 }
 
+static time_t	db_monotonic_time(void)
+{
+	struct timespec	ts;
+
+	if (0 != clock_gettime(CLOCK_MONOTONIC, &ts))
+		return time(NULL);
+
+	return ts.tv_sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if retrying of failed database operation must be stopped   *
+ *          because of shutdown                                               *
+ *                                                                            *
+ * Return value: SUCCEED - shutdown is requested and database is unavailable  *
+ *                         for at least ZBX_SHUTDOWN_TIMEOUT seconds since    *
+ *                         shutdown request                                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Must be called only when database operation has failed because   *
+ *           database is down. Unavailability is counted from the later of    *
+ *           its start and shutdown request, so that data is not lost if      *
+ *           database comes back within the timeout, regardless of how long   *
+ *           it was down before shutdown or how long shutdown took before     *
+ *           database went down. Successful connection resets the count.      *
+ *           Read-only database is not counted as unavailable, it is waited   *
+ *           for indefinitely as without shutdown. Monotonic clock is used,   *
+ *           so system clock changes and suspend are not counted.             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_shutdown_timeout_expired(void)
+{
+	static int	logged;
+	time_t		now;
+
+	if (0 != ZBX_IS_RUNNING())
+		return FAIL;
+
+	/* read-only database is expected to become writable or go down, keep waiting for it as without shutdown */
+	if (0 != db_read_only)
+		return FAIL;
+
+	now = db_monotonic_time();
+
+	if (0 == db_shutdown_since)
+		db_shutdown_since = now;
+
+	if (0 == db_down_since)
+		db_down_since = now;
+
+	if (ZBX_SHUTDOWN_TIMEOUT > now - MAX(db_down_since, db_shutdown_since))
+		return FAIL;
+
+	if (0 == logged)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "shutting down while database is unavailable: unsaved data may be lost");
+		logged = 1;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: connect to the database                                           *
  *                                                                            *
  * Parameters: flag - ZBX_DB_CONNECT_ONCE (try once and return the result),   *
  *                    ZBX_DB_CONNECT_EXIT (exit on failure) or                *
- *                    ZBX_DB_CONNECT_NORMAL (retry until connected)           *
+ *                    ZBX_DB_CONNECT_NORMAL (retry until connected or         *
+ *                    zbx_db_shutdown_timeout_expired())                      *
  *                                                                            *
  * Return value: same as zbx_db_connect_basic()                               *
  *                                                                            *
@@ -292,7 +359,6 @@ int	zbx_db_connect(int flag)
 			/* before we decide whether to keep retrying. The actual connect/sleep below stays fully */
 			/* protected.                                                                            */
 			sigset_t	signal_mask, orig_mask;
-			int		running;
 
 			sigemptyset(&signal_mask);
 			sigaddset(&signal_mask, SIGUSR1);
@@ -304,14 +370,15 @@ int	zbx_db_connect(int flag)
 			if (0 > zbx_sigmask(SIG_UNBLOCK, &signal_mask, &orig_mask))
 				zabbix_log(LOG_LEVEL_WARNING, "cannot unblock signals in %s()", __func__);
 
-			running = ZBX_IS_RUNNING();
-
 			if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 				zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask in %s()", __func__);
-
-			if (0 == running)
-				break;
 		}
+
+		db_read_only = (ZBX_DB_RONLY == err ? 1 : 0);
+
+		/* connection is not re-established, skip waiting for HA manager recovery */
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
+			goto out;
 #if defined(HAVE_POSTGRESQL)
 		if (ZBX_DB_RONLY == err)
 		{
@@ -334,6 +401,12 @@ int	zbx_db_connect(int flag)
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
+	if (ZBX_DB_OK == err)
+	{
+		db_read_only = 0;
+		db_down_since = 0;
+	}
+
 	if (0 != connection_failure)
 	{
 		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
@@ -344,7 +417,7 @@ int	zbx_db_connect(int flag)
 		zbx_db_clear_last_errcode();
 #endif
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
@@ -376,7 +449,7 @@ static void	DBtxn_operation(int (*txn_operation)(void))
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 			break;
 
 		zbx_db_close();
@@ -490,7 +563,7 @@ int	zbx_db_end(int ret)
  *                                                                            *
  * Purpose: prepares a SQL statement for execution                            *
  *                                                                            *
- * Comments: retry until DB is up or shutdown is requested                    *
+ * Comments: retry until DB is up or shutdown timeout expires                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_statement_prepare(const char *sql)
@@ -501,7 +574,7 @@ void	zbx_db_statement_prepare(const char *sql)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 			break;
 
 		zbx_db_close();
@@ -521,7 +594,7 @@ void	zbx_db_statement_prepare(const char *sql)
  *                                                                            *
  * Purpose: execute a non-select statement                                    *
  *                                                                            *
- * Comments: retry until DB is up or shutdown is requested                    *
+ * Comments: retry until DB is up or shutdown timeout expires                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_execute(const char *fmt, ...)
@@ -535,7 +608,7 @@ int	zbx_db_execute(const char *fmt, ...)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 		{
 			/* ZBX_DB_FAIL is already a value zbx_db_vexecute() itself returns for a           */
 			/* non-recoverable error - callers already handle it, unlike the raw DOWN sentinel */
@@ -629,7 +702,7 @@ zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- * Comments: retry until DB is up or shutdown is requested                    *
+ * Comments: retry until DB is up or shutdown timeout expires                 *
  *                                                                            *
  ******************************************************************************/
 zbx_db_result_t	zbx_db_select(const char *fmt, ...)
@@ -643,7 +716,7 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 		{
 			/* callers already treat NULL as "query failed" (zbx_db_vselect() itself returns    */
 			/* NULL for a non-recoverable error) - returning the raw DOWN sentinel here instead */
@@ -672,7 +745,7 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Purpose: execute a select statement and get the first N entries            *
  *                                                                            *
- * Comments: retry until DB is up or shutdown is requested                    *
+ * Comments: retry until DB is up or shutdown timeout expires                 *
  *                                                                            *
  ******************************************************************************/
 zbx_db_result_t	zbx_db_select_n(const char *query, int n)
@@ -683,7 +756,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 		{
 			/* see zbx_db_select() - callers already handle NULL, never the raw DOWN sentinel */
 			rc = NULL;
@@ -3349,7 +3422,7 @@ retry_oracle:
 
 	if (ZBX_DB_DOWN == rc)
 	{
-		if (0 == ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_db_shutdown_timeout_expired())
 		{
 			ret = FAIL;
 			goto out;

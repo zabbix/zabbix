@@ -1179,6 +1179,25 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: writes data left in history and trend cache to database on exit   *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_sync_database_cache(void *args)
+{
+	ZBX_UNUSED(args);
+
+	if (ZBX_DB_OK != zbx_db_connect(ZBX_DB_CONNECT_ONCE))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to the database: unsaved history data is lost");
+		return;
+	}
+
+	zbx_sync_database_cache(&events_cbs, config_history_storage_pipelines);
+	zbx_db_close();
+}
+
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
@@ -1209,9 +1228,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 
-		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
-		zbx_db_close();
+		/* synchronize in child process, so that main process cannot hang on unresponsive database */
+		zbx_threads_exec_supervised(server_sync_database_cache, NULL);
+		zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 
 		zbx_free_configuration_cache();
 
@@ -1711,6 +1730,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
+
+	zbx_threads_set_progress_cb(zbx_hc_get_sync_backlog);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 

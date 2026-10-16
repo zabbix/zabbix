@@ -75,6 +75,10 @@
 	#define zbx_thread_kill_fatal(h)	kill(h, SIGHUP)
 #endif	/* _WINDOWS */
 
+/* time to wait during shutdown for unavailable database or for processes that make no progress, before giving up */
+/* and losing unsaved data                                                                                          */
+#define ZBX_SHUTDOWN_TIMEOUT	(SEC_PER_MIN * 2)
+
 typedef struct
 {
 	unsigned char	program_type;
@@ -100,6 +104,12 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_pthread_init_attr(pthread_attr_t *attr);
+
+/* returns amount of data left to synchronize, any change is treated as shutdown progress */
+typedef zbx_uint64_t	(*zbx_threads_progress_func_t)(void);
+
+void	zbx_threads_set_progress_cb(zbx_threads_progress_func_t cb);
+void	zbx_threads_exec_supervised(void (*func)(void *), void *args);
 #endif
 
 #endif	/* ZABBIX_THREADS_H */

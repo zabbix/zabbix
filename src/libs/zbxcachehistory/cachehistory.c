@@ -3567,17 +3567,20 @@ out:
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
+ * Comments: Must be called by main process (or its child process created     *
+ *           for synchronization) after other processes have exited.          *
+ *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
+void	zbx_sync_database_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sync_history_cache_full(events_cbs, config_history_storage_pipelines);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends(1, ZBX_DC_SYNC_TREND_MODE_FULL);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3590,7 +3593,7 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all(events_cbs, config_history_storage_pipelines);
+		zbx_sync_database_cache(events_cbs, config_history_storage_pipelines);
 
 	cache = NULL;
 
@@ -3726,6 +3729,25 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 	*items_num = cache->history_items.num_data;
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of history values and trends left to synchronize       *
+ *                                                                            *
+ * Comments: Used by main process to track shutdown progress, so cache is not *
+ *           locked to avoid blocking on lock held by a stuck process. The    *
+ *           result is only compared with previous one to detect changes.     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_hc_get_sync_backlog(void)
+{
+	const volatile ZBX_DC_CACHE	*hc = cache;
+
+	if (NULL == hc)
+		return 0;
+
+	return (zbx_uint64_t)hc->history_num + (zbx_uint64_t)hc->trends_num;
 }
 
 /******************************************************************************

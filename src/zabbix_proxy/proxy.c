@@ -1143,11 +1143,30 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&config_load_module);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: writes data left in history cache and proxy memory buffer to      *
+ *          database on exit                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxy_sync_database_cache(void *args)
+{
+	ZBX_UNUSED(args);
+
+	if (ZBX_DB_OK != zbx_db_connect(ZBX_DB_CONNECT_ONCE))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to the database: unsaved history data is lost");
+		return;
+	}
+
+	zbx_sync_database_cache(&events_cbs, config_history_storage_pipelines);
+	zbx_pb_flush();
+	zbx_db_close();
+}
+
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	zbx_pb_disable();
 
 	if (NULL != zbx_threads)
 	{
@@ -1160,12 +1179,17 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
+	/* Disable proxy buffer only after child processes have exited - a child process can hold its lock while */
+	/* waiting for database. Data written to memory buffer meanwhile is flushed to database below.          */
+	zbx_pb_disable();
+
 	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
-	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
-	zbx_pb_flush();
+	/* synchronize in child process, so that main process cannot hang on unresponsive database */
+	zbx_threads_exec_supervised(proxy_sync_database_cache, NULL);
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
+
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
 	zbx_db_close();
@@ -1753,6 +1777,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
+
+	zbx_threads_set_progress_cb(zbx_hc_get_sync_backlog);
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{

@@ -21,7 +21,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxmutexs.h"
-#include "zbxnix.h"
 #include "zbxnum.h"
 #include "zbxproxybuffer.h"
 #include "zbxshmem.h"
@@ -504,7 +503,7 @@ static void	pb_flush(zbx_pb_t *pb)
 
 			pb_flush_lastids(pb);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && 0 != ZBX_IS_RUNNING());
+		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
 	}
 
 	pb_history_clear(pb, UINT64_MAX);
