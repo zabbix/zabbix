@@ -879,7 +879,18 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
 			$this->assertEquals($data['graphs_amount'],
-					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
+					$this->query('xpath://tbody/tr/td//div[@class="flickerfreescreen"]')->all()->count());
+
+			// Every graph is preceded by its name as text: "<host name>: <graph or item name>", linking to the graph.
+			$titles = $this->query('xpath://tbody/tr/td/div[@class="chart-title"]/a')->all();
+			$this->assertEquals($data['graphs_amount'], $titles->count());
+
+			foreach ($titles as $title) {
+				$this->assertMatchesRegularExpression('/^Host_for_monitoring_graphs_\d: .+$/', $title->getText());
+				$this->assertMatchesRegularExpression('/(zabbix\.php\?action=charts\.view|history\.php)/',
+						$title->getAttribute('href')
+				);
+			}
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
