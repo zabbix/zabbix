@@ -422,6 +422,13 @@ void	zbx_threads_exec_supervised(void (*func)(void *), void *args)
 
 	if (0 == pid)
 	{
+		sigset_t	mask;
+
+		/* calling process can be in signal handler with SIGHUP blocked, it must not prevent termination */
+		sigemptyset(&mask);
+		sigaddset(&mask, SIGHUP);
+		zbx_sigmask(SIG_UNBLOCK, &mask, NULL);
+
 		func(args);
 		_exit(EXIT_SUCCESS);
 	}

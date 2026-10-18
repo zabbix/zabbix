@@ -43,6 +43,7 @@ typedef struct
 	int			num;
 	int			disable_from;
 	unsigned char		value_type;
+	unsigned char		flushing;	/* trend is being written to database by exiting history syncer */
 }
 ZBX_DC_TREND;
 
