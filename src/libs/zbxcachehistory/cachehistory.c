@@ -980,11 +980,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 					last_trend_discard = ts.sec;
 				}
 
-				trend->clock = 0;
-				trend->num = 0;
-				memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
-				memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
-				memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
+				dc_trend_reset(trend);
 			}
 			else
 			{
