@@ -20,7 +20,6 @@
 #include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
-#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbx_trigger_constants.h"
