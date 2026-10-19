@@ -83,6 +83,18 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+# split URL into scheme, userinfo, host (possibly bracketed IPv6), port and the rest
+CH_URL_REGEX='^([A-Za-z][A-Za-z0-9+.-]*://)?([^/?#@]*@)?(\[[^]/]*\]|[^]/?#:[]*)(:[0-9]*)?(.*)$'
+
+if [[ $CH_URL =~ $CH_URL_REGEX ]] && [ -z "${BASH_REMATCH[4]}" ]; then
+	CH_PORT=8123
+	if [ "${BASH_REMATCH[1],,}" = "https://" ]; then
+		CH_PORT=8443
+	fi
+
+	CH_URL="${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[3]}:$CH_PORT${BASH_REMATCH[5]}"
+fi
+
 CH_CURL_AUTH=""
 if [ -n "$CH_USER" ]; then
 	CH_CURL_AUTH="-u $CH_USER:$CH_PASSWORD"
