@@ -308,7 +308,12 @@ class testUserMacroPermissions extends CAPITest {
 		$this->authorize($login['username'], $login['password']);
 		$result = $this->call('usermacro.get', $request);
 
-		$this->assertArrayHasKey('result', $result);
+		// Result order is not guaranteed without sortfield, compare regardless of order.
+		if (is_array($expected) && $expected) {
+			CTestArrayHelper::usort($expected, ['hostmacroid']);
+			CTestArrayHelper::usort($result['result'], ['hostmacroid']);
+		}
+
 		$this->assertSame($expected, $result['result']);
 	}
 
