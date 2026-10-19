@@ -21,7 +21,6 @@
 #include "zbxserialize.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
-#include "zbxdbwrap.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
