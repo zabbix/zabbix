@@ -171,14 +171,14 @@ class CApmTrace extends CApmGeneral {
 		$timestamp_unix_nano = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 'ti');
 
 		if ($options['min_duration'] !== null) {
-			$having_root[] = 'argMin(ti.Duration,ti.ParentSpanId=\'\')>={min_duration:Int64}';
+			$having_root[] = 'argMinIf(ti.Duration,ti.Timestamp,ti.ParentSpanId=\'\')>={min_duration:Int64}';
 			$having_no_root[] =
 				'max('.$timestamp_unix_nano.'+ti.Duration)-min('.$timestamp_unix_nano.')>={min_duration:Int64}';
 			$inner_query->param('min_duration', $options['min_duration']);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$having_root[] = 'argMin(ti.Duration,ti.ParentSpanId=\'\')<={max_duration:Int64}';
+			$having_root[] = 'argMinIf(ti.Duration,ti.Timestamp,ti.ParentSpanId=\'\')<={max_duration:Int64}';
 			$having_no_root[] =
 				'max('.$timestamp_unix_nano.'+ti.Duration)-min('.$timestamp_unix_nano.')<={max_duration:Int64}';
 			$inner_query->param('max_duration', $options['max_duration']);
