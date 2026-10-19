@@ -150,8 +150,16 @@ class CUrlValidator extends CValidator {
 			return false;
 		}
 
-		if (array_key_exists('scheme', $url_parts) && $this->options['schemes'] !== null) {
-			if (!in_array(strtolower($url_parts['scheme']), $this->options['schemes'], true)) {
+		if ($this->options['schemes'] !== null) {
+			if (array_key_exists('scheme', $url_parts)) {
+				if (!in_array(strtolower($url_parts['scheme']), $this->options['schemes'], true)) {
+					$this->setError(_('unacceptable URL scheme'));
+
+					return false;
+				}
+			}
+			elseif (str_starts_with(strtolower($value), 'javascript:')
+					&& !in_array('javascript', $this->options['schemes'], true)) {
 				$this->setError(_('unacceptable URL scheme'));
 
 				return false;
