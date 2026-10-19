@@ -42,7 +42,8 @@ class CApmTrace extends CApmGeneral {
 		'links'					=> ['Links.TraceId', 'Links.SpanId', 'Links.TraceState', 'Links.Attributes'],
 		'has_root_span'			=> 'has_root_span',
 		'span_count'			=> 'span_count',
-		'error_count'			=> 'error_count'
+		'error_count'			=> 'error_count',
+		'calculated_duration'	=> 'calculated_duration'
 	];
 
 	protected const CLICKHOUSE_FIELDS = [
@@ -67,9 +68,10 @@ class CApmTrace extends CApmGeneral {
 		'Links.SpanId'			=> ['links', 'spanid'],
 		'Links.TraceState'		=> ['links', 'trace_state'],
 		'Links.Attributes'		=> ['links', 'attributes'],
-		'has_root_span'				=> 'has_root_span',
+		'has_root_span'			=> 'has_root_span',
 		'span_count'			=> 'span_count',
-		'error_count'			=> 'error_count'
+		'error_count'			=> 'error_count',
+		'calculated_duration'	=> 'calculated_duration'
 	];
 
 	/**
@@ -248,27 +250,44 @@ class CApmTrace extends CApmGeneral {
 			$table_schema = $db_schema['otel_traces'];
 
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
-				if ($field === 'span_count') {
-					$query->select('count()', $field);
-				}
-				elseif ($field === 'error_count') {
-					$query->select('countIf(t.StatusCode=\'Error\')', $field);
-				}
-				elseif ($field === 'has_root_span') {
-					$query->select('countIf(ParentSpanId=\'\')>0', $field);
-				}
-				else {
-					$custom_select = CClickHouseHelper::getCustomTypeSelect($table_schema[$field]['type'], $field, 't');
+				switch ($field) {
+					case 'span_count':
+						$query->select('count()', $field);
+						break;
 
-					$select = $custom_select ?? 't.'.$field;
-					$select_alias = $custom_select !== null ? $field : null;
+					case 'error_count':
+						$query->select('countIf(t.StatusCode=\'Error\')', $field);
+						break;
 
-					if ($field !== 'TraceId') {
-						$select = 'argMin('.$select.',tuple(t.ParentSpanId!=\'\',t.Timestamp))';
-						$select_alias = $field;
-					}
+					case 'has_root_span':
+						$query->select('countIf(t.ParentSpanId=\'\')>0', $field);
+						break;
 
-					$query->select($select, $select_alias);
+					case 'calculated_duration':
+						$timestamp_unix_nano =
+							CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 't');
+
+						$query->select('if (countIf(ParentSpanId=\'\')>0,'.
+							'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\'),'.
+							'max('.$timestamp_unix_nano.'+t.Duration)-min('.$timestamp_unix_nano.'))',
+							$field
+						);
+						break;
+
+					default:
+						$custom_select = CClickHouseHelper::getCustomTypeSelect($table_schema[$field]['type'], $field,
+							't'
+						);
+
+						$select = $custom_select ?? 't.'.$field;
+						$select_alias = $custom_select !== null ? $field : null;
+
+						if ($field !== 'TraceId') {
+							$select = 'argMin('.$select.',tuple(t.ParentSpanId!=\'\',t.Timestamp))';
+							$select_alias = $field;
+						}
+
+						$query->select($select, $select_alias);
 				}
 			}
 
