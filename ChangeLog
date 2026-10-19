@@ -1,8 +1,11 @@
 Changes for 8.0.0rc2
 
 New features:
+A.F.....S. [ZBXNEXT-10625] added support of Elasticsearch 8.x and 9.x (kastafjevs, Sasha)
+A.F.....S. [ZBXNEXT-10844] updated the minimum supported Elasticsearch version to 8.0 (Sasha)
 
 Bug fixes:
+........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
 ...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
 
@@ -588,7 +591,6 @@ Bug fixes:
 ........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
 ..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
 ..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
-.........T [ZBX-24844] fixed Linux template (kflorowski)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
 .......PS. [ZBX-27888] resumed VMware data collection after pause of more than 1 hour (MVekslers)
@@ -2225,7 +2227,6 @@ Bug fixes:
 ........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
 ..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
 ..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
-.........T [ZBX-24844] fixed Linux template (kflorowski)
 ...G...... [ZBX-27925] added AI_NUMERICHOST flag to suppress potentially lengthy network host address lookups (jburlakovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
