@@ -292,8 +292,8 @@ class TraceViewPage {
 		row_element.classList.add('trace-waterfall-row');
 		row_element.dataset.spanId = span.id;
 
-		let start = 0;
-		let width = 0;
+		let bar_start = 0;
+		let bar_width = 0;
 
 		const span_color = span.color || this.#getColor(span.index || 0);
 
@@ -304,13 +304,13 @@ class TraceViewPage {
 			label.classList.add('trace-span-label');
 			label.textContent = this.#formatTime(value, this.#getTimeUnit(value));
 
-			start = this.#getClampedStartRatio(span) * 100;
-			width = start + this.#getClampedWidthRatio(span) * 100;
+			bar_start = this.#getClampedStartRatio(span) * 100;
+			bar_width = this.#getClampedWidthRatio(span) * 100;
 
 			const bar = document.createElement('div');
 			bar.classList.add('trace-span-bar');
-			bar.style.setProperty('--trace-span-start', `${start}%`);
-			bar.style.setProperty('--trace-span-width', `${width}%`);
+			bar.style.setProperty('--trace-span-start', `${bar_start}%`);
+			bar.style.setProperty('--trace-span-width', `${bar_width}%`);
 			bar.style.setProperty('--trace-span-color', span_color);
 			bar.appendChild(label);
 
@@ -325,7 +325,7 @@ class TraceViewPage {
 			marker.style.setProperty('--trace-event-position', `${marker_position}%`);
 			marker.style.setProperty('--trace-marker-border-color', span_color);
 
-			if (start > marker_position || marker_position > start + width) {
+			if (bar_width === 0 || bar_start > marker_position || marker_position > bar_start + bar_width) {
 				marker.style.setProperty('--trace-marker-bg-color', span_color);
 			}
 

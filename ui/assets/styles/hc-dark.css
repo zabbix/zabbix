@@ -3041,7 +3041,7 @@ button {
     display: flex;
     align-items: center;
     height: inherit;
-    background-color: #383838; }
+    background-color: #333333; }
   #datatable-traces .duration .duration-time-units {
     z-index: 1;
     display: flex;

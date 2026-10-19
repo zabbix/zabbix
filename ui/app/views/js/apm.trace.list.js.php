@@ -534,7 +534,7 @@
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-			row_selected.focus();
+			row_selected?.focus();
 
 			this.#selected_traceid = null;
 
