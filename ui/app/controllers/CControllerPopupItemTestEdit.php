@@ -211,12 +211,14 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 
 		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
-			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
-			$item_flags = $this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE
-				? ZBX_FLAG_DISCOVERY_PROTOTYPE
-				: ZBX_FLAG_DISCOVERY_NORMAL;
+			$item = [
+				'flags' => $this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE
+					? ZBX_FLAG_DISCOVERY_PROTOTYPE
+					: ZBX_FLAG_DISCOVERY_NORMAL,
+				'query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())
+			];
 
-			if (!CItemTypeTelemetryQuery::validateFilter($item, $item_flags, '', $error)) {
+			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
 				error($error);
 
 				return false;

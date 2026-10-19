@@ -323,13 +323,14 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Validate "query.filter":
 	 * - for "evaltype" CONDITION_EVAL_TYPE_EXPRESSION each "formulaid" should be in use by "formula" field
 	 * - "filter.conditions[].column" contains value allowed by "query.signal_type", "query.metric_point_type"
+	 * - "filter.conditions[].value" of item and item prototype for numeric "filter.conditions.column" support user macro
+	 * - "filter.conditions[].value" of item prototype for numeric "filter.conditions.column" support lld macro
 	 *
 	 * @param array       $item        Telemetry item to validate.
-	 * @param int         $item_flags  Item flags.
 	 * @param string      $path        Path in validation message.
 	 * @param string|null $error       Error message when validation fails, set by reference.
 	 */
-	public static function validateFilter(array $item, int $item_flags, string $path, ?string &$error): bool {
+	public static function validateFilter(array $item, string $path, ?string &$error): bool {
 		if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			$condition_formula_parser = new CConditionFormulaParser();
 			$condition_formula_parser->parse($item['query']['filter']['formula']);
@@ -361,7 +362,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			self::SIGNAL_TYPE_METRICS =>	self::METRICS_CONDITIONS_COLUMN[$item['query']['metric_point_type']],
 			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
 		};
-		$api_allow_lld_macro = $item_flags == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+		$api_allow_lld_macro = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
 			'value' =>		['type' => API_MULTIPLE, 'rules' => [
