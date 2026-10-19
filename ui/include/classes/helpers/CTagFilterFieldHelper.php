@@ -108,6 +108,7 @@ class CTagFilterFieldHelper {
 				->setAttribute('placeholder', $name_placeholder)
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CSelect($options['tag_field_name'].'['.$index.'][operator]'))
+				->setId($options['tag_field_name'].'_'.$index.'_operator')
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),
 					TAG_OPERATOR_EQUAL => _('Equals'),
@@ -122,7 +123,6 @@ class CTagFilterFieldHelper {
 			))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setId($options['tag_field_name'].'_'.$index.'_operator'),
 			(new CCol(
 				(new CButton($options['tag_field_name'].'['.$index.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
