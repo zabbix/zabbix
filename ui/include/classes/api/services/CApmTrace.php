@@ -40,6 +40,7 @@ class CApmTrace extends CApmGeneral {
 		'status_message'		=> 'StatusMessage',
 		'events'				=> ['Events.Timestamp', 'Events.Name', 'Events.Attributes'],
 		'links'					=> ['Links.TraceId', 'Links.SpanId', 'Links.TraceState', 'Links.Attributes'],
+		'has_root_span'			=> 'has_root_span',
 		'span_count'			=> 'span_count',
 		'error_count'			=> 'error_count'
 	];
@@ -66,6 +67,7 @@ class CApmTrace extends CApmGeneral {
 		'Links.SpanId'			=> ['links', 'spanid'],
 		'Links.TraceState'		=> ['links', 'trace_state'],
 		'Links.Attributes'		=> ['links', 'attributes'],
+		'has_root_span'				=> 'has_root_span',
 		'span_count'			=> 'span_count',
 		'error_count'			=> 'error_count'
 	];
@@ -251,6 +253,9 @@ class CApmTrace extends CApmGeneral {
 				}
 				elseif ($field === 'error_count') {
 					$query->select('countIf(t.StatusCode=\'Error\')', $field);
+				}
+				elseif ($field === 'has_root_span') {
+					$query->select('countIf(ParentSpanId=\'\')>0', $field);
 				}
 				else {
 					$custom_select = CClickHouseHelper::getCustomTypeSelect($table_schema[$field]['type'], $field, 't');
