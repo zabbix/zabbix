@@ -178,7 +178,7 @@ class CTestDataHelper {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
-		self::createMacroReferences(self::getConvertedValueReferences($macro_templates));
+		self::prepareMacroReferences($macro_templates);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -258,7 +258,7 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
-		self::createMacroReferences(self::getConvertedValueReferences($macro_hosts));
+		self::prepareMacroReferences($macro_hosts);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -272,18 +272,27 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'proxyid');
 	}
 
-	private static function createMacroReferences(array $hostids): void {
-		if (!$hostids) {
+	/**
+	 * Store references to macros of the given hosts or templates, keyed by macro and owner, so that both
+	 * `:user_macro:{$X}:host:my.name` and the short `:user_macro:{$X}` (last created owner) can be resolved.
+	 *
+	 * @param array $host_refs  Owner references, e.g. `:host:my.name` or `:template:my.name`.
+	 */
+	private static function prepareMacroReferences(array $host_refs): void {
+		if (!$host_refs) {
 			return;
 		}
 
+		$host_refs = array_combine(self::getConvertedValueReferences($host_refs), $host_refs);
+
 		$db_macros = CDataHelper::call('usermacro.get', [
-			'output' => ['hostmacroid', 'macro'],
-			'hostids' => $hostids
+			'output' => ['hostmacroid', 'hostid', 'macro'],
+			'hostids' => array_keys($host_refs)
 		]);
 
 		foreach ($db_macros as $db_macro) {
-			self::$objectids['user_macro'][$db_macro['macro']] = $db_macro['hostmacroid'];
+			self::$objectids['user_macro'][$db_macro['macro']][$host_refs[$db_macro['hostid']]] =
+				$db_macro['hostmacroid'];
 		}
 	}
 
