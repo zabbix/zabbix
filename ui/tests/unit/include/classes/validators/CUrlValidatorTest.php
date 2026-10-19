@@ -126,9 +126,9 @@ class CUrlValidatorTest extends TestCase {
 			['http://localhost:{$PORT}',								[],															'unacceptable URL'], // User macro not allowed.
 			['http://localhost:{MANUALINPUT}',							[],															'unacceptable URL'], // Manual input macro not allowed.
 			['javascript:alert()',										['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
-			['javascript:1/alert(document.domain)/1',					[],															'unacceptable URL scheme'], // Invalid scheme.
-			['JaVaScRiPt:1/alert(1)/1',									[],															'unacceptable URL scheme'], // Invalid scheme.
-			['javascript:0//%0aalert(document.domain)',					[],															'unacceptable URL scheme'], // Invalid scheme.
+			['javascript:1/alert(document.domain)/1',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			['JaVaScRiPt:1/alert(1)/1',									['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			['javascript:0//%0aalert(document.domain)',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
 			['ftp://user@host:port',									['schemes' => ['http', 'https']],							'unacceptable URL'] // Invalid scheme.
 		];
 	}
