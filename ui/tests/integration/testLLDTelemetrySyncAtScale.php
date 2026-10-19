@@ -89,6 +89,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	/* host name => hostid, host name is also the site of its devices */
 	private static $hostids = [];
+	private static $lld_ruleids = [];
 	private static $proxyid;
 
 	/**
@@ -141,13 +142,6 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
-		$response = $this->call('hostgroup.get', [
-			'filter' => ['name' => ['Zabbix servers']],
-			'output' => ['groupid']
-		]);
-		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
-		$groupid = $response['result'][0]['groupid'];
-
 		// The proxy is only used as the APM (OTLP) collector; the hosts are monitored by the server.
 		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
@@ -161,11 +155,23 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['proxyids']);
 		self::$proxyid = $response['result']['proxyids'][0];
 
+		return true;
+	}
+
+	/**
+	 * Create a host for every site.
+	 */
+	private function createSiteHosts(): void {
+		$response = $this->call('hostgroup.get', [
+			'filter' => ['name' => ['Zabbix servers']],
+			'output' => ['groupid']
+		]);
+		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
+		$groupid = $response['result'][0]['groupid'];
+
 		foreach (self::hostNames() as $host) {
 			self::$hostids[$host] = $this->createSiteHost($host, $groupid);
 		}
-
-		return true;
 	}
 
 	/**
@@ -214,7 +220,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$tq_itemid = $response['result']['itemids'][0];
 
 		// Granularity and lookback limit equal to the window give a single bucket, polling more often than the
-		// window slides it, so every poll returns each device that reported within the last window once.
+		// window slides it, so every poll returns each device that reported within the last window once. Every
+		// poll reads the whole window again and late data is picked up by the next one, so there is no time shift.
 		$response = $this->call('discoveryrule.create', [
 			'hostid' => $hostid,
 			'name' => 'APM device discovery',
@@ -222,7 +229,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'timeout' => '3s',
 			'delay' => self::DISCOVERY_DELAY,
-			'time_shift' => self::TQ_TIME_SHIFT,
+			'time_shift' => '0s',
 			'lookback_limit' => self::DISCOVERY_WINDOW,
 			'granularity' => self::DISCOVERY_WINDOW,
 			'query' => [
@@ -243,6 +250,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 		$lld_ruleid = $response['result']['itemids'][0];
+		self::$lld_ruleids[] = $lld_ruleid;
 
 		// Each dependent item keeps only rows of its own device and extracts the aggregated status. JSONPath as
 		// the first step lets all dependent items share one parsed and indexed master value, rows of other
@@ -311,6 +319,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			$response = CAPIHelper::call('host.delete', array_values(self::$hostids));
 			self::assertArrayHasKey('hostids', $response['result']);
 			self::$hostids = [];
+			self::$lld_ruleids = [];
 		}
 
 		if (self::$proxyid !== null) {
@@ -357,8 +366,9 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Every device reports status=0 once, the LLD rule of every host discovers the devices of its site from the
-	 * stored data. Wait until one dependent item and one trigger is discovered per device.
+	 * Create the site hosts, then every device reports status=0 once and the LLD rule of every host discovers the
+	 * devices of its site from the stored data. Wait until one dependent item and one trigger is discovered per
+	 * device.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_IngestPreflight
 	 */
@@ -368,6 +378,18 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			$devices[$host] = self::deviceNames();
 		}
 		$this->sendStatusAndWaitStored($devices, 0);
+
+		$this->createSiteHosts();
+		// Data is already stored when the first poll of the LLD rule runs, so devices are discovered by it.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Do not wait for the first scheduled poll of the LLD rules, it may be up to DISCOVERY_DELAY away.
+		$tasks = [];
+		foreach (self::$lld_ruleids as $lld_ruleid) {
+			$tasks[] = ['type' => ZBX_TM_TASK_CHECK_NOW, 'request' => ['itemid' => $lld_ruleid]];
+		}
+		$response = $this->call('task.create', $tasks);
+		$this->assertArrayHasKey('taskids', $response['result']);
 
 		// Discovery work grows with the number of hosts.
 		$this->callUntilCountIsPresent('item.get', [
