@@ -26,6 +26,7 @@
 #include "proxy.h"
 #include "../events.h"
 #include "lld_protocol.h"
+#include "sha512crypt.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -113,10 +114,15 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
+		if (NULL != error)
 		{
-			diff.error = error;
-			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(error, diff.error_hash);
+
+			if (0 != memcmp(item.error_hash, diff.error_hash, sizeof(item.error_hash)))
+			{
+				diff.error = error;
+				diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			}
 		}
 	}
 
