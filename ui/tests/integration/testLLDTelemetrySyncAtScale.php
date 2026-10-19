@@ -83,12 +83,21 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const TQ_TIME_SHIFT = '5s';
 	const TQ_LOOKBACK_LIMIT = '1h';
 
+	/* granularity smaller than delay, every poll returns several buckets of a device that reported more than once */
+	const SMALL_TQ_GRANULARITY = '1s';
+	/* every status is sent twice a second apart, a poll may hold both buckets of a device, keep the rows of a host */
+	/* within ZBX_TQ_MAX_RESULT_ROWS (10000) */
+	const SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT = 4096;
+	const SMALL_GRANULARITY_SEND_COUNT = 2;
+
 	/* devices that reported within the window are discovered, one bucket per window gives one row per device */
 	const DISCOVERY_DELAY = '1m';
 	const DISCOVERY_WINDOW = '1h';
 
 	/* host name => hostid, host name is also the site of its devices */
 	private static $hostids = [];
+	/* host name => itemid of the Telemetry query item */
+	private static $tq_itemids = [];
 	private static $lld_ruleids = [];
 	private static $proxyid;
 
@@ -218,6 +227,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 		$tq_itemid = $response['result']['itemids'][0];
+		self::$tq_itemids[$host] = $tq_itemid;
 
 		// Granularity and lookback limit equal to the window give a single bucket, polling more often than the
 		// window slides it, so every poll returns each device that reported within the last window once. Every
@@ -319,6 +329,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			$response = CAPIHelper::call('host.delete', array_values(self::$hostids));
 			self::assertArrayHasKey('hostids', $response['result']);
 			self::$hostids = [];
+			self::$tq_itemids = [];
 			self::$lld_ruleids = [];
 		}
 
@@ -447,6 +458,67 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->waitForOpenProblemCount(0);
 	}
 
+	/**
+	 * Switch the Telemetry query items to granularity smaller than their delay, so a poll returns several buckets
+	 * of the same device.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_TriggerRecoveryVerify
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityUpdate() {
+		$items = [];
+		foreach (self::$tq_itemids as $itemid) {
+			$items[] = ['itemid' => $itemid, 'granularity' => self::SMALL_TQ_GRANULARITY];
+		}
+		$response = $this->call('item.update', $items);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertCount(self::HOST_COUNT, $response['result']['itemids']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Send status=1 for the problem devices of all sites, then again a second later, so every device has a bucket
+	 * per send, and wait until it is stored in ClickHouse.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityUpdate
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringSend() {
+		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 1,
+				self::SMALL_GRANULARITY_SEND_COUNT);
+	}
+
+	/**
+	 * Verify that exactly the triggers of the problem devices fire on every host.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringSend
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringVerify() {
+		$this->waitForOpenProblemCount(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT * self::HOST_COUNT);
+
+		foreach (self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT) as $host => $devices) {
+			$this->assertProblemDevices($host, $devices);
+		}
+	}
+
+	/**
+	 * Send status=0 for the same devices, then again a second later, and wait until it is stored in ClickHouse.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringVerify
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoverySend() {
+		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 0,
+				self::SMALL_GRANULARITY_SEND_COUNT);
+	}
+
+	/**
+	 * Verify that all triggers recover.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoverySend
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoveryVerify() {
+		$this->waitForOpenProblemCount(0);
+	}
+
 	private static function hostNames(): array {
 		$hosts = [];
 		for ($i = 1; $i <= self::HOST_COUNT; $i++) {
@@ -473,10 +545,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 *
 	 * @return array  host name => device names
 	 */
-	private static function problemDevices(): array {
+	private static function problemDevices(int $count = self::PROBLEM_DEVICE_COUNT): array {
 		$devices = [];
 		foreach (self::hostNames() as $index => $host) {
-			$devices[$host] = self::problemDeviceNames($index);
+			$devices[$host] = self::problemDeviceNames($index, $count);
 		}
 
 		return $devices;
@@ -487,10 +559,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * sensor10..19) are covered. Every next site starts one device later, so sites do not have the same problem
 	 * devices and rows of another site leaking into the query of a host fire a trigger that must not fire.
 	 */
-	private static function problemDeviceNames(int $site_index): array {
-		$step = intdiv(self::LLD_DISCOVERY_COUNT, self::PROBLEM_DEVICE_COUNT);
+	private static function problemDeviceNames(int $site_index, int $count): array {
+		$step = intdiv(self::LLD_DISCOVERY_COUNT, $count);
 		$devices = [];
-		for ($i = 0; $i < self::PROBLEM_DEVICE_COUNT; $i++) {
+		for ($i = 0; $i < $count; $i++) {
 			$devices[] = self::SENSOR_BASE.(1 + ($i * $step + $site_index) % self::LLD_DISCOVERY_COUNT);
 		}
 
@@ -498,16 +570,26 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * Send the status $send_count times, a second apart, so with granularity of a second every send of a device is
+	 * a bucket of its own.
+	 *
 	 * @param array $devices  site => device names
 	 */
-	private function sendStatusAndWaitStored(array $devices, int $status): void {
+	private function sendStatusAndWaitStored(array $devices, int $status, int $send_count = 1): void {
 		$baseline = $this->getStoredStatusCount($status);
 
-		$error = null;
-		$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
-				'Failed to send status='.$status.' data points: '.$error);
+		for ($i = 1; $i <= $send_count; $i++) {
+			if ($i > 1) {
+				sleep(1);
+			}
 
-		$this->assertStoredStatusIncreasedBy($status, $baseline, array_sum(array_map('count', $devices)));
+			$error = null;
+			$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
+					'Failed to send status='.$status.' data points (send '.$i.' of '.$send_count.'): '.$error);
+		}
+
+		$this->assertStoredStatusIncreasedBy($status, $baseline,
+				array_sum(array_map('count', $devices)) * $send_count);
 	}
 
 	private function waitForOpenProblemCount(int $expected): void {
