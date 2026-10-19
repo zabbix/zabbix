@@ -741,19 +741,30 @@ class testHistoryGet extends CIntegrationTest {
 			'excludeSearch' => true
 		]);
 		$this->assertCount(1, $response['result']);
-		$this->assertEquals('no match here', $response['result'][0]['value']);
+		$this->assertSame('no match here', $response['result'][0]['value']);
 
-		// startSearch on text: only 'contains alpha keyword' starts with 'contains alpha'
+		// startSearch on text: only 'no match here' starts with 'no'
 		$response = $this->call('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'contains alpha'],
+			'search' => ['value' => 'no'],
 			'startSearch' => true
 		]);
 		$this->assertCount(1, $response['result']);
-		$this->assertEquals('contains alpha keyword', $response['result'][0]['value']);
+		$this->assertSame('no match here', $response['result'][0]['value']);
+
+		// startSearch on text: no records start with 'ontains'.
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'ontains'],
+			'startSearch' => true
+		]);
+		$this->assertCount(0, $response['result']);
 
 		// countOutput + search on text
 		$response = $this->call('history.get', [
