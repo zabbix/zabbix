@@ -20,6 +20,8 @@
 #include "zbxjson.h"
 #include "zbxserialize.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxdbwrap.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -47,8 +49,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
  ******************************************************************************/
 
 static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const char *name, zbx_uint64_t dashboardid,
-		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, unsigned char period,
-		const zbx_vector_ptr_pair_t *params)
+		zbx_uint64_t userid, int report_time, unsigned char period, const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *len, name_len;
 	unsigned char	*ptr;
@@ -56,7 +57,6 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_value(data_len, dashboardid);
 	zbx_serialize_prepare_value(data_len, userid);
-	zbx_serialize_prepare_value(data_len, viewer_userid);
 	zbx_serialize_prepare_value(data_len, report_time);
 	zbx_serialize_prepare_value(data_len, period);
 	zbx_serialize_prepare_value(data_len, params->values_num);
@@ -75,7 +75,6 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_value(ptr, dashboardid);
 	ptr += zbx_serialize_value(ptr, userid);
-	ptr += zbx_serialize_value(ptr, viewer_userid);
 	ptr += zbx_serialize_value(ptr, report_time);
 	ptr += zbx_serialize_value(ptr, period);
 	ptr += zbx_serialize_value(ptr, params->values_num);
@@ -92,8 +91,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 }
 
 void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
-		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
-		zbx_vector_ptr_pair_t *params)
+		zbx_uint64_t *userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params)
 {
 	int		params_num;
 	zbx_uint32_t	len;
@@ -101,7 +99,6 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_value(data, dashboardid);
 	data += zbx_deserialize_value(data, userid);
-	data += zbx_deserialize_value(data, viewer_userid);
 	data += zbx_deserialize_value(data, report_time);
 	data += zbx_deserialize_value(data, period);
 	data += zbx_deserialize_value(data, &params_num);
@@ -367,9 +364,82 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 	zbx_vector_ptr_pair_destroy(params);
 }
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if user has access to dashboard                            *
+ *                                                                            *
+ * Parameters: userid      - [IN]                                             *
+ *             dashboardid - [IN]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - access granted                                     *
+ *               FAIL    - no access                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
-	zbx_uint64_t				dashboardid, viewer_userid, ui64;
+#define ZBX_PUBLIC_SHARING	0
+
+	zbx_db_result_t	result;
+	int		ret = FAIL;
+
+	result = zbx_db_select("select d.dashboardid from dashboard d"
+			" where d.templateid is null"
+			" and ("
+				"d.userid=" ZBX_FS_UI64
+				" or d.private=%d"
+				" or exists ("
+					"select null from dashboard_user du"
+					" where d.dashboardid=du.dashboardid and du.userid=" ZBX_FS_UI64
+				")"
+				" or exists ("
+					"select null from dashboard_usrgrp dug"
+					" join users_groups ug on ug.usrgrpid=dug.usrgrpid"
+					" where dug.dashboardid=d.dashboardid and ug.userid=" ZBX_FS_UI64
+				")"
+			")"
+			" and d.dashboardid=" ZBX_FS_UI64,
+			userid, ZBX_PUBLIC_SHARING, userid, userid, dashboardid);
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+
+	zbx_db_free_result(result);
+
+	return ret;
+
+#undef ZBX_PUBLIC_SHARING
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if user has permissions to generate reports                *
+ *                                                                            *
+ * Parameters: user - [IN]                                                    *
+ *                                                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_report_generation_access(const zbx_user_t *user)
+{
+	if (USER_TYPE_ZABBIX_ADMIN > user->type)
+		return FAIL;
+
+	/* No super admin exception here. Any role, including a super admin role, can have the         */
+	/* "Manage scheduled reports" action disabled, and the frontend API then denies report.create, */
+	/* report.update and report.delete for that user. Report testing must be denied the same way.  */
+	if (SUCCEED != zbx_db_user_has_administration_actions_permissions(user, "actions.default_access",
+			"actions.manage_scheduled_reports"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, struct zbx_json *j)
+{
+	zbx_uint64_t				dashboardid, ui64;
 	int					period, report_time, ret = FAIL;
 	struct zbx_json_parse			jp_params;
 	zbx_vector_ptr_pair_t			params;
@@ -389,9 +459,6 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 	}
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_DASHBOARDID, &dashboardid, &error))
-		goto out;
-
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_USERID, &viewer_userid, &error))
 		goto out;
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_PERIOD, &ui64, &error))
@@ -424,8 +491,24 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 		}
 	}
 
-	size = report_serialize_test_report(&data, name, dashboardid, userid, viewer_userid, report_time, period,
-			&params);
+	if (SUCCEED != check_report_generation_access(user))
+	{
+		error = zbx_strdup(error, "no access to scheduled reports");
+		goto out;
+	}
+
+	/* Super admins skip the sharing check. check_dashboard_access() only grants access to the   */
+	/* dashboard owner, public dashboards, and dashboards shared with the user or the user's     */
+	/* groups. The frontend applies those sharing rules only to Zabbix users and Zabbix admins,  */
+	/* so a super admin can see and pick any dashboard for a report, including private ones that */
+	/* are not shared with them. Running the check for super admins would reject such reports.   */
+	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != check_dashboard_access(user->userid, dashboardid))
+	{
+		error = zbx_strdup(error, "no access to dashboard");
+		goto out;
+	}
+
+	size = report_serialize_test_report(&data, name, dashboardid, user->userid, report_time, period, &params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,
 			SEC_PER_MIN, data, size, &response, &error))
