@@ -17,6 +17,7 @@
 #include "module.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBCURL
 void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetry_query_context)
@@ -38,8 +39,9 @@ void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetr
  *                                                                            *
  ******************************************************************************/
 static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, zbx_tq_query_t *query,
-		time_t now, time_t lasttimestamp, const zbx_apm_db_config_t *apm_db_config, const char *url,
-		unsigned char post_type, unsigned char output_format, CURLM *curl_handle, char **error)
+		time_t now, time_t lasttimestamp, const zbx_timespec_t *min_free_ts,
+		const zbx_apm_db_config_t *apm_db_config, const char *url, unsigned char post_type,
+		unsigned char output_format, CURLM *curl_handle, char **error)
 {
 	char				*http_error = NULL;
 	zbx_telemetry_query_context	*telemetry_query_context;
@@ -67,6 +69,7 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 
 	zbx_tq_get_newlasttimestamp(item->lookback_limit, item->granularity, now, lasttimestamp,
 			&telemetry_query_context->item_context.newlasttimestamp);
+	telemetry_query_context->item_context.min_free_ts = *min_free_ts;
 	telemetry_query_context->item_context.db_type = apm_db_config->db_type;
 
 	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST, url,
@@ -132,8 +135,8 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	post_type = ZBX_POSTTYPE_RAW;
 	output_format = HTTP_STORE_RAW;
 
-	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, apm_db_config, url, post_type,
-			output_format, poller_config->curl_handle, &send_error))
+	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, &item->min_free_ts,
+			apm_db_config, url, post_type, output_format, poller_config->curl_handle, &send_error))
 	{
 		SET_MSG_RESULT(result, send_error);
 		zbx_tq_query_clean(query);

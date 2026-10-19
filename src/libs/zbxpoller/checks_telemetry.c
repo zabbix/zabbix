@@ -14,6 +14,7 @@
 
 #include "checks_telemetry.h"
 
+#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
@@ -79,8 +80,8 @@ static int	send_query_http(const char *posts, const zbx_apm_db_config_t *apm_db_
 	return ret;
 }
 
-static int	check_telemetry_query_http(zbx_dc_item_t *item, time_t now, time_t lasttimestamp,
-		const zbx_apm_db_config_t *apm_db_config, char **str, char **error)
+static int	get_values_telemetry_http(zbx_dc_item_t *item, time_t now, time_t lasttimestamp,
+		const zbx_apm_db_config_t *apm_db_config, zbx_vector_str_t *values, char **error)
 {
 	int			ret = FAIL, parse_ret;
 	char			*posts = NULL;
@@ -108,7 +109,7 @@ static int	check_telemetry_query_http(zbx_dc_item_t *item, time_t now, time_t la
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 
-	if (FAIL == (parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, str)))
+	if (FAIL == (parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values)))
 	{
 		*error = zbx_strdup(NULL, "Failed to parse data store response");
 		goto out;
@@ -118,7 +119,6 @@ static int	check_telemetry_query_http(zbx_dc_item_t *item, time_t now, time_t la
 		/* when testing an item, if result is truncated, the check is considered not successful */
 		*error = zbx_dsprintf(NULL, "Telemetry query result row limit (%d) exceeded, result was truncated",
 				ZBX_TQ_MAX_RESULT_ROWS);
-		zbx_free(*str);
 		goto out;
 	}
 
@@ -134,9 +134,10 @@ out:
 
 int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
-	int			ret = NOTSUPPORTED, check_ret;
+	int			ret = NOTSUPPORTED, values_ret;
 	time_t			now, lasttimestamp;
-	char			*str, *error = NULL;
+	zbx_vector_str_t	values;
+	char			*error = NULL;
 
 	if (0 == apm_db_config->status)
 	{
@@ -149,10 +150,12 @@ int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_c
 	/* when testing the item, the time range being queried is restricted only by the lookback limit */
 	lasttimestamp = 0;
 
+	zbx_vector_str_create(&values);
+
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
-		check_ret = check_telemetry_query_http(item, now, lasttimestamp, apm_db_config, &str, &error);
+		values_ret = get_values_telemetry_http(item, now, lasttimestamp, apm_db_config, &values, &error);
 #else
 		ZBX_UNUSED(item);
 		ZBX_UNUSED(lasttimestamp);
@@ -165,18 +168,37 @@ int	get_value_telemetry(zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_c
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		error = zbx_strdup(NULL, "Unsupported APM data source type");
-		check_ret = FAIL;
+		values_ret = FAIL;
 	}
 
-	if (SUCCEED != check_ret)
+	if (SUCCEED != values_ret)
 	{
 		SET_MSG_RESULT(result, error);
 		goto out;
 	}
 
-	SET_TEXT_RESULT(result, str);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		for (int i = 0; i < values.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): row #%d: '%s'", __func__, i + 1, values.values[i]);
+		}
+	}
+
+	if (0 != values.values_num)
+	{
+		SET_TEXT_RESULT(result, values.values[0]);
+		values.values[0] = NULL;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): no buckets, not setting value", __func__);
+	}
 
 	ret = SUCCEED;
 out:
+	zbx_vector_str_clear_ext(&values, zbx_str_free);
+	zbx_vector_str_destroy(&values);
+
 	return ret;
 }

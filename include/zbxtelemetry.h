@@ -260,7 +260,7 @@ void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int 
 void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now, time_t lasttimestamp,
 		time_t *newlasttimestamp);
 
-int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, char **out);
+int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
 
 void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
 

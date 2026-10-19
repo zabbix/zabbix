@@ -225,10 +225,11 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	long				response_code;
 	char				*error = NULL, *http_resp = NULL;
 	char				status_codes[] = "200,201,202,203,204";
-	char				*str = NULL;
+	zbx_vector_str_t		values;
 	zbx_telemetry_query_context	*telemetry_query_context;
 	zbx_dc_tq_item_context_t	*item_context;
 	zbx_timespec_t			timespec;
+	zbx_timespec_t			next_value_ts;
 	zbx_poller_config_t		*poller_config;
 	CURLcode			err_info;
 	zbx_dc_cached_data_t		cached_data;
@@ -247,9 +248,22 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 	zbx_timespec(&timespec);
 
+	zbx_vector_str_create(&values);
 	zbx_dc_config_cached_data_init(&cached_data);
 
 	item_context = &telemetry_query_context->item_context;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): timespec: (%ds, %dns), min_free_ts: (%ds, %dns)", __func__, timespec.sec,
+			timespec.ns, item_context->min_free_ts.sec, item_context->min_free_ts.ns);
+
+	if (timespec.sec < item_context->min_free_ts.sec || (timespec.sec == item_context->min_free_ts.sec &&
+			timespec.ns < item_context->min_free_ts.ns))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): min_free_ts > timespec, using min_free_ts", __func__);
+		next_value_ts = item_context->min_free_ts;
+	}
+	else
+		next_value_ts = timespec;
 
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
 			&response_code, &http_resp, &error) &&
@@ -260,7 +274,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		if (ZBX_APM_DB_TYPE_CLICKHOUSE != item_context->db_type)
 			THIS_SHOULD_NEVER_HAPPEN;
 
-		if (FAIL == (status = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &str)))
+		if (FAIL == (status = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values)))
 		{
 			error = zbx_strdup(NULL, "Failed to parse data store response");
 		}
@@ -275,58 +289,81 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		status = FAIL;
 	}
 
-	if (FAIL != status)
+	if (ZBX_IS_RUNNING())
 	{
-		AGENT_RESULT	result;
-
-		zbx_init_agent_result(&result);
-
-		if (SUCCEED_PARTIAL == status)
+		if (FAIL != status)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "%s(): discarding truncated result", __func__);
-
-			/* lasttimestamp is still updated if result is truncated */
-			zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
-
-			if (ZBX_IS_RUNNING())
+			for (int i = 0; i < values.values_num; i++)
 			{
+				AGENT_RESULT	result;
+
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): bucket %d: '%s'", __func__, i, values.values[i]);
+
+				zbx_init_agent_result(&result);
+
+				SET_TEXT_RESULT(&result, values.values[i]);
+				values.values[i] = NULL;
+
+				zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
+
+				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
+						item_context->flags, item_context->preprocessing, &result,
+						&next_value_ts, ITEM_STATE_NORMAL, NULL);
+
+				zbx_free_agent_result(&result);
+
+				next_value_ts.ns++;
+				zbx_timespec_normalize(&next_value_ts);
+			}
+
+			if (0 == values.values_num)
+			{
+				AGENT_RESULT	result;
+
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): saving empty result", __func__);
+
+				zbx_init_agent_result(&result);
+
+				zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
+
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
 						item_context->flags, item_context->preprocessing, &result, &timespec,
+						ITEM_STATE_NORMAL, NULL);
+
+				zbx_free_agent_result(&result);
+			}
+
+			if (SUCCEED_PARTIAL == status)
+			{
+				/* if result was truncated, values are saved to history, lasttimestamp is updated, */
+				/* but the item becomes not supported */
+				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
+						item_context->flags, item_context->preprocessing, NULL, &timespec,
 						ITEM_STATE_NOTSUPPORTED, error);
+			}
+
+			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP;
+			cached_data.lasttimestamp = item_context->newlasttimestamp;
+
+			if (0 != values.values_num)
+			{
+				cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS;
+				cached_data.min_free_ts = next_value_ts;
 			}
 		}
 		else
 		{
-			SET_TEXT_RESULT(&result, str);
-			str = NULL;
-			zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
-
-			if (ZBX_IS_RUNNING())
-			{
-				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
-						item_context->flags, item_context->preprocessing, &result,
-						&timespec, ITEM_STATE_NORMAL, NULL);
-			}
-		}
-
-		cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP;
-		cached_data.lasttimestamp = item_context->newlasttimestamp;
-
-		zbx_free_agent_result(&result);
-	}
-	else
-	{
-		if (ZBX_IS_RUNNING())
-		{
 			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
-					item_context->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, error);
-		}
+					item_context->preprocessing, NULL,
+					&timespec, ITEM_STATE_NOTSUPPORTED, error);
 
-		/* leave cached_data the same if the check resulted in item becoming not supported */
-		/* (except when result was truncated), lasttimestamp does not change */
+			/* leave cached_data the same if the check resulted in item becoming not supported */
+			/* (except when result was truncated), lasttimestamp does not change */
+		}
 	}
 
-	zbx_free(str);
+	zbx_vector_str_clear_ext(&values, zbx_str_free);
+	zbx_vector_str_destroy(&values);
 
 	zbx_free(error);
 	zbx_free(http_resp);

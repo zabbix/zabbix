@@ -252,6 +252,7 @@ typedef struct
 	const char	*lookback_limit;
 	const char	*granularity;
 	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
 }
 ZBX_DC_TQITEM;
 
