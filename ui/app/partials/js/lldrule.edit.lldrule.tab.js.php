@@ -22,6 +22,7 @@
 var LldRuleEditLldRuleTab = class {
 	#form_element;
 	#form;
+	#lldrule;
 	#container;
 	#field_switches;
 	#host_interface_selector;
@@ -39,6 +40,7 @@ var LldRuleEditLldRuleTab = class {
 	}) {
 		this.#form_element = form_element;
 		this.#form = form;
+		this.#lldrule = lldrule;
 		this.#container = container;
 		this.#field_switches = field_switches;
 		this.#readonly = readonly;
@@ -142,6 +144,7 @@ var LldRuleEditLldRuleTab = class {
 		});
 
 		this.#initEvents();
+		this.#initTelemetryRows();
 		this.#update();
 
 		this.#container.querySelectorAll('#delay-flex-table tr.form_row').forEach(row => {
@@ -649,6 +652,25 @@ var LldRuleEditLldRuleTab = class {
 		else {
 			tbody.querySelector('.js-add-condition').closest('tr').insertAdjacentHTML('beforebegin', html);
 		}
+	}
+
+	#initTelemetryRows() {
+		if (this.field.type.value != <?= ITEM_TYPE_TELEMETRY_QUERY ?>) {
+			return;
+		}
+
+		for (const select of this.#form_element.querySelectorAll('#columns-table .js-column')) {
+			this.#populateColumnSelect(select);
+			this.#toggleAttributeKey(select);
+		}
+
+		this.#lldrule.aggregated_columns.forEach((column, row_index) => {
+			this.#addAggregatedColumnRow({...column, row_index});
+		});
+
+		this.#lldrule.conditions.forEach((condition, row_index) => {
+			this.#addConditionRow({...condition, row_index});
+		});
 	}
 
 	#updateSortOrder(table, name_field) {
