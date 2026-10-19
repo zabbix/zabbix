@@ -135,7 +135,7 @@ class testUserMacroPermissions extends CAPITest {
 				'output' => ['hostmacroid', 'macro', 'value']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -162,7 +162,7 @@ class testUserMacroPermissions extends CAPITest {
 				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -183,7 +183,7 @@ class testUserMacroPermissions extends CAPITest {
 				'searchByAny' => true
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -203,7 +203,7 @@ class testUserMacroPermissions extends CAPITest {
 				'filter' => ['macro' => '{$UM1}']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -214,8 +214,8 @@ class testUserMacroPermissions extends CAPITest {
 				'hostids' => [':host:usermacro.access.host1', ':host:usermacro.access.host2', ':template:usermacro.access.template']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
-				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM0}:template:usermacro.access.template', 'macro' => '{$UM0}', 'value' => ''],
+				['hostmacroid' => ':user_macro:{$UM2}:host:usermacro.access.host2', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -227,8 +227,8 @@ class testUserMacroPermissions extends CAPITest {
 				'searchByAny' => true
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM0}', 'macro' => '{$UM0}', 'value' => ''],
-				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM0}:template:usermacro.access.template', 'macro' => '{$UM0}', 'value' => ''],
+				['hostmacroid' => ':user_macro:{$UM2}:host:usermacro.access.host2', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -248,7 +248,7 @@ class testUserMacroPermissions extends CAPITest {
 				'filter' => ['macro' => '{$UM2}']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM2}', 'macro' => '{$UM2}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM2}:host:usermacro.access.host2', 'macro' => '{$UM2}', 'value' => '']
 			]
 		];
 
@@ -259,7 +259,7 @@ class testUserMacroPermissions extends CAPITest {
 				'filter' => ['macro' => '{$UM1}']
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -270,7 +270,7 @@ class testUserMacroPermissions extends CAPITest {
 				'editable' => true
 			],
 			[
-				['hostmacroid' => ':user_macro:{$UM1}', 'macro' => '{$UM1}', 'value' => '']
+				['hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1', 'macro' => '{$UM1}', 'value' => '']
 			]
 		];
 
@@ -321,7 +321,7 @@ class testUserMacroPermissions extends CAPITest {
 		yield 'user permission "usermacro.access.user.1" fail' => [
 			['username' => 'usermacro.access.user.1', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':user_macro:{$UM1}',
+				'hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1',
 				'value' => 'abc'
 			],
 			[],
@@ -331,11 +331,11 @@ class testUserMacroPermissions extends CAPITest {
 		yield 'admin permission "usermacro.access.user.2" update macros' => [
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':user_macro:{$UM2}',
+				'hostmacroid' => ':user_macro:{$UM2}:host:usermacro.access.host2',
 				'value' => 'abc'
 			],
 			[
-				'hostmacroids' => [':user_macro:{$UM2}']
+				'hostmacroids' => [':user_macro:{$UM2}:host:usermacro.access.host2']
 			],
 			null
 		];
@@ -343,7 +343,7 @@ class testUserMacroPermissions extends CAPITest {
 		yield 'admin permission "usermacro.access.user.2" change for non accessible hosts fail' => [
 			['username' => 'usermacro.access.user.2', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':user_macro:{$UM1}',
+				'hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1',
 				'value' => 'abc'
 			],
 			[],
@@ -353,7 +353,7 @@ class testUserMacroPermissions extends CAPITest {
 		yield 'admin read only permission "usermacro.access.user.3" update macro fail' => [
 			['username' => 'usermacro.access.user.3', 'password' => '|-|e!1@ (/\)0rLD!'],
 			[
-				'hostmacroid' => ':user_macro:{$UM1}',
+				'hostmacroid' => ':user_macro:{$UM1}:host:usermacro.access.host1',
 				'value' => 'abc'
 			],
 			[],
