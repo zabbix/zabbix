@@ -422,8 +422,7 @@ static int	check_report_generation_access(const zbx_user_t *user)
 		return FAIL;
 
 	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid,
-			ZBX_SCHEDULED_REPORTS, ZBX_DEFAULT_ACCESS);
+			" and (name='%s' or name='%s')", user->roleid, ZBX_SCHEDULED_REPORTS, ZBX_DEFAULT_ACCESS);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
