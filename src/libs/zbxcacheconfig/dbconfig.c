@@ -7531,7 +7531,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
 			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
 			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync,
-			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync;
+			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync,
+			cep_op_filter_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7613,6 +7614,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_filter_condition_sync, "cep_operation_filter_condition", changelog_sync_mode,
+			db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7910,8 +7913,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_operation_condition(&cep_op_condition_sync))
 		goto out;
 
+	if (FAIL == zbx_dbsync_prepare_cep_operation_filter_condition(&cep_op_filter_condition_sync))
+		goto out;
+
 	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, &cep_operation_sync,
-			&cep_op_condition_sync, new_revision);
+			&cep_op_condition_sync, &cep_op_filter_condition_sync, new_revision);
 
 	START_SYNC;
 
@@ -8276,6 +8282,7 @@ clean:
 	zbx_dbsync_clear(&cep_window_sync);
 	zbx_dbsync_clear(&cep_operation_sync);
 	zbx_dbsync_clear(&cep_op_condition_sync);
+	zbx_dbsync_clear(&cep_op_filter_condition_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);

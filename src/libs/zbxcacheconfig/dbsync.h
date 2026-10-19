@@ -277,6 +277,7 @@ int	zbx_dbsync_prepare_cep_rule_window(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_operation_filter_condition(zbx_dbsync_t *sync);
 
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);

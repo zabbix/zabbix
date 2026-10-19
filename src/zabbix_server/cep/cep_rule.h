@@ -48,14 +48,15 @@ char	*cep_tag_value_dec(const char *value);
 					CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_CLOSED))
 #define CEP_OP_UNSUPPRESS_MASK		CEP_FLAG_WHEN_ALL
 
-int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
+int	cep_op_filter_match_event(const zbx_cep_op_filter_t *filter, zbx_cep_event_context_t *ctx);
 
 int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
 
-int	cep_rule_has_window_scope_ops(const zbx_cep_rule_t *rule, int when);
+int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
+		zbx_vector_const_cep_operation_ptr_t *ops);
 
 #endif
 

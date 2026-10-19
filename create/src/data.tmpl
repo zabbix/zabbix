@@ -1511,23 +1511,26 @@ ROW   |4         |4   |1h      |0       |var events = cep_get_events();&bsn;&bsn
 ROW   |6         |2   |3d      |0       |                                                                                                                                                                                                                                                                                                                                                                                                                                 |0                  |1            |0            |    |                |
 
 TABLE |cep_operation
-FIELDS|cep_operationid|cep_ruleid|execute_when|type|evaltype|formula|event_name                       |tag |new_tag|tag_value|severity|suppress_duration|sortorder|
-ROW   |1              |1         |2           |2   |0       |       |                                 |    |       |         |0       |0                |1        |
-ROW   |2              |2         |0           |3   |0       |       |                                 |    |       |         |0       |0                |1        |
-ROW   |3              |3         |0           |1   |0       |       |Engine issue                     |    |       |         |0       |0                |1        |
-ROW   |4              |3         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |
-ROW   |5              |4         |0           |1   |0       |       |Risk detected: Communication down|    |       |         |0       |0                |1        |
-ROW   |6              |4         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |
-ROW   |7              |5         |0           |12  |0       |       |                                 |env |       |prod     |0       |0                |1        |
-ROW   |8              |5         |0           |5   |0       |       |                                 |    |       |         |0       |0                |2        |
-ROW   |9              |6         |3           |2   |0       |       |                                 |    |       |         |0       |0                |1        |
-ROW   |10             |6         |3           |5   |0       |       |                                 |    |       |         |0       |0                |2        |
+FIELDS|cep_operationid|cep_ruleid|execute_when|type|evaltype|formula|event_name                       |tag |new_tag|tag_value|severity|suppress_duration|sortorder|apply_to|
+ROW   |1              |1         |2           |2   |0       |       |                                 |    |       |         |0       |0                |1        |0       |
+ROW   |2              |2         |0           |3   |0       |       |                                 |    |       |         |0       |0                |1        |0       |
+ROW   |3              |3         |0           |1   |0       |       |Engine issue                     |    |       |         |0       |0                |1        |0       |
+ROW   |4              |3         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |2       |
+ROW   |5              |4         |0           |1   |0       |       |Risk detected: Communication down|    |       |         |0       |0                |1        |0       |
+ROW   |6              |4         |4           |9   |0       |       |                                 |    |       |         |0       |0                |2        |2       |
+ROW   |7              |5         |0           |12  |0       |       |                                 |env |       |prod     |0       |0                |1        |0       |
+ROW   |8              |5         |0           |5   |0       |       |                                 |    |       |         |0       |0                |2        |0       |
+ROW   |9              |6         |3           |2   |0       |       |                                 |    |       |         |0       |0                |1        |2       |
+ROW   |10             |6         |3           |5   |0       |       |                                 |    |       |         |0       |0                |2        |2       |
 
 TABLE |cep_operation_condition
 FIELDS|cep_operation_conditionid|cep_operationid|type|operator|tag |tag_value|
 ROW   |1                        |2              |33  |10      |    |         |
 ROW   |2                        |3              |34  |10      |    |         |
 ROW   |3                        |5              |34  |10      |    |         |
-ROW   |4                        |9              |33  |10      |    |         |
-ROW   |5                        |10             |33  |11      |    |         |
+
+TABLE |cep_operation_filter_condition
+FIELDS|cep_operation_filter_conditionid|cep_operationid|type|operator|tag |tag_value|
+ROW   |1                               |9              |33  |10      |    |         |
+ROW   |2                               |10             |33  |11      |    |         |
 

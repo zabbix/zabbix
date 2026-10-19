@@ -4504,10 +4504,11 @@ int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select cep_operationid,cep_ruleid,type,execute_when,evaltype,event_name,tag,new_tag,"
-				"tag_value,severity,suppress_duration,sortorder,formula"
+				"tag_value,severity,suppress_duration,sortorder,formula,apply_to,filter_evaltype,"
+				"filter_formula"
 			" from cep_operation");
 
-	dbsync_prepare(sync, 13, NULL);
+	dbsync_prepare(sync, 16, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -4548,6 +4549,36 @@ int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync)
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_operation_conditionid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_OPERATION_CONDITION)]);
+out:
+	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
+
+	return ret;
+}
+
+int	zbx_dbsync_prepare_cep_operation_filter_condition(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select cep_operation_filter_conditionid,cep_operationid,type,operator,tag,tag_value"
+			" from cep_operation_filter_condition");
+
+	dbsync_prepare(sync, 6, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_dbconn_select(sync->db, "%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_operation_filter_conditionid", "where",
+			NULL, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_OPERATION_FILTER_CONDITION)]);
 out:
 	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
