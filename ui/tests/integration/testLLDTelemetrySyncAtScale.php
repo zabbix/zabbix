@@ -27,8 +27,8 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * LLD-discovered dependent items (one per device), and trigger prototypes on them must fire and recover for
  * exactly the devices whose status changed.
  *
- * Macros are not supported in the query, so the site filter cannot come from a template: every host has its own
- * query item, LLD rule and prototypes.
+ * The query item, LLD rule and prototypes come from a template linked to every host, the site filter of the queries
+ * is the {$SITE} user macro, which every host sets to its own name.
  *
  * Each query result row is a separate value, so every row is processed by all dependent items of its host:
  * PROBLEM_DEVICE_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per host and round (indexed, master value parsed
@@ -53,6 +53,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	const HOSTNAME = 'test_lld_telemetry_sync_at_scale';
 	const PROXY_NAME = 'test_lld_telemetry_sync_at_scale_proxy';
+	const TEMPLATE_NAME = 'test_lld_telemetry_sync_at_scale_template';
+	const SITE_MACRO = '{$SITE}';
 	const SERVICE_NAME = 'telemetry-sync-at-scale';
 	const METRIC_NAME = 'device.status';
 	const TQ_ITEM_KEY = 'apm.device.status.query';
@@ -96,8 +98,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	/* host name => hostid, host name is also the site of its devices */
 	private static $hostids = [];
-	/* host name => itemid of the Telemetry query item */
-	private static $tq_itemids = [];
+	private static $templateid;
+	/* itemid of the Telemetry query item on the template */
+	private static $template_tq_itemid;
+	/* LLD rules inherited by the hosts */
 	private static $lld_ruleids = [];
 	private static $proxyid;
 
@@ -168,9 +172,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Create a host for every site.
+	 * Create the template and a host for every site linked to it, then collect the LLD rules inherited by the hosts.
 	 */
 	private function createSiteHosts(): void {
+		$this->createSiteTemplate();
+
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
@@ -179,28 +185,50 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$groupid = $response['result'][0]['groupid'];
 
 		foreach (self::hostNames() as $host) {
-			self::$hostids[$host] = $this->createSiteHost($host, $groupid);
+			$response = $this->call('host.create', [
+				'host' => $host,
+				'interfaces' => [],
+				'groups' => [['groupid' => $groupid]],
+				'templates' => [['templateid' => self::$templateid]],
+				'macros' => [['macro' => self::SITE_MACRO, 'value' => $host]],
+				'status' => HOST_STATUS_MONITORED
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['hostids']);
+			self::$hostids[$host] = $response['result']['hostids'][0];
 		}
+
+		$response = $this->call('discoveryrule.get', [
+			'hostids' => array_values(self::$hostids),
+			'filter' => ['key_' => self::LLD_RULE_KEY],
+			'output' => ['itemid']
+		]);
+		$this->assertCount(self::HOST_COUNT, $response['result']);
+		self::$lld_ruleids = array_column($response['result'], 'itemid');
 	}
 
 	/**
-	 * Create host with the Telemetry query item for devices of its site, Telemetry query LLD rule discovering the
-	 * devices of its site and per-device dependent items and triggers.
+	 * Create template with the Telemetry query item for devices of the site, Telemetry query LLD rule discovering the
+	 * devices of the site and per-device dependent items and triggers. The site comes from the host macro.
 	 */
-	private function createSiteHost(string $host, string $groupid): string {
-		$response = $this->call('host.create', [
-			'host' => $host,
-			'interfaces' => [],
-			'groups' => [['groupid' => $groupid]],
-			'status' => HOST_STATUS_MONITORED
+	private function createSiteTemplate(): void {
+		$response = $this->call('templategroup.get', [
+			'filter' => ['name' => ['Templates']],
+			'output' => ['groupid']
 		]);
-		$this->assertArrayHasKey('hostids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		$hostid = $response['result']['hostids'][0];
+		$this->assertNotEmpty($response['result'], 'Template group "Templates" not found.');
+
+		$response = $this->call('template.create', [
+			'host' => self::TEMPLATE_NAME,
+			'groups' => [['groupid' => $response['result'][0]['groupid']]]
+		]);
+		$this->assertArrayHasKey('templateids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['templateids']);
+		self::$templateid = $response['result']['templateids'][0];
 
 		// Single query for all devices of the site: one row per device that reported in the window.
 		$response = $this->call('item.create', [
-			'hostid' => $hostid,
+			'hostid' => self::$templateid,
 			'name' => 'APM device status query',
 			'key_' => self::TQ_ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
@@ -221,19 +249,18 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'aggregated_columns' => [
 					['column' => 'Value', 'function' => AGGREGATE_MAX, 'parameters' => [], 'alias' => 'value']
 				],
-				'filter' => self::siteStatusFilter($host)
+				'filter' => self::siteStatusFilter(self::SITE_MACRO)
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
-		$tq_itemid = $response['result']['itemids'][0];
-		self::$tq_itemids[$host] = $tq_itemid;
+		self::$template_tq_itemid = $response['result']['itemids'][0];
 
 		// Granularity and lookback limit equal to the window give a single bucket, polling more often than the
 		// window slides it, so every poll returns each device that reported within the last window once. Every
 		// poll reads the whole window again and late data is picked up by the next one, so there is no time shift.
 		$response = $this->call('discoveryrule.create', [
-			'hostid' => $hostid,
+			'hostid' => self::$templateid,
 			'name' => 'APM device discovery',
 			'key_' => self::LLD_RULE_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
@@ -251,7 +278,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'aggregated_columns' => [
 					['column' => '', 'function' => AGGREGATE_COUNT, 'parameters' => [], 'alias' => 'cnt']
 				],
-				'filter' => self::siteStatusFilter($host)
+				'filter' => self::siteStatusFilter(self::SITE_MACRO)
 			],
 			'lld_macro_paths' => [
 				['lld_macro' => self::LLD_MACRO, 'path' => '$["ResourceAttributes.host.name"]']
@@ -260,18 +287,17 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 		$lld_ruleid = $response['result']['itemids'][0];
-		self::$lld_ruleids[] = $lld_ruleid;
 
 		// Each dependent item keeps only rows of its own device and extracts the aggregated status. JSONPath as
 		// the first step lets all dependent items share one parsed and indexed master value, rows of other
 		// devices do not match and are discarded.
 		$response = $this->call('itemprototype.create', [
-			'hostid' => $hostid,
+			'hostid' => self::$templateid,
 			'ruleid' => $lld_ruleid,
 			'name' => 'APM device status ['.self::LLD_MACRO.']',
 			'key_' => self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.']',
 			'type' => ITEM_TYPE_DEPENDENT,
-			'master_itemid' => $tq_itemid,
+			'master_itemid' => self::$template_tq_itemid,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT,
 			'preprocessing' => [
 				[
@@ -287,13 +313,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$response = $this->call('triggerprototype.create', [
 			'description' => 'APM device '.self::LLD_MACRO.' status problem',
-			'expression' => 'last(/'.$host.'/'.self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.'])=1',
+			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.'])=1',
 			'priority' => TRIGGER_SEVERITY_AVERAGE
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
-
-		return $hostid;
 	}
 
 	/**
@@ -329,8 +353,14 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			$response = CAPIHelper::call('host.delete', array_values(self::$hostids));
 			self::assertArrayHasKey('hostids', $response['result']);
 			self::$hostids = [];
-			self::$tq_itemids = [];
 			self::$lld_ruleids = [];
+		}
+
+		if (self::$templateid !== null) {
+			$response = CAPIHelper::call('template.delete', [self::$templateid]);
+			self::assertArrayHasKey('templateids', $response['result']);
+			self::$templateid = null;
+			self::$template_tq_itemid = null;
 		}
 
 		if (self::$proxyid !== null) {
@@ -465,13 +495,13 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_TriggerRecoveryVerify
 	 */
 	public function testLLDTelemetrySyncAtScale_SmallGranularityUpdate() {
-		$items = [];
-		foreach (self::$tq_itemids as $itemid) {
-			$items[] = ['itemid' => $itemid, 'granularity' => self::SMALL_TQ_GRANULARITY];
-		}
-		$response = $this->call('item.update', $items);
+		// The change is propagated to the items inherited by the hosts.
+		$response = $this->call('item.update', [
+			'itemid' => self::$template_tq_itemid,
+			'granularity' => self::SMALL_TQ_GRANULARITY
+		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertCount(self::HOST_COUNT, $response['result']['itemids']);
+		$this->assertCount(1, $response['result']['itemids']);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
