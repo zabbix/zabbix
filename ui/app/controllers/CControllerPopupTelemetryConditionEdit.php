@@ -46,12 +46,11 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				...CItemTypeTelemetryQuery::METRICS_CONDITIONS_COLUMN
 			))],
 			'attribute_key' => ['string'],
-			'operator' => ['integer',
-				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_MORE_EQUAL,
-					CONDITION_OPERATOR_LESS_EQUAL
-				]
-			],
+			'operator' => ['integer', 'in' => array_unique(array_merge(
+				CItemTypeTelemetryQuery::COMPLEX_COLUMN_OPERATORS,
+				CItemTypeTelemetryQuery::NUMERIC_COLUMN_OPERATORS,
+				CItemTypeTelemetryQuery::SIMPLE_COLUMN_OPERATORS
+			))],
 			'value' => ['string'],
 			'parent_discoveryid' => ['db items.itemid']
 		]];
