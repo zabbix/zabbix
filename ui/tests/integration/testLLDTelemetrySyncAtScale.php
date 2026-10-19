@@ -391,17 +391,16 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$response = $this->call('task.create', $tasks);
 		$this->assertArrayHasKey('taskids', $response['result']);
 
-		// Discovery work grows with the number of hosts.
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => array_values(self::$hostids),
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'[']
-		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS * self::HOST_COUNT,
+		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS,
 				self::WAIT_ITERATION_DELAY);
 
 		$this->callUntilCountIsPresent('trigger.get', [
 			'hostids' => array_values(self::$hostids),
 			'search' => ['description' => 'APM device ']
-		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS * self::HOST_COUNT,
+		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS,
 				self::WAIT_ITERATION_DELAY);
 
 		// Make discovered dependent items and triggers known to preprocessing and history sync.
@@ -512,12 +511,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	private function waitForOpenProblemCount(int $expected): void {
-		// Preprocessing work grows with the number of hosts.
 		$this->callUntilCountIsPresent('problem.get', [
 			'hostids' => array_values(self::$hostids),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], $expected, self::TRIGGER_ITERATIONS * self::HOST_COUNT, self::WAIT_ITERATION_DELAY);
+		], $expected, self::TRIGGER_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
