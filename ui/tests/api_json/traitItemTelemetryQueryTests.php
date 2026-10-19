@@ -318,6 +318,225 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield 'all supported "query.filter.conditions[].column" values for traces' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'Duration', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Events.Attributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Events.Name', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ParentSpanId', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SpanAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SpanId', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SpanKind', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SpanName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StatusCode', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StatusMessage', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Timestamp', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceState', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
+		yield 'all supported "query.filter.conditions[].column" values for metrics sum' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'AggregationTemporality', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Attributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Flags', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'IsMonotonic', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricDescription', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricUnit', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeDroppedAttrCount', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StartTimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
+		yield 'all supported "query.filter.conditions[].column" values for metrics gauge' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'Attributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Flags', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricDescription', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricUnit', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeDroppedAttrCount', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StartTimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
+		yield 'all supported "query.filter.conditions[].column" values for metrics histogram' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'AggregationTemporality', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Attributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Count', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Flags', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Max', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricDescription', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricUnit', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Min', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeDroppedAttrCount', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StartTimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Sum', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
+		yield 'all supported "query.filter.conditions[].column" values for metrics exponential histogram' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'AggregationTemporality', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Attributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Count', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Exemplars.Value', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Flags', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Max', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricDescription', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'MetricUnit', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Min', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'NegativeOffset', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'PositiveOffset', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Scale', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeDroppedAttrCount', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'StartTimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Sum', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TimeUnix', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ZeroCount', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
+		yield 'all supported "query.filter.conditions[].column" values for logs' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'Body', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'EventName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'LogAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ResourceSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeAttributes', 'attribute_key' => 'a', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeSchemaUrl', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeVersion', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ServiceName', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SeverityNumber', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SeverityText', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'SpanId', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'Timestamp', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceFlags', 'value' => '1', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			null
+		];
+
 		yield '"query.filter.conditions[].value" value empty string for operation equal/notequal/exists' => [
 			[
 				'query' => [
