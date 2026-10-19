@@ -101,10 +101,14 @@ class CHtmlUrlValidator {
 			return false;
 		}
 
+		$valid_schemes = explode(',', strtolower(CSettingsHelper::get(CSettingsHelper::URI_VALID_SCHEMES)));
+
+		if (!in_array('javascript', $valid_schemes) && strpos(strtolower($url), 'javascript:') === 0) {
+			return false;
+		}
+
 		if (array_key_exists('scheme', $url_parts)) {
-			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(CSettingsHelper::get(
-					CSettingsHelper::URI_VALID_SCHEMES
-			))))) {
+			if (!in_array(strtolower($url_parts['scheme']), $valid_schemes)) {
 				return false;
 			}
 
