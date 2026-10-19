@@ -727,8 +727,8 @@ void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int l
 	/* where */
 	zbx_strcpy_alloc(sql, &alloc, &offset, "where ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"%s\">=toDateTime(" ZBX_FS_TIME_T ") "
-			"and \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
+			"\"%s\">=toDateTime64(" ZBX_FS_TIME_T ",9) "
+			"and \"%s\"<toDateTime64(" ZBX_FS_TIME_T ",9) ",
 			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, ts_col,
 			(zbx_fs_time_t)timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
