@@ -222,7 +222,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			'preprocessing' => [
 				[
 					'type' => ZBX_PREPROC_JSONPATH,
-					'params' => '$[?(@.columns["ResourceAttributes.host.name"] == "'.self::LLD_MACRO.'")].columns.value.first()',
+					'params' => '$[?(@["ResourceAttributes.host.name"] == "'.self::LLD_MACRO.'")].value.first()',
 					'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
 					'error_handler_params' => ''
 				]
@@ -592,13 +592,13 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			return [0, 0];
 		}
 
-		if (!is_array($buckets) || count($buckets) !== 1 || !isset($buckets[0]['columns']['cnt'])
-				|| !isset($buckets[0]['columns']['sum'])) {
+		if (!is_array($buckets) || count($buckets) !== 1 || !isset($buckets[0]['cnt'])
+				|| !isset($buckets[0]['sum'])) {
 			return null;
 		}
 
-		$count = (int) $buckets[0]['columns']['cnt'];
-		$ones = (int) $buckets[0]['columns']['sum'];
+		$count = (int) $buckets[0]['cnt'];
+		$ones = (int) $buckets[0]['sum'];
 
 		return [$count - $ones, $ones];
 	}
