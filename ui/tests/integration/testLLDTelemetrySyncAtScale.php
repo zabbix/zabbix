@@ -116,6 +116,12 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		global $TELEMETRY_PROVIDERS;
+
+		if (empty($TELEMETRY_PROVIDERS)) {
+			$this->markTestSkipped('$TELEMETRY_PROVIDERS is not set in ui/conf/zabbix.conf.php.');
+		}
+
 		$this->truncateOTData();
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
