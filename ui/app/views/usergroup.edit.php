@@ -381,30 +381,6 @@ $tag_filter_form_grid = (new CFormGrid())
 		)
 	]);
 
-$apm_filter = (new CFormGrid())->addItem([
-		(new CLabel([_('Resource attributes')], 'resource_attributes'))
-			->addClass('js-apm-attributes'),
-		(new CFormField(
-			(new CDiv(new CPartial('apm.attributes', [
-				'source' => 'hostgroup',
-				'attributes' => $data['resource_attributes'],
-				'field_name' => 'resource_attributes',
-				'tabs_id' => 'tabs',
-				'attr_tab_id' => 'apm_filter_tab',
-				'has_inline_validation' => true,
-				'signal_types' => [
-					SIGNAL_TYPE_ALL => _('All'),
-					SIGNAL_TYPE_TRACES => _('Traces'),
-					SIGNAL_TYPE_METRICS => _('Metrics'),
-					SIGNAL_TYPE_LOGS => _('Logs')
-				],
-				'default_signal_type' => SIGNAL_TYPE_ALL
-			])))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addClass('form-field-apm-attributes')
-		))->addClass('js-apm-attributes')
-	]);
-
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_grid)
 	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid,
@@ -417,7 +393,6 @@ $tabs = (new CTabView())
 		TAB_INDICATOR_PROXY_ACCESS_LIST
 	)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER)
-	->addTab('apm_filter_tab', _('APM filter'), $apm_filter)
 	->setSelected(0);
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

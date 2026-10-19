@@ -22,7 +22,7 @@
 $data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
 
 if (!$data['readonly']) {
-	$this->includeJsFile('apm.attributes.js.php', $data);
+	$this->includeJsFile('proxy.apm.attributes.js.php', $data);
 }
 
 $header_columns = [
@@ -43,7 +43,6 @@ $table = (new CTable())
 
 $options = [
 	'signal_types' => $data['signal_types'],
-	'default_signal_type' => $data['default_signal_type'],
 	'field_name' => $data['field_name'],
 	'has_inline_validation' => $data['has_inline_validation'],
 	'readonly' => $data['readonly']
@@ -57,7 +56,7 @@ if ($data['has_inline_validation']) {
 
 // fields
 foreach (array_values($data['attributes']) as $index => $attribute) {
-	$table->addItem(renderApmAttrRow($index, $attribute, $options));
+	$table->addItem(renderProxyApmAttrRow($index, $attribute, $options));
 }
 
 // buttons

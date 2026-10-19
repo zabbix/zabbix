@@ -13,7 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerUsergroupEdit extends CController {
 
@@ -42,8 +41,7 @@ class CControllerUsergroupEdit extends CController {
 			'proxies' =>				'array_db proxy.proxyid',
 			'proxy_group_mode' =>		'db usrgrp.proxy_group_mode|in '.PROXY_GROUP_MODE_ALLOW.','.PROXY_GROUP_MODE_DENY,
 			'proxy_groups' =>			'array_db proxy_group.proxy_groupid',
-			'tag_filters' =>			'array',
-			'resource_attributes'=>		'array'
+			'tag_filters' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -126,10 +124,6 @@ class CControllerUsergroupEdit extends CController {
 
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
-
-		// TODO: replace this line with the one below when API is ready
-		$data['resource_attributes'] = [];
-//		$data['resource_attributes'] = $this->hasInput('usrgrpid') ? $this->user_group['resource_attributes'] : [];
 
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $tag_filter) {
