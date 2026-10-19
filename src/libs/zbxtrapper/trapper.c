@@ -1165,7 +1165,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	int			ret = SUCCEED;
 	static double		last_log_time;
 	double			now;
-	static int		dropped_count;
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN] = "";
 
@@ -1187,18 +1186,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			zabbix_log(LOG_LEVEL_WARNING, "trapper got non-JSON data from \"%s\""
 					" (legacy protocols are not supported)", sock->peer);
 
-			if (0 != last_log_time && 0 < dropped_count)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "trapper dropped %d packets in the last %d seconds",
-						dropped_count, (int)(now - last_log_time));
-			}
-
 			last_log_time = now;
-			dropped_count = 0;
-		}
-		else
-		{
-			dropped_count++;
 		}
 
 		return FAIL;
