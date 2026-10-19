@@ -131,6 +131,9 @@ class CHtmlUrlValidatorTest extends TestCase {
 			["\x00\x20javascript:alert(1)\x1F\x20",						[],															false], // Invalid scheme. Leading and trailing C0 control and space characters are ignored by browsers.
 			["ja\tva\rsc\nript:alert(1)",								[],															false], // Invalid scheme. CR, LF and TAB characters are ignored by browsers.
 			['javascript:alert(]',										[],															false], // Invalid scheme.
+			['javascript:1/alert(document.domain)/1',					[],															false], // Invalid scheme.
+			['JaVaScRiPt:1/alert(1)/1',									[],															false], // Invalid scheme.
+			['javascript:0//%0aalert(document.domain)',					[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.
 			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
