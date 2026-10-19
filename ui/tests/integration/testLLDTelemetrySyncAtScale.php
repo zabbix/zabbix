@@ -97,7 +97,6 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'DebugLevel' => 3,
 				'CacheSize' => '128M',
 				'TrendCacheSize' => '128M',
-				
 				'HistoryCacheSize' => '128M',
 				'HistoryIndexCacheSize' => '128M',
 				'ValueCacheSize' => '128M',
