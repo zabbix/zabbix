@@ -115,7 +115,7 @@ class CClickHouseQuery {
 			($this->where ? ' WHERE '.implode(' AND ', $this->where) : '').
 			($this->group ? ' GROUP BY '.implode(',', $this->group) : '').
 			($this->having ? ' HAVING '.implode(' AND ', $this->having) : '').
-			($this->order ? ' ORDER BY '.implode(' ', $this->order) : '').
+			($this->order ? ' ORDER BY '.implode(',', $this->order) : '').
 			($this->limit !== null ? ' LIMIT '.$this->limit : '').
 			($this->offset !== null && $this->offset > 0 ? ' OFFSET '.$this->offset : '');
 	}
