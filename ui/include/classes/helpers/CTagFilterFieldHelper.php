@@ -122,7 +122,7 @@ class CTagFilterFieldHelper {
 				array_key_exists('value', $tag) ? $tag['value'] : ''
 			))
 				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton($options['tag_field_name'].'['.$index.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
