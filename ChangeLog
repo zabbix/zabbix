@@ -1,8 +1,11 @@
 Changes for 8.0.0rc2
 
 New features:
+A.F.....S. [ZBXNEXT-10625] added support of Elasticsearch 8.x and 9.x (kastafjevs, Sasha)
+A.F.....S. [ZBXNEXT-10844] updated the minimum supported Elasticsearch version to 8.0 (Sasha)
 
 Bug fixes:
+........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
 ...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
 

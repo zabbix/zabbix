@@ -692,6 +692,15 @@
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${clickhouse_password}',${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${clickhouse_dbname}'${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
+
+		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$TELEMETRY_PROVIDERS[] = [${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'clickhouse',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${clickhouse_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${clickhouse_user}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${clickhouse_password}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${clickhouse_dbname}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 	</target>
 
 	<target name="drop-db-clickhouse" if="clickhouse">
@@ -714,6 +723,12 @@
 			<arg line="--data &quot;CREATE DATABASE ${clickhouse_dbname} COMMENT '${now}'&quot;"/>
 		</exec>
 		<exec executable="./history_all.sh" dir="database/clickhouse" failonerror="on">
+			<arg line="--server ${clickhouse_url}"/>
+			<arg line="--db ${clickhouse_dbname}"/>
+			<arg line="--user ${clickhouse_user}"/>
+			<arg line="--password ${clickhouse_password}"/>
+		</exec>
+		<exec executable="./otel_all.sh" dir="database/clickhouse" failonerror="on">
 			<arg line="--server ${clickhouse_url}"/>
 			<arg line="--db ${clickhouse_dbname}"/>
 			<arg line="--user ${clickhouse_user}"/>
