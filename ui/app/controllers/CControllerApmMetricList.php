@@ -178,7 +178,7 @@ class CControllerApmMetricList extends CController {
 		);
 
 		foreach (['metric', 'resource', 'scope'] as $type) {
-			CProfile::update('web.metric.metric.filter_'.$type.'_attributes_evaltype',
+			CProfile::update('web.apm.metric.filter_'.$type.'_attributes_evaltype',
 				$this->getInput('filter_'.$type.'_attributes_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 			);
 
