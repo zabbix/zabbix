@@ -1183,9 +1183,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 		if (ZBX_NON_JSON_LOG_INTERVAL <= now - last_log_time)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "trapper got non-JSON data from \"%s\""
-					" (legacy protocols are not supported)", sock->peer);
-
+			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object from %s", sock->peer);
 			last_log_time = now;
 		}
 
