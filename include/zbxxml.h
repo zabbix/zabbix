@@ -26,6 +26,7 @@ void	zbx_xml_escape_xpath(char **data);
 
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
 int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg);
+int	zbx_query_xpath_vector(zbx_variant_t *value, const char *params, char **errmsg);
 
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);

@@ -1,0 +1,162 @@
+[
+    {
+        "value": "<root><columns><pod>pod-XX1</pod><memory>85</memory></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//pod"]
+        },
+        "result": "<pod>pod-XX1</pod>"
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod><memory>85</memory></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//pod/text()"]
+        },
+        "result": "pod-XX1"
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod><memory>85</memory></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["string(//memory)"]
+        },
+        "result": "85"
+    },
+    {
+        "value": "<root><services><s>pay</s><s>bank</s></services></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//s"]
+        },
+        "result": "<s>pay</s><s>bank</s>"
+    },
+    {
+        "value": "<root><services><s>pay</s><s>bank</s></services></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["count(//s)"]
+        },
+        "result": "2"
+    },
+    {
+        "value": "<root><services><s>pay</s><s>bank</s></services></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["count(//s) > 5"]
+        },
+        "result": "0"
+    },
+    {
+        "value": "<root><services><s>pay</s><s>bank</s></services></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["count(//s) > 1"]
+        },
+        "result": "1"
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod><memory>85</memory></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["number(//memory)"]
+        },
+        "result": "85"
+    },
+    {
+        "value": "<root><name lang=\"en\">pay</name></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//name/@lang"]
+        },
+        "result": " lang=\"en\""
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["string(//nonexistent)"]
+        },
+        "result": ""
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//nonexistent", "Unknown"]
+        },
+        "result": "Unknown"
+    },
+    {
+        "value": "<root><columns><pod>pod-XX1</pod></columns></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//nonexistent"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "not valid xml",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//pod", "Fallback"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "not valid xml",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//pod"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//[[[", "Fallback"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["//pod", "a", "b"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": []
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": [""]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "<root><pod>pod-XX1</pod></root>",
+        "macrofunc": {
+            "function": "xmlxpath",
+            "parameters": ["", "dflt"]
+        },
+        "result": "*UNKNOWN*"
+    },
+	{
+		"value": "",
+		"macrofunc": {
+			"function": "xmlxpath",
+			"parameters": ["//pod"]
+		},
+		"result": "*UNKNOWN*"
+	}
+]

@@ -1,0 +1,175 @@
+z-split-view {
+	--split-view-divider-size: 1px;
+	--split-view-divider-color: #{$ui-border-color};
+	--split-view-divider-bg-color: #{$ui-bg-color};
+
+	--split-view-handle-size: 56px;
+	--split-view-handle-hit-area-size: 16px;
+
+	--split-view-current-size: clamp(
+		var(--split-view-min-size, 0%),
+		var(--split-view-fixed-size, 50%),
+		var(--split-view-max-size, 100%)
+	);
+
+	// Default: fixed="end".
+	--split-view-handle-position: calc(100% - var(--split-view-current-size));
+
+	&[fixed='start'] {
+		--split-view-handle-position: var(--split-view-current-size);
+	}
+
+	position: relative;
+	display: grid;
+	align-items: stretch;
+
+	z-split-view-pane,
+	z-split-view-handle {
+		box-sizing: border-box;
+		display: block;
+		min-inline-size: 0;
+		min-block-size: 0;
+	}
+
+	z-split-view-handle {
+		position: sticky;
+		z-index: 2;
+
+		.z-split-view-handle-control {
+			position: absolute;
+			pointer-events: auto;
+			touch-action: none;
+			user-select: none;
+			outline: 0;
+
+			&::before,
+			&::after {
+				content: '';
+				position: absolute;
+				inset-block-start: 50%;
+				inset-inline-start: 50%;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out,
+								border-color $ui-controls-transition-duration ease-out;
+				}
+			}
+
+			&::before {
+				background-color: var(--split-view-divider-color);
+			}
+
+			&::after {
+				background: var(--split-view-divider-bg-color);
+				border: 1px solid var(--split-view-divider-color);
+				border-radius: 4px;
+			}
+
+			&:hover {
+				--split-view-divider-color: #{$ui-selected-bg-color};
+			}
+		}
+	}
+
+	&:not([vertical]) {
+		grid-template-columns: minmax(0, var(--split-view-handle-position)) minmax(0, 1fr);
+
+		& > z-split-view-pane:nth-of-type(1) {
+			grid-column: 1;
+			grid-row: 1;
+		}
+
+		& > z-split-view-pane:nth-of-type(2) {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		& > z-split-view-handle {
+			grid-column: 1 / -1;
+			grid-row: 1;
+			inset-block-start: 0;
+			block-size: 0;
+			z-index: 999;
+
+			.z-split-view-handle-control {
+				inset-inline-start: var(--split-view-handle-position);
+				inline-size: var(--split-view-handle-hit-area-size);
+				transform: translateX(-50%);
+				cursor: col-resize;
+
+				&::before {
+					block-size: 100%;
+					inline-size: var(--split-view-divider-size);
+				}
+
+				&::after {
+					block-size: var(--split-view-handle-size);
+					max-block-size: calc(100% - 10px);
+					inline-size: 5px;
+				}
+			}
+		}
+	}
+
+	&[vertical] {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(0, var(--split-view-handle-position)) minmax(0, 1fr);
+		inset-inline-start: 0;
+		block-size: 100%;
+		overflow-y: hidden;
+
+		& > z-split-view-pane {
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			&:nth-of-type(1) {
+				grid-column: 1;
+				grid-row: 1;
+			}
+
+			&:nth-of-type(2) {
+				grid-column: 1;
+				grid-row: 2;
+			}
+		}
+
+		& > z-split-view-handle {
+			grid-column: 1;
+			grid-row: 1 / -1;
+			align-self: stretch;
+			inline-size: 0;
+
+			.z-split-view-handle-control {
+				inset-block-start: var(--split-view-handle-position);
+				block-size: var(--split-view-handle-hit-area-size);
+				transform: translateY(-50%);
+				cursor: row-resize;
+
+				&::before {
+					inline-size: 100%;
+					block-size: var(--split-view-divider-size);
+				}
+
+				&::after {
+					inline-size: var(--split-view-handle-size);
+					max-inline-size: calc(100% - 10px);
+					block-size: 5px;
+				}
+			}
+		}
+	}
+
+	&[resizing] {
+		--split-view-divider-color: #{$ui-selected-bg-color};
+
+		&:not([vertical]) {
+			cursor: col-resize;
+		}
+
+		&[vertical] {
+			cursor: row-resize;
+		}
+	}
+}

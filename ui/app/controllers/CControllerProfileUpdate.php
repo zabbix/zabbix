@@ -30,6 +30,15 @@ class CControllerProfileUpdate extends CController {
 			switch ($this->getInput('idx')) {
 				case 'web.action.list.filter.active':
 				case 'web.actionlog.filter.active':
+				case 'web.apm.trace.filter.active':
+				case 'web.apm.metric.filter.active':
+				case 'web.apm.log.filter.active':
+				case 'web.apm.log.datatable':
+				case 'web.apm.log.side_drawer.position':
+				case 'web.apm.metric.datatable':
+				case 'web.apm.metric.side_drawer.position':
+				case 'web.apm.trace.datatable':
+				case 'web.apm.trace.side_drawer.position':
 				case 'web.auditacts.filter.active':
 				case 'web.auditlog.filter.active':
 				case 'web.availabilityreport.filter.active':
@@ -88,9 +97,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.device.list.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
-				case 'web.monitoring.problem.datatable':
-				case 'web.monitoring.latest.datatable':
 				case 'web.monitoring.hosts.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.problem.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
 				case 'web.banner.dismissed_ids':
@@ -111,12 +120,18 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
+				case 'web.apm.log.datatable':
+				case 'web.apm.log.side_drawer.position':
+				case 'web.apm.metric.datatable':
+				case 'web.apm.metric.side_drawer.position':
+				case 'web.apm.trace.datatable':
+				case 'web.apm.trace.side_drawer.position':
 				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case 'web.monitoring.problem.datatable':
-				case 'web.monitoring.latest.datatable':
 				case 'web.monitoring.hosts.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.problem.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
 				case 'web.banner.dismissed_ids':
@@ -146,6 +161,9 @@ class CControllerProfileUpdate extends CController {
 		DBstart();
 		switch ($idx) {
 			// PROFILE_TYPE_STR
+			case 'web.apm.log.side_drawer.position':
+			case 'web.apm.metric.side_drawer.position':
+			case 'web.apm.trace.side_drawer.position':
 			case 'web.dashboard.last_widget_type':
 			case 'web.banner.dismissed_ids':
 				$value_str = $this->getInput('value_str');
@@ -156,11 +174,15 @@ class CControllerProfileUpdate extends CController {
 					CProfile::update($idx, $value_str, PROFILE_TYPE_STR);
 				}
 				break;
+
+			case 'web.apm.log.datatable':
+			case 'web.apm.metric.datatable':
+			case 'web.apm.trace.datatable':
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
-			case 'web.monitoring.problem.datatable':
-			case 'web.monitoring.latest.datatable':
 			case 'web.monitoring.hosts.datatable':
+			case 'web.monitoring.latest.datatable':
+			case 'web.monitoring.problem.datatable':
 			case 'web.hosts.datatable':
 			case 'web.templates.datatable':
 				$value_str = $this->getInput('value_str');

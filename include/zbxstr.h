@@ -127,4 +127,16 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 #	define ZBX_STRMASK(x)	((void)(x), ZBX_SECRET_MASK)
 #endif
 
+/* location of a substring */
+typedef struct
+{
+	/* left position */
+	size_t	l;
+	/* right position */
+	size_t	r;
+}
+zbx_strloc_t;
+
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
+
 #endif /* ZABBIX_STR_H */

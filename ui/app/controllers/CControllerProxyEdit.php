@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerProxyEdit extends CController {
 
@@ -63,6 +64,7 @@ class CControllerProxyEdit extends CController {
 					'timeout_telemetry_query', 'compatibility'
 				],
 				'selectProxyGroup' => ['name'],
+				'selectApm' => ['additional_resource_attributes', 'data_collection_status', 'max_messages_per_second'],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
 			]);
@@ -105,7 +107,10 @@ class CControllerProxyEdit extends CController {
 					'tls_psk' => DB::getDefault('proxy', 'tls_psk'),
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject'],
-					'custom_timeouts' => (int) $this->proxy['custom_timeouts']
+					'custom_timeouts' => (int) $this->proxy['custom_timeouts'],
+					'data_collection_status' => (int) $this->proxy['apm']['data_collection_status'],
+					'max_messages_per_second' => (int) $this->proxy['apm']['max_messages_per_second'],
+					'additional_resource_attributes' => $this->proxy['apm']['additional_resource_attributes']
 				],
 				'warnings' => []
 			];
@@ -185,7 +190,7 @@ class CControllerProxyEdit extends CController {
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
 					'timeout_telemetry_query' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
-				],
+				] + array_map(static fn(array $field) => $field['default'], CProxy::APM_SCHEMA),
 				'warnings' => []
 			];
 		}

@@ -1253,8 +1253,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
-				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->power[$side], 10
+				$this->intervals[$side], $units, $this->power[$side], 10, false
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);

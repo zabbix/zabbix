@@ -14,8 +14,10 @@
 
 #include "zbxcacheconfig.h"
 
+#include "dbconfig_local.h"
 #include "dbconfig.h"
 #include "dbsync.h"
+#include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
 #include "zbxnum.h"
@@ -117,6 +119,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"ok_period",			ZBX_SETTING_TYPE_STR, 		0,			"5m"},
 	{"ok_unack_color",		ZBX_SETTING_TYPE_STR, 		0,			"009900"},
 	{"ok_unack_style",		ZBX_SETTING_TYPE_INT, 		0,			"1"},
+	{ZBX_SETTINGS_APM,		ZBX_SETTING_TYPE_STR,		ZBX_SERVER | ZBX_PROXY,	""},
 	{"passwd_check_rules",		ZBX_SETTING_TYPE_INT, 		0,			"8"},
 	{"passwd_min_length",		ZBX_SETTING_TYPE_INT, 		0,			"8"},
 	{"period_default",		ZBX_SETTING_TYPE_STR, 		0,			"1h"},
@@ -462,6 +465,21 @@ static void	store_str_setting(const zbx_setting_value_t *values, const char *nam
 		{
 			UPDATE_REVISION(revision, name, "%s", *target, value_str);
 			dc_strpool_replace(found, target, value_str);
+		}
+	}
+}
+
+static void	store_str_setting_local(const zbx_setting_value_t *values, const char *name, int defaults_log_level,
+		char **target, zbx_uint64_t revision)
+{
+	const char	*value_str = NULL;
+
+	if (SUCCEED == setting_get_str(values, name, defaults_log_level, &value_str))
+	{
+		if (NULL == *target || 0 != strcmp(*target, value_str))
+		{
+			UPDATE_REVISION(revision, name, "%s", ZBX_NULL2STR(*target), value_str);
+			*target = zbx_strdup(*target, value_str);
 		}
 	}
 }
@@ -977,6 +995,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_int_setting(values, "proxy_secrets_provider", defaults_log_level, &config->config->proxy_secrets_provider,
 			revision);
 
+	store_str_setting_local(values, ZBX_SETTINGS_APM, defaults_log_level, &dc_local()->apm_config, revision);
+
 	if (SUCCEED == setting_get_str(values, "apm_global_db", defaults_log_level, &value_str))
 	{
 		update_apm_global_db(value_str, found, revision);
@@ -1019,3 +1039,5 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char p
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+

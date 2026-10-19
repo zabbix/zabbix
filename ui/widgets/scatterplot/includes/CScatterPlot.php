@@ -627,8 +627,6 @@ class CScatterPlot extends CSvg {
 	private function getValuesGridWithPosition(int $axis, bool $empty_set = false): array {
 		$min = 0;
 		$max = 1;
-		$min_calculated = true;
-		$max_calculated = true;
 		$interval = 1;
 		$units = '';
 		$power = 0;
@@ -637,8 +635,6 @@ class CScatterPlot extends CSvg {
 			if ($axis == GRAPH_YAXIS_SIDE_LEFT) {
 				$min = $this->y_min;
 				$max = $this->y_max;
-				$min_calculated = $this->y_min_calculated;
-				$max_calculated = $this->y_max_calculated;
 				$interval = $this->y_interval;
 				$units = $this->y_units;
 				$power = $this->y_power;
@@ -646,17 +642,13 @@ class CScatterPlot extends CSvg {
 			else {
 				$min = $this->x_min;
 				$max = $this->x_max;
-				$min_calculated = $this->x_min_calculated;
-				$max_calculated = $this->x_max_calculated;
 				$interval = $this->x_interval;
 				$units = $this->x_units;
 				$power = $this->x_power;
 			}
 		}
 
-		$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval,
-			$units, $power, 14
-		);
+		$relative_values = calculateGraphScaleValues($min, $max, $interval, $units, $power, 14, false);
 
 		$absolute_values = [];
 

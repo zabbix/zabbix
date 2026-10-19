@@ -240,6 +240,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
@@ -258,6 +259,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
@@ -278,6 +280,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
@@ -300,12 +303,16 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						// The field ID is used here and throughout, as the user role form contains two "Enabled" labels, which causes phpunit warnings.
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Add problem comments' => false,
@@ -330,6 +337,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
@@ -337,7 +345,9 @@ class testFormUserRoles extends CWebTest {
 						'Alerts' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
@@ -365,6 +375,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
@@ -374,7 +385,9 @@ class testFormUserRoles extends CWebTest {
 						'Administration' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
-						'Enabled' => false,
+						'id:api-access' => false,
+						'id:devices.access' => false,
+						'Default access to new device actions' => false,
 						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
@@ -518,6 +531,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
@@ -534,6 +548,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
@@ -552,6 +567,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin',
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
@@ -638,7 +654,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_deny',
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -655,7 +671,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_deny',
 						'User type' => 'Admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -672,7 +688,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_deny',
 						'User type' => 'Super admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -689,7 +705,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_allow',
 						'User type' => 'User',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -707,7 +723,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_allow',
 						'User type' => 'Admin',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -725,7 +741,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_allow',
 						'User type' => 'Super admin',
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -855,12 +871,23 @@ class testFormUserRoles extends CWebTest {
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
-		$form->checkValue(['Enabled' => false]);
+		$form->checkValue(['id:api-access' => false]);
 
 		// The API method buttons are disabled by default.
 		$this->assertFalse($form->getField('API methods')->isEnabled());
-		$this->assertFalse($this->query('button:Select')->one()->isClickable());
+		$selector = 'xpath://div[@id="api_methods_"]/following::button[text()="Select"]';
+		$this->assertFalse($this->query($selector)->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
+
+		// After enabling API access again, API methods controls become active.
+		$form->fill(['id:api-access' => true]);
+		$this->assertTrue($form->getField('API methods')->isEnabled());
+		$this->assertTrue($this->query($selector)->one()->isClickable());
+		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and not(@aria-disabled)]')->exists());
+		$this->query($selector)->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
+
+		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals(4, $form->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
@@ -901,7 +928,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_api',
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.get', 'alert.get', 'apmlog.get', 'apmmetric.get', 'apmspan.get', 'apmtrace.get',
@@ -929,7 +956,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_api',
 						'User type' => 'Admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
@@ -974,7 +1001,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_api',
 						'User type' => 'Super admin',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'apmlog.get',
@@ -1124,6 +1151,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Dashboards' => false,
 						'Monitoring' => [],
+						'APM' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
@@ -1205,7 +1233,7 @@ class testFormUserRoles extends CWebTest {
 					'to_user' => true,
 					'fields' => [
 						'User type' => 'User',
-						'Enabled' => true
+						'id:api-access' => true
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1224,7 +1252,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enabled' => true,
+						'id:api-access' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => ['*.create'],

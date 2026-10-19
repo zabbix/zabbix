@@ -732,6 +732,7 @@ class testUserRolesPermissions extends CWebTest {
 		$pages_before = [
 			'Dashboards',
 			'Monitoring',
+			'APM',
 			'Services',
 			'Inventory',
 			'Reports',

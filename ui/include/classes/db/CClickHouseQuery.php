@@ -23,6 +23,7 @@ class CClickHouseQuery {
 	protected array $group = [];
 	protected array $order = [];
 	protected ?int $limit = null;
+	protected ?int $offset = null;
 	protected array $param = [];
 
 	protected array $linked_queries = [];
@@ -73,6 +74,12 @@ class CClickHouseQuery {
 		return $this;
 	}
 
+	public function offset(?int $offset): static {
+		$this->offset = $offset;
+
+		return $this;
+	}
+
 	public function param(string $name, mixed $value): static {
 		$this->param[$name] = $value;
 
@@ -101,7 +108,8 @@ class CClickHouseQuery {
 			($this->where ? ' WHERE '.implode(' AND ', $this->where) : '').
 			($this->group ? ' GROUP BY '.implode(',', $this->group) : '').
 			($this->order ? ' ORDER BY '.implode(',', $this->order) : '').
-			($this->limit !== null ? ' LIMIT '.$this->limit : '');
+			($this->limit !== null ? ' LIMIT '.$this->limit : '').
+			($this->offset !== null && $this->offset > 0 ? ' OFFSET '.$this->offset : '');
 	}
 
 	public function getParams(): array {

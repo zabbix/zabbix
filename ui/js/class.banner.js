@@ -160,6 +160,9 @@ class CBanner {
 
 		this.#content.innerHTML = content;
 		this.#content.querySelectorAll('a[href]').forEach(link => link.setAttribute('target', '_blank'));
+
+		const banner_size = Math.ceil(this.#container.getBoundingClientRect().height + 1);
+		document.body.style.setProperty('--banner-size', `${banner_size}px`);
 	}
 
 	#createBanner() {
@@ -243,6 +246,8 @@ class CBanner {
 			this.#container = null;
 			this.#content = null;
 			this.#active_banner_id = null;
+
+			document.body.style.removeProperty('--banner-size');
 
 			return;
 		}

@@ -294,7 +294,7 @@ int	zbx_apm_db_config_init_local_config(zbx_apm_db_config_t *apm_db_config, char
 			&apm_db_config->password, apm_db_config->vault_path, config_source_ip, config_ssl_ca_location,
 			config_ssl_cert_location, config_ssl_key_location, error))
 	{
-		*error = zbx_dsprintf(*error, "cannot initialize apm database credentials from vault: %s", *error);
+		*error = zbx_dsprintf(*error, "cannot initialize APM database credentials from vault: %s", *error);
 		goto fail;
 	}
 
