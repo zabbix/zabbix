@@ -21,6 +21,7 @@ class CClickHouseQuery {
 	protected array $join = [];
 	protected array $where = [];
 	protected array $group = [];
+	protected array $having = [];
 	protected array $order = [];
 	protected ?int $limit = null;
 	protected ?int $offset = null;
@@ -58,6 +59,12 @@ class CClickHouseQuery {
 
 	public function group(string $group): static {
 		$this->group[] = $group;
+
+		return $this;
+	}
+
+	public function having(string $having): static {
+		$this->having[] = $having;
 
 		return $this;
 	}
@@ -107,7 +114,8 @@ class CClickHouseQuery {
 			($this->join ? ' '.implode(' ', $this->join) : '').
 			($this->where ? ' WHERE '.implode(' AND ', $this->where) : '').
 			($this->group ? ' GROUP BY '.implode(',', $this->group) : '').
-			($this->order ? ' ORDER BY '.implode(',', $this->order) : '').
+			($this->having ? ' HAVING '.implode(' AND ', $this->having) : '').
+			($this->order ? ' ORDER BY '.implode(' ', $this->order) : '').
 			($this->limit !== null ? ' LIMIT '.$this->limit : '').
 			($this->offset !== null && $this->offset > 0 ? ' OFFSET '.$this->offset : '');
 	}

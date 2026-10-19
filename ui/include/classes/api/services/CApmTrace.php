@@ -143,25 +143,63 @@ class CApmTrace extends CApmGeneral {
 				)
 			);
 
-		$inner_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'ti', $db_schema, [
-			'sortfield' => !$use_span_filtering && !$options['countOutput'] ? $options['sortfield'] : [],
-			'sortorder' => !$use_span_filtering && !$options['countOutput'] ? $options['sortorder'] : []
-		]))
-			->select('DISTINCT ti.TraceId')
+		$inner_query = (new CClickHouseQuery())
+			->select('ti.TraceId')
+			->from('otel_traces', 'ti')
+			->group('ti.TraceId')
 			->where('ti.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']])
-			->where('ti.ParentSpanId=\'\'');
+			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
 
 		if ($options['traceids'] !== null) {
 			$inner_query->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
 		}
 
+		$having_root = [
+			'countIf(ti.ParentSpanId=\'\')>0',
+			'minIf(ti.Timestamp,ti.ParentSpanId=\'\')>={time_from:Int32}',
+			'minIf(ti.Timestamp,ti.ParentSpanId=\'\')<{time_till:Int32}'
+		];
+
+		$having_no_root = [
+			'countIf(ti.ParentSpanId=\'\')=0',
+			'min(ti.Timestamp)>={time_from:Int32}',
+			'min(ti.Timestamp)<{time_till:Int32}'
+		];
+
+		$timestamp_unix_nano = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 'ti');
+
 		if ($options['min_duration'] !== null) {
-			$inner_query->where('ti.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
+			$having_root[] = 'argMin(ti.Duration,ti.ParentSpanId=\'\')>={min_duration:Int64}';
+			$having_no_root[] =
+				'max('.$timestamp_unix_nano.'+ti.Duration)-min('.$timestamp_unix_nano.')>={min_duration:Int64}';
+			$inner_query->param('min_duration', $options['min_duration']);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$inner_query->where('ti.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
+			$having_root[] = 'argMin(ti.Duration,ti.ParentSpanId=\'\')<={max_duration:Int64}';
+			$having_no_root[] =
+				'max('.$timestamp_unix_nano.'+ti.Duration)-min('.$timestamp_unix_nano.')<={max_duration:Int64}';
+			$inner_query->param('max_duration', $options['max_duration']);
+		}
+
+		$inner_query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');
+
+		if (!$use_span_filtering && !$options['countOutput']) {
+			foreach ($options['sortfield'] as $i => $field) {
+				$order_by = match($field) {
+					'TraceId' => 'ti.TraceId',
+					default => 'argMin(ti.'.$field.',tuple(ti.ParentSpanId!=\'\',ti.Timestamp))'
+				};
+
+				$sort_order = $options['sortorder'];
+				$sort_order = match(true) {
+					is_string($sort_order) => $sort_order,
+					is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
+					default => ZBX_SORT_UP
+				};
+
+				$inner_query->order($order_by, $sort_order);
+			}
 		}
 
 		if ($use_span_filtering) {
@@ -221,7 +259,7 @@ class CApmTrace extends CApmGeneral {
 					$select_alias = $custom_select !== null ? $field : null;
 
 					if ($field !== 'TraceId') {
-						$select = 'anyIf('.$select.',t.ParentSpanId=\'\')';
+						$select = 'argMin('.$select.',tuple(t.ParentSpanId!=\'\',t.Timestamp))';
 						$select_alias = $field;
 					}
 
@@ -232,7 +270,7 @@ class CApmTrace extends CApmGeneral {
 			foreach ($options['sortfield'] as $i => $field) {
 				$order_by = match($field) {
 					'TraceId' => 't.TraceId',
-					default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
+					default => 'argMin(t.'.$field.',tuple(t.ParentSpanId!=\'\',t.Timestamp))'
 				};
 
 				$sort_order = $options['sortorder'];
