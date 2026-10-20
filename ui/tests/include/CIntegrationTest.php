@@ -844,13 +844,8 @@ class CIntegrationTest extends CAPITest {
 			if ($output !== false && $output !== null) {
 				$child_pids = explode("\n", trim($output));
 			}
-			if ($component === self::COMPONENT_JAVA) {
-				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
-				self::executeCommand($script, []);
-				sleep(3);
-			} else {
-				posix_kill($parent_pid, SIGTERM);
-			}
+
+			posix_kill($parent_pid, SIGTERM);
 
 			self::waitForShutdown($component, $parent_pid, $child_pids);
 		}
@@ -880,13 +875,8 @@ class CIntegrationTest extends CAPITest {
 					}
 				}
 			}
-			if ($component === self::COMPONENT_JAVA) {
-				$script = PHPUNIT_BINARY_DIR.'/zabbix_java/shutdown.sh';
-				self::executeCommand($script, []);
-				sleep(3);
-			} else {
-				posix_kill($pid, SIGKILL);
-			}
+
+			posix_kill($pid, SIGKILL);
 		}
 
 		unlink($pid_path);
