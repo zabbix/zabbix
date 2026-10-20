@@ -103,11 +103,11 @@ $form_grid
 		new CLabel(_('Start time'), 'hours'),
 		new CFormField(
 			(new CDiv([
-				(new CNumericBox('hours', $data['hours'], 2, !$data['allowed_edit'], false, false))
+				(new CNumericBox('hours', $data['hours'], 2, !$data['allowed_edit'], false))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					->padWithZeroes(2),
 				' : ',
-				(new CNumericBox('minutes', $data['minutes'], 2, !$data['allowed_edit'], false, false))
+				(new CNumericBox('minutes', $data['minutes'], 2, !$data['allowed_edit'], false))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					->padWithZeroes(2)
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)

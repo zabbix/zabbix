@@ -67,7 +67,7 @@ $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 $provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 $provisioning_enabled = ($provisioning->isProvisioningEnabled()
-	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
+	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) == JIT_PROVISIONING_ENABLED
 );
 
 if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
@@ -81,6 +81,7 @@ if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETT
 
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
+$saml_data = null;
 $saml_settings = $provisioning->getIdpConfig();
 $settings = [
 	'sp' => [
@@ -177,6 +178,7 @@ try {
 		}
 
 		$groups_key = $saml_settings['group_name'];
+		$user_attributes = [];
 
 		foreach ($auth->getAttributes() as $attribute => $value) {
 			if ($groups_key !== $attribute) {
@@ -218,52 +220,38 @@ try {
 			$saml_data['provisioned_user'] = $user;
 		}
 
-		$saml_data['sign'] = CEncryptHelper::sign(json_encode($saml_data));
-
-		CSessionHelper::set('saml_data', $saml_data);
-
 		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
 			$relay_state = getRequest('RelayState');
 		}
 	}
 
-	if ($saml_settings['slo_url'] !== '') {
-		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
-			$saml_data = CSessionHelper::get('saml_data');
+	if ($saml_settings['slo_url'] !== '' && hasRequest('slo') && CSessionHelper::has('saml_data')) {
+		$saml_data = CSessionHelper::get('saml_data');
+		CWebUser::logout();
 
-			CWebUser::logout();
+		$url = $auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], true,
+			$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
+		);
 
-			$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false,
-				$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
-			);
-		}
+		header('Pragma: no-cache');
+		header('Cache-Control: no-cache, must-revalidate');
+		redirect($url);
+	}
 
-		if (hasRequest('sls')) {
-			CSessionHelper::unset(['saml_data']);
-			$auth->processSLO();
+	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
+		CWebUser::logout();
+		$url = $auth->processSLO(true, null, false, null, true);
 
-			redirect('index.php');
-		}
+		header('Pragma: no-cache');
+		header('Cache-Control: no-cache, must-revalidate');
+		redirect($url ?: $redirect_to->getUrl());
 	}
 
 	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 		redirect($redirect_to->toString());
 	}
 
-	if (CSessionHelper::has('saml_data')) {
-		$saml_data = CSessionHelper::get('saml_data');
-
-		if (!array_key_exists('sign', $saml_data)) {
-			throw new Exception(_('Session initialization error.'));
-		}
-
-		$saml_data_sign = $saml_data['sign'];
-		$saml_data_sign_check = CEncryptHelper::sign(json_encode(array_diff_key($saml_data, array_flip(['sign']))));
-
-		if (!CEncryptHelper::checkSign($saml_data_sign, $saml_data_sign_check)) {
-			throw new Exception(_('Session initialization error.'));
-		}
-
+	if ($saml_data !== null) {
 		// Temporary disabling wrapper for API requests.
 		$wrapper = API::getWrapper();
 		API::setWrapper();
@@ -302,7 +290,6 @@ try {
 			}
 
 			unset($saml_data['provisioned_user'], $saml_data['idp_groups']);
-			CSessionHelper::set('saml_data', $saml_data);
 		}
 
 		CWebUser::$data = CUser::loginByUsername($saml_data['username_attribute'],
@@ -314,6 +301,7 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
+		CSessionHelper::set('saml_data', $saml_data);
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 		API::getWrapper()->auth = [
 			'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
@@ -324,16 +312,17 @@ try {
 		redirect(reset($redirect));
 	}
 
-	$auth->login(null, [], hasRequest('force_authn'));
+	$url = $auth->login(null, [], hasRequest('force_authn'), false, true);
+
+	header('Pragma: no-cache');
+	header('Cache-Control: no-cache, must-revalidate');
+	redirect($url);
 }
 catch (Exception $e) {
 	error($e->getMessage());
 }
 
-$sso_authorized = CSessionHelper::has('saml_data');
-CSessionHelper::unset(['saml_data']);
-
-if ($sso_authorized) {
+if ($saml_data !== null && !CWebUser::isLoggedIn()) {
 	error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
 	error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
 }
@@ -342,7 +331,7 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		$sso_authorized && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
+		$saml_data !== null && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 			? (new CButton('force_authn', _('Switch SSO user')))
 					->setAttribute('data-url',
 						(new CUrl('index_sso.php'))
