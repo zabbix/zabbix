@@ -19,12 +19,20 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
 
 /**
  * Test suite that exercises APM (OpenTelemetry) data at scale: device status gauges are sent over OTLP/gRPC
- * to the proxy APM collector, stored in ClickHouse and read back by a single Telemetry query item on the
- * server. Per-device status is fanned out to LLD-discovered dependent items (one per device), and trigger
- * prototypes on them must fire and recover for exactly the devices whose status changed.
+ * to the proxy APM collector, stored in ClickHouse and read back by Telemetry query items on the server.
+ * HOST_COUNT hosts stand for sites of LLD_DISCOVERY_COUNT devices each, every device reports the site it belongs
+ * to in the "site" resource attribute and each host has a single Telemetry query item for the devices of its site.
+ * Devices are discovered from their own data by a second Telemetry query on each host, the LLD rule, which
+ * returns one row per device that reported within DISCOVERY_WINDOW. Per-device status is fanned out to
+ * LLD-discovered dependent items (one per device), and trigger prototypes on them must fire and recover for
+ * exactly the devices whose status changed.
  *
- * Each query result row is a separate value, so every row is processed by all dependent items:
- * PROBLEM_DEVICE_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per round (indexed, master value parsed once).
+ * The query item, LLD rule and prototypes come from a template linked to every host, the site filter of the queries
+ * is the {$SITE} user macro, which every host sets to its own name.
+ *
+ * Each query result row is a separate value, so every row is processed by all dependent items of its host:
+ * PROBLEM_DEVICE_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per host and round (indexed, master value parsed
+ * once).
  *
  * Requires: proxy built with APM support, ClickHouse with otel_* tables, grpcurl in PATH.
  *
@@ -44,19 +52,24 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const OTLP_TIMEOUT = 10;
 
 	const HOSTNAME = 'test_lld_telemetry_sync_at_scale';
-	const TEMPLATE_NAME = 'test_lld_telemetry_sync_at_scale_template';
 	const PROXY_NAME = 'test_lld_telemetry_sync_at_scale_proxy';
+	const TEMPLATE_NAME = 'test_lld_telemetry_sync_at_scale_template';
+	const SITE_MACRO = '{$SITE}';
 	const SERVICE_NAME = 'telemetry-sync-at-scale';
 	const METRIC_NAME = 'device.status';
 	const TQ_ITEM_KEY = 'apm.device.status.query';
 	const LLD_RULE_KEY = 'apm.device.discovery';
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'apm.device.status';
+	const SITE_ATTRIBUTE = 'site';
 	const SENSOR_BASE = 'sensor';
+	const PREFLIGHT_SITE = 'apm_preflight';
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
-	const LLD_DISCOVERY_COUNT = 10000;
-	const PROBLEM_DEVICE_COUNT = 9999;
+	const HOST_COUNT = 4;
+	/* every device is a row of the discovery query, which must not exceed ZBX_TQ_MAX_RESULT_ROWS (10000) */
+	const LLD_DISCOVERY_COUNT = 8192;
+	const PROBLEM_DEVICE_COUNT = 8192;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
 	const TRIGGER_ITERATIONS = 60;
@@ -72,11 +85,25 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const TQ_TIME_SHIFT = '5s';
 	const TQ_LOOKBACK_LIMIT = '1h';
 
-	private static $hostid;
+	/* granularity smaller than delay, every poll returns several buckets of a device that reported more than once */
+	const SMALL_TQ_GRANULARITY = '1s';
+	/* every status is sent twice a second apart, a poll may hold both buckets of a device, keep the rows of a host */
+	/* within ZBX_TQ_MAX_RESULT_ROWS (10000) */
+	const SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT = 4096;
+	const SMALL_GRANULARITY_SEND_COUNT = 2;
+
+	/* devices that reported within the window are discovered, one bucket per window gives one row per device */
+	const DISCOVERY_DELAY = '1m';
+	const DISCOVERY_WINDOW = '1h';
+
+	/* host name => hostid, host name is also the site of its devices */
+	private static $hostids = [];
 	private static $templateid;
+	/* itemid of the Telemetry query item on the template */
+	private static $template_tq_itemid;
+	/* LLD rules inherited by the hosts */
+	private static $lld_ruleids = [];
 	private static $proxyid;
-	private static $tq_itemid;
-	private static $lld_ruleid;
 
 	/**
 	 * Component configuration provider.
@@ -90,11 +117,13 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'LogFileSize' => 8,
 				'DebugLevel' => 3,
 				'CacheSize' => '128M',
-				'HistoryCacheSize' => '32M',
-				'HistoryIndexCacheSize' => '32M',
+				'TrendCacheSize' => '128M',
+				'HistoryCacheSize' => '128M',
+				'HistoryIndexCacheSize' => '128M',
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
 				'StartDBSyncers' => '4',
+				'StartLLDProcessors' => self::HOST_COUNT,
 				'StartTelemetryQueryPollers' => '1'
 			],
 			self::COMPONENT_PROXY => [
@@ -126,14 +155,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
-		$response = $this->call('hostgroup.get', [
-			'filter' => ['name' => ['Zabbix servers']],
-			'output' => ['groupid']
-		]);
-		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
-		$groupid = $response['result'][0]['groupid'];
-
-		// The proxy is only used as the APM (OTLP) collector; the host is monitored by the server.
+		// The proxy is only used as the APM (OTLP) collector; the hosts are monitored by the server.
 		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
 			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -146,22 +168,65 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['proxyids']);
 		self::$proxyid = $response['result']['proxyids'][0];
 
+		return true;
+	}
+
+	/**
+	 * Create the template and a host for every site linked to it, then collect the LLD rules inherited by the hosts.
+	 */
+	private function createSiteHosts(): void {
+		$this->createSiteTemplate();
+
+		$response = $this->call('hostgroup.get', [
+			'filter' => ['name' => ['Zabbix servers']],
+			'output' => ['groupid']
+		]);
+		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
+		$groupid = $response['result'][0]['groupid'];
+
+		foreach (self::hostNames() as $host) {
+			$response = $this->call('host.create', [
+				'host' => $host,
+				'interfaces' => [],
+				'groups' => [['groupid' => $groupid]],
+				'templates' => [['templateid' => self::$templateid]],
+				'macros' => [['macro' => self::SITE_MACRO, 'value' => $host]],
+				'status' => HOST_STATUS_MONITORED
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['hostids']);
+			self::$hostids[$host] = $response['result']['hostids'][0];
+		}
+
+		$response = $this->call('discoveryrule.get', [
+			'hostids' => array_values(self::$hostids),
+			'filter' => ['key_' => self::LLD_RULE_KEY],
+			'output' => ['itemid']
+		]);
+		$this->assertCount(self::HOST_COUNT, $response['result']);
+		self::$lld_ruleids = array_column($response['result'], 'itemid');
+	}
+
+	/**
+	 * Create template with the Telemetry query item for devices of the site, Telemetry query LLD rule discovering the
+	 * devices of the site and per-device dependent items and triggers. The site comes from the host macro.
+	 */
+	private function createSiteTemplate(): void {
 		$response = $this->call('templategroup.get', [
 			'filter' => ['name' => ['Templates']],
 			'output' => ['groupid']
 		]);
 		$this->assertNotEmpty($response['result'], 'Template group "Templates" not found.');
-		$templategroupid = $response['result'][0]['groupid'];
 
 		$response = $this->call('template.create', [
 			'host' => self::TEMPLATE_NAME,
-			'groups' => [['groupid' => $templategroupid]]
+			'groups' => [['groupid' => $response['result'][0]['groupid']]]
 		]);
 		$this->assertArrayHasKey('templateids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['templateids']);
 		self::$templateid = $response['result']['templateids'][0];
 
-		// Single query for all devices: one row per device that reported in the window.
+		// Single query for all devices of the site: one row per device that reported in the window.
 		$response = $this->call('item.create', [
 			'hostid' => self::$templateid,
 			'name' => 'APM device status query',
@@ -184,46 +249,55 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'aggregated_columns' => [
 					['column' => 'Value', 'function' => AGGREGATE_MAX, 'parameters' => [], 'alias' => 'value']
 				],
-				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'formula' => '',
-					'conditions' => [
-						[
-							'column' => 'MetricName',
-							'attribute_key' => '',
-							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => self::METRIC_NAME
-						]
-					]
-				]
+				'filter' => self::siteStatusFilter(self::SITE_MACRO)
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
-		self::$tq_itemid = $response['result']['itemids'][0];
+		self::$template_tq_itemid = $response['result']['itemids'][0];
 
-		// Device list is pushed separately, the query item only carries status changes.
+		// Granularity and lookback limit equal to the window give a single bucket, polling more often than the
+		// window slides it, so every poll returns each device that reported within the last window once. Every
+		// poll reads the whole window again and late data is picked up by the next one, so there is no time shift.
 		$response = $this->call('discoveryrule.create', [
 			'hostid' => self::$templateid,
 			'name' => 'APM device discovery',
 			'key_' => self::LLD_RULE_KEY,
-			'type' => ITEM_TYPE_TRAPPER,
-			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'timeout' => '3s',
+			'delay' => self::DISCOVERY_DELAY,
+			'time_shift' => '0s',
+			'lookback_limit' => self::DISCOVERY_WINDOW,
+			'granularity' => self::DISCOVERY_WINDOW,
+			'query' => [
+				'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+				'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+				'columns' => [
+					['column' => 'ResourceAttributes', 'attribute_key' => 'host.name']
+				],
+				'aggregated_columns' => [
+					['column' => '', 'function' => AGGREGATE_COUNT, 'parameters' => [], 'alias' => 'cnt']
+				],
+				'filter' => self::siteStatusFilter(self::SITE_MACRO)
+			],
+			'lld_macro_paths' => [
+				['lld_macro' => self::LLD_MACRO, 'path' => '$["ResourceAttributes.host.name"]']
+			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
-		self::$lld_ruleid = $response['result']['itemids'][0];
+		$lld_ruleid = $response['result']['itemids'][0];
 
 		// Each dependent item keeps only rows of its own device and extracts the aggregated status. JSONPath as
 		// the first step lets all dependent items share one parsed and indexed master value, rows of other
 		// devices do not match and are discarded.
 		$response = $this->call('itemprototype.create', [
 			'hostid' => self::$templateid,
-			'ruleid' => self::$lld_ruleid,
+			'ruleid' => $lld_ruleid,
 			'name' => 'APM device status ['.self::LLD_MACRO.']',
 			'key_' => self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.']',
 			'type' => ITEM_TYPE_DEPENDENT,
-			'master_itemid' => self::$tq_itemid,
+			'master_itemid' => self::$template_tq_itemid,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT,
 			'preprocessing' => [
 				[
@@ -244,19 +318,30 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+	}
 
-		$response = $this->call('host.create', [
-			'host' => self::HOSTNAME,
-			'interfaces' => [],
-			'groups' => [['groupid' => $groupid]],
-			'templates' => [['templateid' => self::$templateid]],
-			'status' => HOST_STATUS_MONITORED
-		]);
-		$this->assertArrayHasKey('hostids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		self::$hostid = $response['result']['hostids'][0];
-
-		return true;
+	/**
+	 * Query filter for status data points of devices of the site.
+	 */
+	private static function siteStatusFilter(string $site): array {
+		return [
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'formula' => '',
+			'conditions' => [
+				[
+					'column' => 'MetricName',
+					'attribute_key' => '',
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'value' => self::METRIC_NAME
+				],
+				[
+					'column' => 'ResourceAttributes',
+					'attribute_key' => self::SITE_ATTRIBUTE,
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'value' => $site
+				]
+			]
+		];
 	}
 
 	public static function clearData(): void {
@@ -264,16 +349,18 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			CAPIHelper::authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		}
 
-		if (self::$hostid !== null) {
-			$response = CAPIHelper::call('host.delete', [self::$hostid]);
+		if (self::$hostids) {
+			$response = CAPIHelper::call('host.delete', array_values(self::$hostids));
 			self::assertArrayHasKey('hostids', $response['result']);
-			self::$hostid = null;
+			self::$hostids = [];
+			self::$lld_ruleids = [];
 		}
 
 		if (self::$templateid !== null) {
 			$response = CAPIHelper::call('template.delete', [self::$templateid]);
 			self::assertArrayHasKey('templateids', $response['result']);
 			self::$templateid = null;
+			self::$template_tq_itemid = null;
 		}
 
 		if (self::$proxyid !== null) {
@@ -286,39 +373,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send the device list to the LLD rule and wait until one dependent item and one trigger is
-	 * discovered per device.
-	 */
-	public function testLLDTelemetrySyncAtScale_LLDDiscovery() {
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		$data = [];
-		foreach (self::deviceNames() as $device) {
-			$data[] = [self::LLD_MACRO => $device];
-		}
-		$this->sendSenderValue(self::HOSTNAME, self::LLD_RULE_KEY, ['data' => $data]);
-
-		$this->callUntilCountIsPresent('item.get', [
-			'hostids' => [self::$hostid],
-			'search' => ['key_' => self::ITEM_PROTO_KEY.'[']
-		], self::LLD_DISCOVERY_COUNT, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
-
-		$this->callUntilCountIsPresent('trigger.get', [
-			'hostids' => [self::$hostid],
-			'search' => ['description' => 'APM device ']
-		], self::LLD_DISCOVERY_COUNT, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
-
-		// Make discovered dependent items and triggers known to preprocessing and history sync.
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-	}
-
-	/**
 	 * Make sure the proxy APM collector accepts data and writes it to ClickHouse before relying on it.
 	 * The proxy receives its APM configuration from the server, so the first sends may be rejected or dropped.
-	 *
-	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
 	 */
 	public function testLLDTelemetrySyncAtScale_IngestPreflight() {
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		// Proxy monitors no hosts, it only needs the APM configuration from the server.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 
@@ -331,7 +390,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		while ($count === $baseline && time() < $deadline) {
 			if (time() >= $next_send) {
 				$error = null;
-				if (!$this->sendDeviceStatus([self::PREFLIGHT_DEVICE], 0, $error)) {
+				if (!$this->sendDeviceStatus([self::PREFLIGHT_SITE => [self::PREFLIGHT_DEVICE]], 0, $error)) {
 					$send_error = $error;
 				}
 				$next_send = time() + self::PREFLIGHT_RESEND_SECONDS;
@@ -348,22 +407,67 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send status=1 for the problem devices and wait until it is stored in ClickHouse.
+	 * Create the site hosts, then every device reports status=0 once and the LLD rule of every host discovers the
+	 * devices of its site from the stored data. Wait until one dependent item and one trigger is discovered per
+	 * device.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_IngestPreflight
 	 */
-	public function testLLDTelemetrySyncAtScale_TriggerFiringSend() {
-		$this->sendStatusAndWaitStored(self::problemDeviceNames(), 1);
+	public function testLLDTelemetrySyncAtScale_LLDDiscovery() {
+		$devices = [];
+		foreach (self::hostNames() as $host) {
+			$devices[$host] = self::deviceNames();
+		}
+		$this->sendStatusAndWaitStored($devices, 0);
+
+		$this->createSiteHosts();
+		// Data is already stored when the first poll of the LLD rule runs, so devices are discovered by it.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Do not wait for the first scheduled poll of the LLD rules, it may be up to DISCOVERY_DELAY away.
+		$tasks = [];
+		foreach (self::$lld_ruleids as $lld_ruleid) {
+			$tasks[] = ['type' => ZBX_TM_TASK_CHECK_NOW, 'request' => ['itemid' => $lld_ruleid]];
+		}
+		$response = $this->call('task.create', $tasks);
+		$this->assertArrayHasKey('taskids', $response['result']);
+
+		$this->callUntilCountIsPresent('item.get', [
+			'hostids' => array_values(self::$hostids),
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'[']
+		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS,
+				self::WAIT_ITERATION_DELAY);
+
+		$this->callUntilCountIsPresent('trigger.get', [
+			'hostids' => array_values(self::$hostids),
+			'search' => ['description' => 'APM device ']
+		], self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, self::LLD_ITERATIONS,
+				self::WAIT_ITERATION_DELAY);
+
+		// Make discovered dependent items and triggers known to preprocessing and history sync.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 
 	/**
-	 * Verify that exactly the triggers of the problem devices fire.
+	 * Send status=1 for the problem devices of all sites and wait until it is stored in ClickHouse.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
+	 */
+	public function testLLDTelemetrySyncAtScale_TriggerFiringSend() {
+		$this->sendStatusAndWaitStored(self::problemDevices(), 1);
+	}
+
+	/**
+	 * Verify that exactly the triggers of the problem devices fire on every host.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringSend
 	 */
 	public function testLLDTelemetrySyncAtScale_TriggerFiringVerify() {
-		$this->waitForOpenProblemCount(self::PROBLEM_DEVICE_COUNT);
-		$this->assertProblemDevices(self::problemDeviceNames());
+		$this->waitForOpenProblemCount(self::PROBLEM_DEVICE_COUNT * self::HOST_COUNT);
+
+		foreach (self::problemDevices() as $host => $devices) {
+			$this->assertProblemDevices($host, $devices);
+		}
 	}
 
 	/**
@@ -372,7 +476,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringVerify
 	 */
 	public function testLLDTelemetrySyncAtScale_TriggerRecoverySend() {
-		$this->sendStatusAndWaitStored(self::problemDeviceNames(), 0);
+		$this->sendStatusAndWaitStored(self::problemDevices(), 0);
 	}
 
 	/**
@@ -384,6 +488,79 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->waitForOpenProblemCount(0);
 	}
 
+	/**
+	 * Switch the Telemetry query items to granularity smaller than their delay, so a poll returns several buckets
+	 * of the same device.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_TriggerRecoveryVerify
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityUpdate() {
+		// The change is propagated to the items inherited by the hosts.
+		$response = $this->call('item.update', [
+			'itemid' => self::$template_tq_itemid,
+			'granularity' => self::SMALL_TQ_GRANULARITY
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertCount(1, $response['result']['itemids']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Send status=1 for the problem devices of all sites, then again a second later, so every device has a bucket
+	 * per send, and wait until it is stored in ClickHouse.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityUpdate
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringSend() {
+		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 1,
+				self::SMALL_GRANULARITY_SEND_COUNT);
+	}
+
+	/**
+	 * Verify that exactly the triggers of the problem devices fire on every host.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringSend
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringVerify() {
+		$this->waitForOpenProblemCount(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT * self::HOST_COUNT);
+
+		foreach (self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT) as $host => $devices) {
+			$this->assertProblemDevices($host, $devices);
+		}
+	}
+
+	/**
+	 * Send status=0 for the same devices, then again a second later, and wait until it is stored in ClickHouse.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringVerify
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoverySend() {
+		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 0,
+				self::SMALL_GRANULARITY_SEND_COUNT);
+	}
+
+	/**
+	 * Verify that all triggers recover.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoverySend
+	 */
+	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoveryVerify() {
+		$this->waitForOpenProblemCount(0);
+	}
+
+	private static function hostNames(): array {
+		$hosts = [];
+		for ($i = 1; $i <= self::HOST_COUNT; $i++) {
+			$hosts[] = self::HOSTNAME.'_'.$i;
+		}
+
+		return $hosts;
+	}
+
+	/**
+	 * Device names are the same on every site, devices are told apart by the site resource attribute.
+	 */
 	private static function deviceNames(): array {
 		$devices = [];
 		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
@@ -394,43 +571,72 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Evenly spread devices starting with sensor1, so prefix collisions (sensor1 vs sensor10..19) are covered.
+	 * Problem devices of every site.
+	 *
+	 * @return array  host name => device names
 	 */
-	private static function problemDeviceNames(): array {
-		$step = intdiv(self::LLD_DISCOVERY_COUNT, self::PROBLEM_DEVICE_COUNT);
+	private static function problemDevices(int $count = self::PROBLEM_DEVICE_COUNT): array {
 		$devices = [];
-		for ($i = 0; $i < self::PROBLEM_DEVICE_COUNT; $i++) {
-			$devices[] = self::SENSOR_BASE.(1 + $i * $step);
+		foreach (self::hostNames() as $index => $host) {
+			$devices[$host] = self::problemDeviceNames($index, $count);
 		}
 
 		return $devices;
 	}
 
-	private function sendStatusAndWaitStored(array $devices, int $status): void {
+	/**
+	 * Evenly spread devices, on the first site starting with sensor1, so prefix collisions (sensor1 vs
+	 * sensor10..19) are covered. Every next site starts one device later, so sites do not have the same problem
+	 * devices and rows of another site leaking into the query of a host fire a trigger that must not fire.
+	 */
+	private static function problemDeviceNames(int $site_index, int $count): array {
+		$step = intdiv(self::LLD_DISCOVERY_COUNT, $count);
+		$devices = [];
+		for ($i = 0; $i < $count; $i++) {
+			$devices[] = self::SENSOR_BASE.(1 + ($i * $step + $site_index) % self::LLD_DISCOVERY_COUNT);
+		}
+
+		return $devices;
+	}
+
+	/**
+	 * Send the status $send_count times, a second apart, so with granularity of a second every send of a device is
+	 * a bucket of its own.
+	 *
+	 * @param array $devices  site => device names
+	 */
+	private function sendStatusAndWaitStored(array $devices, int $status, int $send_count = 1): void {
 		$baseline = $this->getStoredStatusCount($status);
 
-		$error = null;
-		$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
-				'Failed to send status='.$status.' data points: '.$error);
+		for ($i = 1; $i <= $send_count; $i++) {
+			if ($i > 1) {
+				sleep(1);
+			}
 
-		$this->assertStoredStatusIncreasedBy($status, $baseline, count($devices));
+			$error = null;
+			$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
+					'Failed to send status='.$status.' data points (send '.$i.' of '.$send_count.'): '.$error);
+		}
+
+		$this->assertStoredStatusIncreasedBy($status, $baseline,
+				array_sum(array_map('count', $devices)) * $send_count);
 	}
 
 	private function waitForOpenProblemCount(int $expected): void {
 		$this->callUntilCountIsPresent('problem.get', [
-			'hostids' => [self::$hostid],
+			'hostids' => array_values(self::$hostids),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
 		], $expected, self::TRIGGER_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
-	 * Assert that exactly the expected devices have a trigger in PROBLEM state, so a matching count is not made of
-	 * the wrong devices (e.g. sensor1 rows matching sensor10..19).
+	 * Assert that exactly the expected devices of the host have a trigger in PROBLEM state, so a matching count is
+	 * not made of the wrong devices (e.g. sensor1 rows matching sensor10..19, or rows of another site).
 	 */
-	private function assertProblemDevices(array $expected): void {
+	private function assertProblemDevices(string $host, array $expected): void {
 		$response = $this->call('trigger.get', [
-			'hostids' => [self::$hostid],
+			'hostids' => [self::$hostids[$host]],
 			'filter' => ['value' => TRIGGER_VALUE_TRUE],
 			'output' => ['triggerid'],
 			'selectItems' => ['key_']
@@ -447,24 +653,37 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		sort($expected);
 		sort($actual);
 
-		$this->assertEquals($expected, $actual, 'Devices with triggers in PROBLEM state do not match: missing ['.
-				implode(',', array_diff($expected, $actual)).'], unexpected ['.
+		$this->assertEquals($expected, $actual, 'Devices with triggers in PROBLEM state on '.$host.
+				' do not match: missing ['.implode(',', array_diff($expected, $actual)).'], unexpected ['.
 				implode(',', array_diff($actual, $expected)).'].');
 	}
 
 	/**
-	 * Send one device.status gauge data point per device, one OTLP resource per device, batched.
+	 * Send one device.status gauge data point per device, one OTLP resource per device, batched. A batch may hold
+	 * devices of several sites, as when sent by a collector.
+	 *
+	 * @param array $devices  site => device names
 	 */
 	private function sendDeviceStatus(array $devices, int $status, ?string &$error = null): bool {
-		$time_ns = (string) (int) (microtime(true) * 1e9);
+		$site_devices = [];
+		foreach ($devices as $site => $names) {
+			foreach ($names as $device) {
+				$site_devices[] = [$site, $device];
+			}
+		}
 
-		foreach (array_chunk($devices, self::OTLP_BATCH_SIZE) as $batch) {
+		foreach (array_chunk($site_devices, self::OTLP_BATCH_SIZE) as $batch) {
+			// Stamp every request when it is sent like a device would, with a single stamp for all requests the
+			// last ones could arrive after the query window of the stamp has been read.
+			$time_ns = (string) (int) (microtime(true) * 1e9);
+
 			$resource_metrics = [];
-			foreach ($batch as $device) {
+			foreach ($batch as [$site, $device]) {
 				$resource_metrics[] = [
 					'resource' => [
 						'attributes' => [
 							['key' => 'service.name', 'value' => ['stringValue' => self::SERVICE_NAME]],
+							['key' => self::SITE_ATTRIBUTE, 'value' => ['stringValue' => (string) $site]],
 							['key' => 'host.name', 'value' => ['stringValue' => $device]]
 						]
 					],
