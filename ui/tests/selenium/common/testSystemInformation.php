@@ -144,10 +144,12 @@ class testSystemInformation extends CWebTest {
 
 	/**
 	 * Function that checks how a running HA cluster info is displayed in system information widget or report.
-	 *
-	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
-	 */
-	public function assertEnabledHACluster($dashboardid = null) {
+	*
+	* @param integer $dashboardid	id of the dashboard that the widgets are located in.
+	* @param string  $username		optional username to log in with.
+	* @param string  $password		optional password for the user (defaults to 'zabbix').
+	*/
+	public function assertEnabledHACluster($dashboardid = null, $username = null, $password = 'zabbix') {
 		global $DB;
 		self::$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
@@ -155,7 +157,13 @@ class testSystemInformation extends CWebTest {
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
-		$this->page->login()->open($url)->waitUntilReady();
+		if ($username !== null) {
+			$this->page->userLogin($username, $password);
+			$this->page->open($url)->waitUntilReady();
+		}
+		else {
+			$this->page->login()->open($url)->waitUntilReady();
+		}
 		$current_time = time();
 
 		if (!$dashboardid) {
