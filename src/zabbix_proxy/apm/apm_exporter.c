@@ -251,14 +251,6 @@ static int	apm_exporter_cfg_compare(const zbx_apm_exporter_cfg_t *cfg, const zbx
 		case ZBX_APM_DB_TYPE_CLICKHOUSE:
 			if (APM_EXPORTER_CLICKHOUSE != cfg->type)
 				return FAIL;
-			break;
-		default:
-			return FAIL;
-	}
-
-	switch (cfg->type)
-	{
-		case APM_EXPORTER_CLICKHOUSE:
 			return apm_clickhouse_cfg_compare(&cfg->data.clickhouse, apm_config);
 		default:
 			return FAIL;

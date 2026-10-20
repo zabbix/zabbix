@@ -11810,6 +11810,25 @@ out:
 	return num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get APM database configuration                                    *
+ *                                                                            *
+ * Parameters: out                    - [OUT] APM database configuration      *
+ *             local_apm_db_config    - [IN] local configuration, used        *
+ *                                           instead of global configuration  *
+ *                                           when enabled (optional)          *
+ *             config_source_ip       - [IN] source IP (optional)             *
+ *             config_ssl_ca_location - [IN] SSL CA location (optional)       *
+ *             revision               - [IN/OUT] revision of the last         *
+ *                                           retrieved global configuration,  *
+ *                                           updated on retrieval (optional)  *
+ *                                                                            *
+ * Return value: SUCCEED - configuration was retrieved                        *
+ *               FAIL    - global configuration has not changed since the     *
+ *                         specified revision, out is left empty              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
 		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision)
 {
@@ -11835,7 +11854,6 @@ int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_c
 
 		*revision = config->revision.settings_table;
 	}
-
 
 	global_config = &config->config->apm_global_db;
 
@@ -17624,6 +17642,4 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 
 	return apm_config;
 }
-
-
 

@@ -413,7 +413,7 @@ void	*zbx_apm_manager_thread(void *args)
 		if (FAIL == apm_exporter_pool_is_active(manager->exporters))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "no local TelemetryProvider configuration found,"
-				" waiting for global APM data source configuration to start collecting data");
+					" waiting for global APM data source configuration to start collecting data");
 		}
 	}
 
