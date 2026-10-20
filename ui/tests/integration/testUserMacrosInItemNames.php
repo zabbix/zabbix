@@ -452,47 +452,53 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 				['{$SECRET_EXPORT}']
 			);
 
-			// Verify trends NDJSON.
-			$trends_record = $this->waitForExportRecordByItemid($export_dir, 'trends',
-					self::$itemid_export);
-			$this->assertExportNameResolvedFromRecord($trends_record, 'File config.json exists');
-			$this->assertExportTagPairResolvedFromRecord(
-				$trends_record,
-				'item_tags',
-				'env',
-				'prod',
-				['{$ENV}']
-			);
-			$this->assertExportTagPairResolvedFromRecord(
-				$trends_record,
-				'item_tags',
-				'env-prod',
-				'value-prod',
-				['{$ENV}']
-			);
-			// Verify built-in macros in trends NDJSON.
-			$this->assertExportTagPairResolvedFromRecord(
-				$trends_record,
-				'item_tags',
-				'host_' . self::HOSTNAME_EXPORT,
-				'type_server',
-				['{HOST.HOST}', '{INVENTORY.TYPE}']
-			);
-			$this->assertExportTagPairResolvedFromRecord(
-				$trends_record,
-				'item_tags',
-				'inventory_server',
-				'host_' . self::HOSTNAME_EXPORT,
-				['{HOST.HOST}', '{INVENTORY.TYPE}']
-			);
-			// Verify secret macro in trends NDJSON.
-			$this->assertExportTagPairResolvedFromRecord(
-				$trends_record,
-				'item_tags',
-				'secret',
-				'******',
-				['{$SECRET_EXPORT}']
-			);
+			global $HISTORY_PROVIDERS;
+
+			// Skip these checks if ClickHouse or Elasticsearch is used as a history provider.
+			if (!isset($HISTORY_PROVIDERS) || !$HISTORY_PROVIDERS) {
+				// Verify trends NDJSON.
+				$trends_record = $this->waitForExportRecordByItemid($export_dir, 'trends',
+						self::$itemid_export);
+				$this->assertExportNameResolvedFromRecord($trends_record, 'File config.json exists');
+				$this->assertExportTagPairResolvedFromRecord(
+					$trends_record,
+					'item_tags',
+					'env',
+					'prod',
+					['{$ENV}']
+				);
+				$this->assertExportTagPairResolvedFromRecord(
+					$trends_record,
+					'item_tags',
+					'env-prod',
+					'value-prod',
+					['{$ENV}']
+				);
+				// Verify built-in macros in trends NDJSON.
+				$this->assertExportTagPairResolvedFromRecord(
+					$trends_record,
+					'item_tags',
+					'host_' . self::HOSTNAME_EXPORT,
+					'type_server',
+					['{HOST.HOST}', '{INVENTORY.TYPE}']
+				);
+				$this->assertExportTagPairResolvedFromRecord(
+					$trends_record,
+					'item_tags',
+					'inventory_server',
+					'host_' . self::HOSTNAME_EXPORT,
+					['{HOST.HOST}', '{INVENTORY.TYPE}']
+				);
+				// Verify secret macro in trends NDJSON.
+				$this->assertExportTagPairResolvedFromRecord(
+					$trends_record,
+					'item_tags',
+					'secret',
+					'******',
+					['{$SECRET_EXPORT}']
+				);
+			}
+
 			// Verify event NDJSON.
 			$event_name = 'Macro export trigger for ' . self::HOSTNAME_EXPORT;
 			$problem_record = $this->waitForProblemEventByName($export_dir, $event_name);
