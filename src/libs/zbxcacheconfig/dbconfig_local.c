@@ -50,7 +50,12 @@ void	zbx_dc_config_local_init(void)
  ******************************************************************************/
 void	zbx_dc_config_local_acquire(void)
 {
-	atomic_fetch_add(&config_local_refcount, 1);
+	if (0 == atomic_fetch_add(&config_local_refcount, 1))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempting to acquire uninitialized or released local configuration"
+				" cache");
+		zbx_exit(EXIT_FAILURE);
+	}
 }
 
 /******************************************************************************

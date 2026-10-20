@@ -865,16 +865,9 @@ static int	DBpatch_7050062(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (5,'blue-classic-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33',"
-				"'E33734','429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("blue-classic-theme", "'FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+			"'429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "'");
 #undef ZBX_COLORPALETTE_LIGHT
-
-	return FAIL;
 }
 
 static int	DBpatch_7050063(void)
@@ -885,16 +878,9 @@ static int	DBpatch_7050063(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (6,'dark-classic-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2',"
-				"'E45959','59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("dark-classic-theme", "'2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+			"'59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "'");
 #undef ZBX_COLORPALETTE_DARK
-
-	return FAIL;
 }
 
 static int	DBpatch_7050064(void)
@@ -1127,11 +1113,27 @@ static int	DBpatch_7050085(void)
 static int	DBpatch_7050086(void)
 {
 	zbx_db_insert_t	db_insert;
+	zbx_db_result_t	result;
 	zbx_uint64_t	mediatypeid;
-	int		ret;
+	int		ret, exists = FAIL;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select null from media_type where name='Push notification'")))
+		return FAIL;
+
+	if (NULL != zbx_db_fetch(result))
+		exists = SUCCEED;
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == exists)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): media type \"Push notification\" already exists,"
+				" skipping its creation", __func__);
+		return SUCCEED;
+	}
 
 	mediatypeid = zbx_db_get_maxid("media_type");
 
@@ -1265,16 +1267,9 @@ static int	DBpatch_7050092(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (7,'dark-blue-theme','001F42','001F42','004FA8','004FA8','004FA8','E5F1FF',"
-				"'FF5555','10B981','FF5555','002247','" ZBX_COLORPALETTE_DARK "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("dark-blue-theme", "'001F42','001F42','004FA8','004FA8','004FA8','E5F1FF','FF5555',"
+			"'10B981','FF5555','002247','" ZBX_COLORPALETTE_DARK "'");
 #undef ZBX_COLORPALETTE_DARK
-
-	return FAIL;
 }
 
 static int	DBpatch_7050093(void)
@@ -2186,6 +2181,24 @@ static int	DBpatch_7050195(void)
 	return DBset_default("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050196(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'hostinterface.create',"
+					"'hostinterface.update',"
+					"'hostinterface.delete',"
+					"'hostinterface.massadd',"
+					"'hostinterface.massremove'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2388,5 +2401,6 @@ DBPATCH_ADD(7050192, 0, 1)
 DBPATCH_ADD(7050193, 0, 1)
 DBPATCH_ADD(7050194, 0, 1)
 DBPATCH_ADD(7050195, 0, 1)
+DBPATCH_ADD(7050196, 0, 1)
 
 DBPATCH_END()

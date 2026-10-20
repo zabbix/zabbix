@@ -20,12 +20,7 @@
 class CHostInterface extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'interface';
@@ -535,26 +530,6 @@ class CHostInterface extends CApiService {
 		$this->createSnmpInterfaceDetails($snmp_interfaces);
 
 		return true;
-	}
-
-	/**
-	 * Update interfaces.
-	 *
-	 * @param array $interfaces   multidimensional array with Interfaces data
-	 *
-	 * @return array
-	 */
-	public function update(array $interfaces) {
-		$interfaces = zbx_toArray($interfaces);
-
-		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnUpdate($interfaces);
-
-		$this->updateInterfaces($interfaces);
-
-		$this->updateInterfaceDetails($interfaces);
-
-		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
 
 	/**
