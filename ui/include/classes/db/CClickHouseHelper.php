@@ -118,7 +118,7 @@ final class CClickHouseHelper {
 			$values = $options['filter'][$field];
 			$values_prepared = [];
 
-			$field_never_matches = false;
+			$has_never_matched_values = false;
 
 			switch ($type) {
 				case 'Int8':
@@ -131,8 +131,8 @@ final class CClickHouseHelper {
 				case 'UInt64':
 					foreach ($values as $value) {
 						if (!is_int($value) && (!is_string($value) || !preg_match('/^'.ZBX_PREG_INT.'$/', $value))) {
-							$field_never_matches = true;
-							break 2;
+							$has_never_matched_values = true;
+							continue;
 						}
 
 						$value_min = self::getIntMin($type);
@@ -142,8 +142,8 @@ final class CClickHouseHelper {
 								|| (is_int($value) && is_int($value_max) && $value > $value_max)
 								|| bccomp((string) $value, (string) $value_min) === -1
 								|| bccomp((string) $value, (string) $value_max) === 1) {
-							$field_never_matches = true;
-							break 2;
+							$has_never_matched_values = true;
+							continue;
 						}
 
 						$values_prepared[] = $value;
@@ -171,12 +171,13 @@ final class CClickHouseHelper {
 					throw new InvalidArgumentException();
 			}
 
-			if ($field_never_matches) {
-				$has_never_matched_fields = true;
-			}
-			else {
+			if ($values_prepared) {
 				$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
 				$filter_prepared_params['filter_'.$field] = $values_prepared;
+
+			}
+			elseif ($has_never_matched_values) {
+				$has_never_matched_fields = true;
 			}
 		}
 
