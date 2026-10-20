@@ -268,6 +268,31 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		return $result;
 	}
 
+	protected static function prepareItemsForApi(array &$lldrules, bool $sortorder = true): void {
+		parent::prepareItemsForApi($lldrules, $sortorder);
+
+		foreach ($lldrules as &$lldrule) {
+			if (array_key_exists('query', $lldrule) && $lldrule['query']) {
+				$lldrule['query']['signal_type'] = (string) $lldrule['query']['signal_type'];
+				$lldrule['query']['metric_point_type'] = (string) $lldrule['query']['metric_point_type'];
+				$lldrule['query']['filter']['evaltype'] = (string) $lldrule['query']['filter']['evaltype'];
+
+				foreach ($lldrule['query']['aggregated_columns'] as &$column) {
+					$column['function'] = (string) $column['function'];
+				}
+				unset($column);
+
+				foreach ($lldrule['query']['filter']['conditions'] as &$condition) {
+					$condition['operator'] = (string) $condition['operator'];
+				}
+				unset($condition);
+
+				$lldrule['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($lldrule['query']);
+			}
+		}
+		unset($lldrule);
+	}
+
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Output.
