@@ -235,6 +235,10 @@ class testInternalJavaItem extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'getting Java values failed: cannot connect to [[127.0.0.1]:10052]', true, 10, 1);
 
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,ping]\'', true, 10 , 1);
+
 		return true;
 	}
 
@@ -256,6 +260,10 @@ class testInternalJavaItem extends CIntegrationTest {
 		// Wait for log line with JSON back value
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'getting Java values failed: JavaGateway configuration parameter not set or empty', true, 10, 1);
+
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,version]\'', true, 10 , 1);
 
 		return true;
 	}
@@ -280,6 +288,10 @@ class testInternalJavaItem extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'getting Java values failed: cannot connect to [[127.0.0.1]:'.PHPUNIT_PORT_PREFIX.'99', true, 10, 1);
 
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,version]\'', true, 10 , 1);
+
 		return true;
 	}
 
@@ -300,6 +312,10 @@ class testInternalJavaItem extends CIntegrationTest {
 
 		// Wait for log line with JSON back value
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '"data":[{"value":"1"}]', true, 10, 1);
+
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,ping]\'', true, 10 , 1);
 
 		return true;
 	}
@@ -324,6 +340,10 @@ class testInternalJavaItem extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'"data":[{"value":"'.ZABBIX_VERSION.'"}]', true, 10, 1);
 
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,version]\'', true, 10 , 1);
+
 		return true;
 	}
 
@@ -346,6 +366,10 @@ class testInternalJavaItem extends CIntegrationTest {
 		// Wait for log line with JSON back value
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'{"error":"third parameter \'param\' is not supported"}', true, 10, 1);
+
+		// Wait for second log line about getting item value to make sure no freeze occured
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,param]\'', true, 10 , 1);
 
 		return true;
 	}
