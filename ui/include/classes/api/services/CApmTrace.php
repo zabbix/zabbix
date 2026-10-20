@@ -126,12 +126,52 @@ class CApmTrace extends CApmGeneral {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
 		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$time_from = $options['time_from'] - APM_TRACE_MAX_DURATION;
+		$time_till = $options['time_till'];
 
 		$real_count_output = $options['countOutput'];
 
 		if (!$options['output']) {
 			$options['countOutput'] = true;
 		}
+
+		$query = (new CClickHouseQuery())
+			->from('otel_traces', 't')
+			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $time_from])
+			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $time_till])
+			->group('t.TraceId');
+
+		if ($options['traceids'] !== null) {
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+		}
+
+		$having_root = [
+			'countIf(t.ParentSpanId=\'\')>0',
+			'minIf(t.Timestamp,t.ParentSpanId=\'\')>=toDateTime64({time_from:Int32},9)',
+			'minIf(t.Timestamp,t.ParentSpanId=\'\')<toDateTime64({time_till:Int32},9)'
+		];
+
+		$having_no_root = [
+			'countIf(t.ParentSpanId=\'\')=0',
+			'min(t.Timestamp)>=toDateTime64({time_from:Int32},9)',
+			'min(t.Timestamp)<toDateTime64({time_till:Int32},9)'
+		];
+
+		$unix_timestamp = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 't');
+
+		if ($options['min_duration'] !== null) {
+			$having_root[] = 'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\'))>={min_duration:UInt64}';
+			$having_no_root[] = 'max('.$unix_timestamp.'+t.Duration)-min('.$unix_timestamp.')>={min_duration:UInt64}';
+			$query->param('min_duration', $options['min_duration']);
+		}
+
+		if ($options['max_duration'] !== null) {
+			$having_root[] = 'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\')<={max_duration:UInt64}';
+			$having_no_root[] = 'max('.$unix_timestamp.'+t.Duration)-min('.$unix_timestamp.')<={max_duration:UInt64}';
+			$query->param('max_duration', $options['max_duration']);
+		}
+
+		$query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');
 
 		$use_span_filtering = $options['filter'] || $options['search']
 			|| ($options['resource_attributes'] !== null
@@ -145,119 +185,39 @@ class CApmTrace extends CApmGeneral {
 				)
 			);
 
-		$trace_query = (new CClickHouseQuery())
-			->select('DISTINCT tr.TraceId')
-			->from('otel_traces', 'tr')
-			->where('tr.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('tr.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
-
-		if ($options['traceids'] !== null) {
-			$trace_query->where('tr.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
-		}
-
-		$inner_query = (new CClickHouseQuery())
-			->linkQuery($trace_query)
-			->select('ti.TraceId')
-			->from('otel_traces', 'ti')
-			->where('ti.TraceId IN ('.$trace_query->getSql().')')
-			->group('ti.TraceId');
-
-		$having_root = [
-			'countIf(ti.ParentSpanId=\'\')>0',
-			'minIf(ti.Timestamp,ti.ParentSpanId=\'\')>=toDateTime64({time_from:Int32},9)',
-			'minIf(ti.Timestamp,ti.ParentSpanId=\'\')<toDateTime64({time_till:Int32},9)'
-		];
-
-		$having_no_root = [
-			'countIf(ti.ParentSpanId=\'\')=0',
-			'min(ti.Timestamp)>=toDateTime64({time_from:Int32},9)',
-			'min(ti.Timestamp)<toDateTime64({time_till:Int32},9)'
-		];
-
-		$ti_timestamp = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 'ti');
-
-		if ($options['min_duration'] !== null) {
-			$having_root[] = 'argMinIf(ti.Duration,ti.Timestamp,ti.ParentSpanId=\'\')>={min_duration:Int64}';
-			$having_no_root[] =
-				'max('.$ti_timestamp.'+ti.Duration)-min('.$ti_timestamp.')>={min_duration:Int64}';
-			$inner_query->param('min_duration', $options['min_duration']);
-		}
-
-		if ($options['max_duration'] !== null) {
-			$having_root[] = 'argMinIf(ti.Duration,ti.Timestamp,ti.ParentSpanId=\'\')<={max_duration:Int64}';
-			$having_no_root[] =
-				'max('.$ti_timestamp.'+ti.Duration)-min('.$ti_timestamp.')<={max_duration:Int64}';
-			$inner_query->param('max_duration', $options['max_duration']);
-		}
-
-		$inner_query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');
-
-		if (!$use_span_filtering && !$options['countOutput']) {
-			foreach ($options['sortfield'] as $i => $field) {
-				$order_by = match($field) {
-					'TraceId' => 'ti.TraceId',
-					'Duration' => 'if (ti.ParentSpanId=\'\')>0,'.
-						'argMinIf(ti.Duration,ti.Timestamp,ti.ParentSpanId=\'\'),'.
-						'toUInt64(max('.$ti_timestamp.'+ti.Duration)-min('.$ti_timestamp.'))'.
-					')',
-					default => 'argMin(ti.'.$field.',tuple(ti.ParentSpanId!=\'\',ti.Timestamp))'
-				};
-
-				$sort_order = $options['sortorder'];
-				$sort_order = match(true) {
-					is_string($sort_order) => $sort_order,
-					is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
-					default => ZBX_SORT_UP
-				};
-
-				$inner_query->order($order_by, $sort_order);
-			}
-		}
-
 		if ($use_span_filtering) {
-			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema,
+			$filter_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'tf', $db_schema,
 				array_intersect_key($options, array_flip(['filter', 'search', 'searchByAny', 'startSearch',
-					'excludeSearch', 'searchWildcardsEnabled', 'sortfield', 'sortorder'
+					'excludeSearch', 'searchWildcardsEnabled'
 				]))
 			))
-				->linkQuery($inner_query)
-				->select('DISTINCT to.TraceId')
-				->where('to.TraceId IN ('.$inner_query->getSql().')');
+				->select('1')
+				->where('tf.TraceId=t.TraceId')
+				->where('tf.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $time_from])
+				->where('tf.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $time_till]);
 
 			if ($options['resource_attributes'] !== null) {
-				CClickHouseHelper::addAttributeFilter($outer_query, 'to.ResourceAttributes',
+				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.ResourceAttributes',
 					$options['resource_attributes'], $options['resource_attributes_evaltype']
 				);
 			}
 
 			if ($options['span_attributes'] !== null) {
-				CClickHouseHelper::addAttributeFilter($outer_query, 'to.SpanAttributes',
+				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.SpanAttributes',
 					$options['span_attributes'], $options['span_attributes_evaltype']
 				);
 			}
-		}
-		else {
-			$outer_query = $inner_query;
-		}
 
-		if (!$options['countOutput']) {
-			$outer_query
-				->limit($options['limit'])
-				->offset($options['offset']);
+			$query
+				->linkQuery($filter_query)
+				->where('EXISTS ('.$filter_query->getSql().')');
 		}
-
-		$query = (new CClickHouseQuery())
-			->linkQuery($outer_query)
-			->from('otel_traces', 't')
-			->where('t.TraceId IN ('.$outer_query->getSql().')');
 
 		if ($options['countOutput']) {
 			$query->select('count(DISTINCT t.TraceId) as rowscount');
 		}
 		else {
 			$table_schema = $db_schema['otel_traces'];
-
-			$t_timestamp = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', 't');
 
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $options['output']) as $field) {
 				switch ($field) {
@@ -274,17 +234,13 @@ class CApmTrace extends CApmGeneral {
 						break;
 
 					case 'Duration':
-						$query->select('if (countIf(t.ParentSpanId=\'\')>0,'.
-							'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\'),'.
-							'toUInt64(max('.$t_timestamp.'+t.Duration)-min('.$t_timestamp.')))',
-							$field
-						);
+						$query->select(self::getDurationExpression('t'), $field);
 						break;
 
 					default:
-						$custom_select = CClickHouseHelper::getCustomTypeSelect($table_schema[$field]['type'], $field,
-							't'
-						);
+						$field_schema = $table_schema[$field];
+
+						$custom_select = CClickHouseHelper::getCustomTypeSelect($field_schema['type'], $field, 't');
 
 						$select = $custom_select ?? 't.'.$field;
 						$select_alias = $custom_select !== null ? $field : null;
@@ -301,10 +257,7 @@ class CApmTrace extends CApmGeneral {
 			foreach ($options['sortfield'] as $i => $field) {
 				$order_by = match($field) {
 					'TraceId' => 't.TraceId',
-					'Duration' => 'if (t.ParentSpanId=\'\')>0,'.
-						'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\'),'.
-						'toUInt64(max('.$t_timestamp.'+t.Duration)-min('.$t_timestamp.'))'.
-					')',
+					'Duration' => self::getDurationExpression('t'),
 					default => 'argMin(t.'.$field.',tuple(t.ParentSpanId!=\'\',t.Timestamp))'
 				};
 
@@ -318,7 +271,10 @@ class CApmTrace extends CApmGeneral {
 				$query->order($order_by, $sort_order);
 			}
 
-			$query->group('t.TraceId');
+			$query
+				->group('t.TraceId')
+				->limit($options['limit'])
+				->offset($options['offset']);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
@@ -344,5 +300,16 @@ class CApmTrace extends CApmGeneral {
 		}
 
 		return $db_traces;
+	}
+
+	private static function getDurationExpression(string $table_alias): string {
+		$unix_timestamp = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', $table_alias);
+
+		return 'if (countIf('.$table_alias.'.ParentSpanId=\'\')>0,'.
+			'toUInt64('.
+				'argMinIf('.$table_alias.'.Duration,'.$table_alias.'.Timestamp,'.$table_alias.'.ParentSpanId=\'\')'.
+			'),'.
+			'toUInt64(max('.$unix_timestamp.'+'.$table_alias.'.Duration)-min('.$unix_timestamp.'))'.
+		')';
 	}
 }
