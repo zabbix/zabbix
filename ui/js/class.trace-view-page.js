@@ -233,14 +233,35 @@ class TraceViewPage {
 
 		this.#tree.items = Array.from(this.#spans.values())
 			.filter(span => visible_ids.has(span.id))
-			.map(span => ({
-				id: span.id,
-				parent_id: span.parent_id,
-				label: span.name || span.id,
-				subtitle: span.operation || '',
-				meta: span.count ?? '',
-				span
-			}));
+			.map(span => {
+				const label_text = span.name || span.id;
+				let label = label_text;
+
+				if (span.status_code === 'Error') {
+					label = document.createElement('div');
+					label.classList.add('trace-tree-title-content');
+
+					const title_element = document.createElement('div');
+					title_element.classList.add('title')
+					title_element.append(label_text);
+					title_element.title = label_text;
+					label.appendChild(title_element);
+
+					const error_element = document.createElement('div');
+					error_element.classList.add(ZBX_STYLE_ERROR_COUNT);
+					error_element.textContent = '1';
+					label.append(error_element);
+				}
+
+				return {
+					id: span.id,
+					parent_id: span.parent_id,
+					label: label,
+					subtitle: span.operation || '',
+					meta: span.count ?? '',
+					span
+				}
+			});
 
 		this.#tree.expandToDepth(this.#spans.size);
 	}

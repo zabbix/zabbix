@@ -577,7 +577,9 @@
 		}
 
 		#collectSpanDetailsGroups(span) {
-			const groups = [{
+			const groups = [];
+
+			const main_info = {
 				title: <?= json_encode(_('Basic information')); ?>,
 				items: [
 					{
@@ -605,7 +607,23 @@
 						value: span.timestamp
 					}
 				]
-			}];
+			};
+
+			if (span.status_code) {
+				main_info.items.push({
+					name: <?= json_encode(_('Status code')); ?>,
+					value: span.status_code
+				});
+			}
+
+			if (span.status_message) {
+				main_info.items.push({
+					name: <?= json_encode(_('Status message')); ?>,
+					value: span.status_message
+				});
+			}
+
+			groups.push(main_info);
 
 			const resource_attributes = Object.entries(span.resource_attributes);
 			if (resource_attributes.length > 0) {

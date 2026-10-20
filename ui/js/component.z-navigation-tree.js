@@ -215,7 +215,14 @@ class ZNavigationTree extends HTMLElement {
 
 		const title = document.createElement('div');
 		title.className = 'z-navigation-tree-title';
-		title.textContent = item.label ?? item.name ?? item.id;
+
+		if (item.label instanceof HTMLElement) {
+			title.appendChild(item.label);
+		}
+		else {
+			title.textContent = item.label ?? item.name ?? item.id;
+			title.title = item.label ?? item.name ?? item.id;
+		}
 
 		content.appendChild(title);
 
@@ -223,6 +230,8 @@ class ZNavigationTree extends HTMLElement {
 			const subtitle = document.createElement('div');
 			subtitle.className = 'z-navigation-tree-subtitle';
 			subtitle.textContent = item.subtitle;
+			subtitle.title = item.subtitle;
+
 			content.appendChild(subtitle);
 		}
 

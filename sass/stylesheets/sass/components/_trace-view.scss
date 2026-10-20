@@ -168,6 +168,29 @@
 					--navigation-tree-row-block-size: var(--trace-row-block-size);
 
 					grid-row: 2;
+
+					.trace-tree-title-content {
+						display: inline-flex;
+						gap: 5px;
+						width: 100%;
+
+						.title {
+							@extend %overflow-ellipsis;
+						}
+
+						.error-count {
+							display: flex;
+							justify-content: center;
+							width: fit-content;
+							height: 16px;
+							padding: 0 4px;
+							border-radius: 2px;
+							background-color: $red;
+							color: $white;
+							font-size: 12px;
+							font-weight: 700;
+						}
+					}
 				}
 			}
 
