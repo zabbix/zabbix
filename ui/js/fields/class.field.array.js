@@ -18,11 +18,11 @@ class CFieldArray extends CFieldCollection {
 	getInnerValue(trim_value) {
 		const result = [];
 
-		for (const [key, field] of Object.entries(this.getFields())) {
+		for (const field of Object.values(this.getFields())) {
 			const value = trim_value ? field.getValueTrimmed() : field.getValue();
 
 			if (value !== null) {
-				result[key] = value;
+				result.push(value);
 			}
 		}
 
