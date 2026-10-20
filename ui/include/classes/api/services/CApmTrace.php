@@ -305,7 +305,7 @@ class CApmTrace extends CApmGeneral {
 	private static function getDurationExpression(string $table_alias): string {
 		$unix_timestamp = CClickHouseHelper::getCustomTypeSelect('DateTime64(9)', 'Timestamp', $table_alias);
 
-		return 'if (countIf('.$table_alias.'.ParentSpanId=\'\')>0,'.
+		return 'if(countIf('.$table_alias.'.ParentSpanId=\'\')>0,'.
 			'toUInt64('.
 				'argMinIf('.$table_alias.'.Duration,'.$table_alias.'.Timestamp,'.$table_alias.'.ParentSpanId=\'\')'.
 			'),'.
