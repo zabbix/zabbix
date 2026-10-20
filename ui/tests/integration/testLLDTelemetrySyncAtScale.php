@@ -68,8 +68,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	const HOST_COUNT = 4;
 	/* every device is a row of the discovery query, which must not exceed ZBX_TQ_MAX_RESULT_ROWS (10000) */
-	const LLD_DISCOVERY_COUNT = 8196;
-	const PROBLEM_DEVICE_COUNT = 8196;
+	const LLD_DISCOVERY_COUNT = 8192;
+	const PROBLEM_DEVICE_COUNT = 8192;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
 	const TRIGGER_ITERATIONS = 60;
