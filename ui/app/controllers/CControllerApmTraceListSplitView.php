@@ -200,6 +200,6 @@ class CControllerApmTraceListSplitView extends CController {
 	}
 
 	private function formatNs($ns): int {
-		return (int) str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
+		return (int) str_pad((string) ($ns % 7200000000000), 13, '0', STR_PAD_LEFT);
 	}
 }
