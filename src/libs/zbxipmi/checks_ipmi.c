@@ -58,9 +58,9 @@
 	}											\
 	while(0)
 
-/* cb_data passed to OpenIPMI is host's domain_nr (biased by 1 to keep NULL invalid) instead of pointer to host -  */
+/* cb_data passed to OpenIPMI is host's domain_nr (never 0, so NULL stays invalid) instead of pointer to host -    */
 /* callback may arrive after the host has been freed and its memory reused, while domain_nr is never reused        */
-#define ZBX_IPMI_HOST_CB_DATA(h)	((void *)((uintptr_t)(h)->domain_nr + 1))
+#define ZBX_IPMI_HOST_CB_DATA(h)	((void *)(uintptr_t)(h)->domain_nr)
 
 #define RETURN_IF_CB_DATA_INVALID(x, h)								\
 	do											\
@@ -150,7 +150,7 @@ typedef struct zbx_ipmi_host
 }
 zbx_ipmi_host_t;
 
-static unsigned int	domain_nr = 0;		/* for making a sequence of domain names "0", "1", "2", ... */
+static unsigned int	domain_nr = 1;		/* for making a sequence of domain names "1", "2", "3", ... */
 static zbx_ipmi_host_t	*hosts = NULL;		/* head of single-linked list of monitored hosts */
 static os_handler_t	*os_hnd;
 
@@ -172,7 +172,7 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host_by_cb_data(const void *cb_data)
 
 	for (h = hosts; NULL != h; h = h->next)
 	{
-		if (h->domain_nr == (unsigned int)((uintptr_t)cb_data - 1))
+		if (h->domain_nr == (unsigned int)(uintptr_t)cb_data)
 			break;
 	}
 
@@ -280,7 +280,11 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 	h->privilege = privilege;
 	h->username = strdup(username);
 	h->password = strdup(password);
-	h->domain_nr = domain_nr++;
+	h->domain_nr = domain_nr;
+
+	/* 0 is reserved to keep NULL cb_data invalid */
+	if (0 == ++domain_nr)
+		domain_nr = 1;
 
 	h->next = hosts;
 	hosts = h;
