@@ -421,6 +421,9 @@ static int	check_report_generation_access(const zbx_user_t *user)
 	if (USER_TYPE_ZABBIX_ADMIN > user->type)
 		return FAIL;
 
+	/* No super admin exception here. Any role, including a super admin role, can have the         */
+	/* "Manage scheduled reports" action disabled, and the frontend API then denies report.create, */
+	/* report.update and report.delete for that user. Report testing must be denied the same way.  */
 	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
 			" and (name='%s' or name='%s')", user->roleid, ZBX_SCHEDULED_REPORTS, ZBX_DEFAULT_ACCESS);
 
