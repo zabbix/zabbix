@@ -118,8 +118,14 @@ func (sl *ServerListener) run() {
 				conn.Close()
 				log.Warningf("failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
 					conn.RemoteIP(), sl.options.Server)
-			} else if err := sl.processConnection(conn); err != nil {
-				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
+			} else {
+				conn.SetMaxRecvSize(zbxcomms.MaxPassiveCheckDataSize)
+
+				processErr := sl.processConnection(conn)
+				if processErr != nil {
+					log.Warningf("failed to process an incoming connection from %s: %s",
+						conn.RemoteIP(), processErr.Error())
+				}
 			}
 		} else {
 			if err != nil {
@@ -134,7 +140,6 @@ func (sl *ServerListener) run() {
 
 	log.Debugf("listener has been stopped")
 	monitor.Unregister(monitor.Input)
-
 }
 
 func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {

@@ -376,7 +376,6 @@
       }
    },
    "mappings": {
-      "dynamic": false,
       "properties": {
          "itemid": {
             "type": "long"
@@ -401,7 +400,6 @@
       }
    },
    "mappings": {
-      "dynamic": false,
       "properties": {
          "itemid": {
             "type": "long"
@@ -434,7 +432,6 @@
       }
    },
    "mappings": {
-      "dynamic": false,
       "properties": {
          "itemid": {
             "type": "long"
@@ -467,7 +464,6 @@
       }
    },
    "mappings": {
-      "dynamic": false,
       "properties": {
          "itemid": {
             "type": "long"

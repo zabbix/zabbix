@@ -35,7 +35,7 @@ int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = SUCCEED;
+	int		res = FAIL;
 
 	result = DBselect(
 			"select count(*)"
@@ -45,8 +45,9 @@ int	check_perm2system(zbx_uint64_t userid)
 				" and g.users_status=%d",
 			userid, GROUP_STATUS_DISABLED);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
-		res = FAIL;
+	/* deny access if the query failed */
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && 0 == atoi(row[0]))
+		res = SUCCEED;
 
 	DBfree_result(result);
 

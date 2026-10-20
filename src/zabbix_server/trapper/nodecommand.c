@@ -516,12 +516,6 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
-	if (SUCCEED != check_perm2system(user.userid))
-	{
-		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
-		goto finish;
-	}
-
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))

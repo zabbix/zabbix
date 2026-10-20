@@ -48,6 +48,7 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_preprocessor_test \
 	-Wl,--wrap=DBget_user_by_active_session \
 	-Wl,--wrap=DBget_user_by_auth_token \
+	-Wl,--wrap=check_perm2system \
 	-Wl,--wrap=zbx_user_init \
 	-Wl,--wrap=zbx_user_free \
 	-Wl,--wrap=init_result \
