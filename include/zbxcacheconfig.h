@@ -1845,9 +1845,9 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 #define ZBX_CEP_WHEN_PATTERN_MATCH	4
 #define ZBX_CEP_WHEN_EVENT_CLOSED	5
 
-#define ZBX_CEP_FILTER_CURRENT		0
-#define ZBX_CEP_FILTER_OTHERS		1
-#define ZBX_CEP_FILTER_ALL		2
+#define ZBX_CEP_SCOPE_CURRENT		0
+#define ZBX_CEP_SCOPE_OTHERS		1
+#define ZBX_CEP_SCOPE_ALL		2
 
 typedef struct
 {
@@ -1940,8 +1940,8 @@ typedef struct
 	int				type;
 	int				execute_when;
 	zbx_cep_op_filter_t		execute_filter;
-	int				apply_to;
-	zbx_cep_op_filter_t		apply_filter;
+	int				scope;
+	zbx_cep_op_filter_t		scope_filter;
 	int				sortorder;
 	zbx_cep_op_args_t		args;
 }

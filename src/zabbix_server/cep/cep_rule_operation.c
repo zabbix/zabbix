@@ -975,8 +975,8 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute operation on event within operation apply scope and       *
- *          matching operation apply filter                                   *
+ * Purpose: execute operation on event within operation scope and             *
+ *          matching operation scope filter                                   *
  *                                                                            *
  * Parameters: op           - [IN] operation to execute                       *
  *             execute_when - [IN] execution phase                            *
@@ -989,10 +989,9 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
  *             event        - [IN/OUT] resolved mutable event, resolved and   *
  *                            reused across calls as operations execute       *
  *                                                                            *
- * Return value: SUCCEED - the operation was executed, or does not apply at   *
- *                         execute_when                                       *
- *               FAIL - the event is outside operation apply scope, did not   *
- *                      match apply filter, or execution failed               *
+ * Return value: SUCCEED - the operation was executed                         *
+ *               FAIL - the event is outside operation scope, did not         *
+ *                      match scope filter, or execution failed               *
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
@@ -1003,22 +1002,22 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " type:%d", __func__, op->operationid, op->type);
 
-	switch (op->apply_to)
+	switch (op->scope)
 	{
-		case ZBX_CEP_FILTER_CURRENT:
+		case ZBX_CEP_SCOPE_CURRENT:
 			if (0 == (ctx->pos & CEP_POS_CURRENT))
 				goto out;
 			break;
-		case ZBX_CEP_FILTER_OTHERS:
+		case ZBX_CEP_SCOPE_OTHERS:
 			if (0 != (ctx->pos & CEP_POS_CURRENT))
 				goto out;
 			ZBX_FALLTHROUGH;
-		case ZBX_CEP_FILTER_ALL:
-			if (SUCCEED != cep_op_filter_match_event(&op->apply_filter, ctx))
+		case ZBX_CEP_SCOPE_ALL:
+			if (SUCCEED != cep_op_filter_match_event(&op->scope_filter, ctx))
 				goto out;
 			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown \"apply to\":%d found in cep operation", op->apply_to);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown \"scope\":%d found in cep operation", op->scope);
 			goto out;
 	}
 

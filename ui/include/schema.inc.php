@@ -11006,19 +11006,19 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'apply_to' => [
+			'scope' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
 			],
-			'filter_evaltype' => [
+			'scope_evaltype' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
 			],
-			'filter_formula' => [
+			'scope_formula' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -11067,10 +11067,10 @@ return [
 			]
 		]
 	],
-	'cep_operation_filter_condition' => [
-		'key' => 'cep_operation_filter_conditionid',
+	'cep_operation_scope_condition' => [
+		'key' => 'cep_operation_scope_conditionid',
 		'fields' => [
-			'cep_operation_filter_conditionid' => [
+			'cep_operation_scope_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20

@@ -142,7 +142,7 @@ static void	cep_op_filter_clear(zbx_cep_op_filter_t *filter)
 static void	cep_operation_clear(zbx_cep_operation_t *operation)
 {
 	cep_op_filter_clear(&operation->execute_filter);
-	cep_op_filter_clear(&operation->apply_filter);
+	cep_op_filter_clear(&operation->scope_filter);
 	cep_operation_clear_args(operation);
 }
 
@@ -478,7 +478,7 @@ static void	cep_rule_copy_operations(zbx_vector_cep_operation_t *dst, const zbx_
 				break;
 		}
 		cep_op_filter_copy(&op->execute_filter, &src->values[i].execute_filter);
-		cep_op_filter_copy(&op->apply_filter, &src->values[i].apply_filter);
+		cep_op_filter_copy(&op->scope_filter, &src->values[i].scope_filter);
 	}
 }
 
@@ -684,7 +684,7 @@ zbx_cep_config_t	*cep_config_create(void)
 	zbx_hashset_create(&cep_config->operation_condition_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create(&cep_config->operation_filter_condition_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
+	zbx_hashset_create(&cep_config->operation_scope_condition_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	return cep_config;
@@ -701,7 +701,7 @@ void	cep_config_destroy(zbx_cep_config_t *cep_config)
 	zbx_hashset_destroy(&cep_config->condition_rel);
 	zbx_hashset_destroy(&cep_config->operation_rel);
 	zbx_hashset_destroy(&cep_config->operation_condition_rel);
-	zbx_hashset_destroy(&cep_config->operation_filter_condition_rel);
+	zbx_hashset_destroy(&cep_config->operation_scope_condition_rel);
 
 	if (NULL != cep_config->handle)
 		cep_config_handle_release(cep_config->handle);
@@ -884,12 +884,12 @@ static void	cep_operation_dump(zbx_cep_operation_t *operation)
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "    operationid:" ZBX_FS_UI64 " type:%d execute_when:%d apply_to:%d"
+	zabbix_log(LOG_LEVEL_TRACE, "    operationid:" ZBX_FS_UI64 " type:%d execute_when:%d scope:%d"
 			" sortorder:%d %s", operation->operationid, operation->type, operation->execute_when,
-			operation->apply_to, operation->sortorder, ZBX_NULL2EMPTY_STR(args));
+			operation->scope, operation->sortorder, ZBX_NULL2EMPTY_STR(args));
 
 	cep_op_filter_dump("      ", "execute when", &operation->execute_filter);
-	cep_op_filter_dump("      ", "apply to", &operation->apply_filter);
+	cep_op_filter_dump("      ", "scope", &operation->scope_filter);
 
 	zbx_free(args);
 }
@@ -1310,7 +1310,7 @@ static zbx_cep_operation_t	*cep_acquire_operation(zbx_cep_config_t *cep_config, 
 		index = rule->operations.values_num;
 
 		zbx_vector_cep_op_condition_create(&op_local.execute_filter.conditions);
-		zbx_vector_cep_op_condition_create(&op_local.apply_filter.conditions);
+		zbx_vector_cep_op_condition_create(&op_local.scope_filter.conditions);
 		zbx_vector_cep_operation_append(&rule->operations, op_local);
 
 		zbx_hashset_insert(&cep_config->operation_rel, &rel_local, sizeof(rel_local));
@@ -1437,9 +1437,9 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 		operation->sortorder = atoi(row[11]);
 		ZBX_DBROW2STR(operation->execute_filter.formula, row[12]);
 
-		operation->apply_to = atoi(row[13]);
-		operation->apply_filter.evaltype = atoi(row[14]);
-		ZBX_DBROW2STR(operation->apply_filter.formula, row[15]);
+		operation->scope = atoi(row[13]);
+		operation->scope_filter.evaltype = atoi(row[14]);
+		ZBX_DBROW2STR(operation->scope_filter.formula, row[15]);
 
 		switch (operation->type)
 		{
@@ -1565,11 +1565,11 @@ static zbx_cep_operation_t	*cep_acquire_operation_by_execute_condition(zbx_cep_c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: acquire a mutable CEP operation instance by its apply filter      *
+ * Purpose: acquire a mutable CEP operation instance by its scope filter      *
  *          condition identifier                                              *
  *                                                                            *
  * Parameters: cep_config  - [IN/OUT] CEP configuration                       *
- *             conditionid - [IN] apply filter condition identifier           *
+ *             conditionid - [IN] scope filter condition identifier           *
  *             revision    - [IN] revision to assign to the operation         *
  *             rules       - [OUT] updated rules, can be NULL                 *
  *                                                                            *
@@ -1577,13 +1577,13 @@ static zbx_cep_operation_t	*cep_acquire_operation_by_execute_condition(zbx_cep_c
  *               condition or operation is not cached                         *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_operation_t	*cep_acquire_operation_by_apply_condition(zbx_cep_config_t *cep_config,
+static zbx_cep_operation_t	*cep_acquire_operation_by_scope_condition(zbx_cep_config_t *cep_config,
 		zbx_uint64_t conditionid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
 	zbx_object_rel_t		rel_local = {.objectid = conditionid}, *rel;
 	zbx_object_rel_t		op_rel_local, *op_rel;
 
-	if (NULL == (rel = (zbx_object_rel_t *)zbx_hashset_search(&cep_config->operation_filter_condition_rel,
+	if (NULL == (rel = (zbx_object_rel_t *)zbx_hashset_search(&cep_config->operation_scope_condition_rel,
 			&rel_local)))
 	{
 		return NULL;
@@ -1724,7 +1724,7 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache CEP operation apply filter conditions from database         *
+ * Purpose: cache CEP operation scope filter conditions from database         *
  *                                                                            *
  * Parameters: cep_config - [IN/OUT] CEP configuration                        *
  *             sync       - [IN/OUT] database synchronization data            *
@@ -1732,7 +1732,7 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
  *             rules      - [OUT] updated rules, can be NULL                  *
  *                                                                            *
  ******************************************************************************/
-static void	cep_sync_operation_apply_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync,
+static void	cep_sync_operation_scope_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync,
 		zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
 	char		**row;
@@ -1760,8 +1760,8 @@ static void	cep_sync_operation_apply_conditions(zbx_cep_config_t *cep_config, zb
 		if (NULL == (op = cep_acquire_cached_operation(cep_config, operationid, revision, rules)))
 			continue;
 
-		if (NULL == (op_condition = cep_op_filter_acquire_condition(&op->apply_filter, operationid,
-			conditionid, &cep_config->operation_filter_condition_rel)))
+		if (NULL == (op_condition = cep_op_filter_acquire_condition(&op->scope_filter, operationid,
+			conditionid, &cep_config->operation_scope_condition_rel)))
 		{
 			continue;
 		}
@@ -1774,10 +1774,10 @@ static void	cep_sync_operation_apply_conditions(zbx_cep_config_t *cep_config, zb
 	{
 		zbx_cep_operation_t	*op;
 
-		if (NULL != (op = cep_acquire_operation_by_apply_condition(cep_config, rowid, revision, rules)))
-			cep_filter_remove_condition(&op->apply_filter, rowid);
+		if (NULL != (op = cep_acquire_operation_by_scope_condition(cep_config, rowid, revision, rules)))
+			cep_filter_remove_condition(&op->scope_filter, rowid);
 
-		zbx_hashset_remove(&cep_config->operation_filter_condition_rel, &rowid);
+		zbx_hashset_remove(&cep_config->operation_scope_condition_rel, &rowid);
 	}
 
 	if (0 != sync->add_num + sync->update_num + sync->remove_num)
@@ -1841,7 +1841,7 @@ static void	cep_rule_prepare_operations(zbx_cep_rule_t *rule)
 	{
 		zbx_vector_cep_op_condition_sort(&rule->operations.values[i].execute_filter.conditions,
 				cep_op_condition_compare_by_type);
-		zbx_vector_cep_op_condition_sort(&rule->operations.values[i].apply_filter.conditions,
+		zbx_vector_cep_op_condition_sort(&rule->operations.values[i].scope_filter.conditions,
 				cep_op_condition_compare_by_type);
 	}
 }
@@ -1902,14 +1902,14 @@ static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_p
  *             operation_sync           - [IN/OUT] operation sync data        *
  *             op_condition_sync        - [IN/OUT] operation condition sync   *
  *                                                 data                       *
- *             op_condition_filter_sync - [IN/OUT] operation filter           *
- *                                                 condition sync data        *
+ *             op_condition_scope_sync  - [IN/OUT] operation scope condition  *
+ *                                                 sync data                  *
  *             revision                 - [IN] current configuration          *
  *                                             revision                       *
  *                                                                            *
  ******************************************************************************/
 void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
-		zbx_dbsync_t *operation_sync, zbx_dbsync_t *op_condition_sync, zbx_dbsync_t *op_condition_filter_sync,
+		zbx_dbsync_t *operation_sync, zbx_dbsync_t *op_condition_sync, zbx_dbsync_t *op_condition_scope_sync,
 		zbx_uint64_t revision)
 {
 	zbx_vector_cep_rule_ptr_t	rules_cond, *prules_cond = NULL, rules_op, *prules_op = NULL;
@@ -1929,7 +1929,7 @@ void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_
 	cep_sync_windows(cep_config, window_sync, revision);
 	cep_sync_operations(cep_config, operation_sync, revision, prules_op);
 	cep_sync_operation_conditions(cep_config, op_condition_sync, revision, prules_op);
-	cep_sync_operation_apply_conditions(cep_config, op_condition_filter_sync, revision, prules_op);
+	cep_sync_operation_scope_conditions(cep_config, op_condition_scope_sync, revision, prules_op);
 
 	cep_update_rules(cep_config, prules_cond, prules_op);
 	cep_config_update_handle(cep_config, revision);

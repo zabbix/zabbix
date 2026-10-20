@@ -605,9 +605,10 @@ static zbx_uint64_t	cep_window_execute_event_operations(const zbx_cep_rule_t *ru
 
 	if (0 != cep_rule_get_execute_ops(rule, execute_when, ctx, &ops))
 	{
+		/* if any operation has window scope - execute operations on window events */
 		for (int i = 0; i < ops.values_num; i++)
 		{
-			if (ZBX_CEP_FILTER_CURRENT != ops.values[i]->apply_to)
+			if (ZBX_CEP_SCOPE_CURRENT != ops.values[i]->scope)
 			{
 				opmask |= cep_window_execute_operations(rule->ruleid, execute_when, &ops, window,
 						ctx->dbpool, ctx, ack, tasks);
