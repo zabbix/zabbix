@@ -173,7 +173,7 @@ final class CClickHouseHelper {
 
 			if ($values_prepared) {
 				$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
-				$filter_prepared_params['filter_'.$field] = $values_prepared;
+				$filter_prepared_params['filter_'.$field] = [$type, $values_prepared];
 			}
 			elseif ($has_never_matched_values) {
 				$has_never_matched_fields = true;
@@ -222,7 +222,7 @@ final class CClickHouseHelper {
 			}
 			unset($pattern);
 
-			$query->param('search_'.$field, $patterns);
+			$query->param('search_'.$field, 'String', $patterns);
 			$search_prepared[$field] = $options['searchByAny']
 				? 'arrayExists(p -> '.$table_alias.'.'.$field.' ILIKE p, {search_'.$field.':Array(String)})'
 				: 'arrayAll(p -> '.$table_alias.'.'.$field.' ILIKE p, {search_'.$field.':Array(String)})';
@@ -320,7 +320,7 @@ final class CClickHouseHelper {
 
 			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$index;
 
-			$query->param($param_prefix.'_key', $key);
+			$query->param($param_prefix.'_key', 'String', $key);
 
 			$field_param = $field.'[{'.$param_prefix.'_key:String}]';
 
@@ -328,13 +328,13 @@ final class CClickHouseHelper {
 			$where_and = [];
 
 			if (array_key_exists(TAG_OPERATOR_EQUAL, $operators)) {
-				$query->param($param_prefix.'_equal', $operators[TAG_OPERATOR_EQUAL]);
+				$query->param($param_prefix.'_equal', 'String', $operators[TAG_OPERATOR_EQUAL]);
 				$where_or[] = $field_param.' IN {'.$param_prefix.'_equal:Array(String)}';
 			}
 
 			if (array_key_exists(TAG_OPERATOR_LIKE, $operators)) {
 				foreach ($operators[TAG_OPERATOR_LIKE] as $value_index => $value) {
-					$query->param($param_prefix.'_like_'.$value_index, $value);
+					$query->param($param_prefix.'_like_'.$value_index, 'String', $value);
 					$where_or[] = 'positionCaseInsensitive('.$field_param.','.
 						'{'.$param_prefix.'_like_'.$value_index.':String})>0';
 				}
@@ -345,13 +345,13 @@ final class CClickHouseHelper {
 			}
 
 			if (array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operators)) {
-				$query->param($param_prefix.'_not_equal', $operators[TAG_OPERATOR_NOT_EQUAL]);
+				$query->param($param_prefix.'_not_equal', 'String', $operators[TAG_OPERATOR_NOT_EQUAL]);
 				$where_and[] = $field_param.' NOT IN {'.$param_prefix.'_not_equal:Array(String)}';
 			}
 
 			if (array_key_exists(TAG_OPERATOR_NOT_LIKE, $operators)) {
 				foreach ($operators[TAG_OPERATOR_NOT_LIKE] as $value_index => $value) {
-					$query->param($param_prefix.'_not_like_'.$value_index, $value);
+					$query->param($param_prefix.'_not_like_'.$value_index, 'String', $value);
 					$where_and[] = 'positionCaseInsensitive('.$field_param.','.
 						'{'.$param_prefix.'_not_like_'.$value_index.':String})=0';
 				}

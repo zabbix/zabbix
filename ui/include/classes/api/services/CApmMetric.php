@@ -225,10 +225,10 @@ class CApmMetric extends CApmGeneral {
 				$sub_query_options
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
-					'time_from' => $options['time_from']
+					'time_from' => ['Int32', $options['time_from']]
 				])
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
-					'time_till' => $options['time_till']
+					'time_till' => ['Int32', $options['time_till']]
 				]);
 
 			if ($options['limit'] !== null) {
@@ -237,13 +237,13 @@ class CApmMetric extends CApmGeneral {
 
 			if ($options['with_flags_on'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
-					'flags_on' => $options['with_flags_on']
+					'flags_on' => ['Int32', $options['with_flags_on']]
 				]);
 			}
 
 			if ($options['with_flags_off'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_off:Int32})=0', [
-					'flags_off' => $options['with_flags_off']
+					'flags_off' => ['Int32', $options['with_flags_off']]
 				]);
 			}
 

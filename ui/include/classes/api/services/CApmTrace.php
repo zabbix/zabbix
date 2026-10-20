@@ -139,14 +139,14 @@ class CApmTrace extends CApmGeneral {
 			->where('t.Timestamp<toDateTime64({lookup_time_till:Int32},9)')
 			->group('t.TraceId')
 			->params([
-				'lookup_time_from' => $options['time_from'] - APM_TRACE_MAX_DURATION,
-				'lookup_time_till' => $options['time_till'] + APM_TRACE_MAX_DURATION,
-				'time_from' => $options['time_from'],
-				'time_till' => $options['time_till']
+				'lookup_time_from' => ['Int32', $options['time_from'] - APM_TRACE_MAX_DURATION],
+				'lookup_time_till' => ['Int32', $options['time_till'] + APM_TRACE_MAX_DURATION],
+				'time_from' => ['Int32', $options['time_from']],
+				'time_till' => ['Int32', $options['time_till']]
 			]);
 
 		if ($options['traceids'] !== null) {
-			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		$having_root = [
@@ -166,13 +166,13 @@ class CApmTrace extends CApmGeneral {
 		if ($options['min_duration'] !== null) {
 			$having_root[] = 'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\')>={min_duration:UInt64}';
 			$having_no_root[] = 'max('.$timestamp_ns.'+t.Duration)-min('.$timestamp_ns.')>={min_duration:UInt64}';
-			$query->param('min_duration', $options['min_duration']);
+			$query->param('min_duration', 'UInt64', $options['min_duration']);
 		}
 
 		if ($options['max_duration'] !== null) {
 			$having_root[] = 'argMinIf(t.Duration,t.Timestamp,t.ParentSpanId=\'\')<={max_duration:UInt64}';
 			$having_no_root[] = 'max('.$timestamp_ns.'+t.Duration)-min('.$timestamp_ns.')<={max_duration:UInt64}';
-			$query->param('max_duration', $options['max_duration']);
+			$query->param('max_duration', 'UInt64', $options['max_duration']);
 		}
 
 		$query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');

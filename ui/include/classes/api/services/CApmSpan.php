@@ -132,20 +132,20 @@ class CApmSpan extends CApmGeneral {
 		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, $options))
-			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
+			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
+			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
 
 		if ($options['traceids'] !== null) {
-			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
+			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => ['String', $options['spanids']]]);
 		}
 
 		if ($options['parent_spanids'] !== null) {
 			$query->where('t.ParentSpanId IN {parent_spanids:Array(String)}', [
-				'parent_spanids' => $options['parent_spanids']
+				'parent_spanids' => ['String', $options['parent_spanids']]
 			]);
 		}
 
@@ -162,11 +162,15 @@ class CApmSpan extends CApmGeneral {
 		}
 
 		if ($options['min_duration'] !== null) {
-			$query->where('t.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
+			$query->where('toUInt64(t.Duration)>={min_duration:UInt64}', [
+				'min_duration' => ['UInt64', $options['min_duration']]
+			]);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$query->where('t.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
+			$query->where('toUInt64(t.Duration)<={max_duration:UInt64}', [
+				'max_duration' => ['UInt64', $options['max_duration']]
+			]);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());

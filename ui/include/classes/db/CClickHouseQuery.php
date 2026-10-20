@@ -87,15 +87,15 @@ class CClickHouseQuery {
 		return $this;
 	}
 
-	public function param(string $name, mixed $value): static {
-		$this->param[$name] = $value;
+	public function param(string $name, string $type, mixed $value): static {
+		$this->param[$name] = [$type, $value];
 
 		return $this;
 	}
 
 	public function params(array $params): static {
-		foreach ($params as $name => $value) {
-			$this->param($name, $value);
+		foreach ($params as $name => [$type, $value]) {
+			$this->param($name, $type, $value);
 		}
 
 		return $this;

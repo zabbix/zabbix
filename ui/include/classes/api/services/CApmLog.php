@@ -131,32 +131,32 @@ class CApmLog extends CApmGeneral {
 		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_logs', 'l', $db_schema, $options))
-			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
+			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
+			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
 
 		if ($options['traceids'] !== null) {
-			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
+			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => ['String', $options['spanids']]]);
 		}
 
 		if ($options['with_flags_on'] !== null) {
 			$query->where('bitAnd(l.TraceFlags, {flags_on:Int32})={flags_on:Int32}', [
-				'flags_on' => $options['with_flags_on']
+				'flags_on' => ['Int32', $options['with_flags_on']]
 			]);
 		}
 
 		if ($options['with_flags_off'] !== null) {
 			$query->where('bitAnd(l.TraceFlags, {flags_off:Int32})=0', [
-				'flags_off' => $options['with_flags_off']
+				'flags_off' => ['Int32', $options['with_flags_off']]
 			]);
 		}
 
 		if ($options['severity_numbers'] !== null) {
 			$query->where('l.SeverityNumber IN {severity_numbers:Array(Int32)}', [
-				'severity_numbers' => $options['severity_numbers']
+				'severity_numbers' => ['Int32', $options['severity_numbers']]
 			]);
 		}
 
