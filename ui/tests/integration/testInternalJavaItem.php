@@ -133,13 +133,11 @@ class testInternalJavaItem extends CIntegrationTest {
 			if ($item['name'] == $name) {
 				$items[] = [
 					'itemid' => $item['itemid'],
-					'name' => $name,
 					'status' => ITEM_STATUS_ACTIVE
 				];
 			} else {
 				$items[] = [
 					'itemid' => $item['itemid'],
-					'name' => $name,
 					'status' => ITEM_STATUS_DISABLED
 				];
 			}
