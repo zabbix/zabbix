@@ -371,10 +371,6 @@ class TraceViewPage {
 		const ids = new Set();
 
 		for (const span of this.#spans.values()) {
-			if (!this.#spanIntersectsSelectedRange(span)) {
-				continue;
-			}
-
 			let current = span;
 
 			while (current !== undefined) {

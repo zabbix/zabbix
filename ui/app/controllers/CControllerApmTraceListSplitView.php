@@ -51,8 +51,8 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function doAction(): void {
 		$traceid = $this->getInput('traceid');
-		$time_from = $this->getInput('timestamp') - 1;
-		$time_to = $this->getInput('timestamp') + 1;
+		$time_from = $this->getInput('timestamp') - APM_TRACE_MAX_DURATION;
+		$time_to = $this->getInput('timestamp') + APM_TRACE_MAX_DURATION;
 
 		try {
 			$traces = API::ApmTrace()->get([
@@ -122,6 +122,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
+			$trace_end = max($span_end, $trace_end);
 
 			$span_events = array_map(function (array $event) use ($trace_start) {
 				$event_timestamp = $this->formatNs($event['timestamp']);
