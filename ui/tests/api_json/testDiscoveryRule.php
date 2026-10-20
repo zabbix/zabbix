@@ -30,13 +30,37 @@ class testDiscoveryRule extends CAPITest {
 
 	public static function prepareTestData() {
 		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'lld_telemetry_query_template_group']
+			],
 			'host_groups' => [
 				['name' => 'lld_telemetry_query_host_group']
+			],
+			'templates' => [
+				[
+					'host' => 'lld_telemetry_query_template',
+					'groups' => ['groupid' => ':template_group:lld_telemetry_query_template_group'],
+					'lld_rules' => [
+						[
+							'name' => 'template telemetry query lld',
+							'key_' => 'template_lld_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'delay' => '1m',
+							'query' => [
+								'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+								'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+							]
+						]
+					]
+				]
 			],
 			'hosts' => [
 				[
 					'host' => 'lld_telemetry_query_host',
 					'groups' => ['groupid' => ':host_group:lld_telemetry_query_host_group'],
+					'templates' => ['templateid' => ':template:lld_telemetry_query_template'],
 					'lld_rules' => [
 						[
 							'name' => 'telemetry query lld',
@@ -6496,6 +6520,131 @@ class testDiscoveryRule extends CAPITest {
 			static fn(array $lld_rule) => array_intersect_key($lld_rule, $expected),
 			$result['result']
 		));
+	}
+
+	public static function dataInvalidInheritDiscoveryRuleTelemetryQuery_Update() {
+		$discoveryrule = [
+			'itemid' => ':lld_rule:template_lld_telemetry_query:host:lld_telemetry_query_host'
+		];
+
+		yield 'Telemetry query inherited "granularity" cannot be greater than "lookback_limit" stored in database' => [
+			['granularity' => '1h'] + $discoveryrule,
+			[],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
+		yield 'Telemetry query inherited "lookback_limit" cannot be less than "granularity" stored in database' => [
+			['lookback_limit' => '1s'] + $discoveryrule,
+			[],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
+		yield 'Telemetry query inherited "query" cannot be updated' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			] + $discoveryrule,
+			[],
+			'Invalid parameter "/1": cannot update readonly parameter "query" of inherited object.'
+		];
+	}
+
+	public static function dataValidInheritDiscoveryRuleTelemetryQuery_Update() {
+		$discoveryrule = [
+			'itemid' => ':lld_rule:template_lld_telemetry_query:host:lld_telemetry_query_host'
+		];
+
+		yield 'Telemetry query inherited "granularity" not greater than "lookback_limit" stored in database' => [
+			['granularity' => '5m'] + $discoveryrule,
+			['lookback_limit' => '10m', 'granularity' => '5m'],
+			null
+		];
+
+		yield 'Telemetry query inherited "lookback_limit" not less than "granularity" stored in database' => [
+			['lookback_limit' => '5m'] + $discoveryrule,
+			['lookback_limit' => '5m', 'granularity' => '5m'],
+			null
+		];
+
+		yield 'Telemetry query inherited user macro in "time_shift", "lookback_limit" and "granularity"' => [
+			['time_shift' => '{$MACRO}', 'lookback_limit' => '{$MACRO}', 'granularity' => '{$MACRO}'] + $discoveryrule,
+			['time_shift' => '{$MACRO}', 'lookback_limit' => '{$MACRO}', 'granularity' => '{$MACRO}'],
+			null
+		];
+	}
+
+	/**
+	 * @dataProvider dataInvalidInheritDiscoveryRuleTelemetryQuery_Update
+	 * @dataProvider dataValidInheritDiscoveryRuleTelemetryQuery_Update
+	 */
+	public function testInheritDiscoveryRuleTelemetryQuery_Update(array $discoveryrule, array $expected,
+			?string $error) {
+		CTestDataHelper::convertLldRuleReferences($discoveryrule);
+
+		$this->call('discoveryrule.update', $discoveryrule, $error);
+
+		if ($error !== null) {
+			return;
+		}
+
+		['result' => $result] = $this->call('discoveryrule.get', [
+			'output' => array_keys($expected),
+			'itemids' => $discoveryrule['itemid']
+		]);
+
+		$this->assertEquals($expected, array_intersect_key(reset($result), $expected));
+	}
+
+	/**
+	 * Template discovery rule update must fail when combined with "granularity" or "lookback_limit" overridden on host level
+	 * the result value of "granularity" becomes greater than "lookback_limit".
+	 */
+	public function testInheritValidationDiscoveryRuleTelemetryQuery_Update() {
+		$ruleid = CTestDataHelper::getConvertedValueReference(':lld_rule:template_lld_telemetry_query');
+		$inherited_ruleid = CTestDataHelper::getConvertedValueReference(
+			':lld_rule:template_lld_telemetry_query:host:lld_telemetry_query_host'
+		);
+
+		$this->call('discoveryrule.update', [
+			'itemid' => $ruleid,
+			'lookback_limit' => '10m',
+			'granularity' => '1m'
+		]);
+
+		$this->call('discoveryrule.update', [
+			'itemid' => $inherited_ruleid,
+			'granularity' => '5m'
+		]);
+
+		$this->call('discoveryrule.update', [
+			'itemid' => $ruleid,
+			'lookback_limit' => '2m'
+		], 'Cannot update inherited discovery rule with key "template_lld_telemetry_query" on host "lld_telemetry_query_host" because granularity cannot be greater than lookback limit.');
+
+		$this->call('discoveryrule.update', [
+			'itemid' => $inherited_ruleid,
+			'lookback_limit' => '5m'
+		]);
+
+		$this->call('discoveryrule.update', [
+			'itemid' => $inherited_ruleid,
+			'granularity' => '10m'
+		], 'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".');
+
+		['result' => $actual] = $this->call('discoveryrule.get', [
+			'output' => ['lookback_limit', 'granularity'],
+			'itemids' => [$ruleid, $inherited_ruleid],
+			'preservekeys' => true
+		]);
+
+		$this->assertEquals([
+			$ruleid => ['itemid' => $ruleid, 'lookback_limit' => '10m', 'granularity' => '1m'],
+			$inherited_ruleid => ['itemid' => $inherited_ruleid, 'lookback_limit' => '5m', 'granularity' => '5m']
+		], $actual, '');
 	}
 
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.

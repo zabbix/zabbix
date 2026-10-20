@@ -176,6 +176,8 @@ class CTestDataHelper {
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
+
+		self::addInheritedLldRules($templates, 'template');
 	}
 
 	public static function convertTemplateReferences(array &$templates): void {
@@ -251,6 +253,44 @@ class CTestDataHelper {
 		self::createItems($items);
 		self::createLldRules($lld_rules);
 		self::createHttptests($httptests);
+
+		self::addInheritedLldRules($hosts, 'host');
+	}
+
+	/**
+	 * Register discovery rules inherited from linked templates, making them accessible by references
+	 * `:lld_rule:rule_key:host:rule_host` and `:lld_rule:rule_key:template:rule_template`.
+	 *
+	 * @param array  $hosts        Created hosts or templates.
+	 * @param string $object_type  Parent object identifier string "host" or "template".
+	 */
+	private static function addInheritedLldRules(array $hosts, string $object_type): void {
+		$host_refs = [];
+
+		foreach ($hosts as $host) {
+			if ($host['templates']) {
+				$host_refs[self::$objectids[$object_type][$host['host']]] = ':'.$object_type.':'.$host['host'];
+			}
+		}
+
+		if (!$host_refs) {
+			return;
+		}
+
+		$lld_rules = CDataHelper::call('discoveryrule.get', [
+			'output' => ['itemid', 'hostid', 'key_'],
+			'hostids' => array_keys($host_refs),
+			'inherited' => true
+		]);
+
+		foreach ($lld_rules as $lld_rule) {
+			$lld_rule_ids = self::$objectids['lld_rule'][$lld_rule['key_']] ?? [];
+
+			// Prepend inherited rule itemid to make ":lld_rule:rule_key" resolve to last created discovery rule.
+			self::$objectids['lld_rule'][$lld_rule['key_']] = [
+				$host_refs[$lld_rule['hostid']] => $lld_rule['itemid']
+			] + $lld_rule_ids;
+		}
 	}
 
 	public static function convertHostReferences(array &$hosts): void {

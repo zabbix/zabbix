@@ -1019,6 +1019,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $_upd_db_items);
 
 			self::checkDuplicates($_upd_items, $_upd_db_items);
+			self::validateInheritedTelemetryQueryItems($_upd_items, $_upd_db_items);
 
 			$upd_items = array_merge($upd_items, $_upd_items);
 			$upd_db_items += $_upd_db_items;
