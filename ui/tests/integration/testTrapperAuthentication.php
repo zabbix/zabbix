@@ -246,19 +246,21 @@ class testTrapperAuthentication extends CIntegrationTest {
 		}
 	}
 
+	private function createServer(): CZabbixServer {
+		return new CZabbixServer('127.0.0.1',
+			$this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+			5, 5, ZBX_SOCKET_BYTES_LIMIT
+		);
+	}
+
 	/**
 	 * @dataProvider authenticationDataProvider
 	 */
 	public function testTrapperAuthentication_disabledGroup($credential_type, $method, $params, $error) {
 		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-
-		$server = new CZabbixServer('127.0.0.1',
-			$this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-			5, 5, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
-		);
 		$credential = self::$credentials[$credential_type];
 
-		$this->assertAuthenticatedTrapperRequest($server, $method, $credential, $params, $error);
+		$this->assertAuthenticatedTrapperRequest($this->createServer(), $method, $credential, $params, $error);
 
 		// One disabled group must deny access even while the other group remains enabled.
 		$this->call('usergroup.update', [
@@ -269,6 +271,7 @@ class testTrapperAuthentication extends CIntegrationTest {
 		$this->assertEquals(ZBX_SESSION_ACTIVE, CDBHelper::getValue(
 			'SELECT status FROM sessions WHERE sessionid='.zbx_dbstr(self::$credentials['session'])
 		));
+		$server = $this->createServer();
 		$this->assertFalse($this->sendTrapperRequest($server, $method, $credential, $params, false));
 		$this->assertSame('Permission denied.', $server->getError());
 
@@ -277,6 +280,6 @@ class testTrapperAuthentication extends CIntegrationTest {
 			'users_status' => GROUP_STATUS_ENABLED
 		]);
 
-		$this->assertAuthenticatedTrapperRequest($server, $method, $credential, $params, $error);
+		$this->assertAuthenticatedTrapperRequest($this->createServer(), $method, $credential, $params, $error);
 	}
 }

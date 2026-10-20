@@ -1,3 +1,8 @@
+Changes for 7.0.32
+
+7.0.32rc1 was released as 7.0.32 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.32rc1
 
 New features:
@@ -7,7 +12,6 @@ Bug fixes:
 ........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
 ..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
 ..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
-.........T [ZBX-24844] fixed Linux template (kflorowski)
 ...G...... [ZBX-27925] added AI_NUMERICHOST flag to suppress potentially lengthy network host address lookups (jburlakovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
@@ -4253,12 +4257,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.49
+
+6.0.49rc1 was released as 6.0.49 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.49rc1
 
 New features:
 A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
-
-Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48
