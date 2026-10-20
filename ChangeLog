@@ -1,10 +1,16 @@
 Changes for 8.0.0rc2
 
 New features:
+A......... [ZBXNEXT-10814] removed public access from all hostinterface methods except get; deleted unused hostinterface.update method (vskalbins)
+A.......S. [ZBXNEXT-10837] updated maximum supported ClickHouse version to 26.9 and minimum version to 26.3 (mprihodko)
 A.F.....S. [ZBXNEXT-10625] added support of Elasticsearch 8.x and 9.x (kastafjevs, Sasha)
 A.F.....S. [ZBXNEXT-10844] updated the minimum supported Elasticsearch version to 8.0 (Sasha)
 
 Bug fixes:
+..F....... [ZBX-28192] fixed widget layout with hidden header (ashubin)
+.......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
+..F....... [ZBX-28227] fixed 'undefined' tooltip on the widget configuration button and restored the actions button tooltip (aluchko)
+.......PS. [ZBX-28217] fixed trapper log spamming during port scans and health checks (sboidenko)
 ........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
 ...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
