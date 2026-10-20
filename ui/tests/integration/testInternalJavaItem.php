@@ -181,7 +181,7 @@ class testInternalJavaItem extends CIntegrationTest {
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'JavaGateway' => "127.0.0.1",
-				'JavaGatewayPort' => 10050
+				'JavaGatewayPort' => PHPUNIT_PORT_PREFIX.'99'
 			]
 		];
 	}
@@ -242,7 +242,7 @@ class testInternalJavaItem extends CIntegrationTest {
 
 		// Wait for log line with JSON back value
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				'getting Java values failed: cannot connect to [[127.0.0.1]:10050]', true, 10, 1);
+				'getting Java values failed: cannot connect to [[127.0.0.1]:'.PHPUNIT_PORT_PREFIX.'99', true, 10, 1);
 
 		return true;
 	}
