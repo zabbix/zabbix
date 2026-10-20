@@ -119,6 +119,7 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace_view_spans = [];
 		foreach ($spans as $i => $span) {
 			$span_timestamp = $this->formatNs($span['timestamp']);
+			$trace_start = min($span_timestamp, $trace_start);
 
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
