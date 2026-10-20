@@ -169,6 +169,20 @@ class testInternalJavaItem extends CIntegrationTest {
 			]
 		];
 	}
+	
+	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function serverNotSetConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 20
+			]
+		];
+	}
 
 	/**
 	 * Component configuration provider wrong configuration.
@@ -204,7 +218,6 @@ class testInternalJavaItem extends CIntegrationTest {
 	}
 
 	/**
-	 *
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testInternalJavaItem_notStarted() {
@@ -226,7 +239,30 @@ class testInternalJavaItem extends CIntegrationTest {
 	}
 
 	/**
-	 *
+	 * @required-components java
+	 * @configurationDataProvider serverNotSetConfigurationProvider
+	 */
+	public function testInternalJavaItem_notConfigured() {
+
+		$this->prepareItem('zbx_java_ver_test');
+
+		// Wait for log line about getting item value
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'In get_value() key:\'zabbix[java,,version]\'', true, 10 , 1);
+
+		// Wait for log line about JMX endpoint not being used
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'jmx_endpoint:\'N/A\'', true, 10 , 1);
+
+		// Wait for log line with JSON back value
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'getting Java values failed: JavaGateway configuration parameter not set or empty', true, 10, 1);
+
+		return true;
+	}
+
+
+	/**
+	 * @required-components java
 	 * @configurationDataProvider serverWrongConfigurationProvider
 	 */
 	public function testInternalJavaItem_wrongPort() {
@@ -248,7 +284,6 @@ class testInternalJavaItem extends CIntegrationTest {
 	}
 
 	/**
-	 *
 	 * @required-components java
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
