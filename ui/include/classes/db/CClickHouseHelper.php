@@ -174,7 +174,6 @@ final class CClickHouseHelper {
 			if ($values_prepared) {
 				$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
 				$filter_prepared_params['filter_'.$field] = $values_prepared;
-
 			}
 			elseif ($has_never_matched_values) {
 				$has_never_matched_fields = true;
