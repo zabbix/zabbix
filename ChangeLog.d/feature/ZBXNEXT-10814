@@ -1,0 +1,1 @@
+A......... [ZBXNEXT-10814] removed public access from all hostinterface methods except get; deleted unused hostinterface.update method (vskalbins)
