@@ -167,7 +167,7 @@ class testInternalJavaItem extends CIntegrationTest {
 			]
 		];
 	}
-	
+
 	/**
 	 * Component configuration provider.
 	 *
