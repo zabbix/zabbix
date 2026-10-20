@@ -562,6 +562,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$table->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'At least one LDAP server must exist');
+		CMessageElement::find()->one()->close();
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 
 		// Uncheck LDAP authentication and try saving again. Make sure the server is not deleted from DB before saving.
