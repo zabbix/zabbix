@@ -297,8 +297,9 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			foreach ($components as $component) {
-				if ($component !== self::COMPONENT_JAVA)
+				if ($component !== self::COMPONENT_JAVA) {
 					self::prepareComponentConfiguration($component, self::$case_configuration);
+				}
 				self::startComponent($component);
 			}
 			self::$suite_components_running = true;
