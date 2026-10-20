@@ -185,6 +185,7 @@ void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 
 	zbx_vector_apm_exporter_ptr_destroy(&pool->exporters);
 	apm_exporter_cfg_clear(&pool->cfg);
+	zbx_apm_db_config_clear(&pool->cfg_global);
 
 	pthread_mutex_destroy(&pool->lock);
 
