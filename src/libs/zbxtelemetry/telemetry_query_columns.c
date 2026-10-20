@@ -170,7 +170,7 @@ static const zbx_tq_column_info_t	*get_column_info_from_arr(const zbx_tq_column_
 	return NULL;
 }
 
-const zbx_tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
+const zbx_tq_column_info_t	*zbx_tq_get_column_info(zbx_tq_signal_type_t signal_type,
 		zbx_tq_metric_point_type_t metric_point_type, const char *column)
 {
 	if (NULL == column)
