@@ -458,6 +458,8 @@ void	*zbx_apm_manager_thread(void *args)
 	zbx_apm_db_config_t			apm_global = {0};
 	zbx_uint32_t				rtc_manager_msgs[] = {ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
+
 	apm_args = (const zbx_thread_apm_manager_args_t *)unit_args->args.args;
 
 	apm_config_tls.ca_file = apm_args->apm_ca_file;
@@ -486,6 +488,16 @@ void	*zbx_apm_manager_thread(void *args)
 		zbx_free(args);
 
 		zbx_exit(EXIT_FAILURE);
+	}
+
+	if (APM_STATUS_ENABLED == apm_config.enabled && SUCCEED == apm_manager_global_config_active(manager))
+	{
+		if (APM_STATUS_ENABLED != apm_manager_update_global_config(manager, &apm_global, apm_args->source_ip,
+				apm_args->ca_location))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "no local TelemetryProvider configuration found,"
+					" waiting for global APM data source configuration to start collecting data");
+		}
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_APM_MANAGER, 0, rtc_manager_msgs, ARRSIZE(rtc_manager_msgs),
