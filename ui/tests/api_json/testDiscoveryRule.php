@@ -22,9 +22,49 @@ require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemType.
 require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
  * @backup items
  */
 class testDiscoveryRule extends CAPITest {
+
+	public static function prepareTestData() {
+		CTestDataHelper::createObjects([
+			'host_groups' => [
+				['name' => 'lld_telemetry_query_host_group']
+			],
+			'hosts' => [
+				[
+					'host' => 'lld_telemetry_query_host',
+					'groups' => ['groupid' => ':host_group:lld_telemetry_query_host_group'],
+					'lld_rules' => [
+						[
+							'name' => 'telemetry query lld',
+							'key_' => 'lld_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'delay' => '1m',
+							'query' => [
+								'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+								'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+							]
+						],
+						[
+							'name' => 'trapper lld',
+							'key_' => 'lld_trapper',
+							'type' => ITEM_TYPE_TRAPPER
+						]
+					]
+				]
+			]
+		]);
+	}
+
+	public static function cleanTestData() {
+		CTestDataHelper::cleanUp();
+	}
+
 	public static function discoveryrule_create_data_invalid() {
 		return [
 			'Test invalid permissions to host' => [
@@ -6191,6 +6231,289 @@ class testDiscoveryRule extends CAPITest {
 				$this->assertLLDOverride($db_lld_overrides[$override_num], $override);
 			}
 		}
+	}
+
+	public static function dataInvalidDiscoveryRuleTelemetryQuery_Update() {
+		$query = [
+			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+			'columns' => [],
+			'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+			'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+		];
+
+		yield 'Telemetry query "granularity" cannot be empty' => [
+			['granularity' => ''],
+			[],
+			'Invalid parameter "/1/granularity": cannot be empty.'
+		];
+
+		yield 'Telemetry query "granularity" less than allowed' => [
+			['granularity' => '0'],
+			[],
+			'Invalid parameter "/1/granularity": value must be one of 1-86400.'
+		];
+
+		yield 'Telemetry query "granularity" greater than allowed' => [
+			['granularity' => '86401s', 'lookback_limit' => '3d'],
+			[],
+			'Invalid parameter "/1/granularity": value must be one of 1-86400.'
+		];
+
+		yield 'Telemetry query "granularity" do not support LLD macro' => [
+			['granularity' => '{#MACRO}'],
+			[],
+			'Invalid parameter "/1/granularity": a time unit is expected.'
+		];
+
+		yield 'Telemetry query "granularity" cannot be greater than "lookback_limit"' => [
+			['granularity' => '30s', 'lookback_limit' => '10s'],
+			[],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
+		yield 'Telemetry query "granularity" cannot be greater than "lookback_limit" stored in database' => [
+			['granularity' => '1h'],
+			[],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
+		yield 'Telemetry query "granularity" is not supported for non telemetry query type' => [
+			['itemid' => ':lld_rule:lld_trapper', 'granularity' => '30s'],
+			[],
+			'Invalid parameter "/1/granularity": value must be "15s".'
+		];
+
+		yield 'Telemetry query "lookback_limit" cannot be empty' => [
+			['lookback_limit' => ''],
+			[],
+			'Invalid parameter "/1/lookback_limit": cannot be empty.'
+		];
+
+		yield 'Telemetry query "lookback_limit" less than allowed' => [
+			['lookback_limit' => '0'],
+			[],
+			'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
+		];
+
+		yield 'Telemetry query "lookback_limit" greater than allowed' => [
+			['lookback_limit' => '259201s'],
+			[],
+			'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
+		];
+
+		yield 'Telemetry query "lookback_limit" do not support LLD macro' => [
+			['lookback_limit' => '{#MACRO}'],
+			[],
+			'Invalid parameter "/1/lookback_limit": a time unit is expected.'
+		];
+
+		yield 'Telemetry query "lookback_limit" less than "granularity" stored in database' => [
+			['lookback_limit' => '1s'],
+			[],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+		];
+
+		yield 'Telemetry query "lookback_limit" is not supported for non telemetry query type' => [
+			['itemid' => ':lld_rule:lld_trapper', 'lookback_limit' => '30s'],
+			[],
+			'Invalid parameter "/1/lookback_limit": value must be "10m".'
+		];
+
+		yield 'Telemetry query "query.signal_type" is required' => [
+			['query' => []],
+			[],
+			'Invalid parameter "/1/query": the parameter "signal_type" is missing.'
+		];
+
+		yield 'Telemetry query "query" unexpected parameter' => [
+			['query' => $query + ['unexpected' => '']],
+			[],
+			'Invalid parameter "/1/query": unexpected parameter "unexpected".'
+		];
+
+		yield 'Telemetry query "query.aggregated_columns" cannot be empty' => [
+			['query' => ['aggregated_columns' => []] + $query],
+			[],
+			'Invalid parameter "/1/query/aggregated_columns": cannot be empty.'
+		];
+
+		yield 'Telemetry query "query.filter.conditions[].formulaid" is not used in "query.filter.formula"' => [
+			[
+				'query' => [
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => 'a', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => 'c', 'formulaid' => 'C']
+						]
+					]
+				] + $query
+			],
+			[],
+			'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield 'Telemetry query "query" is required on type change' => [
+			['itemid' => ':lld_rule:lld_trapper', 'type' => ITEM_TYPE_TELEMETRY_QUERY, 'delay' => '1m'],
+			[],
+			'Invalid parameter "/1": the parameter "query" is missing.'
+		];
+
+		yield 'Telemetry query "query" should be empty for non telemetry query type' => [
+			['itemid' => ':lld_rule:lld_trapper', 'query' => $query],
+			[],
+			'Invalid parameter "/1/query": should be empty.'
+		];
+	}
+
+	public static function dataValidDiscoveryRuleTelemetryQuery_Update() {
+		$query = [
+			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+			'columns' => [],
+			'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+			'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+		];
+		$expected_query = [
+			'signal_type' => '0',
+			'metric_point_type' => '0',
+			'columns' => [],
+			'aggregated_columns' => [
+				['column' => 'Timestamp', 'function' => '1', 'alias' => 'Timestamp', 'parameters' => []]
+			],
+			'filter' => [
+				'evaltype' => '0',
+				'formula' => '',
+				'conditions' => [],
+				'eval_formula' => ''
+			]
+		];
+
+		yield 'Telemetry query with maximal "time_shift", "lookback_limit" and "granularity"' => [
+			['time_shift' => '1d', 'lookback_limit' => '3d', 'granularity' => '1d'],
+			['time_shift' => '1d', 'lookback_limit' => '3d', 'granularity' => '1d'],
+			null
+		];
+
+		yield 'Telemetry query "granularity" equal to "lookback_limit"' => [
+			['lookback_limit' => '5m', 'granularity' => '300'],
+			['time_shift' => '1d', 'lookback_limit' => '5m', 'granularity' => '300'],
+			null
+		];
+
+		yield 'Telemetry query user macro in "time_shift", "lookback_limit" and "granularity"' => [
+			['time_shift' => '{$MACRO}', 'lookback_limit' => '{$MACRO}', 'granularity' => '{$MACRO}'],
+			['time_shift' => '{$MACRO}', 'lookback_limit' => '{$MACRO}', 'granularity' => '{$MACRO}'],
+			null
+		];
+
+		yield 'Telemetry query "granularity" with user macro in "lookback_limit" stored in database' => [
+			['granularity' => '1d'],
+			['time_shift' => '{$MACRO}', 'lookback_limit' => '{$MACRO}', 'granularity' => '1d'],
+			null
+		];
+
+		yield 'Telemetry query with minimal "time_shift"' => [
+			['time_shift' => '0'],
+			['time_shift' => '0', 'lookback_limit' => '{$MACRO}', 'granularity' => '1d'],
+			null
+		];
+
+		yield 'Telemetry query "query.signal_type" metrics' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					'columns' => [['column' => 'MetricName']],
+					'aggregated_columns' => [['column' => 'Value', 'function' => AGGREGATE_AVG, 'alias' => 'avg']]
+				] + $query
+			],
+			[
+				'query' => [
+					'signal_type' => '1',
+					'metric_point_type' => '1',
+					'columns' => [['column' => 'MetricName', 'attribute_key' => '']],
+					'aggregated_columns' => [
+						['column' => 'Value', 'function' => '3', 'alias' => 'avg', 'parameters' => []]
+					]
+				] + $expected_query
+			],
+			null
+		];
+
+		yield 'Telemetry query "query.filter" with custom expression' => [
+			[
+				'query' => [
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => 'a', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'operator' => CONDITION_OPERATOR_NOT_EQUAL, 'value' => 'b', 'formulaid' => 'B']
+						]
+					]
+				] + $query
+			],
+			[
+				'query' => [
+					'filter' => [
+						'evaltype' => '3',
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'attribute_key' => '', 'operator' => '0', 'value' => 'a', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'attribute_key' => '', 'operator' => '1', 'value' => 'b', 'formulaid' => 'B']
+						],
+						'eval_formula' => 'A or B'
+					]
+				] + $expected_query
+			],
+			null
+		];
+
+		yield 'Telemetry query type change from trapper' => [
+			[
+				'itemid' => ':lld_rule:lld_trapper',
+				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+				'delay' => '1m',
+				'lookback_limit' => '1h',
+				'granularity' => '1m',
+				'query' => $query
+			],
+			[
+				'type' => '24',
+				'delay' => '1m',
+				'time_shift' => '15s',
+				'lookback_limit' => '1h',
+				'granularity' => '1m',
+				'query' => $expected_query
+			],
+			null
+		];
+	}
+
+	/**
+	 * @dataProvider dataInvalidDiscoveryRuleTelemetryQuery_Update
+	 * @dataProvider dataValidDiscoveryRuleTelemetryQuery_Update
+	 */
+	public function testDiscoveryRuleTelemetryQuery_Update(array $discoveryrule, array $expected, ?string $error) {
+		$discoveryrule += ['itemid' => ':lld_rule:lld_telemetry_query'];
+		$discoveryrule['itemid'] = CTestDataHelper::getConvertedValueReference($discoveryrule['itemid']);
+
+		$this->call('discoveryrule.update', $discoveryrule, $error);
+
+		if ($error !== null) {
+			return;
+		}
+
+		$result = $this->call('discoveryrule.get', [
+			'output' => array_keys($expected),
+			'itemids' => $discoveryrule['itemid']
+		]);
+
+		$this->assertEquals([$expected], array_map(
+			static fn(array $lld_rule) => array_intersect_key($lld_rule, $expected),
+			$result['result']
+		));
 	}
 
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
