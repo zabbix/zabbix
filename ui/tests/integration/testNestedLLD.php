@@ -350,7 +350,51 @@ class testNestedLLD extends CIntegrationTest{
 
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_ITEMTYPES,
-			'interfaces' => [],
+			'interfaces' => [
+				[
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.local',
+					'main' => 1,
+					'port' => '10163',
+					'type' => INTERFACE_TYPE_SNMP,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'retries' => 5,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
+				],
+				[
+					'type' => INTERFACE_TYPE_IPMI,
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.local',
+					'port' => '1023',
+					'main' => 1
+				],
+				[
+					'type' => INTERFACE_TYPE_JMX,
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => 'zabbix.com',
+					'port' => '1234',
+					'ip' => '',
+					'main' => 1
+				],
+				[
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'main' => 1,
+					'port' => '20000',
+					'type' => INTERFACE_TYPE_AGENT,
+					'useip' => INTERFACE_USE_IP
+				]
+			],
 			'groups' => [
 				['groupid' => 4]
 			],
@@ -361,56 +405,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid_item_types = $response['result']['hostids'][0];
-
-		$response = $this->call('hostinterface.create', [
-			[
-				'hostid' => self::$hostid_item_types,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.local',
-				'main' => 1,
-				'port' => '10163',
-				'type' => INTERFACE_TYPE_SNMP,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'retries' => 5,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
-				]
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'type' => INTERFACE_TYPE_IPMI,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.local',
-				'port' => '1023',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'type' => INTERFACE_TYPE_JMX,
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => 'zabbix.com',
-				'port' => '1234',
-				'ip' => '',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'main' => 1,
-				'port' => '20000',
-				'type' => INTERFACE_TYPE_AGENT,
-				'useip' => INTERFACE_USE_IP
-			]
-		]);
 
 		/* for nested macro testing ZBXNEXT-10068 */
 		$response = $this->call('host.create', [

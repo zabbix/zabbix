@@ -88,6 +88,16 @@ class testTaskCreate extends CAPITest {
 					[
 						'groupid' => self::$data['hostgroupid']
 					]
+				],
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '192.168.3.1',
+						'dns' => '',
+						'port' => '10050'
+					]
 				]
 			],
 			[
@@ -98,6 +108,16 @@ class testTaskCreate extends CAPITest {
 						'groupid' => self::$data['hostgroupid']
 					]
 				],
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '192.168.3.2',
+						'dns' => '',
+						'port' => '10060'
+					]
+				],
 				'status' => HOST_STATUS_NOT_MONITORED
 			],
 			[
@@ -106,6 +126,16 @@ class testTaskCreate extends CAPITest {
 				'groups' => [
 					[
 						'groupid' => 50016 // "API group for hosts" with read-only access to zabbix-user & zabbix-admin.
+					]
+				],
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '192.168.3.1',
+						'dns' => '',
+						'port' => '10050'
 					]
 				]
 			]
@@ -118,41 +148,14 @@ class testTaskCreate extends CAPITest {
 			'execute_now' => $hosts['hostids'][2]
 		];
 
-		// Create host interfaces separately.
-		$interfaces_data = [
-			[
-				'hostid' => self::$data['hostids']['monitored'],
-				'type' => INTERFACE_TYPE_AGENT,
-				'main' => INTERFACE_PRIMARY,
-				'useip' => INTERFACE_USE_IP,
-				'ip' => '192.168.3.1',
-				'dns' => '',
-				'port' => '10050'
-			],
-			[
-				'hostid' => self::$data['hostids']['not_monitored'],
-				'type' => INTERFACE_TYPE_AGENT,
-				'main' => INTERFACE_PRIMARY,
-				'useip' => INTERFACE_USE_IP,
-				'ip' => '192.168.3.2',
-				'dns' => '',
-				'port' => '10060'
-			],
-			[
-				'hostid' => self::$data['hostids']['execute_now'],
-				'type' => INTERFACE_TYPE_AGENT,
-				'main' => INTERFACE_PRIMARY,
-				'useip' => INTERFACE_USE_IP,
-				'ip' => '192.168.3.1',
-				'dns' => '',
-				'port' => '10050'
-			]
-		];
-		$interfaces = CDataHelper::call('hostinterface.create', $interfaces_data);
-		$this->assertArrayHasKey('interfaceids', $interfaces);
-		$interfaceid_monitored = $interfaces['interfaceids'][0];
-		$interfaceid_not_monitored = $interfaces['interfaceids'][1];
-		$interfaceid_execute_now = $interfaces['interfaceids'][2];
+		$interfaceids = array_column(CDataHelper::call('hostinterface.get', [
+			'output' => ['interfaceid', 'hostid'],
+			'hostids' => array_values(self::$data['hostids'])
+		]), 'interfaceid', 'hostid');
+
+		$interfaceid_monitored = $interfaceids[self::$data['hostids']['monitored']];
+		$interfaceid_not_monitored = $interfaceids[self::$data['hostids']['not_monitored']];
+		$interfaceid_execute_now = $interfaceids[self::$data['hostids']['execute_now']];
 
 		// Create template.
 		$templates_data = [[

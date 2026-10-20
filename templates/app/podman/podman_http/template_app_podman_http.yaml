@@ -41,7 +41,7 @@ zabbix_export:
         2. **Use VPN**: If remote access is required, consider using a VPN to securely connect to the network where the API service is running.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -2356,15 +2356,46 @@ zabbix_export:
             required: 'YES'
             regex: '.*'
       dashboards:
-        - uuid: b1a8873f761244b5a20d8b3973a9e5cd
+        - uuid: 3b8504036a354276a740b9d1f608a968
           name: Podman
           pages:
-            - name: Overview
+            - name: 'Podman: Overview'
               widgets:
                 - type: item
-                  width: '9'
+                  name: 'Podman version'
+                  width: '6'
                   hide_header: 'YES'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '15'
+                    - type: STRING
+                      name: description
+                      value: PODMAN
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '9'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: DBEAFE
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -2376,157 +2407,74 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                - type: svggraph
-                  name: CPU
-                  'y': '2'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: 0EC9AC
-                    - type: STRING
-                      name: ds.0.color.1
-                      value: 524BBC
-                    - type: STRING
-                      name: ds.0.color.2
-                      value: FFD54F
                     - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.data_set_label
-                      value: 'CPU usage'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.cpu.util.system
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.cpu.util.user
-                    - type: ITEM
-                      name: ds.0.itemids.2
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.cpu.util.idle
-                    - type: INTEGER
-                      name: ds.0.missingdatafunc
-                      value: '1'
-                    - type: INTEGER
-                      name: ds.0.stacked
-                      value: '1'
-                    - type: INTEGER
-                      name: ds.0.width
-                      value: '3'
-                    - type: STRING
-                      name: lefty_max
-                      value: '100'
-                    - type: STRING
-                      name: lefty_min
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
+                      name: show.2
                       value: '4'
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: STRING
-                      name: reference
-                      value: URSMW
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
-                - type: piechart
-                  name: Memory
-                  'y': '7'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: draw_type
-                      value: '1'
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: FFD54F
-                    - type: STRING
-                      name: ds.0.color.1
-                      value: 0EC9AC
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.data_set_label
-                      value: Memory
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.memory.free
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.memory.used
-                    - type: INTEGER
-                      name: ds.0.type.0
-                      value: '0'
-                    - type: INTEGER
-                      name: ds.0.type.1
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: space
-                      value: '3'
-                    - type: INTEGER
-                      name: total_show
-                      value: '1'
                     - type: STRING
                       name: units
-                      value: B
+                      value: version
+                    - type: STRING
+                      name: units_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: units_show
+                      name: units_pos
                       value: '1'
-                - type: itemnavigator
-                  'y': '12'
-                  width: '15'
-                  height: '5'
+                    - type: INTEGER
+                      name: units_size
+                      value: '10'
+                    - type: STRING
+                      name: updown_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: up_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                - type: item
+                  name: 'Podman API version'
+                  'y': '2'
+                  width: '6'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: items.0
-                      value: '*'
+                      name: bg_color
+                      value: 4D91FF
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '15'
+                    - type: STRING
+                      name: description
+                      value: |
+                        PODMAN
+                        API
+                    - type: INTEGER
+                      name: desc_bold
                       value: '1'
                     - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: host
+                      name: desc_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: problems
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '9'
+                    - type: INTEGER
+                      name: desc_v_pos
                       value: '0'
                     - type: STRING
-                      name: reference
-                      value: JGMCF
-                - type: item
-                  x: '9'
-                  width: '9'
-                  hide_header: 'YES'
-                  fields:
+                      name: down_color
+                      value: DBEAFE
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -2538,89 +2486,237 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                - type: piechart
-                  name: Swap
-                  x: '12'
-                  'y': '7'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: version
+                    - type: STRING
+                      name: units_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: units_pos
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '10'
+                    - type: STRING
+                      name: updown_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: up_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                - type: svggraph
+                  name: 'Host: CPU utilization'
+                  'y': '4'
+                  width: '24'
+                  height: '6'
                   fields:
                     - type: INTEGER
-                      name: draw_type
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
                       value: '1'
                     - type: STRING
-                      name: ds.0.color.0
-                      value: FFD54F
-                    - type: STRING
-                      name: ds.0.color.1
-                      value: 0EC9AC
+                      name: ds.0.aggregate_interval
+                      value: 5m
                     - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0D68FD
                     - type: STRING
                       name: ds.0.data_set_label
-                      value: Swap
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.swap.free
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.swap.used
+                      value: 'Host: System CPU utilization'
                     - type: INTEGER
-                      name: ds.0.type.0
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Host CPU utilization in system mode'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
                       value: '0'
                     - type: INTEGER
-                      name: ds.0.type.1
+                      name: ds.0.width
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Host: User CPU utilization'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Host CPU utilization in user mode'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.2.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.2.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.2.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.2.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: 'Host: Idle CPU utilization'
+                    - type: INTEGER
+                      name: ds.2.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Host CPU utilization in idle mode'
+                    - type: INTEGER
+                      name: ds.2.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.2.width
+                      value: '4'
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '2'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: space
                       value: '3'
                     - type: INTEGER
-                      name: total_show
+                      name: legend_lines_mode
                       value: '1'
-                    - type: STRING
-                      name: units
-                      value: B
                     - type: INTEGER
-                      name: units_show
+                      name: legend_statistic
                       value: '1'
-                - type: svggraph
-                  x: '15'
-                  'y': '12'
-                  width: '34'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: FFD54F
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.itemids.0._reference
-                      value: JGMCF._itemid
                     - type: STRING
                       name: reference
-                      value: DYMFK
+                      value: QOBPE
                     - type: INTEGER
                       name: righty
                       value: '0'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: problemsbysv
+                  name: Severity
+                  'y': '10'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: KRNCT
+                    - type: INTEGER
+                      name: severities.0
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.5
+                      value: '5'
+                    - type: INTEGER
+                      name: show_opdata
+                      value: '1'
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
                 - type: item
-                  x: '18'
-                  width: '9'
+                  name: 'Podman host architecture'
+                  x: '6'
+                  width: '10'
                   hide_header: 'YES'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '22'
+                    - type: STRING
+                      name: description
+                      value: |
+                        PODMAN
+                        HOST
+                        OS
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '9'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -2632,82 +2728,64 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
+                    - type: STRING
+                      name: units
+                      value: architecture
+                    - type: STRING
+                      name: units_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: units_show
-                      value: '0'
+                      name: units_pos
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '10'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '2'
                     - type: INTEGER
                       name: value_size
-                      value: '30'
-                - type: piechart
-                  name: Containers
-                  x: '24'
-                  'y': '7'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: draw_type
-                      value: '1'
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: FFD54F
-                    - type: STRING
-                      name: ds.0.color.1
-                      value: 0EC9AC
-                    - type: STRING
-                      name: ds.0.color.2
-                      value: 524BBC
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.data_set_label
-                      value: Containers
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.containers.paused
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.containers.running
-                    - type: ITEM
-                      name: ds.0.itemids.2
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.containers.stopped
-                    - type: INTEGER
-                      name: ds.0.type.0
-                      value: '0'
-                    - type: INTEGER
-                      name: ds.0.type.1
-                      value: '0'
-                    - type: INTEGER
-                      name: ds.0.type.2
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '3'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: space
-                      value: '3'
-                    - type: INTEGER
-                      name: total_show
-                      value: '1'
+                      value: '25'
                 - type: item
-                  x: '27'
-                  width: '9'
+                  name: 'Podman images total size'
+                  x: '6'
+                  'y': '2'
+                  width: '10'
                   hide_header: 'YES'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '22'
+                    - type: STRING
+                      name: description
+                      value: |
+                        PODMAN 
+                        IMAGES 
+                        TOTAL SIZE
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '9'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: DBEAFE
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -2722,89 +2800,58 @@ zabbix_export:
                     - type: INTEGER
                       name: show.2
                       value: '4'
-                    - type: INTEGER
-                      name: show.3
-                      value: '5'
                     - type: STRING
-                      name: sparkline.time_period._reference
-                      value: DASHBOARD._timeperiod._timeperiod
-                - type: problemsbysv
-                  x: '36'
-                  width: '36'
-                  hide_header: 'YES'
-                  fields:
+                      name: units_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: units_pos
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '10'
                     - type: STRING
-                      name: reference
-                      value: PLVLU
-                    - type: INTEGER
-                      name: show_opdata
-                      value: '1'
-                    - type: INTEGER
-                      name: show_suppressed
-                      value: '1'
-                - type: svggraph
-                  name: Memory
-                  x: '36'
-                  'y': '2'
-                  width: '36'
-                  height: '5'
-                  fields:
+                      name: updown_color
+                      value: DBEAFE
                     - type: STRING
-                      name: ds.0.color.0
-                      value: 0EC9AC
+                      name: up_color
+                      value: DBEAFE
                     - type: STRING
-                      name: ds.0.color.1
-                      value: FFD54F
+                      name: value_color
+                      value: FFFFFF
                     - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.memory.used
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Podman by HTTP'
-                        key: podman.host.memory.free
+                      name: value_h_pos
+                      value: '2'
                     - type: INTEGER
-                      name: ds.0.missingdatafunc
-                      value: '1'
-                    - type: INTEGER
-                      name: ds.0.stacked
-                      value: '1'
-                    - type: INTEGER
-                      name: ds.0.width
-                      value: '3'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '3'
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: STRING
-                      name: reference
-                      value: THFCJ
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: simple_triggers
-                      value: '1'
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
+                      name: value_size
+                      value: '25'
                 - type: problems
-                  x: '36'
-                  'y': '7'
-                  width: '36'
-                  height: '5'
-                  hide_header: 'YES'
+                  name: 'Problem history list'
+                  x: '6'
+                  'y': '10'
+                  width: '66'
+                  height: '3'
                   fields:
                     - type: STRING
                       name: reference
-                      value: FAOBB
+                      value: KJKFJ
+                    - type: INTEGER
+                      name: severities.0
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.5
+                      value: '5'
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -2818,12 +2865,10 @@ zabbix_export:
                       name: show_suppressed
                       value: '1'
                 - type: honeycomb
-                  name: 'Containers status'
-                  x: '49'
-                  'y': '12'
-                  width: '23'
-                  height: '5'
-                  hide_header: 'YES'
+                  name: 'Container: Status'
+                  x: '16'
+                  width: '56'
+                  height: '4'
                   fields:
                     - type: STRING
                       name: items.0
@@ -2834,81 +2879,440 @@ zabbix_export:
                     - type: STRING
                       name: primary_label
                       value: '{{ITEM.NAME}.regsub("^(Container \[)(.*)(\]: Status)", "\2")}'
+                    - type: INTEGER
+                      name: primary_label_bold
+                      value: '1'
+                    - type: STRING
+                      name: primary_label_color
+                      value: FAFAFA
                     - type: STRING
                       name: reference
-                      value: IOIBT
+                      value: KXYUJ
+                    - type: STRING
+                      name: secondary_label_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: show.0
-                      value: '1'
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '2'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: FCCB1D
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '3'
-                    - type: STRING
-                      name: thresholds.3.color
-                      value: D32F2F
-                    - type: STRING
-                      name: thresholds.3.threshold
-                      value: '9'
-            - name: Weathermap
-              widgets:
-                - type: honeycomb
-                  name: 'CPU utilization'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Container [*]: Average CPU usage'
-                    - type: INTEGER
-                      name: maintenance
-                      value: '1'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Container \[)(.*)(\]: Average CPU usage)", "\2")}'
-                    - type: STRING
-                      name: reference
-                      value: EXERJ
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
+                      value: 9BC2FF
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FCCB1D
+                      value: 0D68FD
                     - type: STRING
                       name: thresholds.1.threshold
-                      value: '50'
+                      value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: E65660
+                      value: 094EB3
                     - type: STRING
                       name: thresholds.2.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: '656565'
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '3'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: '500000'
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: '900000'
+                    - type: STRING
+                      name: thresholds.5.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.6.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: thresholds.6.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.7.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.7.threshold
+                      value: '7'
+                    - type: STRING
+                      name: thresholds.8.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: thresholds.8.threshold
+                      value: '8'
+                    - type: STRING
+                      name: thresholds.9.color
+                      value: '063375'
+                    - type: STRING
+                      name: thresholds.9.threshold
+                      value: '9'
+                    - type: STRING
+                      name: thresholds.10.color
+                      value: '750000'
+                    - type: STRING
+                      name: thresholds.10.threshold
+                      value: '10'
+                - type: svggraph
+                  name: 'Host: Swap memory usage'
+                  x: '24'
+                  'y': '4'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: D40000
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Host: Used swap memory'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Host used swap'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Host: Free swap memory'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Host free swap'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.2.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.2.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.2.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.2.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: 'Host: Total swap memory'
+                    - type: INTEGER
+                      name: ds.2.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Host total swap'
+                    - type: INTEGER
+                      name: ds.2.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.2.width
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: CLXUC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: 'Host: Memory usage'
+                  x: '48'
+                  'y': '4'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: D40000
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Host: Used memory'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Host used memory'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Host: Free memory'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Host free memory'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.2.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.2.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.2.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.2.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: 'Host: Total memory'
+                    - type: INTEGER
+                      name: ds.2.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Host total memory'
+                    - type: INTEGER
+                      name: ds.2.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.2.width
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: RMBZD
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+            - name: 'Podman: Container stats'
+              widgets:
+                - type: topitems
+                  name: 'Container: Status list'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Container*status'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '1'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Container: CPU utilization'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Container*CPU usage'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '100'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
                       value: '80'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
                 - type: itemnavigator
-                  name: Containers
-                  'y': '5'
-                  width: '17'
-                  height: '5'
+                  name: 'Container: Navigator'
+                  'y': '6'
+                  width: '24'
+                  height: '4'
                   fields:
                     - type: INTEGER
                       name: group_by.0.attribute
@@ -2922,6 +3326,30 @@ zabbix_export:
                     - type: STRING
                       name: group_by.1.tag_name
                       value: container
+                    - type: STRING
+                      name: items.0
+                      value: 'Container [*]: Created'
+                    - type: STRING
+                      name: items.1
+                      value: 'Container [*]: Started'
+                    - type: STRING
+                      name: items.2
+                      value: 'Container [*]: Memory limit'
+                    - type: STRING
+                      name: items.3
+                      value: 'Container [*]: Size of read-write layer'
+                    - type: STRING
+                      name: items.4
+                      value: 'Container [*]: Size of root filesystem'
+                    - type: STRING
+                      name: items.5
+                      value: 'Container [*]: Checkpointed'
+                    - type: STRING
+                      name: items.6
+                      value: 'Container [*]: Restored'
+                    - type: STRING
+                      name: items.7
+                      value: 'Container [*]: Finished'
                     - type: INTEGER
                       name: item_tags.0.operator
                       value: '1'
@@ -2933,80 +3361,37 @@ zabbix_export:
                       value: container
                     - type: STRING
                       name: reference
-                      value: YUNTU
-                - type: itemnavigator
-                  name: Images
-                  'y': '10'
-                  width: '17'
-                  height: '5'
-                  fields:
+                      value: QUDRE
                     - type: INTEGER
-                      name: group_by.0.attribute
-                      value: '3'
-                    - type: STRING
-                      name: group_by.0.tag_name
-                      value: image
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: podman
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: image
-                    - type: STRING
-                      name: reference
-                      value: FKMXJ
-                - type: svggraph
-                  name: 'Containers history'
-                  x: '17'
-                  'y': '5'
-                  width: '55'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: FFD54F
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.itemids.0._reference
-                      value: YUNTU._itemid
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: STRING
-                      name: reference
-                      value: IUTSQ
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: show_problems
-                      value: '1'
-                    - type: INTEGER
-                      name: simple_triggers
-                      value: '1'
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
+                      name: show_lines
+                      value: '1000'
                 - type: item
-                  x: '17'
+                  name: 'Container: Navigator item'
                   'y': '10'
-                  width: '15'
-                  height: '5'
+                  width: '24'
+                  height: '3'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 094EB3
                     - type: INTEGER
                       name: decimal_size
-                      value: '20'
+                      value: '26'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
                     - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("^(.*: )(.*)", "\2")}'
+                      name: desc_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 9BC2FF
                     - type: STRING
                       name: itemid._reference
-                      value: FKMXJ._itemid
+                      value: QUDRE._itemid
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -3016,161 +3401,345 @@ zabbix_export:
                     - type: INTEGER
                       name: show.2
                       value: '4'
-                    - type: INTEGER
-                      name: show.3
-                      value: '5'
                     - type: STRING
-                      name: sparkline.time_period._reference
-                      value: DASHBOARD._timeperiod._timeperiod
+                      name: units_color
+                      value: FAFAFA
                     - type: INTEGER
                       name: units_size
-                      value: '20'
+                      value: '15'
+                    - type: STRING
+                      name: updown_color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: up_color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '25'
-                - type: honeycomb
-                  name: 'Memory utilization'
+                      value: '24'
+                - type: topitems
+                  name: 'Container: Block input'
                   x: '24'
                   width: '24'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Container [*]: Memory usage percentage'
-                    - type: INTEGER
-                      name: maintenance
-                      value: '1'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Container \[)(.*)(\]: Memory usage percentage)", "\2")}'
-                    - type: STRING
-                      name: reference
-                      value: KHDUU
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: FCCB1D
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '50'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '80'
-                - type: topitems
-                  name: 'CPU utilization'
-                  x: '32'
-                  'y': '10'
-                  width: '20'
-                  height: '5'
+                  height: '3'
                   fields:
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Container [*]: Average CPU usage'
+                      value: 'Container*: Block input'
                     - type: STRING
                       name: columns.0.max
-                      value: '100'
+                      value: '5368709120'
                     - type: STRING
                       name: columns.0.min
                       value: '0'
                     - type: STRING
                       name: columns.0.thresholds.0.color
-                      value: 0EC9AC
+                      value: 9BC2FF
                     - type: STRING
                       name: columns.0.thresholds.0.threshold
-                      value: '50'
+                      value: '0'
                     - type: STRING
                       name: columns.0.thresholds.1.color
-                      value: FFD54F
+                      value: 4D91FF
                     - type: STRING
                       name: columns.0.thresholds.1.threshold
-                      value: '80'
+                      value: '1073741824'
                     - type: STRING
                       name: columns.0.thresholds.2.color
-                      value: FF465C
+                      value: 0D68FD
                     - type: STRING
                       name: columns.0.thresholds.2.threshold
-                      value: '90'
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '3221225472'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '4294967296'
                     - type: INTEGER
                       name: item_ordering_limit
                       value: '100'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
                     - type: INTEGER
                       name: layout
                       value: '1'
                     - type: INTEGER
                       name: problems
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Container: Block output'
+                  x: '24'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Container*: Block output'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.min
                       value: '0'
-                - type: honeycomb
-                  name: 'Image size'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '3221225472'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '4294967296'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: scatterplot
+                  name: 'Container: Block I/O scatterplot'
+                  x: '24'
+                  'y': '6'
+                  width: '24'
+                  height: '7'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1m
+                    - type: STRING
+                      name: ds.0.color
+                      value: '969696'
+                    - type: INTEGER
+                      name: ds.0.marker
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.marker_size
+                      value: '2'
+                    - type: STRING
+                      name: ds.0.x_axis_items.0
+                      value: 'Container*: Block input'
+                    - type: STRING
+                      name: ds.0.y_axis_items.0
+                      value: 'Container*: Block output'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: WIGHU
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: thresholds.0.x_axis_threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: thresholds.0.y_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: thresholds.1.x_axis_threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: thresholds.1.y_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.x_axis_threshold
+                      value: '3221225472'
+                    - type: STRING
+                      name: thresholds.2.y_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: '700000'
+                    - type: STRING
+                      name: thresholds.3.x_axis_threshold
+                      value: '4294967296'
+                    - type: STRING
+                      name: thresholds.3.y_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.4.x_axis_threshold
+                      value: '5368709120'
+                    - type: STRING
+                      name: thresholds.4.y_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: thresholds.5.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.5.y_axis_threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: thresholds.6.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: thresholds.6.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.6.y_axis_threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: thresholds.7.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.7.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.7.y_axis_threshold
+                      value: '3221225472'
+                    - type: STRING
+                      name: thresholds.8.color
+                      value: '700000'
+                    - type: STRING
+                      name: thresholds.8.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.8.y_axis_threshold
+                      value: '4294967296'
+                    - type: STRING
+                      name: thresholds.9.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.9.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.9.y_axis_threshold
+                      value: '5368709120'
+                - type: topitems
+                  name: 'Container: Memory utilization'
                   x: '48'
                   width: '24'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Image [*]: Size'
-                    - type: INTEGER
-                      name: maintenance
-                      value: '1'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Image \[)(.*)(\]: Size)", "\2")}'
-                    - type: STRING
-                      name: reference
-                      value: IOUTZ
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: FCCB1D
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '250000000'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '500000000'
-                - type: topitems
-                  name: 'Memory utilization'
-                  x: '52'
-                  'y': '10'
-                  width: '20'
-                  height: '5'
+                  height: '3'
                   fields:
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Container [*]: Memory usage percentage'
+                      value: 'Container*: Memory usage'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '3221225472'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '4294967296'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Container: Memory utilization, %'
+                  x: '48'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Container*: Memory usage percentage'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
@@ -3179,37 +3748,595 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: columns.0.thresholds.0.color
-                      value: 0EC9AC
+                      value: 9BC2FF
                     - type: STRING
                       name: columns.0.thresholds.0.threshold
-                      value: '50'
+                      value: '0'
                     - type: STRING
                       name: columns.0.thresholds.1.color
-                      value: FFD54F
+                      value: 4D91FF
                     - type: STRING
                       name: columns.0.thresholds.1.threshold
-                      value: '80'
+                      value: '20'
                     - type: STRING
                       name: columns.0.thresholds.2.color
-                      value: FF465C
+                      value: 0D68FD
                     - type: STRING
                       name: columns.0.thresholds.2.threshold
-                      value: '90'
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
                     - type: INTEGER
                       name: item_ordering_limit
                       value: '100'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
                     - type: INTEGER
                       name: layout
                       value: '1'
                     - type: INTEGER
                       name: problems
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: show_column_header
+                      value: '1'
+                - type: scatterplot
+                  name: 'Container: Memory utilization scatterplot'
+                  x: '48'
+                  'y': '6'
+                  width: '24'
+                  height: '7'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1m
+                    - type: STRING
+                      name: ds.0.color
+                      value: '969696'
+                    - type: INTEGER
+                      name: ds.0.marker
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.marker_size
+                      value: '2'
+                    - type: STRING
+                      name: ds.0.x_axis_items.0
+                      value: '*ontai* [*]: Memory limit'
+                    - type: STRING
+                      name: ds.0.y_axis_items.0
+                      value: 'Container*: Memory usage percentage'
+                    - type: INTEGER
+                      name: legend
                       value: '0'
+                    - type: STRING
+                      name: reference
+                      value: DVTZL
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: thresholds.0.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.0.y_axis_threshold
+                      value: '20'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: thresholds.1.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.1.y_axis_threshold
+                      value: '40'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.2.y_axis_threshold
+                      value: '60'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.3.x_axis_threshold
+                      value: ''
+                    - type: STRING
+                      name: thresholds.3.y_axis_threshold
+                      value: '80'
+                    - type: STRING
+                      name: y_axis_max
+                      value: '100'
+                    - type: STRING
+                      name: y_axis_min
+                      value: '0'
+            - name: 'Podman: Image stats'
+              widgets:
+                - type: topitems
+                  name: 'Image: Architecture'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display_value_as
+                      value: '2'
+                    - type: STRING
+                      name: columns.0.highlights.0.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.0.pattern
+                      value: amd64
+                    - type: STRING
+                      name: columns.0.highlights.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.1.pattern
+                      value: arm64
+                    - type: STRING
+                      name: columns.0.highlights.2.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.2.pattern
+                      value: arm
+                    - type: STRING
+                      name: columns.0.highlights.3.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.3.pattern
+                      value: '386'
+                    - type: STRING
+                      name: columns.0.highlights.4.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.4.pattern
+                      value: ppc64le
+                    - type: STRING
+                      name: columns.0.highlights.5.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.5.pattern
+                      value: s390x
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Architecture'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Operating system'
+                  'y': '3'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display_value_as
+                      value: '2'
+                    - type: STRING
+                      name: columns.0.highlights.0.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.0.pattern
+                      value: linux
+                    - type: STRING
+                      name: columns.0.highlights.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.1.pattern
+                      value: windows
+                    - type: STRING
+                      name: columns.0.highlights.2.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.highlights.2.pattern
+                      value: freebsd
+                    - type: STRING
+                      name: columns.0.highlights.3.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.3.pattern
+                      value: solaris
+                    - type: STRING
+                      name: columns.0.highlights.4.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.4.pattern
+                      value: darwin
+                    - type: STRING
+                      name: columns.0.highlights.5.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.highlights.5.pattern
+                      value: plan9
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Ope*'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Container count'
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Containers count'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '9'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '6'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Creation time'
+                  'y': '9'
+                  width: '24'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Creation time'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '3600'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '86400'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '604800'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: svggraph
+                  name: 'Image: Size change, last 2 days'
+                  x: '24'
+                  width: '48'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 13h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Image*: Size'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
+                      value: image
+                    - type: STRING
+                      name: ds.0.item_tags.0.value
+                      value: ''
+                    - type: INTEGER
+                      name: ds.0.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: CYYMC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: STRING
+                      name: time_period.from
+                      value: now-2d
+                    - type: STRING
+                      name: time_period.to
+                      value: now
+                - type: topitems
+                  name: 'Image: Size'
+                  x: '24'
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Size'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '10737418240'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Virtual size'
+                  x: '24'
+                  'y': '9'
+                  width: '24'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Virtual size'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '10737418240'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Unique size'
+                  x: '48'
+                  'y': '6'
+                  width: '24'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Unique size'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '10737418240'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: topitems
+                  name: 'Image: Shared size'
+                  x: '48'
+                  'y': '9'
+                  width: '24'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'image*]: Shared size'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '1073741824'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '2147483648'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '5368709120'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '10737418240'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '100'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
       valuemaps:
         - uuid: c11a16d28a2d41ad8445f910129e49b1
           name: Boolean
