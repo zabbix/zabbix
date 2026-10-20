@@ -25,7 +25,12 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testInternalJavaItem extends CIntegrationTest {
 
+	// Java gateway uses fixed pid file, log file and port, so parallel runs on the same host take turns.
+	const JAVA_LOCK_FILE = '/tmp/zabbix_java_integration.lock';
+	const JAVA_LOCK_TIMEOUT = 180;
+
 	private static $hostid;
+	private static $java_lock;
 	private static $items = [
 		'zbx_java_ping_test' => [
 			'name' => 'zbx_java_ping_test',
@@ -51,6 +56,8 @@ class testInternalJavaItem extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		self::lockJavaGateway();
+
 		// Create host "java_host"
 		$response = $this->call('host.create', [
 			[
@@ -91,6 +98,30 @@ class testInternalJavaItem extends CIntegrationTest {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Wait until no other test run uses Java gateway.
+	 *
+	 * @throws Exception    on failed lock file open or wait timeout
+	 */
+	private static function lockJavaGateway(): void {
+		self::$java_lock = @fopen(self::JAVA_LOCK_FILE, 'c') ?: @fopen(self::JAVA_LOCK_FILE, 'r');
+
+		if (self::$java_lock === false) {
+			throw new Exception('Failed to open lock file "'.self::JAVA_LOCK_FILE.'".');
+		}
+
+		$start = time();
+
+		while (!flock(self::$java_lock, LOCK_EX | LOCK_NB)) {
+			if (time() - $start >= self::JAVA_LOCK_TIMEOUT) {
+				throw new Exception('Java gateway is used by another test run, waited '.self::JAVA_LOCK_TIMEOUT.
+						' seconds.');
+			}
+
+			sleep(1);
+		}
 	}
 
 	/**
@@ -160,6 +191,14 @@ class testInternalJavaItem extends CIntegrationTest {
 	 *
 	 */
 	public static function clearData(): void {
+		if (self::$java_lock) {
+			flock(self::$java_lock, LOCK_UN);
+			fclose(self::$java_lock);
+			self::$java_lock = null;
+		}
+
+		unlink(self::JAVA_LOCK_FILE);
+
 		// Triggers, items, and user macros should be cascade deleted.
 		CDataHelper::call('host.delete', [self::$hostid]);
 	}
