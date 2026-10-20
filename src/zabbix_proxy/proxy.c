@@ -908,22 +908,11 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
+	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file || NULL != config_apm_ca_file) &&
+			(NULL == config_apm_cert_file || NULL == config_apm_key_file || NULL == config_apm_ca_file))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
-				" APMTLSCAFile configuration parameter");
-		err = 1;
-	}
-	if (NULL == config_apm_cert_file && NULL != config_apm_key_file)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSKeyFile configuration parameter must be used with APMTLSCertFile"
-				" configuration parameter");
-		err = 1;
-	}
-	if (NULL != config_apm_cert_file && NULL == config_apm_key_file)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile configuration parameter must be used with APMTLSKeyFile"
-				" configuration parameter");
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCAFile, APMTLSCertFile and APMTLSKeyFile configuration parameters"
+				" must be used together");
 		err = 1;
 	}
 #else
