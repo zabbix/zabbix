@@ -443,10 +443,7 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						const selectRow = e => {
-							/** @type {HTMLElement} */
-							const target = e.target;
-
+						const selectRow = target => {
 							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
@@ -466,11 +463,18 @@
 						};
 
 						row.addEventListener('keydown', e => {
-							if (e.key === 'Enter') {
-								e.preventDefault();
-
-								selectRow(e);
+							if (e.key !== 'Enter') {
+								return;
 							}
+
+							const target = e.target;
+
+							if (target.tagName === 'A') {
+								return;
+							}
+
+							e.preventDefault();
+							selectRow(target);
 						});
 
 						row.addEventListener('click', e => {
@@ -480,7 +484,13 @@
 								return;
 							}
 
-							selectRow(e);
+							const target = e.target;
+
+							if (target.tagName === 'A') {
+								return;
+							}
+
+							selectRow(target);
 						});
 					}
 				})
