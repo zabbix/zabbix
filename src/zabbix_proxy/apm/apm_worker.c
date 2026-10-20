@@ -62,7 +62,7 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	zbx_apm_dataset_t	ds;
 	zbx_vector_tag_t	*attrs;
-	int			ret, retries = 0;
+	int			ret = APM_COMMIT_ERR, retries = 0;
 
 	apm_dataset_init(&ds);
 
@@ -88,38 +88,38 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	zbx_apm_exporter_t	*exporter;
 
-	if (NULL != (exporter = apm_exporter_acquire(worker->exporters)))
+	apm_dataset_flush_stats(&ds, worker->commit_stats);
+
+	do
 	{
-		apm_dataset_flush_stats(&ds, worker->commit_stats);
-
-		do
+		if (1 < retries)
 		{
-			if (1 < retries)
-			{
-				int	delay;
+			int	delay;
 
-				if (5 < retries)
-					delay = APM_MAX_RETRY_DELAY;
-				else
-					delay = 1 << (retries - 2);
+			if (5 < retries)
+				delay = APM_MAX_RETRY_DELAY;
+			else
+				delay = 1 << (retries - 2);
 
-				zabbix_log(LOG_LEVEL_WARNING, "APM database is down, retrying in %d seconds", delay);
+			zabbix_log(LOG_LEVEL_WARNING, "APM database is down, retrying in %d seconds", delay);
 
-				for (int i = 0; i < delay && SUCCEED == zbx_mw_worker_is_running(&worker->base); i++)
-					sleep(1);
-			}
-
-			ret = apm_exporter_commit(exporter, &ds);
-			retries++;
+			for (int i = 0; i < delay && SUCCEED == zbx_mw_worker_is_running(&worker->base); i++)
+				sleep(1);
 		}
-		while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
 
-		/* uncommitted rows are left in dataset, undo commit stats for them */
-		if (APM_COMMIT_OK != ret)
-			apm_dataset_undo_stats(&ds, worker->commit_stats);
+		if (NULL == (exporter = apm_exporter_acquire(worker->exporters)))
+			break;
 
+		ret = apm_exporter_commit(exporter, &ds);
 		apm_exporter_release(worker->exporters, exporter);
+
+		retries++;
 	}
+	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
+
+	/* uncommitted rows are left in dataset, undo commit stats for them */
+	if (APM_COMMIT_OK != ret)
+		apm_dataset_undo_stats(&ds, worker->commit_stats);
 
 	apm_dataset_destroy(&ds);
 
