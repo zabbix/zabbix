@@ -278,6 +278,7 @@ class testDiscoveryRule extends CAPITest {
 		$discoveryrule = [
 			'name' => 'API LLD rule telemetry query',
 			'key_' => 'api_lld_rule_telemetry_query',
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'hostid' => '50009',
 			'delay' => '30s'
 		];
@@ -289,160 +290,144 @@ class testDiscoveryRule extends CAPITest {
 		];
 
 		yield 'Telemetry query "granularity" cannot be empty' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'granularity' => '',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/granularity": cannot be empty.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/granularity": cannot be empty.'
 		];
 
 		yield 'Telemetry query "granularity" less than allowed' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'granularity' => '0',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/granularity": value must be one of 1-86400.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/granularity": value must be one of 1-86400.'
 		];
 
 		yield 'Telemetry query "granularity" greater than allowed' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'granularity' => '86401s',
 				'lookback_limit' => '3d',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/granularity": value must be one of 1-86400.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/granularity": value must be one of 1-86400.'
 		];
 
 		yield 'Telemetry query "granularity" do not support LLD macro' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'granularity' => '{#MACRO}',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/granularity": a time unit is expected.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/granularity": a time unit is expected.'
 		];
 
 		yield 'Telemetry query "granularity" cannot be greater than lookback_limit' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'granularity' => '30s',
 				'lookback_limit' => '10s',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
+			] + $discoveryrule,
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
 		];
 
 		yield 'Telemetry query "granularity" is not supported for non telemetry query type' => [
-			'discoveryrule' => [
+			[
 				'type' => ITEM_TYPE_TRAPPER,
 				'delay' => '0',
 				'granularity' => '30s'
 			] + $discoveryrule,
-			'expected_error' => 'Invalid parameter "/1/granularity": value must be "15s".'
+			'Invalid parameter "/1/granularity": value must be "15s".'
 		];
 
 		yield 'Telemetry query "lookback_limit" less than allowed' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'lookback_limit' => '0',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
 		];
 
 		yield 'Telemetry query "lookback_limit" greater than allowed' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'lookback_limit' => '259201s',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/lookback_limit": value must be one of 1-259200.'
 		];
 
 		yield 'Telemetry query "lookback_limit" do not support LLD macro' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'lookback_limit' => '{#MACRO}',
 				'query' => $query
-			],
-			'expected_error' => 'Invalid parameter "/1/lookback_limit": a time unit is expected.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/lookback_limit": a time unit is expected.'
 		];
 
 		yield 'Telemetry query "lookback_limit" for non telemetry query type' => [
-			'discoveryrule' => [
+			[
 				'type' => ITEM_TYPE_TRAPPER,
 				'delay' => '0',
 				'lookback_limit' => '30s'
 			] + $discoveryrule,
-			'expected_error' => 'Invalid parameter "/1/lookback_limit": value must be "10m".'
+			'Invalid parameter "/1/lookback_limit": value must be "10m".'
 		];
 
 		yield 'Telemetry query "query" is required' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY
-			],
-			'expected_error' => 'Invalid parameter "/1": the parameter "query" is missing.'
+			$discoveryrule,
+			'Invalid parameter "/1": the parameter "query" is missing.'
 		];
 
 		yield 'Telemetry query "query.signal_type" unsupported value' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => ['signal_type' => 3] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/signal_type": value must be one of '.implode(', ', [
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/signal_type": value must be one of '.implode(', ', [
 				CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
 				CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
 			]).'.'
 		];
 
 		yield 'Telemetry query "query.signal_type" metrics require "query.metric_point_type"' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => ['signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query": the parameter "metric_point_type" is missing.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query": the parameter "metric_point_type" is missing.'
 		];
 
 		yield 'Telemetry query "query.aggregated_columns" cannot be empty' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => ['aggregated_columns' => []] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/aggregated_columns": cannot be empty.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/aggregated_columns": cannot be empty.'
 		];
 
 		yield 'Telemetry query "query.columns" column' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => ['columns' => [['column' => 'Body']]] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/columns/1/column": value must be one of "'.
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/columns/1/column": value must be one of "'.
 				implode('", "', CItemTypeTelemetryQuery::TRACES_COLUMNS_COLUMN).'".'
 		];
 
 		yield 'Telemetry query "query.filter" is required' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => array_diff_key($query, ['filter' => ''])
-			],
-			'expected_error' => 'Invalid parameter "/1/query": the parameter "filter" is missing.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query": the parameter "filter" is missing.'
 		];
 
 		yield 'Telemetry query "query" should be empty for non telemetry query type' => [
-			'discoveryrule' => [
+			[
 				'type' => ITEM_TYPE_TRAPPER,
 				'delay' => '0',
 				'query' => $query
 			] + $discoveryrule,
-			'expected_error' => 'Invalid parameter "/1/query": should be empty.'
+			'Invalid parameter "/1/query": should be empty.'
 		];
 
 		yield 'Telemetry query "query.filter.formula" is required for custom expression' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => [
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -451,13 +436,12 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/filter": the parameter "formula" is missing.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/filter": the parameter "formula" is missing.'
 		];
 
 		yield 'Telemetry query "query.filter.conditions[].formulaid" is required for custom expression' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => [
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -467,13 +451,12 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/filter/conditions/1": the parameter "formulaid" is missing.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/filter/conditions/1": the parameter "formulaid" is missing.'
 		];
 
 		yield 'Telemetry query "query.filter.formula" has more conditions than "query.filter.conditions"' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => [
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -483,13 +466,12 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
 		];
 
 		yield 'Telemetry query "query.filter.conditions[].formulaid" is not used in "query.filter.formula"' => [
-			'discoveryrule' => $discoveryrule + [
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			[
 				'query' => [
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -500,8 +482,8 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => 'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
 		];
 	}
 
@@ -773,80 +755,80 @@ class testDiscoveryRule extends CAPITest {
 		];
 
 		yield 'Telemetry query with default "time_shift", "lookback_limit" and "granularity"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_1',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query with minimal "time_shift", "lookback_limit" and "granularity"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_2',
 				'time_shift' => '0',
 				'lookback_limit' => '1s',
 				'granularity' => '1s',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query with maximal "time_shift", "lookback_limit" and "granularity"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_3',
 				'time_shift' => '1d',
 				'lookback_limit' => '3d',
 				'granularity' => '1d',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "granularity" equal to "lookback_limit"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_4',
 				'lookback_limit' => '5m',
 				'granularity' => '300',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query user macro in "time_shift", "lookback_limit" and "granularity"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_5',
 				'time_shift' => '{$MACRO}',
 				'lookback_limit' => '{$MACRO}',
 				'granularity' => '{$MACRO}',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query user macro in "granularity" greater than "lookback_limit"' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_6',
 				'lookback_limit' => '1s',
 				'granularity' => '{$MACRO}',
 				'query' => $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "query.signal_type" logs' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_7',
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
 					'columns' => [['column' => 'ServiceName'], ['column' => 'LogAttributes', 'attribute_key' => 'key']],
 					'aggregated_columns' => [['column' => 'SeverityNumber', 'function' => AGGREGATE_MAX, 'alias' => 'max']]
 				] + $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "query.signal_type" metrics' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_8',
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
@@ -854,12 +836,12 @@ class testDiscoveryRule extends CAPITest {
 					'columns' => [['column' => 'MetricName']],
 					'aggregated_columns' => [['column' => 'Value', 'function' => AGGREGATE_AVG, 'alias' => 'avg']]
 				] + $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "query.aggregated_columns" with count and percentile functions' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_9',
 				'query' => [
 					'aggregated_columns' => [
@@ -867,12 +849,12 @@ class testDiscoveryRule extends CAPITest {
 						['column' => 'Duration', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [99.9999], 'alias' => 'p99']
 					]
 				] + $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "query.filter" with "and/or" conditions' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_10',
 				'query' => [
 					'filter' => [
@@ -884,12 +866,12 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 
 		yield 'Telemetry query "query.filter" with custom expression' => [
-			'discoveryrule' => $discoveryrule + [
+			[
 				'key_' => 'lld_rule_telemetry_query_11',
 				'query' => [
 					'filter' => [
@@ -901,8 +883,8 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				] + $query
-			],
-			'expected_error' => null
+			] + $discoveryrule,
+			null
 		];
 	}
 
