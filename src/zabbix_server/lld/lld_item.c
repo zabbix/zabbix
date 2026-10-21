@@ -1661,6 +1661,50 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Validates that granularity <= lookback limit, otherwise rolls     *
+ *          back both fields.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_validate_lookback_limit_and_granularity(zbx_lld_item_full_t *item, char **error)
+{
+	char	errmsg_buf[MAX_STRING_LEN];
+
+	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		return;
+
+	/* only new items or items with changed lookback limit or granularity will be validated */
+	if (0 != item->itemid && 0 == (item->flags &
+			(ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT | ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY)))
+	{
+		return;
+	}
+
+	if (SUCCEED == is_user_macro(item->lookback_limit) || SUCCEED == is_user_macro(item->granularity))
+		return;
+
+	if (SUCCEED == zbx_tq_validate_lookback_limit_and_granularity(item->lookback_limit, NULL,
+			item->granularity, NULL, errmsg_buf, sizeof(errmsg_buf)))
+	{
+		return;
+	}
+
+	lld_item_add_error(item, error, "%s", errmsg_buf);
+
+	if (0 != item->itemid)
+	{
+		lld_field_str_rollback(&item->lookback_limit, &item->lookback_limit_orig, &item->flags,
+				ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT);
+		lld_field_str_rollback(&item->granularity, &item->granularity_orig, &item->flags,
+				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY);
+	}
+	else
+	{
+		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hostid            - [IN]                                       *
  *             items             - [IN]                                       *
  *             item_prototypes   - [IN]                                       *
@@ -1735,6 +1779,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 				ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT, ZBX_ITEM_LOOKBACK_LIMIT_LEN, error);
 		lld_validate_item_field(item, &item->granularity, &item->granularity_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY, ZBX_ITEM_GRANULARITY_LEN, error);
+	}
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		lld_validate_lookback_limit_and_granularity(item, error);
 	}
 
 	/* check duplicated item keys */

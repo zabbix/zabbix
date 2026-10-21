@@ -1149,14 +1149,11 @@ int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_ou
 			ZBX_TQ_GRANULARITY_MAX, "granularity", error, max_error_len);
 }
 
-int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
-		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
-		size_t max_error_len)
+int	zbx_tq_validate_lookback_limit_and_granularity(const char *lookback_limit_str, int *lookback_limit_out,
+		const char *granularity_str, int *granularity_out, char *error, size_t max_error_len)
 {
-	int	time_shift_tmp, lookback_limit_tmp, granularity_tmp;
+	int	lookback_limit_tmp, granularity_tmp;
 
-	if (SUCCEED != zbx_tq_validate_time_shift(time_shift_str, &time_shift_tmp, error, max_error_len))
-		return FAIL;
 	if (SUCCEED != zbx_tq_validate_lookback_limit(lookback_limit_str, &lookback_limit_tmp, error, max_error_len))
 		return FAIL;
 	if (SUCCEED != zbx_tq_validate_granularity(granularity_str, &granularity_tmp, error, max_error_len))
@@ -1165,12 +1162,26 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 	if (granularity_tmp > lookback_limit_tmp)
 		return ret_errf(FAIL, error, max_error_len, "\"granularity\" cannot be larger than \"lookback_limit\"");
 
-	if (NULL != time_shift_out)
-		*time_shift_out = time_shift_tmp;
 	if (NULL != lookback_limit_out)
 		*lookback_limit_out = lookback_limit_tmp;
 	if (NULL != granularity_out)
 		*granularity_out = granularity_tmp;
+
+	return SUCCEED;
+}
+
+int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
+		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
+		size_t max_error_len)
+{
+	if (SUCCEED != zbx_tq_validate_time_shift(time_shift_str, time_shift_out, error, max_error_len))
+		return FAIL;
+
+	if (SUCCEED != zbx_tq_validate_lookback_limit_and_granularity(lookback_limit_str, lookback_limit_out,
+			granularity_str, granularity_out, error, max_error_len))
+	{
+		return FAIL;
+	}
 
 	return SUCCEED;
 }
