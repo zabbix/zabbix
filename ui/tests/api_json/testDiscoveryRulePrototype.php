@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemType.php';
-require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
  * @onBefore prepareTestData
