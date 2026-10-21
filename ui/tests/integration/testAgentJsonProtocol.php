@@ -302,9 +302,14 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	}
 
 	private function setInterfacePort($port) {
-		$this->call('hostinterface.update', [
-			'interfaceid' => self::$interfaceid,
-			'port' => $port
+		$this->call('host.update', [
+			'hostid' => self::$hostid,
+			'interfaces' => [
+				[
+					'interfaceid' => self::$interfaceid,
+					'port' => $port
+				]
+			]
 		]);
 	}
 

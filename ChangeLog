@@ -1,8 +1,17 @@
 Changes for 8.0.0rc2
 
 New features:
+A......... [ZBXNEXT-10814] removed public access from all hostinterface methods except get; deleted unused hostinterface.update method (vskalbins)
+A.......S. [ZBXNEXT-10837] updated maximum supported ClickHouse version to 26.9 and minimum version to 26.3 (mprihodko)
+A.F.....S. [ZBXNEXT-10625] added support of Elasticsearch 8.x and 9.x (kastafjevs, Sasha)
+A.F.....S. [ZBXNEXT-10844] updated the minimum supported Elasticsearch version to 8.0 (Sasha)
 
 Bug fixes:
+..F....... [ZBX-28192] fixed widget layout with hidden header (ashubin)
+.......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
+..F....... [ZBX-28227] fixed 'undefined' tooltip on the widget configuration button and restored the actions button tooltip (aluchko)
+.......PS. [ZBX-28217] fixed trapper log spamming during port scans and health checks (sboidenko)
+........S. [ZBX-27897] fixed timer function triggers stopping working when disabling and enabling an item (wiper)
 ....I..... [ZBX-28182] fixed upgrade patch to avoid using hardcoded ids when inserting new graph themes, also added skipping logic when there is already existing graph theme or media type with same name (arimdjonoks)
 ...G...... [ZBX-28183] fixed agent 2 crash when activating MQTT items without a default session configured (opucka)
 
@@ -577,6 +586,11 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.16
+
+7.4.16rc1 was released as 7.4.16 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.4.16rc1
@@ -2213,6 +2227,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.32
+
+7.0.32rc1 was released as 7.0.32 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.32rc1
@@ -6467,6 +6486,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.49
+
+6.0.49rc1 was released as 6.0.49 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.49rc1
