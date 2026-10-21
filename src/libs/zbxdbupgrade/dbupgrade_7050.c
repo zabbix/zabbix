@@ -2181,6 +2181,24 @@ static int	DBpatch_7050195(void)
 	return DBset_default("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050196(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'hostinterface.create',"
+					"'hostinterface.update',"
+					"'hostinterface.delete',"
+					"'hostinterface.massadd',"
+					"'hostinterface.massremove'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2383,5 +2401,6 @@ DBPATCH_ADD(7050192, 0, 1)
 DBPATCH_ADD(7050193, 0, 1)
 DBPATCH_ADD(7050194, 0, 1)
 DBPATCH_ADD(7050195, 0, 1)
+DBPATCH_ADD(7050196, 0, 1)
 
 DBPATCH_END()

@@ -238,6 +238,7 @@ static void	lld_item_full_free(zbx_lld_item_full_t *item)
 	zbx_free(item->logtimefmt_orig);
 	zbx_free(item->publickey_orig);
 	zbx_free(item->privatekey_orig);
+	zbx_free(item->query);
 	zbx_free(item->query_orig);
 	zbx_free(item->time_shift);
 	zbx_free(item->time_shift_orig);
@@ -771,13 +772,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 				}
 			}
 
+			item->query = zbx_strdup(NULL, row[51]);
 			item->query_orig = NULL;
-
-			if (0 != strcmp(row[51], item_prototype->query))
-			{
-				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY;
-				item->query_orig = zbx_strdup(NULL, row[51]);
-			}
 
 			item->time_shift = zbx_strdup(NULL, row[52]);
 			item->time_shift_orig = NULL;
@@ -1731,6 +1727,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE, ZBX_ITEM_SSL_KEY_FILE_LEN, error);
 		lld_validate_item_field(item, &item->ssl_key_password, &item->ssl_key_password_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD, ZBX_ITEM_SSL_KEY_PASSWORD_LEN, error);
+		lld_validate_item_field(item, &item->query, &item->query_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_QUERY, ZBX_ITEM_QUERY_LEN, error);
 		lld_validate_item_field(item, &item->time_shift, &item->time_shift_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT, ZBX_ITEM_TIME_SHIFT_LEN, error);
 		lld_validate_item_field(item, &item->lookback_limit, &item->lookback_limit_orig,
@@ -2077,6 +2075,16 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	zbx_substitute_lld_macros(&item->ssl_key_password, lld_obj, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
+	item->query = zbx_strdup(NULL, item_prototype->query);
+	item->query_orig = NULL;
+
+	if (SUCCEED == ret && ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type &&
+			FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj, err,
+			sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in query: %s.\n", err);
+	}
+
 	item->time_shift = zbx_strdup(NULL, item_prototype->time_shift);
 	item->time_shift_orig = NULL;
 	zbx_substitute_lld_macros(&item->time_shift, lld_obj, ZBX_MACRO_ANY, NULL, 0);
@@ -2098,7 +2106,6 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->logtimefmt_orig = NULL;
 	item->publickey_orig = NULL;
 	item->privatekey_orig = NULL;
-	item->query_orig = NULL;
 
 	item->lifetime_orig = NULL;
 	item->enabled_lifetime_orig = NULL;
@@ -2490,6 +2497,21 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->ssl_key_password = buffer;
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->query);
+
+	if (ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type &&
+			FAIL == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, err, sizeof(err)))
+	{
+		*error = zbx_strdcatf(*error, "Cannot update item, error in query: %s.\n", err);
+	}
+	else if (0 != strcmp(item->query, buffer))
+	{
+		item->query_orig = item->query;
+		item->query = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY;
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->time_shift);
@@ -3094,9 +3116,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
 				item_prototype->allow_traps, item_prototype->lifetime, item_prototype->lifetime_type,
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
-				item_prototype->evaltype, item_prototype->discover, item_prototype->query,
-				item->time_shift, item->lookback_limit,
-				item->granularity);
+				item_prototype->evaltype, item_prototype->discover, item->query, item->time_shift,
+				item->lookback_limit, item->granularity);
 
 		/* In the case of prototype item discovery find the discovered LLD rule id */
 		if (NULL != rule_index)
@@ -3600,11 +3621,11 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_QUERY))
 	{
-		value_esc = zbx_db_dyn_escape_string(item_prototype->query);
+		value_esc = zbx_db_dyn_escape_string(item->query);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%squery='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_query(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-				item->item_flags, item->query_orig, item_prototype->query);
+				item->item_flags, item->query_orig, item->query);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT))
