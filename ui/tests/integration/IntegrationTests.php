@@ -86,6 +86,7 @@ require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+require_once dirname(__FILE__).'/testReportTest.php';
 /* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
 /* require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php'; */
 
@@ -163,6 +164,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
 		$suite->addTestSuite('testScheduledReports');
+		$suite->addTestSuite('testReportTest');
 		$suite->addTestSuite('testTriggerCEP');
 		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
