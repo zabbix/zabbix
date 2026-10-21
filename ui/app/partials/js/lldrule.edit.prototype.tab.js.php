@@ -246,10 +246,17 @@ var LldRuleEditPrototypeTab = class {
 			}
 		});
 
+		this.#container.querySelector('#delay-flex-table').addEventListener('input', e => {
+			if (e.target.matches('[name$="[delay]"]')) {
+				this.#updateTelemetryIndicators();
+			}
+		});
+
 		jQuery('#query-fields-table')
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
 		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
 		jQuery('#columns-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'columns'));
+		jQuery('#delay-flex-table').on('tableupdate.dynamicRows', () => this.#updateTelemetryIndicators());
 	}
 
 	getContainer() {
