@@ -171,12 +171,12 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		$suite->addTestSuite('testLLDTelemetrySyncAtScale');
+		$suite->addTestSuite('testTelemetryQueryItemsWithProxyInput');
 		/* $suite->addTestSuite('testLLDTelemetrySyncAtScaleClickHouseCollector'); */
 
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		/* $suite->addTestSuite('testTelemetryQueryItems'); */
-		/* $suite->addTestSuite('testTelemetryQueryItemsWithProxyInput'); */
 		return $suite;
 	}
 }
