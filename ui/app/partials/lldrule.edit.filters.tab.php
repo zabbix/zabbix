@@ -34,12 +34,12 @@ $formgrid = (new CFormGrid());
 
 $formgrid
 	->addItem([
-		(new CLabel(_('Type of calculation'), 'label-evaltype'))
+		(new CLabel(_('Type of calculation'), 'label-filters-evaltype'))
 			->addClass('js-item-condition'),
 		(new CFormField([
 			(new CDiv(
 				(new CSelect('filters_evaltype'))
-					->setFocusableElementId('label-evaltype')
+					->setFocusableElementId('label-filters-evaltype')
 					->setId('filters_evaltype')
 					->setValue($filter['evaltype'])
 					->addOptions(CSelect::createOptionsFromArray([
