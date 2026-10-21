@@ -1783,7 +1783,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 	for (int i = 0; i < items->values_num; i++)
 	{
-		lld_validate_lookback_limit_and_granularity(item, error);
+		lld_validate_lookback_limit_and_granularity(items->values[i], error);
 	}
 
 	/* check duplicated item keys */
