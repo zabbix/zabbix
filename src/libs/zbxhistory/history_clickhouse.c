@@ -1571,8 +1571,8 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 	else
 	{
 		if (NULL != local_table_name && SUCCEED == zbx_mregexp_sub(schema,
-				"ENGINE *= *Distributed\\([^,]+, *[^,]+, *['\\\\]+(\\w+)", "\\1",
-				ZBX_REGEXP_GROUP_CHECK_DISABLE, local_table_name))
+				"ENGINE *= *Distributed\\([^,]+, *['\\\\]+(\\w+)['\\\\]+, *['\\\\]+(\\w+)", "\\1.\\2",
+				ZBX_REGEXP_GROUP_CHECK_DISABLE, local_table_name) && NULL != *local_table_name)
 		{
 			return;
 		}
