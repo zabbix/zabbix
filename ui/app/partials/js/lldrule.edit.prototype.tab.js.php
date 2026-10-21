@@ -159,7 +159,7 @@ var LldRuleEditPrototypeTab = class {
 		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
 
 		const input_selectors = ['[name="authtype"]', '[name="custom_timeout"]', '[name="lifetime_type"]',
-			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]'
+			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]', '[name="evaltype"]'
 		];
 		const inputs = this.#container.querySelectorAll(input_selectors.join(','));
 
