@@ -217,7 +217,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'publickey', 'privatekey',
 
 			// Telemetry Query item type specific fields.
-			'query', 'time_shift', 'lookback_limit', 'granularity', 'storage_mode'
+			'query', 'time_shift', 'lookback_limit', 'granularity'
 		];
 
 		if ($is_lld_prototype) {
