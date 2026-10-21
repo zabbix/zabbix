@@ -875,8 +875,19 @@ class testFormUserRoles extends CWebTest {
 
 		// The API method buttons are disabled by default.
 		$this->assertFalse($form->getField('API methods')->isEnabled());
-		$this->assertFalse($this->query('button:Select')->one()->isClickable());
+		$selector = 'xpath://div[@id="api_methods_"]/following::button[text()="Select"]';
+		$this->assertFalse($this->query($selector)->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
+
+		// After enabling API access again, API methods controls become active.
+		$form->fill(['id:api-access' => true]);
+		$this->assertTrue($form->getField('API methods')->isEnabled());
+		$this->assertTrue($this->query($selector)->one()->isClickable());
+		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and not(@aria-disabled)]')->exists());
+		$this->query($selector)->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
+
+		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals(4, $form->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
@@ -960,9 +971,8 @@ class testFormUserRoles extends CWebTest {
 						'graphprototype.delete', 'graphprototype.get', 'graphprototype.update', 'hanode.get', 'history.clear',
 						'history.get', 'history.push', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
 						'host.update', 'hostdashboard.get', 'hostgroup.delete','hostgroup.get', 'hostgroup.massadd',
-						'hostgroup.massremove', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
-						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
-						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
+						'hostgroup.massremove', 'hostgroup.update', 'hostinterface.get', 'hostprototype.create',
+						'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
 						'housekeeping.get', 'httptest.create', 'httptest.delete', 'httptest.get', 'httptest.update',
 						'iconmap.get', 'image.get', 'item.create', 'item.delete', 'item.get', 'item.update',
 						'itemprototype.create', 'itemprototype.delete', 'itemprototype.get', 'itemprototype.update',
@@ -1009,9 +1019,8 @@ class testFormUserRoles extends CWebTest {
 						'hanode.get', 'history.clear', 'history.get', 'history.push', 'host.create', 'host.delete', 'host.get',
 						'host.massadd', 'host.massremove', 'host.update', 'hostdashboard.get', 'hostgroup.create',
 						'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
-						'hostgroup.propagate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
-						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.update',
-						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
+						'hostgroup.propagate', 'hostgroup.update', 'hostinterface.get', 'hostprototype.create',
+						'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
 						'housekeeping.get', 'housekeeping.update', 'httptest.create', 'httptest.delete', 'httptest.get',
 						'httptest.update', 'iconmap.create', 'iconmap.delete', 'iconmap.get', 'iconmap.update',
 						'image.create', 'image.delete', 'image.get', 'image.update', 'item.create', 'item.delete',

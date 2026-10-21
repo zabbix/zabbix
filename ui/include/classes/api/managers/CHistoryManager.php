@@ -272,6 +272,7 @@ class CHistoryManager {
 			$filter[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gt' => (time() - $period)
 					]
 				]
@@ -332,7 +333,7 @@ class CHistoryManager {
 						}
 					}
 
-					$results[$item['key']][] = $row['_source'];
+					$results[$item['key']][] = CElasticsearchHelper::normalizeDocument($row['_source'], $type);
 				}
 			}
 		}
@@ -563,7 +564,7 @@ class CHistoryManager {
 				],
 				[
 					'term' => [
-						'clock' => $clock
+						'clock' => (string) $clock
 					]
 				],
 				[
@@ -583,6 +584,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'lt' => $clock,
 							'gte' => $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
 						]
@@ -602,7 +604,7 @@ class CHistoryManager {
 			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
 
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
-				return $result[0];
+				return CElasticsearchHelper::normalizeDocument($result[0], $item['value_type']);
 			}
 		}
 
@@ -882,6 +884,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'gte' => $time_from,
 							'lte' => $time_to
 						]
@@ -890,6 +893,10 @@ class CHistoryManager {
 			];
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
+
+			if (!array_key_exists('group_by_itemid', $data)) {
+				continue;
+			}
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
@@ -1198,6 +1205,7 @@ class CHistoryManager {
 						[
 							'range' => [
 								'clock' => [
+									'format' => CElasticsearchHelper::DATE_FORMAT,
 									'gte' => $time_from,
 									'lte' => $time_to
 								]
@@ -1259,6 +1267,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'gte' => $time_from,
 							'lte' => $time_to
 						]
@@ -1511,7 +1520,8 @@ class CHistoryManager {
 							],
 							[
 								'range' => [
-									'clock' => ['gte' => $time_from] + ($time_to !== null ? ['lte' => $time_to] : [])
+									'clock' => ['format' => CElasticsearchHelper::DATE_FORMAT, 'gte' => $time_from]
+										+ ($time_to !== null ? ['lte' => $time_to] : [])
 								]
 							]
 						]

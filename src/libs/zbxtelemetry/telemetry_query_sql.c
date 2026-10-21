@@ -487,8 +487,9 @@ static char	*tq_sql_dyn_get_array_condition(zbx_tq_condition_t *cond, const tq_s
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_get_base_column_type(cond->col_info->type),
-				cond->attribute_key, cond->value, cond->operator, ctx);
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("x",
+				zbx_tq_get_base_column_type(cond->col_info->type), cond->attribute_key, cond->value,
+				cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s)", elem_cond, col_esc);
 
@@ -507,7 +508,7 @@ static char	*tq_sql_dyn_get_array_condition(zbx_tq_condition_t *cond, const tq_s
 
 static char	*tq_sql_dyn_get_condition(zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
-	if (SUCCEED == tq_column_type_is_array(cond->col_info->type))
+	if (SUCCEED == zbx_tq_column_type_is_array(cond->col_info->type))
 	{
 		return tq_sql_dyn_get_array_condition(cond, ctx);
 	}
