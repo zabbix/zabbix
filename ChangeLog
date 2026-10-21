@@ -1,6 +1,7 @@
 Changes for 8.0.0rc2
 
 New features:
+.........T [ZBXNEXT-10812] updated dashboard for 'Zabbix server health' template (smansurovs)
 A......... [ZBXNEXT-10814] removed public access from all hostinterface methods except get; deleted unused hostinterface.update method (vskalbins)
 A.......S. [ZBXNEXT-10837] updated maximum supported ClickHouse version to 26.9 and minimum version to 26.3 (mprihodko)
 A.F.....S. [ZBXNEXT-10625] added support of Elasticsearch 8.x and 9.x (kastafjevs, Sasha)
