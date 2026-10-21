@@ -72,6 +72,8 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
 .......PS. [ZBX-28173] fixed database reconnection (wiper)
 ..F....... [ZBX-27927] added unsigned option to SVG graph axes (dfofanovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
@@ -206,6 +208,10 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+A.F....... [ZBX-28198] fixed redirection to invalid URL (dpankins)
+.......PS. [ZBX-28196] added heartbeat connection type and frequency validation (sboidenko)
+........S. [ZBX-28194] fixed memory allocation size for binary items on MySQL/MariaDB (sboidenko)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 A......... [ZBX-28076] improved login handling (vbodrihins)
 A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 .......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
@@ -719,6 +725,11 @@ A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28
 .........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+.......PS. [ZBX-28196] added heartbeat connection type and frequency validation (sboidenko)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+........S. [ZBX-28194] fixed memory allocation size for binary items on MySQL/MariaDB (sboidenko)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
 ..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
@@ -751,6 +762,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+A.F....... [ZBX-28198] fixed redirection to invalid URL (dpankins)
 A......... [ZBX-28076] improved login handling (vbodrihins)
 A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 .......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
@@ -2354,6 +2366,11 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+.......PS. [ZBX-28196] added heartbeat connection type and frequency validation (sboidenko)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+........S. [ZBX-28194] fixed memory allocation size for binary items on MySQL/MariaDB (sboidenko)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
 ..F....... [ZBX-26953] fixed redirect functionality for discovery rules, host prototypes, graphs, graph prototypes, web scenarios, and maps (msnihach)
@@ -6532,6 +6549,9 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 ...G...... [ZBX-27024] resolved system.run failing and race conditions (opucka)
 
 --------------------------------------------------------------------------------
