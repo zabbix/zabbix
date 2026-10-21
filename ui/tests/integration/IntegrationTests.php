@@ -89,7 +89,7 @@ require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
 require_once dirname(__FILE__).'/testReportTest.php';
 /* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
-/* require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php'; */
+require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php';
 
 use PHPUnit\Framework\TestSuite;
 
