@@ -589,6 +589,13 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
 
 --------------------------------------------------------------------------------
+Changes for 7.4.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.4.16
 
 7.4.16rc1 was released as 7.4.16 without any changes
