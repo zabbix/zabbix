@@ -249,6 +249,17 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			]);
 
 		foreach ($src_items as &$src_item) {
+			if ($src_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+				unset($src_item['query']['filter']['eval_formula']);
+
+				if ($src_item['query']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					foreach ($src_item['query']['filter']['conditions'] as &$condition) {
+						unset($condition['formulaid']);
+					}
+					unset($condition);
+				}
+			}
+
 			foreach ($src_item['filter']['conditions'] as &$condition) {
 				if ($src_item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 					unset($condition['formulaid']);
