@@ -256,6 +256,30 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		if ($result) {
 			self::prepareItemsForApi($result, false);
 
+			foreach ($result as &$lldrule) {
+				if (array_key_exists('query', $lldrule) && $lldrule['query']) {
+					$lldrule['query']['signal_type'] = (string) $lldrule['query']['signal_type'];
+					$lldrule['query']['metric_point_type'] = (string) $lldrule['query']['metric_point_type'];
+					$lldrule['query']['filter']['evaltype'] = (string) $lldrule['query']['filter']['evaltype'];
+
+					foreach ($lldrule['query']['aggregated_columns'] as &$column) {
+						$column['function'] = (string) $column['function'];
+					}
+					unset($column);
+
+					foreach ($lldrule['query']['filter']['conditions'] as &$condition) {
+						$condition['operator'] = (string) $condition['operator'];
+					}
+					unset($condition);
+
+					$lldrule['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($lldrule['query']);
+				}
+
+				// Make telemetry query field storage_mode inaccessible.
+				unset($lldrule['storage_mode']);
+			}
+			unset($lldrule);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
@@ -266,31 +290,6 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		return $result;
-	}
-
-	protected static function prepareItemsForApi(array &$lldrules, bool $sortorder = true): void {
-		parent::prepareItemsForApi($lldrules, $sortorder);
-
-		foreach ($lldrules as &$lldrule) {
-			if (array_key_exists('query', $lldrule) && $lldrule['query']) {
-				$lldrule['query']['signal_type'] = (string) $lldrule['query']['signal_type'];
-				$lldrule['query']['metric_point_type'] = (string) $lldrule['query']['metric_point_type'];
-				$lldrule['query']['filter']['evaltype'] = (string) $lldrule['query']['filter']['evaltype'];
-
-				foreach ($lldrule['query']['aggregated_columns'] as &$column) {
-					$column['function'] = (string) $column['function'];
-				}
-				unset($column);
-
-				foreach ($lldrule['query']['filter']['conditions'] as &$condition) {
-					$condition['operator'] = (string) $condition['operator'];
-				}
-				unset($condition);
-
-				$lldrule['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($lldrule['query']);
-			}
-		}
-		unset($lldrule);
 	}
 
 	private static function validateGet(array &$options): void {

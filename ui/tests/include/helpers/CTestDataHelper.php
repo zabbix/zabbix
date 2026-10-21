@@ -428,6 +428,14 @@ class CTestDataHelper {
 		return $items;
 	}
 
+	public static function convertLldRulePrototypeReferences(array &$lld_rules): void {
+		self::convertPropertyReference($lld_rules, 'itemid');
+		self::convertPropertyReference($lld_rules, 'hostid');
+		self::convertPropertyReference($lld_rules, 'ruleid');
+		self::convertPropertyReference($lld_rules, 'interfaceid');
+		self::convertPropertyReference($lld_rules, 'master_itemid');
+	}
+
 	/**
 	 * @param array $lld_rules
 	 */
