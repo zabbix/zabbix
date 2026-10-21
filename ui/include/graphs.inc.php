@@ -83,7 +83,9 @@ function getGraphDims($graphid = null, array $itemids = [], ?int $outer_width = 
 				'webitems' => true
 			]);
 
-			$units = array_column($items, 'units');
+			foreach ($items as $item) {
+				$units[] = CGraphHelper::splitUnits($item['units'])[0];
+			}
 		}
 
 		$side_units[GRAPH_YAXIS_SIDE_DEFAULT] = $units ?: [''];
@@ -105,7 +107,7 @@ function getGraphDims($graphid = null, array $itemids = [], ?int $outer_width = 
 			$graphDims['graphtype'] = max($graphDims['graphtype'], (int) $graph['graphtype']);
 			$graphDims['graphHeight'] = max($graphDims['graphHeight'], (int) $graph['height']);
 
-			$side_units[$graph['yaxisside']][] = $graph['units'];
+			$side_units[$graph['yaxisside']][] = CGraphHelper::splitUnits($graph['units'])[0];
 		}
 
 		if ($graphDims['graphHeight'] == 0) {
