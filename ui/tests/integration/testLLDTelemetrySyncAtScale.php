@@ -155,6 +155,15 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
+		$this->createCollector();
+
+		return true;
+	}
+
+	/**
+	 * Create the APM (OTLP) collector that stores sent data points in ClickHouse.
+	 */
+	protected function createCollector(): void {
 		// The proxy is only used as the APM (OTLP) collector; the hosts are monitored by the server.
 		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
@@ -167,8 +176,14 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey('proxyids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['proxyids']);
 		self::$proxyid = $response['result']['proxyids'][0];
+	}
 
-		return true;
+	/**
+	 * Make the collector receive its configuration before data is sent to it.
+	 */
+	protected function syncCollectorConfiguration(): void {
+		// Proxy monitors no hosts, it only needs the APM configuration from the server.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 	}
 
 	/**
@@ -378,8 +393,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDTelemetrySyncAtScale_IngestPreflight() {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-		// Proxy monitors no hosts, it only needs the APM configuration from the server.
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->syncCollectorConfiguration();
 
 		// Resend periodically, data sent before the proxy has APM configuration may be dropped.
 		$baseline = $this->getStoredStatusCount(0);
