@@ -196,16 +196,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						' Proxy_2 for filter'
 			],
 			[
-				'Name' => 'Proxy group with proxies for Actions 1',
-				'State' => 'Unknown',
-				'Failover period' => '1m',
-				'Online proxies' => '0',
-				'Minimum proxies' => '1',
-				'Proxies' => '2',
-				7 => 'Proxy for Proxy groups 1, Proxy for Proxy groups 2'
-			],
-			[
-				'Name' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
+				'Name' => 'Proxy group \'&quot;&lt;s&gt; for Actions',
 				'State' => '',
 				'Failover period' => '1m',
 				'Online proxies' => '0',
@@ -214,7 +205,16 @@ class testPageAdministrationProxyGroups extends CWebTest {
 				7 => ''
 			],
 			[
-				'Name' => 'Proxy group for Actions 3 абц 頑張って 😀',
+				'Name' => 'Proxy group with proxies for Actions',
+				'State' => 'Unknown',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '2',
+				7 => 'Proxy for Proxy groups 1, Proxy for Proxy groups 2'
+			],
+			[
+				'Name' => 'Proxy group абц 頑張って 😀 for Actions',
 				'State' => '',
 				'Failover period' => '1m',
 				'Online proxies' => '0',
@@ -286,9 +286,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Degrading proxy group',
 						'Multiple spaces in proxy group',
 						'Online proxy group',
-						'Proxy group with proxies for Actions 1',
-						'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
-						'Proxy group for Actions 3 абц 頑張って 😀'
+						'Proxy group \'&quot;&lt;s&gt; for Actions',
+						'Proxy group with proxies for Actions',
+						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]
 			],
@@ -349,9 +349,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Multiple spaces in proxy group',
 						'Offline group',
 						'Online proxy group',
-						'Proxy group with proxies for Actions 1',
-						'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
-						'Proxy group for Actions 3 абц 頑張って 😀'
+						'Proxy group \'&quot;&lt;s&gt; for Actions',
+						'Proxy group with proxies for Actions',
+						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]
 			],
@@ -508,16 +508,16 @@ class testPageAdministrationProxyGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['Proxy group for Actions 2 \'&quot;&lt;s&gt;'],
-					'error' => 'Proxy group "Proxy group for Actions 2 \'&quot;&lt;s&gt;" is used by action "Autoregistration action 1".'
+					'groups' => ['Proxy group \'&quot;&lt;s&gt; for Actions'],
+					'error' => 'Proxy group "Proxy group \'&quot;&lt;s&gt; for Actions" is used by action "Autoregistration action 1".'
 				]
 			],
 			// #4 Attempt to delete a proxy group that is used in a Discovery action.
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['Proxy group for Actions 3 абц 頑張って 😀'],
-					'error' => 'Proxy group "Proxy group for Actions 3 абц 頑張って 😀" is used by action "Discovery action with proxy groups".'
+					'groups' => ['Proxy group абц 頑張って 😀 for Actions'],
+					'error' => 'Proxy group "Proxy group абц 頑張って 😀 for Actions" is used by action "Discovery action with proxy groups".'
 				]
 			],
 			// #5 Delete a proxy group that has nothing linked to it.

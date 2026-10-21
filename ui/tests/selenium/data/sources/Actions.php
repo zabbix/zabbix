@@ -52,13 +52,13 @@ class Actions {
 		CDataHelper::call('proxygroup.create',
 			[
 				[
-					'name' => 'Proxy group with proxies for Actions 1'
+					'name' => 'Proxy group with proxies for Actions'
 				],
 				[
-					'name' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;'
+					'name' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 				],
 				[
-					'name' => 'Proxy group for Actions 3 абц 頑張って 😀'
+					'name' => 'Proxy group абц 頑張って 😀 for Actions'
 				]
 			]
 		);
@@ -77,14 +77,14 @@ class Actions {
 				[
 					'name' => 'Proxy for Proxy groups 1',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions 1'],
+					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions'],
 					'local_address' => '127.0.0.1',
 					'local_port' => '10051'
 				],
 				[
 					'name' => 'Proxy for Proxy groups 2',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions 1'],
+					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions'],
 					'local_address' => '127.0.0.2',
 					'local_port' => '10051'
 				]
@@ -354,12 +354,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => $proxy_groupids['Proxy group with proxies for Actions 1']
+							'value' => $proxy_groupids['Proxy group with proxies for Actions']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => $proxy_groupids['Proxy group for Actions 2 \'&quot;&lt;s&gt;']
+							'value' => $proxy_groupids['Proxy group \'&quot;&lt;s&gt; for Actions']
 						]
 					]
 				],
@@ -501,12 +501,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => $proxy_groupids['Proxy group with proxies for Actions 1']
+							'value' => $proxy_groupids['Proxy group with proxies for Actions']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => $proxy_groupids['Proxy group for Actions 3 абц 頑張って 😀']
+							'value' => $proxy_groupids['Proxy group абц 頑張って 😀 for Actions']
 						]
 					]
 				],
