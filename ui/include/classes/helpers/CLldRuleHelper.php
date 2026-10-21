@@ -30,14 +30,14 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'formula' => DB::getDefault('items', 'formula'),
 			'conditions'=> []
 		];
+		$item['filters_evaltype'] = $item['filter']['evaltype'];
+		$item['filters_formula'] = $item['filter']['formula'];
+		$item['filters_conditions'] = $item['filter']['conditions'];
 		$item['discovered_lld'] = false;
 		$item['lifetime_type'] = DB::getDefault('items', 'lifetime_type');
 		$item['lifetime'] = DB::getDefault('items', 'lifetime');
 		$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
 		$item['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
-		$item['filters_evaltype'] = $item['filter']['evaltype'];
-		$item['filters_formula'] = $item['filter']['formula'];
-		$item['filters_conditions'] = $item['filter']['conditions'];
 
 		return $item;
 	}
