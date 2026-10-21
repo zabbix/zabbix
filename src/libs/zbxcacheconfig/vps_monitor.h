@@ -19,6 +19,7 @@
 
 typedef struct
 {
+	zbx_uint64_t	total_collected_num;
 	zbx_uint64_t	total_values_num;
 	zbx_uint64_t	values_num;
 	zbx_uint64_t	values_limit;
