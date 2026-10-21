@@ -17084,12 +17084,13 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue httptest to be processed according to the delay             *
+ * Purpose: queue httptest to be processed according to supplied delay and    *
+ *          store that delay as its current delay                             *
  *                                                                            *
- * Parameter: now        - [IN] the current timestamp                         *
- *            httptestid - [IN] the id of httptest to be queued               *
- *            delay      - [IN] the number of seconds between httptest        *
- *                              processing                                    *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *             delay      - [IN] number of seconds between httptest           *
+ *                               processing                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
@@ -17101,6 +17102,30 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
 	{
 		httptest->delay = delay;
+		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+		dc_httptest_queue(httptest);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue httptest that could not be processed according to its       *
+ *          current delay                                                     *
+ *                                                                            *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+	{
 		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 		dc_httptest_queue(httptest);
 	}

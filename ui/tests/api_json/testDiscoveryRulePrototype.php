@@ -54,6 +54,8 @@ class testDiscoveryRulePrototype extends CAPITest {
 
 		$discoveryrule_prototypes = [
 			[
+				'hostid' => ':host:lld_prototype_telemetry_query_host',
+				'ruleid' => ':lld_rule:lld_parent',
 				'name' => 'telemetry query lld prototype',
 				'key_' => 'lld_telemetry_query[{#M}]',
 				'type' => ITEM_TYPE_TELEMETRY_QUERY,
@@ -66,19 +68,14 @@ class testDiscoveryRulePrototype extends CAPITest {
 				]
 			],
 			[
+				'hostid' => ':host:lld_prototype_telemetry_query_host',
+				'ruleid' => ':lld_rule:lld_parent',
 				'name' => 'trapper lld prototype',
 				'key_' => 'lld_trapper[{#M}]',
 				'type' => ITEM_TYPE_TRAPPER
 			]
 		];
-
-		foreach ($discoveryrule_prototypes as &$discoveryrule_prototype) {
-			$discoveryrule_prototype += [
-				'hostid' => CTestDataHelper::getConvertedValueReference(':host:lld_prototype_telemetry_query_host'),
-				'ruleid' => CTestDataHelper::getConvertedValueReference(':lld_rule:lld_parent')
-			];
-		}
-		unset($discoveryrule_prototype);
+		CTestDataHelper::convertLldRulePrototypeReferences($discoveryrule_prototypes);
 
 		$result = CDataHelper::call('discoveryruleprototype.create', $discoveryrule_prototypes);
 

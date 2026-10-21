@@ -127,6 +127,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$macro_templates = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -138,6 +139,10 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $template)) {
+				$macro_templates[] = ':template:'.$template['host'];
+			}
 
 			if (array_key_exists('value_maps', $template)) {
 				foreach ($template['value_maps'] as $value_map) {
@@ -173,9 +178,12 @@ class CTestDataHelper {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
+		self::prepareMacroReferences($macro_templates);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
+
+		self::addInheritedLldRules($templates, 'template');
 	}
 
 	public static function convertTemplateReferences(array &$templates): void {
@@ -192,6 +200,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$macro_hosts = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -204,6 +213,10 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $host)) {
+				$macro_hosts[] = ':host:'.$host['host'];
+			}
 
 			if (array_key_exists('value_maps', $host)) {
 				foreach ($host['value_maps'] as $value_map) {
@@ -247,10 +260,49 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
+		self::prepareMacroReferences($macro_hosts);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
 		self::createHttptests($httptests);
+
+		self::addInheritedLldRules($hosts, 'host');
+	}
+
+	/**
+	 * Register discovery rules inherited from linked templates, making them accessible by references
+	 * `:lld_rule:rule_key:host:rule_host` and `:lld_rule:rule_key:template:rule_template`.
+	 *
+	 * @param array  $hosts        Created hosts or templates.
+	 * @param string $object_type  Parent object identifier string "host" or "template".
+	 */
+	private static function addInheritedLldRules(array $hosts, string $object_type): void {
+		$host_refs = [];
+
+		foreach ($hosts as $host) {
+			if ($host['templates']) {
+				$host_refs[self::$objectids[$object_type][$host['host']]] = ':'.$object_type.':'.$host['host'];
+			}
+		}
+
+		if (!$host_refs) {
+			return;
+		}
+
+		$lld_rules = CDataHelper::call('discoveryrule.get', [
+			'output' => ['itemid', 'hostid', 'key_'],
+			'hostids' => array_keys($host_refs),
+			'inherited' => true
+		]);
+
+		foreach ($lld_rules as $lld_rule) {
+			$lld_rule_ids = self::$objectids['lld_rule'][$lld_rule['key_']] ?? [];
+
+			// Prepend inherited rule itemid to make ":lld_rule:rule_key" resolve to last created discovery rule.
+			self::$objectids['lld_rule'][$lld_rule['key_']] = [
+				$host_refs[$lld_rule['hostid']] => $lld_rule['itemid']
+			] + $lld_rule_ids;
+		}
 	}
 
 	public static function convertHostReferences(array &$hosts): void {
@@ -258,6 +310,35 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
 		self::convertPropertyReference($hosts, 'proxyid');
+	}
+
+	/**
+	 * Store references to macros of the given hosts or templates, keyed by macro and owner, so that both
+	 * `:user_macro:{$X}:host:my.name` and the short `:user_macro:{$X}` (last created owner) can be resolved.
+	 *
+	 * @param array $host_refs  Owner references, e.g. `:host:my.name` or `:template:my.name`.
+	 */
+	private static function prepareMacroReferences(array $host_refs): void {
+		if (!$host_refs) {
+			return;
+		}
+
+		$host_refs = array_combine(self::getConvertedValueReferences($host_refs), $host_refs);
+
+		$db_macros = CDataHelper::call('usermacro.get', [
+			'output' => ['hostmacroid', 'hostid', 'macro'],
+			'hostids' => array_keys($host_refs)
+		]);
+
+		foreach ($db_macros as $db_macro) {
+			self::$objectids['user_macro'][$db_macro['macro']][$host_refs[$db_macro['hostid']]] =
+				$db_macro['hostmacroid'];
+		}
+	}
+
+	public static function convertUserMacroReferences(array &$host_macro): void {
+		self::convertPropertyReference($host_macro, 'hostmacroid');
+		self::convertPropertyReference($host_macro, 'hostid');
 	}
 
 	/**
@@ -386,6 +467,14 @@ class CTestDataHelper {
 		}
 
 		return $items;
+	}
+
+	public static function convertLldRulePrototypeReferences(array &$lld_rules): void {
+		self::convertPropertyReference($lld_rules, 'itemid');
+		self::convertPropertyReference($lld_rules, 'hostid');
+		self::convertPropertyReference($lld_rules, 'ruleid');
+		self::convertPropertyReference($lld_rules, 'interfaceid');
+		self::convertPropertyReference($lld_rules, 'master_itemid');
 	}
 
 	/**

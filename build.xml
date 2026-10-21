@@ -240,6 +240,7 @@
 			<arg line="--with-ares"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-apm"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -783,6 +784,7 @@
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-apm"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
