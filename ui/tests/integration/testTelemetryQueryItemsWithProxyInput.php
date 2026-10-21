@@ -29,15 +29,12 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 	private static int $proxyid;
 
 	public function serverConfigurationProvider(): array {
+		// TelemetryProvider of server and proxy comes from $TELEMETRY_PROVIDERS of the frontend configuration.
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"'
+				'LogFile' => self::getLogPath(self::COMPONENT_SERVER)
 			],
 			self::COMPONENT_PROXY => [
 				'DebugLevel' => 5,
@@ -45,10 +42,6 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 				'LogFile' => self::getLogPath(self::COMPONENT_PROXY),
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
 				'ListenPort' => PHPUNIT_PORT_PREFIX . self::PROXY_PORT_SUFFIX,
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"',
 				'StartAPMCollectors' => 1,
 				'Hostname' => self::PROXY_NAME
 			]
