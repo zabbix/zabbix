@@ -1130,7 +1130,7 @@ class testFormAction extends CLegacyWebTest {
 
 	public static function create() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1168,7 +1168,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1180,7 +1180,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1199,17 +1199,17 @@ class testFormAction extends CLegacyWebTest {
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'equals',
-							'Proxy group' => 'Proxy group for Actions 1'
+							'Proxy group' => 'Proxy group with proxies for Actions 1'
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'does not equal',
-							'Proxy group' => 'Proxy group for Actions 2'
+							'Proxy group' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;'
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Proxy group equals Proxy group for Actions 1',
-						'B' => 'Proxy group does not equal Proxy group for Actions 2',
+						'A' => 'Proxy group equals Proxy group with proxies for Actions 1',
+						'B' => 'Proxy group does not equal Proxy group for Actions 2 \'&quot;&lt;s&gt;',
 						'C' => 'Received value does not contain Received value',
 						'D' => 'Service type equals FTP'
 					],
@@ -1224,7 +1224,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1235,7 +1235,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1254,19 +1254,19 @@ class testFormAction extends CLegacyWebTest {
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'equals',
-							'Proxy group' => 'Proxy group for Actions 1'
+							'Proxy group' => 'Proxy group with proxies for Actions 1'
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'does not equal',
-							'Proxy group' => 'Proxy group for Actions 2'
+							'Proxy group' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;'
 						]
 					],
 					'expected conditions' => [
 						'A' => 'Host name contains Zabbix',
 						'B' => 'Host metadata does not contain Zabbix',
-						'C' => 'Proxy group equals Proxy group for Actions 1',
-						'D' => 'Proxy group does not equal Proxy group for Actions 2'
+						'C' => 'Proxy group equals Proxy group with proxies for Actions 1',
+						'D' => 'Proxy group does not equal Proxy group for Actions 2 \'&quot;&lt;s&gt;'
 					],
 					'operations' => [
 						[
@@ -1279,7 +1279,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1290,7 +1290,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1323,7 +1323,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1335,7 +1335,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1385,7 +1385,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1397,7 +1397,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1407,6 +1407,22 @@ class testFormAction extends CLegacyWebTest {
 					'error_title' => 'Cannot add action',
 					'errors' => [
 						'No operations defined for action "No operations action".'
+					]
+				]
+			],
+			// #11.
+			[
+				[
+					'eventsource' => EVENT_SOURCE_DISCOVERY,
+					'name' => 'Empty proxy group condition',
+					'conditions' => [
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'equals'
+						]
+					],
+					'condition_error' => [
+						'Incorrect value for field "value": cannot be empty.'
 					]
 				]
 			]
@@ -1423,18 +1439,28 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Create action');
 		$this->assertEquals('New action', $this->query('tag:h4')->waitUntilVisible()->one()->getText());
 
-		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$action_form = $dialog->asForm();
 		$action_form->getField('id:name')->fill($data['name']);
 
 		if (array_key_exists('conditions', $data)) {
 			foreach ($data['conditions'] as $condition) {
 				$action_form->query('xpath:.//table[@id="conditionTable"]//button[text()="Add"]')->one()->click();
-				COverlayDialogElement::find()->waitUntilReady()->one();
-				$condition_form = $this->query('id:popup.condition')->asForm()->one();
+				$condition_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+				$condition_form = $condition_dialog->asForm();
 				$condition_form->fill($condition);
 				$condition_form->submit();
-				$condition_form->waitUntilNotVisible();
+
+				// In case if condition form error is expected, check the error and move on to the next case.
+				if (array_key_exists('condition_error', $data)) {
+					$this->assertMessage(TEST_BAD, null, $data['condition_error']);
+					$condition_dialog->close();
+					$dialog->close();
+
+					return;
+				}
+
+				$condition_dialog->waitUntilNotVisible();
 			}
 		}
 

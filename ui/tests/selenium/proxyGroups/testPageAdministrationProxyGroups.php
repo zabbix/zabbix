@@ -196,7 +196,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						' Proxy_2 for filter'
 			],
 			[
-				'Name' => 'Proxy group for Actions 1',
+				'Name' => 'Proxy group with proxies for Actions 1',
 				'State' => 'Unknown',
 				'Failover period' => '1m',
 				'Online proxies' => '0',
@@ -205,7 +205,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 				7 => 'Proxy for Proxy groups 1, Proxy for Proxy groups 2'
 			],
 			[
-				'Name' => 'Proxy group for Actions 2',
+				'Name' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
 				'State' => '',
 				'Failover period' => '1m',
 				'Online proxies' => '0',
@@ -214,7 +214,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 				7 => ''
 			],
 			[
-				'Name' => 'Proxy group for Actions 3',
+				'Name' => 'Proxy group for Actions 3 абц 頑張って 😀',
 				'State' => '',
 				'Failover period' => '1m',
 				'Online proxies' => '0',
@@ -286,9 +286,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Degrading proxy group',
 						'Multiple spaces in proxy group',
 						'Online proxy group',
-						'Proxy group for Actions 1',
-						'Proxy group for Actions 2',
-						'Proxy group for Actions 3'
+						'Proxy group with proxies for Actions 1',
+						'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
+						'Proxy group for Actions 3 абц 頑張って 😀'
 					]
 				]
 			],
@@ -349,9 +349,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Multiple spaces in proxy group',
 						'Offline group',
 						'Online proxy group',
-						'Proxy group for Actions 1',
-						'Proxy group for Actions 2',
-						'Proxy group for Actions 3'
+						'Proxy group with proxies for Actions 1',
+						'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
+						'Proxy group for Actions 3 абц 頑張って 😀'
 					]
 				]
 			],
@@ -508,16 +508,16 @@ class testPageAdministrationProxyGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['Proxy group for Actions 2'],
-					'error' => 'Proxy group "Proxy group for Actions 2" is used by action "Autoregistration action 1".'
+					'groups' => ['Proxy group for Actions 2 \'&quot;&lt;s&gt;'],
+					'error' => 'Proxy group "Proxy group for Actions 2 \'&quot;&lt;s&gt;" is used by action "Autoregistration action 1".'
 				]
 			],
 			// #4 Attempt to delete a proxy group that is used in a Discovery action.
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['Proxy group for Actions 3'],
-					'error' => 'Proxy group "Proxy group for Actions 3" is used by action "Discovery action with proxy groups".'
+					'groups' => ['Proxy group for Actions 3 абц 頑張って 😀'],
+					'error' => 'Proxy group "Proxy group for Actions 3 абц 頑張って 😀" is used by action "Discovery action with proxy groups".'
 				]
 			],
 			// #5 Delete a proxy group that has nothing linked to it.

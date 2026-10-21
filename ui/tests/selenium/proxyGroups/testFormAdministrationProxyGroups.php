@@ -634,16 +634,16 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'group' => 'Proxy group for Actions 2',
-					'error' => 'Proxy group "Proxy group for Actions 2" is used by action "Autoregistration action 1".'
+					'group' => 'Proxy group for Actions 2 \'&quot;&lt;s&gt;',
+					'error' => 'Proxy group "Proxy group for Actions 2 \'&quot;&lt;s&gt;" is used by action "Autoregistration action 1".'
 				]
 			],
 			// #3 Attempt to delete a proxy group that is used in a Discovery action.
 			[
 				[
 					'expected' => TEST_BAD,
-					'group' => 'Proxy group for Actions 3',
-					'error' => 'Proxy group "Proxy group for Actions 3" is used by action "Discovery action with proxy groups".'
+					'group' => 'Proxy group for Actions 3 абц 頑張って 😀',
+					'error' => 'Proxy group "Proxy group for Actions 3 абц 頑張って 😀" is used by action "Discovery action with proxy groups".'
 				]
 			],
 			// #4 Delete a proxy group that has nothing linked to it.
