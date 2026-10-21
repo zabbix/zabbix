@@ -51,8 +51,8 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function doAction(): void {
 		$traceid = $this->getInput('traceid');
-		$time_from = $this->getInput('timestamp') - 1;
-		$time_to = $this->getInput('timestamp') + 1;
+		$time_from = $this->getInput('timestamp') - APM_TRACE_MAX_DURATION;
+		$time_to = $this->getInput('timestamp') + APM_TRACE_MAX_DURATION;
 
 		try {
 			$traces = API::ApmTrace()->get([
@@ -75,7 +75,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 			$spans = API::ApmSpan()->get([
 				'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp',
-					'duration', 'events', 'resource_attributes', 'span_attributes'
+					'duration', 'events', 'resource_attributes', 'span_attributes', 'status_code', 'status_message'
 				],
 				'time_from' => $time_from,
 				'time_till' => $time_to,
@@ -119,9 +119,11 @@ class CControllerApmTraceListSplitView extends CController {
 		$trace_view_spans = [];
 		foreach ($spans as $i => $span) {
 			$span_timestamp = $this->formatNs($span['timestamp']);
+			$trace_start = min($span_timestamp, $trace_start);
 
 			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
 			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
+			$trace_end = max($span_end, $trace_end);
 
 			$span_events = array_map(function (array $event) use ($trace_start) {
 				$event_timestamp = $this->formatNs($event['timestamp']);
@@ -159,7 +161,9 @@ class CControllerApmTraceListSplitView extends CController {
 				'count' => $span_counts[$span['spanid']] ?? null,
 				'events' => $span_events,
 				'resource_attributes' => $span['resource_attributes'],
-				'span_attributes' => $span['span_attributes']
+				'span_attributes' => $span['span_attributes'],
+				'status_code' => $span['status_code'],
+				'status_message' => $span['status_message']
 			];
 		}
 
@@ -196,6 +200,6 @@ class CControllerApmTraceListSplitView extends CController {
 	}
 
 	private function formatNs($ns): int {
-		return (int) str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
+		return (int) str_pad((string) ($ns % 7200000000000), 13, '0', STR_PAD_LEFT);
 	}
 }
