@@ -457,8 +457,7 @@ class CConditionHelper {
 				ZBX_CONDITION_TYPE_EVENT_LAST,
 				ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
 				ZBX_CONDITION_TYPE_EVENT_COPIED,
-				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED,
-				ZBX_CONDITION_TYPE_EVENT_CURRENT => ['operator']
+				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => ['operator']
 			};
 
 			foreach ($field_names as $field_name) {
@@ -472,28 +471,29 @@ class CConditionHelper {
 	}
 
 	/**
-	 * Check that all constants of formula are specified in the filter conditions of the given LLD rules or overrides.
+	 * Check that all constants of formula are specified in the filter conditions.
 	 *
 	 * @param array  $objects
 	 * @param string $path
+	 * @param string $filter_key
 	 *
 	 * @throws APIException
 	 */
-	public static function checkFilterFormula(array $objects, string $path = '/'): void {
+	public static function checkFilterFormula(array $objects, string $path = '/', string $filter_key = 'filter'): void {
 		$condition_formula_parser = new CConditionFormulaParser();
 
 		foreach ($objects as $i => $object) {
-			if (!array_key_exists('filter', $object)
-					|| $object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (!array_key_exists($filter_key, $object)
+					|| $object[$filter_key]['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 				continue;
 			}
 
-			$condition_formula_parser->parse($object['filter']['formula']);
+			$condition_formula_parser->parse($object[$filter_key]['formula']);
 
 			$constants = array_unique(array_column($condition_formula_parser->getConstants(), 'value'));
-			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/filter';
+			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/'.$filter_key;
 
-			$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');
+			$condition_formulaids = array_column($object[$filter_key]['conditions'], 'formulaid');
 
 			foreach ($constants as $constant) {
 				if (!in_array($constant, $condition_formulaids)) {
@@ -503,7 +503,7 @@ class CConditionHelper {
 				}
 			}
 
-			foreach ($object['filter']['conditions'] as $j => $condition) {
+			foreach ($object[$filter_key]['conditions'] as $j => $condition) {
 				if (!in_array($condition['formulaid'], $constants)) {
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						$subpath.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
