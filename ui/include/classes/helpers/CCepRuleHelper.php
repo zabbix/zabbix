@@ -89,6 +89,9 @@ class CCepRuleHelper {
 	public const SCOPE_OTHER_EVENTS = 1;
 	public const SCOPE_ALL_EVENTS = 2;
 
+	public const SCOPE_FILTER_YES = 1;
+	public const SCOPE_FILTER_NO = 0;
+
 	public const FILTER_SHOW_ALL = 0;
 	public const FILTER_SHOW_LEGACY = 1;
 	public const FILTER_SHOW_CEP = 2;
@@ -343,8 +346,7 @@ class CCepRuleHelper {
 			ZBX_CONDITION_TYPE_EVENT_FIRST => _('First event in time window'),
 			ZBX_CONDITION_TYPE_EVENT_LAST => _('Last event in time window'),
 			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Problem is suppressed'),
-			ZBX_CONDITION_TYPE_EVENT_COPIED => _('Event is cloned'),
-			ZBX_CONDITION_TYPE_EVENT_CURRENT => _('Current event')
+			ZBX_CONDITION_TYPE_EVENT_COPIED => _('Event is cloned')
 		];
 	}
 
@@ -373,10 +375,6 @@ class CCepRuleHelper {
 			ZBX_CONDITION_TYPE_EVENT_COPIED => [
 				CONDITION_OPERATOR_YES => _('Event is cloned'),
 				CONDITION_OPERATOR_NO => _('Event is not cloned')
-			],
-			ZBX_CONDITION_TYPE_EVENT_CURRENT => [
-				CONDITION_OPERATOR_YES => _('Current event'),
-				CONDITION_OPERATOR_NO => _('Not current event')
 			]
 		];
 	}
@@ -475,6 +473,14 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG => _('Rename'),
 			self::OP_REMOVE_TAG => _('Remove'),
 			self::OP_CLOSE_WINDOW => _('Close (window)')
+		];
+	}
+
+	public static function getApplyToStrings(): array {
+		return [
+			self::SCOPE_CURRENT_EVENT => _('Current event'),
+			self::SCOPE_OTHER_EVENTS => _('Other events'),
+			self::SCOPE_ALL_EVENTS => _('All events')
 		];
 	}
 

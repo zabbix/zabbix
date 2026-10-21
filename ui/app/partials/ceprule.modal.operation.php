@@ -104,6 +104,59 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 					->setId('operation-conditions-#{row_index}-error-container')
 			))
 		]))
+		->addItem((new CTemplateTag('ceprule-operation-scope-condition-row-template'))->addItem([
+			(new CRow(['#{formulaid}',
+				(new CCol('#{*description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-scope-condition-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-scope-condition-remove'),
+					(new CInput('hidden', 'scope_filter[conditions][#{row_index}][type]', '#{type}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Type'))
+						->setErrorContainer('operation-scope-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'scope_filter[conditions][#{row_index}][operator]', '#{operator}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Operator'))
+						->setErrorContainer('operation-scope-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'scope_filter[conditions][#{row_index}][tag]', '#{tag}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-scope-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'scope_filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-scope-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'scope_filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setAttribute('data-changed', '')
+						->setErrorLabel(_('Tag value'))
+						->setErrorContainer('operation-scope-conditions-#{row_index}-error-container'),
+					(new CVar('scope_filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('scope_filter[conditions][#{row_index}][row_index]', '#{row_index}'))
+						->setAttribute('data-changed', '')
+						->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}')
+		]))
+		->addItem((new CTemplateTag('ceprule-operation-scope-condition-row-error-container-template'))->addItem([
+			(new CRow(
+				(new CCol())
+					->setColSpan(3)
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setId('operation-scope-conditions-#{row_index}-error-container')
+			))
+		]))
 		->addItem((new CTemplateTag('ceprule-operation-condition-modal-template'))->addItem(
 			new CPartial('ceprule.modal.operation.condition')
 		))
@@ -134,7 +187,7 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 			(new CDiv([
 				(new CSpan())->setId('ceprule-operation-filter-expression-preview'),
 				(new CTextAreaFlexible('filter[formula]'))
-					->setMaxlength(DB::getFieldLength('cep_rule', 'formula'))
+					->setMaxlength(DB::getFieldLength('cep_operation', 'formula'))
 					->setId('ceprule-operation-filter-expression')
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAttribute('placeholder', 'A or (B and C) ...')
@@ -264,5 +317,80 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 			->setId('ceprule-operation-severity-argument')
 			->addItem(new CSeverity('severity', TRIGGER_SEVERITY_INFORMATION))
 		)
+		->addItem(
+			(new CLabel(_('Applies to'), 'ceprule-operation-scope'))
+				->addItem(
+					makeHelpIcon(new CList([
+						_('Current event - applies the operation to the current event.'),
+						_('Other events - applies the operation to all events in the window except the current one. You can filter which events to include.'),
+						_('All events - applies the operation to every event in the window. You can filter which events to include.')
+					]))
+				)
+		)
+		->addItem(new CFormField([
+			(new CRadioButtonList('scope', CCepRuleHelper::SCOPE_CURRENT_EVENT))
+				->setId('ceprule-operation-scope')
+				->addValue(_('Current event'), CCepRuleHelper::SCOPE_CURRENT_EVENT)
+				->addValue(_('Other events'), CCepRuleHelper::SCOPE_OTHER_EVENTS)
+				->addValue(_('All events'), CCepRuleHelper::SCOPE_ALL_EVENTS)
+				->setModern()
+		]))
+		->addItem(new CLabel(_('Filter'), 'ceprule-operation-use-scope-filter'))
+		->addItem(new CFormField([
+			new CHorList([
+				(new CListItem([
+					(new CCheckBox('use_scope_filter', CCepRuleHelper::SCOPE_FILTER_YES))
+						->setId('ceprule-operation-use-scope-filter')
+						->setUncheckedValue(CCepRuleHelper::SCOPE_FILTER_NO)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CSelect('scope_filter[evaltype]'))
+						->setId('ceprule-operation-scope-filter-evaltype')
+						->setFocusableElementId('ceprule-operation-scope-filter-evaltype-select')
+						->addOptions(CSelect::createOptionsFromArray([
+							CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+							CONDITION_EVAL_TYPE_AND => _('And'),
+							CONDITION_EVAL_TYPE_OR => _('Or'),
+							CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+						]))
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CDiv([
+						(new CSpan())->setId('ceprule-operation-scope-filter-expression-preview'),
+						(new CTextAreaFlexible('scope_filter[formula]'))
+							->setMaxlength(DB::getFieldLength('cep_operation', 'scope_formula'))
+							->setId('ceprule-operation-scope-filter-expression')
+							->setWidth(487)
+							->setAttribute('placeholder', 'A or (B and C) ...')
+					]))
+						->addClass(ZBX_STYLE_CELL)
+						->addClass(ZBX_STYLE_CELL_EXPRESSION)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP)
+			])
+		]))
+		->addItem((new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setColumns([
+						new CTableColumn(
+							(new CColHeader(_('Label')))->setWidth('40')
+						),
+						(new CTableColumn(_('Name')))
+							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+						new CTableColumn(
+							(new CColHeader(_('Actions')))->setWidth('75')
+						)
+					])
+					->setId('ceprule-operation-scope-filter-conditions')
+					->addItem((new CTag('tfoot', true))
+						->addItem((new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-scope-condition-add')
+						))->setColSpan(4))
+					)
+			))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'scope_filter[conditions]')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		)))
 	)
 	->show();

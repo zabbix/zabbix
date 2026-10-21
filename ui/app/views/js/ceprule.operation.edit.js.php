@@ -42,11 +42,20 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Number} */
 	#condition_row_index;
 
+	/** @type {Number} */
+	#scope_condition_row_index;
+
 	/** @type {Template} */
 	#condition_row_template;
 
 	/** @type {Template} */
+	#scope_condition_row_template;
+
+	/** @type {Template} */
 	#condition_error_container_row_template;
+
+	/** @type {Template} */
+	#scope_condition_error_container_row_template;
 
 	/** @type {Template} */
 	#condition_row_template_property;
@@ -63,6 +72,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
 		this.#operation_conditon_rules = operation_conditon_rules;
 		this.#condition_row_index = 0;
+		this.#scope_condition_row_index = 0;
 
 		this.#overlay = overlay;
 		this.#initTemplates();
@@ -75,6 +85,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.#initActions();
 
 		this.#refreshExpressionPreview();
+		this.#refreshScopeExpressionPreview();
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
@@ -97,8 +108,14 @@ window.ceprule_operation_edit_popup = new class {
 		);
 
 		this.#condition_row_template = new Template(window['ceprule-operation-condition-row-template'].innerHTML);
+		this.#scope_condition_row_template = new Template(
+			window['ceprule-operation-scope-condition-row-template'].innerHTML
+		);
 		this.#condition_error_container_row_template = new Template(
 			window['ceprule-operation-condition-row-error-container-template'].innerHTML
+		);
+		this.#scope_condition_error_container_row_template = new Template(
+			window['ceprule-operation-scope-condition-row-error-container-template'].innerHTML
 		);
 	}
 
@@ -122,14 +139,23 @@ window.ceprule_operation_edit_popup = new class {
 		this.form.findFieldByName('filter[evaltype]').getField()
 			.addEventListener('change', () => this.#refreshExpressionPreview());
 
+		this.form.findFieldByName('scope_filter[evaltype]').getField()
+			.addEventListener('change', () => this.#refreshScopeExpressionPreview());
+
+		this.form.findFieldByName('scope').getField()
+			.addEventListener('change', () => this.#handleScopeChanged());
+
+		this.form.findFieldByName('use_scope_filter').getField()
+			.addEventListener('change', () => this.#handleFilterChanged());
+
 		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
-				this.#openConditionPopup(undefined, e.target);
+				this.#openConditionPopup('execute_when', undefined, e.target);
 			}
 			else if (e.target.classList.contains('js-condition-edit')) {
 				const row_index = e.target.closest('tr').dataset.row_index;
 
-				this.#openConditionPopup(row_index, e.target);
+				this.#openConditionPopup('execute_when', row_index, e.target);
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').nextSibling.remove();
@@ -139,6 +165,24 @@ window.ceprule_operation_edit_popup = new class {
 
 				if (!this.form_element.querySelector('#ceprule-operation-filter-conditions [data-row_index]')) {
 					this.#condition_row_index = 0;
+				}
+			}
+			else if (e.target.classList.contains('js-scope-condition-add')) {
+				this.#openConditionPopup('scope', undefined, e.target);
+			}
+			else if (e.target.classList.contains('js-scope-condition-edit')) {
+				const row_index = e.target.closest('tr').dataset.row_index;
+
+				this.#openConditionPopup('scope', row_index, e.target);
+			}
+			else if (e.target.classList.contains('js-scope-condition-remove')) {
+				e.target.closest('tr').nextSibling.remove();
+				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
+				this.#refreshScopeExpressionPreview();
+
+				if (!this.form_element.querySelector('#ceprule-operation-scope-filter-conditions [data-row_index]')) {
+					this.#scope_condition_row_index = 0;
 				}
 			}
 		});
@@ -181,22 +225,71 @@ window.ceprule_operation_edit_popup = new class {
 		evaltype_field.previousElementSibling.style.display = identifiers.length < 2 ? 'none' : '';
 	}
 
+	#listScopeConditionIdentifiers() {
+		const conditions = Object.values(this.form.findFieldByName('scope_filter[conditions]').getValue() ?? {});
+
+		return conditions.map(condition => ({
+			id: condition.formulaid,
+			type: condition.type
+		}));
+	}
+
+	#refreshScopeExpressionPreview() {
+		const identifiers = this.#listScopeConditionIdentifiers();
+		const evaltype = Number(this.form.findFieldByName('scope_filter[evaltype]').getValue());
+
+		if (evaltype == <?= CONDITION_EVAL_TYPE_AND_OR ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_AND ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_OR ?>) {
+			window['ceprule-operation-scope-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+			window['ceprule-operation-scope-filter-expression-preview'].style.display = ''
+			window['ceprule-operation-scope-filter-expression'].disabled = true;
+			window['ceprule-operation-scope-filter-expression'].style.display = 'none';
+		}
+		else {
+			window['ceprule-operation-scope-filter-expression'].disabled = identifiers.length < 2;
+			window['ceprule-operation-scope-filter-expression'].style.display = '';
+			window['ceprule-operation-scope-filter-expression-preview'].style.display = 'none'
+
+			if (identifiers.length < 2) {
+				window['ceprule-operation-scope-filter-evaltype'].value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+			}
+		}
+
+		window['ceprule-operation-scope-filter-evaltype'].style.display = identifiers.length < 2 ? 'none' : '';
+	}
+
 	#editConditionRow(condition, index) {
 		this.form_element.querySelector(`#ceprule-operation-filter-conditions [data-row_index="${index}"]`)
-			.replaceWith(this.#buildConditionRow(condition, index));
+			.replaceWith(this.#buildConditionRow('execute_when', condition, index));
 	}
 
 	#addConditionRow(condition) {
 		const row_index = this.#condition_row_index++;
 		const table = this.form_element.querySelector('#ceprule-operation-filter-conditions tbody');
 
-		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index));
+		table.insertAdjacentElement('beforeend', this.#buildConditionRow('execute_when', condition, row_index));
 		table.insertAdjacentElement('beforeend',
 			this.#condition_error_container_row_template.evaluateToElement({row_index})
 		);
 	}
 
-	#buildConditionRow(condition, row_index) {
+	#editScopeConditionRow(condition, index) {
+		this.form_element.querySelector(`#ceprule-operation-scope-filter-conditions [data-row_index="${index}"]`)
+			.replaceWith(this.#buildConditionRow('scope', condition, index));
+	}
+
+	#addScopeConditionRow(condition) {
+		const row_index = this.#scope_condition_row_index++;
+		const table = this.form_element.querySelector('#ceprule-operation-scope-filter-conditions tbody');
+
+		table.insertAdjacentElement('beforeend', this.#buildConditionRow('scope', condition, row_index));
+		table.insertAdjacentElement('beforeend',
+			this.#scope_condition_error_container_row_template.evaluateToElement({row_index})
+		);
+	}
+
+	#buildConditionRow(condition_context, condition, row_index) {
 		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationConditionLabels()
 		) ?>');
@@ -219,7 +312,6 @@ window.ceprule_operation_edit_popup = new class {
 			case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
 			case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
 			case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
-			case <?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>:
 				description_template = this.#condition_row_template_property;
 				description_view.text = descriptions[condition.type][condition.operator];
 				break;
@@ -240,7 +332,11 @@ window.ceprule_operation_edit_popup = new class {
 				break;
 		}
 
-		const element = this.#condition_row_template.evaluateToElement({
+		const row_template = condition_context === 'execute_when'
+			? this.#condition_row_template
+			: this.#scope_condition_row_template;
+
+		const element = row_template.evaluateToElement({
 			...condition,
 			row_index: row_index,
 			formulaid: num2letter(row_index),
@@ -264,10 +360,16 @@ window.ceprule_operation_edit_popup = new class {
 			this.#addConditionRow(condition);
 		}
 
+		for (const condition of Object.values(operation.scope_filter.conditions || {})) {
+			this.#addScopeConditionRow(condition);
+		}
+
 		this.form_element.querySelector(`[name="type"]`).value = operation.type;
 		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
 		this.form_element.querySelector(`[name="filter[evaltype]"]`).value = operation.filter.evaltype;
 		this.form_element.querySelector(`[name="filter[formula]"]`).value = operation.filter.formula;
+		this.form_element.querySelector(`[name="scope_filter[evaltype]"]`).value = operation.scope_filter.evaltype;
+		this.form_element.querySelector(`[name="scope_filter[formula]"]`).value = operation.scope_filter.formula;
 		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
 		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
@@ -282,10 +384,13 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
 		});
-		this.form_element.querySelectorAll(`[name="filter[evaltype]"]`).forEach(node => {
-			node.checked = node.value == operation.filter.evaltype;
-		});
 		this.form_element.querySelector(`[name="event_name"]`).value = operation.event_name;
+
+		this.form_element.querySelectorAll(`[name="scope"]`).forEach(node => {
+			node.checked = node.value === operation.scope;
+		});
+		this.form_element.querySelector(`[name="use_scope_filter"]`).checked
+			= Object.values(operation.scope_filter.conditions || {}).length > 0;
 
 		// Set enabled options.
 		const zselect = window['ceprule-operation-execute-when'];
@@ -399,12 +504,107 @@ window.ceprule_operation_edit_popup = new class {
 
 	#handleExecuteWhenChanged() {
 		this.#setAvailableOperationOptions();
+		this.#setScopeState();
 	}
 
-	#openConditionPopup(index, trigger_element) {
+	#setScopeState() {
+		let set_visible;
+		let set_readonly;
+		let set_value = null;
+
+		const window_type = Number(this.form.findFieldByName('window_type').getValue());
+		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
+
+		if (window_type == <?= CCepRuleHelper::WINDOW_NONE ?>
+				&& execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
+			set_visible = false;
+			set_readonly = true;
+			set_value = <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>;
+		}
+		else if (execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
+			set_visible = true;
+			set_readonly = true;
+			set_value = <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>;
+		}
+		else if ([
+			<?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>,
+			<?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>
+		].includes(execute_when)) {
+			set_visible = true;
+			set_readonly = true;
+			set_value = <?= CCepRuleHelper::SCOPE_ALL_EVENTS ?>;
+		}
+		else {
+			set_visible = true;
+			set_readonly = false;
+		}
+
+		const scope_field = document.getElementById('ceprule-operation-scope');
+
+		this.form_element.querySelector('label[for="ceprule-operation-scope"]').style.display = set_visible
+			? '' : 'none';
+		scope_field.closest('.form-field').style.display = set_visible ? '' : 'none';
+
+		scope_field.querySelectorAll('input').forEach(node => {
+			if (set_value !== null) {
+				node.checked = Number(node.value) === set_value;
+			}
+
+			node.readOnly = set_readonly;
+		});
+
+		this.#handleScopeChanged();
+	}
+
+	#handleScopeChanged() {
+		const scope = Number(this.form.findFieldByName('scope').getValue());
+		const show_filter = scope != <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>;
+
+		this.form_element.querySelector('label[for="ceprule-operation-use-scope-filter"]').style.display = show_filter
+			? '' : 'none';
+		this.form.findFieldByName('use_scope_filter').getField().closest('.form-field').style.display
+			= show_filter ? '' : 'none';
+
+		if (!show_filter) {
+			this.#handleFilterChanged(<?= CCepRuleHelper::SCOPE_FILTER_NO ?>);
+		}
+		else {
+			this.#handleFilterChanged();
+		}
+	}
+
+	#handleFilterChanged(forced_state) {
+		const use_scope_filter = forced_state !== undefined
+			? forced_state
+			: Number(this.form.findFieldByName('use_scope_filter').getValue());
+
+		const show_filter = use_scope_filter === <?= CCepRuleHelper::SCOPE_FILTER_YES ?>;
+		const table_node = document.getElementById('ceprule-operation-scope-filter-conditions');
+
+		table_node.closest('.form-field').style.display = show_filter ? '' : 'none';
+		table_node.querySelectorAll('input').forEach(input => {
+			input.disabled = !show_filter;
+		});
+
+		document.getElementById('ceprule-operation-scope-filter-evaltype').disabled = !show_filter;
+		document.getElementById('ceprule-operation-scope-filter-expression').disabled = !show_filter;
+
+		if (show_filter) {
+			this.#refreshScopeExpressionPreview();
+		}
+		else {
+			document.getElementById('ceprule-operation-scope-filter-evaltype').style.display = 'none';
+			document.getElementById('ceprule-operation-scope-filter-expression').style.display = 'none';
+			document.getElementById('ceprule-operation-scope-filter-expression-preview').style.display = 'none';
+		}
+	}
+
+	#openConditionPopup(condition_context, index, trigger_element) {
 		const is_new = index === undefined;
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
+		const conditions = condition_context === 'execute_when'
+			? this.form.findFieldByName('filter[conditions]').getValue()
+			: this.form.findFieldByName('scope_filter[conditions]').getValue();
 		const condition = is_new ? null : conditions[index];
 		const used_property_types = Object.values(conditions)
 			.filter(({type}) => {
@@ -430,14 +630,31 @@ window.ceprule_operation_edit_popup = new class {
 					isSubmit: true,
 					action: overlay => ceprule_operation_condition_edit_popup.submit()
 							.then(fields => {
-								if (is_new) {
-									this.#addConditionRow(fields);
+								switch (condition_context) {
+									case 'execute_when':
+										if (is_new) {
+											this.#addConditionRow(fields);
+										}
+										else {
+											this.#editConditionRow(fields, index);
+										}
+
+										this.form.discoverAllFields();
+										this.#refreshExpressionPreview();
+										break;
+
+									case 'scope':
+										if (is_new) {
+											this.#addScopeConditionRow(fields);
+										}
+										else {
+											this.#editScopeConditionRow(fields, index);
+										}
+
+										this.form.discoverAllFields();
+										this.#refreshScopeExpressionPreview();
+										break;
 								}
-								else {
-									this.#editConditionRow(fields, index);
-								}
-								this.form.discoverAllFields();
-								this.#refreshExpressionPreview();
 							})
 							.then(() => overlayDialogueDestroy(overlay.dialogueid))
 							.catch(() => overlay.unsetLoading())

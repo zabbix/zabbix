@@ -99,7 +99,7 @@ class CControllerCepRuleEdit extends CController {
 				'cep_ruleids' => $cepruleid,
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
 				'selectOperations' => ['sortorder', 'execute_when', 'filter', 'type', 'event_name', 'severity',
-					'suppress_duration', 'tag', 'new_tag', 'tag_value'],
+					'suppress_duration', 'tag', 'new_tag', 'tag_value', 'scope', 'scope_filter'],
 				'selectFilter' => ['formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags'
@@ -162,6 +162,13 @@ class CControllerCepRuleEdit extends CController {
 				}
 				unset($condition);
 
+				foreach ($operation['scope_filter']['conditions'] as &$condition) {
+					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+						$condition['tag_name'] = $condition['tag'];
+						unset($condition['tag']);
+					}
+				}
+				unset($condition);
 
 				if ($operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 					$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE;
@@ -244,6 +251,34 @@ class CControllerCepRuleEdit extends CController {
 			'suppress_duration' => ['db cep_operation.suppress_duration', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['max' => 5 * SEC_PER_YEAR, 'min' => 1, 'with_year' => true]],
 				'when' => ['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
+			],
+			'scope' => [
+				['db cep_operation.scope', 'required',
+					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT, CCepRuleHelper::SCOPE_OTHER_EVENTS,
+						CCepRuleHelper::SCOPE_ALL_EVENTS],
+					'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]
+				],
+				['db cep_operation.scope', 'required',
+					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT],
+					'when' => [
+						['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
+						['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]]
+					]
+				],
+				['db cep_operation.scope', 'required',
+					'in' => [CCepRuleHelper::SCOPE_ALL_EVENTS],
+					'when' => [
+						['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
+						['execute_when', 'in' => [CCepRuleHelper::WHEN_WINDOW_CLOSED,
+							CCepRuleHelper::WHEN_PATTERN_MATCHED]]
+					]
+				]
+			],
+			'scope_filter' => ['object', 'fields' => CControllerCepRuleGeneral::getOperationFilterValidationFields(),
+				'when' => [
+					['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
+					['scope', 'not_in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT]]
+				]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
 		]]))->getRules();
@@ -344,23 +379,15 @@ class CControllerCepRuleEdit extends CController {
 					'integer', 'required', 'in' => [
 						ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
 						ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED,
-						ZBX_CONDITION_TYPE_EVENT_CURRENT
+						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 					],
 					'messages' => ['in' => _('Invalid value.')]
 				],
 				[
 					'integer', 'not_in' => [
-						ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_CURRENT
+						ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST
 					],
 					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
-					'messages' => ['not_in' => _('Invalid value.')]
-				],
-				[
-					'integer', 'not_in' => [ZBX_CONDITION_TYPE_EVENT_CURRENT],
-					'when' => ['execute_when', 'in' => [
-						CCepRuleHelper::WHEN_WINDOW_CLOSED, CCepRuleHelper::WHEN_PATTERN_MATCHED
-					]],
 					'messages' => ['not_in' => _('Invalid value.')]
 				]
 			],
@@ -370,7 +397,7 @@ class CControllerCepRuleEdit extends CController {
 					'when' => ['type', 'in' => [
 						ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST,
 						ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
-						ZBX_CONDITION_TYPE_EVENT_SUPPRESSED, ZBX_CONDITION_TYPE_EVENT_CURRENT
+						ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 					]]
 				],
 				['db cep_operation_condition.operator', 'required',

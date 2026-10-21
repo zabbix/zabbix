@@ -576,6 +576,12 @@ window.ceprule_edit_popup = new class {
 					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
 					formula: '',
 					conditions: []
+				},
+				scope: <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>,
+				scope_filter: {
+					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					formula: '',
+					conditions: []
 				}
 			};
 		}
@@ -721,6 +727,10 @@ window.ceprule_edit_popup = new class {
 			CCepRuleHelper::getOperationLabelStrings()
 		) ?>')[operation_type];
 
+		const scope_str = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getApplyToStrings()
+		) ?>')[operation.scope];
+
 		const severity_names_json = '<?= json_encode([
 			TRIGGER_SEVERITY_NOT_CLASSIFIED => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
 			TRIGGER_SEVERITY_INFORMATION => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1)),
@@ -775,7 +785,7 @@ window.ceprule_edit_popup = new class {
 			arguments_str = `${operation.tag_name}:${operation.tag_value}`;
 		}
 
-		const conditions_input_html = Object.values(operation.filter.conditions)
+		let conditions_input_html = Object.values(operation.filter.conditions)
 			.map((condition, condition_index) => (new Template(`
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][type]"
 					type="hidden" value="#{type}" data-changed/>
@@ -788,6 +798,22 @@ window.ceprule_edit_popup = new class {
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_value]"
 					type="hidden" value="#{tag_value}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][formulaid]"
+					type="hidden" value="#{formulaid}" data-changed/>
+			`)).evaluate(condition)).join('');
+
+		conditions_input_html += Object.values(operation.scope_filter.conditions)
+			.map((condition, condition_index) => (new Template(`
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][type]"
+					type="hidden" value="#{type}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][operator]"
+					type="hidden" value="#{operator}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag_name]"
+					type="hidden" value="#{tag_name}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag_value]"
+					type="hidden" value="#{tag_value}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][formulaid]"
 					type="hidden" value="#{formulaid}" data-changed/>
 			`)).evaluate(condition)).join('');
 
@@ -816,7 +842,6 @@ window.ceprule_edit_popup = new class {
 				case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
 				case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
 				case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
-				case <?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>:
 					description_template = this.#template_operation_table_condition_property;
 					description_view.text = descriptions[condition.type][condition.operator];
 					break;
@@ -842,7 +867,7 @@ window.ceprule_edit_popup = new class {
 
 		const condition_description_html = condition_descriptions.join('<br>');
 		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
-			condition_description_html, ...operation};
+			condition_description_html, scope_str, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 
 		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;

@@ -51,12 +51,6 @@ window.ceprule_operation_condition_edit_popup = new class {
 			case <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>:
 				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>);
 				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>);
-				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>);
-				break;
-
-			case <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>:
-			case <?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>:
-				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>);
 				break;
 		}
 
@@ -116,10 +110,6 @@ window.ceprule_operation_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_NO ?>
 			],
 			[<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>]: [
-				<?= CONDITION_OPERATOR_YES ?>,
-				<?= CONDITION_OPERATOR_NO ?>
-			],
-			[<?= ZBX_CONDITION_TYPE_EVENT_CURRENT ?>]: [
 				<?= CONDITION_OPERATOR_YES ?>,
 				<?= CONDITION_OPERATOR_NO ?>
 			]
