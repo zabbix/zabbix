@@ -253,15 +253,29 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
+		// The item may be polled before the sent data is visible in ClickHouse, wait for the expected bucket count.
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value'],
 			'itemids' => [$itemid],
-			'history' => self::ITEM_VALUE_TYPE
-		]);
+			'history' => self::ITEM_VALUE_TYPE,
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], null, null, function (array $response) use ($expected_buckets, $msg) {
+			$buckets = json_decode($response['result'][0]['value'], true);
+
+			if (!is_array($buckets)) {
+				return $msg.': invalid value: '.$response['result'][0]['value'];
+			}
+
+			if (count($expected_buckets) != count($buckets)) {
+				return $msg.': invalid bucket count, expected '.count($expected_buckets).', got '.count($buckets);
+			}
+
+			return true;
+		});
 
 		$buckets = json_decode($response['result'][0]['value'], true, 512, JSON_THROW_ON_ERROR);
-
-		$this->assertEquals(count($expected_buckets), count($buckets), "Invalid bucket count");
 
 		for ($i = 0; $i < count($expected_buckets); $i++) {
 			$this->assertArrayHasKey('clock', $buckets[$i], $msg);
