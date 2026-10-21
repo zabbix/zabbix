@@ -25,13 +25,6 @@ require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemTypeT
  */
 class testDiscoveryRulePrototype extends CAPITest {
 
-	/**
-	 * LLD rule prototype IDs created in prepareTestData, indexed by key.
-	 *
-	 * @var array
-	 */
-	private static $itemids = [];
-
 	public static function prepareTestData() {
 		CTestDataHelper::createObjects([
 			'host_groups' => [
@@ -47,39 +40,31 @@ class testDiscoveryRulePrototype extends CAPITest {
 							'key_' => 'lld_parent',
 							'type' => ITEM_TYPE_TRAPPER
 						]
+					],
+					'lld_rule_prototypes' => [
+						[
+							'ruleid' => ':lld_rule:lld_parent',
+							'name' => 'telemetry query lld prototype',
+							'key_' => 'lld_telemetry_query[{#M}]',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'delay' => '1m',
+							'query' => [
+								'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+								'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+							]
+						],
+						[
+							'ruleid' => ':lld_rule:lld_parent',
+							'name' => 'trapper lld prototype',
+							'key_' => 'lld_trapper[{#M}]',
+							'type' => ITEM_TYPE_TRAPPER
+						]
 					]
 				]
 			]
 		]);
-
-		$discoveryrule_prototypes = [
-			[
-				'hostid' => ':host:lld_prototype_telemetry_query_host',
-				'ruleid' => ':lld_rule:lld_parent',
-				'name' => 'telemetry query lld prototype',
-				'key_' => 'lld_telemetry_query[{#M}]',
-				'type' => ITEM_TYPE_TELEMETRY_QUERY,
-				'delay' => '1m',
-				'query' => [
-					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
-					'columns' => [],
-					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
-					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
-				]
-			],
-			[
-				'hostid' => ':host:lld_prototype_telemetry_query_host',
-				'ruleid' => ':lld_rule:lld_parent',
-				'name' => 'trapper lld prototype',
-				'key_' => 'lld_trapper[{#M}]',
-				'type' => ITEM_TYPE_TRAPPER
-			]
-		];
-		CTestDataHelper::convertLldRulePrototypeReferences($discoveryrule_prototypes);
-
-		$result = CDataHelper::call('discoveryruleprototype.create', $discoveryrule_prototypes);
-
-		self::$itemids = array_combine(array_column($discoveryrule_prototypes, 'key_'), $result['itemids']);
 	}
 
 	public static function cleanTestData() {
@@ -484,15 +469,14 @@ class testDiscoveryRulePrototype extends CAPITest {
 	 * @dataProvider dataValidDiscoveryRulePrototypeTelemetryQuery_Create
 	 */
 	public function testDiscoveryRulePrototypeTelemetryQuery_Create(array $discoveryrule, ?string $error) {
-		$discoveryrule['hostid'] = CTestDataHelper::getConvertedValueReference($discoveryrule['hostid']);
-		$discoveryrule['ruleid'] = CTestDataHelper::getConvertedValueReference($discoveryrule['ruleid']);
+		CTestDataHelper::convertLldRulePrototypeReferences($discoveryrule);
 
 		$this->call('discoveryruleprototype.create', $discoveryrule, $error);
 	}
 
 	public static function dataInvalidDiscoveryRulePrototypeTelemetryQuery_Update() {
 		$discoveryrule = [
-			'itemid' => 'lld_telemetry_query[{#M}]'
+			'itemid' => ':lld_rule_prototype:lld_telemetry_query[{#M}]'
 		];
 		$query = [
 			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -532,7 +516,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 		];
 
 		yield 'Telemetry query "granularity" is not supported for non telemetry query type' => [
-			['itemid' => 'lld_trapper[{#M}]', 'granularity' => '30s'] + $discoveryrule,
+			['itemid' => ':lld_rule_prototype:lld_trapper[{#M}]', 'granularity' => '30s'] + $discoveryrule,
 			[],
 			'Invalid parameter "/1/granularity": value must be "15s".'
 		];
@@ -562,7 +546,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 		];
 
 		yield 'Telemetry query "lookback_limit" is not supported for non telemetry query type' => [
-			['itemid' => 'lld_trapper[{#M}]', 'lookback_limit' => '30s'] + $discoveryrule,
+			['itemid' => ':lld_rule_prototype:lld_trapper[{#M}]', 'lookback_limit' => '30s'] + $discoveryrule,
 			[],
 			'Invalid parameter "/1/lookback_limit": value must be "10m".'
 		];
@@ -609,13 +593,13 @@ class testDiscoveryRulePrototype extends CAPITest {
 		];
 
 		yield 'Telemetry query "query" is required on type change' => [
-			['itemid' => 'lld_trapper[{#M}]', 'type' => ITEM_TYPE_TELEMETRY_QUERY, 'delay' => '1m'] + $discoveryrule,
+			['itemid' => ':lld_rule_prototype:lld_trapper[{#M}]', 'type' => ITEM_TYPE_TELEMETRY_QUERY, 'delay' => '1m'] + $discoveryrule,
 			[],
 			'Invalid parameter "/1": the parameter "query" is missing.'
 		];
 
 		yield 'Telemetry query "query" should be empty for non telemetry query type' => [
-			['itemid' => 'lld_trapper[{#M}]', 'query' => $query] + $discoveryrule,
+			['itemid' => ':lld_rule_prototype:lld_trapper[{#M}]', 'query' => $query] + $discoveryrule,
 			[],
 			'Invalid parameter "/1/query": should be empty.'
 		];
@@ -623,7 +607,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 
 	public static function dataValidDiscoveryRulePrototypeTelemetryQuery_Update() {
 		$discoveryrule = [
-			'itemid' => 'lld_telemetry_query[{#M}]'
+			'itemid' => ':lld_rule_prototype:lld_telemetry_query[{#M}]'
 		];
 		$query = [
 			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -735,7 +719,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 
 		yield 'Telemetry query type change from trapper' => [
 			[
-				'itemid' => 'lld_trapper[{#M}]',
+				'itemid' => ':lld_rule_prototype:lld_trapper[{#M}]',
 				'type' => ITEM_TYPE_TELEMETRY_QUERY,
 				'delay' => '1m',
 				'lookback_limit' => '1h',
@@ -760,7 +744,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 	 */
 	public function testDiscoveryRulePrototypeTelemetryQuery_Update(array $discoveryrule, array $expected,
 			?string $error) {
-		$discoveryrule['itemid'] = self::$itemids[$discoveryrule['itemid']];
+		CTestDataHelper::convertLldRulePrototypeReferences($discoveryrule);
 
 		$this->call('discoveryruleprototype.update', $discoveryrule, $error);
 
