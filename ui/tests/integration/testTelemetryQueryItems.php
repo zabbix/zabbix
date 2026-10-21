@@ -21,8 +21,6 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_telemetry_query_items
- * @backup history
- * @onBefore initEnv
  * @onAfter clearEnv
  */
 class testTelemetryQueryItems extends CIntegrationTest {
