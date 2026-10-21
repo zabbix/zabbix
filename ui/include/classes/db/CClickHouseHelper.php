@@ -171,12 +171,12 @@ final class CClickHouseHelper {
 					throw new InvalidArgumentException();
 			}
 
-			if ($values_prepared) {
+			if ($has_never_matched_values && !$values_prepared) {
+				$has_never_matched_fields = true;
+			}
+			else {
 				$filter_prepared[$field] = $table_alias.'.'.$field.' IN {filter_'.$field.':Array('.$type.')}';
 				$filter_prepared_params['filter_'.$field] = [$type, $values_prepared];
-			}
-			elseif ($has_never_matched_values) {
-				$has_never_matched_fields = true;
 			}
 		}
 
