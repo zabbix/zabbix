@@ -643,7 +643,7 @@ var LldRuleEditLldRuleTab = class {
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({
 			...data,
-			formulaid: num2letter(data.row_index),
+			formulaid: data.formulaid ?? num2letter(data.row_index),
 			attribute_key_name: is_complex ? data.attribute_key : '',
 			operator_name: this.#telemetry_operator_labels[data.operator],
 			value_name: is_exists ? '' : data.value
