@@ -6892,7 +6892,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -6989,7 +6989,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -7185,7 +7185,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -7481,7 +7481,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -7864,7 +7864,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -8159,7 +8159,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -8454,7 +8454,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -8552,7 +8552,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -9045,7 +9045,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -9143,7 +9143,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -9266,7 +9266,7 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: |
-                        PROCESSING
+                        TOTAL PROCESSING
                         RATE
                     - type: INTEGER
                       name: desc_bold
@@ -9302,7 +9302,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '6'
@@ -9317,10 +9317,10 @@ zabbix_export:
                       value: F3F4F7
                     - type: INTEGER
                       name: units_pos
-                      value: '3'
+                      value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -9423,10 +9423,10 @@ zabbix_export:
                       value: F3F4F7
                     - type: INTEGER
                       name: units_pos
-                      value: '3'
+                      value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -10129,7 +10129,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: down_color
-                      value: '091825'
+                      value: DBEAFE
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -10149,16 +10149,16 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 0D68FD
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
-                      value: '10'
+                      value: '6'
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
                     - type: INTEGER
                       name: sparkline.width
-                      value: '10'
+                      value: '1'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -10167,10 +10167,10 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: updown_color
-                      value: '091825'
+                      value: FFFFFF
                     - type: STRING
                       name: up_color
-                      value: '091825'
+                      value: D40000
                     - type: STRING
                       name: value_color
                       value: FAFAFA
@@ -10231,16 +10231,16 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 0D68FD
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
-                      value: '10'
+                      value: '6'
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
                     - type: INTEGER
                       name: sparkline.width
-                      value: '7'
+                      value: '1'
                     - type: STRING
                       name: units
                       value: '!vps'
@@ -10249,10 +10249,10 @@ zabbix_export:
                       value: F3F4F7
                     - type: INTEGER
                       name: units_pos
-                      value: '3'
+                      value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -10322,13 +10322,13 @@ zabbix_export:
                       value: D40000
                     - type: INTEGER
                       name: sparkline.fill
-                      value: '10'
+                      value: '6'
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
                     - type: INTEGER
                       name: sparkline.width
-                      value: '7'
+                      value: '1'
                     - type: STRING
                       name: thresholds.0.color
                       value: 094EB3
@@ -10355,10 +10355,10 @@ zabbix_export:
                       value: F3F4F7
                     - type: INTEGER
                       name: units_pos
-                      value: '3'
+                      value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11037,7 +11037,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '6'
@@ -11055,7 +11055,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11125,7 +11125,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '6'
@@ -11143,7 +11143,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11213,7 +11213,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '6'
@@ -11231,7 +11231,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11301,7 +11301,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '6'
@@ -11319,7 +11319,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11336,7 +11336,7 @@ zabbix_export:
                       name: value_size
                       value: '15'
                 - type: item
-                  name: 'Delayed items'
+                  name: 'Queue over 6 seconds'
                   'y': '8'
                   width: '5'
                   hide_header: 'YES'
@@ -11425,7 +11425,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '12'
                     - type: STRING
                       name: updown_color
                       value: FFFFFF
@@ -11437,7 +11437,7 @@ zabbix_export:
                       value: FAFAFA
                     - type: INTEGER
                       name: value_h_pos
-                      value: '0'
+                      value: '2'
                     - type: INTEGER
                       name: value_size
                       value: '15'
@@ -11544,7 +11544,7 @@ zabbix_export:
                       value: FAFAFA
                     - type: INTEGER
                       name: value_h_pos
-                      value: '0'
+                      value: '2'
                     - type: INTEGER
                       name: value_size
                       value: '10'
@@ -11735,6 +11735,7 @@ zabbix_export:
                       name: show_problems
                       value: '1'
                 - type: svggraph
+                  name: 'Queue: Delayed items'
                   x: '5'
                   'y': '8'
                   width: '67'
@@ -13408,7 +13409,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -13718,7 +13719,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BDD8FE
+                      value: 76ABFF
                     - type: STRING
                       name: sparkline.time_period._reference
                       value: DASHBOARD._timeperiod
@@ -14211,7 +14212,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 0D68FD
+                      value: 76ABFF
                     - type: INTEGER
                       name: sparkline.fill
                       value: '2'
