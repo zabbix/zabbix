@@ -601,6 +601,21 @@ class testTriggerCEP extends CIntegrationTest {
 	// prepareDataCepWindowCloseWindowOperations().
 	const CEP_TAG_EVENT_CLOSED = 'event_closed';
 	const CEP_TAG_EVENT_CLOSED_VALUE = 'window';
+	// The eviction flavours with the same "All events" scope on the operations of the event evicted point: the
+	// point is then performed for every "down" event the window of an id holds beside the "up" event that did not
+	// fit into it, see prepareDataCepWindowCloseWindowOperations() with $any_event.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window evicted any event';
+	const CEP_RULE_WINDOW_TAG_CLOSE_EVICTED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window tag close window evicted any event';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window cause close window evicted any event';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED_ANY_EVENT = self::CEP_RULE_NAME_PREFIX
+		.'window pattern close window evicted any event';
+	// The tag every eviction flavour but the aged ones adds at the event evicted point, see
+	// prepareDataCepWindowCloseWindowOperations().
+	const CEP_TAG_EVENT_EVICTED = 'event_evicted';
+	const CEP_TAG_EVENT_EVICTED_VALUE = 'window';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window cause close window';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window cause close window evicted';
 	// One flavour per window type is additionally run with the "down" values of a single id discarded as they occur,
@@ -3462,6 +3477,17 @@ HEREDOC;
 	}
 
 	/**
+	 * The pattern match flavour above with the "All events" scope on its event evicted operations, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEvictedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false,
+			false, false, false, false, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the pattern match flavour of the close window scenario that performs its close window operation when
 	 * an event it holds is closed, so the window is ended by its trigger recovering while its script never reports a
 	 * match, see prepareDataCepWindowCloseWindowOperations().
@@ -3504,6 +3530,17 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowOnEvicted() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * The simple window flavour above with the "All events" scope on its event evicted operations, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnEvictedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false,
+			false, false, false, false, false, false, true
 		);
 	}
 
@@ -3564,6 +3601,17 @@ HEREDOC;
 	}
 
 	/**
+	 * The tag correlation flavour above with the "All events" scope on its event evicted operations, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowTagCloseWindowOnEvictedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE_ONCE,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false,
+			false, false, false, false, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the tag correlation flavour of the close window scenario that performs its close window operation
 	 * when an event it holds is closed, so the window is ended by its trigger recovering rather than by an "up"
 	 * value, see prepareDataCepWindowCloseWindowOperations().
@@ -3607,6 +3655,17 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowOnEvicted() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * The cause and symptom flavour above with the "All events" scope on its event evicted operations, see
+	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowOnEvictedAnyEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED_ANY_EVENT, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false,
+			false, false, false, false, false, false, true
 		);
 	}
 
@@ -4111,7 +4170,11 @@ HEREDOC;
 	 *     one that needs a capacity limit, and it has room for exactly the "down" events of an id
 	 *     (getCloseWindowCapacity()): they take every place of its window, so the "up" event of that id finds them
 	 *     all taken and is evicted - without ever entering the window it ends. Being evicted rather than held is
-	 *     also why this flavour needs the extra "close" operation below;
+	 *     also why this flavour needs the extra "close" operation below. Unless it is aged, a tag operation is
+	 *     performed at that point as well, which shows which events the point was performed for: the evicted event
+	 *     alone while it is limited to the current event, every event of its window and the evicted one beside them
+	 *     when it is not (see $any_event) - the point is performed before the evicted event is let go of, see
+	 *     cep_window_push_event();
 	 *   - WHEN_EVENT_CLOSED, which is reached by an event the window holds being closed - here by the recovery
 	 *     value of its trigger rather than by an "up" value, which this flavour is never sent. Any event the window
 	 *     holds closing means the id has recovered, so the operation keeps no condition. The events of the window
@@ -4204,21 +4267,23 @@ HEREDOC;
 	 * that was closed before its window ended - which is what the flavour that recovers the trigger first is about,
 	 * see runEventAssessmentTestCepWindowCloseWindow() with $recover_first.
 	 *
-	 * $any_event gives the operations of the event closed point the "All events" scope instead of the "Current event"
-	 * one an operation has by default. Only the event closed flavours may ask for it - the window closed point is
-	 * always performed for every event of the window: the operations are then performed for every event of the
-	 * window the closed event belongs to instead of for that event alone. The close window operation is
-	 * unconditional there anyway and the window is ended by whichever of its events performs it first, so the
-	 * problems closed are the ones the flavour limited to the current event closes. The tag operation beside it is
-	 * what differs: it tags the events of the other trigger the window holds as well - see
-	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * $any_event gives the close window operation and the tag operation beside it the "All events" scope instead of
+	 * the "Current event" one an operation has by default. Only the event closed and the eviction flavours that are
+	 * not aged may ask for it - those are the ones with that tag operation, and the window closed point is always
+	 * performed for every event of the window anyway: the operations are then performed for every event of the
+	 * window the event that reached the point belongs to instead of for that event alone. The window is ended by
+	 * whichever of its events performs the close window operation first, so the problems closed are the ones the
+	 * flavour limited to the current event closes. The tag operation is what differs: at the event closed point it
+	 * tags the events of the other trigger the window holds as well, at the event evicted point the "down" events
+	 * of the id beside its evicted "up" one - see runEventAssessmentTestCepWindowCloseWindow().
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			bool $discard_down = false, bool $single_service = false, bool $second_rule = false,
 			bool $discard_by_tag_value = false, bool $aged = false, bool $suppress_points = false,
 			bool $unsuppress_on_close = false, bool $tag_on_close = false, bool $any_event = false) {
-		$this->assertFalse($any_event && $execute_when != CCepRuleHelper::WHEN_EVENT_CLOSED,
-			'Only an event closed flavour may give "'.$name.'" the "All events" scope.'
+		$this->assertFalse($any_event && $execute_when != CCepRuleHelper::WHEN_EVENT_CLOSED
+				&& ($execute_when != CCepRuleHelper::WHEN_EVENT_EVICTED || $aged),
+			'Only an event closed or a not aged eviction flavour may give "'.$name.'" the "All events" scope.'
 		);
 
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
@@ -4340,14 +4405,14 @@ HEREDOC;
 			] + $up_condition;
 		}
 
-		// The scope of the event closed operations, see $any_event.
-		$event_closed_scope = $any_event ? ['scope' => CCepRuleHelper::SCOPE_ALL_EVENTS] : [];
+		// The scope of the close window operation and of the tag operation beside it, see $any_event.
+		$scope = $any_event ? ['scope' => CCepRuleHelper::SCOPE_ALL_EVENTS] : [];
 
 		$close_window = [
 			'sortorder' => 1,
 			'execute_when' => $execute_when,
 			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
-		] + $event_closed_scope;
+		] + $scope;
 
 		// The pattern match execution point is reached only once the script has found the "up" event, an aged
 		// flavour is reached by whichever event of the window is oldest and the event closed one by whichever event of
@@ -4371,7 +4436,23 @@ HEREDOC;
 				'type' => CCepRuleHelper::OP_ADD_TAG,
 				'tag' => self::CEP_TAG_EVENT_CLOSED,
 				'tag_value' => self::CEP_TAG_EVENT_CLOSED_VALUE
-			] + $event_closed_scope;
+			] + $scope;
+		}
+
+		if ($execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED && !$aged) {
+			// The same for the event evicted point: the evicted "up" event alone while its operations are limited to
+			// the current event, that event and every "down" event the window holds when they are not ($any_event).
+			// The evicted event is let go of only once every operation of the point has been performed (see
+			// cep_window_push_event()) and the window is closed after that, so all of them are still there to be
+			// tagged. An aged flavour has none: the event the clock evicts is whichever one is oldest, see
+			// runEventAssessmentTestCepWindowCloseWindowAged().
+			$operations[] = [
+				'sortorder' => 3,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => self::CEP_TAG_EVENT_EVICTED,
+				'tag_value' => self::CEP_TAG_EVENT_EVICTED_VALUE
+			] + $scope;
 		}
 
 		// The event closed flavours leave the problems a closing window held to the recovery values of their triggers
@@ -12205,6 +12286,22 @@ HEREDOC;
 	}
 
 	/**
+	 * The same eviction scenario with the same pattern match window, with the "All events" scope on its event evicted
+	 * operations: that point is then performed for every event of the window beside the evicted one rather than
+	 * for the evicted event alone, which ends the window all the same but also tags the "down" problems it held -
+	 * see prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEvictedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvictedAnyEvent() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEvictedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED_ANY_EVENT
+		);
+	}
+
+	/**
 	 * The same close window scenario with the same pattern match window, whose close window operation is this time
 	 * performed when an event the window holds is closed: the script never reports a match, no "up" value is sent at
 	 * all, and the recovery value of the trigger closing some of the problems of every window is what ends the
@@ -12417,6 +12514,22 @@ HEREDOC;
 	}
 
 	/**
+	 * The same eviction scenario with the same simple window, with the "All events" scope on its event evicted
+	 * operations: that point is then performed for every event of the window beside the evicted one rather than
+	 * for the evicted event alone, which ends the window all the same but also tags the "down" problems it held -
+	 * see prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedAnyEvent() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_ANY_EVENT
+		);
+	}
+
+	/**
 	 * The same close window scenario with the same simple window, whose close window operation is this time
 	 * performed when an event the window holds is closed: no "up" value is sent at all, the recovery value of the
 	 * trigger closes some of the problems of every window and that is what ends the windows, which must close the
@@ -12598,6 +12711,22 @@ HEREDOC;
 	}
 
 	/**
+	 * The same eviction scenario with the same tag correlation window, with the "All events" scope on its event evicted
+	 * operations: that point is then performed for every event of the window beside the evicted one rather than
+	 * for the evicted event alone, which ends the window all the same but also tags the "down" problems it held -
+	 * see prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowOnEvictedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowOnEvictedAnyEvent() {
+		$this->prepareDataCepWindowTagCloseWindowOnEvictedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED_ANY_EVENT
+		);
+	}
+
+	/**
 	 * The same close window scenario with the same tag correlation window, whose close window operation is this
 	 * time performed when an event the window holds is closed: no "up" value is sent at all, the recovery value of
 	 * the trigger closes some of the problems of every window and that is what ends the windows, which must close
@@ -12704,6 +12833,22 @@ HEREDOC;
 		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvicted();
 
 		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED);
+	}
+
+	/**
+	 * The same eviction scenario with the same cause and symptom window, with the "All events" scope on its event
+	 * evicted operations: that point is then performed for every event of the window beside the evicted one rather
+	 * than for the evicted event alone, which ends the window all the same but also tags the "down" problems it held -
+	 * see prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvictedAnyEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvictedAnyEvent() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvictedAnyEvent();
+
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED_ANY_EVENT
+		);
 	}
 
 	/**
@@ -15391,26 +15536,26 @@ return;
 	}
 
 	/**
-	 * Whether the "add tag" operation the $name rule performs at the event closed point is limited to the current
-	 * event - true when it has the "Current event" scope, false when it has another - or null when the rule has no such
-	 * operation.
+	 * Whether the operation the $name rule adds the $tag tag with at the $execute_when point is limited to the
+	 * current event - true when it has the "Current event" scope, false when it has another - or null when the rule
+	 * has no such operation.
 	 *
 	 * The rule is asked rather than the caller told, as it is asked where it closes its window
-	 * (getCepRuleCloseWindowExecuteWhen()): the event closed flavours of either scope are driven by the same
-	 * assessment, so which of them it was given is read from the rule.
+	 * (getCepRuleCloseWindowExecuteWhen()): the event closed and the eviction flavours of either scope are driven by
+	 * the same assessment, so which of them it was given is read from the rule.
 	 */
-	private function getCepRuleEventClosedTagCurrent(string $name): ?bool {
+	private function getCepRuleTagCurrent(string $name, int $execute_when, string $tag): ?bool {
 		$response = $this->call('ceprule.get', [
 			'filter' => ['name' => $name],
 			'output' => ['cep_ruleid'],
-			'selectOperations' => ['type', 'execute_when', 'scope']
+			'selectOperations' => ['type', 'execute_when', 'tag', 'scope']
 		]);
 
 		$this->assertNotEmpty($response['result'], 'There is no CEP rule named "'.$name.'".');
 
 		foreach ($response['result'][0]['operations'] as $operation) {
-			if ($operation['type'] != CCepRuleHelper::OP_ADD_TAG
-					|| $operation['execute_when'] != CCepRuleHelper::WHEN_EVENT_CLOSED) {
+			if ($operation['type'] != CCepRuleHelper::OP_ADD_TAG || $operation['execute_when'] != $execute_when
+					|| $operation['tag'] !== $tag) {
 				continue;
 			}
 
@@ -16221,6 +16366,13 @@ return;
 	 * back without them would close nothing but its "up" event and leave every "down" problem of its id open. See
 	 * maybeRestartServerMidScenario().
 	 *
+	 * The eviction flavours additionally tag the events the event evicted point was performed for, see
+	 * prepareDataCepWindowCloseWindowOperations(). Once step 2 has closed the window of an id, that is its "up"
+	 * event alone while the tag operation is limited to the current event, and its "up" event together with every
+	 * "down" event its window held with the "All events" scope - which of the two the rule has is read from it, see
+	 * getCepRuleTagCurrent(). The tagged events are counted over the whole run, so a tag that reached the events of
+	 * another id would show as well.
+	 *
 	 * The pattern match flavour is not tied to the value that ends the window: its window is examined once a
 	 * second, so the closing follows the "up" value rather than accompanying it - which is why every step of this
 	 * scenario is waited for rather than asserted right away.
@@ -16264,9 +16416,9 @@ return;
 	 *   3. the tag operation the rule performs at the event closed point beside the close window one shows which
 	 *      events that point was performed for. Limited to the current event it is the closed event alone, so one
 	 *      problem of the first trigger per id is tagged - the one whose closing ended the window of that id - and
-	 *      none of the second trigger. Without that condition it is every event the window held, so the problems
-	 *      of both triggers are tagged. Whether the rule has that condition is read from it, see
-	 *      getCepRuleEventClosedTagCurrent();
+	 *      none of the second trigger. With the "All events" scope it is every event the window held, so the
+	 *      problems of both triggers are tagged. Which scope the rule has is read from it, see
+	 *      getCepRuleTagCurrent();
 	 *   4. the recovery value "0" is sent through the second trigger, which closes the problems left open.
 	 * They are not combined with $discarded, $single_service, $doubled or $suppress_points.
 	 *
@@ -16370,6 +16522,14 @@ return;
 				.'" needs more than one value per id.'
 			);
 		}
+
+		// Whether the tag of the event evicted point is limited to the current event, or null for a flavour that does
+		// not add it - every flavour but the eviction ones that are not aged, see
+		// prepareDataCepWindowCloseWindowOperations().
+		$evicted_tag_current = $this->getCepRuleTagCurrent($rule_name, CCepRuleHelper::WHEN_EVENT_EVICTED,
+			self::CEP_TAG_EVENT_EVICTED
+		);
+		$evicted_tagged = 0;
 
 		// Which discovered triggers the values go through. The flavours that drive an id per window send everything
 		// through a single trigger - what they vary is the id, and one trigger produces the events of every id alike.
@@ -16599,7 +16759,8 @@ return;
 				// 3. Which events the event closed point was performed for, read from the tag it adds. The closed
 				//    event is still in its window when the point is performed, and being closed by its recovery
 				//    already does not keep a tag from being added to it.
-				if ($this->getCepRuleEventClosedTagCurrent($rule_name)) {
+				if ($this->getCepRuleTagCurrent($rule_name, CCepRuleHelper::WHEN_EVENT_CLOSED,
+						self::CEP_TAG_EVENT_CLOSED)) {
 					// Limited to the current event: the event whose closing ended the window of an id is tagged,
 					// one per id, and nothing of the second trigger is. The first trigger is waited for first: a
 					// tag of the second one would have been added in the same pass.
@@ -16655,6 +16816,17 @@ return;
 				// all, and the ones the window held it closes in the single step of the window ending.
 				$this->waitForProblemEventCountByTag($all, 'service', $service, $events + 1);
 				$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
+
+				if ($evicted_tag_current !== null) {
+					// Which events the event evicted point was performed for: the "up" event alone while it is limited
+					// to the current event, that event and every "down" event the window of the id held with the
+					// "All events" scope. Counted over the whole run, so the events of no other id may carry it.
+					$evicted_tagged += $evicted_tag_current ? 1 : $events + 1;
+
+					$this->waitForProblemEventCountByTag($all, self::CEP_TAG_EVENT_EVICTED,
+						self::CEP_TAG_EVENT_EVICTED_VALUE, $evicted_tagged
+					);
+				}
 			}
 			catch (Throwable $e) {
 				$assert_no_rule_errors();
