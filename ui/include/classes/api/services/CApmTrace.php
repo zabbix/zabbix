@@ -281,7 +281,7 @@ class CApmTrace extends CApmGeneral {
 			}
 
 			if (!in_array('TraceId', $options['sortfield'])) {
-				$query->order('TraceId');
+				$query->order('t.TraceId');
 			}
 
 			$query
