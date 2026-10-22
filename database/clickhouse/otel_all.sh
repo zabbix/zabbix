@@ -1,6 +1,9 @@
 #!/bin/sh
-set -e
 DIR="$(dirname "$0")"
-"$DIR/otel_logs_schema.sh" "$@"
-"$DIR/otel_traces_schema.sh" "$@"
-"$DIR/otel_metrics_schema.sh" "$@"
+
+for script in otel_logs_schema.sh otel_traces_schema.sh otel_metrics_schema.sh; do
+	if ! "$DIR/$script" "$@"; then
+		echo "$script failed" >&2
+		exit 1
+	fi
+done

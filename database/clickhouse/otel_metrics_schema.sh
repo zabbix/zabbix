@@ -42,7 +42,7 @@ ORDER BY (ServiceName, MetricName, Attributes, toUnixTimestamp64Nano(TimeUnix))
 TTL toDateTime(TimeUnix) + toIntervalSecond($CH_TTL)
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1"
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_metrics_gauge
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
@@ -50,7 +50,7 @@ CREATE TABLE $CH_DB.otel_metrics_gauge
 )$TABLE_OPTIONS
 EOF
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_metrics_sum
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
@@ -60,7 +60,7 @@ CREATE TABLE $CH_DB.otel_metrics_sum
 )$TABLE_OPTIONS
 EOF
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_metrics_histogram
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),
@@ -74,7 +74,7 @@ CREATE TABLE $CH_DB.otel_metrics_histogram
 )$TABLE_OPTIONS
 EOF
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_metrics_exponential_histogram
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),

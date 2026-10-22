@@ -3,7 +3,7 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_logs
 (
 	Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),

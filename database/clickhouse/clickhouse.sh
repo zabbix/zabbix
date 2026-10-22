@@ -99,3 +99,20 @@ CH_CURL_AUTH=""
 if [ -n "$CH_USER" ]; then
 	CH_CURL_AUTH="-u $CH_USER:$CH_PASSWORD"
 fi
+
+# executes query read from stdin, fails on transfer or ClickHouse errors
+ch_query()
+{
+	local out
+
+	if ! out=$(curl -sS $CH_CURL_AUTH -w '\n%{http_code}' "$CH_URL" --data-binary @-); then
+		return 1
+	fi
+
+	if [ "${out##*$'\n'}" != "200" ]; then
+		printf "%s" "${out%$'\n'*}" >&2
+		return 1
+	fi
+
+	printf "%s" "${out%$'\n'*}"
+}
