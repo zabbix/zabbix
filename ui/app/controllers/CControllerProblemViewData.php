@@ -286,9 +286,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$problem_link_item = (new CDiv())
 				->addClass(ZBX_STYLE_FLEX_ITEM)
+				->addClass($options['compact_view'] == 1 ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK)
 				->addItem(
 					(new CLinkAction($problem['name']))
-						->addClass(ZBX_STYLE_WORDBREAK)
 						->setMenuPopup(CMenuPopupHelper::getTrigger([
 							'triggerid' => $trigger['triggerid'],
 							'backurl' => (new CUrl('zabbix.php'))

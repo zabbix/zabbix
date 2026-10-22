@@ -419,13 +419,13 @@
 
 					for (const [index, host] of hosts.entries()) {
 						const flex_item = document.createElement('div');
-						flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+						flex_item.classList.add(ZBX_STYLE_FLEX_ITEM,
+							compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION,
-							compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
