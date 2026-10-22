@@ -3,10 +3,6 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-echo "DROP VIEW IF EXISTS $CH_DB.otel_traces_trace_id_ts_mv SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-echo "DROP TABLE IF EXISTS $CH_DB.otel_traces_trace_id_ts SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-echo "DROP TABLE IF EXISTS $CH_DB.otel_traces SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-
 cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 CREATE TABLE $CH_DB.otel_traces
 (

@@ -3,8 +3,6 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-echo "DROP TABLE IF EXISTS $CH_DB.otel_logs SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-
 cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 CREATE TABLE $CH_DB.otel_logs
 (

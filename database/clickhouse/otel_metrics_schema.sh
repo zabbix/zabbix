@@ -3,10 +3,6 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-for table in gauge sum histogram exponential_histogram; do
-	echo "DROP TABLE IF EXISTS $CH_DB.otel_metrics_$table SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-done
-
 # columns and indexes shared by all metric tables
 COMMON_COLUMNS="
 	ResourceAttributes Map(LowCardinality(String), String) CODEC(ZSTD(1)),
