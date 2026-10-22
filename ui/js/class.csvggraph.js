@@ -618,14 +618,15 @@
 					}
 
 					if (show_hint && data.hintMaxRows > rows_added) {
-						jQuery('<li>')
-							.append(
-								jQuery('<span>')
-									.css('background-color', point.g.getAttribute('data-color'))
-									.addClass('svg-graph-hintbox-item-color')
-							)
-							.append(`${point.g.getAttribute('data-metric')}: ${point.v}`)
-							.appendTo(html);
+						const color_span = document.createElement('span');
+						color_span.style.backgroundColor = point.g.getAttribute('data-color');
+						color_span.classList.add('svg-graph-hintbox-item-color');
+
+						const li = document.createElement('li');
+						li.append(color_span, `${point.g.getAttribute('data-metric')}: ${point.v}`)
+
+						html.append(li);
+
 						rows_added++;
 					}
 				}
