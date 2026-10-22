@@ -20,9 +20,9 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup role, users, usrgrp, module
+ * @backup role, users, usrgrp, module, proxy, proxy_group
  *
- * @onBefore prepareUserData
+ * @onBefore prepareUserData, prepareProxyData
  *
  * @dataSource UserPermissions, MonitoringOverview
  */
@@ -55,7 +55,21 @@ class testFormUserPermissions extends CWebTest {
 	protected static $admin_user;
 
 	/**
-	 * Function used to create roles.
+	 * ID of the user created for proxy access checks.
+	 *
+	 * @var integer
+	 */
+	protected static $proxy_access_userid;
+
+	/**
+	 * ID of the user group created for proxy access checks.
+	 *
+	 * @var integer
+	 */
+	protected static $proxy_access_usrgrpid;
+
+	/**
+	 * Function used to create roles and users.
 	 */
 	public function prepareUserData() {
 		$role = CDataHelper::call('role.create', [
@@ -87,6 +101,51 @@ class testFormUserPermissions extends CWebTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$admin_user = $user['userids'][0];
+
+		self::$proxy_access_usrgrpid = CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'User group for proxy access'
+			]
+		])['usrgrpids'][0];
+
+		self::$proxy_access_userid = CDataHelper::call('user.create', [
+			[
+				'username' => 'user_proxy_access',
+				'passwd' => 'test5678',
+				'roleid' => USER_TYPE_ZABBIX_USER,
+				'usrgrps' => [
+					[
+						'usrgrpid' => self::$proxy_access_usrgrpid
+					]
+				]
+			]
+		])['userids'][0];
+	}
+
+	public function prepareProxyData() {
+		CDataHelper::call('proxy.create',
+			[
+				[
+					'name' => 'Proxy allowed',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				],
+				[
+					'name' => 'Proxy not allowed',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				]
+			]
+		);
+
+		CDataHelper::call('proxygroup.create',
+			[
+				[
+					'name' => 'Proxy group denied'
+				],
+				[
+					'name' => 'Proxy group not denied'
+				]
+			]
+		);
 	}
 
 	public static function getUpdateRoleData() {
@@ -481,6 +540,36 @@ class testFormUserPermissions extends CWebTest {
 			]
 		];
 		$this->assertTableData($permissions_after, $table_selector);
+	}
+
+	/**
+	 * Check proxy and proxy group permissions.
+	 */
+	public function testFormUserPermissions_UpdateProxyAccessList() {
+		// Add proxy and proxy group access to the user's group.
+		$this->page->login()->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$proxy_access_usrgrpid)->waitUntilReady();
+		$form = $this->query('id:user-group-form')->waitUntilPresent()->asForm()->one();
+
+		// Add proxy and proxy group access.
+		$form->selectTab('Proxy access list');
+
+		$form->getField('Proxies')->fill('Allow list');
+		$this->query('xpath://div[@id="proxyids_"]/..')->asMultiselect()->one()->fill('Proxy allowed');
+
+		$form->getField('Proxy groups')->fill('Deny list');
+		$this->query('xpath://div[@id="proxy_groupids_"]/..')->asMultiselect()->one()->fill('Proxy group denied');
+
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User group updated');
+
+		// Verify the effective proxy permissions for the user.
+		$this->page->open('zabbix.php?action=user.edit&userid='.self::$proxy_access_userid)->waitUntilReady();
+
+		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->asForm()->one();
+
+		$form->selectTab('Permissions');
+		$this->assertEquals('Proxy allowed', $form->getField('Proxies')->getText());
+		$this->assertEquals('Proxy group not denied', $form->getField('Proxy groups')->getText());
 	}
 
 	/**
