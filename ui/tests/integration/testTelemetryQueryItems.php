@@ -245,11 +245,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 		$this->deleteOTData();
 
-		$itemid = $this->createTQItem($hostid, $subcase['item']);
-
 		$now = time();
 		$this->sendInput($subcase['input_tmpl']($now));
 
+		$itemid = $this->createTQItem($hostid, $subcase['item']);
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
@@ -265,10 +264,12 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			$buckets = json_decode($response['result'][0]['value'], true);
 
 			if (!is_array($buckets)) {
+				echo('asdfasdf');
 				return $msg.': invalid value: '.$response['result'][0]['value'];
 			}
 
 			if (count($expected_buckets) != count($buckets)) {
+				echo('asdfasdf2');
 				return $msg.': invalid bucket count, expected '.count($expected_buckets).', got '.count($buckets);
 			}
 
