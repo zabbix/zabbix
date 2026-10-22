@@ -9,6 +9,10 @@ display_help()
 	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
 	printf "  %-16s %s\n" "-e|--engine" "Table engine ($CH_ENGINE)"
 	printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
+	printf "  %-16s %s\n" "--ca" "CA certificate file to verify the server certificate"
+	printf "  %-16s %s\n" "--cert" "Client certificate file"
+	printf "  %-16s %s\n" "--key" "Client private key file"
+	printf "  %-16s %s\n" "--insecure" "Skip server certificate and host name verification"
 	printf "  %-16s %s\n" "-h|--help" "Help message"
 
 	exit 1
@@ -28,6 +32,11 @@ CH_ENGINE="MergeTree()"
 
 # directory with the exported CSV files
 CH_IMPORT_DIR="/tmp"
+
+CH_CA=""
+CH_CERT=""
+CH_KEY=""
+CH_INSECURE=""
 
 if [ $# -eq 0 ]; then
 	display_help
@@ -72,6 +81,21 @@ while [ $# -gt 0 ]; do
 		shift
 		CH_IMPORT_DIR=$1
 		;;
+	--ca)
+		shift
+		CH_CA=$1
+		;;
+	--cert)
+		shift
+		CH_CERT=$1
+		;;
+	--key)
+		shift
+		CH_KEY=$1
+		;;
+	--insecure)
+		CH_INSECURE=1
+		;;
 	-h|--help)
 		display_help
 		;;
@@ -100,9 +124,25 @@ if [[ $CH_URL =~ $CH_URL_REGEX ]] && [ -z "${BASH_REMATCH[4]}" ]; then
 	CH_URL="${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[3]}:$CH_PORT${BASH_REMATCH[5]}"
 fi
 
-CH_CURL_AUTH=""
+CH_CURL_OPTS=()
 if [ -n "$CH_USER" ]; then
-	CH_CURL_AUTH="-u $CH_USER:$CH_PASSWORD"
+	CH_CURL_OPTS+=(-u "$CH_USER:$CH_PASSWORD")
+fi
+
+if [ -n "$CH_CA" ]; then
+	CH_CURL_OPTS+=(--cacert "$CH_CA")
+fi
+
+if [ -n "$CH_CERT" ]; then
+	CH_CURL_OPTS+=(--cert "$CH_CERT")
+fi
+
+if [ -n "$CH_KEY" ]; then
+	CH_CURL_OPTS+=(--key "$CH_KEY")
+fi
+
+if [ -n "$CH_INSECURE" ]; then
+	CH_CURL_OPTS+=(--insecure)
 fi
 
 # executes query read from stdin, fails on transfer or ClickHouse errors
@@ -110,7 +150,7 @@ ch_query()
 {
 	local out
 
-	if ! out=$(curl -sS $CH_CURL_AUTH -w '\n%{http_code}' "$CH_URL" --data-binary @-); then
+	if ! out=$(curl -sS "${CH_CURL_OPTS[@]}" -w '\n%{http_code}' "$CH_URL" --data-binary @-); then
 		return 1
 	fi
 
