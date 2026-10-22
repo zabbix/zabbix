@@ -126,10 +126,14 @@ fi
 CH_URL_REGEX='^([A-Za-z][A-Za-z0-9+.-]*://)?([^/?#@]*@)?(\[[^]/]*\]|[^]/?#:[]*)(:[0-9]*)?(.*)$'
 
 if [[ $CH_URL =~ $CH_URL_REGEX ]] && [ -z "${BASH_REMATCH[4]}" ]; then
-	CH_PORT=8123
-	if [ "${BASH_REMATCH[1],,}" = "https://" ]; then
-		CH_PORT=8443
-	fi
+	case ${BASH_REMATCH[1]} in
+		[Hh][Tt][Tt][Pp][Ss]://)
+			CH_PORT=8443
+			;;
+		*)
+			CH_PORT=8123
+			;;
+	esac
 
 	CH_URL="${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[3]}:$CH_PORT${BASH_REMATCH[5]}"
 fi
