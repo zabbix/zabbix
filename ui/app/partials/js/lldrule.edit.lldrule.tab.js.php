@@ -141,6 +141,8 @@ var LldRuleEditLldRuleTab = class {
 					this.#toggleAttributeKey(select);
 				}
 			}
+
+			this.#selectNextColumn(e.target);
 		});
 
 		this.#initEvents();
@@ -219,6 +221,7 @@ var LldRuleEditLldRuleTab = class {
 		this.#form_element.querySelector('#columns-table').addEventListener('change', (e) => {
 			if (e.target.classList.contains('js-column')) {
 				this.#toggleAttributeKey(e.target);
+				this.#toggleSelectedColumns();
 			}
 		});
 
@@ -348,6 +351,36 @@ var LldRuleEditLldRuleTab = class {
 		}
 
 		this.#updateTelemetryVisibility();
+	}
+
+	#selectNextColumn(table) {
+		const columns = table.querySelectorAll('.js-column');
+
+		if (columns.length === 0) {
+			return;
+		}
+
+		const selected_columns = [...columns].slice(0, -1).map(column => column.value);
+		const last_column = columns[columns.length - 1];
+		const next_option = last_column.getOptions().find(option => !selected_columns.includes(String(option.value)));
+
+		if (next_option !== undefined) {
+			last_column.value = next_option.value;
+			last_column.dispatchEvent(new Event('change', {bubbles: true}));
+		}
+	}
+
+	#toggleSelectedColumns() {
+		const columns = this.#container.querySelectorAll('#columns-table .js-column');
+		const selected_columns = [...columns].map(column => column.value);
+
+		for (const column of columns) {
+			const disabled_columns = selected_columns.filter(value => value !== column.value);
+
+			for (const option of column.getOptions()) {
+				option.disabled = disabled_columns.includes(String(option.value));
+			}
+		}
 	}
 
 	#updateTelemetryVisibility() {
