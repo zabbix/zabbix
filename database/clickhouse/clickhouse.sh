@@ -83,6 +83,11 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+if [ -z "$CH_PARTITION" ]; then
+	echo "Partitioning schema cannot be empty"
+	exit 1
+fi
+
 # split URL into scheme, userinfo, host (possibly bracketed IPv6), port and the rest
 CH_URL_REGEX='^([A-Za-z][A-Za-z0-9+.-]*://)?([^/?#@]*@)?(\[[^]/]*\]|[^]/?#:[]*)(:[0-9]*)?(.*)$'
 
