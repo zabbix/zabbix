@@ -2181,6 +2181,36 @@ static int	DBpatch_7050195(void)
 	return DBset_default("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050196(void)
+{
+	const zbx_db_table_t	table =
+			{"usrgrp_apm_filter", "usrgrp_apm_filterid", 0,
+				{
+					{"usrgrp_apm_filterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"attribute_key", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"signal_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050197(void)
+{
+	return DBcreate_index("usrgrp_apm_filter", "usrgrp_apm_filter_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_7050198(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_apm_filter", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2383,5 +2413,8 @@ DBPATCH_ADD(7050192, 0, 1)
 DBPATCH_ADD(7050193, 0, 1)
 DBPATCH_ADD(7050194, 0, 1)
 DBPATCH_ADD(7050195, 0, 1)
+DBPATCH_ADD(7050196, 0, 1)
+DBPATCH_ADD(7050197, 0, 1)
+DBPATCH_ADD(7050198, 0, 1)
 
 DBPATCH_END()
