@@ -6456,15 +6456,14 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     padding: 0 5px;
     line-height: 22px;
     cursor: pointer;
+    background-color: #383838;
     border: 1px solid #4f4f4f;
     border-right-width: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
-      background-color: #383838; }
-      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-        content: attr(data-placeholder);
-        color: #9d9d9d !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #9d9d9d !important; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #2b2b2b; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {
