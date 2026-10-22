@@ -194,7 +194,8 @@ var LldRuleEditLldRuleTab = class {
 
 		this.#container.querySelector('#delay-flex-table').addEventListener('click', e => {
 			if (e.target.type === 'radio') {
-				this.#setVisibleCustomIntervalParameters(e.target.closest('tr'))
+				this.#setVisibleCustomIntervalParameters(e.target.closest('tr'));
+				this.#updateTelemetryIndicators();
 			}
 		});
 

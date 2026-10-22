@@ -397,7 +397,10 @@ window.item_edit_form = new class {
 					break;
 			}
 		});
-		this.form_element.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
+		this.form_element.querySelector('#delay-flex-table').addEventListener('click', e => {
+			this.#intervalTypeChangeHandler(e);
+			this.#updateTelemetryIndicators();
+		});
 
 		const updateSortOrder = (table, field_name) => {
 			table.querySelectorAll('.form_row').forEach((row, index) => {
