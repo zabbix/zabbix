@@ -1156,6 +1156,7 @@ static void	proxy_sync_database_cache(void *args)
 	if (ZBX_DB_OK != zbx_db_connect(ZBX_DB_CONNECT_ONCE))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to the database: unsaved history data is lost");
+
 		return;
 	}
 

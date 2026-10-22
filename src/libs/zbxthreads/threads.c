@@ -288,7 +288,7 @@ static void	threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 			pid_t	pid;
 			int	status;
 
-			if (!threads[i] || priority != threads_flags[i])
+			if (ZBX_THREAD_HANDLE_NULL == threads[i] || priority != threads_flags[i])
 				continue;
 
 			if (0 != (pid = waitpid(threads[i], &status, WNOHANG)) && (-1 != pid || EINTR != errno))
@@ -318,7 +318,7 @@ static void	threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 		{
 			for (int i = 0; i < threads_num; i++)
 			{
-				if (!threads[i] || priority != threads_flags[i])
+				if (ZBX_THREAD_HANDLE_NULL == threads[i] || priority != threads_flags[i])
 					continue;
 
 				zabbix_log(LOG_LEVEL_WARNING, "process with PID %d made no shutdown progress for %d"

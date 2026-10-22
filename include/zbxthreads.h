@@ -75,8 +75,8 @@
 	#define zbx_thread_kill_fatal(h)	kill(h, SIGHUP)
 #endif	/* _WINDOWS */
 
-/* time to wait during shutdown for unavailable database or for processes that make no progress, before giving up */
-/* and losing unsaved data                                                                                          */
+/* Time to wait during shutdown for unavailable database or for processes that make no progress, before giving up */
+/* and losing unsaved data.                                                                                       */
 #define ZBX_SHUTDOWN_TIMEOUT	(SEC_PER_MIN * 2)
 
 typedef struct

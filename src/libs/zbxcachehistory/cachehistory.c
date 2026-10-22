@@ -884,8 +884,8 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
 
 	trend = DCget_trend(history->itemid);
 
-	/* trend is being written to database by exiting history syncer, start new trend - it is merged with */
-	/* the written one in database when flushed                                                         */
+	/* Trend is being written to database by exiting history syncer, start new trend - it is merged with */
+	/* the written one in database when flushed.                                                         */
 	if (0 != trend->flushing)
 		dc_trend_reset(trend);
 
@@ -1863,7 +1863,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
  *                                                                            *
  * Purpose: clear trends written to database by exiting history syncer        *
  *                                                                            *
- * Parameters: flushed - [IN] item identifiers and clocks of written trends   *
+ * Parameters: flushed - [IN] item ids and clocks of written trends           *
  *                                                                            *
  * Comments: Trend is not cleared if new value was added to it meanwhile -    *
  *           such trend was already started anew by DCadd_trend().            *
@@ -3244,9 +3244,9 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 				if (0 == ZBX_IS_RUNNING())
 				{
-					/* shutdown was requested while waiting for cache space - drop this  */
+					/* Shutdown was requested while waiting for cache space - drop this  */
 					/* value rather than wait indefinitely for syncers that may          */
-					/* themselves be exiting; already queued values are unaffected       */
+					/* themselves be exiting; already queued values are unaffected.      */
 					LOCK_CACHE;
 					goto next_value;
 				}
