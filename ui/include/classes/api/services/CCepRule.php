@@ -417,7 +417,7 @@ class CCepRule extends CApiService {
 				$op_filter['eval_formula'] = $op_filter['formula'];
 			}
 			else {
-				CConditionHelper::sortCepRuleOperationConditions($op_filter['conditions']);
+				CConditionHelper::sortCepRuleOperationScopeConditions($op_filter['conditions']);
 
 				$op_filter['eval_formula'] = CConditionHelper::getEvalFormula($op_filter['conditions'], 'type',
 					(int) $op_filter['evaltype']
@@ -1894,24 +1894,24 @@ class CCepRule extends CApiService {
 		}
 
 		foreach ($db_operations as &$db_operation) {
-			$db_filter = &$db_operation['scope_filter'];
+			$db_scope_filter = &$db_operation['scope_filter'];
 
-			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				CConditionHelper::sortConditionsByFormula($db_filter['conditions'], $db_filter['formula']);
+			if ($db_scope_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::sortConditionsByFormula($db_scope_filter['conditions'], $db_scope_filter['formula']);
 
-				CConditionHelper::addFormulaIds($db_filter['conditions'], $db_filter['formula']);
-				CConditionHelper::replaceConditionIds($db_filter['formula'], $db_filter['conditions']);
+				CConditionHelper::addFormulaIds($db_scope_filter['conditions'], $db_scope_filter['formula']);
+				CConditionHelper::replaceConditionIds($db_scope_filter['formula'], $db_scope_filter['conditions']);
 			}
 			else {
-				CConditionHelper::sortCepRuleOperationConditions($db_filter['conditions']);
+				CConditionHelper::sortCepRuleOperationConditions($db_scope_filter['conditions']);
 
-				foreach ($db_filter['conditions'] as &$condition) {
+				foreach ($db_scope_filter['conditions'] as &$condition) {
 					$condition['formulaid'] = '';
 				}
 				unset($condition);
 			}
 
-			unset($db_filter);
+			unset($db_scope_filter);
 		}
 		unset($db_operation);
 	}
