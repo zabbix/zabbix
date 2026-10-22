@@ -131,7 +131,8 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['javascript:alert(]',										[],															false], // Invalid scheme.
 			['javascript:1/alert(document.domain)/1',					[],															false], // Invalid scheme.
 			['JaVaScRiPt:1/alert(1)/1',									[],															false], // Invalid scheme.
-			['javascript:0//%0aalert(document.domain)',					[],															false], // Invalid scheme.
+			['javascript:0//%0aalert(document.mdomain)',				[],															false], // Invalid scheme.
+			["java\tsc\nr\ript:1/alert(document.domain)/1",				[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.
 			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
