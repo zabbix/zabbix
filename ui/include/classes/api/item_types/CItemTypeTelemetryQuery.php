@@ -158,9 +158,10 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getCreateValidationRules(array $item): array {
-		$flags = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
 			? API_ALLOW_LLD_MACRO : 0;
-		$flags |= API_NOT_EMPTY | API_ALLOW_USER_MACRO;
+		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
 			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
@@ -177,7 +178,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
 		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-			|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) ? API_ALLOW_LLD_MACRO : 0;
+				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO : 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -195,7 +197,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-			|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE) ? API_ALLOW_LLD_MACRO : 0;
+				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO : 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -365,7 +368,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 			self::SIGNAL_TYPE_METRICS =>	self::METRICS_CONDITIONS_COLUMN[$item['query']['metric_point_type']],
 			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
 		};
-		$api_allow_lld_macro = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+			|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+				? API_ALLOW_LLD_MACRO : 0;
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
 			'value' =>		['type' => API_MULTIPLE, 'rules' => [
