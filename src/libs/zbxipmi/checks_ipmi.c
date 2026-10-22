@@ -47,22 +47,11 @@
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_auth.h>
 
-#define RETURN_IF_CB_DATA_NULL(x, y)								\
-	do											\
-	{											\
-		if (NULL == (x))								\
-		{										\
-			zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", (y));	\
-			return;									\
-		}										\
-	}											\
-	while(0)
-
 /* cb_data passed to OpenIPMI is host's domain_nr (never 0, so NULL stays invalid) instead of pointer to host -    */
 /* callback may arrive after the host has been freed and its memory reused, while domain_nr is never reused        */
 #define ZBX_IPMI_HOST_CB_DATA(h)	((void *)(uintptr_t)(h)->domain_nr)
 
-#define RETURN_IF_CB_DATA_INVALID(x, h)								\
+#define RESOLVE_CB_DATA(x, h)									\
 	do											\
 	{											\
 		if (NULL == ((h) = zbx_get_ipmi_host_by_cb_data(x)))				\
@@ -737,7 +726,7 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' err:%d th:%p", __func__, h->ip, h->port, err, (void *)th);
 
@@ -830,7 +819,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 
 	ZBX_UNUSED(raw_value);
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -922,7 +911,7 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1217,7 +1206,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 	const char		*e_string;
 	size_t			sz;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1270,7 +1259,7 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1463,7 +1452,7 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 {
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p sensor:%p op:%d",
 			__func__, h->ip, h->port, (void *)h, (void *)ent, (void *)sensor, (int)op);
@@ -1497,7 +1486,7 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 {
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p control:%p op:%d",
 			__func__, h->ip, h->port, (void *)h, (void *)ent, (void *)control, (int)op);
@@ -1528,7 +1517,7 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 	int	ret;
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -1566,7 +1555,7 @@ static void	zbx_domain_closed_cb(void *cb_data)
 {
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __func__, (void *)h, h->ip, h->port);
 
@@ -1592,7 +1581,7 @@ static void	zbx_connection_change_cb(ipmi_domain_t *domain, int err, unsigned in
 	int		ret;
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p err:%d conn_num:%u port_num:%u"
 			" still_connected:%d cb_data:%p", __func__, h->ip, h->port, (void *)h, (void *)domain,
@@ -1626,7 +1615,7 @@ static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' domain:%p cb_data:%p", __func__, h->ip,
 			h->port, (void *)domain, cb_data);
@@ -1858,7 +1847,12 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = (char *)cb_data;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_get_domain_id_by_name_cb");
+	if (NULL == cb_data)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", __func__);
+
+		return;
+	}
 
 	/* from 'domain' pointer find the domain name */
 	ipmi_domain_get_name(domain, name, sizeof(name));
@@ -1877,7 +1871,7 @@ static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 	zbx_ipmi_host_t	*h;
 	int		ret;
 
-	RETURN_IF_CB_DATA_INVALID(cb_data, h);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", (unsigned int)ret);
