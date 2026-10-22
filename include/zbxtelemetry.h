@@ -244,6 +244,8 @@ int	zbx_tq_validate_lookback_limit(const char *lookback_limit_str, int *lookback
 		size_t max_error_len);
 int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
+int	zbx_tq_validate_lookback_limit_and_granularity(const char *lookback_limit_str, int *lookback_limit_out,
+		const char *granularity_str, int *granularity_out, char *error, size_t max_error_len);
 int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);

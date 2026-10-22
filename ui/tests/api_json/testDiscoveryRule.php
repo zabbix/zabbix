@@ -18,8 +18,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/classes/parsers/CParser.php';
 require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormulaParser.php';
 require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
-require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemType.php';
-require_once dirname(__FILE__).'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
  * @onBefore prepareTestData

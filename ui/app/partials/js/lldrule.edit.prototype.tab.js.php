@@ -159,7 +159,7 @@ var LldRuleEditPrototypeTab = class {
 		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
 
 		const input_selectors = ['[name="authtype"]', '[name="custom_timeout"]', '[name="lifetime_type"]',
-			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]'
+			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]', '[name="evaltype"]'
 		];
 		const inputs = this.#container.querySelectorAll(input_selectors.join(','));
 
@@ -194,7 +194,8 @@ var LldRuleEditPrototypeTab = class {
 
 		this.#container.querySelector('#delay-flex-table').addEventListener('click', e => {
 			if (e.target.type === 'radio') {
-				this.#setVisibleCustomIntervalParameters(e.target.closest('tr'))
+				this.#setVisibleCustomIntervalParameters(e.target.closest('tr'));
+				this.#updateTelemetryIndicators();
 			}
 		});
 
@@ -246,10 +247,17 @@ var LldRuleEditPrototypeTab = class {
 			}
 		});
 
+		this.#container.querySelector('#delay-flex-table').addEventListener('input', e => {
+			if (e.target.matches('[name$="[delay]"]')) {
+				this.#updateTelemetryIndicators();
+			}
+		});
+
 		jQuery('#query-fields-table')
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
 		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
 		jQuery('#columns-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'columns'));
+		jQuery('#delay-flex-table').on('tableupdate.dynamicRows', () => this.#updateTelemetryIndicators());
 	}
 
 	getContainer() {
@@ -634,14 +642,30 @@ var LldRuleEditPrototypeTab = class {
 		const is_complex = config.complex.includes(data.column);
 		const is_exists = data.operator == <?= CONDITION_OPERATOR_EXISTS ?>;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
+		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
+
+		const used_formulaids = new Set(
+			[...tbody.querySelectorAll('input[name$="[formulaid]"]')]
+			.map(input => input.value)
+		);
+
+		let formulaid_index = 0;
+
+		while (used_formulaids.has(num2letter(formulaid_index))) {
+			formulaid_index++;
+		}
+
+		const formulaid = existing !== null
+			? existing.querySelector('input[name$="[formulaid]"]').value
+			: data.formulaid ?? num2letter(formulaid_index);
+
 		const html = new Template(source).evaluate({
 			...data,
-			formulaid: num2letter(data.row_index),
+			formulaid,
 			attribute_key_name: is_complex ? data.attribute_key : '',
 			operator_name: this.#telemetry_operator_labels[data.operator],
 			value_name: is_exists ? '' : data.value
 		});
-		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
 		if (existing !== null) {
 			this.#removeRelatedErrorContainer(existing);

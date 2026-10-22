@@ -99,6 +99,9 @@ window.lldrule_edit = new class {
 		this.#form.findFieldByName('interfaceid')?.setChanged();
 		this.#form.findFieldByName('type').setChanged();
 		this.#form.validateChanges(['interfaceid', 'type']);
+
+		this.#form.findFieldByName('aggregated_columns')
+			.setButtonOnBlur('js-add-aggregated-column', 'telemetry-aggregated-column');
 	}
 
 	#formIsReady() {

@@ -21,19 +21,15 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_telemetry_query_items
- * @backup history
- * @onBefore initEnv
  * @onAfter clearEnv
  */
 class testTelemetryQueryItems extends CIntegrationTest {
-	/* CLICKHOUSE_* constants must not contain \ or " (must not require escaping) */
-	const CLICKHOUSE_URL = 'http://127.0.0.1:8123';
-	const CLICKHOUSE_USERNAME = 'zb';
-	const CLICKHOUSE_PASSWORD = '2b';
-	const CLICKHOUSE_DB = 'zabbix';
+	const CLICKHOUSE_TIMEOUT = 10;
 
 	const COLLECTOR_ADDRESS = 'localhost:4317';
 	const PROTO_DIR = PHPUNIT_BASEDIR . '/src/zabbix_proxy/apm/';
+	const OTLP_TIMEOUT = 10;
+	const OTLP_SEND_WAIT_SECONDS = 30;
 
 	const HOST_NAME = 'test_telemetry_query_items';
 
@@ -43,17 +39,27 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	private static int $hostid;
 
 	public function serverConfigurationProvider(): array {
+		// TelemetryProvider of server and proxy comes from $TELEMETRY_PROVIDERS of the frontend configuration.
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"'
+				'LogFile' => self::getLogPath(self::COMPONENT_SERVER)
 			]
 		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		global $TELEMETRY_PROVIDERS;
+
+		if (empty($TELEMETRY_PROVIDERS)) {
+			$this->markTestSkipped('$TELEMETRY_PROVIDERS is not set in ui/conf/zabbix.conf.php.');
+		}
+
+		return true;
 	}
 
 	private function createTQItem(int $hostid, array $item_fields): int {
@@ -87,6 +93,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$cmd =
 			'grpcurl '.
 			'-plaintext ' .
+			'-max-time ' . self::OTLP_TIMEOUT . ' ' .
 			'-import-path ' . escapeshellarg($import_path) . ' ' .
 			'-proto ' . escapeshellarg($proto) . ' ' .
 			'-d ' . escapeshellarg($payload) . ' ' .
@@ -104,13 +111,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		string $proto,
 		string $payload,
 		string $address,
-		string $method,
-		int $iterations = 30,
-		int $delay = 1): void {
-		$output_lines = [];
-		$exit_code = 0;
+		string $method): void {
+		$deadline = time() + self::OTLP_SEND_WAIT_SECONDS;
 
-		for ($i = 0; $i < $iterations; $i++) {
+		while (true) {
 			$output_lines = [];
 			$exit_code = $this->trySendOTLP($import_path, $proto, $payload, $address, $method, $output_lines);
 
@@ -118,7 +122,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				return;
 			}
 
-			sleep($delay);
+			if (time() >= $deadline) {
+				break;
+			}
+
+			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
 		$this->fail('Failed to send OTLP request: last exit_code: ' . $exit_code . ', last output_lines: ' . implode("\n", $output_lines));
@@ -168,26 +176,48 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		}
 	}
 
+	/**
+	 * The ClickHouse telemetry provider of the frontend configuration, the same one server and proxy are configured
+	 * with (see getDefaultComponentConfiguration()).
+	 */
+	private function getClickHouseProvider(): array {
+		global $TELEMETRY_PROVIDERS;
+
+		if (isset($TELEMETRY_PROVIDERS)) {
+			foreach ($TELEMETRY_PROVIDERS as $provider) {
+				if ($provider['provider'] === 'clickhouse') {
+					return $provider + ['db' => '', 'username' => '', 'password' => ''];
+				}
+			}
+		}
+
+		$this->fail('No ClickHouse provider in $TELEMETRY_PROVIDERS, set it in ui/conf/zabbix.conf.php.');
+	}
+
 	private function deleteOTData(): void {
+		$provider = $this->getClickHouseProvider();
 		$handle = curl_init();
 
-		$sql = "TRUNCATE ALL TABLES FROM " . self::CLICKHOUSE_DB . " LIKE 'otel_%'";
+		$sql = 'TRUNCATE ALL TABLES FROM '.$provider['db']." LIKE 'otel_%'";
 
 		curl_setopt_array($handle, [
-			CURLOPT_URL => self::CLICKHOUSE_URL,
+			CURLOPT_URL => rtrim($provider['url'], '/').'/?database='.urlencode($provider['db']),
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $sql,
 			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-			CURLOPT_USERNAME => self::CLICKHOUSE_USERNAME,
-			CURLOPT_PASSWORD => self::CLICKHOUSE_PASSWORD
+			CURLOPT_USERNAME => $provider['username'],
+			CURLOPT_PASSWORD => $provider['password'],
+			CURLOPT_CONNECTTIMEOUT => self::CLICKHOUSE_TIMEOUT,
+			CURLOPT_TIMEOUT => self::CLICKHOUSE_TIMEOUT
 		]);
 
 		$response = curl_exec($handle);
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-		$this->assertEquals(200, $http_code, 'Unexpected http code: ' . $http_code . ', response: ' . $response);
+		$this->assertNotFalse($response, 'curl error: '.curl_error($handle).', query: '.$sql);
+		$this->assertEquals(200, $http_code, 'Unexpected http code: '.$http_code.', response: '.$response);
 	}
 
 	private static function normalizeValue(mixed $value): mixed {
@@ -223,15 +253,29 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
+		// The item may be polled before the sent data is visible in ClickHouse, wait for the expected bucket count.
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value'],
 			'itemids' => [$itemid],
-			'history' => self::ITEM_VALUE_TYPE
-		]);
+			'history' => self::ITEM_VALUE_TYPE,
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], null, null, function (array $response) use ($expected_buckets, $msg) {
+			$buckets = json_decode($response['result'][0]['value'], true);
+
+			if (!is_array($buckets)) {
+				return $msg.': invalid value: '.$response['result'][0]['value'];
+			}
+
+			if (count($expected_buckets) != count($buckets)) {
+				return $msg.': invalid bucket count, expected '.count($expected_buckets).', got '.count($buckets);
+			}
+
+			return true;
+		});
 
 		$buckets = json_decode($response['result'][0]['value'], true, 512, JSON_THROW_ON_ERROR);
-
-		$this->assertEquals(count($expected_buckets), count($buckets), "Invalid bucket count");
 
 		for ($i = 0; $i < count($expected_buckets); $i++) {
 			$this->assertArrayHasKey('clock', $buckets[$i], $msg);

@@ -1,11 +1,12 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
-echo "DROP TABLE IF EXISTS $CH_DB.history_json SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+echo "DROP TABLE IF EXISTS $CH_DB.history_json SYNC" | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+cat << EOF | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-
 CREATE TABLE $CH_DB.history_json
 (
 	itemid UInt64,

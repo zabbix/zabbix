@@ -30,14 +30,14 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'formula' => DB::getDefault('items', 'formula'),
 			'conditions'=> []
 		];
+		$item['filters_evaltype'] = $item['filter']['evaltype'];
+		$item['filters_formula'] = $item['filter']['formula'];
+		$item['filters_conditions'] = $item['filter']['conditions'];
 		$item['discovered_lld'] = false;
 		$item['lifetime_type'] = DB::getDefault('items', 'lifetime_type');
 		$item['lifetime'] = DB::getDefault('items', 'lifetime');
 		$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
 		$item['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
-		$item['filters_evaltype'] = $item['filter']['evaltype'];
-		$item['filters_formula'] = $item['filter']['formula'];
-		$item['filters_conditions'] = $item['filter']['conditions'];
 
 		return $item;
 	}
@@ -217,7 +217,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'publickey', 'privatekey',
 
 			// Telemetry Query item type specific fields.
-			'query', 'time_shift', 'lookback_limit', 'granularity', 'storage_mode'
+			'query', 'time_shift', 'lookback_limit', 'granularity'
 		];
 
 		if ($is_lld_prototype) {
@@ -249,6 +249,17 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			]);
 
 		foreach ($src_items as &$src_item) {
+			if ($src_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+				unset($src_item['query']['filter']['eval_formula']);
+
+				if ($src_item['query']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					foreach ($src_item['query']['filter']['conditions'] as &$condition) {
+						unset($condition['formulaid']);
+					}
+					unset($condition);
+				}
+			}
+
 			foreach ($src_item['filter']['conditions'] as &$condition) {
 				if ($src_item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 					unset($condition['formulaid']);

@@ -1,13 +1,10 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
-echo "DROP VIEW IF EXISTS $CH_DB.otel_traces_trace_id_ts_mv SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-echo "DROP TABLE IF EXISTS $CH_DB.otel_traces_trace_id_ts SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-echo "DROP TABLE IF EXISTS $CH_DB.otel_traces SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+ch_query << EOF || exit 1
 CREATE TABLE $CH_DB.otel_traces
 (
 	Timestamp DateTime64(9) CODEC(Delta, ZSTD(1)),

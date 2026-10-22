@@ -16,49 +16,54 @@
 require_once dirname(__FILE__).'/testTelemetryQueryItems.php';
 
 /**
+ * Variant of testTelemetryQueryItems where the data is sent to the proxy APM collector, which stores it in ClickHouse
+ * for the Telemetry query items of the server to read back.
+ *
+ * Requires: proxy built with APM support, ClickHouse with otel_* tables, grpcurl in PATH.
+ *
  * @required-components server, proxy
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_telemetry_query_items
+ * @suite-components-reuse true
  * @backup history
- * @onBefore initEnv
- * @onAfter clearEnv
+ * @onAfter clearData
  */
 class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
-	const PROXY_NAME = 'proxy';
+	const PROXY_NAME = 'test_telemetry_query_items_proxy';
 
-	private static int $proxyid;
+	private static $proxyid;
 
 	public function serverConfigurationProvider(): array {
+		// TelemetryProvider of server and proxy comes from $TELEMETRY_PROVIDERS of the frontend configuration.
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 5,
+				'DebugLevel' => 4,
 				'LogFileSize' => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"'
+				'LogFile' => self::getLogPath(self::COMPONENT_SERVER)
 			],
 			self::COMPONENT_PROXY => [
-				'DebugLevel' => 5,
+				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
+				'Hostname' => self::PROXY_NAME,
+				'Server' => '127.0.0.1:'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
+				'ConfigFrequency' => 1,
+				'DataSenderFrequency' => 1,
+				'DebugLevel' => 4,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_PROXY),
-				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
-				'ListenPort' => PHPUNIT_PORT_PREFIX . self::PROXY_PORT_SUFFIX,
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"',
-				'StartAPMCollectors' => 1,
-				'Hostname' => self::PROXY_NAME
+				'StartAPMCollectors' => 1
 			]
 		];
 	}
 
-	public function initEnv(): void {
-		parent::initEnv();
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		parent::prepareData();
 
-		$result = CDataHelper::call('proxy.create', [
+		// The proxy is only used as the APM (OTLP) collector; the hosts are monitored by the server.
+		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
 			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 			'hosts' => [],
@@ -66,24 +71,27 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 				'data_collection_status' => 1
 			]
 		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['proxyids']);
+		self::$proxyid = $response['result']['proxyids'][0];
 
-		$this->assertArrayHasKey('proxyids', $result);
-		$this->assertArrayHasKey(0, $result['proxyids']);
-		self::$proxyid = $result['proxyids'][0];
+		return true;
 	}
 
-	public function clearEnv(): void {
-		CDataHelper::call('proxy.delete', [self::$proxyid]);
-		parent::clearEnv();
+	/**
+	 * Class level callbacks are executed without an instance, so the cleanup must be static.
+	 */
+	public static function clearData(): void {
+		if (self::$proxyid !== null) {
+			CDataHelper::call('proxy.delete', [self::$proxyid]);
+			self::$proxyid = null;
+		}
 	}
 
 	public function executeSubcases(array $subcases): void {
-		CDataHelper::call('task.create', [
-			'type' => 2,
-			'request' => [
-				'proxyids' => [self::$proxyid]
-			]
-		]);
+		// The proxy APM collector starts listening only after the proxy receives its APM configuration from the server.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 
 		parent::executeSubcases($subcases);
 	}

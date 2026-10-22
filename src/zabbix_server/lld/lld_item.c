@@ -1661,6 +1661,50 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Validates that granularity <= lookback limit, otherwise rolls     *
+ *          back both fields.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_validate_lookback_limit_and_granularity(zbx_lld_item_full_t *item, char **error)
+{
+	char	errmsg_buf[MAX_STRING_LEN];
+
+	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		return;
+
+	/* only new items or items with changed lookback limit or granularity will be validated */
+	if (0 != item->itemid && 0 == (item->flags &
+			(ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT | ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY)))
+	{
+		return;
+	}
+
+	if (SUCCEED == is_user_macro(item->lookback_limit) || SUCCEED == is_user_macro(item->granularity))
+		return;
+
+	if (SUCCEED == zbx_tq_validate_lookback_limit_and_granularity(item->lookback_limit, NULL,
+			item->granularity, NULL, errmsg_buf, sizeof(errmsg_buf)))
+	{
+		return;
+	}
+
+	lld_item_add_error(item, error, "%s", errmsg_buf);
+
+	if (0 != item->itemid)
+	{
+		lld_field_str_rollback(&item->lookback_limit, &item->lookback_limit_orig, &item->flags,
+				ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT);
+		lld_field_str_rollback(&item->granularity, &item->granularity_orig, &item->flags,
+				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY);
+	}
+	else
+	{
+		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hostid            - [IN]                                       *
  *             items             - [IN]                                       *
  *             item_prototypes   - [IN]                                       *
@@ -1670,8 +1714,6 @@ out:
  *****************************************************************************/
 static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, char **error)
 {
-	zbx_lld_item_full_t	*item;
-	zbx_lld_item_ref_t	*ref, ref_local;
 	zbx_hashset_t		key_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1679,7 +1721,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	/* check an item name validity */
 	for (int i = 0; i < items->values_num; i++)
 	{
-		item = items->values[i];
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		lld_validate_item_field(item, &item->name, &item->name_proto,
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ZBX_ITEM_NAME_LEN, error);
@@ -1737,6 +1779,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY, ZBX_ITEM_GRANULARITY_LEN, error);
 	}
 
+	for (int i = 0; i < items->values_num; i++)
+	{
+		lld_validate_lookback_limit_and_granularity(items->values[i], error);
+	}
+
 	/* check duplicated item keys */
 
 	zbx_hashset_create(&key_index, 0, lld_item_ref_key_hash_func, lld_item_ref_key_compare_func);
@@ -1744,7 +1791,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	/* add 'good' (existing, discovered and not updated) keys to the hashset */
 	for (int i = 0; i < items->values_num; i++)
 	{
-		item = items->values[i];
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
@@ -1752,7 +1799,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		/* skip new or updated item keys */
 		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 		{
-			ref_local.item = item;
+			zbx_lld_item_ref_t	ref_local = {.item = item};
+
 			zbx_hashset_insert(&key_index, &ref_local, sizeof(ref_local));
 		}
 	}
@@ -1760,7 +1808,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	/* check new and updated keys for duplicated keys in discovered items */
 	for (int i = 0; i < items->values_num; i++)
 	{
-		item = items->values[i];
+		zbx_lld_item_full_t	*item = items->values[i];
+		zbx_lld_item_ref_t	*ref, ref_local;
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
@@ -1792,7 +1841,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	/* check preprocessing steps for new and updated discovered items */
 	for (int i = 0; i < items->values_num; i++)
 	{
-		item = items->values[i];
+		zbx_lld_item_full_t	*item = items->values[i];
 
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;

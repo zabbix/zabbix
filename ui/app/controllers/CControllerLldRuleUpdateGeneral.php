@@ -553,19 +553,19 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			]],
 			'time_shift' => ['db items.time_shift', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
-					['min' => 0, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
+					['min' => 0, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => static::isPrototype()]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'lookback_limit' => ['db items.lookback_limit', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
-					['min' => 1, 'max' => 3 * SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
+					['min' => 1, 'max' => 3 * SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => static::isPrototype()]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'granularity' => ['db items.granularity', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
-					['min' => 1, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
+					['min' => 1, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => static::isPrototype()]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
