@@ -709,6 +709,10 @@ window.item_edit_form = new class {
 			metric_point_type: metric_point_type
 		};
 
+		if (this.source === 'itemprototype') {
+			parameters.parent_discoveryid = this.form_data.parent_discoveryid;
+		}
+
 		if (row !== null) {
 			const row_index = row.dataset.row_index;
 

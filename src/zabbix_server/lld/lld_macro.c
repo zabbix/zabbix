@@ -881,23 +881,44 @@ exit:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: validate that telemetry query fields are valid to save after LLD  *
- *          macro expansion (e.g. length of fields in query is intentionally  *
- *          not checked after expanding user macros but is checked before     *
- *          saving item during LLD)                                           *
- *                                                                            *
- ******************************************************************************/
 static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
 		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+		const zbx_tq_column_info_t	*col_info;
 
-		/* fields being valid UTF-8 after macro expansion is checked when preparing the query */
+		if (NULL == cond->column)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_COLUMN, i);
+			return FAIL;
+		}
 
-		if (SUCCEED == zbx_tq_column_type_is_attributes(cond->col_info->type) && '\0' == *cond->attribute_key)
+		col_info = zbx_tq_get_column_info(query->signal_type, query->metric_point_type, cond->column);
+
+		if (NULL == col_info)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is invalid for condition #%d",
+					ZBX_TQ_QUERY_TAG_COLUMN, i);
+			return FAIL;
+		}
+
+		if (NULL == cond->attribute_key)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_utf8(cond->attribute_key))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_tq_column_type_is_attributes(col_info->type) && '\0' == *cond->attribute_key)
 		{
 			zbx_snprintf(error, max_error_len,
 					"\"%s\" cannot be empty in attribute condition #%d",
@@ -909,6 +930,27 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
+			return FAIL;
+		}
+
+		if (NULL == cond->value)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_utf8(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_OPERATOR, i);
 			return FAIL;
 		}
 
@@ -927,6 +969,15 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
 					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(col_info->type) &&
+				SUCCEED != zbx_is_user_macro(cond->value) &&
+				SUCCEED != zbx_tq_validate_numeric_condition_value(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not numeric for numeric condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
 			return FAIL;
 		}
 	}
@@ -954,12 +1005,14 @@ int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t 
 	if (SUCCEED != zbx_tq_parse_query(&query, *data, error, maxerrlen))
 		goto out;
 
-	if (SUCCEED != zbx_tq_prepare_query(&query, telemetry_query_lld_macro_expand_cb, (void *)lld_obj, error,
-			maxerrlen))
+	if (SUCCEED != zbx_tq_expand_macros_in_query(&query, telemetry_query_lld_macro_expand_cb, (void *)lld_obj,
+			error, maxerrlen))
 	{
 		goto clean;
 	}
 
+	/* during LLD telemetry query is not fully validated (as it may not be possible, */
+	/* since fields in conditions may contain non-LLD macros) */
 	if (SUCCEED != lld_validate_telemetry_query(&query, error, maxerrlen))
 		goto clean;
 

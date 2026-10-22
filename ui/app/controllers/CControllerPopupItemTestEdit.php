@@ -184,26 +184,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
-					'operator' => [
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
-							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						],
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-								CONDITION_OPERATOR_NOT_LIKE
-							],
-							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						]
-					],
-					'value' => [
-						['string', 'required', 'length' => 255,
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
-						],
-						['string', 'required', 'length' => 255, 'not_empty',
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-						]
-					]
+					'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
+					'value' => CTelemetryHelper::getConditionValueValidationRules($allow_lld_macro)
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
@@ -229,7 +211,12 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 
 		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
-			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+			$item = [
+				'flags' => $this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE
+					? ZBX_FLAG_DISCOVERY_PROTOTYPE
+					: ZBX_FLAG_DISCOVERY_NORMAL,
+				'query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())
+			];
 
 			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
 				error($error);

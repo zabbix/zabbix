@@ -19,6 +19,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxeval.h"
+#include "zbxnum.h"
 
 ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)
 ZBX_VECTOR_IMPL(tq_aggr_column, zbx_tq_aggr_column_t)
@@ -230,4 +231,9 @@ int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
 		default:
 			return FAIL;
 	}
+}
+
+int	zbx_tq_validate_numeric_condition_value(const char *value)
+{
+	return zbx_is_double(value, NULL);
 }

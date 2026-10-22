@@ -437,31 +437,62 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_t type, const char *key,
 		const char *value, zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
+	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator ||
+			ZBX_TQ_OPERATOR_MORE_EQUAL == operator || ZBX_TQ_OPERATOR_LESS_EQUAL == operator)
 	{
 		char		*str;
 		char		*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
-		char		*value_esc = tq_sql_dyn_escape_string(value, ctx);
-		const char	*operator_str = (ZBX_TQ_OPERATOR_EQUAL == operator ? "=" : "<>");
+		const char	*operator_str;
 
-		if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+		switch (operator)
 		{
-			char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
+			case ZBX_TQ_OPERATOR_EQUAL:
+				operator_str = "=";
+				break;
+			case ZBX_TQ_OPERATOR_NOT_EQUAL:
+				operator_str = "<>";
+				break;
+			case ZBX_TQ_OPERATOR_MORE_EQUAL:
+				operator_str = ">=";
+				break;
+			case ZBX_TQ_OPERATOR_LESS_EQUAL:
+				operator_str = "<=";
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				operator_str = "";
+		}
 
-			/* ensure that "not equal" results in false if attribute key is missing */
-			str = zbx_dsprintf(NULL, "(%s and %s%s%s)", exists_check, operand, operator_str, value_esc);
-
-			zbx_free(exists_check);
+		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(type))
+		{
+			/* value is already validated to be numeric */
+			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value);
 		}
 		else
 		{
-			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_esc);
+			char	*value_esc = tq_sql_dyn_escape_string(value, ctx);
+
+			if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+			{
+				char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
+
+				/* ensure that "not equal" results in false if attribute key is missing */
+				str = zbx_dsprintf(NULL, "(%s and %s%s%s)", exists_check, operand, operator_str,
+						value_esc);
+
+				zbx_free(exists_check);
+			}
+			else
+			{
+				str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_esc);
+			}
+
+			zbx_free(value_esc);
 		}
 
 		zbx_free(operand);
-		zbx_free(value_esc);
 
-		return	str;
+		return str;
 	}
 	else if (ZBX_TQ_OPERATOR_CONTAINS == operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
 	{
