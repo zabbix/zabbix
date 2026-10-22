@@ -771,14 +771,30 @@ window.item_edit_form = new class {
 		const is_complex = config.complex.includes(data.column);
 		const is_exists = data.operator == <?= CONDITION_OPERATOR_EXISTS ?>;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
+		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
+
+		const used_formulaids = new Set(
+			[...tbody.querySelectorAll('input[name$="[formulaid]"]')]
+			.map(input => input.value)
+		);
+
+		let formulaid_index = 0;
+
+		while (used_formulaids.has(num2letter(formulaid_index))) {
+			formulaid_index++;
+		}
+
+		const formulaid = existing !== null
+			? existing.querySelector('input[name$="[formulaid]"]').value
+			: data.formulaid ?? num2letter(formulaid_index);
+
 		const html = new Template(source).evaluate({
 			...data,
-			formulaid: data.formulaid ?? num2letter(data.row_index),
+			formulaid,
 			attribute_key_name: is_complex ? data.attribute_key : '',
 			operator_name: this.telemetry_operator_labels[data.operator],
 			value_name: is_exists ? '' : data.value
 		});
-		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
 		if (existing !== null) {
 			this.#removeRelatedErrorContainer(existing);
