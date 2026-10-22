@@ -1758,6 +1758,12 @@ jQuery(function($) {
 				if (sections.length > 1 && section_label !== null) {
 					item.ariaLabel = section_label + ', ' + item['label'];
 				}
+
+				if (!item.dataAttributes && item.error) {
+					item.dataAttributes = {error: item.error};
+					delete item.error;
+				}
+
 				$menu_popup.append(createMenuItem(item));
 			});
 		});
