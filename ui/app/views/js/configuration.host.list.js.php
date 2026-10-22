@@ -442,28 +442,20 @@
 						context: 'host'
 					});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const item_link = document.createElement('a');
 					item_link.classList.add(ZBX_STYLE_WORDBREAK);
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					const flex_item = document.createElement('div');
-					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
-					flex_item.appendChild(item_link);
-
-					flex_wrapper.appendChild(flex_item);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('triggers', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
@@ -475,28 +467,20 @@
 						context: 'host'
 					});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const item_link = document.createElement('a');
 					item_link.classList.add(ZBX_STYLE_WORDBREAK);
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					const flex_item = document.createElement('div');
-					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
-					flex_item.appendChild(item_link);
-
-					flex_wrapper.appendChild(flex_item);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
@@ -508,28 +492,20 @@
 						context: 'host'
 					});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const item_link = document.createElement('a');
 					item_link.classList.add(ZBX_STYLE_WORDBREAK);
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					const flex_item = document.createElement('div');
-					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
-					flex_item.appendChild(item_link);
-
-					flex_wrapper.appendChild(flex_item);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
@@ -541,28 +517,20 @@
 						context: 'host'
 					});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const item_link = document.createElement('a');
 					item_link.classList.add(ZBX_STYLE_WORDBREAK);
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					const flex_item = document.createElement('div');
-					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
-					flex_item.appendChild(item_link);
-
-					flex_wrapper.appendChild(flex_item);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
@@ -573,28 +541,20 @@
 						context: 'host'
 					}, 'httpconf.php');
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const item_link = document.createElement('a');
 					item_link.classList.add(ZBX_STYLE_WORDBREAK);
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					const flex_item = document.createElement('div');
-					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
-					flex_item.appendChild(item_link);
-
-					flex_wrapper.appendChild(flex_item);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('interface', ({cell_data, cell}) => {
 					const [host_port] = cell_data;
