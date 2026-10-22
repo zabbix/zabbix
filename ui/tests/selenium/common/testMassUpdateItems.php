@@ -71,24 +71,28 @@ class testMassUpdateItems extends CWebTest{
 	 * Add interface to host.
 	 */
 	public function prepareInterfaceData() {
-		CDataHelper::call('hostinterface.create', [
-			[
-				'hostid' => self::HOSTID,
-				'dns' => '',
-				'ip' => '127.0.5.5',
-				'main' => 0,
-				'port' => '10055',
-				'type' => 2,
-				'useip' => 1,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
+		CDataHelper::call('host.massadd', [
+			'hosts' => [
+				['hostid' => self::HOSTID]
+			],
+			'interfaces' => [
+				[
+					'dns' => '',
+					'ip' => '127.0.5.5',
+					'main' => 0,
+					'port' => '10055',
+					'type' => 2,
+					'useip' => 1,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
 				]
 			]
 		]);
