@@ -280,6 +280,10 @@ class CApmTrace extends CApmGeneral {
 				$query->order($order_by, $sort_order);
 			}
 
+			if (!in_array('TraceId', $options['sortfield'])) {
+				$query->order('TraceId');
+			}
+
 			$query
 				->limit($options['limit'])
 				->offset($options['offset']);
