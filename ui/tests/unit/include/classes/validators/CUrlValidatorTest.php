@@ -129,6 +129,7 @@ class CUrlValidatorTest extends TestCase {
 			['javascript:1/alert(document.domain)/1',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
 			['JaVaScRiPt:1/alert(1)/1',									['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
 			['javascript:0//%0aalert(document.domain)',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			["java\tsc\nr\ript:1/alert(document.domain)/1",				['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
 			['ftp://user@host:port',									['schemes' => ['http', 'https']],							'unacceptable URL'] // Invalid scheme.
 		];
 	}
