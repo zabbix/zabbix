@@ -56,7 +56,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 		try {
 			$traces = API::ApmTrace()->get([
-				'output' => ['traceid', 'error_count'],
+				'output' => ['traceid', 'error_count', 'timestamp', 'duration'],
 				'time_from' => $time_from,
 				'time_till' => $time_to,
 				'traceids' => [$traceid]
@@ -111,24 +111,19 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_counts[$span['parent_spanid']]++;
 		}
 
-		$trace_timestamp = $this->formatNs($trace['timestamp']);
-		$trace_start = $trace_timestamp;
-		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
-
 		$today = strtotime('today');
-
 		$trace_view_spans = [];
+
+		$start_timestamp = min($trace['timestamp'], min(array_column($spans, 'timestamp', 'timestamp')));
+		$end = $trace['duration'];
+
 		foreach ($spans as $i => $span) {
-			$span_timestamp = $this->formatNs($span['timestamp']);
-			$trace_start = min($span_timestamp, $trace_start);
+			$span_start = $span['timestamp'] - $start_timestamp;
+			$span_end = $span_start + $span['duration'];
+			$end = max($span_end, $end);
 
-			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
-			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
-			$trace_end = max($span_end, $trace_end);
-
-			$span_events = array_map(function (array $event) use ($trace_start) {
-				$event_timestamp = $this->formatNs($event['timestamp']);
-				$event_time = ($event_timestamp - $trace_start) * SEC_PER_NANOSEC;
+			$span_events = array_map(function (array $event) use ($start_timestamp) {
+				$event_time = $event['timestamp'] - $start_timestamp;
 				$event_duration = $event_time
 					? convertSecondsToTimeUnits($event_time, ['combine_last_subsecond_parts' => true])
 					: '0'._x('ns', 'nanosecond short');
@@ -173,12 +168,12 @@ class CControllerApmTraceListSplitView extends CController {
 			'trace_view_data' => [
 				'id' => $traceid,
 				'start' => 0,
-				'end' => $trace_end,
+				'end' => $end,
 				'selected_start' => 0,
-				'selected_end' => $trace_end,
+				'selected_end' => $end,
 				'spans' => $trace_view_spans
 			]
-		]);
+		], JSON_THROW_ON_ERROR);
 
 		$this->setResponse(
 			(new CControllerResponseData(['main_block' => $output]))
@@ -201,6 +196,6 @@ class CControllerApmTraceListSplitView extends CController {
 	}
 
 	private function formatNs($ns): int {
-		return (int) str_pad((string) ($ns % 7200000000000), 13, '0', STR_PAD_LEFT);
+		return (int) str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
 	}
 }
