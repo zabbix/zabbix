@@ -92,14 +92,16 @@ class CHtmlUrlValidator {
 			}
 		}
 
-		$url_parts = parse_url(preg_replace('/[\r\n\t]/', '', trim($url, "\x00..\x1F\x20")));
+		$trimmed_url = preg_replace('/[\r\n\t]/', '', trim($url, "\x00..\x1F\x20"));
+
+		$url_parts = parse_url($trimmed_url);
 		if (!$url_parts) {
 			return false;
 		}
 
 		$valid_schemes = explode(',', strtolower(CSettingsHelper::get(CSettingsHelper::URI_VALID_SCHEMES)));
 
-		if (!in_array('javascript', $valid_schemes) && strpos(strtolower($url), 'javascript:') === 0) {
+		if (!in_array('javascript', $valid_schemes) && strpos(strtolower($trimmed_url), 'javascript:') === 0) {
 			return false;
 		}
 
