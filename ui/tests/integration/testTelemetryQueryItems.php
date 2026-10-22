@@ -973,7 +973,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
 	 */
-	public function testTelemetryQueryItems_checkDataAllCollumns(): void {
+	public function testTelemetryQueryItems_checkDataAllColumns(): void {
 		$this->executeSubcases([
 			[
 				'description' => 'Traces all columns test with EXPRESSION evaltype',
@@ -1023,9 +1023,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 							self::qcond('StatusCode', CONDITION_OPERATOR_EQUAL, 'Ok'),
 							self::qcond('StatusMessage', CONDITION_OPERATOR_LIKE, 'status'),
 							self::qcond('Events.Name', CONDITION_OPERATOR_EQUAL, 'test-span-event'),
-							self::qcond('Events.Attributes', CONDITION_OPERATOR_EXISTS, '', 'event.attr')
+							self::qcond('Events.Attributes', CONDITION_OPERATOR_EXISTS, '', 'event.attr'),
+							self::qcond('Timestamp', CONDITION_OPERATOR_MORE_EQUAL, '123'),
+							self::qcond('Duration', CONDITION_OPERATOR_LESS_EQUAL, '5')
 						],
-						'A and B and C and D and E or F and G and (H and I and (J or K)) and L and M and N and (O or not O)'
+						'A and B and C and D and E or F and G and (H and I and (J or K)) and L and M and N and (O or not O) and P and Q'
 					)
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1103,7 +1105,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ResourceAttributes', CONDITION_OPERATOR_NOT_EQUAL, 'other-host', 'host.name'),
 						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EXISTS, '', 'scope.attr'),
 						self::qcond('LogAttributes', CONDITION_OPERATOR_EXISTS, '', 'logger.name'),
-						self::qcond('EventName', CONDITION_OPERATOR_NOT_LIKE, 'missing-event')
+						self::qcond('EventName', CONDITION_OPERATOR_NOT_LIKE, 'missing-event'),
+						self::qcond('Timestamp', CONDITION_OPERATOR_NOT_EQUAL, '123'),
+						self::qcond('TraceFlags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('SeverityNumber', CONDITION_OPERATOR_EQUAL, '9')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1185,7 +1190,15 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/sum'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'sum-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'sum description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Value', CONDITION_OPERATOR_EQUAL, '42.5'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_EQUAL, '2'),
+						self::qcond('IsMonotonic', CONDITION_OPERATOR_EQUAL, '1')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1265,7 +1278,13 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'Test description'),
 						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
 						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, 'grpcurl', 'method'),
-						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Value', CONDITION_OPERATOR_EQUAL, '1.23456e2'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1347,7 +1366,17 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/histogram'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'histogram-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'histogram description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Count', CONDITION_OPERATOR_EQUAL, '6'),
+						self::qcond('Sum', CONDITION_OPERATOR_EQUAL, '6.3E1'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('Min', CONDITION_OPERATOR_EQUAL, '5.0'),
+						self::qcond('Max', CONDITION_OPERATOR_EQUAL, '40'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_EQUAL, '1')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1445,7 +1474,21 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/exponential-histogram'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'exponential-histogram-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'exponential histogram description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Count', CONDITION_OPERATOR_EQUAL, '7'),
+						self::qcond('Sum', CONDITION_OPERATOR_EQUAL, '7.7e1'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('Scale', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('ZeroCount', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('PositiveOffset', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('NegativeOffset', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('Min', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('Max', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_NOT_EQUAL, '0.0')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
