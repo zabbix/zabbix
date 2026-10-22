@@ -15,8 +15,6 @@
 #include "zbxhistory.h"
 #include "history.h"
 
-#include "zbxnix.h"
-
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxjson.h"
@@ -576,12 +574,6 @@ try_again:
 			curl_multi_add_handle(writer.handle, retries.values[i]);
 
 		zbx_vector_ptr_clear(&retries);
-
-		if (0 == ZBX_IS_RUNNING())
-		{
-			ret = FAIL;
-			goto clean;
-		}
 
 		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
 		goto try_again;

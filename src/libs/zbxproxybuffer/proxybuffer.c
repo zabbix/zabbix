@@ -503,7 +503,7 @@ static void	pb_flush(zbx_pb_t *pb)
 
 			pb_flush_lastids(pb);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
+		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
 
 	pb_history_clear(pb, UINT64_MAX);

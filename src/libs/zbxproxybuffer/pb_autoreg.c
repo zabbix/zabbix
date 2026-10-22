@@ -433,7 +433,7 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 
 		pb_autoreg_write_host_db(id, host, ip, dns, port, connection_type, host_metadata, flags, clock);
 	}
-	while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
+	while (ZBX_DB_DOWN == zbx_db_commit());
 
 	pb_lock();
 

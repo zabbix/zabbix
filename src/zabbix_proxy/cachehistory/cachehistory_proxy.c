@@ -404,8 +404,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 				zbx_db_begin();
 				DBmass_proxy_update_items(&item_diff);
 			}
-			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()) &&
-					SUCCEED != zbx_db_shutdown_timeout_expired());
+			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 		}
 
 		zbx_dbcache_lock();

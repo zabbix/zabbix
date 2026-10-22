@@ -14,7 +14,6 @@
 
 #include "zbxcachehistory.h"
 
-#include "zbxnix.h"
 #include "zbxmutexs.h"
 #include "module.h"
 #include "zbxexport.h"
@@ -834,25 +833,10 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear trend data after it has been moved for flushing to DB       *
- *                                                                            *
- ******************************************************************************/
-static void	dc_trend_reset(ZBX_DC_TREND *trend)
-{
-	trend->clock = 0;
-	trend->num = 0;
-	trend->flushing = 0;
-	memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
-	memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
-	memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: move trend to the array of trends for flushing to DB              *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trend_append(const ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
+static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
 {
 	if (*trends_num == *trends_alloc)
 	{
@@ -862,12 +846,12 @@ static void	dc_trend_append(const ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, in
 
 	memcpy(&(*trends)[*trends_num], trend, sizeof(ZBX_DC_TREND));
 	(*trends_num)++;
-}
 
-static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
-{
-	dc_trend_append(trend, trends, trends_alloc, trends_num);
-	dc_trend_reset(trend);
+	trend->clock = 0;
+	trend->num = 0;
+	memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
+	memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
+	memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
 }
 
 /******************************************************************************
@@ -883,11 +867,6 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
 	hour = history->ts.sec - history->ts.sec % SEC_PER_HOUR;
 
 	trend = DCget_trend(history->itemid);
-
-	/* Trend is being written to database by exiting history syncer, start new trend - it is merged with */
-	/* the written one in database when flushed.                                                         */
-	if (0 != trend->flushing)
-		dc_trend_reset(trend);
 
 	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type) &&
 			SUCCEED == zbx_history_requires_trends(trend->value_type))
@@ -980,7 +959,11 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 					last_trend_discard = ts.sec;
 				}
 
-				dc_trend_reset(trend);
+				trend->clock = 0;
+				trend->num = 0;
+				memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
+				memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
+				memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
 			}
 			else
 			{
@@ -1861,55 +1844,18 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear trends written to database by exiting history syncer        *
- *                                                                            *
- * Parameters: flushed - [IN] item ids and clocks of written trends           *
- *                                                                            *
- * Comments: Trend is not cleared if new value was added to it meanwhile -    *
- *           such trend was already started anew by DCadd_trend().            *
- *                                                                            *
- ******************************************************************************/
-static void	dc_trends_clear_flushed(const zbx_vector_uint64_pair_t *flushed)
-{
-	LOCK_TRENDS;
-
-	for (int i = 0; i < flushed->values_num; i++)
-	{
-		ZBX_DC_TREND	*trend;
-
-		if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends, &flushed->values[i].first)))
-			continue;
-
-		if (0 != trend->flushing && (zbx_uint64_t)trend->clock == flushed->values[i].second)
-			dc_trend_reset(trend);
-	}
-
-	UNLOCK_TRENDS;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: flush all trends to the database                                  *
- *                                                                            *
- * Comments: In parallel mode (history syncers on exit) trends are marked as  *
- *           being flushed and cleared only after they are committed, so that *
- *           trends of a history syncer terminated because of unresponsive    *
- *           database (or failed to commit) stay in cache and are written by  *
- *           full synchronization of main process.                            *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_mode)
 {
-	zbx_hashset_iter_t		iter;
-	ZBX_DC_TREND			*trends = NULL, *trend;
-	int				trends_alloc = 0, trends_num = 0, compression_age, limit, txn_started;
-	zbx_vector_uint64_pair_t	flushed;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_TREND		*trends = NULL, *trend;
+	int			trends_alloc = 0, trends_num = 0, compression_age, limit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, cache->trends_num);
 
 	compression_age = zbx_hc_get_history_compression_age();
-
-	zbx_vector_uint64_pair_create(&flushed);
 
 	LOCK_TRENDS;
 
@@ -1927,25 +1873,18 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 		{
 			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
 			{
-				zbx_uint64_pair_t	pair;
-
-				/* skip trends being flushed by other history syncers */
-				if (0 != trend->flushing || SUCCEED == zbx_hc_is_itemid_cached(trend->itemid))
+				if (SUCCEED == zbx_hc_is_itemid_cached(trend->itemid))
 					continue;
+			}
 
-				dc_trend_append(trend, &trends, &trends_alloc, &trends_num);
-				trend->flushing = 1;
+			DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
 
-				pair.first = trend->itemid;
-				pair.second = (zbx_uint64_t)trend->clock;
-				zbx_vector_uint64_pair_append(&flushed, pair);
-
+			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
+			{
 				limit--;
 				if (0 >= limit)
 					break;
 			}
-			else
-				DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
 		}
 	}
 
@@ -1958,9 +1897,6 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 		qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 	zbx_db_begin();
-
-	/* transaction is not started if database is unavailable and shutdown timeout has expired */
-	txn_started = (0 != zbx_db_txn_level() ? SUCCEED : FAIL);
 
 	zbx_vector_uint64_pair_t	trends_diff;
 
@@ -1982,10 +1918,8 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 		zbx_vector_uint64_pair_clear(&trends_diff);
 	}
 
-	if (ZBX_DB_OK == zbx_db_commit() && SUCCEED == txn_started)
-		dc_trends_clear_flushed(&flushed);
+	zbx_db_commit();
 
-	zbx_vector_uint64_pair_destroy(&flushed);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 
 	if (ZBX_DC_SYNC_TREND_MODE_FULL == sync_trend_mode)
@@ -3242,15 +3176,6 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			{
 				UNLOCK_CACHE;
 
-				if (0 == ZBX_IS_RUNNING())
-				{
-					/* Shutdown was requested while waiting for cache space - drop this  */
-					/* value rather than wait indefinitely for syncers that may          */
-					/* themselves be exiting; already queued values are unaffected.      */
-					LOCK_CACHE;
-					goto next_value;
-				}
-
 				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
 				sleep(1);
 
@@ -3272,7 +3197,6 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item->head = data;
 		}
 		item->values_num++;
-next_value:;
 	}
 }
 
@@ -3632,9 +3556,6 @@ out:
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
- * Comments: Must be called by main process (or its child process created     *
- *           for synchronization) after other processes have exited.          *
- *                                                                            *
  ******************************************************************************/
 void	zbx_sync_database_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
@@ -3794,25 +3715,6 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 	*items_num = cache->history_items.num_data;
 
 	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get number of history values and trends left to synchronize       *
- *                                                                            *
- * Comments: Used by main process to track shutdown progress, so cache is not *
- *           locked to avoid blocking on lock held by a stuck process. The    *
- *           result is only compared with previous one to detect changes.     *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	zbx_hc_get_sync_backlog(void)
-{
-	const volatile ZBX_DC_CACHE	*hc = cache;
-
-	if (NULL == hc)
-		return 0;
-
-	return (zbx_uint64_t)hc->history_num + (zbx_uint64_t)hc->trends_num;
 }
 
 /******************************************************************************
@@ -4038,6 +3940,22 @@ void	zbx_dbcache_set_history_num(int num)
 int	zbx_dbcache_get_history_num(void)
 {
 	return cache->history_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets number of history values and trends left to be synced        *
+ *                                                                            *
+ * Comments: Cache is read without locking because the value is only used to  *
+ *           detect if history syncers are making progress during shutdown.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_get_unsynced_num(void)
+{
+	if (NULL == cache)
+		return 0;
+
+	return cache->history_num + cache->trends_num;
 }
 
 zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void)

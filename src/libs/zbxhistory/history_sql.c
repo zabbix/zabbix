@@ -164,7 +164,7 @@ static int	sql_writer_flush(void)
 			zbx_db_insert_execute(db_insert);
 		}
 	}
-	while (ZBX_DB_DOWN == (txn_error = zbx_db_commit()) && SUCCEED != zbx_db_shutdown_timeout_expired());
+	while (ZBX_DB_DOWN == (txn_error = zbx_db_commit()));
 
 	sql_writer_release();
 

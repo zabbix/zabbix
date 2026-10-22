@@ -801,7 +801,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 			zbx_db_begin();
 			pb_history_add_rows_db(&data->rows, next, &lastid);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
+		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
 	else
 	{
@@ -812,7 +812,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 			zbx_db_begin();
 			(void)zbx_db_insert_execute(&data->db_insert);
 		}
-		while (ZBX_DB_DOWN == zbx_db_commit() && SUCCEED != zbx_db_shutdown_timeout_expired());
+		while (ZBX_DB_DOWN == zbx_db_commit());
 
 		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}

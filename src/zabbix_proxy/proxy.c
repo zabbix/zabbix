@@ -1145,21 +1145,12 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: writes data left in history cache and proxy memory buffer to      *
- *          database on exit                                                  *
+ * Purpose: writes data left in history cache and proxy buffer to database    *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_sync_database_cache(void *args)
+static void	proxy_sync_database_cache(void)
 {
-	ZBX_UNUSED(args);
-
-	if (ZBX_DB_OK != zbx_db_connect(ZBX_DB_CONNECT_ONCE))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to the database: unsaved history data is lost");
-
-		return;
-	}
-
+	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
 	zbx_sync_database_cache(&events_cbs, config_history_storage_pipelines);
 	zbx_pb_flush();
 	zbx_db_close();
@@ -1167,12 +1158,19 @@ static void	proxy_sync_database_cache(void *args)
 
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
+	int	sync = ZBX_SYNC_ALL;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != zbx_threads)
 	{
-		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		/* wait for all child processes to exit, do not touch database if they had to be killed */
+		if (SUCCEED != zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret,
+				zbx_hc_get_unsynced_num))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "history cache and proxy buffer will not be synced to database");
+			sync = ZBX_SYNC_NONE;
+		}
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1180,17 +1178,16 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	/* Disable proxy buffer only after child processes have exited - a child process can hold its lock while */
-	/* waiting for database. Data written to memory buffer meanwhile is flushed to database below.          */
+	/* child process can hold proxy buffer lock while waiting for database, disable buffer after they exit */
 	zbx_pb_disable();
-
 	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
-	/* synchronize in child process, so that main process cannot hang on unresponsive database */
-	zbx_threads_exec_supervised(proxy_sync_database_cache, NULL);
-	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
+	/* synchronize in child process, so that unavailable database cannot hang main process */
+	if (ZBX_SYNC_ALL == sync)
+		zbx_thread_exec_and_wait(proxy_sync_database_cache, zbx_hc_get_unsynced_num);
 
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
 	zbx_db_close();
@@ -1778,8 +1775,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
-
-	zbx_threads_set_progress_cb(zbx_hc_get_sync_backlog);
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{

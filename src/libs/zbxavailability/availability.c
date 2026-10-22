@@ -293,7 +293,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 
 		txn_error = zbx_db_commit();
 	}
-	while (ZBX_DB_DOWN == txn_error && SUCCEED != zbx_db_shutdown_timeout_expired());
+	while (ZBX_DB_DOWN == txn_error);
 
 	zbx_free(sql);
 }

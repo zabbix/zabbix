@@ -36,7 +36,6 @@
 #include "zbxalgo.h"
 #include "zbxlog.h"
 #include "zbxself.h"
-#include "zbxnix.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -1906,7 +1905,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
-	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status && 0 != ZBX_IS_RUNNING())
+	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status)
 	{
 		if (tick <= (now = zbx_time()))
 		{
@@ -2004,7 +2003,7 @@ pause:
 	timeout.sec = ZBX_HA_POLL_PERIOD;
 	timeout.ns = 0;
 
-	while (SUCCEED != stop && 0 != ZBX_IS_RUNNING())
+	while (SUCCEED != stop)
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);

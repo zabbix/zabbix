@@ -169,7 +169,6 @@ zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num);
 
 void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-zbx_uint64_t	zbx_hc_get_sync_backlog(void);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
 int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start);
@@ -184,6 +183,7 @@ void	zbx_dbcache_lock(void);
 void	zbx_dbcache_unlock(void);
 void	zbx_dbcache_set_history_num(int num);
 int	zbx_dbcache_get_history_num(void);
+int	zbx_hc_get_unsynced_num(void);
 
 zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 

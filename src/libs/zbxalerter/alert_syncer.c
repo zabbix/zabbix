@@ -753,12 +753,12 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
  * Parameters: mediatypes - [IN]                                              *
  *             data       - [IN] serialized alert results                     *
  *                                                                            *
- * Return value: count of results flushed                                     *
+ * Return value: count of results                                             *
  *                                                                            *
  ******************************************************************************/
 static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *data)
 {
-	int				results_num, ret = ZBX_DB_OK;
+	int				results_num;
 	zbx_vector_events_tags_t	update_events_tags;
 	zbx_am_result_t			**results;
 
@@ -770,6 +770,7 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 
 	if (0 != results_num)
 	{
+		int 		ret;
 		char		*sql;
 		size_t		sql_alloc = results_num * 128, sql_offset;
 		zbx_db_insert_t	db_event, db_problem;
@@ -839,7 +840,7 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 			zbx_db_insert_execute(&db_problem);
 			zbx_db_insert_clean(&db_problem);
 		}
-		while (ZBX_DB_DOWN == (ret = zbx_db_commit()) && SUCCEED != zbx_db_shutdown_timeout_expired());
+		while (ZBX_DB_DOWN == (ret = zbx_db_commit()));
 
 		if (ZBX_DB_OK == ret)
 			am_service_add_event_tags(&update_events_tags);
@@ -860,12 +861,9 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 	zbx_vector_events_tags_destroy(&update_events_tags);
 	zbx_free(results);
 
-	int	results_flushed = (ZBX_DB_OK == ret) ? results_num : 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() results_flushed:%d results_num:%d",
-			__func__, results_flushed, results_num);
-
-	return results_flushed;
+	return results_num;
 }
 
 /******************************************************************************
