@@ -410,30 +410,30 @@ class CCepRule extends CApiService {
 				array_diff_key($row, array_flip(['cep_operation_scope_conditionid', 'cep_operationid']));
 		}
 
-		foreach ($op_scope_filters as &$op_filter) {
-			if ($op_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				CConditionHelper::sortConditionsByFormula($op_filter['conditions'], $op_filter['formula']);
+		foreach ($op_scope_filters as &$op_scope_filter) {
+			if ($op_scope_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::sortConditionsByFormula($op_scope_filter['conditions'], $op_scope_filter['formula']);
 
-				$op_filter['eval_formula'] = $op_filter['formula'];
+				$op_scope_filter['eval_formula'] = $op_scope_filter['formula'];
 			}
 			else {
-				CConditionHelper::sortCepRuleOperationScopeConditions($op_filter['conditions']);
+				CConditionHelper::sortCepRuleOperationScopeConditions($op_scope_filter['conditions']);
 
-				$op_filter['eval_formula'] = CConditionHelper::getEvalFormula($op_filter['conditions'], 'type',
-					(int) $op_filter['evaltype']
+				$op_scope_filter['eval_formula'] = CConditionHelper::getEvalFormula($op_scope_filter['conditions'],
+					'type', (int) $op_scope_filter['evaltype']
 				);
 			}
 
-			CConditionHelper::addFormulaIds($op_filter['conditions'], $op_filter['eval_formula']);
-			CConditionHelper::replaceConditionIds($op_filter['eval_formula'], $op_filter['conditions']);
+			CConditionHelper::addFormulaIds($op_scope_filter['conditions'], $op_scope_filter['eval_formula']);
+			CConditionHelper::replaceConditionIds($op_scope_filter['eval_formula'], $op_scope_filter['conditions']);
 
-			if ($op_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$op_filter['formula'] = $op_filter['eval_formula'];
+			if ($op_scope_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$op_scope_filter['formula'] = $op_scope_filter['eval_formula'];
 			}
 
-			$op_filter['conditions'] = array_values($op_filter['conditions']);
+			$op_scope_filter['conditions'] = array_values($op_scope_filter['conditions']);
 		}
-		unset($op_filter);
+		unset($op_scope_filter);
 	}
 
 	/**
