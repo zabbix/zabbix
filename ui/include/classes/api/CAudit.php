@@ -534,6 +534,7 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
+		'usergroup.apm_filters' => 'usrgrp_apm_filter',
 		'usergroup.users' => 'users_groups',
 		'usergroup.proxies' => 'usrgrp_proxy',
 		'usergroup.proxy_groups' => 'usrgrp_proxy_group'
@@ -674,6 +675,7 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
+		'usergroup.apm_filters' => 'usrgrp_apm_filterid',
 		'usergroup.users' => 'id',
 		'usergroup.proxies' => 'proxyid',
 		'usergroup.proxy_groups' => 'proxy_groupid'
