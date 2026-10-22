@@ -583,9 +583,9 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX.'window cause close window on closed';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_ON_CLOSED = self::CEP_RULE_NAME_PREFIX
 		.'window pattern close window on closed';
-	// The same event closed flavours with their event closed operations left without the "Current event" condition
-	// every other operation of the suite is given (see limitOperationsToCurrentEvent()): the operations are then
-	// performed for every event of the window the closed event belongs to rather than for the closed event alone.
+	// The same event closed flavours with their event closed operations given the "All events" scope instead of the
+	// "Current event" one an operation has by default: the operations are then performed for every event of the
+	// window the closed event belongs to rather than for the closed event alone.
 	// Closing a window is the same whichever of its events asks for it, so the problems they close are the ones the
 	// flavours above close - what these add is the tag operation beside it, which tags the problems of the other
 	// trigger the window holds as well, see prepareDataCepWindowCloseWindowOperations() with $any_event.
@@ -3473,7 +3473,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The pattern match flavour above without the "Current event" condition on its event closed operations, see
+	 * The pattern match flavour above with the "All events" scope on its event closed operations, see
 	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
 	 */
 	public function prepareDataCepWindowPatternCloseWindowOnClosedAnyEvent() {
@@ -3519,7 +3519,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The simple window flavour above without the "Current event" condition on its event closed operations, see
+	 * The simple window flavour above with the "All events" scope on its event closed operations, see
 	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowOnClosedAnyEvent() {
@@ -3575,7 +3575,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The tag correlation flavour above without the "Current event" condition on its event closed operations, see
+	 * The tag correlation flavour above with the "All events" scope on its event closed operations, see
 	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
 	 */
 	public function prepareDataCepWindowTagCloseWindowOnClosedAnyEvent() {
@@ -3623,7 +3623,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The cause and symptom flavour above without the "Current event" condition on its event closed operations, see
+	 * The cause and symptom flavour above with the "All events" scope on its event closed operations, see
 	 * prepareDataCepWindowCloseWindowOperations() with $any_event.
 	 */
 	public function prepareDataCepWindowCauseSymptomCloseWindowOnClosedAnyEvent() {
@@ -4204,13 +4204,13 @@ HEREDOC;
 	 * that was closed before its window ended - which is what the flavour that recovers the trigger first is about,
 	 * see runEventAssessmentTestCepWindowCloseWindow() with $recover_first.
 	 *
-	 * $any_event leaves the operations of the rule without the "Current event" condition upsertCepRule() otherwise
-	 * gives them (see limitOperationsToCurrentEvent()). Only the event closed flavours may ask for it, and there it
-	 * changes the operations of the event closed point alone - the window closed point takes no such condition: they
-	 * are then performed for every event of the window the closed event belongs to instead of for that event alone.
-	 * The close window operation is unconditional there anyway and the window is ended by whichever of its events
-	 * performs it first, so the problems closed are the ones the flavour with the condition closes. The tag
-	 * operation beside it is what differs: it tags the events of the other trigger the window holds as well - see
+	 * $any_event gives the operations of the event closed point the "All events" scope instead of the "Current event"
+	 * one an operation has by default. Only the event closed flavours may ask for it - the window closed point is
+	 * always performed for every event of the window: the operations are then performed for every event of the
+	 * window the closed event belongs to instead of for that event alone. The close window operation is
+	 * unconditional there anyway and the window is ended by whichever of its events performs it first, so the
+	 * problems closed are the ones the flavour limited to the current event closes. The tag operation beside it is
+	 * what differs: it tags the events of the other trigger the window holds as well - see
 	 * runEventAssessmentTestCepWindowCloseWindow().
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
@@ -4218,7 +4218,7 @@ HEREDOC;
 			bool $discard_by_tag_value = false, bool $aged = false, bool $suppress_points = false,
 			bool $unsuppress_on_close = false, bool $tag_on_close = false, bool $any_event = false) {
 		$this->assertFalse($any_event && $execute_when != CCepRuleHelper::WHEN_EVENT_CLOSED,
-			'Only an event closed flavour may leave "'.$name.'" without the "Current event" condition.'
+			'Only an event closed flavour may give "'.$name.'" the "All events" scope.'
 		);
 
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
@@ -4340,11 +4340,14 @@ HEREDOC;
 			] + $up_condition;
 		}
 
+		// The scope of the event closed operations, see $any_event.
+		$event_closed_scope = $any_event ? ['scope' => CCepRuleHelper::SCOPE_ALL_EVENTS] : [];
+
 		$close_window = [
 			'sortorder' => 1,
 			'execute_when' => $execute_when,
 			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
-		];
+		] + $event_closed_scope;
 
 		// The pattern match execution point is reached only once the script has found the "up" event, an aged
 		// flavour is reached by whichever event of the window is oldest and the event closed one by whichever event of
@@ -4368,7 +4371,7 @@ HEREDOC;
 				'type' => CCepRuleHelper::OP_ADD_TAG,
 				'tag' => self::CEP_TAG_EVENT_CLOSED,
 				'tag_value' => self::CEP_TAG_EVENT_CLOSED_VALUE
-			];
+			] + $event_closed_scope;
 		}
 
 		// The event closed flavours leave the problems a closing window held to the recovery values of their triggers
@@ -4552,7 +4555,7 @@ HEREDOC;
 
 		$cep_ruleid = $this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
-		), !$any_event);
+		));
 
 		// The limits must have been stored as the macros themselves: were they resolved before reaching the
 		// database, the scenario would be running on plain values again and would say nothing about macros at all.
@@ -4577,7 +4580,7 @@ HEREDOC;
 			$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
 				self::buildSecondRuleName($name), [], $second_operations, CONDITION_EVAL_TYPE_AND, '', $window_type,
 				$window
-			), !$any_event);
+			));
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -5659,17 +5662,10 @@ HEREDOC;
 	 *
 	 * The operations of every rule are then renumbered so their execution points come in the order the server
 	 * reaches them, which is the order the API insists on, see groupOperationsByExecuteWhen().
-	 *
-	 * Every operation that may be limited to the current event is limited to it, see
-	 * limitOperationsToCurrentEvent(), unless $current_event leaves the rule without that condition.
 	 */
-	private function upsertCepRule(array $rule_params, bool $current_event = true): string {
+	private function upsertCepRule(array $rule_params): string {
 		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
 		$rule_params = self::groupOperationsByExecuteWhen($rule_params);
-
-		if ($current_event) {
-			$rule_params = self::limitOperationsToCurrentEvent($rule_params);
-		}
 
 		// The rules of the scenario that ran before go here: they match the very same events and would keep
 		// closing the problems of this one. Everything this scenario has asked for since beginCepScenario()
@@ -5725,88 +5721,6 @@ HEREDOC;
 
 		foreach ($params['operations'] as $sortorder => &$operation) {
 			$operation['sortorder'] = $sortorder;
-		}
-		unset($operation);
-
-		return $params;
-	}
-
-	/**
-	 * The rule parameters $params with a "Current event" Yes condition AND-ed to the filter of every operation
-	 * whose execution point accepts one (event added, evicted and closed).
-	 *
-	 * At those points an operation is by default performed for every event of the window, not only for the event
-	 * that reached the point. The suite is written around the operation acting on that one event alone, which is
-	 * what the condition restores. An operation that already has a "Current event" condition of its own is left
-	 * as it is - it asks for a scope of its own and the API takes only one such condition per operation.
-	 *
-	 * The condition is AND-ed whatever the evaltype: under AND and AND/OR it is merely appended (it is of a type no
-	 * other condition shares, so AND/OR puts it in a group of its own), an OR filter becomes the custom expression
-	 * "(A or B or ...) and X" and a custom expression is wrapped as "(<formula>) and X".
-	 */
-	private static function limitOperationsToCurrentEvent(array $params): array {
-		$current_event = [
-			'type' => ZBX_CONDITION_TYPE_EVENT_CURRENT,
-			'operator' => CONDITION_OPERATOR_YES
-		];
-
-		foreach ($params['operations'] as &$operation) {
-			if (!in_array(ZBX_CONDITION_TYPE_EVENT_CURRENT,
-					CCepRuleHelper::OPERATION_CONDITION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']])) {
-				continue;
-			}
-
-			if (!array_key_exists('filter', $operation) || !$operation['filter']['conditions']) {
-				$operation['filter'] = [
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'conditions' => [$current_event]
-				];
-
-				continue;
-			}
-
-			$filter = $operation['filter'];
-
-			if (in_array(ZBX_CONDITION_TYPE_EVENT_CURRENT, array_column($filter['conditions'], 'type'))) {
-				continue;
-			}
-
-			switch ($filter['evaltype']) {
-				case CONDITION_EVAL_TYPE_AND_OR:
-				case CONDITION_EVAL_TYPE_AND:
-					$filter['conditions'][] = $current_event;
-					break;
-
-				case CONDITION_EVAL_TYPE_OR:
-					$formulaids = [];
-
-					foreach ($filter['conditions'] as $i => &$condition) {
-						$condition['formulaid'] = chr(ord('A') + $i);
-						$formulaids[] = $condition['formulaid'];
-					}
-					unset($condition);
-
-					$formulaid = chr(ord('A') + count($filter['conditions']));
-					$filter = [
-						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-						'formula' => '('.implode(' or ', $formulaids).') and '.$formulaid,
-						'conditions' => array_merge($filter['conditions'],
-							[['formulaid' => $formulaid] + $current_event]
-						)
-					];
-					break;
-
-				case CONDITION_EVAL_TYPE_EXPRESSION:
-					$used = array_column($filter['conditions'], 'formulaid');
-
-					for ($formulaid = 'A'; in_array($formulaid, $used); $formulaid++);
-
-					$filter['formula'] = '('.$filter['formula'].') and '.$formulaid;
-					$filter['conditions'][] = ['formulaid' => $formulaid] + $current_event;
-					break;
-			}
-
-			$operation['filter'] = $filter;
 		}
 		unset($operation);
 
@@ -12306,7 +12220,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The same event closed scenario with the same pattern match window, without the "Current event" condition on
+	 * The same event closed scenario with the same pattern match window, with the "All events" scope on
 	 * its event closed operations: that point is then performed for every event of the window rather than for
 	 * the closed event alone, which ends the window all the same but also tags the problems of the other
 	 * trigger it held - see prepareDataCepWindowCloseWindowOperations() and
@@ -12516,7 +12430,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The same event closed scenario with the same simple window, without the "Current event" condition on
+	 * The same event closed scenario with the same simple window, with the "All events" scope on
 	 * its event closed operations: that point is then performed for every event of the window rather than for
 	 * the closed event alone, which ends the window all the same but also tags the problems of the other
 	 * trigger it held - see prepareDataCepWindowCloseWindowOperations() and
@@ -12698,7 +12612,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The same event closed scenario with the same tag correlation window, without the "Current event" condition on
+	 * The same event closed scenario with the same tag correlation window, with the "All events" scope on
 	 * its event closed operations: that point is then performed for every event of the window rather than for
 	 * the closed event alone, which ends the window all the same but also tags the problems of the other
 	 * trigger it held - see prepareDataCepWindowCloseWindowOperations() and
@@ -12808,7 +12722,7 @@ HEREDOC;
 	}
 
 	/**
-	 * The same event closed scenario with the same cause and symptom window, without the "Current event" condition on
+	 * The same event closed scenario with the same cause and symptom window, with the "All events" scope on
 	 * its event closed operations: that point is then performed for every event of the window rather than for
 	 * the closed event alone, which ends the window all the same but also tags the problems of the other
 	 * trigger it held - see prepareDataCepWindowCloseWindowOperations() and
@@ -15478,18 +15392,18 @@ return;
 
 	/**
 	 * Whether the "add tag" operation the $name rule performs at the event closed point is limited to the current
-	 * event - true when it carries a "Current event" Yes condition, false when it does not - or null when the rule has
-	 * no such operation.
+	 * event - true when it has the "Current event" scope, false when it has another - or null when the rule has no such
+	 * operation.
 	 *
 	 * The rule is asked rather than the caller told, as it is asked where it closes its window
-	 * (getCepRuleCloseWindowExecuteWhen()): the event closed flavours with the condition and without it are driven by
-	 * the same assessment, so which of them it was given is read from the rule.
+	 * (getCepRuleCloseWindowExecuteWhen()): the event closed flavours of either scope are driven by the same
+	 * assessment, so which of them it was given is read from the rule.
 	 */
 	private function getCepRuleEventClosedTagCurrent(string $name): ?bool {
 		$response = $this->call('ceprule.get', [
 			'filter' => ['name' => $name],
 			'output' => ['cep_ruleid'],
-			'selectOperations' => ['type', 'execute_when', 'filter']
+			'selectOperations' => ['type', 'execute_when', 'scope']
 		]);
 
 		$this->assertNotEmpty($response['result'], 'There is no CEP rule named "'.$name.'".');
@@ -15500,16 +15414,7 @@ return;
 				continue;
 			}
 
-			$conditions = isset($operation['filter']['conditions']) ? $operation['filter']['conditions'] : [];
-
-			foreach ($conditions as $condition) {
-				if ($condition['type'] == ZBX_CONDITION_TYPE_EVENT_CURRENT
-						&& $condition['operator'] == CONDITION_OPERATOR_YES) {
-					return true;
-				}
-			}
-
-			return false;
+			return $operation['scope'] == CCepRuleHelper::SCOPE_CURRENT_EVENT;
 		}
 
 		return null;
@@ -16706,7 +16611,7 @@ return;
 					);
 				}
 				else {
-					// Without that condition every event of the window: every problem of the run is tagged, those
+					// With the "All events" scope every event of the window: every problem of the run is tagged, those
 					// of the second trigger the window was still holding open and those of the first one alike.
 					$this->waitForProblemEventCountByTag([$triggerids[$keys[1]]], self::CEP_TAG_EVENT_CLOSED,
 						self::CEP_TAG_EVENT_CLOSED_VALUE, $held_open
