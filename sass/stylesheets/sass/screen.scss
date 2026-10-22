@@ -2076,6 +2076,7 @@ select {
 		padding: 0 5px;
 		line-height: 22px;
 		cursor: pointer;
+		background-color: $form-bg-color;
 		border: 1px solid $form-border-color;
 		border-right-width: 0;
 		@extend %overflow-ellipsis;
@@ -2084,13 +2085,9 @@ select {
 			padding-top: 1px;
 		}
 
-		&.multilineinput-preview-placeholder {
-			background-color: $form-bg-color;
-
-			&::before {
-				content: attr(data-placeholder);
-				color: $input-placeholder-color !important;
-			}
+		&.multilineinput-preview-placeholder::before {
+			content: attr(data-placeholder);
+			color: $input-placeholder-color !important;
 		}
 	}
 
