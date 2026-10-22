@@ -2183,6 +2183,24 @@ static int	DBpatch_7050195(void)
 
 static int	DBpatch_7050196(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'hostinterface.create',"
+					"'hostinterface.update',"
+					"'hostinterface.delete',"
+					"'hostinterface.massadd',"
+					"'hostinterface.massremove'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050197(void)
+{
 	const zbx_db_table_t	table =
 			{"usrgrp_apm_filter", "usrgrp_apm_filterid", 0,
 				{
@@ -2199,12 +2217,12 @@ static int	DBpatch_7050196(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050197(void)
+static int	DBpatch_7050198(void)
 {
 	return DBcreate_index("usrgrp_apm_filter", "usrgrp_apm_filter_1", "usrgrpid", 0);
 }
 
-static int	DBpatch_7050198(void)
+static int	DBpatch_7050199(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -2416,5 +2434,6 @@ DBPATCH_ADD(7050195, 0, 1)
 DBPATCH_ADD(7050196, 0, 1)
 DBPATCH_ADD(7050197, 0, 1)
 DBPATCH_ADD(7050198, 0, 1)
+DBPATCH_ADD(7050199, 0, 1)
 
 DBPATCH_END()
