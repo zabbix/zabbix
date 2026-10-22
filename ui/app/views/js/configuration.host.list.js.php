@@ -450,7 +450,11 @@
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const flex_item = document.createElement('div');
+					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+					flex_item.appendChild(item_link);
+
+					flex_wrapper.appendChild(flex_item);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -479,7 +483,11 @@
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const flex_item = document.createElement('div');
+					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+					flex_item.appendChild(item_link);
+
+					flex_wrapper.appendChild(flex_item);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -508,7 +516,11 @@
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const flex_item = document.createElement('div');
+					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+					flex_item.appendChild(item_link);
+
+					flex_wrapper.appendChild(flex_item);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -537,7 +549,11 @@
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const flex_item = document.createElement('div');
+					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+					flex_item.appendChild(item_link);
+
+					flex_wrapper.appendChild(flex_item);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
@@ -565,7 +581,11 @@
 					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					flex_wrapper.appendChild(item_link);
+					const flex_item = document.createElement('div');
+					flex_item.classList.add(ZBX_STYLE_FLEX_ITEM);
+					flex_item.appendChild(item_link);
+
+					flex_wrapper.appendChild(flex_item);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
