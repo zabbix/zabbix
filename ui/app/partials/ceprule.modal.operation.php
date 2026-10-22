@@ -353,7 +353,9 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 							CONDITION_EVAL_TYPE_OR => _('Or'),
 							CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 						]))
-				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				]))
+					->setId('ceprule-operation-scope-filter-evaltype-li')
+					->addClass(ZBX_STYLE_ALIGN_TOP),
 				(new CListItem([
 					(new CDiv([
 						(new CSpan())->setId('ceprule-operation-scope-filter-expression-preview'),
@@ -365,7 +367,9 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 					]))
 						->addClass(ZBX_STYLE_CELL)
 						->addClass(ZBX_STYLE_CELL_EXPRESSION)
-				]))->addClass(ZBX_STYLE_ALIGN_TOP)
+				]))
+					->setId('ceprule-operation-scope-filter-expression-li')
+					->addClass(ZBX_STYLE_ALIGN_TOP)
 			])
 		]))
 		->addItem((new CFormField(

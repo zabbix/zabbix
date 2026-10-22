@@ -508,21 +508,12 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#setScopeState() {
-		let set_visible;
 		let set_readonly;
 		let set_value = null;
 
-		const window_type = Number(this.form.findFieldByName('window_type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
 
-		if (window_type == <?= CCepRuleHelper::WINDOW_NONE ?>
-				&& execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
-			set_visible = false;
-			set_readonly = true;
-			set_value = <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>;
-		}
-		else if (execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
-			set_visible = true;
+		if (execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
 			set_readonly = true;
 			set_value = <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>;
 		}
@@ -530,20 +521,14 @@ window.ceprule_operation_edit_popup = new class {
 			<?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>,
 			<?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>
 		].includes(execute_when)) {
-			set_visible = true;
 			set_readonly = true;
 			set_value = <?= CCepRuleHelper::SCOPE_ALL_EVENTS ?>;
 		}
 		else {
-			set_visible = true;
 			set_readonly = false;
 		}
 
 		const scope_field = document.getElementById('ceprule-operation-scope');
-
-		this.form_element.querySelector('label[for="ceprule-operation-scope"]').style.display = set_visible
-			? '' : 'none';
-		scope_field.closest('.form-field').style.display = set_visible ? '' : 'none';
 
 		scope_field.querySelectorAll('input').forEach(node => {
 			if (set_value !== null) {
@@ -582,21 +567,9 @@ window.ceprule_operation_edit_popup = new class {
 		const table_node = document.getElementById('ceprule-operation-scope-filter-conditions');
 
 		table_node.closest('.form-field').style.display = show_filter ? '' : 'none';
-		table_node.querySelectorAll('input').forEach(input => {
-			input.disabled = !show_filter;
-		});
-
-		document.getElementById('ceprule-operation-scope-filter-evaltype').disabled = !show_filter;
-		document.getElementById('ceprule-operation-scope-filter-expression').disabled = !show_filter;
-
-		if (show_filter) {
-			this.#refreshScopeExpressionPreview();
-		}
-		else {
-			document.getElementById('ceprule-operation-scope-filter-evaltype').style.display = 'none';
-			document.getElementById('ceprule-operation-scope-filter-expression').style.display = 'none';
-			document.getElementById('ceprule-operation-scope-filter-expression-preview').style.display = 'none';
-		}
+		document.getElementById('ceprule-operation-scope-filter-evaltype-li').style.display = show_filter ? '' : 'none';
+		document.getElementById('ceprule-operation-scope-filter-expression-li').style.display = show_filter
+			? '' : 'none';
 	}
 
 	#openConditionPopup(condition_context, index, trigger_element) {

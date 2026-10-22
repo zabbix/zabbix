@@ -613,6 +613,15 @@ window.ceprule_edit_popup = new class {
 
 								overlayDialogueDestroy(overlay.dialogueid);
 
+								if (fields.scope == <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>
+										|| fields.use_scope_filter == <?= CCepRuleHelper::SCOPE_FILTER_NO ?>) {
+									fields.scope_filter = {
+										evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+										formula: '',
+										conditions: []
+									};
+								}
+
 								if (is_new) {
 									this.#addOperationRow(fields);
 								}
@@ -870,14 +879,11 @@ window.ceprule_edit_popup = new class {
 			condition_description_html, scope_str, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 
-		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;
 		const rows = new DocumentFragment();
-
-		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
 		rows.append(row);
 		rows.append((new Template(`
-			<tr class="error-container-row"><td colspan="5" id="${error_container_id}"></td></tr>
-		`)).evaluateToElement());
+			<tr class="error-container-row"><td colspan="5" id="ceprule-operations-#{row_index}-error-container"></td></tr>
+		`)).evaluateToElement({row_index: operation.row_index}));
 
 		return rows;
 	}

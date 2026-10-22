@@ -134,6 +134,7 @@ $form = (new CForm())
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][execute_when]', '#{execute_when}'))
+						->setAttribute('data-error-container', 'ceprule-operations-#{row_index}-error-container')
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][type]', '#{type}'))

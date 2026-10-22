@@ -177,30 +177,20 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'scope' => [
 				['db cep_operation.scope', 'required',
 					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT, CCepRuleHelper::SCOPE_OTHER_EVENTS,
-						CCepRuleHelper::SCOPE_ALL_EVENTS],
-					'when' => ['../window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]
+						CCepRuleHelper::SCOPE_ALL_EVENTS]
 				],
-				['db cep_operation.scope', 'required',
+				['db cep_operation.scope',
 					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT],
-					'when' => [
-						['../window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
-						['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]]
-					]
+					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]]
 				],
-				['db cep_operation.scope', 'required',
+				['db cep_operation.scope',
 					'in' => [CCepRuleHelper::SCOPE_ALL_EVENTS],
-					'when' => [
-						['../window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
-						['execute_when', 'in' => [CCepRuleHelper::WHEN_WINDOW_CLOSED,
-							CCepRuleHelper::WHEN_PATTERN_MATCHED]]
-					]
+					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_WINDOW_CLOSED,
+						CCepRuleHelper::WHEN_PATTERN_MATCHED]]
 				]
 			],
 			'scope_filter' => ['object', 'fields' => self::getOperationFilterValidationFields(),
-				'when' => [
-					['../window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]],
-					['scope', 'not_in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT]]
-				]
+				'when' => ['scope', 'not_in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
 		];
