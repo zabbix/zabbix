@@ -239,6 +239,16 @@ class testDiscoveryRulePrototype extends CAPITest {
 			'Invalid parameter "/1/query/aggregated_columns": cannot be empty.'
 		];
 
+		yield 'Telemetry query "query.aggregated_columns[].alias" cannot be "clock"' => [
+			[
+				'key_' => 'telemetry_query_create_invalid_24[{#M}]',
+				'query' => [
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'clock']]
+				] + $query
+			] + $discoveryrule,
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+		];
+
 		yield 'Telemetry query "query.columns" column' => [
 			[
 				'key_' => 'telemetry_query_create_invalid_18[{#M}]',
@@ -573,6 +583,16 @@ class testDiscoveryRulePrototype extends CAPITest {
 			['query' => ['aggregated_columns' => []] + $query] + $discoveryrule,
 			[],
 			'Invalid parameter "/1/query/aggregated_columns": cannot be empty.'
+		];
+
+		yield 'Telemetry query "query.aggregated_columns[].alias" cannot be "clock"' => [
+			[
+				'query' => [
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'clock']]
+				] + $query
+			] + $discoveryrule,
+			[],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
 		];
 
 		yield 'Telemetry query "query.filter.conditions[].formulaid" is not used in "query.filter.formula"' => [

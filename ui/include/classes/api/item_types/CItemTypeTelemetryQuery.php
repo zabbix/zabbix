@@ -273,6 +273,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 	/**
 	 * Validate "query.aggregated_columns":
+	 * - "alias" value cannot be equal "clock"
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
 	 * - "column" contains value allowed by "query.signal_type", "query.metric_point_type"
@@ -305,6 +306,14 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 					return false;
 				}
+			}
+
+			if ($column['alias'] === 'clock') {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
+					_s('value must be not %1$s', '"clock"')
+				);
+
+				return false;
 			}
 		}
 

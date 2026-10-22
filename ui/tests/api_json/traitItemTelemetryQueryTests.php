@@ -936,6 +936,18 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query/aggregated_columns/1/alias": value is too long.'
 		];
 
+		yield '"query.aggregated_columns[].alias" set to "clock" fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'clock']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+		];
+
 		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
 			[
 				'query' => [
@@ -1175,6 +1187,18 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/column": value must be one of "ScopeDroppedAttrCount", "StartTimeUnix", "TimeUnix", "Value".'
+		];
+
+		yield '"query.aggregated_columns[].alias" set to "clock" fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'clock']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
 		];
 	}
 
