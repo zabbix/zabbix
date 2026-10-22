@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
 echo "DROP TABLE IF EXISTS $CH_DB.history_str SYNC" | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-

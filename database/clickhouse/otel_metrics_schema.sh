@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
 # columns and indexes shared by all metric tables

@@ -1,3 +1,5 @@
+# CH_SCRIPT must be set by the sourcing script to the supported option set: schema or import
+
 display_help()
 {
 	echo "Arguments:"
@@ -5,10 +7,14 @@ display_help()
 	printf "  %-16s %s\n" "-d|--db" "Database name ($CH_DB)"
 	printf "  %-16s %s\n" "-u|--user" "ClickHouse username"
 	printf "  %-16s %s\n" "-p|--password" "ClickHouse password"
-	printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
-	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
-	printf "  %-16s %s\n" "-e|--engine" "Table engine ($CH_ENGINE)"
-	printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
+	if [ "$CH_SCRIPT" = "schema" ]; then
+		printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
+		printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
+		printf "  %-16s %s\n" "-e|--engine" "Table engine ($CH_ENGINE)"
+	fi
+	if [ "$CH_SCRIPT" = "import" ]; then
+		printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
+	fi
 	printf "  %-16s %s\n" "--ca" "CA certificate file to verify the server certificate"
 	printf "  %-16s %s\n" "--cert" "Client certificate file"
 	printf "  %-16s %s\n" "--key" "Client private key file"
@@ -66,18 +72,22 @@ while [ $# -gt 0 ]; do
 		CH_PASSWORD=$1
 		;;
 	-t|--ttl)
+		[ "$CH_SCRIPT" = "schema" ] || display_help
 		shift
 		CH_TTL=$1
 		;;
 	-P|--partition)
+		[ "$CH_SCRIPT" = "schema" ] || display_help
 		shift
 		CH_PARTITION=$1
 		;;
 	-e|--engine)
+		[ "$CH_SCRIPT" = "schema" ] || display_help
 		shift
 		CH_ENGINE=$1
 		;;
 	-i|--import-dir)
+		[ "$CH_SCRIPT" = "import" ] || display_help
 		shift
 		CH_IMPORT_DIR=$1
 		;;
