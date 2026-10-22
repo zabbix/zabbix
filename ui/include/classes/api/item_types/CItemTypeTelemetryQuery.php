@@ -310,7 +310,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 			if ($column['alias'] === 'clock') {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
-					_s('value must be not %1$s', '"clock"')
+					_s('value must not be %1$s', '"clock"')
 				);
 
 				return false;

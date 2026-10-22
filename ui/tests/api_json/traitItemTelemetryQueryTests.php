@@ -945,7 +945,7 @@ trait traitItemTelemetryQueryTests {
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
-			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must not be "clock".'
 		];
 
 		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
@@ -1198,7 +1198,7 @@ trait traitItemTelemetryQueryTests {
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
-			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must not be "clock".'
 		];
 	}
 

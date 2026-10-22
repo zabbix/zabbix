@@ -246,7 +246,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'clock']]
 				] + $query
 			] + $discoveryrule,
-			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must not be "clock".'
 		];
 
 		yield 'Telemetry query "query.columns" column' => [
@@ -592,7 +592,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 				] + $query
 			] + $discoveryrule,
 			[],
-			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must be not "clock".'
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value must not be "clock".'
 		];
 
 		yield 'Telemetry query "query.filter.conditions[].formulaid" is not used in "query.filter.formula"' => [
