@@ -31,10 +31,18 @@ Parameters:
 -P|--partition: Partitioning schema (default: toDate (by days))
 -e|--engine: Table engine (default: MergeTree())
 -i|--import-dir: Directory with the exported CSV files (default: /tmp)
+--ca: CA certificate file to verify the server certificate (default: system
+      CA store)
+--cert: Client certificate file
+--key: Client private key file
+--insecure: Skip server certificate and host name verification
 -h|--help: Display help message
 
 Example:
 ./history_schema.sh -s http://localhost:8123 -d zabbix -u user -p password
+
+HTTPS example with a client certificate:
+./history_schema.sh -s https://clickhouse.example.com -d zabbix --ca ca.crt --cert client.crt --key client.key
 
 The housekeeping interval (TTL) and partition schema are loosely linked.
 When increasing housekeeping interval, it might be worth increasing also
@@ -57,8 +65,7 @@ OpenTelemetry Schema Creation Scripts:
 - otel_all.sh - invokes all OpenTelemetry schema creation scripts
 
 - otel_logs_schema.sh - otel_logs table
-- otel_traces_schema.sh - otel_traces table, otel_traces_trace_id_ts trace
-  lookup table and otel_traces_trace_id_ts_mv materialized view filling it
+- otel_traces_schema.sh - otel_traces table
 - otel_metrics_schema.sh - otel_metrics_gauge, otel_metrics_sum,
   otel_metrics_histogram and otel_metrics_exponential_histogram tables
 
