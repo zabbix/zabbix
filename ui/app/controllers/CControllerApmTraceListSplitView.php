@@ -56,6 +56,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 		try {
 			$traces = API::ApmTrace()->get([
+				'output' => ['traceid', 'error_count'],
 				'time_from' => $time_from,
 				'time_till' => $time_to,
 				'traceids' => [$traceid]

@@ -1643,7 +1643,7 @@ button {
 .zi-chevron-left::before,
 .zi-chevron-right::before,
 .zi-chevron-up::before,
-.zi-chevron-up-small::before, .zi-users-filled-small::before {
+.zi-chevron-up-small::before, .zi-users-filled-small::before, .trace-view .trace-view-header .trace-view-header-error .icon::before, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .icon::before {
   font-size: 16px; }
 
 .zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-chevron-up-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before {
@@ -5912,6 +5912,15 @@ section {
       .trace-view .trace-view-header .trace-view-header-info .btn-icon {
         margin-inline-start: 5px;
         margin-inline-end: 2px; }
+    .trace-view .trace-view-header .trace-view-header-error {
+      display: inline-flex;
+      align-items: center;
+      line-height: 18px;
+      gap: 5px;
+      margin-right: 10px;
+      color: #e33734; }
+      .trace-view .trace-view-header .trace-view-header-error .icon {
+        color: #e33734; }
     .trace-view .trace-view-header .trace-view-close-button {
       flex: 0 0;
       margin-inline-end: -8px; }
@@ -6003,17 +6012,9 @@ section {
             display: inline-flex;
             gap: 5px;
             width: 100%; }
-            .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .error-count {
-              display: flex;
-              justify-content: center;
-              width: fit-content;
-              height: 16px;
-              padding: 0 4px;
-              border-radius: 2px;
-              background-color: #e33734;
-              color: #ffffff;
-              font-size: 12px;
-              font-weight: 700; }
+            .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .icon {
+              color: #e33734;
+              font-weight: normal; }
       .trace-view .trace-view-container .trace-scroll .trace-time {
         display: grid;
         overflow-x: hidden;

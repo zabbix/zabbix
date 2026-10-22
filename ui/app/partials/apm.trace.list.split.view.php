@@ -40,6 +40,16 @@ $trace_view = (new CDiv())
 							->addClass('btn-small')
 							->addClass('js-copy-button')
 					]),
+				$data['trace']['error_count'] > 0
+					? (new CDiv())
+						->addClass('trace-view-header-error')
+						->addItem((new CIcon(ZBX_ICON_CIRCLE_WARNING)))
+						->addItem(
+							(new CSpan(_s('Errors: %1s', $data['trace']['error_count'])))
+								->addClass('error-count')
+								->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						)
+					: null,
 				(new CButtonIcon(ZBX_ICON_CLOSE))
 					->addClass('trace-view-close-button')
 					->addClass('js-close-button')

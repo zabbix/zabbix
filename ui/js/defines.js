@@ -171,6 +171,8 @@ const ZBX_STYLE_DURATION_TIME_UNITS = 'duration-time-units';
 const ZBX_STYLE_DEBUG_OUTPUT = 'debug-output';
 const ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH = 'debug-output-table-refresh';
 
+const ZBX_STYLE_ICON = 'icon';
+
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
@@ -181,6 +183,7 @@ const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
 const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_CHEVRON_UP_SMALL = 'zi-chevron-up-small';
+const ZBX_ICON_CIRCLE_WARNING = 'zi-circle-warning';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_CONTEXT = 'zi-context';
 const ZBX_ICON_CLOSE = 'zi-close';

@@ -248,8 +248,8 @@ class TraceViewPage {
 					label.appendChild(title_element);
 
 					const error_element = document.createElement('div');
-					error_element.classList.add(ZBX_STYLE_ERROR_COUNT);
-					error_element.textContent = '1';
+					error_element.classList.add(ZBX_STYLE_ICON);
+					error_element.classList.add(ZBX_ICON_CIRCLE_WARNING);
 					label.append(error_element);
 				}
 
