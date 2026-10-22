@@ -3307,7 +3307,7 @@ textarea.has-error {
 .multiselect-control.has-error:focus-within .multiselect {
   border-color: #ad1f1f; }
 
-.multilineinput-control.has-error > input[readonly][type="text"] {
+.multilineinput-control.has-error > .multilineinput-preview {
   border: 1px solid #ad1f1f; }
 
 div[data-field-type="set"].has-error {
@@ -9263,6 +9263,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     padding: 0 5px;
     line-height: 22px;
     cursor: pointer;
+    background-color: #ffffff;
     border: 1px solid #888888;
     border-right-width: 0;
     border-radius: var(--input-border-radius);
@@ -9270,11 +9271,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-bottom-right-radius: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
-      background-color: #ffffff; }
-      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-        content: attr(data-placeholder);
-        color: #777777 !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #777777; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #f0f0f0; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {
@@ -9282,6 +9281,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-color: #9f9f9f;
     color: #888888;
     cursor: default; }
+    .multilineinput-control.multilineinput-disabled .multilineinput-preview.multilineinput-preview-placeholder::before {
+      color: #c8c8c8; }
   .multilineinput-control.editable {
     background-color: #ffffff !important;
     border-color: #9f9f9f; }

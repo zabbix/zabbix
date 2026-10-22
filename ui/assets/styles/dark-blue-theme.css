@@ -3372,7 +3372,7 @@ textarea.has-error {
 .multiselect-control.has-error:focus-within .multiselect {
   border-color: #ff9b9b; }
 
-.multilineinput-control.has-error > input[readonly][type="text"] {
+.multilineinput-control.has-error > .multilineinput-preview {
   border: 1px solid #ff5555; }
 
 div[data-field-type="set"].has-error {
@@ -9326,6 +9326,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     padding: 0 5px;
     line-height: 22px;
     cursor: pointer;
+    background-color: #001f42;
     border: 1px solid #0066d9;
     border-right-width: 0;
     border-radius: var(--input-border-radius);
@@ -9333,11 +9334,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-bottom-right-radius: 0; }
     .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
-    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder {
-      background-color: #001f42; }
-      .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
-        content: attr(data-placeholder);
-        color: #939ca4 !important; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #939ca4; }
   .multilineinput-control.multilineinput-readonly .multilineinput-preview {
     background-color: #002956; }
   .multilineinput-control.multilineinput-disabled .multilineinput-preview {
@@ -9345,6 +9344,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-color: #003a7a;
     color: #0066d9;
     cursor: default; }
+    .multilineinput-control.multilineinput-disabled .multilineinput-preview.multilineinput-preview-placeholder::before {
+      color: #626c75; }
   .multilineinput-control.editable {
     background-color: #001f42 !important;
     border-color: #626c75; }
@@ -10728,6 +10729,10 @@ select[readonly] {
   select[readonly]::placeholder {
     color: #7a858f;
     -webkit-text-fill-color: #7a858f; }
+
+.multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+  color: #7a858f;
+  -webkit-text-fill-color: #7a858f; }
 
 select[readonly] {
   color: #e5f1ff;
