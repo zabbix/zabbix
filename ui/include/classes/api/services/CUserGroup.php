@@ -2044,7 +2044,7 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	protected static function addAffectedApmFilters(array $user_groups, array &$db_user_groups): void {
+	private static function addAffectedApmFilters(array $user_groups, array &$db_user_groups): void {
 		$usrgrpids = [];
 
 		foreach ($user_groups as $user_group) {
