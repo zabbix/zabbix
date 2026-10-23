@@ -1,0 +1,336 @@
+---
+test case: "asdf"
+in:
+  str: "asdf"
+
+out:
+  value: "asdf"
+
+---
+test case: "'; drop table otel_traces; --"
+in:
+  str: "'; drop table otel_traces; --"
+
+out:
+  value: "\\'; drop table otel_traces; --"
+
+---
+test case: "\"; drop table otel_traces; --"
+in:
+  str: "\"; drop table otel_traces; --"
+
+out:
+  value: "\\\"; drop table otel_traces; --"
+
+---
+test case: "`; drop table otel_traces; --"
+in:
+  str: "`; drop table otel_traces; --"
+
+out:
+  value: "\\`; drop table otel_traces; --"
+
+---
+test case: ""
+in:
+  str: ""
+
+out:
+  value: ""
+
+---
+test case: "'\"`\\"
+in:
+  str: "'\"`\\"
+
+out:
+  value: "\\'\\\"\\`\\\\"
+
+---
+test case: single quote
+in:
+  str: "'"
+out:
+  value: "\\'"
+
+---
+test case: backslash
+in:
+  str: "\\"
+out:
+  value: "\\\\"
+
+---
+test case: trailing backslash
+in:
+  str: "asdf\\"
+out:
+  value: "asdf\\\\"
+
+---
+test case: leading backslash
+in:
+  str: "\\asdf"
+out:
+  value: "\\\\asdf"
+
+---
+test case: two backslashes
+in:
+  str: "\\\\"
+out:
+  value: "\\\\\\\\"
+
+---
+test case: literal backslash n
+in:
+  str: "\\n"
+out:
+  value: "\\\\n"
+
+---
+test case: literal backslash t
+in:
+  str: "\\t"
+out:
+  value: "\\\\t"
+
+---
+test case: literal backslash r
+in:
+  str: "\\r"
+out:
+  value: "\\\\r"
+
+---
+test case: literal backslash zero
+in:
+  str: "\\0"
+out:
+  value: "\\\\0"
+
+---
+test case: literal hex escape text
+in:
+  str: "\\x41"
+out:
+  value: "\\\\x41"
+
+---
+test case: backslash then quote
+in:
+  str: "\\'"
+out:
+  value: "\\\\\\'"
+
+---
+test case: quote then backslash
+in:
+  str: "'\\"
+out:
+  value: "\\'\\\\"
+
+---
+test case: repeated quotes
+in:
+  str: "'''"
+out:
+  value: "\\'\\'\\'"
+
+---
+test case: alternating escapes
+in:
+  str: "\\'\\'\\"
+out:
+  value: "\\\\\\'\\\\\\'\\\\"
+
+---
+test case: injection with double-dash comment
+in:
+  str: "' OR 1 = 1 -- "
+out:
+  value: "\\' OR 1 = 1 -- "
+
+---
+test case: injection with hash comment
+in:
+  str: "' OR 1 = 1 #"
+out:
+  value: "\\' OR 1 = 1 #"
+
+---
+test case: injection with hash-bang comment
+in:
+  str: "' OR 1 = 1 #!"
+out:
+  value: "\\' OR 1 = 1 #!"
+
+---
+test case: injection with slash comment
+in:
+  str: "' OR 1 = 1 //"
+out:
+  value: "\\' OR 1 = 1 //"
+
+---
+test case: injection with block comment
+in:
+  str: "' OR 1 = 1 /*"
+out:
+  value: "\\' OR 1 = 1 /*"
+
+---
+test case: injection with semicolon
+in:
+  str: "'; SELECT sleep(10); --"
+out:
+  value: "\\'; SELECT sleep(10); --"
+
+---
+test case: injection with escaped quote
+in:
+  str: "\\'; DROP TABLE otel_traces; --"
+out:
+  value: "\\\\\\'; DROP TABLE otel_traces; --"
+
+---
+test case: injection containing newline
+in:
+  str: "'\nDROP TABLE otel_traces; --"
+out:
+  value: "\\'\nDROP TABLE otel_traces; --"
+
+---
+test case: union injection
+in:
+  str: "' UNION ALL SELECT version() --"
+out:
+  value: "\\' UNION ALL SELECT version() --"
+
+---
+test case: close parenthesis injection
+in:
+  str: "'); DROP TABLE otel_traces; --"
+out:
+  value: "\\'); DROP TABLE otel_traces; --"
+
+---
+test case: multiline block comment injection
+in:
+  str: "'; DROP TABLE otel_traces; /*\nignored\n*/"
+out:
+  value: "\\'; DROP TABLE otel_traces; /*\nignored\n*/"
+
+---
+test case: Russian Unicode
+in:
+  str: "Привет"
+out:
+  value: "Привет"
+
+---
+test case: Chinese Unicode
+in:
+  str: "你好"
+out:
+  value: "你好"
+
+---
+test case: emoji
+in:
+  str: "😀"
+out:
+  value: "😀"
+
+---
+test case: precomposed accented character
+in:
+  str: "é"
+out:
+  value: "é"
+
+---
+test case: decomposed accented character
+in:
+  str: "e\u0301"
+out:
+  value: "e\u0301"
+
+---
+test case: mixed Unicode
+in:
+  str: "Hello, Привет, 你好, 😀"
+out:
+  value: "Hello, Привет, 你好, 😀"
+
+---
+test case: Unicode containing single quote
+in:
+  str: "Привет 'мир'"
+out:
+  value: "Привет \\'мир\\'"
+
+---
+test case: Unicode containing backslash
+in:
+  str: "路径\\文件"
+out:
+  value: "路径\\\\文件"
+
+---
+test case: non-breaking space
+in:
+  str: "hello\u00a0world"
+out:
+  value: "hello\u00a0world"
+
+---
+test case: Unicode line separator
+in:
+  str: "hello\u2028world"
+out:
+  value: "hello\u2028world"
+
+---
+test case: Unicode paragraph separator
+in:
+  str: "hello\u2029world"
+out:
+  value: "hello\u2029world"
+
+---
+test case: actual tab
+in:
+  str: "hello\tworld"
+out:
+  value: "hello\tworld"
+
+---
+test case: actual newline
+in:
+  str: "hello\nworld"
+out:
+  value: "hello\nworld"
+
+---
+test case: actual carriage return
+in:
+  str: "hello\rworld"
+out:
+  value: "hello\rworld"
+
+---
+test case: actual backspace
+in:
+  str: "hello\bworld"
+out:
+  value: "hello\bworld"
+
+---
+test case: actual form feed
+in:
+  str: "hello\fworld"
+out:
+  value: "hello\fworld"
+
+...
