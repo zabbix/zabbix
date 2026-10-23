@@ -1307,8 +1307,6 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 
 	if (0 != (ret = ipmi_control_id_get_val(c->control_id, zbx_got_control_reading_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during      */
-		/* ipmi_control_id_get_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_id_get_val() returned error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
@@ -1354,8 +1352,6 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 	if (0 != (ret = ipmi_control_id_set_val(c->control_id, c->val, zbx_got_control_setting_cb,
 			ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during      */
-		/* ipmi_control_id_set_val(), as domain might be closed due to communication failure */
 		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_id_set_val() returned error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
