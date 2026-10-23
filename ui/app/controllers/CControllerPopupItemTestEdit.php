@@ -173,7 +173,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
 						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
 					],
-					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty', 'not_in' => ['clock']]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
