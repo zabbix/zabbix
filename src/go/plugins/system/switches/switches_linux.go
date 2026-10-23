@@ -52,12 +52,17 @@ func init() {
 
 // Export implements plugin.Exporter interface. Parameters are ignored, as in the C agent.
 func (*Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, error) {
-	content, err := procfs.ReadAll(procStatFilepath)
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
+		SetPattern(pattern).
+		SetMatchMode(procfs.ModePrefix)
+
+	lines, err := parser.Parse(procStatFilepath)
 	if err != nil {
-		return nil, errs.Wrapf(err, "failed to read %q", procStatFilepath)
+		return nil, errs.Wrapf(err, "failed to parse %q", procStatFilepath)
 	}
 
-	value, err := parseSwitches(content)
+	value, err := parseSwitches(lines)
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to get context switches from %q", procStatFilepath)
 	}
@@ -65,13 +70,9 @@ func (*Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, erro
 	return value, nil
 }
 
-// parseSwitches returns the value of the first parsable line starting with "ctxt" in /proc/stat content.
-func parseSwitches(content []byte) (uint64, error) {
-	for line := range strings.Lines(string(content)) {
-		if !strings.HasPrefix(line, pattern) {
-			continue
-		}
-
+// parseSwitches returns the value of the first parsable "ctxt" line.
+func parseSwitches(lines []string) (uint64, error) {
+	for _, line := range lines {
 		value, ok := parseValue(line)
 		if ok {
 			return value, nil
