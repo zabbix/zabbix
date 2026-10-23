@@ -3,6 +3,7 @@ Changes for 8.0.0rc3
 New features:
 
 Bug fixes:
+...G...... [ZBX-26650] fixed Zabbix agent 2 unix system run timeout (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0rc2
