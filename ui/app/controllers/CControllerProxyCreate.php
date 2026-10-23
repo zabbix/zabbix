@@ -119,7 +119,7 @@ class CControllerProxyCreate extends CController {
 			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
 				'when' => [['quota_mode', 'in' => [PROXY_APM_QUOTA_MODE_CUSTOM]]]
 			],
-			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
+			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'value', 'signal_type'],
 				'fields' => [
 					'key' => ['required', 'string', 'not_empty'],
 					'value' => ['required', 'string'],
@@ -128,7 +128,7 @@ class CControllerProxyCreate extends CController {
 					]
 				],
 				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
-				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
+				'messages' => ['uniq' => _('Attribute key, value and category are not unique.')]
 			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
