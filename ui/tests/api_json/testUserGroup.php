@@ -135,6 +135,26 @@ class testUserGroup extends CAPITest {
 				]
 			]
 		]);
+
+		// usergroup.get
+		CTestDataHelper::createObjects([
+			'user_groups' => [
+				[
+					'name' => 'user group selectApmFilters check',
+					'apm_filters' => [
+						[
+							'attribute_key' => 'attr_key2',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'attribute_key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				]
+			]
+		]);
 	}
 
 	public static function cleanTestData(): void {
@@ -224,6 +244,40 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'name' => 'Апи группа УТФ-8'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'User group with APM filter',
+						'apm_filters' => [
+							[
+								'attribute_key' => 'attr_key',
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_ALL
+							],
+							[
+								'attribute_key' => 'attr_key',
+								'value' => '',
+								'signal_type' => SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'User group with APM filter without value',
+						'apm_filters' => [
+							[
+								'attribute_key' => 'aatr_key',
+								'signal_type' => SIGNAL_TYPE_LOGS
+							]
+						]
 					]
 				],
 				'expected_error' => null
@@ -695,6 +749,58 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/templategroup_rights/1/permission": value must be one of 0, 2, 3.'
+			],
+			// Check user group APM filter.
+			[
+				'group' => [
+					'name' => 'Check APM filter, empty resource attribute key',
+					'apm_filters' => [
+							[
+								'attribute_key' => '',
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_ALL
+							]
+						]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/attribute_key": cannot be empty.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter, missing resource attribute key',
+					'apm_filters' => [
+							[
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_ALL
+							]
+						]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1": the parameter "attribute_key" is missing.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter signal type, not valid number',
+					'apm_filters' => [
+							[
+								'attribute_key' => 'attr_key',
+								'value' => 'attr_value',
+								'signal_type' => 'abc'
+							]
+						]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": an integer is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter, incorrect signal type value',
+					'apm_filters' => [
+							[
+								'attribute_key' => 'attr_key',
+								'value' => 'attr_value',
+								'signal_type' => 5
+							]
+						]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": value must be one of -1, 0, 1, 2.'
 			]
 		];
 	}
@@ -1168,5 +1274,48 @@ class testUserGroup extends CAPITest {
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	public static function getUserGroupApmFiltersGetData() {
+		return [
+			'usergroup.get with selectApmFilters' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters check',
+						'apm_filters' => [
+							[
+								'signal_type' => SIGNAL_TYPE_METRICS,
+								'attribute_key' => 'attr_key1',
+								'value' => ''
+							],
+							[
+								'signal_type' => SIGNAL_TYPE_METRICS,
+								'attribute_key' => 'attr_key2',
+								'value' => 'attr_value'
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters check'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserGroupApmFiltersGetData
+	 */
+	public function testDHostGetProxy_Permissions(array $expected_result, string $search): void {
+		$usrgrpid = ['usrgrpid' => $expected_result[0]['usrgrpid']];
+		CTestDataHelper::convertValueReferences($usrgrpid);
+
+		$expected_result[0]['usrgrpid'] = $usrgrpid['usrgrpid'];
+
+		$result = $this->call('usergroup.get', [
+			'output' => ['usrgrpid'],
+			'selectApmFilters' => "extend",
+			'search' => ['name' => $search]
+		]);
+
+		$this->assertEqualsCanonicalizing($expected_result, $result['result']);
 	}
 }
