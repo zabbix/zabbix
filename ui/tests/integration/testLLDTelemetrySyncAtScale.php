@@ -36,6 +36,8 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  *
  * Requires: proxy built with APM support, ClickHouse with otel_* tables, grpcurl in PATH.
  *
+ * For discovery, send and stored count only run as '/testLLDTelemetrySyncAtScale_(IngestPreflight|LLDDiscovery|StatusZeroSend|StatusZeroVpsWritten|StatusZeroVerify)$/'
+ *
  * @required-components server, proxy
  * @suite-components-reuse true
  * @configurationDataProvider configurationProvider
@@ -104,6 +106,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	/* LLD rules inherited by the hosts */
 	private static $lld_ruleids = [];
 	private static $proxyid;
+	/* hosts monitored before the test, disabled for its duration */
+	private static $disabled_hostids = [];
+	/* baselines taken before status=0 of all devices is sent */
+	private static $vps_last;
+	private static $stored_zero_last;
 
 	/**
 	 * Component configuration provider.
@@ -116,7 +123,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 8,
 				'DebugLevel' => 3,
-				'CacheSize' => '128M',
+				'CacheSize' => '512M',
 				'TrendCacheSize' => '128M',
 				'HistoryCacheSize' => '128M',
 				'HistoryIndexCacheSize' => '128M',
@@ -124,7 +131,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'LogSlowQueries' => '60000',
 				'StartDBSyncers' => '4',
 				'StartLLDProcessors' => self::HOST_COUNT,
-				'StartTelemetryQueryPollers' => '1'
+				'StartTelemetryQueryPollers' => '1',
+				'CacheUpdateFrequency' => '3600'
 			],
 			self::COMPONENT_PROXY => [
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
@@ -155,9 +163,29 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
+		$this->disablePreviousHosts();
 		$this->createCollector();
 
 		return true;
+	}
+
+	/**
+	 * Disable hosts left monitored by previous tests, so only the hosts of this test load the server.
+	 */
+	private function disablePreviousHosts(): void {
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid']
+		]);
+		self::$disabled_hostids = array_column($response['result'], 'hostid');
+
+		if (self::$disabled_hostids) {
+			$response = $this->call('host.update', array_map(
+				static fn($hostid) => ['hostid' => $hostid, 'status' => HOST_STATUS_NOT_MONITORED],
+				self::$disabled_hostids
+			));
+			$this->assertArrayHasKey('hostids', $response['result']);
+		}
 	}
 
 	/**
@@ -384,6 +412,15 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			self::$proxyid = null;
 		}
 
+		if (self::$disabled_hostids) {
+			$response = CAPIHelper::call('host.update', array_map(
+				static fn($hostid) => ['hostid' => $hostid, 'status' => HOST_STATUS_MONITORED],
+				self::$disabled_hostids
+			));
+			self::assertArrayHasKey('hostids', $response['result']);
+			self::$disabled_hostids = [];
+		}
+
 		CAPIHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
 	}
 
@@ -460,6 +497,44 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		// Make discovered dependent items and triggers known to preprocessing and history sync.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Every device of every site reports status=0 again, now that the dependent items are discovered, so they get
+	 * a value without firing triggers.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
+	 */
+	public function testLLDTelemetrySyncAtScale_StatusZeroSend() {
+		self::$vps_last = $this->getVpsWritten();
+		self::$stored_zero_last = $this->getStoredStatusCount(0);
+
+		$devices = [];
+		foreach (self::hostNames() as $host) {
+			$devices[$host] = self::deviceNames();
+		}
+
+		$error = null;
+		$this->assertTrue($this->sendDeviceStatus($devices, 0, $error),
+				'Failed to send status=0 data points: '.$error);
+	}
+
+	/**
+	 * Verify that VPS written counter increased by a value of every dependent item, one per sent data point.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_StatusZeroSend
+	 */
+	public function testLLDTelemetrySyncAtScale_StatusZeroVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::LLD_DISCOVERY_COUNT * self::HOST_COUNT);
+	}
+
+	/**
+	 * Verify that every sent data point can be read back from ClickHouse by a Telemetry query.
+	 *
+	 * @depends testLLDTelemetrySyncAtScale_StatusZeroSend
+	 */
+	public function testLLDTelemetrySyncAtScale_StatusZeroVerify() {
+		$this->assertStoredStatusIncreasedBy(0, self::$stored_zero_last, self::LLD_DISCOVERY_COUNT * self::HOST_COUNT);
 	}
 
 	/**
@@ -866,6 +941,33 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertEquals($expected, self::parseStoredStatusCounts($result)[$status],
 				'Unexpected number of status='.$status.' data points stored in ClickHouse: '.
 				$result['item']['result']);
+	}
+
+	/**
+	 * Values written to history by the server, the dependent items of the hosts write one per device and poll; the
+	 * Telemetry query items keep no history and are not counted.
+	 */
+	private function getVpsWritten(): int {
+		$result = $this->callTestItemUntilCallback(
+			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[vps,written]'],
+			fn($result) => $result !== false && isset($result['item']['result'])
+					&& is_numeric($result['item']['result'])
+		);
+
+		return (int) $result['item']['result'];
+	}
+
+	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
+		$expected = $baseline + $min_increase;
+
+		$result = $this->callTestItemUntilCallback(
+			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[vps,written]'],
+			fn($result) => $result !== false && isset($result['item']['result'])
+					&& is_numeric($result['item']['result']) && (int) $result['item']['result'] >= $expected
+		);
+
+		$this->assertGreaterThanOrEqual($expected, (int) $result['item']['result'],
+				'VPS written did not reach expected value.');
 	}
 
 	/**
