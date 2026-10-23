@@ -18,9 +18,18 @@
  * @var CView $this
  */
 
-$form_items = [$data['messages']];
+$form_items = $data['is_ping'] ? [] : [$data['messages']];
 
-if ($data['success']) {
+if ($data['is_ping']) {
+	$form_items[] = (new CDiv())->setId('ping-result')->setAttribute('role', 'status')
+		->setAttribute('data-host', $data['ping_host'])
+		->setAttribute('data-ip', $data['ping_ip'])
+		->setAttribute('data-output', $data['output'])
+		->setAttribute('data-success', $data['success'] ? '1' : '0');
+}
+
+
+if ($data['success'] && !$data['is_ping']) {
 	$row_description = [
 		(new CTextArea('', $data['output']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
@@ -52,7 +61,8 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.scriptexec.js.php'),
+	'script_inline' => $this->readJsFile('popup.scriptexec.js.php')
+		. ($data['is_ping'] ? file_get_contents(__DIR__.'/../../js/ping-result.js') : ''),
 	'body' => $form->toString(),
 	'buttons' => null
 ];
