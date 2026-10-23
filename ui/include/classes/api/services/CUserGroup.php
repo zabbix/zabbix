@@ -897,8 +897,7 @@ class CUserGroup extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			if (!array_key_exists($row['ugsetid'], $db_ugset_permissions)
-					|| !array_key_exists($row['id'], $db_ugset_permissions[$row['ugsetid']])) {
+			if (!array_key_exists($row['id'], $db_ugset_permissions[$row['ugsetid']])) {
 				$db_ugset_permissions[$row['ugsetid']][$row['id']] = $row['permission'];
 			}
 			elseif ($db_ugset_permissions[$row['ugsetid']][$row['id']] != PERM_DENY
@@ -932,7 +931,7 @@ class CUserGroup extends CApiService {
 			}
 
 			if (!$ugset_permissions[$ugsetid]) {
-				unset($ugset_permissions[$ugsetid]);
+				unset($ugset_permissions[$ugsetid], $db_ugset_permissions[$ugsetid]);
 			}
 		}
 
