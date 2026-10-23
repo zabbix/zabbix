@@ -1304,7 +1304,7 @@ class testUserGroup extends CAPITest {
 	/**
 	 * @dataProvider getUserGroupApmFiltersGetData
 	 */
-	public function testDHostGetProxy_Permissions(array $expected_result, string $search): void {
+	public function testUserGroupGetApmFilter(array $expected_result, string $search): void {
 		$usrgrpid = ['usrgrpid' => $expected_result[0]['usrgrpid']];
 		CTestDataHelper::convertValueReferences($usrgrpid);
 
