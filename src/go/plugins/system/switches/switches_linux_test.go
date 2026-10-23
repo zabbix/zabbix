@@ -15,107 +15,85 @@
 package switches
 
 import (
-	_ "embed"
 	"errors"
 	"testing"
 )
-
-//go:embed testdata/system.cpu.switches_valid.txt
-var validContent []byte
-
-//go:embed testdata/system.cpu.switches_valid_minimal.txt
-var validMinimalContent []byte
-
-//go:embed testdata/system.cpu.switches_multiple.txt
-var multipleCtxtContent []byte
-
-//go:embed testdata/system.cpu.switches_first_invalid.txt
-var firstInvalidCtxtContent []byte
-
-//go:embed testdata/system.cpu.switches_whitespace_variations.txt
-var whitespaceVariationsContent []byte
-
-//go:embed testdata/system.cpu.switches_missing.txt
-var missingCtxtContent []byte
-
-//go:embed testdata/system.cpu.switches_invalid_value.txt
-var invalidValueContent []byte
-
-//go:embed testdata/system.cpu.switches_no_value.txt
-var noValueContent []byte
 
 func Test_parseSwitches(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name    string
-		content []byte
+		content string
 		want    uint64
 		wantErr error
 	}{
 		{
-			name:    "+valid",
-			content: validContent,
-			want:    232483817,
-		},
-		{
-			name:    "+validMinimalProcStat",
-			content: validMinimalContent,
-			want:    1000,
+			name: "+valid",
+			content: "cpu  831300 1214 517796 136940034 196296 0 102135 0 0 0\n" +
+				"cpu0 62729 215 48494 9745954 20063 0 57638 0 0 0\n" +
+				"intr 146085590 0 0 0 0 0 0 0 0 0 95 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 408001\n" +
+				"ctxt 232483817\n" +
+				"btime 1764129870\n" +
+				"processes 945413\n" +
+				"procs_running 1\n" +
+				"procs_blocked 0\n" +
+				"softirq 69102762 0 7547819 234 2303788 0 0 7557992 27371530 3284 24318115\n",
+			want: 232483817,
 		},
 		{
 			name:    "+multipleCtxtEntries",
-			content: multipleCtxtContent,
+			content: "cpu  1 2 3 4\nctxt 232483817\nctxt 232483999\nbtime 1\n",
 			want:    232483817,
 		},
 		{
 			name:    "+firstCtxtInvalid",
-			content: firstInvalidCtxtContent,
+			content: "cpu  1 2 3 4\nctxt invalid_value\nctxt 232483817\nbtime 1\n",
 			want:    232483817,
 		},
 		{
-			name:    "+whitespaceVariations",
-			content: whitespaceVariationsContent,
+			name:    "+tabSeparator",
+			content: "cpu  1 2 3 4\nctxt\t232483817\nbtime 1\n",
 			want:    232483817,
 		},
 		{
 			name:    "+ctxtPrefixedToken",
-			content: []byte("cpu  1 2 3 4\nctxtx 4242\nbtime 1\n"),
+			content: "cpu  1 2 3 4\nctxtx 4242\nbtime 1\n",
 			want:    4242,
 		},
 		{
 			name:    "+trailingNonDigits",
-			content: []byte("cpu  1 2 3 4\nctxt 4242abc\nbtime 1\n"),
+			content: "cpu  1 2 3 4\nctxt 4242abc\nbtime 1\n",
 			want:    4242,
 		},
 		{
 			name:    "+noTrailingNewline",
-			content: []byte("cpu  1 2 3 4\nctxt 4242"),
+			content: "cpu  1 2 3 4\nctxt 4242",
 			want:    4242,
 		},
 		{
 			name:    "-missingCtxt",
-			content: missingCtxtContent,
+			content: "cpu  1 2 3 4\nbtime 1\nprocesses 945413\n",
 			wantErr: errCtxtNotFound,
 		},
 		{
 			name:    "-ctxtNotAtLineStart",
-			content: []byte("cpu  1 2 3 4\n ctxt 4242\nbtime 1\n"),
+			content: "cpu  1 2 3 4\n ctxt 4242\nbtime 1\n",
 			wantErr: errCtxtNotFound,
 		},
 		{
 			name:    "-invalidCtxtValue",
-			content: invalidValueContent,
+			content: "cpu  1 2 3 4\nctxt invalid_value\nbtime 1\n",
 			wantErr: errCtxtNotFound,
 		},
 		{
 			name:    "-ctxtNoValue",
-			content: noValueContent,
+			content: "cpu  1 2 3 4\nctxt\nbtime 1\n",
 			wantErr: errCtxtNotFound,
 		},
 		{
 			name:    "-emptyContent",
-			content: nil,
+			content: "",
 			wantErr: errCtxtNotFound,
 		},
 	}
@@ -124,7 +102,7 @@ func Test_parseSwitches(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := parseSwitches(tt.content)
+			got, err := parseSwitches([]byte(tt.content))
 			if !errors.Is(err, tt.wantErr) {
 				t.Fatalf("parseSwitches() error = %v, wantErr %v", err, tt.wantErr)
 			}
