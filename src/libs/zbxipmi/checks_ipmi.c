@@ -2405,7 +2405,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	zbx_ipmi_control_t	*c;
 	size_t			offset;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " control:%s value:%d",
 			__func__, hostid, sensor, value);
 
 	if (NULL == os_hnd)
@@ -2455,7 +2455,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);\
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return h->ret;
 }
