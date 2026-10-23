@@ -44,7 +44,7 @@ TTL toDateTime(TimeUnix) + toIntervalSecond($CH_TTL)
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1"
 
 ch_query << EOF || exit 1
-CREATE TABLE $CH_DB.otel_metrics_gauge
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_gauge
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
 	Flags UInt32 CODEC(ZSTD(1)),$EXEMPLARS$COMMON_INDEXES
@@ -52,7 +52,7 @@ CREATE TABLE $CH_DB.otel_metrics_gauge
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE $CH_DB.otel_metrics_sum
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_sum
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
 	Flags UInt32 CODEC(ZSTD(1)),$EXEMPLARS
@@ -62,7 +62,7 @@ CREATE TABLE $CH_DB.otel_metrics_sum
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE $CH_DB.otel_metrics_histogram
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_histogram
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),
 	Sum Float64 CODEC(ZSTD(1)),
@@ -76,7 +76,7 @@ CREATE TABLE $CH_DB.otel_metrics_histogram
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE $CH_DB.otel_metrics_exponential_histogram
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_exponential_histogram
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),
 	Sum Float64 CODEC(ZSTD(1)),

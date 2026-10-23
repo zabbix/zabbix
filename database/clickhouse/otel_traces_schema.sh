@@ -5,7 +5,7 @@ CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
 ch_query << EOF || exit 1
-CREATE TABLE $CH_DB.otel_traces
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_traces
 (
 	Timestamp DateTime64(9) CODEC(Delta, ZSTD(1)),
 	TraceId String CODEC(ZSTD(1)),
