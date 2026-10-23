@@ -583,6 +583,10 @@
 				title: <?= json_encode(_('Basic information')); ?>,
 				items: [
 					{
+						name: <?= json_encode(_('Parent span ID')); ?>,
+						value: span.parent_id
+					},
+					{
 						name: <?= json_encode(_('Span ID')); ?>,
 						value: span.id
 					},

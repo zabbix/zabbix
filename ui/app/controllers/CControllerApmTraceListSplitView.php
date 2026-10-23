@@ -117,6 +117,8 @@ class CControllerApmTraceListSplitView extends CController {
 		$start_timestamp = min($trace['timestamp'], min(array_column($spans, 'timestamp', 'timestamp')));
 		$end = $trace['duration'];
 
+		$spanids = array_column($spans, 'spanid');
+
 		foreach ($spans as $i => $span) {
 			$span_start = $span['timestamp'] - $start_timestamp;
 			$span_end = $span_start + $span['duration'];
@@ -145,7 +147,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$trace_view_spans[$i] = [
 				'index' => $i,
 				'id' => $span['spanid'],
-				'parent_id' => $span['parent_spanid'] ?: null,
+				'parent_id' => in_array($span['parent_spanid'], $spanids) ? $span['parent_spanid'] : null,
 				'name' => $span['service_name'],
 				'operation' => $span['span_name'],
 				'service_name' => $span['service_name'],

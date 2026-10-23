@@ -19,7 +19,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['traceid', 'spanid', 'service_name', 'span_count', 'error_count',
 		'span_name', 'span_kind', 'scope_name', 'scope_version', 'status_code', 'status_message', 'timestamp',
 		'timestamp_formatted', 'timestamp_ns_formatted', 'trace_state', 'span_attributes', 'resource_attributes',
-		'duration', 'duration_time_units', 'duration_percentage'];
+		'duration', 'duration_time_units', 'duration_percentage', 'has_root_span'];
 
 	protected array $filter = [];
 
@@ -158,7 +158,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp']);
+		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp', 'has_root_span']);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
@@ -211,7 +211,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$trace_max_duration = max(array_column($traces, 'duration'));
 
 			foreach ($traces as &$trace) {
-				if (!array_key_exists('service_name', $trace) || !$trace['service_name']) {
+				if (array_key_exists('has_root_span', $trace) && $trace['has_root_span'] == 0) {
 					$trace['service_name'] = '['._('No root span found').']';
 				}
 
