@@ -1585,14 +1585,12 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			}
 
 			if (data.params !== undefined) {
-				if (data.params.scriptid !== undefined) {
+
+				if (data.params.error !== null) {
+					item.error = data.params.error;
+				}
+				else if (data.params.scriptid !== undefined) {
 					item.clickCallback = function(e) {
-
-						if (data.params.error !== null) {
-							alert(data.params.error);
-							return;
-						}
-
 						jQuery(this)
 							.closest('.menu-popup-top')
 							.menuPopup('close', trigger_elm, false);
@@ -1609,14 +1607,6 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 					item.url = data.params.url;
 					if (data.params.target !== '') {
 						item.target = data.params.target;
-					}
-
-					if (data.params.error !== null) {
-						if (item.dataAttributes === undefined) {
-							item.dataAttributes = {};
-						}
-
-						item.dataAttributes.error = data.params.error;
 					}
 				}
 			}
@@ -1766,15 +1756,6 @@ jQuery(function($) {
 				item = $.extend({}, item);
 				if (sections.length > 1 && section_label !== null) {
 					item.ariaLabel = section_label + ', ' + item['label'];
-				}
-
-				if (item.error) {
-					if (item.dataAttributes === undefined) {
-						item.dataAttributes = {};
-					}
-
-					item.dataAttributes.error = item.error;
-					delete item.error;
 				}
 
 				$menu_popup.append(createMenuItem(item));
@@ -2298,7 +2279,16 @@ jQuery(function($) {
 			link.addClass('disabled');
 		}
 		else {
-			if (options.url !== undefined) {
+			if ('error' in options && options.error) {
+				if (options.dataAttributes === undefined) {
+					options.dataAttributes = {};
+				}
+
+				options.dataAttributes.error = options.error;
+
+				link.on('click', (e) => alert(e.target.dataset.error));
+			}
+			else if (options.url !== undefined) {
 				link.attr('href', options.url);
 
 				if ('target' in options) {
@@ -2309,13 +2299,8 @@ jQuery(function($) {
 					link.attr('rel', options.rel);
 				}
 			}
-
-			if (options.clickCallback !== undefined) {
+			else if (options.clickCallback !== undefined) {
 				link.on('click', options.clickCallback);
-			}
-
-			if (options.url === null && 'dataAttributes' in options && 'error' in options.dataAttributes) {
-				link.on('click', (e) => alert(e.target.dataset.error));
 			}
 		}
 
