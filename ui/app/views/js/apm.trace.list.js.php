@@ -114,16 +114,18 @@
 				to: filter_options.timeselector.to
 			};
 
-			$('#filter-attributes')
-				.dynamicRows({template: '#filter-attributes-row-tmpl'})
-				.on('afteradd.dynamicRows', function () {
-					const rows = this.querySelectorAll('.form_row');
-					new CApmAttrFilterItem(rows[rows.length - 1]);
-				});
+			for (const key of ['resource', 'span']) {
+				$(`#filter-${key}-attributes`)
+					.dynamicRows({template: `#filter-${key}-attributes-row-tmpl`})
+					.on('afteradd.dynamicRows', function () {
+						const rows = this.querySelectorAll('.form_row');
+						new CApmAttrFilterItem(rows[rows.length - 1]);
+					});
 
-			document.querySelectorAll(`#filter-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
-				new CApmAttrFilterItem(row);
-			});
+				document.querySelectorAll(`#filter-${key}-attributes .${ZBX_STYLE_FORM_ROW}`).forEach(row => {
+					new CApmAttrFilterItem(row);
+				});
+			}
 		}
 
 		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
@@ -238,6 +240,7 @@
 
 					row.setAttribute('data-traceid', row_data[traceid] ?? '');
 					row.setAttribute('data-timestamp', Math.floor((row_data[timestamp] ?? Date.now()) / 1000000000));
+					row.setAttribute('tabindex', '0');
 
 					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
 				})
@@ -406,33 +409,43 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', e => {
+						const selectRow = e => {
 							/** @type {HTMLElement} */
 							const target = e.target;
-							const selection = window.getSelection();
 
-							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
+							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
-							if (this.#selected_traceid !== traceid) {
-								if (this.#selected_traceid !== null) {
-									const row_selected = datatable_element
-										.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
-									row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
-								}
-
-								this.#selected_traceid = traceid;
-								row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
-
-								this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
+							if (this.#selected_traceid === traceid) {
+								return;
 							}
-							else {
-								this.#selected_traceid = null;
-								row.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
-								this.#side_drawer.close();
+							datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
+								?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#selected_traceid = traceid;
+							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+							this.#openSideDrawer(traceid, row.getAttribute('data-timestamp'));
+						};
+
+						row.addEventListener('keydown', e => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+
+								selectRow(e);
 							}
+						});
+
+						row.addEventListener('click', e => {
+							const selection = window.getSelection();
+
+							if (selection && selection.toString().length > 0) {
+								return;
+							}
+
+							selectRow(e);
 						});
 					}
 				})
@@ -479,6 +492,9 @@
 				this.#trace_view_page = new TraceViewPage(trace_view_element, trace_view_data);
 			}
 
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
+
 			this.#unscheduleRefresh();
 		}
 
@@ -518,6 +534,8 @@
 			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
 			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
 
+			row_selected?.focus();
+
 			this.#selected_traceid = null;
 
 			this.#scheduleRefresh();
@@ -539,9 +557,18 @@
 				title: <?= json_encode(_('Span details')); ?>,
 				groups: this.#collectSpanDetailsGroups(span)
 			});
+
+			trace_details.open();
 		}
 
 		#onSideDrawerSpanDetailsClose = () => {
+			const trace_details = this.#side_drawer.getElement().querySelector('[data-trace-details]');
+			if (trace_details === null) {
+				return;
+			}
+
+			trace_details.close();
+
 			this.#details_panel?.destroy();
 			this.#details_panel = null;
 
@@ -550,9 +577,15 @@
 		}
 
 		#collectSpanDetailsGroups(span) {
-			const groups = [{
+			const groups = [];
+
+			const main_info = {
 				title: <?= json_encode(_('Basic information')); ?>,
 				items: [
+					{
+						name: <?= json_encode(_('Parent span ID')); ?>,
+						value: span.parent_id
+					},
 					{
 						name: <?= json_encode(_('Span ID')); ?>,
 						value: span.id
@@ -578,7 +611,23 @@
 						value: span.timestamp
 					}
 				]
-			}];
+			};
+
+			if (span.status_code) {
+				main_info.items.push({
+					name: <?= json_encode(_('Status code')); ?>,
+					value: span.status_code
+				});
+			}
+
+			if (span.status_message) {
+				main_info.items.push({
+					name: <?= json_encode(_('Status message')); ?>,
+					value: span.status_message
+				});
+			}
+
+			groups.push(main_info);
 
 			const resource_attributes = Object.entries(span.resource_attributes);
 			if (resource_attributes.length > 0) {
