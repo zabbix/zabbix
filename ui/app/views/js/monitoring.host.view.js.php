@@ -270,9 +270,6 @@
 					const [hostid, items_count] = cell_data;
 					const {allowed_ui_latest_data} = response;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					if (allowed_ui_latest_data) {
 						const url = zabbixUrl({
 							action: 'latest.view',
@@ -285,32 +282,28 @@
 						latest_data_link.setAttribute('href', url);
 						latest_data_link.textContent = <?= json_encode(_('Latest data')); ?>;
 
-						flex_wrapper.appendChild(latest_data_link);
+						cell.appendChild(latest_data_link);
 					}
 					else {
 						const latest_data_link = document.createElement('span');
 						latest_data_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS, ZBX_STYLE_DISABLED);
 						latest_data_link.textContent = <?= json_encode(_('Latest data')); ?>;
 
-						flex_wrapper.appendChild(latest_data_link);
+						cell.appendChild(latest_data_link);
 					}
 
 					if (items_count > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items_count;
 
-						flex_wrapper.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [hostid, graphs] = cell_data;
 
 					if (graphs > 0) {
-						const flex_wrapper = document.createElement('div');
-						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 						const url = zabbixUrl({
 							action: 'charts.view',
 							filter_set: 1,
@@ -322,21 +315,19 @@
 						graphs_link.setAttribute('href', url);
 						graphs_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
+						cell.appendChild(graphs_link);
+
 						const count = document.createElement('sup');
 						count.textContent = graphs;
 
-						flex_wrapper.append(graphs_link, count);
-
-						cell.appendChild(flex_wrapper);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
 				.setCellRenderer('dashboards', ({cell_data, cell}) => {
 					const [hostid, dashboards] = cell_data;
 
 					if (dashboards > 0) {
-						const flex_wrapper = document.createElement('div');
-						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 						const url = zabbixUrl({
 							action: 'host.dashboard.view',
 							hostid
@@ -347,21 +338,19 @@
 						dashboards_link.setAttribute('href', url);
 						dashboards_link.textContent = <?= json_encode(_('Dashboards')); ?>;
 
+						cell.appendChild(dashboards_link);
+
 						const count = document.createElement('sup');
 						count.textContent = dashboards;
 
-						flex_wrapper.append(dashboards_link, count);
-
-						cell.appendChild(flex_wrapper);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [hostid, httpTests] = cell_data;
 
 					if (httpTests > 0) {
-						const flex_wrapper = document.createElement('div');
-						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 						const url = zabbixUrl({
 							action: 'web.view',
 							filter_set: 1,
@@ -373,12 +362,13 @@
 						web_link.setAttribute('href', url);
 						web_link.textContent = <?= json_encode(_('Web')); ?>;
 
+						cell.appendChild(web_link);
+
 						const count = document.createElement('sup');
 						count.textContent = httpTests;
 
-						flex_wrapper.append(web_link, count);
-
-						cell.appendChild(flex_wrapper);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
 				.setOptionsHandler('problems', CDataTableOptionsPopupMonitoringHostProblems)
