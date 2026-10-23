@@ -285,11 +285,10 @@ $apm_tab = (new CFormGrid())
 		))->addClass('js-apm-attributes'),
 	)
 	->addItem([
-		(new CLabel([_('Add resource attributes')], 'additional_resource_attributes'))
+		(new CLabel([_('Resource attributes')], 'additional_resource_attributes'))
 			->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('apm.attributes', [
-				'source' => 'proxy',
 				'attributes' => $data['form']['additional_resource_attributes'],
 				'field_name' => 'additional_resource_attributes',
 				'tabs_id' => 'proxy-tabs',

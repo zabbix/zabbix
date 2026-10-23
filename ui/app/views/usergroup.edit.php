@@ -386,7 +386,6 @@ $apm_filter = (new CFormGrid())->addItem([
 			->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('apm.attributes', [
-				'source' => 'hostgroup',
 				'attributes' => $data['resource_attributes'],
 				'field_name' => 'resource_attributes',
 				'tabs_id' => 'tabs',
