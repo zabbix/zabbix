@@ -1588,6 +1588,12 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			if (data.params !== undefined) {
 				if (data.params.scriptid !== undefined) {
 					item.clickCallback = function(e) {
+
+						if (data.params.error !== null) {
+							alert(data.params.error);
+							return;
+						}
+
 						jQuery(this)
 							.closest('.menu-popup-top')
 							.menuPopup('close', trigger_elm, false);
