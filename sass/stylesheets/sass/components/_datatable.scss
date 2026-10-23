@@ -46,8 +46,7 @@
 					flex-wrap: nowrap;
 					column-gap: 0;
 
-					& > .link-action,
-					.flex-item > .link-action {
+					& > .link-action {
 						@extend %overflow-ellipsis;
 					}
 				}
