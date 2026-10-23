@@ -1763,8 +1763,12 @@ jQuery(function($) {
 					item.ariaLabel = section_label + ', ' + item['label'];
 				}
 
-				if (!item.dataAttributes && item.error) {
-					item.dataAttributes = {error: item.error};
+				if (item.error) {
+					if (item.dataAttributes === undefined) {
+						item.dataAttributes = {};
+					}
+
+					item.dataAttributes.error = item.error;
 					delete item.error;
 				}
 
