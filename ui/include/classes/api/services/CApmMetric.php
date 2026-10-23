@@ -224,6 +224,10 @@ class CApmMetric extends CApmGeneral {
 
 		$sub_queries = [];
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$apm_filter_resource_attributes = CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_METRICS);
+		}
+
 		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
 			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
 				$sub_query_options
@@ -234,6 +238,12 @@ class CApmMetric extends CApmGeneral {
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => ['Int32', $options['time_till']]
 				]);
+
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				CClickHouseHelper::addAttributeFilter($sub_query, $table_alias.'.ResourceAttributes',
+					$apm_filter_resource_attributes, TAG_EVAL_TYPE_OR
+				);
+			}
 
 			foreach ($fallback_sortfields as $sortfield) {
 				$sub_query->order($table_alias.'.'.$sortfield);

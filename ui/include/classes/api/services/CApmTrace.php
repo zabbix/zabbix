@@ -177,7 +177,8 @@ class CApmTrace extends CApmGeneral {
 
 		$query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');
 
-		$use_span_filtering = $options['filter'] || $options['search']
+		$use_span_filtering = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+			|| $options['filter'] || $options['search']
 			|| ($options['resource_attributes'] !== null
 				&& array_filter($options['resource_attributes'],
 					static fn (array $attribute) => $attribute['key'] !== ''
@@ -199,6 +200,12 @@ class CApmTrace extends CApmGeneral {
 				->where('tf.TraceId=t.TraceId')
 				->where('tf.Timestamp>=toDateTime64({lookup_time_from:Int32},9)')
 				->where('tf.Timestamp<toDateTime64({lookup_time_till:Int32},9)');
+
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.ResourceAttributes',
+					CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_TRACES), TAG_EVAL_TYPE_OR
+				);
+			}
 
 			if ($options['resource_attributes'] !== null) {
 				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.ResourceAttributes',

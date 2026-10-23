@@ -134,6 +134,12 @@ class CApmLog extends CApmGeneral {
 			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
 			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			CClickHouseHelper::addAttributeFilter($query, 'l.ResourceAttributes',
+				CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_LOGS), TAG_EVAL_TYPE_OR
+			);
+		}
+
 		if ($options['traceids'] !== null) {
 			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}

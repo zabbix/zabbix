@@ -29,6 +29,8 @@ class CClickHouseQuery {
 
 	protected array $linked_queries = [];
 
+	protected array $meta_attributes = [];
+
 	public function __construct() {}
 
 	public function select(string $select, ?string $alias = null): static {
@@ -128,5 +130,15 @@ class CClickHouseQuery {
 		}
 
 		return $params;
+	}
+
+	public function setMetaAttribute(string $name, mixed $value = true): static {
+		$this->meta_attributes[$name] = $value;
+
+		return $this;
+	}
+
+	public function getMetaAttribute(string $name, mixed $default = null): mixed {
+		return array_key_exists($name, $this->meta_attributes) ? $this->meta_attributes[$name] : $default;
 	}
 }

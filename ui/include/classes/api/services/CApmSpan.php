@@ -135,6 +135,12 @@ class CApmSpan extends CApmGeneral {
 			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
 			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			CClickHouseHelper::addAttributeFilter($query, 't.ResourceAttributes',
+				CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_TRACES), TAG_EVAL_TYPE_OR
+			);
+		}
+
 		if (!$options['countOutput']) {
 			$fallback_sortfields = array_diff(['TraceId', 'SpanId'], $options['sortfield']);
 
