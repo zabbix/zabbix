@@ -30,7 +30,10 @@ const (
 	pattern          = "ctxt"
 )
 
-var errCtxtNotFound = errs.New("ctxt line not found")
+var (
+	errCtxtNotFound     = errs.New("ctxt line not found")
+	errParamsNotAllowed = errs.New("item does not allow parameters")
+)
 
 // Plugin is a base struct for a plugin.
 type Plugin struct {
@@ -50,8 +53,12 @@ func init() {
 	}
 }
 
-// Export implements plugin.Exporter interface. Parameters are ignored, as in the C agent.
-func (*Plugin) Export(_ string, _ []string, _ plugin.ContextProvider) (any, error) {
+// Export implements plugin.Exporter interface.
+func (*Plugin) Export(_ string, params []string, _ plugin.ContextProvider) (any, error) {
+	if len(params) != 0 {
+		return nil, errParamsNotAllowed
+	}
+
 	parser := procfs.NewParser().
 		SetScanStrategy(procfs.StrategyOSReadFile).
 		SetPattern(pattern).

@@ -92,3 +92,31 @@ func Test_parseSwitches(t *testing.T) {
 		})
 	}
 }
+
+func TestPlugin_Export_params(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		params []string
+	}{
+		{name: "-emptyParam", params: []string{""}},
+		{name: "-oneParam", params: []string{"foo"}},
+		{name: "-twoParams", params: []string{"foo", "bar"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := (&Plugin{}).Export("system.cpu.switches", tt.params, nil)
+			if !errors.Is(err, errParamsNotAllowed) {
+				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, errParamsNotAllowed)
+			}
+
+			if got != nil {
+				t.Fatalf("Plugin.Export() = %v, want nil", got)
+			}
+		})
+	}
+}
