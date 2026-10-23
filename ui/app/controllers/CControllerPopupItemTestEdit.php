@@ -212,9 +212,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
 			$item = [
-				'flags' => $this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE
-					? ZBX_FLAG_DISCOVERY_PROTOTYPE
-					: ZBX_FLAG_DISCOVERY_NORMAL,
+				'flags' => in_array($this->test_type, [
+					self::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+					self::ZBX_TEST_TYPE_LLD_PROTOTYPE
+				]),
 				'query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())
 			];
 
