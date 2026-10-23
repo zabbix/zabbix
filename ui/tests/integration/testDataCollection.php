@@ -760,9 +760,9 @@ class testDataCollection extends CIntegrationTest {
 
 		// Both value and source fields of the first row are allocated before the second row fails to parse.
 		$payload = str_repeat('x', 4096);
-		$client = $this->getClient(self::COMPONENT_SERVER);
 
 		// Host/key based history data parsing.
+		$client = $this->getClient(self::COMPONENT_SERVER);
 		$result = $client->sendDataValues('sender', [
 			['host' => $host, 'key' => $key, 'value' => $payload, 'source' => $payload],
 			1
@@ -770,7 +770,8 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertNotFalse($result, 'Failed to send sender data: '.$client->getError());
 		$this->assertEquals(0, $result['processed'] ?? 0);
 
-		// Itemid based history data parsing.
+		// Itemid based history data parsing, a new client is required as the connection is closed after a request.
+		$client = $this->getClient(self::COMPONENT_SERVER);
 		$result = $client->sendAgentDataValues([
 			['itemid' => $itemid, 'value' => $payload, 'source' => $payload, 'clock' => time(), 'ns' => 0],
 			1
