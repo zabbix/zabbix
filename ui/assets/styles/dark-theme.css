@@ -2155,17 +2155,18 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: var(--surface-border-radius);
+    height: 0;
     z-index: 11;
-    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out; }
+    border-top-width: 0;
+    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out, border-top-width 0s linear 300ms; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
     padding-top: 8px;
-    border-top-color: transparent;
+    border-top-width: 1px;
     border-top-left-radius: var(--surface-border-radius);
     border-top-right-radius: var(--surface-border-radius);
-    transition-property: border-radius; }
+    transition: border-radius 300ms; }
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
@@ -2175,9 +2176,11 @@ button {
       .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
-    height: 2rem;
-    margin-top: -2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
+    height: 32px;
+    margin-top: -32px;
+    border-top-width: 1px;
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-contents {
     border-top-left-radius: 0;
     border-top-right-radius: 0;

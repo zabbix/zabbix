@@ -164,15 +164,19 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('hostmacroids', $response['result']);
 		self::$hostmacroid = $response['result']['hostmacroids'][0];
 
-		$response = $this->call('hostinterface.update', [
-			'interfaceid' => self::$interfaceid,
-			'useip' => 0,
-			'dns' => '{$INJADDR}',
-			'ip' => ''
+		$response = $this->call('host.update', [
+			'hostid' => self::$hostid,
+			'interfaces' => [
+				[
+					'interfaceid' => self::$interfaceid,
+					'useip' => 0,
+					'dns' => '{$INJADDR}',
+					'ip' => ''
+				]
+			]
 		]);
-		$this->assertArrayHasKey('interfaceids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
-		self::$interfaceid = $response['result']['interfaceids'][0];
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
 		$this->updateServerStatus();
 
@@ -649,12 +653,17 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	public function testHostConnMacroValidation_testHostConnRecursion() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		$response = $this->call('hostinterface.update', [
-			'interfaceid' => self::$interfaceid,
-			'dns' => '{HOST.CONN}'
+		$response = $this->call('host.update', [
+			'hostid' => self::$hostid,
+			'interfaces' => [
+				[
+					'interfaceid' => self::$interfaceid,
+					'dns' => '{HOST.CONN}'
+				]
+			]
 		]);
-		$this->assertArrayHasKey('interfaceids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
 		$this->startComponent(self::COMPONENT_SERVER);
 	}
@@ -669,103 +678,102 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->clearLog(self::COMPONENT_SERVER);
 
-		$response = $this->call('hostinterface.update', [
-			'interfaceid' => self::$interfaceid,
-			'dns' => 'zabbix.com',
-			'main' => 1
-		]);
-		$this->assertArrayHasKey('interfaceids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
-
-		$response = $this->call('hostinterface.create', [
-			[
-				'hostid' => self::$hostid,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.com',
-				'main' => 1,
-				'port' => '10163',
-				'type' => INTERFACE_TYPE_SNMP,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'retries' => 5,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
+		$response = $this->call('host.update', [
+			'hostid' => self::$hostid,
+			'interfaces' => [
+				[
+					'interfaceid' => self::$interfaceid,
+					'dns' => 'zabbix.com',
+					'main' => 1
+				],
+				[
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.com',
+					'main' => 1,
+					'port' => '10163',
+					'type' => INTERFACE_TYPE_SNMP,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'retries' => 5,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
+				],
+				[
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => '{HOST.CONN}',
+					'main' => 0,
+					'ip' => '',
+					'port' => '10164',
+					'type' => INTERFACE_TYPE_SNMP,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'retries' => 5,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
+				],
+				[
+					'type' => INTERFACE_TYPE_IPMI,
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.com',
+					'port' => '1023',
+					'main' => 1
+				],
+				[
+					'type' => INTERFACE_TYPE_IPMI,
+					'ip' => '',
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => '{HOST.CONN}',
+					'port' => '10231',
+					'main' => 0
+				],
+				[
+					'type' => INTERFACE_TYPE_JMX,
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => 'zabbix.com',
+					'port' => '1234',
+					'ip' => '',
+					'main' => 1
+				],
+				[
+					'type' => INTERFACE_TYPE_JMX,
+					'ip' => '',
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => '{HOST.CONN}',
+					'port' => '12345',
+					'main' => 0
+				],
+				[
+					'ip' => '',
+					'dns' => '{HOST.CONN}',
+					'main' => 0,
+					'port' => '20000',
+					'type' => INTERFACE_TYPE_AGENT,
+					'useip' => INTERFACE_USE_DNS
 				]
-			],
-			[
-				'hostid' => self::$hostid,
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => '{HOST.CONN}',
-				'main' => 0,
-				'ip' => '',
-				'port' => '10164',
-				'type' => INTERFACE_TYPE_SNMP,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'retries' => 5,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
-				]
-			],
-			[
-				'hostid' => self::$hostid,
-				'type' => INTERFACE_TYPE_IPMI,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.com',
-				'port' => '1023',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid,
-				'type' => INTERFACE_TYPE_IPMI,
-				'ip' => '',
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => '{HOST.CONN}',
-				'port' => '10231',
-				'main' => 0
-			],
-			[
-				'hostid' => self::$hostid,
-				'type' => INTERFACE_TYPE_JMX,
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => 'zabbix.com',
-				'port' => '1234',
-				'ip' => '',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid,
-				'type' => INTERFACE_TYPE_JMX,
-				'ip' => '',
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => '{HOST.CONN}',
-				'port' => '12345',
-				'main' => 0
-			],
-			[
-				'hostid' => self::$hostid,
-				'ip' => '',
-				'dns' => '{HOST.CONN}',
-				'main' => 0,
-				'port' => '20000',
-				'type' => INTERFACE_TYPE_AGENT,
-				'useip' => INTERFACE_USE_DNS
 			]
 		]);
-		$this->assertArrayHasKey('interfaceids', $response['result']);
-		$this->assertCount(7, $response['result']['interfaceids']);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+
+		$response = $this->call('hostinterface.get', [
+			'output' => ['interfaceid'],
+			'hostids' => [self::$hostid]
+		]);
+		$this->assertCount(8, $response['result']);
 
 		$this->startComponent(self::COMPONENT_SERVER);
 
