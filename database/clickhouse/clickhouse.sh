@@ -21,7 +21,8 @@ display_help()
 	printf "  %-16s %s\n" "--insecure" "Skip server certificate and host name verification"
 	printf "  %-16s %s\n" "-h|--help" "Help message"
 
-	exit 1
+	# otel_all.sh relies on this exit code to tell help from failure
+	exit 2
 }
 
 CH_URL=http://localhost:8123
