@@ -107,6 +107,7 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[ZBX_LOG_COMPONENT_NAME_LEN];
 	sigjmp_buf		jmp_ret;
+	int			notify = 0;
 
 	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
@@ -121,8 +122,6 @@ static void	*pp_worker_entry(void *args)
 	pp_context_init(&worker->execute_ctx);
 	pp_task_queue_lock(queue);
 	pp_task_queue_register_worker(queue);
-
-	int	notify = 0;
 
 	while (0 == worker->stop)
 	{
