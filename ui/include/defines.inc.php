@@ -1986,6 +1986,7 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION', 0);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 
 // Tab indicator names.
+define('TAB_INDICATOR_APM_FILTER', 'apm-filter');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');

@@ -722,7 +722,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addClass(ZBX_STYLE_TOP)
-	]))->addClass('form_row');
+	]))->addClass(ZBX_STYLE_FORM_ROW);
 
 	$error_container_row = $options['has_inline_validation']
 		? (new CRow(

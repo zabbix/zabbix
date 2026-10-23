@@ -284,6 +284,8 @@ class TabIndicatorFactory {
 				return new TemplateMacrosTabIndicatorItem;
 			case 'Time':
 				return new TimeTabIndicatorItem;
+			case 'ApmFilter':
+				return new ApmFilterTabIndicatorItem;
 			case 'Valuemaps':
 				return new ValuemapsTabIndicatorItem;
 			case 'TemplateValuemaps':
@@ -2135,5 +2137,31 @@ class ScatterPlotThresholdsTabIndicatorItem extends TabIndicatorItem {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes();
 		});
+	}
+}
+
+class ApmFilterTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		return document.querySelectorAll('#apm_filter_tab .attributes-table tbody tr.form_row').length > 0;
+	}
+
+	initObserver() {
+		const target_node = document.getElementById('apm_filter_tab');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }

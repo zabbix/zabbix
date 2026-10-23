@@ -416,7 +416,7 @@ $tabs = (new CTabView())
 		TAB_INDICATOR_PROXY_ACCESS_LIST
 	)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER)
-	->addTab('apm_filter_tab', _('APM filter'), $apm_filter)
+	->addTab('apm_filter_tab', _('APM filter'), $apm_filter, TAB_INDICATOR_APM_FILTER)
 	->setSelected(0);
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
