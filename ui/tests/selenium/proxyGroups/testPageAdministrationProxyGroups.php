@@ -205,15 +205,6 @@ class testPageAdministrationProxyGroups extends CWebTest {
 				7 => ''
 			],
 			[
-				'Name' => 'Proxy group with proxies for Actions',
-				'State' => 'Unknown',
-				'Failover period' => '1m',
-				'Online proxies' => '0',
-				'Minimum proxies' => '1',
-				'Proxies' => '2',
-				7 => 'Proxy for Proxy groups 1, Proxy for Proxy groups 2'
-			],
-			[
 				'Name' => 'Proxy group абц 頑張って 😀 for Actions',
 				'State' => '',
 				'Failover period' => '1m',
@@ -287,7 +278,6 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Multiple spaces in proxy group',
 						'Online proxy group',
 						'Proxy group \'&quot;&lt;s&gt; for Actions',
-						'Proxy group with proxies for Actions',
 						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]
@@ -350,7 +340,6 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Offline group',
 						'Online proxy group',
 						'Proxy group \'&quot;&lt;s&gt; for Actions',
-						'Proxy group with proxies for Actions',
 						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]

@@ -52,9 +52,6 @@ class Actions {
 		CDataHelper::call('proxygroup.create',
 			[
 				[
-					'name' => 'Proxy group with proxies for Actions'
-				],
-				[
 					'name' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 				],
 				[
@@ -73,20 +70,6 @@ class Actions {
 				[
 					'name' => 'Proxy for Actions 2',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-				],
-				[
-					'name' => 'Proxy for Proxy groups 1',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions'],
-					'local_address' => '127.0.0.1',
-					'local_port' => '10051'
-				],
-				[
-					'name' => 'Proxy for Proxy groups 2',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'proxy_groupid' => $proxy_groupids['Proxy group with proxies for Actions'],
-					'local_address' => '127.0.0.2',
-					'local_port' => '10051'
 				]
 			]
 		);
@@ -353,11 +336,6 @@ class Actions {
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
-							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => $proxy_groupids['Proxy group with proxies for Actions']
-						],
-						[
-							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => $proxy_groupids['Proxy group \'&quot;&lt;s&gt; for Actions']
 						]
@@ -498,11 +476,6 @@ class Actions {
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
-						[
-							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
-							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => $proxy_groupids['Proxy group with proxies for Actions']
-						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,

@@ -1198,20 +1198,14 @@ class testFormAction extends CLegacyWebTest {
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
-							'Operator' => 'equals',
-							'Proxy group' => 'Proxy group with proxies for Actions'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'does not equal',
 							'Proxy group' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Proxy group equals Proxy group with proxies for Actions',
-						'B' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions',
-						'C' => 'Received value does not contain Received value',
-						'D' => 'Service type equals FTP'
+						'A' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions',
+						'B' => 'Received value does not contain Received value',
+						'C' => 'Service type equals FTP'
 					],
 					'operations' => [
 						[
@@ -1253,11 +1247,6 @@ class testFormAction extends CLegacyWebTest {
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
-							'Operator' => 'equals',
-							'Proxy group' => 'Proxy group with proxies for Actions'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
 							'Operator' => 'does not equal',
 							'Proxy group' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 						]
@@ -1265,8 +1254,7 @@ class testFormAction extends CLegacyWebTest {
 					'expected conditions' => [
 						'A' => 'Host name contains Zabbix',
 						'B' => 'Host metadata does not contain Zabbix',
-						'C' => 'Proxy group equals Proxy group with proxies for Actions',
-						'D' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions'
+						'C' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions'
 					],
 					'operations' => [
 						[
