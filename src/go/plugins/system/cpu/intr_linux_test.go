@@ -16,104 +16,179 @@ package cpu
 
 import (
 	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-	"syscall"
 	"testing"
 
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const intrMetricKey = "system.cpu.intr"
+func TestPlugin_getCPUIntr(t *testing.T) {
+	t.Parallel()
 
-func TestPlugin_ExportIntr(t *testing.T) {
+	errRead := errors.New("read error")
+
+	tests := []struct {
+		name     string
+		params   []string
+		line     string
+		readErr  error
+		want     any
+		wantErr  bool
+		errIs    error
+		wantRead bool
+	}{
+		{
+			name:     "+valid",
+			params:   nil,
+			line:     "intr 308874139 44 0 1 13",
+			readErr:  nil,
+			want:     uint64(308874139),
+			wantErr:  false,
+			errIs:    nil,
+			wantRead: true,
+		},
+		{
+			name:     "-withParam",
+			params:   []string{""},
+			line:     "",
+			readErr:  nil,
+			want:     nil,
+			wantErr:  true,
+			errIs:    zbxerr.ErrorTooManyParameters,
+			wantRead: false,
+		},
+		{
+			name:     "-readError",
+			params:   nil,
+			line:     "",
+			readErr:  errRead,
+			want:     nil,
+			wantErr:  true,
+			errIs:    errRead,
+			wantRead: true,
+		},
+		{
+			name:     "-invalidLine",
+			params:   nil,
+			line:     "intr invalid",
+			readErr:  nil,
+			want:     nil,
+			wantErr:  true,
+			errIs:    nil,
+			wantRead: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var gotPrefix string
+
+			p := &Plugin{
+				Base: plugin.Base{Logger: log.New("test")},
+				cpus: nil,
+				findProcStatLine: func(prefix string) (string, error) {
+					gotPrefix = prefix
+
+					return tt.line, tt.readErr
+				},
+			}
+
+			got, err := p.getCPUIntr(tt.params)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("getCPUIntr() error = %v, wantErr %t", err, tt.wantErr)
+			}
+
+			if tt.errIs != nil && !errors.Is(err, tt.errIs) {
+				t.Fatalf("getCPUIntr() error = %v, want %v", err, tt.errIs)
+			}
+
+			if got != tt.want {
+				t.Fatalf("getCPUIntr() = %v, want %v", got, tt.want)
+			}
+
+			wasRead := gotPrefix != ""
+			if wasRead != tt.wantRead {
+				t.Fatalf("getCPUIntr() read /proc/stat = %t, want %t", wasRead, tt.wantRead)
+			}
+
+			if wasRead && gotPrefix != intrPrefix {
+				t.Fatalf("getCPUIntr() prefix = %q, want %q", gotPrefix, intrPrefix)
+			}
+		})
+	}
+}
+
+func Test_parseIntrTotal(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name    string
-		content string
+		line    string
 		want    uint64
 		wantErr bool
 	}{
 		{
-			name:    "+totalInterrupts",
-			content: "cpu  100 20 30 40\ncpu0 100 20 30 40\nintr 308874139 44 0 1 13\nctxt 684166014\n",
+			name:    "+total",
+			line:    "intr 308874139 44 0 1 13",
 			want:    308874139,
+			wantErr: false,
+		},
+		{
+			name:    "+onlyTotal",
+			line:    "intr 123",
+			want:    123,
+			wantErr: false,
 		},
 		{
 			name:    "+zero",
-			content: "intr 0 0 0\n",
+			line:    "intr 0 0 0",
 			want:    0,
+			wantErr: false,
 		},
 		{
 			name:    "+maxUint64",
-			content: "intr 18446744073709551615\n",
+			line:    "intr 18446744073709551615",
 			want:    ^uint64(0),
+			wantErr: false,
 		},
 		{
 			name:    "+whitespace",
-			content: "intr\t  123\t44 0\n",
+			line:    "intr\t  123\t44 0",
 			want:    123,
+			wantErr: false,
 		},
 		{
-			name:    "+noFinalNewline",
-			content: "intr 123",
-			want:    123,
-		},
-		{
-			name:    "+firstEntry",
-			content: "intr 123 44\nintr 456 0\n",
-			want:    123,
-		},
-		{
-			name:    "+longIntrLine",
-			content: "intr 123 " + strings.Repeat("0 ", 40000) + "\n",
-			want:    123,
-		},
-		{
-			name:    "+longPrecedingLine",
-			content: "cpu " + strings.Repeat("0 ", 40000) + "\nintr 123\n",
-			want:    123,
-		},
-		{
-			name:    "-emptyFile",
-			wantErr: true,
-		},
-		{
-			name:    "-missingIntr",
-			content: "cpu 100 20 30 40\nctxt 123\nsoftirq 456\n",
-			wantErr: true,
-		},
-		{
-			name:    "-similarLabel",
-			content: "intr_extra 123\n",
+			name:    "-empty",
+			line:    "",
+			want:    0,
 			wantErr: true,
 		},
 		{
 			name:    "-noValue",
-			content: "intr\n",
+			line:    "intr",
+			want:    0,
 			wantErr: true,
 		},
 		{
 			name:    "-invalidValue",
-			content: "intr invalid 123\n",
-			wantErr: true,
-		},
-		{
-			name:    "-invalidFirstEntry",
-			content: "intr invalid\nintr 123\n",
+			line:    "intr invalid 123",
+			want:    0,
 			wantErr: true,
 		},
 		{
 			name:    "-negativeValue",
-			content: "intr -1\n",
+			line:    "intr -1",
+			want:    0,
 			wantErr: true,
 		},
 		{
 			name:    "-overflow",
-			content: "intr 18446744073709551616\n",
+			line:    "intr 18446744073709551616",
+			want:    0,
 			wantErr: true,
 		},
 	}
@@ -122,111 +197,13 @@ func TestPlugin_ExportIntr(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			path := filepath.Join(t.TempDir(), "stat")
-
-			err := os.WriteFile(path, []byte(tt.content), 0600)
-			if err != nil {
-				t.Fatalf("failed to write proc stat fixture: %v", err)
+			got, err := parseIntrTotal(tt.line)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("parseIntrTotal() error = %v, wantErr %t", err, tt.wantErr)
 			}
 
-			p := &Plugin{
-				procStatFilepath: path,
-			}
-
-			got, err := p.Export(intrMetricKey, nil, nil)
-
-			if tt.wantErr {
-				wantErr := fmt.Sprintf("Cannot find a line with %q in %s.", intrPattern, path)
-				if err == nil || err.Error() != wantErr || got != nil {
-					t.Fatalf("Export() = (%v, %v), want (nil, %q)", got, err, wantErr)
-				}
-
-				return
-			}
-
-			if err != nil || got != tt.want {
-				t.Fatalf("Export() = (%v, %v), want (%d, nil)", got, err, tt.want)
-			}
-		})
-	}
-}
-
-func TestPlugin_ExportIntrReadError(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name string
-		want error
-	}{
-		{
-			name: "-missingFile",
-			want: syscall.ENOENT,
-		},
-		{
-			name: "-directory",
-			want: syscall.EISDIR,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			path := t.TempDir()
-			if tt.name == "-missingFile" {
-				path = filepath.Join(path, "stat")
-			}
-
-			p := &Plugin{
-				procStatFilepath: path,
-			}
-
-			got, err := p.Export(intrMetricKey, nil, nil)
-			if got != nil || !errors.Is(err, tt.want) {
-				t.Fatalf("Export() = (%v, %v), want (nil, %v)", got, err, tt.want)
-			}
-		})
-	}
-}
-
-func TestPlugin_ExportIntrValidation(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name   string
-		key    string
-		params []string
-		want   error
-	}{
-		{
-			name:   "-withEmptyParam",
-			key:    intrMetricKey,
-			params: []string{""},
-			want:   zbxerr.ErrorTooManyParameters,
-		},
-		{
-			name:   "-withParam",
-			key:    intrMetricKey,
-			params: []string{"all"},
-			want:   zbxerr.ErrorTooManyParameters,
-		},
-		{
-			name:   "-withMultipleParams",
-			key:    intrMetricKey,
-			params: []string{"all", "avg1"},
-			want:   zbxerr.ErrorTooManyParameters,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			p := &Plugin{}
-
-			got, err := p.Export(tt.key, tt.params, nil)
-			if got != nil || !errors.Is(err, tt.want) {
-				t.Fatalf("Export() = (%v, %v), want (nil, %v)", got, err, tt.want)
+			if got != tt.want {
+				t.Fatalf("parseIntrTotal() = %d, want %d", got, tt.want)
 			}
 		})
 	}

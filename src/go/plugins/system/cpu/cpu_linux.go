@@ -39,11 +39,11 @@ const (
 type Plugin struct {
 	plugin.Base
 	cpus             []*cpuUnit
-	procStatFilepath string
+	findProcStatLine func(prefix string) (string, error)
 }
 
 func init() {
-	impl.procStatFilepath = procStatLocation
+	impl.findProcStatLine = findProcStatLine
 
 	err := plugin.RegisterMetrics(
 		&impl, pluginName,
