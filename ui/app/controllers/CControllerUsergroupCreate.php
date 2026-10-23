@@ -85,7 +85,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 					]]
 				]
 			],
-			'resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
+			'apm_filters' => ['objects', 'uniq' => ['key', 'value', 'signal_type'],
 				'fields' => [
 					'key' => ['required', 'string', 'not_empty'],
 					'value' => ['required', 'string'],
@@ -93,7 +93,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 						'in' => [SIGNAL_TYPE_ALL, SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
 					]
 				],
-				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
+				'messages' => ['uniq' => _('Attribute key, value and category are not unique.')]
 			]
 		]];
 	}

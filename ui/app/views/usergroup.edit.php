@@ -382,12 +382,12 @@ $tag_filter_form_grid = (new CFormGrid())
 	]);
 
 $apm_filter = (new CFormGrid())->addItem([
-		(new CLabel([_('Resource attributes')], 'resource_attributes'))
+		(new CLabel([_('Resource attributes')], 'apm_filters'))
 			->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('apm.attributes', [
-				'attributes' => $data['resource_attributes'],
-				'field_name' => 'resource_attributes',
+				'attributes' => $data['apm_filters'],
+				'field_name' => 'apm_filters',
 				'tabs_id' => 'tabs',
 				'attr_tab_id' => 'apm_filter_tab',
 				'has_inline_validation' => true,

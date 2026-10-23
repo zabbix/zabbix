@@ -43,7 +43,7 @@ class CControllerUsergroupEdit extends CController {
 			'proxy_group_mode' =>		'db usrgrp.proxy_group_mode|in '.PROXY_GROUP_MODE_ALLOW.','.PROXY_GROUP_MODE_DENY,
 			'proxy_groups' =>			'array_db proxy_group.proxy_groupid',
 			'tag_filters' =>			'array',
-			'resource_attributes'=>		'array'
+			'apm_filters' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -68,6 +68,7 @@ class CControllerUsergroupEdit extends CController {
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
 				'selectProxies' => ['proxyid', 'name'],
 				'selectProxyGroups' => ['proxy_groupid', 'name'],
+				'selectApmFilters' => ['key', 'value', 'signal_type'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
 			]);
@@ -127,9 +128,7 @@ class CControllerUsergroupEdit extends CController {
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
-		// TODO: replace this line with the one below when API is ready
-		$data['resource_attributes'] = [];
-//		$data['resource_attributes'] = $this->hasInput('usrgrpid') ? $this->user_group['resource_attributes'] : [];
+		$data['apm_filters'] = $this->hasInput('usrgrpid') ? $this->user_group['apm_filters'] : [];
 
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $tag_filter) {
