@@ -209,8 +209,6 @@ class testInternalJavaItem extends CIntegrationTest {
 			self::$java_lock = null;
 		}
 
-		unlink(self::JAVA_LOCK_FILE);
-
 		// Triggers, items, and user macros should be cascade deleted.
 		if (self::$hostid !== null) {
 			CDataHelper::call('host.delete', [self::$hostid]);
