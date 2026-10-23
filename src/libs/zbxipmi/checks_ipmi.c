@@ -1453,8 +1453,9 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 		switch (op)
 		{
 			case IPMI_ADDED:
-				if (NULL == zbx_get_ipmi_sensor(h, sensor))
-					zbx_allocate_ipmi_sensor(h, sensor);
+				/* the replaced sensor with the same ID may not be deleted yet */
+				zbx_delete_ipmi_sensor(h, sensor);
+				zbx_allocate_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_DELETED:
 				/* the entry is kept for the replacing sensor, which has the same ID */
@@ -1484,8 +1485,9 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 	switch (op)
 	{
 		case IPMI_ADDED:
-			if (NULL == zbx_get_ipmi_control(h, control))
-				zbx_allocate_ipmi_control(h, control);
+			/* the replaced control with the same ID may not be deleted yet */
+			zbx_delete_ipmi_control(h, control);
+			zbx_allocate_ipmi_control(h, control);
 			break;
 		case IPMI_DELETED:
 			/* the entry is kept for the replacing control, which has the same ID */
